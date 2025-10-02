@@ -595,8 +595,8 @@
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 85, 99, 0.7);
 }
-/* Hide scrollbar for horiz */
-ntal menu */ .scrollbar-hide {
+/* Hide scrollbar for horizontal menu */
+.scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

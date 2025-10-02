@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "../types/user.types";
+// import { User } from "../types/user.types";
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -177,16 +177,16 @@ class ApiService {
   }
 
   // User endpoints
-  async getUsers(): Promise<User[]> {
-    return this.request<User[]>("/users");
+  async getUsers(): Promise<any[]> {
+    return this.request<any[]>("/users");
   }
 
-  async getUserById(id: string): Promise<User> {
-    return this.request<User>(`/users/${id}`);
+  async getUserById(id: string): Promise<any> {
+    return this.request<any>(`/users/${id}`);
   }
 
-  async updateUser(id: string, userData: Partial<User>): Promise<User> {
-    return this.request<User>(`/users/${id}`, {
+  async updateUser(id: string, userData: Partial<any>): Promise<any> {
+    return this.request<any>(`/users/${id}`, {
       method: "PATCH",
       body: userData,
     });

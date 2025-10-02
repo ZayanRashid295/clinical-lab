@@ -215,7 +215,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         id: userProfile.id,
         email: userProfile.email,
         name: `${userProfile.firstName} ${userProfile.lastName}`,
-        roles: userProfile.roles?.map((ur) => ur.role?.name) || [],
+        roles:
+          userProfile.roles
+            ?.map((ur) => ur.role?.name)
+            .filter((name): name is string => Boolean(name)) || [],
         avatar: userProfile.avatar,
         createdAt: new Date(),
         updatedAt: new Date(),

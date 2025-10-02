@@ -7,7 +7,9 @@ export default function RobotFace() {
   const [mouthOpen, setMouthOpen] = useState(0);
   const [eyeBlink, setEyeBlink] = useState(false);
   const [wavePhase, setWavePhase] = useState(0);
-  const [particles, setParticles] = useState([]);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; opacity: number }>
+  >([]);
   const story1 = `Hello! I am Synthia.
   
       I'm revolutionizing web development. 
@@ -48,23 +50,24 @@ Kindness, Yahya's grandmother had always told him, never goes unrewarded. And st
   const [isRecording, setIsRecording] = useState(false);
   const [micPermission, setMicPermission] = useState("prompt"); // 'prompt', 'granted', 'denied'
   const [voiceIntensity, setVoiceIntensity] = useState(0); // For voice-synced radiation
-  const intervalRef = useRef(null);
-  const blinkIntervalRef = useRef(null);
-  const waveRef = useRef(null);
-  const utteranceRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const intervalRef = useRef<any>(null);
+  const blinkIntervalRef = useRef<any>(null);
+  const waveRef = useRef<any>(null);
+  const utteranceRef = useRef<any>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     // Initialize speech recognition
     const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = "en-US";
 
-      recognition.onresult = (event) => {
+      recognition.onresult = (event: any) => {
         let interimTranscript = "";
         let finalTranscript = "";
 
@@ -88,7 +91,7 @@ Kindness, Yahya's grandmother had always told him, never goes unrewarded. And st
         setIsRecording(false);
       };
 
-      recognition.onerror = (event) => {
+      recognition.onerror = (event: any) => {
         console.error("Speech recognition error:", event.error);
         setIsRecording(false);
       };
@@ -187,11 +190,11 @@ Kindness, Yahya's grandmother had always told him, never goes unrewarded. And st
               };
               utterance.onend = () => {
                 setVoiceIntensity(0);
-                resolve();
+                resolve(undefined);
               };
               utterance.onerror = () => {
                 setVoiceIntensity(0);
-                resolve();
+                resolve(undefined);
               };
               window.speechSynthesis.speak(utterance);
             });
@@ -362,7 +365,7 @@ Kindness, Yahya's grandmother had always told him, never goes unrewarded. And st
           onChange={(e) => setText(e.target.value)}
           disabled={isTalking || isRecording}
           className="w-full px-6 py-4 bg-slate-900 border-2 border-cyan-500/50 rounded-xl text-white font-mono text-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-          rows="3"
+          rows={3}
           placeholder="Enter text for the robot to speak or use voice recording..."
         />
       </div>
