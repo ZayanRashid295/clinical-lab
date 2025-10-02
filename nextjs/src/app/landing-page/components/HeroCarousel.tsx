@@ -17,9 +17,14 @@ interface HeroSlide {
 interface HeroCarouselProps {
   slides: HeroSlide[];
   onLoginClick?: () => void;
+  onDemoClick?: () => void;
 }
 
-export function HeroCarousel({ slides, onLoginClick }: HeroCarouselProps) {
+export function HeroCarousel({
+  slides,
+  onLoginClick,
+  onDemoClick,
+}: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -99,6 +104,7 @@ export function HeroCarousel({ slides, onLoginClick }: HeroCarouselProps) {
                       variant="outline"
                       className="bg-background/10 backdrop-blur-md border-white/30 text-white hover:bg-background/20"
                       data-testid="button-watch-demo"
+                      onClick={onDemoClick}
                     >
                       <Play className="mr-2 h-5 w-5" />
                       {slide.ctaSecondary}

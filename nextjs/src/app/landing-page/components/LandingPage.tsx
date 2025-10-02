@@ -6,6 +6,7 @@ import { HeroCarousel } from "./HeroCarousel";
 import { FeatureCard } from "./FeatureCard";
 import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
+import { VideoModal } from "./VideoModal";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/shared/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -331,6 +332,7 @@ function HowItWorksSection2() {
 
 export default function LandingPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const handleOpenLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -338,6 +340,14 @@ export default function LandingPage() {
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
+  };
+
+  const handleOpenVideoModal = () => {
+    setIsVideoModalOpen(true);
+  };
+
+  const handleCloseVideoModal = () => {
+    setIsVideoModalOpen(false);
   };
 
   const heroSlides = [
@@ -380,7 +390,11 @@ export default function LandingPage() {
       <LandingNav onLoginClick={handleOpenLoginModal} />
 
       <main className="flex-1">
-        <HeroCarousel slides={heroSlides} onLoginClick={handleOpenLoginModal} />
+        <HeroCarousel
+          slides={heroSlides}
+          onLoginClick={handleOpenLoginModal}
+          onDemoClick={handleOpenVideoModal}
+        />
 
         <section id="features" className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
@@ -454,6 +468,12 @@ export default function LandingPage() {
       </footer>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={handleCloseVideoModal}
+        videoSrc="/video/new3.mp4"
+        title="Clinical Lab Demo"
+      />
     </div>
   );
 }
