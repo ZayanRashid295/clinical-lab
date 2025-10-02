@@ -19,12 +19,7 @@ model User {
   roles        UserRole[]
 
   // Cross-module relations
-  // Ride module
-  passengerRides    Ride[]           @relation("PassengerRides")
-  driverRides       Ride[]           @relation("DriverRides")
-  rideReviews       RideReview[]     @relation("RideReviewer")
-  receivedReviews   RideReview[]     @relation("RideReviewee")
-  rideMessages      RideMessage[]    @relation("RideMessageSender")
+  
 
   // Chat module
   chatParticipants    ChatParticipant[]    @relation("ChatParticipant")
@@ -38,20 +33,12 @@ model User {
   promoCodeUsages    PromoCodeUsage[]    @relation("PromoCodeUsage")
   wallet             Wallet?
 
-  // Payout module (for drivers)
-  payouts            Payout[]            @relation("DriverPayouts")
-  payoutSchedules    PayoutSchedule[]    @relation("DriverPayoutSchedules")
-  payoutSettings     PayoutSettings?     @relation("DriverPayoutSettings")
-  earnings           Earnings[]          @relation("DriverEarnings")
 
   // Notification module
   notifications      Notification[]      @relation("UserNotifications")
   notificationPreferences NotificationPreference?
 
   // Location module
-  driverLocation     DriverLocation?     @relation("DriverLocation")
-  addresses          Address[]           @relation("UserAddresses")
-  geofenceEvents     GeofenceEvent[]     @relation("GeofenceEvents")
 
   @@map("users")
 }

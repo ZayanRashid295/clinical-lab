@@ -4,7 +4,6 @@
 model Payment {
   id            String        @id @default(cuid())
   userId        String
-  rideId        String?
   amount        Decimal       @db.Decimal(10, 2)
   currency      String        @default("USD")
   status        PaymentStatus @default(PENDING)
@@ -18,7 +17,7 @@ model Payment {
 
   // Relations
   user        User         @relation("UserPayments", fields: [userId], references: [id])
-  ride        Ride?        @relation(fields: [rideId], references: [id])
+ 
   refunds     Refund[]
   walletTransaction WalletTransaction?
   promoCodeUsages PromoCodeUsage[] @relation("PromoCodePayment")
