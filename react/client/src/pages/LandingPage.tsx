@@ -5,63 +5,70 @@ import { PricingCard } from "@/components/PricingCard";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { 
-  Brain, 
-  Users, 
-  BarChart3, 
-  Award, 
+import {
+  Brain,
+  Users,
+  BarChart3,
+  Award,
   Target,
   Zap,
   Shield,
   Clock,
-  Check
+  Check,
 } from "lucide-react";
-import studentPracticeImage from '@assets/generated_images/Student_practicing_virtual_patient_interview_225e435d.png';
-import facultyAnalyticsImage from '@assets/generated_images/Faculty_reviewing_student_analytics_dashboard_94a01cbe.png';
-import heroImage from '@assets/generated_images/Medical_students_AI_learning_collaboration_6db2826f.png';
+import studentPracticeImage from "@assets/generated_images/Student_practicing_virtual_patient_interview_225e435d.png";
+import facultyAnalyticsImage from "@assets/generated_images/Faculty_reviewing_student_analytics_dashboard_94a01cbe.png";
+import heroImage from "@assets/generated_images/Medical_students_AI_learning_collaboration_6db2826f.png";
 
 function FeaturesGrid() {
   const features = [
     {
       icon: Brain,
       title: "AI Patient Simulations",
-      description: "Practice with realistic AI patients that respond naturally to your clinical approach"
+      description:
+        "Practice with realistic AI patients that respond naturally to your clinical approach",
     },
     {
       icon: Target,
       title: "Shadow Mode",
-      description: "Learn by observing AI doctor-patient interactions with teachable moments highlighted"
+      description:
+        "Learn by observing AI doctor-patient interactions with teachable moments highlighted",
     },
     {
       icon: BarChart3,
       title: "OSCE-Style Assessment",
-      description: "Receive detailed rubric-based feedback aligned with medical competencies"
+      description:
+        "Receive detailed rubric-based feedback aligned with medical competencies",
     },
     {
       icon: Award,
       title: "Gamification",
-      description: "Track progress with leaderboards, Elo ratings, and specialty-specific achievements"
+      description:
+        "Track progress with leaderboards, Elo ratings, and specialty-specific achievements",
     },
     {
       icon: Zap,
       title: "Instant Feedback",
-      description: "Get real-time guidance on clinical decisions and communication skills"
+      description:
+        "Get real-time guidance on clinical decisions and communication skills",
     },
     {
       icon: Users,
       title: "Faculty Oversight",
-      description: "Comprehensive analytics and cohort management for institutions"
+      description:
+        "Comprehensive analytics and cohort management for institutions",
     },
     {
       icon: Shield,
       title: "Evidence-Based",
-      description: "Cases anchored to clinical guidelines and validated by medical experts"
+      description:
+        "Cases anchored to clinical guidelines and validated by medical experts",
     },
     {
       icon: Clock,
       title: "24/7 Access",
-      description: "Practice anytime, anywhere with our cloud-based platform"
-    }
+      description: "Practice anytime, anywhere with our cloud-based platform",
+    },
   ];
 
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
@@ -83,7 +90,7 @@ function FeaturesGrid() {
             isVisible && "opacity-100 translate-y-0",
             !isVisible && "translate-y-12"
           )}
-          style={{ transitionDelay: isVisible ? `${index * 100}ms` : '0ms' }}
+          style={{ transitionDelay: isVisible ? `${index * 100}ms` : "0ms" }}
         >
           <FeatureCard
             icon={feature.icon}
@@ -122,10 +129,10 @@ function PricingGrid() {
             "AI-powered feedback & scoring",
             "Leaderboard & achievements",
             "Progress tracking dashboard",
-            "Community support"
+            "Community support",
           ]}
           cta="Start Free Trial"
-          onSelect={() => console.log('Student plan selected')}
+          onSelect={() => console.log("Student plan selected")}
         />
       </div>
 
@@ -148,11 +155,11 @@ function PricingGrid() {
             "Advanced analytics & insights",
             "SOAP note AI grading",
             "Priority support",
-            "Downloadable certificates"
+            "Downloadable certificates",
           ]}
           popular={true}
           cta="Start Free Trial"
-          onSelect={() => console.log('Student Pro plan selected')}
+          onSelect={() => console.log("Student Pro plan selected")}
         />
       </div>
 
@@ -178,10 +185,10 @@ function PricingGrid() {
             "White-label options",
             "Dedicated account manager",
             "SSO integration",
-            "Custom curriculum alignment"
+            "Custom curriculum alignment",
           ]}
           cta="Contact Sales"
-          onSelect={() => console.log('Institution plan selected')}
+          onSelect={() => console.log("Institution plan selected")}
         />
       </div>
     </div>
@@ -189,8 +196,12 @@ function PricingGrid() {
 }
 
 function HowItWorksSection1() {
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({ threshold: 0.2 });
-  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({ threshold: 0.2 });
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
@@ -207,8 +218,9 @@ function HowItWorksSection1() {
         </div>
         <h3 className="text-3xl font-bold mb-4">Shadow Mode</h3>
         <p className="text-lg text-muted-foreground mb-6">
-          Watch AI doctors conduct patient interviews. Pause anytime to ask questions like 
-          "Why this test?" or "Why not X?" Learn from expert clinical reasoning in action.
+          Watch AI doctors conduct patient interviews. Pause anytime to ask
+          questions like "Why this test?" or "Why not X?" Learn from expert
+          clinical reasoning in action.
         </p>
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
@@ -246,8 +258,12 @@ function HowItWorksSection1() {
 }
 
 function HowItWorksSection2() {
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({ threshold: 0.2 });
-  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({ threshold: 0.2 });
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -259,7 +275,11 @@ function HowItWorksSection2() {
           !imageVisible && "-translate-x-12"
         )}
       >
-        <img src={facultyAnalyticsImage} alt="Clinical Interview Mode" className="w-full" />
+        <img
+          src={facultyAnalyticsImage}
+          alt="Clinical Interview Mode"
+          className="w-full"
+        />
       </div>
       <div
         ref={contentRef}
@@ -274,8 +294,8 @@ function HowItWorksSection2() {
         </div>
         <h3 className="text-3xl font-bold mb-4">Clinical Interview Mode</h3>
         <p className="text-lg text-muted-foreground mb-6">
-          Take the lead as the doctor. Conduct interviews, perform exams, order tests, 
-          make diagnoses, and document everything with SOAP notes.
+          Take the lead as the doctor. Conduct interviews, perform exams, order
+          tests, make diagnoses, and document everything with SOAP notes.
         </p>
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
@@ -306,28 +326,32 @@ export default function LandingPage() {
   const heroSlides = [
     {
       title: "Revolutionize Medical Education with AI",
-      subtitle: "Practice clinical interviews, shadow AI doctors, and receive OSCE-style assessments in a safe, scalable environment.",
+      subtitle:
+        "Practice clinical interviews, shadow AI doctors, and receive OSCE-style assessments in a safe, scalable environment.",
       image: heroImage,
       ctaPrimary: "Get Started",
       ctaSecondary: "Watch Demo",
     },
     {
       title: "AI Patient Simulations",
-      subtitle: "Practice with realistic AI patients that respond naturally to your clinical approach. Experience safe, repeatable learning environments.",
+      subtitle:
+        "Practice with realistic AI patients that respond naturally to your clinical approach. Experience safe, repeatable learning environments.",
       image: studentPracticeImage,
       ctaPrimary: "Try It Now",
       ctaSecondary: "Learn More",
     },
     {
       title: "Shadow Mode Learning",
-      subtitle: "Observe expert AI doctors and learn from their clinical reasoning. Pause anytime to ask questions and understand every decision.",
+      subtitle:
+        "Observe expert AI doctors and learn from their clinical reasoning. Pause anytime to ask questions and understand every decision.",
       image: facultyAnalyticsImage,
       ctaPrimary: "Start Learning",
       ctaSecondary: "View Demo",
     },
     {
       title: "OSCE-Style Assessment & Feedback",
-      subtitle: "Receive detailed, rubric-based feedback on every case. Track your performance and improve with data-driven insights.",
+      subtitle:
+        "Receive detailed, rubric-based feedback on every case. Track your performance and improve with data-driven insights.",
       image: heroImage,
       ctaPrimary: "Get Started",
       ctaSecondary: "See Features",
@@ -337,16 +361,19 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <LandingNav />
-      
+
       <main className="flex-1">
         <HeroCarousel slides={heroSlides} />
 
         <section id="features" className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Transform Clinical Education</h2>
+              <h2 className="text-4xl font-bold mb-4">
+                Transform Clinical Education
+              </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Safe, scalable AI-powered training that prepares students for real patient encounters
+                Safe, scalable AI-powered training that prepares students for
+                real patient encounters
               </p>
             </div>
 
@@ -358,7 +385,9 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">How It Works</h2>
-              <p className="text-xl text-muted-foreground">Three powerful modes for comprehensive clinical training</p>
+              <p className="text-xl text-muted-foreground">
+                Three powerful modes for comprehensive clinical training
+              </p>
             </div>
 
             <HowItWorksSection1 />
@@ -371,7 +400,8 @@ export default function LandingPage() {
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">Choose Your Plan</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Flexible pricing for students and institutions. All plans include 14-day free trial.
+                Flexible pricing for students and institutions. All plans
+                include 14-day free trial.
               </p>
             </div>
 
@@ -402,7 +432,7 @@ export default function LandingPage() {
 
       <footer className="border-t py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 AI Doctor Learning Lab. All rights reserved.</p>
+          <p>&copy; 2025 Clinical Lab Learning Lab. All rights reserved.</p>
         </div>
       </footer>
     </div>

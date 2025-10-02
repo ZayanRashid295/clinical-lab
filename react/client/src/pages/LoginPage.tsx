@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   const fillTestCredentials = () => {
-    setEmail("test@example.com");
+    setEmail("admin@uber.com");
     setPassword("password123");
     setError("");
   };
@@ -52,7 +52,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>
-            Sign in to your AI Doctor Learning Lab account
+            Sign in to your Clinical Lab Learning Lab account
           </CardDescription>
         </CardHeader>
         <CardContent>

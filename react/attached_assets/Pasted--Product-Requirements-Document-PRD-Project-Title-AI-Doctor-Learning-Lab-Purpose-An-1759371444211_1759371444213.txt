@@ -1,6 +1,6 @@
 # 📘 Product Requirements Document (PRD)
 
-**Project Title:** AI Doctor Learning Lab\
+**Project Title:** Clinical Lab Learning Lab\
 **Purpose:** An interactive medical education platform that allows
 students to participate in **shadow mode** sessions and practice
 **clinical interview mode** with AI patients, complete with assessment,
@@ -42,7 +42,7 @@ gamification, and institutional oversight.
 ### A. Learning Modes
 
 1.  **Shadow Mode**
-    -   AI Doctor ↔ AI Patient conversation (recorded or live).\
+    -   Clinical Lab ↔ AI Patient conversation (recorded or live).\
     -   Student can pause and ask questions ("Why this test?", "Why not
         X?").\
     -   Highlighted *teachable moments*.

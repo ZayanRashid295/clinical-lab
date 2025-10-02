@@ -1,8 +1,8 @@
-# AI Doctor Learning Lab
+# Clinical Lab Learning Lab
 
 ## Overview
 
-AI Doctor Learning Lab is an interactive medical education platform that revolutionizes clinical training through AI-powered simulations. The platform enables medical students to practice clinical interviews with AI patients, observe expert consultations in "shadow mode," and receive OSCE-style assessments with detailed rubric-based feedback. Faculty members can monitor student progress, assign cases, and track cohort performance through comprehensive analytics dashboards.
+Clinical Lab Learning Lab is an interactive medical education platform that revolutionizes clinical training through AI-powered simulations. The platform enables medical students to practice clinical interviews with AI patients, observe expert consultations in "shadow mode," and receive OSCE-style assessments with detailed rubric-based feedback. Faculty members can monitor student progress, assign cases, and track cohort performance through comprehensive analytics dashboards.
 
 The application serves three primary user roles: medical students who practice and learn, faculty members who assign cases and monitor progress, and institutional administrators who manage cohorts and curricula. The platform combines gamification elements (leaderboards, Elo ratings, achievements) with professional medical credibility to create an engaging yet clinically rigorous learning environment.
 
@@ -20,13 +20,15 @@ Preferred communication style: Simple, everyday language.
 
 **State Management**: TanStack Query (React Query) for server state management with custom query client configuration. The application uses a centralized API request pattern with credential-based authentication and comprehensive error handling.
 
-**Component Architecture**: 
+**Component Architecture**:
+
 - Reusable UI components in `/client/src/components/ui/` (buttons, cards, dialogs, etc.)
 - Feature-specific components (ChatBubble, CaseCard, RubricScorecard, LeaderboardTable)
 - Layout components (AppSidebar with role-based navigation)
 - Page-level components in `/client/src/pages/`
 
 **Routing Strategy**: Client-side routing with Wouter supporting routes for:
+
 - Landing page and authentication
 - Student dashboard and case library
 - Case sessions (shadow mode and clinical interview mode)
@@ -48,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 **Current Implementation**: In-memory storage (MemStorage) implementing the IStorage interface with basic CRUD operations for users.
 
 **Database Schema**: Drizzle ORM configured for PostgreSQL with schema defined in `/shared/schema.ts`. Current schema includes:
+
 - Users table with UUID primary keys, username/password authentication
 - Zod validation schemas for type-safe data insertion
 
@@ -65,26 +68,31 @@ Preferred communication style: Simple, everyday language.
 
 ### External Dependencies
 
-**UI Component Library**: 
-- Radix UI primitives (@radix-ui/*) for accessible, unstyled component foundations
+**UI Component Library**:
+
+- Radix UI primitives (@radix-ui/\*) for accessible, unstyled component foundations
 - shadcn/ui configuration with "new-york" style variant
 - Tailwind CSS with custom theme extending base colors and typography
 
-**Form Handling**: 
+**Form Handling**:
+
 - React Hook Form with @hookform/resolvers for validation
 - Zod schemas via drizzle-zod for type-safe form validation
 
 **Database & ORM**:
+
 - Drizzle ORM for type-safe database queries
 - @neondatabase/serverless for PostgreSQL connectivity with WebSocket support
 - connect-pg-simple for PostgreSQL session storage
 
 **Development Tools**:
+
 - Vite with @vitejs/plugin-react for fast development
 - Replit-specific plugins (@replit/vite-plugin-runtime-error-modal, cartographer, dev-banner)
 - TypeScript with strict mode enabled
 
 **Utilities**:
+
 - date-fns for date manipulation
 - embla-carousel-react for carousel components
 - class-variance-authority and clsx for conditional styling
