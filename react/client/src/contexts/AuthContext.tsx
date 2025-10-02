@@ -86,7 +86,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = (): boolean => {
     const token = localStorage.getItem("access_token");
-    return !!token && !!user;
+    const hasToken = !!token;
+    const hasUser = !!user;
+    const isAuth = hasToken && hasUser;
+
+    console.log("🔍 Authentication check:", {
+      hasToken,
+      hasUser,
+      isAuth,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : "none",
+      userEmail: user?.email || "none",
+    });
+
+    return isAuth;
   };
 
   const getCurrentUser = (): User | null => {
