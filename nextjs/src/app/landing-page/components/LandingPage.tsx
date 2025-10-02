@@ -8,6 +8,10 @@ import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
 import { VideoModal } from "./VideoModal";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/shared/components/theme-toggle/theme-toggle";
+import SettingsButton from "@/shared/components/common/settings-button/settings-button";
+import SettingsModal from "@/shared/components/settings/settings-modal";
+import { ThemeTest } from "./ThemeTest";
 import { useScrollAnimation } from "@/shared/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import {
@@ -224,7 +228,7 @@ function HowItWorksSection1() {
         <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
           Mode 1
         </div>
-        <h3 className="text-3xl font-bold mb-4">Shadow Mode</h3>
+        <h3 className="text-3xl font-bold mb-4 text-foreground">Shadow Mode</h3>
         <p className="text-lg text-muted-foreground mb-6">
           Watch AI doctors conduct patient interviews. Pause anytime to ask
           questions like "Why this test?" or "Why not X?" Learn from expert
@@ -235,19 +239,25 @@ function HowItWorksSection1() {
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Interactive AI doctor-patient conversations</span>
+            <span className="text-foreground">
+              Interactive AI doctor-patient conversations
+            </span>
           </li>
           <li className="flex items-start gap-3">
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Highlighted teachable moments</span>
+            <span className="text-foreground">
+              Highlighted teachable moments
+            </span>
           </li>
           <li className="flex items-start gap-3">
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Pause and ask questions anytime</span>
+            <span className="text-foreground">
+              Pause and ask questions anytime
+            </span>
           </li>
         </ul>
       </div>
@@ -300,7 +310,9 @@ function HowItWorksSection2() {
         <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
           Mode 2
         </div>
-        <h3 className="text-3xl font-bold mb-4">Clinical Interview Mode</h3>
+        <h3 className="text-3xl font-bold mb-4 text-foreground">
+          Clinical Interview Mode
+        </h3>
         <p className="text-lg text-muted-foreground mb-6">
           Take the lead as the doctor. Conduct interviews, perform exams, order
           tests, make diagnoses, and document everything with SOAP notes.
@@ -310,19 +322,23 @@ function HowItWorksSection2() {
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Full patient encounter simulation</span>
+            <span className="text-foreground">
+              Full patient encounter simulation
+            </span>
           </li>
           <li className="flex items-start gap-3">
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Virtual physical exams and investigations</span>
+            <span className="text-foreground">
+              Virtual physical exams and investigations
+            </span>
           </li>
           <li className="flex items-start gap-3">
             <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span>Automated SOAP note grading</span>
+            <span className="text-foreground">Automated SOAP note grading</span>
           </li>
         </ul>
       </div>
@@ -333,6 +349,7 @@ function HowItWorksSection2() {
 export default function LandingPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const handleOpenLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -348,6 +365,14 @@ export default function LandingPage() {
 
   const handleCloseVideoModal = () => {
     setIsVideoModalOpen(false);
+  };
+
+  const handleOpenSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const handleCloseSettingsModal = () => {
+    setIsSettingsModalOpen(false);
   };
 
   const heroSlides = [
@@ -386,20 +411,20 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <LandingNav onLoginClick={handleOpenLoginModal} />
 
-      <main className="flex-1">
+      <main className="flex-1 bg-background text-foreground">
         <HeroCarousel
           slides={heroSlides}
           onLoginClick={handleOpenLoginModal}
           onDemoClick={handleOpenVideoModal}
         />
 
-        <section id="features" className="py-20 px-6">
+        <section id="features" className="py-20 px-6 bg-background">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">
+              <h2 className="text-4xl font-bold mb-4 text-foreground">
                 Transforming Clinical Education
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -412,10 +437,15 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="py-20 px-6 bg-muted/30">
+        <section
+          id="how-it-works"
+          className="py-20 px-6 bg-muted/30 dark:bg-muted/20"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">How It Works</h2>
+              <h2 className="text-4xl font-bold mb-4 text-foreground">
+                How It Works
+              </h2>
               <p className="text-xl text-muted-foreground">
                 Three powerful modes for comprehensive clinical training
               </p>
@@ -426,10 +456,12 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="py-20 px-6">
+        <section id="pricing" className="py-20 px-6 bg-background">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Choose Your Plan</h2>
+              <h2 className="text-4xl font-bold mb-4 text-foreground">
+                Choose Your Plan
+              </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Flexible pricing for students and institutions. All plans
                 include 14-day free trial.
@@ -461,7 +493,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t py-12 px-6">
+      <footer className="border-t border-border bg-background py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
           <p>&copy; 2025 Clinical Lab. All rights reserved.</p>
         </div>
@@ -474,6 +506,19 @@ export default function LandingPage() {
         videoSrc="/video/new3.mp4"
         title="Clinical Lab Demo"
       />
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={handleCloseSettingsModal}
+      />
+
+      {/* Floating Theme Controls */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3">
+        <ThemeToggle floating={true} position="bottom-right" />
+        <SettingsButton onClick={handleOpenSettingsModal} />
+      </div>
+
+      {/* Theme Test - Remove this after testing */}
+      <ThemeTest />
     </div>
   );
 }

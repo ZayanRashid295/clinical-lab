@@ -28,7 +28,12 @@ export function PricingCard({
   onSelect,
 }: PricingCardProps) {
   return (
-    <Card className={cn("p-8 relative", popular && "border-primary border-2")}>
+    <Card
+      className={cn(
+        "p-8 relative bg-card border-border",
+        popular && "border-primary border-2"
+      )}
+    >
       {popular && (
         <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
           Most Popular
@@ -36,13 +41,15 @@ export function PricingCard({
       )}
 
       <div className="mb-6">
-        <h3 className="text-2xl font-bold mb-2">{name}</h3>
+        <h3 className="text-2xl font-bold mb-2 text-card-foreground">{name}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
       <div className="mb-6">
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold">{price}</span>
+          <span className="text-4xl font-bold text-card-foreground">
+            {price}
+          </span>
           <span className="text-muted-foreground">/{period}</span>
         </div>
       </div>
@@ -62,7 +69,7 @@ export function PricingCard({
             <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Check className="h-3 w-3 text-primary" />
             </div>
-            <span className="text-sm">{feature}</span>
+            <span className="text-sm text-card-foreground">{feature}</span>
           </div>
         ))}
       </div>

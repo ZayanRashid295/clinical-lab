@@ -33,6 +33,35 @@ module.exports = {
           800: "var(--color-secondary-800)",
           900: "var(--color-secondary-900)",
         },
+        // Semantic colors for theme system
+        background: "var(--background)",
+        foreground: "var(--text-primary)",
+        card: {
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text-primary)",
+        },
+        popover: {
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text-primary)",
+        },
+        muted: {
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text-secondary)",
+        },
+        accent: {
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text-primary)",
+        },
+        border: "var(--border)",
+        input: "var(--border)",
+        ring: "var(--primary-color)",
+        chart: {
+          1: "var(--color-primary-500)",
+          2: "var(--color-primary-600)",
+          3: "var(--color-primary-700)",
+          4: "var(--color-primary-800)",
+          5: "var(--color-primary-900)",
+        },
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

@@ -101,10 +101,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const parsed = JSON.parse(stored);
           const newConfig = { ...DEFAULT_UI_CONFIG, ...parsed };
           setConfig(newConfig);
+          // Apply theme immediately after loading
+          themeApplicationService.applyTheme(newConfig);
+        } else {
+          // Apply default theme if no stored config
+          themeApplicationService.applyTheme(DEFAULT_UI_CONFIG);
         }
       } catch (error) {
         console.warn("Failed to load UI config from localStorage:", error);
         setConfig(DEFAULT_UI_CONFIG);
+        // Apply default theme on error
+        themeApplicationService.applyTheme(DEFAULT_UI_CONFIG);
       }
     };
 

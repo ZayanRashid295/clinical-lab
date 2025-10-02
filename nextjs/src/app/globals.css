@@ -43,6 +43,19 @@
   --surface: #f8f9fa;
   --border: #e0e0e0;
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  
+  /* Semantic color variables for Tailwind */
+  --foreground: var(--text-primary);
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--surface);
+  --accent-foreground: var(--text-primary);
+  --input: var(--border);
+  --ring: var(--primary-color);
 }
 
 /* Dark mode variables */
@@ -76,6 +89,19 @@
   --surface: #2a2a2a;
   --border: #333333;
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  
+  /* Dark mode semantic color variables for Tailwind */
+  --foreground: var(--text-primary);
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--surface);
+  --accent-foreground: var(--text-primary);
+  --input: var(--border);
+  --ring: var(--primary-color);
 }
 
 /* 3D Login Form Styles */
