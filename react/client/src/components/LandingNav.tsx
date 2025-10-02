@@ -114,13 +114,6 @@ export function LandingNav() {
             <Button onClick={handleSignup} data-testid="button-signup">
               Sign Up
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setLocation("/test-logout")}
-              data-testid="button-test-logout"
-            >
-              Test Logout
-            </Button>
           </div>
         </div>
       </nav>
