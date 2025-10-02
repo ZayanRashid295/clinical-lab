@@ -7,6 +7,8 @@ import { FeatureCard } from "./FeatureCard";
 import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/shared/hooks/useScrollAnimation";
+import { cn } from "@/lib/utils";
 import {
   Brain,
   Users,
@@ -18,14 +20,12 @@ import {
   Clock,
   Check,
 } from "lucide-react";
-
-// Placeholder images - you can replace these with actual images
-const heroImage =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=1200&h=600&fit=crop";
 const studentPracticeImage =
-  "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&h=600&fit=crop";
+  "/images/Student_practicing_virtual_patient_interview_225e435d.png";
 const facultyAnalyticsImage =
-  "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1200&h=600&fit=crop";
+  "/images/Faculty_reviewing_student_analytics_dashboard_94a01cbe.png";
+const heroImage =
+  "/images/Medical_students_AI_learning_collaboration_6db2826f.png";
 
 function FeaturesGrid() {
   const features = [
@@ -78,10 +78,27 @@ function FeaturesGrid() {
     },
   ];
 
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      ref={ref}
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 opacity-0 transition-all duration-700 ease-out",
+        isVisible && "opacity-100 translate-y-0",
+        !isVisible && "translate-y-12"
+      )}
+    >
       {features.map((feature, index) => (
-        <div key={index}>
+        <div
+          key={index}
+          className={cn(
+            "opacity-0 transition-all duration-700 ease-out",
+            isVisible && "opacity-100 translate-y-0",
+            !isVisible && "translate-y-12"
+          )}
+          style={{ transitionDelay: isVisible ? `${index * 100}ms` : "0ms" }}
+        >
           <FeatureCard
             icon={feature.icon}
             title={feature.title}
@@ -94,9 +111,20 @@ function FeaturesGrid() {
 }
 
 function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-      <div>
+    <div
+      ref={ref}
+      className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
+    >
+      <div
+        className={cn(
+          "opacity-0 transition-all duration-700 ease-out",
+          isVisible && "opacity-100 translate-y-0",
+          !isVisible && "translate-y-12"
+        )}
+      >
         <PricingCard
           name="Student"
           price="$19"
@@ -115,7 +143,13 @@ function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
         />
       </div>
 
-      <div>
+      <div
+        className={cn(
+          "opacity-0 transition-all duration-700 ease-out delay-100",
+          isVisible && "opacity-100 translate-y-0",
+          !isVisible && "translate-y-12"
+        )}
+      >
         <PricingCard
           name="Student Pro"
           price="$39"
@@ -136,7 +170,13 @@ function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
         />
       </div>
 
-      <div>
+      <div
+        className={cn(
+          "opacity-0 transition-all duration-700 ease-out delay-200",
+          isVisible && "opacity-100 translate-y-0",
+          !isVisible && "translate-y-12"
+        )}
+      >
         <PricingCard
           name="Institution"
           price="Custom"
@@ -163,9 +203,23 @@ function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
 }
 
 function HowItWorksSection1() {
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-      <div>
+      <div
+        ref={contentRef}
+        className={cn(
+          "opacity-0 transition-all duration-700 ease-out",
+          contentVisible && "opacity-100 translate-x-0",
+          !contentVisible && "-translate-x-12"
+        )}
+      >
         <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
           Mode 1
         </div>
@@ -177,26 +231,33 @@ function HowItWorksSection1() {
         </p>
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Interactive AI doctor-patient conversations</span>
           </li>
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Highlighted teachable moments</span>
           </li>
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Pause and ask questions anytime</span>
           </li>
         </ul>
       </div>
-      <div className="rounded-xl overflow-hidden shadow-lg">
+      <div
+        ref={imageRef}
+        className={cn(
+          "rounded-xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 ease-out delay-200",
+          imageVisible && "opacity-100 translate-x-0",
+          !imageVisible && "translate-x-12"
+        )}
+      >
         <img src={studentPracticeImage} alt="Shadow Mode" className="w-full" />
       </div>
     </div>
@@ -204,16 +265,37 @@ function HowItWorksSection1() {
 }
 
 function HowItWorksSection2() {
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
+    threshold: 0.2,
+  });
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div className="order-2 lg:order-1 rounded-xl overflow-hidden shadow-lg">
+      <div
+        ref={imageRef}
+        className={cn(
+          "order-2 lg:order-1 rounded-xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 ease-out delay-200",
+          imageVisible && "opacity-100 translate-x-0",
+          !imageVisible && "-translate-x-12"
+        )}
+      >
         <img
           src={facultyAnalyticsImage}
           alt="Clinical Interview Mode"
           className="w-full"
         />
       </div>
-      <div className="order-1 lg:order-2">
+      <div
+        ref={contentRef}
+        className={cn(
+          "order-1 lg:order-2 opacity-0 transition-all duration-700 ease-out",
+          contentVisible && "opacity-100 translate-x-0",
+          !contentVisible && "translate-x-12"
+        )}
+      >
         <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
           Mode 2
         </div>
@@ -224,19 +306,19 @@ function HowItWorksSection2() {
         </p>
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Full patient encounter simulation</span>
           </li>
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Virtual physical exams and investigations</span>
           </li>
           <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-white text-xs">✓</span>
             </div>
             <span>Automated SOAP note grading</span>
@@ -348,15 +430,15 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-wrap gap-6 justify-center text-sm">
                 <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-chart-3" />
                   Cancel anytime
                 </span>
                 <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-chart-3" />
                   Education discounts available
                 </span>
                 <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-chart-3" />
                   Group pricing for cohorts
                 </span>
               </div>
