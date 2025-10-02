@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Stethoscope, Eye, EyeOff, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/shared/contexts/theme-context";
 import { useAuth } from "@/shared/contexts/auth-context";
 import { useRouter } from "next/navigation";
 
@@ -17,15 +16,12 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const { config } = useTheme();
   const { login, isLoading } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const isDarkMode = config.theme === "dark";
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -96,34 +92,17 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       onClick={handleBackdropClick}
     >
       {/* Backdrop with glassmorphic effect */}
-      <div
-        className={cn(
-          "absolute inset-0 backdrop-blur-sm",
-          isDarkMode ? "bg-black/20" : "bg-black/30"
-        )}
-      />
+      <div className="absolute inset-0 backdrop-blur-sm bg-black/30" />
 
       {/* Modal content */}
       <div className="relative w-full max-w-md transform transition-all duration-300 ease-out">
-        <div
-          className={cn(
-            "backdrop-blur-md border rounded-2xl shadow-2xl p-8",
-            isDarkMode
-              ? "bg-white/10 border-white/20"
-              : "bg-black/20 border-black/30"
-          )}
-        >
+        <div className="backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 bg-white/10">
           {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className={cn(
-              "absolute top-4 right-4 h-8 w-8",
-              isDarkMode
-                ? "text-white/70 hover:text-white hover:bg-white/10"
-                : "text-black/70 hover:text-black hover:bg-black/10"
-            )}
+            className="absolute top-4 right-4 h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -131,31 +110,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div
-                className={cn(
-                  "h-12 w-12 rounded-lg backdrop-blur-sm flex items-center justify-center border",
-                  isDarkMode
-                    ? "bg-white/20 border-white/30"
-                    : "bg-black/20 border-black/30"
-                )}
-              >
-                <Stethoscope
-                  className={cn(
-                    "h-7 w-7",
-                    isDarkMode ? "text-white" : "text-black"
-                  )}
-                />
+              <div className="h-12 w-12 rounded-lg backdrop-blur-sm flex items-center justify-center border bg-white/20 border-white/30">
+                <Stethoscope className="h-7 w-7 text-white" />
               </div>
             </div>
-            <h2
-              className={cn(
-                "text-2xl font-bold mb-2",
-                isDarkMode ? "text-white" : "text-black"
-              )}
-            >
-              Welcome Back
-            </h2>
-            <p className={cn(isDarkMode ? "text-white/80" : "text-black/80")}>
+            <h2 className="text-2xl font-bold mb-2 text-white">Welcome Back</h2>
+            <p className="text-white/70">
               Sign in to your Clinical Lab account
             </p>
           </div>
@@ -165,22 +125,14 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             {error && (
               <Alert
                 variant="destructive"
-                className={cn(
-                  "border-red-500/30",
-                  isDarkMode
-                    ? "bg-red-500/20 text-white"
-                    : "bg-red-500/20 text-black"
-                )}
+                className="border-red-500/30 bg-red-500/20 text-white"
               >
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-2">
-              <Label
-                htmlFor="modal-email"
-                className={cn(isDarkMode ? "text-white/90" : "text-black/90")}
-              >
+              <Label htmlFor="modal-email" className="text-white/90">
                 Email
               </Label>
               <Input
@@ -191,20 +143,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className={cn(
-                  "placeholder:text-white/50 focus:ring-white/20",
-                  isDarkMode
-                    ? "bg-white/10 border-white/20 text-white focus:border-white/40"
-                    : "bg-black/10 border-black/20 text-black placeholder:text-black/50 focus:border-black/40 focus:ring-black/20"
-                )}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="modal-password"
-                className={cn(isDarkMode ? "text-white/90" : "text-black/90")}
-              >
+              <Label htmlFor="modal-password" className="text-white/90">
                 Password
               </Label>
               <div className="relative">
@@ -216,23 +160,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
-                  className={cn(
-                    "placeholder:text-white/50 focus:ring-white/20 pr-10",
-                    isDarkMode
-                      ? "bg-white/10 border-white/20 text-white focus:border-white/40"
-                      : "bg-black/10 border-black/20 text-black placeholder:text-black/50 focus:border-black/40 focus:ring-black/20"
-                  )}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20 pr-10"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className={cn(
-                    "absolute right-0 top-0 h-full px-3 py-2",
-                    isDarkMode
-                      ? "hover:bg-white/10 text-white/70 hover:text-white"
-                      : "hover:bg-black/10 text-black/70 hover:text-black"
-                  )}
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-white/10 text-white/70 hover:text-white"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                 >
@@ -247,12 +181,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
             <Button
               type="submit"
-              className={cn(
-                "w-full transition-all duration-200",
-                isDarkMode
-                  ? "bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/40"
-                  : "bg-black/20 hover:bg-black/30 text-black border border-black/30 hover:border-black/40"
-              )}
+              className="w-full transition-all duration-200 bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/40"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
@@ -265,24 +194,14 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               variant="outline"
               onClick={fillTestCredentials}
               disabled={isLoading}
-              className={cn(
-                "text-sm bg-transparent",
-                isDarkMode
-                  ? "border-white/30 text-white hover:bg-white/10 hover:border-white/40"
-                  : "border-black/30 text-black hover:bg-black/10 hover:border-black/40"
-              )}
+              className="text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:border-white/40"
             >
               Fill Test Credentials
             </Button>
           </div>
 
           {/* Footer */}
-          <div
-            className={cn(
-              "mt-6 text-center text-sm",
-              isDarkMode ? "text-white/70" : "text-black/70"
-            )}
-          >
+          <div className="mt-6 text-center text-sm text-white/70">
             <p>Don't have an account? Contact your administrator.</p>
           </div>
         </div>

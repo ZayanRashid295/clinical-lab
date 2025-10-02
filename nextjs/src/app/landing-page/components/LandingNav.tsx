@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import ThemeToggle from "@/shared/components/theme-toggle/theme-toggle";
-import { Stethoscope, Trophy } from "lucide-react";
+import { Stethoscope, Trophy, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/shared/contexts/theme-context";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,12 @@ interface LandingNavProps {
 
 export function LandingNav({ onLoginClick }: LandingNavProps) {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const { config, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    const newTheme = config.theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+  };
 
   const handleLogin = () => {
     if (onLoginClick) {
@@ -117,7 +123,23 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
             >
               <Trophy className="h-5 w-5" />
             </Button>
-            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              data-testid="button-theme-toggle"
+              title={
+                config.theme === "dark"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
+            >
+              {config.theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <Button
               variant="ghost"
               onClick={handleLogin}

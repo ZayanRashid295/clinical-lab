@@ -8,10 +8,8 @@ import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
 import { VideoModal } from "./VideoModal";
 import { Button } from "@/components/ui/button";
-import ThemeToggle from "@/shared/components/theme-toggle/theme-toggle";
 import SettingsButton from "@/shared/components/common/settings-button/settings-button";
 import SettingsModal from "@/shared/components/settings/settings-modal";
-import { ThemeTest } from "./ThemeTest";
 import { useScrollAnimation } from "@/shared/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import {
@@ -511,14 +509,10 @@ export default function LandingPage() {
         onClose={handleCloseSettingsModal}
       />
 
-      {/* Floating Theme Controls */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3">
-        <ThemeToggle floating={true} position="bottom-right" />
+      {/* Floating Settings Button */}
+      <div className="fixed bottom-4 left-4 z-50">
         <SettingsButton onClick={handleOpenSettingsModal} />
       </div>
-
-      {/* Theme Test - Remove this after testing */}
-      <ThemeTest />
     </div>
   );
 }
