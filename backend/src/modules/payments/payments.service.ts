@@ -31,7 +31,6 @@ export class PaymentsService {
       data: createPaymentDto,
       include: {
         user: true,
-        ride: true,
       },
     });
   }
@@ -40,7 +39,6 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       include: {
         user: true,
-        ride: true,
       },
     });
   }
@@ -50,7 +48,7 @@ export class PaymentsService {
       where: { id },
       include: {
         user: true,
-        ride: true,
+
         refunds: true,
       },
     });
