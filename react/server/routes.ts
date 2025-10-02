@@ -4,11 +4,11 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup Replit Auth
+  // Setup Auth (now optional for development)
   await setupAuth(app);
 
-  // Auth endpoint to get current user
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Auth endpoint to get current user (for development mode)
+  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -20,7 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cases endpoint
-  app.get('/api/cases', isAuthenticated, async (req, res) => {
+  app.get("/api/cases", isAuthenticated, async (req, res) => {
     try {
       const { specialty, difficulty } = req.query;
       const cases = await storage.getCases({

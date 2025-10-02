@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { Stethoscope, Trophy } from "lucide-react";
@@ -13,21 +14,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function LandingNav() {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
   const handleLogin = () => {
-    window.location.href = '/api/login';
+    setLocation("/login");
   };
 
   const handleSignup = () => {
-    window.location.href = '/api/login';
+    setLocation("/login");
   };
 
   const globalEntries = [
-    { rank: 1, name: "Sarah Chen", specialty: "Internal Medicine", eloRating: 1845, casesCompleted: 127 },
-    { rank: 2, name: "Michael Rodriguez", specialty: "Emergency Med", eloRating: 1823, casesCompleted: 115 },
-    { rank: 3, name: "Emily Johnson", specialty: "Pediatrics", eloRating: 1801, casesCompleted: 98 },
-    { rank: 4, name: "David Kim", specialty: "Surgery", eloRating: 1798, casesCompleted: 105 },
-    { rank: 5, name: "Jessica Martinez", specialty: "Internal Medicine", eloRating: 1776, casesCompleted: 92 },
+    {
+      rank: 1,
+      name: "Sarah Chen",
+      specialty: "Internal Medicine",
+      eloRating: 1845,
+      casesCompleted: 127,
+    },
+    {
+      rank: 2,
+      name: "Michael Rodriguez",
+      specialty: "Emergency Med",
+      eloRating: 1823,
+      casesCompleted: 115,
+    },
+    {
+      rank: 3,
+      name: "Emily Johnson",
+      specialty: "Pediatrics",
+      eloRating: 1801,
+      casesCompleted: 98,
+    },
+    {
+      rank: 4,
+      name: "David Kim",
+      specialty: "Surgery",
+      eloRating: 1798,
+      casesCompleted: 105,
+    },
+    {
+      rank: 5,
+      name: "Jessica Martinez",
+      specialty: "Internal Medicine",
+      eloRating: 1776,
+      casesCompleted: 92,
+    },
   ];
 
   return (
@@ -42,14 +74,29 @@ export function LandingNav() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition">Features</a>
-            <a href="#how-it-works" className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition">How It Works</a>
-            <a href="#pricing" className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition">Pricing</a>
+            <a
+              href="#features"
+              className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition"
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition"
+            >
+              How It Works
+            </a>
+            <a
+              href="#pricing"
+              className="text-sm font-medium hover-elevate px-3 py-2 rounded-md transition"
+            >
+              Pricing
+            </a>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => setLeaderboardOpen(true)}
               data-testid="button-leaderboard"
@@ -57,11 +104,22 @@ export function LandingNav() {
               <Trophy className="h-5 w-5" />
             </Button>
             <ThemeToggle />
-            <Button variant="ghost" onClick={handleLogin} data-testid="button-login">
+            <Button
+              variant="ghost"
+              onClick={handleLogin}
+              data-testid="button-login"
+            >
               Log In
             </Button>
             <Button onClick={handleSignup} data-testid="button-signup">
               Sign Up
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setLocation("/test-logout")}
+              data-testid="button-test-logout"
+            >
+              Test Logout
             </Button>
           </div>
         </div>
@@ -75,11 +133,20 @@ export function LandingNav() {
               Leaderboard
             </DialogTitle>
           </DialogHeader>
-          <Tabs defaultValue="global" className="flex-1 overflow-hidden flex flex-col">
+          <Tabs
+            defaultValue="global"
+            className="flex-1 overflow-hidden flex flex-col"
+          >
             <TabsList>
-              <TabsTrigger value="global" data-testid="tab-global">Global</TabsTrigger>
-              <TabsTrigger value="cohort" data-testid="tab-cohort">My Cohort</TabsTrigger>
-              <TabsTrigger value="specialty" data-testid="tab-specialty">By Specialty</TabsTrigger>
+              <TabsTrigger value="global" data-testid="tab-global">
+                Global
+              </TabsTrigger>
+              <TabsTrigger value="cohort" data-testid="tab-cohort">
+                My Cohort
+              </TabsTrigger>
+              <TabsTrigger value="specialty" data-testid="tab-specialty">
+                By Specialty
+              </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-auto mt-4">

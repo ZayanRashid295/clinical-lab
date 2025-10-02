@@ -10,22 +10,22 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Trophy, 
-  Award, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Trophy,
+  Award,
   BarChart3,
   Users,
   FileText,
   Stethoscope,
   User,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogoutDialog } from "./LogoutDialog";
 
 const studentItems = [
   { title: "My Progress", url: "/progress", icon: BarChart3 },
@@ -41,26 +41,28 @@ const facultyItems = [
   { title: "Case Authoring", url: "/faculty/cases", icon: FileText },
 ];
 
-export function AppSidebar({ role = "student" }: { role?: "student" | "faculty" }) {
+export function AppSidebar({
+  role = "student",
+}: {
+  role?: "student" | "faculty";
+}) {
   const [location] = useLocation();
   const { user } = useAuth();
   const items = role === "faculty" ? facultyItems : studentItems;
 
-  const displayName = user?.firstName 
-    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`
-    : 'Student';
+  const displayName = user?.firstName
+    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ""}`
+    : user?.email || "Student";
 
   const getInitials = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     } else if (user?.firstName) {
       return user.firstName[0].toUpperCase();
+    } else if (user?.email) {
+      return user.email[0].toUpperCase();
     }
-    return 'S';
-  };
-
-  const handleLogout = () => {
-    window.location.href = '/api/logout';
+    return "S";
   };
 
   return (
@@ -82,10 +84,12 @@ export function AppSidebar({ role = "student" }: { role?: "student" | "faculty" 
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     asChild
                     isActive={location === item.url}
-                    data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-testid={`link-${item.title
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
                   >
                     <a href={item.url}>
                       <item.icon className="h-4 w-4" />
@@ -101,7 +105,9 @@ export function AppSidebar({ role = "student" }: { role?: "student" | "faculty" 
       <SidebarFooter className="p-4">
         <div className="flex items-center gap-3 p-3 rounded-lg">
           <Avatar className="h-9 w-9">
-            {user?.profileImageUrl && <AvatarImage src={user.profileImageUrl} />}
+            {user?.profileImageUrl && (
+              <AvatarImage src={user.profileImageUrl} />
+            )}
             <AvatarFallback>{getInitials()}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
@@ -110,14 +116,7 @@ export function AppSidebar({ role = "student" }: { role?: "student" | "faculty" 
               {role === "faculty" ? "Faculty" : "Medical Student"}
             </p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <LogoutDialog />
         </div>
       </SidebarFooter>
     </Sidebar>

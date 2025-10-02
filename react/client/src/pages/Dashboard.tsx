@@ -3,14 +3,14 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { StatCard } from "@/components/StatCard";
 import { BookOpen, Trophy, Target, Clock } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  
-  const displayName = user?.firstName 
-    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`
-    : 'Student';
+
+  const displayName = user?.firstName
+    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ""}`
+    : "Student";
 
   const style = {
     "--sidebar-width": "16rem",
@@ -26,12 +26,16 @@ export default function Dashboard() {
             <SidebarTrigger data-testid="button-sidebar-toggle" />
             <ThemeToggle />
           </header>
-          
+
           <main className="flex-1 overflow-auto p-6">
             <div className="max-w-7xl mx-auto space-y-6">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Welcome back, {displayName}!</h1>
-                <p className="text-muted-foreground">Continue your medical education journey</p>
+                <h1 className="text-3xl font-bold mb-2">
+                  Welcome back, {displayName}!
+                </h1>
+                <p className="text-muted-foreground">
+                  Continue your medical education journey
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -47,11 +51,7 @@ export default function Dashboard() {
                   icon={Trophy}
                   trend={{ value: 5, label: "this week" }}
                 />
-                <StatCard
-                  title="Avg Score"
-                  value="85%"
-                  icon={Target}
-                />
+                <StatCard title="Avg Score" value="85%" icon={Target} />
                 <StatCard
                   title="Study Time"
                   value="24h"
