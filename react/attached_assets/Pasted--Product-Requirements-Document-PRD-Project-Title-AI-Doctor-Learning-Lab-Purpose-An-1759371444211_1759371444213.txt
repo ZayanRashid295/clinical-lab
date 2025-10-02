@@ -1,6 +1,6 @@
 # 📘 Product Requirements Document (PRD)
 
-**Project Title:** Clinical Lab Learning Lab\
+**Project Title:** Clinical Lab\
 **Purpose:** An interactive medical education platform that allows
 students to participate in **shadow mode** sessions and practice
 **clinical interview mode** with AI patients, complete with assessment,

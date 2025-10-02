@@ -381,7 +381,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">
-                Transform Clinical Education
+                Transforming Clinical Education
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Safe, scalable AI-powered training that prepares students for
@@ -444,7 +444,7 @@ export default function LandingPage() {
 
       <footer className="border-t py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Clinical Lab Learning Lab. All rights reserved.</p>
+          <p>&copy; 2025 Clinical Lab. All rights reserved.</p>
         </div>
       </footer>
 

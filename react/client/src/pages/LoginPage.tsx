@@ -52,7 +52,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>
-            Sign in to your Clinical Lab Learning Lab account
+            Sign in to your Clinical Lab account
           </CardDescription>
         </CardHeader>
         <CardContent>

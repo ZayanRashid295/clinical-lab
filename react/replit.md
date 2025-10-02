@@ -1,8 +1,8 @@
-# Clinical Lab Learning Lab
+# Clinical Lab
 
 ## Overview
 
-Clinical Lab Learning Lab is an interactive medical education platform that revolutionizes clinical training through AI-powered simulations. The platform enables medical students to practice clinical interviews with AI patients, observe expert consultations in "shadow mode," and receive OSCE-style assessments with detailed rubric-based feedback. Faculty members can monitor student progress, assign cases, and track cohort performance through comprehensive analytics dashboards.
+Clinical Lab is an interactive medical education platform that revolutionizes clinical training through AI-powered simulations. The platform enables medical students to practice clinical interviews with AI patients, observe expert consultations in "shadow mode," and receive OSCE-style assessments with detailed rubric-based feedback. Faculty members can monitor student progress, assign cases, and track cohort performance through comprehensive analytics dashboards.
 
 The application serves three primary user roles: medical students who practice and learn, faculty members who assign cases and monitor progress, and institutional administrators who manage cohorts and curricula. The platform combines gamification elements (leaderboards, Elo ratings, achievements) with professional medical credibility to create an engaging yet clinically rigorous learning environment.
 

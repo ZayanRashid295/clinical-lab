@@ -1,4 +1,4 @@
-# Clinical Lab Learning Lab - Design Guidelines
+# Clinical Lab - Design Guidelines
 
 ## Design Approach
 
