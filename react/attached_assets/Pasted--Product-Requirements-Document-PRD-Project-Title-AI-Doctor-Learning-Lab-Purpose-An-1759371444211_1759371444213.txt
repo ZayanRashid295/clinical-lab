@@ -1,0 +1,157 @@
+# 📘 Product Requirements Document (PRD)
+
+**Project Title:** AI Doctor Learning Lab\
+**Purpose:** An interactive medical education platform that allows
+students to participate in **shadow mode** sessions and practice
+**clinical interview mode** with AI patients, complete with assessment,
+gamification, and institutional oversight.
+
+------------------------------------------------------------------------
+
+## 1. Vision & Goals
+
+-   **Vision:** To revolutionize clinical education by providing safe,
+    scalable, AI-powered practical sessions that mimic real patient
+    encounters and allow both learning and assessment.\
+-   **Goals:**
+    -   Enable students to learn through **shadow mode** and practice
+        via **clinical interview mode**.\
+    -   Provide **graded, feedback-rich assessments** aligned with
+        medical school competencies.\
+    -   Support **faculty oversight** and institutional adoption for
+        OSCE-style training.\
+    -   Offer **gamification** to increase engagement and
+        self-assessment.
+
+------------------------------------------------------------------------
+
+## 2. User Roles
+
+-   **Medical Student**\
+    Practices in shadow mode and clinical interview mode, takes tests,
+    competes on leaderboards.\
+-   **Faculty/Instructor**\
+    Assigns cases, tracks student progress, reviews performance.\
+-   **Institution (Hospital/School Admin)**\
+    Manages cohorts, sets curricula, reviews analytics.
+
+------------------------------------------------------------------------
+
+## 3. Core Features
+
+### A. Learning Modes
+
+1.  **Shadow Mode**
+    -   AI Doctor ↔ AI Patient conversation (recorded or live).\
+    -   Student can pause and ask questions ("Why this test?", "Why not
+        X?").\
+    -   Highlighted *teachable moments*.
+2.  **Clinical Interview Mode (Interactive Case)**
+    -   Student plays the doctor, conducting a **clinical interview**
+        with the AI patient.\
+    -   Can:
+        -   Take history, perform virtual physical exams.\
+        -   Order labs, interpret results, and request imaging.\
+        -   Make diagnoses and propose treatment plans.\
+        -   Document with SOAP notes.\
+    -   Difficulty levels (Basic → Advanced).\
+    -   Specialty selection (IM, Surgery, Pediatrics, Psych, etc.).
+3.  **Switch Mode**
+    -   Seamless transition from shadow mode → clinical interview mode
+        on the same case.
+
+------------------------------------------------------------------------
+
+### B. Assessment & Feedback
+
+-   **Rubric-Based Scoring** (OSCE-style):
+    -   History, physical, investigations, management, documentation,
+        communication.\
+-   **Timeline Review**: Show what the student did vs. ideal path.\
+-   **Appropriateness Scoring**: Reward guideline-based care, penalize
+    low-value orders.\
+-   **Note Grader**: Automated SOAP note evaluation.\
+-   **Communication Coach**: Empathy, clarity, patient-friendly
+    explanations.
+
+------------------------------------------------------------------------
+
+### C. Gamification & Progression
+
+-   **Leaderboards**: Global, cohort-based, specialty-based.\
+-   **Elo Ratings**: Adjusted per specialty.\
+-   **Practice vs Ranked**: Practice with hints vs formal assessment
+    mode.\
+-   **Achievements/Badges**: Sepsis bundle hero, ECG interpreter, etc.
+
+------------------------------------------------------------------------
+
+### D. Faculty & Institution Tools
+
+-   **Cohort Management**: Add/remove students, assign rotations.\
+-   **Case Blueprints**: Align cases with curriculum outcomes (CanMEDS,
+    AAMC).\
+-   **Analytics Dashboard**: Student progress, heatmaps of common
+    errors.\
+-   **Case Authoring Tool**: Faculty can create cases (validated by
+    rules).\
+-   **Assessment Modes**:
+    -   OSCE Station simulation.\
+    -   Proctored test mode (timed, locked).
+
+------------------------------------------------------------------------
+
+### E. Advanced Enhancements (Future)
+
+-   **Multi-player Cases**: Students play different roles (doctor,
+    nurse, consultant).\
+-   **Emergency Scenarios**: Code blue, sepsis, trauma --- real-time
+    pressure.\
+-   **Cost-Aware Mode**: Simulates real-world test cost implications.\
+-   **Consult Pager**: Option to "call" AI specialist; graded on
+    appropriateness.
+
+------------------------------------------------------------------------
+
+## 4. Technical Architecture (MVP Scope)
+
+-   **Frontend:** Angular or React (for real-time interaction).\
+-   **Backend:** NestJS / Node.js with Prisma ORM.\
+-   **Database:** MySQL (cases, users, leaderboards).\
+-   **AI Engine:**
+    -   LLMs for dialogue generation (doctor, patient, feedback).\
+    -   Guardrails to ensure case fidelity (structured JSON + canonical
+        answer key).\
+-   **Deployment:** Dockerized microservices (scalable).
+
+------------------------------------------------------------------------
+
+## 5. MVP Scope
+
+1.  **Core modes**: Shadow mode + Clinical interview mode + Switch
+    mode.\
+2.  **Case bank**: 20 curated cases (IM, EM, Pediatrics).\
+3.  **Rubric-based scoring + timeline feedback.**\
+4.  **Leaderboards + badges.**\
+5.  **Faculty console (basic cohort mgmt + analytics).**\
+6.  **Case authoring tool (beta).**
+
+------------------------------------------------------------------------
+
+## 6. Risks & Mitigation
+
+-   **Risk: Over-reliance on LLM hallucination** → Mitigation: Constrain
+    responses to structured JSON + validated canonical pathway.\
+-   **Risk: Too game-like / not credible** → Mitigation: Anchor cases to
+    **guidelines** + SME validation.\
+-   **Risk: Low adoption by institutions** → Mitigation: Provide
+    **analytics + OSCE support** (their current gold standard).
+
+------------------------------------------------------------------------
+
+## 7. Success Metrics
+
+-   **Student Engagement**: Avg. weekly cases completed.\
+-   **Learning Outcomes**: Improvement in rubric scores over time.\
+-   **Faculty Adoption**: % using dashboards/case creation.\
+-   **Institution Retention**: Renewals after pilot cohort.

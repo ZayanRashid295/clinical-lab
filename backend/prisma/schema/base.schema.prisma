@@ -1,0 +1,170 @@
+// Base schema for core application tables
+// This file contains fundamental tables like users, settings, permissions, etc.
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  phone     String?  @unique
+  firstName String
+  lastName  String
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userSettings UserSettings?
+  permissions  UserPermission[]
+  roles        UserRole[]
+
+  // Cross-module relations
+  // Ride module
+  passengerRides    Ride[]           @relation("PassengerRides")
+  driverRides       Ride[]           @relation("DriverRides")
+  rideReviews       RideReview[]     @relation("RideReviewer")
+  receivedReviews   RideReview[]     @relation("RideReviewee")
+  rideMessages      RideMessage[]    @relation("RideMessageSender")
+
+  // Chat module
+  chatParticipants    ChatParticipant[]    @relation("ChatParticipant")
+  chatMessages        ChatMessage[]        @relation("ChatMessageSender")
+  chatMessageReactions ChatMessageReaction[] @relation("ChatMessageReaction")
+  chatReadStatus      ChatReadStatus[]     @relation("ChatReadStatus")
+
+  // Payment module
+  payments           Payment[]           @relation("UserPayments")
+  paymentMethods     PaymentMethod[]     @relation("UserPaymentMethods")
+  promoCodeUsages    PromoCodeUsage[]    @relation("PromoCodeUsage")
+  wallet             Wallet?
+
+  // Payout module (for drivers)
+  payouts            Payout[]            @relation("DriverPayouts")
+  payoutSchedules    PayoutSchedule[]    @relation("DriverPayoutSchedules")
+  payoutSettings     PayoutSettings?     @relation("DriverPayoutSettings")
+  earnings           Earnings[]          @relation("DriverEarnings")
+
+  // Notification module
+  notifications      Notification[]      @relation("UserNotifications")
+  notificationPreferences NotificationPreference?
+
+  // Location module
+  driverLocation     DriverLocation?     @relation("DriverLocation")
+  addresses          Address[]           @relation("UserAddresses")
+  geofenceEvents     GeofenceEvent[]     @relation("GeofenceEvents")
+
+  @@map("users")
+}
+
+model UserSettings {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  language        String  @default("en")
+  timezone        String  @default("UTC")
+  notifications   Json    @default("{}")
+  privacySettings Json    @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  resource    String   // e.g., "ride", "user", "payment"
+  action      String   // e.g., "create", "read", "update", "delete"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users UserPermission[]
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model UserPermission {
+  id           String @id @default(cuid())
+  userId       String
+  permissionId String
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+  @@map("user_permissions")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  // Relations
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String
+  resourceId String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model SystemSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      String   @default("string") // string, number, boolean, json
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}

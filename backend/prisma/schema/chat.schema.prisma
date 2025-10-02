@@ -1,0 +1,106 @@
+// Chat module schema
+// This file contains all tables related to chat and messaging functionality
+
+model ChatRoom {
+  id        String      @id @default(cuid())
+  name      String?
+  type      ChatType    @default(DIRECT)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  participants ChatParticipant[]
+  messages     ChatMessage[]
+  readStatus   ChatReadStatus[]
+
+  @@map("chat_rooms")
+}
+
+model ChatParticipant {
+  id        String   @id @default(cuid())
+  chatRoomId String
+  userId    String
+  role      ChatRole @default(MEMBER)
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+
+  // Relations
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  user     User     @relation("ChatParticipant", fields: [userId], references: [id])
+
+  @@unique([chatRoomId, userId])
+  @@map("chat_participants")
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  chatRoomId String
+  senderId  String
+  content   String
+  type      MessageType @default(TEXT)
+  metadata  Json?
+  isEdited  Boolean     @default(false)
+  editedAt  DateTime?
+  isDeleted Boolean     @default(false)
+  deletedAt DateTime?
+  createdAt DateTime    @default(now())
+
+  // Relations
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender   User     @relation("ChatMessageSender", fields: [senderId], references: [id])
+  reactions ChatMessageReaction[]
+
+  @@map("chat_messages")
+}
+
+model ChatMessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User        @relation("ChatMessageReaction", fields: [userId], references: [id])
+
+  @@unique([messageId, userId, emoji])
+  @@map("chat_message_reactions")
+}
+
+model ChatReadStatus {
+  id        String   @id @default(cuid())
+  chatRoomId String
+  userId    String
+  lastReadMessageId String?
+  lastReadAt DateTime @default(now())
+
+  // Relations
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  user     User     @relation("ChatReadStatus", fields: [userId], references: [id])
+
+  @@unique([chatRoomId, userId])
+  @@map("chat_read_status")
+}
+
+enum ChatType {
+  DIRECT
+  GROUP
+  SUPPORT
+  RIDE
+}
+
+enum ChatRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  LOCATION
+  SYSTEM
+}

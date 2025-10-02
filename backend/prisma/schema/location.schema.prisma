@@ -1,0 +1,148 @@
+// Location module schema
+// This file contains all tables related to location and mapping functionality
+
+model Location {
+  id          String   @id @default(cuid())
+  name        String?
+  address     String
+  latitude    Float
+  longitude   Float
+  city        String?
+  state       String?
+  country     String?
+  postalCode  String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  pickupRides   Ride[] @relation("PickupLocation")
+  dropoffRides  Ride[] @relation("DropoffLocation")
+
+  @@map("locations")
+}
+
+model DriverLocation {
+  id        String   @id @default(cuid())
+  driverId  String   @unique
+  latitude  Float
+  longitude Float
+  heading   Float?   // Direction in degrees
+  speed     Float?   // Speed in km/h
+  accuracy  Float?   // Accuracy in meters
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  driver User @relation("DriverLocation", fields: [driverId], references: [id])
+
+  @@map("driver_locations")
+}
+
+model Address {
+  id          String   @id @default(cuid())
+  userId      String?
+  name        String?  // Home, Work, etc.
+  address     String
+  latitude    Float
+  longitude   Float
+  city        String?
+  state       String?
+  country     String?
+  postalCode  String?
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User? @relation("UserAddresses", fields: [userId], references: [id])
+
+  @@map("addresses")
+}
+
+model Geofence {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  type        GeofenceType
+  centerLat   Float
+  centerLng   Float
+  radius      Float?      // For circular geofences
+  polygon     Json?       // For polygon geofences
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  events GeofenceEvent[]
+
+  @@map("geofences")
+}
+
+model GeofenceEvent {
+  id          String        @id @default(cuid())
+  geofenceId  String
+  userId      String
+  eventType   GeofenceEventType
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  geofence Geofence @relation(fields: [geofenceId], references: [id])
+  user     User     @relation("GeofenceEvents", fields: [userId], references: [id])
+
+  @@map("geofence_events")
+}
+
+model Route {
+  id          String   @id @default(cuid())
+  name        String?
+  originLat   Float
+  originLng   Float
+  destinationLat Float
+  destinationLng Float
+  waypoints   Json?    // Array of waypoint coordinates
+  distance    Float?   // Total distance in kilometers
+  duration    Int?     // Total duration in minutes
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("routes")
+}
+
+model TrafficData {
+  id          String   @id @default(cuid())
+  latitude    Float
+  longitude   Float
+  congestion  Float    // 0-1 scale (0 = no traffic, 1 = heavy traffic)
+  speed       Float?   // Average speed in km/h
+  timestamp   DateTime @default(now())
+
+  @@map("traffic_data")
+}
+
+model ServiceArea {
+  id          String   @id @default(cuid())
+  name        String
+  city        String
+  state       String
+  country     String
+  polygon     Json     // GeoJSON polygon
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("service_areas")
+}
+
+enum GeofenceType {
+  CIRCULAR
+  POLYGON
+}
+
+enum GeofenceEventType {
+  ENTER
+  EXIT
+  DWELL
+}

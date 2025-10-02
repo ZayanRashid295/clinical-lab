@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor-Patient Zoom Dialog</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7fafc;
+    }
+
+    /* Keyframes for the pulsing radius effect */
+    @keyframes pulse-speech {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.08);
+      }
+
+      /* Slightly enlarge the avatar for speech simulation */
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .video-box {
+      position: relative;
+      background-color: #2d3748;
+      /* Dark gray for a video feel */
+      border: 4px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .active-speaker {
+      border-color: #38a169;
+      /* Green border for active speaker */
+    }
+
+    .speaking .avatar-container {
+      /* Apply the pulse animation to the avatar container when speaking */
+      animation: pulse-speech 0.3s infinite alternate;
+    }
+
+    .speaker-name {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- Main Application Container -->
+  <div id="app-container" class="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-8">
+
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Virtual Consultation Simulation</h1>
+
+    <!-- Video Display Area -->
+    <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-8 mb-8">
+
+      <!-- Doctor Video Box -->
+      <div id="doctor-box" class="video-box w-full md:w-1/2 h-64 rounded-xl flex items-center justify-center">
+        <!-- Avatar Container (Male Doctor) -->
+        <div id="doctor-avatar"
+          class="relative w-32 h-32 bg-gray-600 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
+          <span class="text-6xl text-white select-none">👨‍⚕️</span>
+          <div class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+        </div>
+        <!-- Name Tag -->
+        <div class="speaker-name absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold">
+          Doctor
+        </div>
+      </div>
+
+      <!-- Patient Video Box -->
+      <div id="patient-box" class="video-box w-full md:w-1/2 h-64 rounded-xl flex items-center justify-center">
+        <!-- Avatar Container (Female Patient) -->
+        <div id="patient-avatar"
+          class="relative w-32 h-32 bg-gray-600 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
+          <span class="text-6xl text-white select-none">👩‍🦱</span>
+          <div class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+        </div>
+        <!-- Name Tag -->
+        <div class="speaker-name absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold">
+          Patient
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Dialog Text Area -->
+    <div id="dialog-display"
+      class="min-h-24 bg-gray-100 p-4 rounded-lg shadow-inner flex items-center justify-center mb-6">
+      <p id="current-line" class="text-xl font-medium text-gray-700 text-center italic">
+        Press "Start Simulation" to begin the consultation.
+      </p>
+    </div>
+
+    <!-- Control Button and Status -->
+    <div class="flex flex-col items-center">
+      <button id="next-button"
+        class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+        Start Simulation
+      </button>
+      <p id="status-message" class="mt-4 text-sm text-red-600 hidden">
+        <span class="font-bold">Loading audio...</span> Please wait.
+      </p>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    // Global state
+    let currentLineIndex = -1;
+    let isPlaying = false;
+
+    let doctorVoice = null;
+    let patientVoice = null;
+
+    // Dialogue Script.
+    const dialog = [
+      { speaker: 'Doctor', line: "Good morning, thanks for joining the video call. How are you feeling today?" },
+      { speaker: 'Patient', line: "Good morning, doctor. I've been having a persistent dull headache for about a week now." },
+      { speaker: 'Doctor', line: "I see. Can you describe the pain? Is it sharp, throbbing, or constant?" },
+      { speaker: 'Patient', line: "It's mostly a constant, dull pressure, especially behind my eyes. It gets worse in the afternoon." },
+      { speaker: 'Doctor', line: "Alright. Any other symptoms? Nausea, fever, or sensitivity to light?" },
+      { speaker: 'Patient', line: "Just a bit of light sensitivity, but no nausea or fever." },
+      { speaker: 'Doctor', 'line': "We'll run some basic tests, but let's start with a new prescription to manage the pain. I'll send it over." },
+      { speaker: 'Patient', 'line': "Thank you, doctor." },
+    ];
+
+    // --- DOM Elements ---
+    const nextButton = document.getElementById('next-button');
+    const currentLineDisplay = document.getElementById('current-line');
+    const doctorBox = document.getElementById('doctor-box');
+    const patientBox = document.getElementById('patient-box');
+
+    // --- Voice Selection Logic ---
+
+    function loadVoices() {
+      const voices = window.speechSynthesis.getVoices();
+      let maleVoice = null;
+      let femaleVoice = null;
+
+      // Simple keyword search to find distinct English voices
+      for (const voice of voices) {
+        const name = voice.name.toLowerCase();
+        const lang = voice.lang.toLowerCase();
+
+        // Prioritize English voices
+        if (!lang.startsWith('en')) continue;
+
+        // Look for Male voice
+        if (!maleVoice && (name.includes('male') || name.includes('man') || name.includes('david') || name.includes('en-us'))) {
+          maleVoice = voice;
+        }
+        // Look for Female voice
+        if (!femaleVoice && (name.includes('female') || name.includes('woman') || name.includes('girl') || name.includes('susan') || name.includes('en-gb'))) {
+          femaleVoice = voice;
+        }
+        if (maleVoice && femaleVoice) break;
+      }
+
+      // Fallback: If specific genders aren't found, use the first two English voices found.
+      if (!maleVoice || !femaleVoice) {
+        const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+        if (!maleVoice && englishVoices.length > 0) maleVoice = englishVoices[0];
+        if (!femaleVoice && englishVoices.length > 1) {
+          // Try to ensure the fallback voices are different
+          femaleVoice = englishVoices[englishVoices.length - 1];
+        }
+      }
+
+      doctorVoice = maleVoice;
+      patientVoice = femaleVoice || maleVoice; // Ensure patientVoice is set, even if it defaults to male
+
+      console.log("TTS Voices Loaded:");
+      console.log("Doctor Voice:", doctorVoice ? doctorVoice.name : "Default (No Specific Voice Found)");
+      console.log("Patient Voice:", patientVoice ? patientVoice.name : "Default (No Specific Voice Found)");
+    }
+
+    // --- Browser TTS Function ---
+
+    /**
+     * Generates and plays audio for a single line of dialogue using the browser's TTS.
+     * @param {string} text The text to synthesize.
+     * @param {string} speaker The speaker name ('Doctor' or 'Patient').
+     */
+    function speakLine(text, speaker) {
+      if (!isPlaying) return; // Only speak if simulation is running
+
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      // Assign specific voices based on pre-loaded variables
+      if (speaker === 'Doctor' && doctorVoice) {
+        utterance.voice = doctorVoice;
+        utterance.pitch = 1.0;
+        utterance.rate = 1.0;
+      } else if (speaker === 'Patient' && patientVoice) {
+        utterance.voice = patientVoice;
+        utterance.pitch = 1.0;
+        utterance.rate = 0.95;
+      } else {
+        // Fallback to pitch/rate adjustments
+        if (speaker === 'Doctor') { utterance.pitch = 1.0; utterance.rate = 1.0; }
+        else { utterance.pitch = 1.0; utterance.rate = 0.95; }
+      }
+
+      // Event Handlers for animation control
+      utterance.onstart = () => {
+        startTalkingAnimation(speaker);
+        document.getElementById('status-message').classList.add('hidden');
+      };
+
+      utterance.onend = () => {
+        stopTalkingAnimation();
+        // Clear the line after speaking is finished
+        currentLineDisplay.textContent = "...";
+
+        // Automatically advance to the next line
+        currentLineIndex++;
+        if (currentLineIndex < dialog.length) {
+          advanceDialogue(); // Recursive call for continuous play
+        } else {
+          // End of dialogue
+          stopSimulation();
+          currentLineDisplay.textContent = "Conversation finished. Press Start to restart.";
+        }
+      };
+
+      utterance.onerror = (event) => {
+        console.error("TTS Error:", event);
+        // If an error occurs, stop the simulation to prevent an infinite loop
+        stopSimulation();
+        currentLineDisplay.textContent = "Error: TTS playback failed. Simulation stopped.";
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // --- UI Animation/State Management ---
+
+    /**
+     * Starts the visual "talking" (pulsing) effect for the specified speaker.
+     * @param {string} speaker 'Doctor' or 'Patient'
+     */
+    function startTalkingAnimation(speaker) {
+      stopTalkingAnimation();
+      if (speaker === 'Doctor') {
+        doctorBox.classList.add('active-speaker', 'speaking');
+      } else if (speaker === 'Patient') {
+        patientBox.classList.add('active-speaker', 'speaking');
+      }
+      // Enable button while talking so user can stop it immediately
+      nextButton.disabled = false;
+    }
+
+    /**
+     * Stops all visual "talking" (pulsing) effects.
+     */
+    function stopTalkingAnimation() {
+      doctorBox.classList.remove('active-speaker', 'speaking');
+      patientBox.classList.remove('active-speaker', 'speaking');
+    }
+
+    // --- Main Dialogue Flow Control ---
+
+    function advanceDialogue() {
+      if (!isPlaying) return; // Guard against running if stopped
+
+      const currentLine = dialog[currentLineIndex];
+      const displaySpeaker = currentLine.speaker === 'Doctor' ? 'Doctor:' : 'Patient:';
+
+      // 1. Display the text
+      currentLineDisplay.textContent = `${displaySpeaker} ${currentLine.line}`;
+
+      // 2. Speak the line and manage UI state (speakLine handles the automatic increment and next call via onend)
+      speakLine(currentLine.line, currentLine.speaker);
+    }
+
+    function startSimulation() {
+      if (isPlaying) {
+        // If button is pressed while playing, treat it as a stop request
+        stopSimulation();
+        return;
+      }
+
+      if (!('speechSynthesis' in window)) {
+        currentLineDisplay.textContent = "Error: Browser TTS not supported. Cannot run simulation.";
+        nextButton.disabled = true;
+        return;
+      }
+
+      isPlaying = true;
+      currentLineIndex = 0; // Start from the beginning
+
+      nextButton.textContent = "Stop Simulation";
+      nextButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      nextButton.classList.add('bg-red-600', 'hover:bg-red-700');
+
+      window.speechSynthesis.cancel(); // Clear any queued speech before starting
+      stopTalkingAnimation(); // Ensure no lingering animations
+
+      // Start the auto-loop
+      advanceDialogue();
+    }
+
+    function stopSimulation() {
+      isPlaying = false;
+      window.speechSynthesis.cancel();
+      stopTalkingAnimation();
+
+      currentLineIndex = -1; // Reset to beginning for next start
+
+      nextButton.textContent = "Start Simulation";
+      nextButton.classList.remove('bg-red-600', 'hover:bg-red-700');
+      nextButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+
+      // If the text display isn't already the finished message, reset it
+      if (!currentLineDisplay.textContent.includes("finished")) {
+        currentLineDisplay.textContent = "Simulation stopped. Press Start to continue.";
+      }
+    }
+
+    // --- Initialization ---
+
+    function initApp() {
+      try {
+        // 1. Load TTS Voices 
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+          window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        loadVoices(); // Call initially in case voices are already loaded
+
+        // 2. Set up controls
+        nextButton.onclick = startSimulation;
+
+      } catch (e) {
+        console.error("Initialization failed:", e);
+        currentLineDisplay.textContent = "Initialization Error. Check console for details.";
+        nextButton.disabled = true;
+      }
+    }
+
+    window.onload = initApp;
+
+  </script>
+</body>
+
+</html>

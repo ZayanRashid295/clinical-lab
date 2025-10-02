@@ -1,0 +1,808 @@
+import React, { useState, useEffect } from "react";
+import {
+  Stethoscope,
+  Brain,
+  Heart,
+  Bone,
+  Eye,
+  Baby,
+  Syringe,
+  Activity,
+  Microscope,
+  Pill,
+  Wind,
+  Droplet,
+  Users,
+  BookOpen,
+  MessageCircle,
+  Clock,
+  TrendingUp,
+  CheckCircle,
+  Play,
+} from "lucide-react";
+import { useTheme } from "../../../shared/contexts/theme-context";
+import { useLanguage } from "../../../shared/contexts/language-context";
+import SettingsModal from "../../../shared/components/settings/settings-modal";
+import { colorSchemesService } from "../../../shared/services/theme/color-schemes/color-schemes.service";
+import ZoomSimulationCore from "../zoom-simulation/zoom-simulation-core";
+
+export default function MedicalTrainingPlatform() {
+  const [screen, setScreen] = useState("menu");
+  const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState("Beginner");
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(
+    null
+  );
+  const [simulationActive, setSimulationActive] = useState(false);
+  const [currentDialogue, setCurrentDialogue] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Theme and language context
+  const { config } = useTheme();
+  const { t } = useLanguage();
+
+  const difficulties = ["Beginner", "Intermediate", "Advanced", "Expert"];
+
+  const specialties: { name: string; icon: React.ElementType }[] = [
+    { name: "Cardiology", icon: Heart },
+    { name: "Neurology", icon: Brain },
+    { name: "Orthopedics", icon: Bone },
+    { name: "Ophthalmology", icon: Eye },
+    { name: "Pediatrics", icon: Baby },
+    { name: "Internal Medicine", icon: Stethoscope },
+    { name: "Emergency Medicine", icon: Activity },
+    { name: "Endocrinology", icon: Syringe },
+    { name: "Pulmonology", icon: Wind },
+    { name: "Pathology", icon: Microscope },
+    { name: "Pharmacology", icon: Pill },
+    { name: "Hematology", icon: Droplet },
+  ];
+
+  const dialogueSequence = [
+    {
+      doctor: "Good morning. What brings you in today?",
+      patient: "I've been having chest pain for the past two days.",
+      thought:
+        "Patient presenting with chest pain. Need to assess onset, location, character, radiation, and associated symptoms.",
+      diagnoses: [
+        {
+          condition: "Acute Coronary Syndrome",
+          probability: 35,
+          reason: "Chest pain is primary symptom",
+        },
+        {
+          condition: "Costochondritis",
+          probability: 25,
+          reason: "Common cause of chest pain",
+        },
+        {
+          condition: "GERD",
+          probability: 20,
+          reason: "Can present as chest discomfort",
+        },
+      ],
+    },
+    {
+      doctor: "Can you describe the pain? Is it sharp or dull?",
+      patient: "It's more of a pressure, like something heavy on my chest.",
+      thought:
+        "Pressure sensation increases concern for cardiac origin. Need to explore risk factors and timing.",
+      diagnoses: [
+        {
+          condition: "Acute Coronary Syndrome",
+          probability: 55,
+          reason: "Pressure sensation typical of cardiac pain",
+        },
+        {
+          condition: "Costochondritis",
+          probability: 15,
+          reason: "Less likely with pressure sensation",
+        },
+        {
+          condition: "GERD",
+          probability: 15,
+          reason: "Can cause pressure but less common",
+        },
+      ],
+    },
+    {
+      doctor: "Does the pain radiate anywhere? Your arm, jaw, or back?",
+      patient: "Yes, sometimes it goes down my left arm.",
+      thought:
+        "Left arm radiation is highly concerning for cardiac ischemia. This is a red flag symptom.",
+      diagnoses: [
+        {
+          condition: "Acute Coronary Syndrome",
+          probability: 75,
+          reason: "Classic radiation pattern to left arm",
+        },
+        {
+          condition: "Costochondritis",
+          probability: 8,
+          reason: "Unlikely with this radiation pattern",
+        },
+        {
+          condition: "Pulmonary Embolism",
+          probability: 10,
+          reason: "Consider as differential",
+        },
+      ],
+    },
+  ];
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (simulationActive && screen === "simulation") {
+      timer = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [simulationActive, screen]);
+
+  const handleLogin = () => {
+    setScreen("menu");
+  };
+
+  const startSimulation = () => {
+    setSimulationActive(true);
+    setCurrentDialogue(0);
+    setElapsedTime(0);
+  };
+
+  const nextDialogue = () => {
+    if (currentDialogue < dialogueSequence.length - 1) {
+      setCurrentDialogue((prev) => prev + 1);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  // Settings handlers
+  const handleSettingsOpen = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const handleSettingsClose = () => {
+    setIsSettingsOpen(false);
+  };
+
+  // Get current color scheme for dynamic styling
+  const currentColorScheme = colorSchemesService.getColorScheme(
+    config.colorScheme
+  );
+  const primaryColor = currentColorScheme.primary[600];
+  const primaryHoverColor = currentColorScheme.primary[700];
+
+  // Main Menu Screen
+  if (screen === "menu") {
+    const menuOptions = [
+      {
+        title: "Clinical Interview With Patient",
+        icon: MessageCircle,
+        description: "One-on-one consultation with AI patient",
+        color: "from-blue-500 to-blue-600",
+        action: () => setScreen("difficulty"),
+      },
+      {
+        title: "Shadow Session",
+        icon: Users,
+        description: "Observe AI doctor diagnosing AI patient",
+        color: "from-purple-500 to-purple-600",
+        action: () => {
+          setSelectedMode("shadow");
+          setScreen("difficulty");
+        },
+      },
+      {
+        title: "AI Assisted Teaching",
+        icon: BookOpen,
+        description: "Learn with AI-guided tutorials",
+        color: "from-green-500 to-green-600",
+        action: () => alert("Coming soon!"),
+      },
+      {
+        title: "Q & A",
+        icon: MessageCircle,
+        description: "Ask questions and get expert answers",
+        color: "from-orange-500 to-orange-600",
+        action: () => alert("Coming soon!"),
+      },
+    ];
+
+    return (
+      <>
+        <div
+          className={`min-h-screen p-8 ${
+            config.theme === "dark"
+              ? "bg-gradient-to-br from-gray-900 to-gray-800"
+              : "bg-gradient-to-br from-slate-50 to-slate-100"
+          }`}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-12">
+              <h1
+                className={`text-4xl font-bold mb-2 ${
+                  config.theme === "dark" ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Welcome to MedTrain AI
+              </h1>
+              <p
+                className={
+                  config.theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }
+              >
+                Choose your training mode to begin
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              {menuOptions.map((option, idx) => {
+                const IconComponent = option.icon;
+                return (
+                  <button
+                    key={idx}
+                    onClick={option.action}
+                    className={`rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 text-left group ${
+                      config.theme === "dark"
+                        ? "bg-gray-800 hover:bg-gray-700"
+                        : "bg-white"
+                    }`}
+                  >
+                    <div
+                      className={`inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br ${option.color} mb-4 group-hover:scale-110 transition-transform`}
+                    >
+                      <IconComponent className="w-8 h-8 text-white" />
+                    </div>
+                    <h3
+                      className={`text-2xl font-bold mb-2 ${
+                        config.theme === "dark" ? "text-white" : "text-gray-800"
+                      }`}
+                    >
+                      {option.title}
+                    </h3>
+                    <p
+                      className={
+                        config.theme === "dark"
+                          ? "text-gray-300"
+                          : "text-gray-600"
+                      }
+                    >
+                      {option.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Settings Modal */}
+        <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
+
+        {/* Settings Floating Button */}
+        <button
+          onClick={handleSettingsOpen}
+          className="fixed bottom-6 right-6 p-4 text-white rounded-full shadow-lg transition-colors duration-200 z-50"
+          style={{
+            backgroundColor: primaryColor,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primaryHoverColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = primaryColor;
+          }}
+          title="Settings"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </button>
+      </>
+    );
+  }
+
+  // Difficulty & Specialty Selection Screen
+  if (screen === "difficulty") {
+    return (
+      <>
+        <div
+          className={`min-h-screen p-8 ${
+            config.theme === "dark"
+              ? "bg-gradient-to-br from-gray-900 to-gray-800"
+              : "bg-gradient-to-br from-blue-50 to-indigo-100"
+          }`}
+        >
+          <div className="max-w-7xl mx-auto">
+            <h1
+              className={`text-4xl font-bold mb-2 text-center ${
+                config.theme === "dark" ? "text-white" : "text-gray-800"
+              }`}
+            >
+              Shadow Session Configuration
+            </h1>
+            <p
+              className={`text-center mb-12 ${
+                config.theme === "dark" ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
+              Select difficulty level and medical specialty
+            </p>
+
+            <div className="mb-16 flex justify-center">
+              <div
+                className={`inline-flex rounded-lg p-1 shadow-md border ${
+                  config.theme === "dark"
+                    ? "bg-gray-800 border-gray-600"
+                    : "bg-white border-gray-200"
+                }`}
+              >
+                {difficulties.map((diff) => (
+                  <button
+                    key={diff}
+                    onClick={() => setSelectedDifficulty(diff)}
+                    className={`px-8 py-3 rounded-md font-semibold transition-all duration-200 ${
+                      selectedDifficulty === diff
+                        ? "text-white shadow-sm"
+                        : config.theme === "dark"
+                        ? "text-gray-300 hover:text-white"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        selectedDifficulty === diff
+                          ? primaryColor
+                          : "transparent",
+                    }}
+                  >
+                    {diff}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <h2
+              className={`text-2xl font-semibold mb-6 text-center ${
+                config.theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
+            >
+              Choose Medical Specialty
+            </h2>
+            <div className="grid grid-cols-4 gap-6 mb-8">
+              {specialties.map((specialty) => {
+                const IconComponent = specialty.icon;
+                return (
+                  <button
+                    key={specialty.name}
+                    onClick={() => {
+                      setSelectedSpecialty(specialty.name);
+                      setScreen("simulation");
+                    }}
+                    className={`p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+                      config.theme === "dark"
+                        ? "bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-indigo-500"
+                        : "bg-white border-gray-200 hover:bg-indigo-50 hover:border-indigo-500"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="p-3 rounded-full bg-indigo-100">
+                        <IconComponent className="w-8 h-8 text-indigo-600" />
+                      </div>
+                      <h3
+                        className={`text-sm font-semibold text-center ${
+                          config.theme === "dark"
+                            ? "text-white"
+                            : "text-gray-800"
+                        }`}
+                      >
+                        {specialty.name}
+                      </h3>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={() => setScreen("menu")}
+                className={`px-8 py-3 rounded-lg font-semibold transition-colors ${
+                  config.theme === "dark"
+                    ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                Back to Menu
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Settings Modal */}
+        <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
+
+        {/* Settings Floating Button */}
+        <button
+          onClick={handleSettingsOpen}
+          className="fixed bottom-6 right-6 p-4 text-white rounded-full shadow-lg transition-colors duration-200 z-50"
+          style={{
+            backgroundColor: primaryColor,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primaryHoverColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = primaryColor;
+          }}
+          title="Settings"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </button>
+      </>
+    );
+  }
+
+  // Simulation Screen
+  if (screen === "simulation") {
+    const currentData = dialogueSequence[currentDialogue];
+    const questionsAsked = currentDialogue + 1;
+    const totalQuestions = dialogueSequence.length;
+    const progress = ((questionsAsked / totalQuestions) * 100).toFixed(0);
+    const confidenceLevel = currentData.diagnoses[0].probability;
+
+    return (
+      <>
+        <div
+          className={`min-h-screen p-6 ${
+            config.theme === "dark" ? "bg-gray-900" : "bg-gray-50"
+          }`}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h1
+                className={`text-3xl font-bold ${
+                  config.theme === "dark" ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Virtual Consultation Simulation
+              </h1>
+
+              {/* Start/End Session Button */}
+              <div className="flex gap-3">
+                {!simulationActive ? (
+                  <button
+                    onClick={startSimulation}
+                    className="px-6 py-3 text-white rounded-lg font-bold transition-colors shadow-lg inline-flex items-center gap-2"
+                    style={{
+                      backgroundColor: primaryColor,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryHoverColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryColor;
+                    }}
+                  >
+                    <Play className="w-5 h-5" />
+                    Start Session
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setSimulationActive(false);
+                      setCurrentDialogue(0);
+                      setElapsedTime(0);
+                    }}
+                    className="px-6 py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors shadow-lg"
+                  >
+                    End Session
+                  </button>
+                )}
+                <button
+                  onClick={() => setScreen("menu")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                    config.theme === "dark"
+                      ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Back to Menu
+                </button>
+              </div>
+            </div>
+
+            {/* Top Stats Bar */}
+            <div className="grid grid-cols-5 gap-3 mb-4">
+              <div
+                className={`rounded-lg p-3 shadow ${
+                  config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div
+                  className={`flex items-center gap-1 mb-1 ${
+                    config.theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  <Clock className="w-3 h-3" />
+                  <span className="text-xs font-semibold">Time</span>
+                </div>
+                <div
+                  className={`text-xl font-bold ${
+                    config.theme === "dark" ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  {formatTime(elapsedTime)}
+                </div>
+              </div>
+              <div
+                className={`rounded-lg p-3 shadow ${
+                  config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div
+                  className={`flex items-center gap-1 mb-1 ${
+                    config.theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  <MessageCircle className="w-3 h-3" />
+                  <span className="text-xs font-semibold">Questions</span>
+                </div>
+                <div
+                  className={`text-xl font-bold ${
+                    config.theme === "dark" ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  {questionsAsked}/{totalQuestions}
+                </div>
+              </div>
+              <div
+                className={`rounded-lg p-3 shadow ${
+                  config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div
+                  className={`flex items-center gap-1 mb-1 ${
+                    config.theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="text-xs font-semibold">Progress</span>
+                </div>
+                <div
+                  className={`text-xl font-bold ${
+                    config.theme === "dark" ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  {progress}%
+                </div>
+              </div>
+              <div
+                className={`rounded-lg p-3 shadow ${
+                  config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div
+                  className={`flex items-center gap-1 mb-1 ${
+                    config.theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  <CheckCircle className="w-3 h-3" />
+                  <span className="text-xs font-semibold">Confidence</span>
+                </div>
+                <div
+                  className={`text-xl font-bold ${
+                    config.theme === "dark" ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  {confidenceLevel}%
+                </div>
+              </div>
+              <div
+                className={`rounded-lg p-3 shadow ${
+                  config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div
+                  className={`text-xs font-semibold mb-1 ${
+                    config.theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  Specialty
+                </div>
+                <div className="text-base font-bold text-indigo-600">
+                  {selectedSpecialty}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              {/* Left Column - Doctor */}
+              <div className="space-y-4">
+                <div
+                  className={`rounded-xl p-6 shadow-lg ${
+                    config.theme === "dark" ? "bg-gray-800" : "bg-slate-700"
+                  }`}
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="relative mb-3">
+                      <div
+                        className={`w-24 h-24 rounded-full flex items-center justify-center border-4 text-5xl ${
+                          config.theme === "dark"
+                            ? "bg-gray-700 border-gray-600"
+                            : "bg-slate-600 border-white"
+                        }`}
+                      >
+                        👨‍⚕️
+                      </div>
+                      <div
+                        className={`absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-4 ${
+                          config.theme === "dark"
+                            ? "border-gray-800"
+                            : "border-slate-700"
+                        }`}
+                      ></div>
+                    </div>
+                    <div
+                      className={`px-4 py-2 rounded-lg font-semibold text-sm ${
+                        config.theme === "dark"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-900 text-white"
+                      }`}
+                    >
+                      Doctor
+                    </div>
+                  </div>
+                </div>
+
+                {/* Doctor's Thought Process */}
+                {simulationActive && (
+                  <div
+                    className={`rounded-xl p-4 border-2 ${
+                      config.theme === "dark"
+                        ? "bg-purple-900/20 border-purple-700"
+                        : "bg-purple-50 border-purple-200"
+                    }`}
+                  >
+                    <h3
+                      className={`font-bold mb-2 flex items-center gap-2 text-sm ${
+                        config.theme === "dark"
+                          ? "text-purple-300"
+                          : "text-purple-900"
+                      }`}
+                    >
+                      <Brain className="w-4 h-4" />
+                      Doctor's Thought Process
+                    </h3>
+                    <p
+                      className={`italic text-sm ${
+                        config.theme === "dark"
+                          ? "text-gray-300"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {currentData.thought}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Zoom Simulation */}
+              <div className="space-y-4">
+                <div
+                  className={`rounded-xl p-4 shadow-lg ${
+                    config.theme === "dark" ? "bg-gray-800" : "bg-white"
+                  }`}
+                >
+                  <h3
+                    className={`font-bold mb-4 text-sm flex items-center gap-2 ${
+                      config.theme === "dark" ? "text-white" : "text-gray-800"
+                    }`}
+                  >
+                    <MessageCircle className="w-4 h-4 text-indigo-600" />
+                    Live Consultation
+                  </h3>
+                  <ZoomSimulationCore
+                    onDialogueComplete={() => {
+                      console.log("Zoom simulation completed");
+                    }}
+                    onDialogueProgress={(currentIndex, totalLines) => {
+                      console.log(`Progress: ${currentIndex}/${totalLines}`);
+                    }}
+                    className="zoom-simulation-integrated"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Settings Modal */}
+        <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
+
+        {/* Settings Floating Button */}
+        <button
+          onClick={handleSettingsOpen}
+          className="fixed bottom-6 right-6 p-4 text-white rounded-full shadow-lg transition-colors duration-200 z-50"
+          style={{
+            backgroundColor: primaryColor,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primaryHoverColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = primaryColor;
+          }}
+          title="Settings"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </button>
+      </>
+    );
+  }
+
+  return null;
+}
