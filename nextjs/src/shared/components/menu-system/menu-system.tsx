@@ -103,7 +103,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   const handleLogout = async () => {
     await logout();
     resetMenuState();
-    router.push("/login");
+    router.push("/landing-page");
   };
 
   // Handle search

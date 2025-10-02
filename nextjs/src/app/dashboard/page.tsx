@@ -19,13 +19,13 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (isClient && !isAuthenticated && !isLoading) {
-      router.push("/login");
+      router.push("/landing-page");
     }
   }, [isAuthenticated, isLoading, router, isClient]);
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    router.push("/landing-page");
   };
 
   // Show loading state during SSR and initial client load

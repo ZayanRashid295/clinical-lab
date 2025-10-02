@@ -8,6 +8,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Stethoscope, Eye, EyeOff, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/shared/contexts/theme-context";
+import { useAuth } from "@/shared/contexts/auth-context";
+import { useRouter } from "next/navigation";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -16,11 +18,12 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { config } = useTheme();
+  const { login, isLoading } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const isDarkMode = config.theme === "dark";
 
@@ -57,29 +60,24 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
     try {
-      // Simulate login API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use the auth context login function which calls the backend
+      await login(email, password);
 
-      // For demo purposes, accept any email/password
-      if (email && password) {
-        onClose();
-        // Redirect to dashboard or handle successful login
-        window.location.href = "/dashboard";
-      } else {
-        setError("Please enter both email and password");
-      }
+      // Close modal and redirect to dashboard on successful login
+      onClose();
+      router.push("/dashboard");
     } catch (err) {
-      setError("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+      // Handle login errors
+      const errorMessage =
+        err instanceof Error ? err.message : "Login failed. Please try again.";
+      setError(errorMessage);
     }
   };
 
   const fillTestCredentials = () => {
-    setEmail("admin@clinical-lab.com");
+    setEmail("admin@uber.com");
     setPassword("password123");
     setError("");
   };
