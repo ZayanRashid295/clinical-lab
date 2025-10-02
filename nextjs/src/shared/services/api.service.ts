@@ -70,7 +70,7 @@ class ApiService {
     // Get auth token from localStorage (client-side only)
     let token: string | null = null;
     if (typeof window !== "undefined") {
-      token = localStorage.getItem("authToken");
+      token = localStorage.getItem("access_token");
     }
 
     // Set default headers
