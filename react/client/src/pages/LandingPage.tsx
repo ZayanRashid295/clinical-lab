@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { LandingNav } from "@/components/LandingNav";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { FeatureCard } from "@/components/FeatureCard";
 import { PricingCard } from "@/components/PricingCard";
+import { LoginModal } from "@/components/LoginModal";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -103,7 +105,7 @@ function FeaturesGrid() {
   );
 }
 
-function PricingGrid() {
+function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
@@ -132,7 +134,7 @@ function PricingGrid() {
             "Community support",
           ]}
           cta="Start Free Trial"
-          onSelect={() => console.log("Student plan selected")}
+          onSelect={onLoginClick}
         />
       </div>
 
@@ -159,7 +161,7 @@ function PricingGrid() {
           ]}
           popular={true}
           cta="Start Free Trial"
-          onSelect={() => console.log("Student Pro plan selected")}
+          onSelect={onLoginClick}
         />
       </div>
 
@@ -188,7 +190,7 @@ function PricingGrid() {
             "Custom curriculum alignment",
           ]}
           cta="Contact Sales"
-          onSelect={() => console.log("Institution plan selected")}
+          onSelect={onLoginClick}
         />
       </div>
     </div>
@@ -323,6 +325,16 @@ function HowItWorksSection2() {
 }
 
 export default function LandingPage() {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleOpenLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
   const heroSlides = [
     {
       title: "Revolutionize Medical Education with AI",
@@ -360,10 +372,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <LandingNav />
+      <LandingNav onLoginClick={handleOpenLoginModal} />
 
       <main className="flex-1">
-        <HeroCarousel slides={heroSlides} />
+        <HeroCarousel slides={heroSlides} onLoginClick={handleOpenLoginModal} />
 
         <section id="features" className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
@@ -405,7 +417,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <PricingGrid />
+            <PricingGrid onLoginClick={handleOpenLoginModal} />
 
             <div className="text-center mt-12">
               <p className="text-sm text-muted-foreground mb-4">
@@ -435,6 +447,8 @@ export default function LandingPage() {
           <p>&copy; 2025 Clinical Lab Learning Lab. All rights reserved.</p>
         </div>
       </footer>
+
+      <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
     </div>
   );
 }

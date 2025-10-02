@@ -14,9 +14,10 @@ interface HeroSlide {
 
 interface HeroCarouselProps {
   slides: HeroSlide[];
+  onLoginClick?: () => void;
 }
 
-export function HeroCarousel({ slides }: HeroCarouselProps) {
+export function HeroCarousel({ slides, onLoginClick }: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -28,9 +29,12 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
-  const scrollTo = useCallback((index: number) => {
-    if (emblaApi) emblaApi.scrollTo(index);
-  }, [emblaApi]);
+  const scrollTo = useCallback(
+    (index: number) => {
+      if (emblaApi) emblaApi.scrollTo(index);
+    },
+    [emblaApi]
+  );
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -59,14 +63,17 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
       <div className="absolute inset-0 overflow-hidden" ref={emblaRef}>
         <div className="flex h-full">
           {slides.map((slide, index) => (
-            <div key={index} className="flex-[0_0_100%] min-w-0 relative h-full">
-              <div 
+            <div
+              key={index}
+              className="flex-[0_0_100%] min-w-0 relative h-full"
+            >
+              <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${slide.image})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
               </div>
-              
+
               <div className="relative z-10 h-full flex items-center justify-center">
                 <div className="max-w-7xl mx-auto px-6 text-center text-white">
                   <h1 className="text-5xl md:text-6xl font-bold mb-6">
@@ -76,17 +83,18 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
                     {slide.subtitle}
                   </p>
                   <div className="flex gap-4 justify-center flex-wrap">
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="bg-primary text-primary-foreground border border-primary-border px-8"
                       data-testid="button-get-started"
+                      onClick={onLoginClick}
                     >
                       {slide.ctaPrimary}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
-                    <Button 
-                      size="lg" 
-                      variant="outline" 
+                    <Button
+                      size="lg"
+                      variant="outline"
                       className="bg-background/10 backdrop-blur-md border-white/30 text-white hover:bg-background/20"
                       data-testid="button-watch-demo"
                     >
@@ -126,8 +134,8 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
             onClick={() => scrollTo(index)}
             className={cn(
               "h-2 rounded-full transition-all",
-              index === selectedIndex 
-                ? "w-8 bg-white" 
+              index === selectedIndex
+                ? "w-8 bg-white"
                 : "w-2 bg-white/50 hover:bg-white/70"
             )}
             data-testid={`button-hero-dot-${index}`}

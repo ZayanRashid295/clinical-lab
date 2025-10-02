@@ -12,16 +12,28 @@ import {
 import { LeaderboardTable } from "./LeaderboardTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function LandingNav() {
+interface LandingNavProps {
+  onLoginClick?: () => void;
+}
+
+export function LandingNav({ onLoginClick }: LandingNavProps) {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [, setLocation] = useLocation();
 
   const handleLogin = () => {
-    setLocation("/login");
+    if (onLoginClick) {
+      onLoginClick();
+    } else {
+      setLocation("/login");
+    }
   };
 
   const handleSignup = () => {
-    setLocation("/login");
+    if (onLoginClick) {
+      onLoginClick();
+    } else {
+      setLocation("/login");
+    }
   };
 
   const globalEntries = [
