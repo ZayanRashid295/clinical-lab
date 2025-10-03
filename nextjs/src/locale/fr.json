@@ -98,6 +98,8 @@
     "billing": "Facturation",
     "medApp": "App Médicale",
     "zoomSimulation": "Simulation Zoom",
+    "shadowMode": "Mode Ombre",
+    "shadowMode2": "Mode Ombre 2",
     "admin": "Administration",
     "users": "Utilisateurs",
     "roles": "Rôles",

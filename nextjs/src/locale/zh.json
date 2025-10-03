@@ -98,6 +98,8 @@
     "billing": "账单",
     "medApp": "医疗应用",
     "zoomSimulation": "Zoom模拟",
+    "shadowMode": "影子模式",
+    "shadowMode2": "影子模式2",
     "admin": "管理",
     "users": "用户",
     "roles": "角色",

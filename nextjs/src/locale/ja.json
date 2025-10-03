@@ -98,6 +98,8 @@
     "billing": "請求",
     "medApp": "医療アプリ",
     "zoomSimulation": "ズームシミュレーション",
+    "shadowMode": "シャドウモード",
+    "shadowMode2": "シャドウモード2",
     "admin": "管理",
     "users": "ユーザー",
     "roles": "役割",
