@@ -1,10 +1,22 @@
 "use client";
 
-import React from "react";
-import MedicalTrainingPlatform from "../components/medical-training/med-app";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-const MedAppPage: React.FC = () => {
-  return <MedicalTrainingPlatform />;
-};
+export default function MedAppPage() {
+  const router = useRouter();
 
-export default MedAppPage;
+  useEffect(() => {
+    // Redirect to the main dashboard that handles content switching
+    router.replace("/main-dashboard");
+  }, [router]);
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading Medical App...</p>
+      </div>
+    </div>
+  );
+}

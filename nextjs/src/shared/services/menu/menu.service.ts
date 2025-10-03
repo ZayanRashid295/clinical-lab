@@ -172,12 +172,20 @@ const defaultMenuItems: MenuItem[] = [
     order: 7,
   },
   {
+    id: "shadow-mode",
+    label: "menu.shadowMode",
+    icon: "👁️",
+    path: "/shadow-mode",
+    roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+    order: 8,
+  },
+  {
     id: "admin",
     label: "menu.admin",
     icon: "⚙️",
     path: "/admin",
     roles: ["ADMIN"],
-    order: 8,
+    order: 9,
     submenu: [
       {
         id: "users",

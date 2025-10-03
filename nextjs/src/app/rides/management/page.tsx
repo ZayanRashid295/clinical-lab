@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ZoomRedirect() {
+export default function RidesManagementRedirect() {
   const router = useRouter();
 
   useEffect(() => {
     // Redirect to the test version
-    router.replace("/test/zoom-simulation");
+    router.replace("/test/rides-management");
   }, [router]);
 
   return (
@@ -16,7 +16,7 @@ export default function ZoomRedirect() {
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
         <p className="text-muted-foreground">
-          Redirecting to Zoom Simulation...
+          Redirecting to Rides Management...
         </p>
       </div>
     </div>
