@@ -4,7 +4,7 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
   experimental: {
     // Enable app directory
-    appDir: true,
+    // appDir: true,
   },
 };
 

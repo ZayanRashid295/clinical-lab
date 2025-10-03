@@ -501,7 +501,7 @@ export default function LandingPage() {
       <VideoModal
         isOpen={isVideoModalOpen}
         onClose={handleCloseVideoModal}
-        videoSrc="/video/new3.mp4"
+        videoSrc="/video/promotional.mp4"
         title="Clinical Lab Demo"
       />
       <SettingsModal
