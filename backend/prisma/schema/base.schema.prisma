@@ -38,6 +38,11 @@ model User {
   notifications      Notification[]      @relation("UserNotifications")
   notificationPreferences NotificationPreference?
 
+  // Learning module
+  learningSessions   LearningSession[]
+  learningProgress   LearningProgress?
+  learningFeedback   LearningFeedback[]
+
   // Location module
 
   @@map("users")

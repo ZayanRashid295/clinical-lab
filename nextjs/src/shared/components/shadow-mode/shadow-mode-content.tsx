@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -23,15 +23,33 @@ import {
   MessageSquare,
   BookOpen,
   Users,
+  ArrowLeft,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { MedicalCase, LearningSession } from "@/shared/types/learning.types";
+import { learningService } from "@/shared/services/learning/learning.service";
+import CaseSelection from "./case-selection";
+import ShadowModeLearningInterface from "./shadow-mode-learning-interface";
 
 interface ShadowModeContentProps {
   isFullScreen?: boolean;
 }
 
+type ViewMode = "selection" | "learning";
+
 export default function ShadowModeContent({
   isFullScreen = false,
 }: ShadowModeContentProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>("selection");
+  const [selectedCase, setSelectedCase] = useState<MedicalCase | null>(null);
+  const [currentSession, setCurrentSession] = useState<LearningSession | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Legacy state for the original shadow mode demo
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isMuted, setIsMuted] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState("02:34");
@@ -58,6 +76,87 @@ export default function ShadowModeContent({
     setShowAnnotations(!showAnnotations);
   };
 
+  // New learning mode handlers
+  const handleCaseSelect = async (caseId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const medicalCase = await learningService.getCaseById(caseId);
+      setSelectedCase(medicalCase);
+      setViewMode("learning");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load case");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToSelection = () => {
+    setViewMode("selection");
+    setSelectedCase(null);
+    setCurrentSession(null);
+  };
+
+  const handleSessionUpdate = (session: LearningSession) => {
+    setCurrentSession(session);
+  };
+
+  // Render learning interface if case is selected
+  if (viewMode === "learning" && selectedCase && currentSession) {
+    return (
+      <ShadowModeLearningInterface
+        session={currentSession}
+        onSessionUpdate={handleSessionUpdate}
+        medicalCase={selectedCase}
+        isFullScreen={isFullScreen}
+      />
+    );
+  }
+
+  // Render case selection
+  if (viewMode === "selection") {
+    return (
+      <CaseSelection
+        onCaseSelect={handleCaseSelect}
+        isFullScreen={isFullScreen}
+      />
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={containerClass}>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading case...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className={containerClass}>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
+            <p className="text-destructive mb-2">Error loading case</p>
+            <p className="text-sm text-muted-foreground mb-4">{error}</p>
+            <Button onClick={handleBackToSelection} variant="outline">
+              Back to Case Selection
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default shadow mode demo (legacy)
   return (
     <div className={containerClass}>
       <div className={maxWidthClass}>
@@ -72,7 +171,7 @@ export default function ShadowModeContent({
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="bg-primary/10 text-primary">
-              Live Session
+              Demo Mode
             </Badge>
             <Button variant="outline" size="sm">
               <Settings className="h-4 w-4 mr-2" />

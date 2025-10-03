@@ -1,0 +1,104 @@
+// Learning module schema for medical training simulation
+// This file contains tables for learning cases, sessions, and AI conversations
+
+model LearningCase {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  difficulty  String   // beginner, intermediate, advanced
+  disease     String   // Hidden disease name for AI doctor
+  diseaseName String   // Hidden from student & AI doctor - the true diagnosis
+  specialty   String   // e.g., cardiology, neurology, gastroenterology
+  isRare      Boolean  @default(false) // true if rare disease case
+  symptoms    Json     // Array of symptoms
+  history     Json     // Medical history items
+  labs        Json     // Laboratory results
+  expectedQuestions Json // Expected questions for this case
+  patientProfile Json  // Patient demographics and profile
+  vitalSigns  Json?    // Vital signs data
+  physicalExam Json?   // Physical examination findings
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sessions    LearningSession[]
+
+  @@map("learning_cases")
+}
+
+model LearningSession {
+  id           String   @id @default(cuid())
+  userId       String
+  caseId       String
+  conversation Json     // Store conversation history as JSON
+  soapNote     Json?    // SOAP note if completed
+  isComplete   Boolean  @default(false)
+  duration     Int?     // Session duration in minutes
+  questionsAsked Int    @default(0) // Number of questions asked by student
+  keyFindings  Int      @default(0) // Number of key findings identified
+  score        Float?   // Session score if evaluated
+  feedback     String?  // AI-generated feedback
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  case         LearningCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations LearningConversation[]
+  feedbacks    LearningFeedback[]
+
+  @@map("learning_sessions")
+}
+
+model LearningConversation {
+  id          String   @id @default(cuid())
+  sessionId   String
+  role        String   // doctor, patient, student
+  content     String   // Message content
+  explanation String?  // Explanation for doctor messages
+  timestamp   DateTime @default(now())
+  isIntervention Boolean @default(false) // Student intervention
+  relevanceScore Float? // Relevance score for student questions
+
+  // Relations
+  session     LearningSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("learning_conversations")
+}
+
+model LearningProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  totalSessions   Int      @default(0)
+  completedSessions Int    @default(0)
+  totalDuration   Int      @default(0) // Total learning time in minutes
+  averageScore    Float?   // Average session score
+  specialties     Json     // Progress by specialty
+  difficultyLevel Json     // Progress by difficulty level
+  lastSessionAt   DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@map("learning_progress")
+}
+
+model LearningFeedback {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String
+  feedback    String   // Student feedback about the session
+  rating      Int      // Rating from 1-5
+  suggestions String?  // Suggestions for improvement
+  createdAt   DateTime @default(now())
+
+  // Relations
+  session     LearningSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("learning_feedback")
+}
