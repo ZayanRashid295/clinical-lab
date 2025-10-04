@@ -39,6 +39,7 @@ export default function DashboardLayout({
   } = useMenuService();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize menu when user changes
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function DashboardLayout({
       // Provide default menu items for demo/testing
       initializeMenu(["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"]);
     }
+    setIsInitialized(true);
   }, [user, initializeMenu]);
 
   // Set active menu based on pathname or prop
@@ -58,6 +60,18 @@ export default function DashboardLayout({
       syncMenuStateFromPath(pathname);
     }
   }, [activeMenuId, pathname, menuItems, setActiveMenu, syncMenuStateFromPath]);
+
+  // Show loading state while initializing
+  if (!isInitialized || menuItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Handle menu click - Navigate to proper routes
   const handleMenuClick = (menuId: string) => {
