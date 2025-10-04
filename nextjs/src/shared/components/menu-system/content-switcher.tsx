@@ -5,7 +5,7 @@ import DashboardContent from "@/shared/components/dashboard/dashboard-content";
 import RidesContent from "@/shared/components/rides/rides-content";
 import MedAppContent from "@/shared/components/med-app/med-app-content";
 import ShadowModeContent from "@/shared/components/shadow-mode/shadow-mode-content";
-import ShadowMode2Content from "@/shared/components/shadow-mode/shadow-mode-2-content";
+import ShadowModeLegacyContent from "@/shared/components/shadow-mode/shadow-mode-legacy-content";
 import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
 interface ContentSwitcherProps {
@@ -22,8 +22,8 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
       return <MedAppContent isFullScreen={false} />;
     case "shadow-mode":
       return <ShadowModeContent isFullScreen={false} />;
-    case "shadow-mode2":
-      return <ShadowMode2Content isFullScreen={false} />;
+    case "shadow-mode-legacy":
+      return <ShadowModeLegacyContent isFullScreen={false} />;
     case "fleet":
       return (
         <UnderConstruction

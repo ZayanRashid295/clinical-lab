@@ -25,13 +25,13 @@ import {
   Users,
 } from "lucide-react";
 
-interface ShadowMode2ContentProps {
+interface ShadowModeLegacyContentProps {
   isFullScreen?: boolean;
 }
 
-export default function ShadowMode2Content({
+export default function ShadowModeLegacyContent({
   isFullScreen = false,
-}: ShadowMode2ContentProps) {
+}: ShadowModeLegacyContentProps) {
   // Legacy state for the original shadow mode demo
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -66,7 +66,7 @@ export default function ShadowMode2Content({
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              Shadow Mode 2
+              Shadow Mode Legacy
             </h1>
             <p className="text-muted-foreground mt-2">
               Watch AI doctors conduct patient interviews and learn from expert

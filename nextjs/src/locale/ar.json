@@ -100,7 +100,7 @@
     "medApp": "التطبيق الطبي",
     "zoomSimulation": "محاكاة زووم",
     "shadowMode": "وضع الظل",
-    "shadowMode2": "وضع الظل 2",
+    "shadowModeLegacy": "وضع الظل القديم",
     "admin": "الإدارة",
     "users": "المستخدمون",
     "roles": "الأدوار",

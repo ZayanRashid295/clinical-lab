@@ -99,7 +99,7 @@
     "medApp": "의료 앱",
     "zoomSimulation": "줌 시뮬레이션",
     "shadowMode": "섀도우 모드",
-    "shadowMode2": "섀도우 모드 2",
+    "shadowModeLegacy": "섀도우 모드 레거시",
     "admin": "관리",
     "users": "사용자",
     "roles": "역할",

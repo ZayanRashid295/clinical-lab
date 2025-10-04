@@ -101,7 +101,7 @@
     "medApp": "Med App",
     "zoomSimulation": "Zoom Simulation",
     "shadowMode": "Shadow Mode",
-    "shadowMode2": "Shadow Mode 2",
+    "shadowModeLegacy": "Shadow Mode Legacy",
     "admin": "Admin",
     "users": "Users",
     "roles": "Roles",

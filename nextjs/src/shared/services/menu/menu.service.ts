@@ -180,10 +180,10 @@ const defaultMenuItems: MenuItem[] = [
     order: 8,
   },
   {
-    id: "shadow-mode2",
-    label: "menu.shadowMode2",
+    id: "shadow-mode-legacy",
+    label: "menu.shadowModeLegacy",
     icon: "👁️",
-    path: "/shadow-mode2",
+    path: "/shadow-mode-legacy",
     roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
     order: 9,
   },

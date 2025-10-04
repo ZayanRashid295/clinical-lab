@@ -99,7 +99,7 @@
     "medApp": "App Médicale",
     "zoomSimulation": "Simulation Zoom",
     "shadowMode": "Mode Ombre",
-    "shadowMode2": "Mode Ombre 2",
+    "shadowModeLegacy": "Mode Ombre Legacy",
     "admin": "Administration",
     "users": "Utilisateurs",
     "roles": "Rôles",
