@@ -82,11 +82,6 @@ export default function DashboardLayout({
     return () => window.removeEventListener("popstate", handlePopState);
   }, [menuItems, syncMenuStateFromPath]);
 
-  // Debug: Track activeMenu state changes
-  useEffect(() => {
-    console.log("activeMenu state changed to:", activeMenu);
-  }, [activeMenu]);
-
   // Show loading state in content area while initializing
   const renderContent = () => {
     if (!isInitialized || menuItems.length === 0) {
@@ -102,19 +97,11 @@ export default function DashboardLayout({
     // Prioritize activeMenu state over activeMenuId prop for navigation
     // activeMenuId is only used for initial page load, not for menu navigation
     const currentActiveMenu = activeMenu;
-    console.log("RenderContent:", {
-      activeMenuId,
-      activeMenu,
-      currentActiveMenu,
-    });
     return <ContentSwitcher activeMenu={currentActiveMenu} />;
   };
 
   // Handle menu click - Switch content and update URL
   const handleMenuClick = (menuId: string) => {
-    console.log("=== MENU CLICK HANDLER CALLED ===");
-    console.log("Menu clicked:", menuId, "Current activeMenu:", activeMenu);
-
     // Force immediate state update
     setActiveMenu(menuId);
 
@@ -142,8 +129,6 @@ export default function DashboardLayout({
         window.history.pushState(null, "", menuItem.path);
       }
     }
-
-    console.log("After setActiveMenu, new activeMenu should be:", menuId);
   };
 
   // Handle menu toggle (for submenus)

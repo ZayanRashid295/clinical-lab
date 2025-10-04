@@ -548,6 +548,20 @@ export function EnhancedLearningInterface({
         `Checking speech status - Queue empty: ${isQueueEmpty}, Not playing: ${isNotPlaying}, Not paused: ${isNotPaused}`
       );
 
+      // If audio is paused but there are items in queue, try to resume
+      if (!isQueueEmpty && isAudioPaused && !isPlayingSpeechRef.current) {
+        console.log(
+          "Audio is paused with items in queue, attempting to resume..."
+        );
+        resumeAudio();
+      }
+
+      // If audio is playing but marked as paused, fix the state
+      if (isPlayingSpeechRef.current && isAudioPaused) {
+        console.log("Audio is playing but marked as paused, fixing state...");
+        setIsAudioPaused(false);
+      }
+
       if (isQueueEmpty && isNotPlaying && isNotPaused) {
         console.log("Speech completed, proceeding with diagnosis check");
         callback();
@@ -781,12 +795,21 @@ export function EnhancedLearningInterface({
       `Processing queue - isPlaying: ${isPlayingSpeechRef.current}, queueLength: ${speechQueueRef.current.length}, isAudioPaused: ${isAudioPaused}`
     );
 
-    if (
-      isPlayingSpeechRef.current ||
-      speechQueueRef.current.length === 0 ||
-      isAudioPaused
-    ) {
+    if (isPlayingSpeechRef.current || speechQueueRef.current.length === 0) {
       return;
+    }
+
+    // If audio is paused, try to resume it
+    if (isAudioPaused) {
+      console.log("Audio is paused, attempting to resume...");
+      resumeAudio();
+      return;
+    }
+
+    // If audio is playing but marked as paused, fix the state
+    if (isPlayingSpeechRef.current && isAudioPaused) {
+      console.log("Audio is playing but marked as paused, fixing state...");
+      setIsAudioPaused(false);
     }
 
     const nextItem = speechQueueRef.current.shift();
@@ -922,6 +945,7 @@ export function EnhancedLearningInterface({
       // Don't clear spoken messages - they should remain tracked to prevent duplicates
     }
   };
+
 
   // Smart auto-scroll function - only scrolls if user is at or near the bottom
   const smartAutoScroll = () => {
@@ -1588,6 +1612,7 @@ export function EnhancedLearningInterface({
               <X size={14} />
               Stop Audio
             </button>
+
 
             {/* Speaking Indicator */}
             {(isSpeaking.doctor || isSpeaking.patient) && (

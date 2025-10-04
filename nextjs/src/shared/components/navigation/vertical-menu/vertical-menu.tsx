@@ -36,7 +36,6 @@ const VerticalMenu: React.FC<VerticalMenuProps> = ({
   const rtldir = isRTL ? "rtl" : "ltr";
   // Handle menu click
   const handleMenuClick = (menuId: string) => {
-    console.log("VerticalMenu: handleMenuClick called with:", menuId);
     onMenuClick(menuId);
   };
 
@@ -122,19 +121,11 @@ const VerticalMenu: React.FC<VerticalMenuProps> = ({
           {menuItems.map((menuItem, i) => (
             <div key={menuItem.id} className="relative group">
               <button
-                onClick={() => {
-                  console.log(
-                    "VerticalMenu: Button clicked for:",
-                    menuItem.id,
-                    "Has submenu:",
-                    hasSubmenu(menuItem)
-                  );
-                  if (hasSubmenu(menuItem)) {
-                    handleMenuToggle(menuItem.id);
-                  } else {
-                    handleMenuClick(menuItem.id);
-                  }
-                }}
+                onClick={() =>
+                  hasSubmenu(menuItem)
+                    ? handleMenuToggle(menuItem.id)
+                    : handleMenuClick(menuItem.id)
+                }
                 className={`w-full flex items-center text-left transition-all duration-200 group ${
                   !isCollapsed ? "px-4 py-3" : "px-2 py-2"
                 } ${
