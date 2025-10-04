@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../common/prisma/prisma.service";
-import { CreateLearningSessionDto } from "../dto/create-learning-session.dto";
+import { CreateLearningSessionDto } from "./create-learning-session.dto";
 
 @Injectable()
 export class LearningSessionsService {

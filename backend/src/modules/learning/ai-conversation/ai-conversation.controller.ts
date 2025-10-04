@@ -7,12 +7,11 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-// import { AIConversationService } from "../services/ai-conversation.service";
-import { DoctorQuestionDto } from "../dto/doctor-question.dto";
-import { PatientResponseDto } from "../dto/patient-response.dto";
-import { DoctorThoughtDto } from "../dto/doctor-thought.dto";
-import { AskDoctorDto } from "../dto/ask-doctor.dto";
-import { AIConversationService } from "../services/ai-conversation.service";
+import { AIConversationService } from "./ai-conversation.service";
+import { DoctorQuestionDto } from "./doctor-question.dto";
+import { PatientResponseDto } from "./patient-response.dto";
+import { DoctorThoughtDto } from "./doctor-thought.dto";
+import { AskDoctorDto } from "./ask-doctor.dto";
 
 @Controller("learning/ai")
 // @UseGuards(JwtAuthGuard) // Temporarily disabled for development

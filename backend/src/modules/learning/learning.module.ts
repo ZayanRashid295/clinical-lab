@@ -1,17 +1,23 @@
 import { Module } from "@nestjs/common";
 import { PrismaModule } from "../../common/prisma/prisma.module";
 
-// Controllers
-import { LearningCasesController } from "./controllers/learning-cases.controller";
-import { LearningSessionsController } from "./controllers/learning-sessions.controller";
-import { AIConversationController } from "./controllers/ai-conversation.controller";
-import { LearningProgressController } from "./controllers/learning-progress.controller";
+// Import from organized modules
+import { LearningCasesController, LearningCasesService } from "./cases";
 
-// Services
-import { LearningCasesService } from "./services/learning-cases.service";
-import { LearningSessionsService } from "./services/learning-sessions.service";
-import { AIConversationService } from "./services/ai-conversation.service";
-import { LearningProgressService } from "./services/learning-progress.service";
+import {
+  LearningSessionsController,
+  LearningSessionsService,
+} from "./sessions";
+
+import {
+  AIConversationController,
+  AIConversationService,
+} from "./ai-conversation";
+
+import {
+  LearningProgressController,
+  LearningProgressService,
+} from "./progress";
 
 @Module({
   imports: [PrismaModule],

@@ -11,9 +11,8 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-// import { LearningCasesService } from "../services/learning-cases.service";
-import { CreateLearningCaseDto } from "../dto/create-learning-case.dto";
-import { LearningCasesService } from "../services/learning-cases.service";
+import { LearningCasesService } from "./learning-cases.service";
+import { CreateLearningCaseDto } from "./create-learning-case.dto";
 
 @Controller("learning/cases")
 @UseGuards(JwtAuthGuard)

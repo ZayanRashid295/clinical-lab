@@ -9,7 +9,7 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-import { LearningProgressService } from "../services/learning-progress.service";
+import { LearningProgressService } from "./learning-progress.service";
 // import { LearningProgressService } from "../services/learning-progress.service";
 
 @Controller("learning/progress")

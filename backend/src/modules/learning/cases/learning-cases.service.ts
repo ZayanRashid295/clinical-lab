@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../common/prisma/prisma.service";
-import { CreateLearningCaseDto } from "../dto/create-learning-case.dto";
+import { CreateLearningCaseDto } from "./create-learning-case.dto";
 
 @Injectable()
 export class LearningCasesService {

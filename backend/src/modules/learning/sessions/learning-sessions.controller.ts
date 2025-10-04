@@ -12,9 +12,8 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-// import { LearningSessionsService } from "../services/learning-sessions.service";
-import { CreateLearningSessionDto } from "../dto/create-learning-session.dto";
-import { LearningSessionsService } from "../services/learning-sessions.service";
+import { LearningSessionsService } from "./learning-sessions.service";
+import { CreateLearningSessionDto } from "./create-learning-session.dto";
 
 @Controller("learning/sessions")
 @UseGuards(JwtAuthGuard)

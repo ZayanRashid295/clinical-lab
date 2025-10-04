@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { DoctorQuestionDto } from "../dto/doctor-question.dto";
-import { PatientResponseDto } from "../dto/patient-response.dto";
-import { DoctorThoughtDto } from "../dto/doctor-thought.dto";
-import { AskDoctorDto } from "../dto/ask-doctor.dto";
+import { DoctorQuestionDto } from "./doctor-question.dto";
+import { PatientResponseDto } from "./patient-response.dto";
+import { DoctorThoughtDto } from "./doctor-thought.dto";
+import { AskDoctorDto } from "./ask-doctor.dto";
 
 @Injectable()
 export class AIConversationService {
