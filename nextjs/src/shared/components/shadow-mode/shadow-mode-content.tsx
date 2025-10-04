@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -29,7 +29,6 @@ import {
 } from "lucide-react";
 import { MedicalCase, LearningSession } from "@/shared/types/learning.types";
 import { learningService } from "@/shared/services/learning/learning.service";
-import { useLearningContext } from "@/shared/contexts/learning-context";
 import CaseSelection from "./case-selection";
 import ShadowModeLearningInterface from "./shadow-mode-learning-interface";
 
@@ -50,12 +49,12 @@ export default function ShadowModeContent({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Use global learning context instead of local state
-  const {
-    cases: allCases,
-    isLoading: casesLoading,
-    error: casesError,
-  } = useLearningContext();
+  // Local state management for Shadow Mode context
+  const [allCases, setAllCases] = useState<MedicalCase[]>([]);
+  const [casesLoading, setCasesLoading] = useState(false);
+  const [casesError, setCasesError] = useState<string | null>(null);
+  const casesLoadedRef = useRef(false);
+  const loadingStartedRef = useRef(false);
 
   // Legacy state for the original shadow mode demo
   const [isPlaying, setIsPlaying] = React.useState(false);
@@ -110,6 +109,36 @@ export default function ShadowModeContent({
     setCurrentSession(session);
   };
 
+  // Case loading logic to maintain Shadow Mode context
+  useEffect(() => {
+    const loadCases = async () => {
+      // Check if cases are already loaded or loading has started
+      if (casesLoadedRef.current || loadingStartedRef.current) {
+        return; // Cases already loaded or loading started
+      }
+
+      // Set loading flags immediately to prevent duplicate calls
+      loadingStartedRef.current = true;
+      setCasesLoading(true);
+      setCasesError(null);
+
+      try {
+        const cases = await learningService.getAllCases();
+        setAllCases(cases);
+        casesLoadedRef.current = true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load cases";
+        setCasesError(errorMessage);
+        console.error("Failed to load cases:", err);
+      } finally {
+        setCasesLoading(false);
+      }
+    };
+
+    loadCases();
+  }, []); // Empty dependency array to run only once
+
   // Render learning interface if case is selected
   if (viewMode === "learning" && selectedCase && currentSession) {
     return (
@@ -128,6 +157,9 @@ export default function ShadowModeContent({
       <CaseSelection
         onCaseSelect={handleCaseSelect}
         isFullScreen={isFullScreen}
+        cases={allCases}
+        isLoading={casesLoading}
+        error={casesError}
       />
     );
   }

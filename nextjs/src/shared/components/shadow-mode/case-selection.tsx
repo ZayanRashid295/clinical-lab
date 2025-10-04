@@ -28,19 +28,23 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { MedicalCase } from "@/shared/types/learning.types";
-import { useLearningContext } from "@/shared/contexts/learning-context";
 
 interface CaseSelectionProps {
   onCaseSelect: (caseId: string) => void;
   isFullScreen?: boolean;
+  cases: MedicalCase[];
+  isLoading: boolean;
+  error: string | null;
 }
 
 export default function CaseSelection({
   onCaseSelect,
   isFullScreen = false,
+  cases,
+  isLoading,
+  error,
 }: CaseSelectionProps) {
-  // Use global learning context
-  const { cases, isLoading, error } = useLearningContext();
+  // Using props from parent instead of global context
   const [filteredCases, setFilteredCases] = useState<MedicalCase[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");

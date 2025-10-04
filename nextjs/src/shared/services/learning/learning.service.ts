@@ -60,6 +60,7 @@ class LearningService {
 
   // Learning Cases
   async getAllCases(): Promise<MedicalCase[]> {
+    console.log("🌐 API CALL: GET /learning/cases");
     return this.makeRequest<MedicalCase[]>("/learning/cases");
   }
 
