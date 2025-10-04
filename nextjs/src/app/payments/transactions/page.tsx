@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function TransactionsRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/transactions");
-  }, [router]);
-
+export default function TransactionsPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Transactions...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="transactions">
+      <UnderConstruction
+        menuTitle="Transactions"
+        menuIcon="🧾"
+        description="Complete transaction history and management system for all payment activities."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Transaction history and records",
+          "Payment status tracking",
+          "Refund management",
+          "Transaction analytics",
+          "Export and reporting",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

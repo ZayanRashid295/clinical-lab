@@ -1,24 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function ZoomRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/zoom-simulation");
-  }, [router]);
-
+export default function ZoomPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">
-          Redirecting to Zoom Simulation...
-        </p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="zoom-simulation">
+      <UnderConstruction
+        menuTitle="Zoom Simulation"
+        menuIcon="📹"
+        description="Interactive video simulation system for training and communication scenarios."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Video call simulation",
+          "Interactive training scenarios",
+          "Real-time communication tools",
+          "Recording and playback capabilities",
+          "Multi-participant support",
+          "Screen sharing and collaboration",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

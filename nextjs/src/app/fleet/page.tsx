@@ -1,22 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function FleetRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/fleet");
-  }, [router]);
-
+export default function FleetPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Fleet...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="fleet">
+      <UnderConstruction
+        menuTitle="Fleet Management"
+        menuIcon="🚛"
+        description="Comprehensive fleet management system for tracking vehicles, drivers, and maintenance schedules."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Vehicle tracking and monitoring",
+          "Driver management and scheduling",
+          "Maintenance scheduling and alerts",
+          "Fuel consumption analytics",
+          "Route optimization",
+          "Real-time GPS tracking",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

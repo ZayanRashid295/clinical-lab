@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function ReportsRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/reports");
-  }, [router]);
-
+export default function ReportsPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Reports...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="reports">
+      <UnderConstruction
+        menuTitle="Reports & Analytics"
+        menuIcon="📊"
+        description="Comprehensive reporting system for generating detailed analytics and business insights."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Custom report generation",
+          "Automated report scheduling",
+          "Data visualization and charts",
+          "Export capabilities (PDF, Excel, CSV)",
+          "Report sharing and collaboration",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

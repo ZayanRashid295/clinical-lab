@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function RevenueRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/revenue");
-  }, [router]);
-
+export default function RevenuePage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Revenue...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="revenue">
+      <UnderConstruction
+        menuTitle="Revenue Analytics"
+        menuIcon="💰"
+        description="Comprehensive revenue tracking and financial analytics system for business insights."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Revenue tracking and forecasting",
+          "Financial performance metrics",
+          "Profit and loss analysis",
+          "Revenue optimization insights",
+          "Financial reporting and dashboards",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

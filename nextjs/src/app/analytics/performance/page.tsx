@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function PerformanceRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/performance");
-  }, [router]);
-
+export default function PerformancePage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Performance...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="performance">
+      <UnderConstruction
+        menuTitle="Performance Analytics"
+        menuIcon="📈"
+        description="Advanced performance analytics and monitoring system for tracking key metrics and KPIs."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Real-time performance metrics",
+          "KPI tracking and monitoring",
+          "Performance benchmarking",
+          "Trend analysis and forecasting",
+          "Custom dashboard creation",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

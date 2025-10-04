@@ -1,22 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function AdminRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/admin");
-  }, [router]);
-
+export default function AdminPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Admin...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="admin">
+      <UnderConstruction
+        menuTitle="Admin Panel"
+        menuIcon="⚙️"
+        description="Comprehensive administrative control panel for system management and configuration."
+        estimatedCompletion="2 weeks"
+        features={[
+          "User management and roles",
+          "System configuration",
+          "Security settings",
+          "Audit logs and monitoring",
+          "Data management tools",
+          "Performance analytics",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

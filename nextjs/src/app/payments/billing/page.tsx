@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function BillingRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/billing");
-  }, [router]);
-
+export default function BillingPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Billing...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="billing">
+      <UnderConstruction
+        menuTitle="Billing"
+        menuIcon="🧾"
+        description="Comprehensive billing system for managing invoices, payments, and financial records."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Invoice generation and management",
+          "Payment tracking and processing",
+          "Billing cycle automation",
+          "Financial reporting",
+          "Customer billing portal",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }

@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import DashboardLayout from "@/shared/components/layout/dashboard-layout";
+import UnderConstruction from "@/shared/components/placeholders/under-construction";
 
-export default function MaintenanceRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the test version
-    router.replace("/test/maintenance");
-  }, [router]);
-
+export default function MaintenancePage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to Maintenance...</p>
-      </div>
-    </div>
+    <DashboardLayout activeMenuId="maintenance">
+      <UnderConstruction
+        menuTitle="Maintenance Management"
+        menuIcon="🔧"
+        description="Comprehensive vehicle maintenance system for scheduling, tracking, and managing fleet upkeep."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Maintenance scheduling and alerts",
+          "Service history tracking",
+          "Parts and inventory management",
+          "Cost tracking and analytics",
+          "Preventive maintenance automation",
+        ]}
+        isFullScreen={false}
+      />
+    </DashboardLayout>
   );
 }
