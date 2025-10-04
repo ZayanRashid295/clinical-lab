@@ -30,7 +30,7 @@ import {
 import { MedicalCase, LearningSession } from "@/shared/types/learning.types";
 import { learningService } from "@/shared/services/learning/learning.service";
 import CaseSelection from "./case-selection";
-import ShadowModeLearningInterface from "./shadow-mode-learning-interface";
+import { EnhancedLearningInterface } from "./enhanced-learning-interface";
 
 interface ShadowModeContentProps {
   isFullScreen?: boolean;
@@ -91,6 +91,20 @@ export default function ShadowModeContent({
     try {
       const medicalCase = await learningService.getCaseById(caseId);
       setSelectedCase(medicalCase);
+
+      // Create a new learning session
+      const newSession: LearningSession = {
+        id: `session-${Date.now()}`,
+        caseId: caseId,
+        disease: medicalCase.disease,
+        patientProfile: medicalCase.patientProfile,
+        conversation: [],
+        isComplete: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      setCurrentSession(newSession);
       setViewMode("learning");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load case");
@@ -142,11 +156,10 @@ export default function ShadowModeContent({
   // Render learning interface if case is selected
   if (viewMode === "learning" && selectedCase && currentSession) {
     return (
-      <ShadowModeLearningInterface
+      <EnhancedLearningInterface
         session={currentSession}
         onSessionUpdate={handleSessionUpdate}
         medicalCase={selectedCase}
-        isFullScreen={isFullScreen}
       />
     );
   }
