@@ -83,19 +83,20 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
     }
   };
 
-  // Show loading state while client-side rendering is not ready
-  if (!isClient) {
-    return (
-      <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="flex-1 flex items-center justify-center">
+  // Show loading state in content area while client-side rendering is not ready
+  const renderContent = () => {
+    if (!isClient) {
+      return (
+        <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Loading...</p>
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
+    return children;
+  };
 
   // Horizontal Layout
   if (isHorizontalLayout) {
@@ -115,7 +116,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-800">
-          {children}
+          {renderContent()}
         </main>
       </div>
     );
@@ -282,7 +283,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
 
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-800">
-          {children}
+          {renderContent()}
         </main>
       </div>
     </div>

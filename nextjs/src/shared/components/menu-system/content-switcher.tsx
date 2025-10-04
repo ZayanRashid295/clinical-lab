@@ -13,6 +13,7 @@ interface ContentSwitcherProps {
 }
 
 export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
+  console.log("ContentSwitcher rendering with activeMenu:", activeMenu);
   switch (activeMenu) {
     case "dashboard":
       return <DashboardContent isFullScreen={false} />;
