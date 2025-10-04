@@ -7,6 +7,7 @@ import MedAppContent from "@/shared/components/med-app/med-app-content";
 import ShadowModeContent from "@/shared/components/shadow-mode/shadow-mode-content";
 import ShadowModeLegacyContent from "@/shared/components/shadow-mode/shadow-mode-legacy-content";
 import UnderConstruction from "@/shared/components/placeholders/under-construction";
+import ZoomSimulation from "@/app/components/zoom-simulation/zoom-simulation";
 
 interface ContentSwitcherProps {
   activeMenu: string;
@@ -79,23 +80,7 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
         />
       );
     case "zoom-simulation":
-      return (
-        <UnderConstruction
-          menuTitle="Zoom Simulation"
-          menuIcon="📹"
-          description="Interactive video conferencing simulation for medical training and virtual consultations."
-          estimatedCompletion="5 weeks"
-          features={[
-            "Virtual patient consultations",
-            "Multi-participant video calls",
-            "Screen sharing and collaboration",
-            "Recording and playback",
-            "AI-powered patient interactions",
-            "Assessment and feedback tools",
-          ]}
-          isFullScreen={false}
-        />
-      );
+      return <ZoomSimulation />;
     case "admin":
       return (
         <UnderConstruction

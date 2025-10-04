@@ -7,3 +7,5 @@ async function main() {
   await seedBase(prisma);
   await seedLearningCases(prisma);
 }
+
+main();
