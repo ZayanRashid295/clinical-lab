@@ -266,11 +266,17 @@ export function EnhancedLearningInterface({
         conversationHistory: [],
       };
 
-      const response = await fetch("/api/learning/doctor-question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, conversation: [] }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/learning/ai/doctor-question",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
+          },
+          body: JSON.stringify({ context, conversation: [] }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to generate doctor question");
@@ -322,11 +328,17 @@ export function EnhancedLearningInterface({
           conversationHistory: [],
         };
 
-        const doctorResponse = await fetch("/api/learning/doctor-question", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ context, conversation: [] }),
-        });
+        const doctorResponse = await fetch(
+          "http://localhost:3000/learning/ai/doctor-question",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
+            },
+            body: JSON.stringify({ context, conversation: [] }),
+          }
+        );
 
         if (!doctorResponse.ok) {
           throw new Error("Failed to generate doctor question");
@@ -392,16 +404,22 @@ export function EnhancedLearningInterface({
 
         setConversationStatus("patient-responding");
 
-        const patientResponse = await fetch("/api/learning/patient-response", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: lastMessage.content,
-            context,
-            instruction:
-              "Keep responses under 2 sentences and conversational. Be natural and realistic.",
-          }),
-        });
+        const patientResponse = await fetch(
+          "http://localhost:3000/learning/ai/patient-response",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
+            },
+            body: JSON.stringify({
+              question: lastMessage.content,
+              context,
+              instruction:
+                "Keep responses under 2 sentences and conversational. Be natural and realistic.",
+            }),
+          }
+        );
 
         if (!patientResponse.ok) {
           // Add error message to conversation
@@ -665,15 +683,21 @@ export function EnhancedLearningInterface({
         })),
       };
 
-      const response = await fetch("/api/learning/ask-doctor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: studentQuestion,
-          context,
-          conversation: session.conversation,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/learning/ai/ask-doctor",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
+          },
+          body: JSON.stringify({
+            question: studentQuestion,
+            context,
+            conversation: session.conversation,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to get doctor response");
@@ -1049,11 +1073,17 @@ export function EnhancedLearningInterface({
       };
 
       // Generate next doctor question
-      const nextDoctorResponse = await fetch("/api/learning/doctor-question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, conversation: updatedConversation }),
-      });
+      const nextDoctorResponse = await fetch(
+        "http://localhost:3000/learning/ai/doctor-question",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
+          },
+          body: JSON.stringify({ context, conversation: updatedConversation }),
+        }
+      );
 
       if (!nextDoctorResponse.ok) {
         // Add error message to conversation
@@ -1176,22 +1206,28 @@ export function EnhancedLearningInterface({
     setCurrentThought("");
 
     try {
-      const response = await fetch("/api/learning/doctor-thought", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          context,
-          conversation: conversationHistory,
-          currentCase: medicalCase,
-          patientInfo: {
-            age: medicalCase?.age || "Not specified",
-            gender: medicalCase?.gender || "Not specified",
-            occupation: medicalCase?.occupation || "Not specified",
+      const response = await fetch(
+        "http://localhost:3000/learning/ai/doctor-thought",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem("token")}`, // Temporarily disabled
           },
-          instruction:
-            "Generate a concise one-sentence reasoning thought (max 25 words). Focus on immediate clinical observation or next step.",
-        }),
-      });
+          body: JSON.stringify({
+            context,
+            conversation: conversationHistory,
+            currentCase: medicalCase,
+            patientInfo: {
+              age: medicalCase?.age || "Not specified",
+              gender: medicalCase?.gender || "Not specified",
+              occupation: medicalCase?.occupation || "Not specified",
+            },
+            instruction:
+              "Generate a concise one-sentence reasoning thought (max 25 words). Focus on immediate clinical observation or next step.",
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to generate doctor thought");
