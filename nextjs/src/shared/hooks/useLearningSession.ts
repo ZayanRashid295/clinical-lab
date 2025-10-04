@@ -411,12 +411,12 @@ export const useLearningSession = ({
     setUIState((prev) => ({ ...prev, isSpeaking: false }));
   }, []);
 
-  // Initialize session on mount
+  // Initialize session on mount - only when we have both user and medical case
   useEffect(() => {
-    if (user?.id && medicalCase) {
+    if (user?.id && medicalCase && caseId) {
       initializeSession();
     }
-  }, [user?.id, medicalCase, initializeSession]);
+  }, [user?.id, medicalCase, caseId, initializeSession]);
 
   return {
     // Session data

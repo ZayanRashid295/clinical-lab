@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { MedicalCase, LearningSession } from "@/shared/types/learning.types";
 import { learningService } from "@/shared/services/learning/learning.service";
+import { useLearningContext } from "@/shared/contexts/learning-context";
 import CaseSelection from "./case-selection";
 import ShadowModeLearningInterface from "./shadow-mode-learning-interface";
 
@@ -48,6 +49,13 @@ export default function ShadowModeContent({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Use global learning context instead of local state
+  const {
+    cases: allCases,
+    isLoading: casesLoading,
+    error: casesError,
+  } = useLearningContext();
 
   // Legacy state for the original shadow mode demo
   const [isPlaying, setIsPlaying] = React.useState(false);

@@ -62,10 +62,16 @@ export default function ShadowModeLearningInterface({
 
   // Auto-generate doctor question when session starts
   useEffect(() => {
-    if (session && uiState.messages.length === 0 && !isLoading) {
+    if (session && uiState.messages.length === 0 && !isLoading && !error) {
       generateDoctorQuestion();
     }
-  }, [session, uiState.messages.length, isLoading, generateDoctorQuestion]);
+  }, [
+    session,
+    uiState.messages.length,
+    isLoading,
+    error,
+    generateDoctorQuestion,
+  ]);
 
   const handlePlayConversation = () => {
     if (uiState.isPlaying) {

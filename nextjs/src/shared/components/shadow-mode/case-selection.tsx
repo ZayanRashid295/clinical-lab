@@ -28,7 +28,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { MedicalCase } from "@/shared/types/learning.types";
-import { learningService } from "@/shared/services/learning/learning.service";
+import { useLearningContext } from "@/shared/contexts/learning-context";
 
 interface CaseSelectionProps {
   onCaseSelect: (caseId: string) => void;
@@ -39,18 +39,12 @@ export default function CaseSelection({
   onCaseSelect,
   isFullScreen = false,
 }: CaseSelectionProps) {
-  const [cases, setCases] = useState<MedicalCase[]>([]);
+  // Use global learning context
+  const { cases, isLoading, error } = useLearningContext();
   const [filteredCases, setFilteredCases] = useState<MedicalCase[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [specialtyFilter, setSpecialtyFilter] = useState<string>("all");
-
-  // Load cases on component mount
-  useEffect(() => {
-    loadCases();
-  }, []);
 
   // Filter cases based on search and filters
   useEffect(() => {
@@ -85,19 +79,6 @@ export default function CaseSelection({
 
     setFilteredCases(filtered);
   }, [cases, searchTerm, difficultyFilter, specialtyFilter]);
-
-  const loadCases = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const loadedCases = await learningService.getAllCases();
-      setCases(loadedCases);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load cases");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -150,7 +131,7 @@ export default function CaseSelection({
             <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
             <p className="text-destructive mb-2">Error loading cases</p>
             <p className="text-sm text-muted-foreground mb-4">{error}</p>
-            <Button onClick={loadCases} variant="outline">
+            <Button onClick={() => window.location.reload()} variant="outline">
               Try Again
             </Button>
           </div>
