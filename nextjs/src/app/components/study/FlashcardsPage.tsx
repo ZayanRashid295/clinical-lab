@@ -122,19 +122,21 @@ export default function FlashcardsPage() {
   // Filter cards based on selected criteria
   useEffect(() => {
     let filtered = mockFlashcards;
-    
+
     if (selectedSubject !== "all") {
-      filtered = filtered.filter(card => card.subject === selectedSubject);
+      filtered = filtered.filter((card) => card.subject === selectedSubject);
     }
-    
+
     if (selectedDifficulty !== "all") {
-      filtered = filtered.filter(card => card.difficulty === selectedDifficulty);
+      filtered = filtered.filter(
+        (card) => card.difficulty === selectedDifficulty
+      );
     }
-    
+
     if (isShuffled) {
       filtered = [...filtered].sort(() => Math.random() - 0.5);
     }
-    
+
     setStudyCards(filtered);
     setCurrentCardIndex(0);
     setIsFlipped(false);
@@ -165,7 +167,7 @@ export default function FlashcardsPage() {
   };
 
   const handleAnswer = (isCorrect: boolean) => {
-    setSessionStats(prev => ({
+    setSessionStats((prev) => ({
       ...prev,
       total: prev.total + 1,
       correct: isCorrect ? prev.correct + 1 : prev.correct,
@@ -192,11 +194,15 @@ export default function FlashcardsPage() {
   };
 
   const getProgressPercentage = () => {
-    return studyCards.length > 0 ? ((currentCardIndex + 1) / studyCards.length) * 100 : 0;
+    return studyCards.length > 0
+      ? ((currentCardIndex + 1) / studyCards.length) * 100
+      : 0;
   };
 
   const getSuccessRate = (card: Flashcard) => {
-    return card.reviewCount > 0 ? (card.correctCount / card.reviewCount) * 100 : 0;
+    return card.reviewCount > 0
+      ? (card.correctCount / card.reviewCount) * 100
+      : 0;
   };
 
   return (
@@ -307,7 +313,9 @@ export default function FlashcardsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Session Correct</p>
-                <p className="text-2xl font-bold text-green-600">{sessionStats.correct}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {sessionStats.correct}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
@@ -317,8 +325,12 @@ export default function FlashcardsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Session Incorrect</p>
-                <p className="text-2xl font-bold text-red-600">{sessionStats.incorrect}</p>
+                <p className="text-sm text-muted-foreground">
+                  Session Incorrect
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {sessionStats.incorrect}
+                </p>
               </div>
               <XCircle className="h-8 w-8 text-red-600" />
             </div>
@@ -330,9 +342,12 @@ export default function FlashcardsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Success Rate</p>
                 <p className="text-2xl font-bold">
-                  {sessionStats.total > 0 
-                    ? Math.round((sessionStats.correct / sessionStats.total) * 100)
-                    : 0}%
+                  {sessionStats.total > 0
+                    ? Math.round(
+                        (sessionStats.correct / sessionStats.total) * 100
+                      )
+                    : 0}
+                  %
                 </p>
               </div>
               <Star className="h-8 w-8 text-yellow-600" />
@@ -351,9 +366,7 @@ export default function FlashcardsPage() {
                   <Badge className={getDifficultyColor(currentCard.difficulty)}>
                     {currentCard.difficulty}
                   </Badge>
-                  <Badge variant="outline">
-                    {currentCard.subject}
-                  </Badge>
+                  <Badge variant="outline">{currentCard.subject}</Badge>
                   <Badge variant="secondary">
                     {currentCard.topic.replace("_", " ")}
                   </Badge>
@@ -370,17 +383,34 @@ export default function FlashcardsPage() {
             </CardHeader>
             <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
               <div className="text-center space-y-6 w-full">
-                <div className="min-h-[200px] flex items-center justify-center">
-                  <p className="text-xl leading-relaxed">
-                    {isFlipped ? currentCard.back : currentCard.front}
-                  </p>
+                {/* 3D Flip Card Container */}
+                <div className="perspective-1000 w-full max-w-md mx-auto">
+                  <div
+                    className={`relative w-full h-64 transition-transform duration-700 transform-style-preserve-3d ${
+                      isFlipped ? "rotate-y-180" : ""
+                    }`}
+                  >
+                    {/* Front of Card */}
+                    <div className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6">
+                      <p className="text-xl leading-relaxed text-gray-800">
+                        {currentCard.front}
+                      </p>
+                    </div>
+
+                    {/* Back of Card */}
+                    <div className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-6 rotate-y-180">
+                      <p className="text-xl leading-relaxed text-gray-800">
+                        {currentCard.back}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                
+
                 <div className="flex items-center justify-center gap-4">
                   <Button
                     variant="outline"
                     onClick={handleFlip}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
                   >
                     {isFlipped ? (
                       <>
@@ -459,7 +489,8 @@ export default function FlashcardsPage() {
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No flashcards found</h3>
             <p className="text-muted-foreground mb-4">
-              Try adjusting your filters or create new flashcards to get started.
+              Try adjusting your filters or create new flashcards to get
+              started.
             </p>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -471,4 +502,3 @@ export default function FlashcardsPage() {
     </div>
   );
 }
-
