@@ -1,0 +1,195 @@
+// MCQ System Database Schema
+// Supports multiple subjects, test levels, and hierarchical categorization
+
+
+
+// Main subject areas (Medicine, Engineering, Accounting, etc.)
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  categories  Category[]
+  questions   Question[]
+  testLevels  TestLevel[]
+
+  @@map("subjects")
+}
+
+// Different exam levels (USMLE1, USMLE2, FE Exam, CPA, etc.)
+model TestLevel {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  subjectId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questions   QuestionTestLevel[]
+
+  @@index([subjectId])
+  @@map("test_levels")
+}
+
+// Hierarchical categorization system
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  level       Int      // 1=System, 2=Category, 3=Subcategory, etc.
+  path        String   // Full hierarchical path (e.g., "Medicine/Organ Systems/Cardiovascular")
+  parentId    String?
+  subjectId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Category[] @relation("CategoryHierarchy")
+  questions   Question[]
+
+  @@index([subjectId])
+  @@index([parentId])
+  @@unique([name, subjectId, parentId])
+  @@map("categories")
+}
+
+// Difficulty levels for questions
+model DifficultyLevel {
+  id          String   @id @default(cuid())
+  name        String   @unique // Easy, Medium, Hard, Expert
+  description String?
+  weight      Int      // Numerical weight for sorting
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  questions   Question[]
+
+  @@map("difficulty_levels")
+}
+
+// The actual MCQ questions
+model Question {
+  id                String   @id @default(cuid())
+  questionText      String
+  explanation       String?
+  correctAnswer     String   // Reference to the correct option
+  imageUrl          String?
+  videoUrl          String?
+  source            String?  // Where the question came from
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Foreign Keys
+  subjectId         String
+  categoryId        String
+  difficultyLevelId String
+
+  // Relations
+  subject           Subject            @relation(fields: [subjectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category          Category           @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  difficultyLevel   DifficultyLevel    @relation(fields: [difficultyLevelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  options           QuestionOption[]
+  tags              QuestionTag[]
+  testLevels        QuestionTestLevel[]
+  userProgress      UserProgress[]
+
+  @@index([subjectId])
+  @@index([categoryId])
+  @@index([difficultyLevelId])
+  @@map("questions")
+}
+
+// Answer choices for each question
+model QuestionOption {
+  id         String   @id @default(cuid())
+  optionText String
+  optionKey  String   // A, B, C, D, etc.
+  isCorrect  Boolean  @default(false)
+  questionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  question   Question @relation(fields: [questionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([questionId])
+  @@unique([questionId, optionKey])
+  @@map("question_options")
+}
+
+// Flexible tagging system for additional categorization
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  color       String?  // For UI purposes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  questions   QuestionTag[]
+
+  @@map("tags")
+}
+
+// Many-to-many relationship between questions and tags
+model QuestionTag {
+  id         String   @id @default(cuid())
+  questionId String
+  tagId      String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  question   Question @relation(fields: [questionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([questionId])
+  @@index([tagId])
+  @@unique([questionId, tagId])
+  @@map("question_tags")
+}
+
+// Many-to-many relationship between questions and test levels
+model QuestionTestLevel {
+  id         String   @id @default(cuid())
+  questionId String
+  testLevelId String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  testLevel  TestLevel @relation(fields: [testLevelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([questionId])
+  @@index([testLevelId])
+  @@unique([questionId, testLevelId])
+  @@map("question_test_levels")
+}
+
+// Optional: User progress tracking
+model UserProgress {
+  id         String   @id @default(cuid())
+  userId     String   // External user ID
+  questionId String
+  isCorrect  Boolean
+  timeSpent  Int?     // Time in seconds
+  createdAt  DateTime @default(now())
+
+  // Relations
+  question   Question @relation(fields: [questionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([questionId])
+  @@index([userId])
+  @@unique([userId, questionId])
+  @@map("user_progress")
+}
+
