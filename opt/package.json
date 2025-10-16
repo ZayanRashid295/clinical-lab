@@ -1,0 +1,32 @@
+{
+  "name": "openai-question-answerer",
+  "version": "1.0.0",
+  "description": "A simple TypeScript script that uses OpenAI API to generate answers for questions",
+  "main": "openai-question-answerer.ts",
+  "scripts": {
+    "start": "ts-node openai-question-answerer.ts",
+    "start:gemini": "ts-node gemini-question-answerer.ts",
+    "build": "tsc openai-question-answerer.ts",
+    "build:gemini": "tsc gemini-question-answerer.ts",
+    "dev": "ts-node openai-question-answerer.ts",
+    "dev:gemini": "ts-node gemini-question-answerer.ts"
+  },
+  "dependencies": {
+    "openai": "^4.20.1",
+    "dotenv": "^16.3.1",
+    "@google/generative-ai": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.19",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "openai",
+    "typescript",
+    "ai",
+    "question-answering"
+  ],
+  "author": "",
+  "license": "MIT"
+}
