@@ -351,7 +351,7 @@ const defaultMenuItems: MenuItem[] = [
 
 export const useMenuService = () => {
   const [menuState, setMenuState] = useState<MenuState>({
-    activeMenu: "dashboard",
+    activeMenu: "",
     expandedMenus: [],
     isCollapsed: false,
     menuItems: [],
@@ -464,7 +464,7 @@ export const useMenuService = () => {
   // Reset menu state
   const resetMenuState = useCallback(() => {
     setMenuState({
-      activeMenu: "dashboard",
+      activeMenu: "",
       expandedMenus: [],
       isCollapsed: false,
       menuItems: [],
