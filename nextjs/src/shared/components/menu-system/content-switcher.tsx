@@ -12,6 +12,9 @@ import TestCreationPage from "@/app/components/test-creation/TestCreationPage";
 import TestSessionPage from "@/app/components/test-session/TestSessionPage";
 
 import UnderConstruction from "@/shared/components/placeholders/under-construction";
+import ShadowModeContent from "../shadow-mode/shadow-mode-content";
+import ShadowModeLegacyContent from "../shadow-mode/shadow-mode-legacy-content";
+import ZoomSimulation from "@/app/components/zoom-simulation/zoom-simulation";
 
 interface ContentSwitcherProps {
   activeMenu: string;
