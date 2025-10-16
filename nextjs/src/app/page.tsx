@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
-import { defaultLocale } from "../shared/config/i18n";
 
-// This page only renders when the app is built statically (output: 'export')
+// This page redirects to the landing page as the default route
 export default function RootPage() {
-  redirect(`/${defaultLocale}`);
+  redirect("/landing-page");
 }
