@@ -1,0 +1,16 @@
+{
+  "name": "prisma-schema-generator",
+  "version": "1.0.0",
+  "description": "Generate Prisma schema from compact JSON definition",
+  "main": "generate-prisma.ts",
+  "scripts": {
+    "generate": "ts-node run-generator.ts",
+    "build": "tsc generate-prisma.ts run-generator.ts --outDir dist",
+    "test": "ts-node run-generator.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "name": "Ecommerce Compact Schema",
+  "description": "Compact database schema for ecommerce application with table names, primary keys, and relations",
+  "tables": [
+    {
+      "name": "users",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "addresses", "type": "one-to-many" },
+        { "table": "carts", "type": "one-to-many" },
+        { "table": "orders", "type": "one-to-many" },
+        { "table": "reviews", "type": "one-to-many" },
+        { "table": "wishlists", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "addresses",
+      "primaryKey": "id",
+      "relations": [{ "table": "users", "type": "many-to-one" }]
+    },
+    {
+      "name": "categories",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "categories", "type": "one-to-many", "self": true },
+        { "table": "product_categories", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "products",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "product_categories", "type": "one-to-many" },
+        { "table": "product_images", "type": "one-to-many" },
+        { "table": "product_variants", "type": "one-to-many" },
+        { "table": "cart_items", "type": "one-to-many" },
+        { "table": "order_items", "type": "one-to-many" },
+        { "table": "reviews", "type": "one-to-many" },
+        { "table": "wishlists", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "product_categories",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "products", "type": "many-to-one" },
+        { "table": "categories", "type": "many-to-one" }
+      ]
+    },
+    {
+      "name": "product_images",
+      "primaryKey": "id",
+      "relations": [{ "table": "products", "type": "many-to-one" }]
+    },
+    {
+      "name": "product_variants",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "products", "type": "many-to-one" },
+        { "table": "cart_items", "type": "one-to-many" },
+        { "table": "order_items", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "carts",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "users", "type": "many-to-one" },
+        { "table": "cart_items", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "cart_items",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "carts", "type": "many-to-one" },
+        { "table": "products", "type": "many-to-one" },
+        { "table": "product_variants", "type": "many-to-one" }
+      ]
+    },
+    {
+      "name": "orders",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "users", "type": "many-to-one" },
+        { "table": "order_items", "type": "one-to-many" },
+        { "table": "payments", "type": "one-to-many" },
+        { "table": "shipments", "type": "one-to-many" },
+        { "table": "reviews", "type": "one-to-many" }
+      ]
+    },
+    {
+      "name": "order_items",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "orders", "type": "many-to-one" },
+        { "table": "products", "type": "many-to-one" },
+        { "table": "product_variants", "type": "many-to-one" }
+      ]
+    },
+    {
+      "name": "payments",
+      "primaryKey": "id",
+      "relations": [{ "table": "orders", "type": "many-to-one" }]
+    },
+    {
+      "name": "shipments",
+      "primaryKey": "id",
+      "relations": [{ "table": "orders", "type": "many-to-one" }]
+    },
+    {
+      "name": "reviews",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "products", "type": "many-to-one" },
+        { "table": "users", "type": "many-to-one" },
+        { "table": "orders", "type": "many-to-one" }
+      ]
+    },
+    {
+      "name": "coupons",
+      "primaryKey": "id",
+      "relations": []
+    },
+    {
+      "name": "wishlists",
+      "primaryKey": "id",
+      "relations": [
+        { "table": "users", "type": "many-to-one" },
+        { "table": "products", "type": "many-to-one" }
+      ]
+    }
+  ]
+}
