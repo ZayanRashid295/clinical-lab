@@ -30,7 +30,7 @@ class LearningService {
     const url = `${this.baseUrl}${endpoint}`;
 
     // Get token from localStorage or context
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("access_token");
 
     const defaultHeaders: HeadersInit = {
       "Content-Type": "application/json",
