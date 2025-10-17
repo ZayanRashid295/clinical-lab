@@ -336,3 +336,4 @@ const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = ({
 };
 
 export default PaymentHistoryTable;
+

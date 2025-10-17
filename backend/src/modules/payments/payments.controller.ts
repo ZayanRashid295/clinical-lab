@@ -46,7 +46,7 @@ export class PaymentsController {
     @Query("minAmount") minAmount?: string,
     @Query("maxAmount") maxAmount?: string,
     @Query("sortBy") sortBy?: string,
-    @Query("sortOrder") sortOrder?: string,
+    @Query("sortOrder") sortOrder?: string
   ) {
     const queryParams = {
       page: page ? parseInt(page) : 1,
@@ -61,7 +61,7 @@ export class PaymentsController {
       sortBy,
       sortOrder: sortOrder as "asc" | "desc" | undefined,
     };
-    
+
     return this.paymentsService.findAll(queryParams);
   }
 

@@ -65,11 +65,25 @@ export class PaymentsService {
 
     if (queryParams?.search) {
       where.OR = [
-        { transactionId: { contains: queryParams.search, mode: "insensitive" } },
+        {
+          transactionId: { contains: queryParams.search, mode: "insensitive" },
+        },
         { description: { contains: queryParams.search, mode: "insensitive" } },
-        { user: { email: { contains: queryParams.search, mode: "insensitive" } } },
-        { user: { firstName: { contains: queryParams.search, mode: "insensitive" } } },
-        { user: { lastName: { contains: queryParams.search, mode: "insensitive" } } },
+        {
+          user: {
+            email: { contains: queryParams.search, mode: "insensitive" },
+          },
+        },
+        {
+          user: {
+            firstName: { contains: queryParams.search, mode: "insensitive" },
+          },
+        },
+        {
+          user: {
+            lastName: { contains: queryParams.search, mode: "insensitive" },
+          },
+        },
       ];
     }
 
