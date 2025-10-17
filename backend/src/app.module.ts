@@ -8,6 +8,12 @@ import { PaymentsModule } from "./modules/payments/payments.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { LearningModule } from "./modules/learning/learning.module";
+import { ProductsModule } from "./modules/products/products.module";
+import { ContentModule } from "./modules/content/content.module";
+import { QuestionsModule } from "./modules/questions/questions.module";
+import { TagsModule } from "./modules/tags/tags.module";
+import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
+import { AssessmentsModule } from "./modules/assessments/assessments.module";
 
 @Module({
   imports: [
@@ -22,6 +28,12 @@ import { LearningModule } from "./modules/learning/learning.module";
     NotificationsModule,
     ChatModule,
     LearningModule,
+    ProductsModule,
+    ContentModule,
+    QuestionsModule,
+    TagsModule,
+    SubscriptionsModule,
+    AssessmentsModule,
   ],
 })
 export class AppModule {}
