@@ -1,0 +1,141 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+export abstract class BaseApiService {
+  protected baseURL: string;
+
+  constructor() {
+    this.baseURL = API_BASE_URL;
+  }
+
+  // Generic request method with common functionality
+  protected async request(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<any> {
+    const url = `${this.baseURL}${endpoint}`;
+    const config: RequestInit = {
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    // Add auth token if available
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+        console.log(
+          `🔑 Adding auth token to request: Bearer ${token.substring(0, 10)}...`
+        );
+      } else {
+        console.log("⚠️ No auth token found in localStorage");
+      }
+    }
+
+    try {
+      console.log(`Making API request to: ${url}`);
+      console.log(`Request config:`, {
+        method: config.method,
+        headers: config.headers,
+        body: config.body ? "Present" : "None",
+      });
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(
+          `API request failed with status ${response.status}:`,
+          errorData
+        );
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const text = await response.text();
+
+      // Handle empty responses
+      if (!text.trim()) {
+        console.warn(`Empty response from ${url}`);
+        return null;
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (parseError) {
+        console.error(`Failed to parse JSON response from ${url}:`, text);
+        const errorMessage =
+          parseError instanceof Error
+            ? parseError.message
+            : "Unknown parsing error";
+        throw new Error(`Invalid JSON response from server: ${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("API request failed:", error);
+      // If it's a network error (like connection refused), provide a more helpful message
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(
+          `Unable to connect to API server at ${url}. Please ensure the backend is running.`
+        );
+      }
+      throw error;
+    }
+  }
+
+  // Common GET method
+  protected async get(
+    endpoint: string,
+    params?: Record<string, any>
+  ): Promise<any> {
+    let url = endpoint;
+
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          searchParams.append(key, String(value));
+        }
+      });
+
+      if (searchParams.toString()) {
+        url += `?${searchParams.toString()}`;
+      }
+    }
+
+    return this.request(url, { method: "GET" });
+  }
+
+  // Common POST method
+  protected async post(endpoint: string, data?: any): Promise<any> {
+    return this.request(endpoint, {
+      method: "POST",
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  // Common PATCH method
+  protected async patch(endpoint: string, data?: any): Promise<any> {
+    return this.request(endpoint, {
+      method: "PATCH",
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  // Common PUT method
+  protected async put(endpoint: string, data?: any): Promise<any> {
+    return this.request(endpoint, {
+      method: "PUT",
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  // Common DELETE method
+  protected async delete(endpoint: string): Promise<any> {
+    return this.request(endpoint, { method: "DELETE" });
+  }
+}

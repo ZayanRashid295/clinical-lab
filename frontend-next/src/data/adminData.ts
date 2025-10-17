@@ -1,0 +1,388 @@
+import {
+  Users,
+  Shield,
+  CheckCircle,
+  XCircle,
+  Clock,
+  BarChart3,
+  FileText,
+} from "lucide-react";
+
+// Centralized mock data for admin sections
+export const MOCK_USERS = [
+  {
+    id: "1",
+    name: "John Smith",
+    email: "john.smith@company.com",
+    phone: "+1 (555) 123-4567",
+    role: "ADMIN",
+    status: "ACTIVE",
+    lastLogin: "2024-01-15T10:30:00Z",
+    createdAt: "2023-06-15T09:00:00Z",
+    location: "New York, NY",
+  },
+  {
+    id: "2",
+    name: "Sarah Johnson",
+    email: "sarah.johnson@company.com",
+    phone: "+1 (555) 234-5678",
+    role: "FLEET_MANAGER",
+    status: "ACTIVE",
+    lastLogin: "2024-01-14T16:45:00Z",
+    createdAt: "2023-08-20T14:30:00Z",
+    location: "Los Angeles, CA",
+  },
+  {
+    id: "3",
+    name: "Mike Davis",
+    email: "mike.davis@company.com",
+    phone: "+1 (555) 345-6789",
+    role: "DRIVER",
+    status: "ACTIVE",
+    lastLogin: "2024-01-15T08:15:00Z",
+    createdAt: "2023-09-10T11:20:00Z",
+    location: "Chicago, IL",
+  },
+  {
+    id: "4",
+    name: "Emily Wilson",
+    email: "emily.wilson@company.com",
+    phone: "+1 (555) 456-7890",
+    role: "CUSTOMER_SUPPORT",
+    status: "INACTIVE",
+    lastLogin: "2024-01-10T12:00:00Z",
+    createdAt: "2023-07-05T16:45:00Z",
+    location: "Miami, FL",
+  },
+  {
+    id: "5",
+    name: "David Brown",
+    email: "david.brown@company.com",
+    phone: "+1 (555) 567-8901",
+    role: "DRIVER",
+    status: "PENDING",
+    lastLogin: null,
+    createdAt: "2024-01-12T09:30:00Z",
+    location: "Seattle, WA",
+  },
+];
+
+export const MOCK_ROLES = [
+  {
+    id: "1",
+    name: "ADMIN",
+    displayName: "Administrator",
+    description: "Full system access with all permissions",
+    permissions: ["USER_MANAGEMENT", "ROLE_MANAGEMENT", "SYSTEM_SETTINGS"],
+    userCount: 3,
+    isActive: true,
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-12-15T10:30:00Z",
+  },
+  {
+    id: "2",
+    name: "FLEET_MANAGER",
+    displayName: "Fleet Manager",
+    description: "Manage fleet operations, vehicles, and drivers",
+    permissions: [
+      "FLEET_MANAGEMENT",
+      "DRIVER_MANAGEMENT",
+      "VEHICLE_MANAGEMENT",
+    ],
+    userCount: 8,
+    isActive: true,
+    createdAt: "2023-02-15T09:00:00Z",
+    updatedAt: "2023-11-20T14:45:00Z",
+  },
+  {
+    id: "3",
+    name: "DRIVER",
+    displayName: "Driver",
+    description: "Access to driver-specific features and ride management",
+    permissions: ["RIDE_MANAGEMENT", "PROFILE_MANAGEMENT", "EARNING_ACCESS"],
+    userCount: 156,
+    isActive: true,
+    createdAt: "2023-03-01T12:00:00Z",
+    updatedAt: "2023-10-30T16:20:00Z",
+  },
+];
+
+export const MOCK_REPORTS = [
+  {
+    id: "1",
+    name: "Revenue Report",
+    description: "Monthly revenue analysis and trends",
+    type: "FINANCIAL",
+    category: "Revenue",
+    lastGenerated: "2024-01-15T10:30:00Z",
+    nextScheduled: "2024-02-15T10:30:00Z",
+    status: "ACTIVE",
+    format: "PDF",
+    size: "2.4 MB",
+    recordCount: 1250,
+  },
+  {
+    id: "2",
+    name: "Driver Performance",
+    description: "Driver efficiency and performance metrics",
+    type: "OPERATIONAL",
+    category: "Performance",
+    lastGenerated: "2024-01-14T16:45:00Z",
+    nextScheduled: "2024-01-21T16:45:00Z",
+    status: "ACTIVE",
+    format: "EXCEL",
+    size: "1.8 MB",
+    recordCount: 156,
+  },
+];
+
+export const MOCK_AUDIT_LOGS = [
+  {
+    id: "1",
+    userId: "user_123",
+    userName: "John Smith",
+    action: "LOGIN",
+    resource: "Authentication",
+    details: "User logged in successfully",
+    ipAddress: "192.168.1.100",
+    timestamp: "2024-01-15T10:30:00Z",
+    status: "SUCCESS",
+    severity: "INFO",
+  },
+  {
+    id: "2",
+    userId: "user_456",
+    userName: "Sarah Johnson",
+    action: "CREATE_USER",
+    resource: "User Management",
+    details: "Created new user account for mike.davis@company.com",
+    ipAddress: "192.168.1.101",
+    timestamp: "2024-01-15T09:45:00Z",
+    status: "SUCCESS",
+    severity: "INFO",
+  },
+];
+
+// Configuration for each admin section
+export const ADMIN_SECTIONS = {
+  users: {
+    id: "users",
+    title: "User Management",
+    description: "Manage system users and their permissions",
+    icon: Users,
+    stats: [
+      {
+        label: "Total Users",
+        value: MOCK_USERS.length,
+        icon: Users,
+        color: "text-blue-600",
+      },
+      {
+        label: "Active Users",
+        value: MOCK_USERS.filter((u) => u.status === "ACTIVE").length,
+        icon: CheckCircle,
+        color: "text-green-600",
+      },
+      {
+        label: "Inactive Users",
+        value: MOCK_USERS.filter((u) => u.status === "INACTIVE").length,
+        icon: XCircle,
+        color: "text-red-600",
+      },
+      {
+        label: "Pending Users",
+        value: MOCK_USERS.filter((u) => u.status === "PENDING").length,
+        icon: Clock,
+        color: "text-yellow-600",
+      },
+    ],
+    filters: [
+      { type: "search" as const, key: "search", label: "users" },
+      {
+        type: "select" as const,
+        key: "status",
+        label: "Status",
+        options: [
+          { value: "ACTIVE", label: "Active" },
+          { value: "INACTIVE", label: "Inactive" },
+          { value: "PENDING", label: "Pending" },
+        ],
+      },
+      {
+        type: "select" as const,
+        key: "role",
+        label: "Role",
+        options: [
+          { value: "ADMIN", label: "Admin" },
+          { value: "FLEET_MANAGER", label: "Fleet Manager" },
+          { value: "DRIVER", label: "Driver" },
+          { value: "CUSTOMER_SUPPORT", label: "Customer Support" },
+        ],
+      },
+    ],
+    data: MOCK_USERS,
+    emptyMessage: "Get started by adding your first user.",
+  },
+  roles: {
+    id: "roles",
+    title: "Role Management",
+    description: "Define and manage user roles and permissions",
+    icon: Shield,
+    stats: [
+      {
+        label: "Total Roles",
+        value: MOCK_ROLES.length,
+        icon: Shield,
+        color: "text-blue-600",
+      },
+      {
+        label: "Active Roles",
+        value: MOCK_ROLES.filter((r) => r.isActive).length,
+        icon: CheckCircle,
+        color: "text-green-600",
+      },
+      {
+        label: "Inactive Roles",
+        value: MOCK_ROLES.filter((r) => !r.isActive).length,
+        icon: XCircle,
+        color: "text-red-600",
+      },
+      {
+        label: "Total Users",
+        value: MOCK_ROLES.reduce((sum, role) => sum + role.userCount, 0),
+        icon: Users,
+        color: "text-purple-600",
+      },
+    ],
+    filters: [
+      { type: "search" as const, key: "search", label: "roles" },
+      {
+        type: "select" as const,
+        key: "status",
+        label: "Status",
+        options: [
+          { value: "ACTIVE", label: "Active" },
+          { value: "INACTIVE", label: "Inactive" },
+        ],
+      },
+    ],
+    data: MOCK_ROLES,
+    emptyMessage: "Get started by creating your first role.",
+  },
+  reports: {
+    id: "reports",
+    title: "Reports",
+    description: "Generate and manage system reports",
+    icon: BarChart3,
+    stats: [
+      {
+        label: "Total Reports",
+        value: MOCK_REPORTS.length,
+        icon: BarChart3,
+        color: "text-blue-600",
+      },
+      {
+        label: "Active Reports",
+        value: MOCK_REPORTS.filter((r) => r.status === "ACTIVE").length,
+        icon: CheckCircle,
+        color: "text-green-600",
+      },
+      {
+        label: "Total Size",
+        value: "4.2 MB",
+        icon: FileText,
+        color: "text-purple-600",
+      },
+      {
+        label: "Total Records",
+        value: MOCK_REPORTS.reduce(
+          (sum, r) => sum + r.recordCount,
+          0
+        ).toLocaleString(),
+        icon: Users,
+        color: "text-yellow-600",
+      },
+    ],
+    filters: [
+      { type: "search" as const, key: "search", label: "reports" },
+      {
+        type: "select" as const,
+        key: "type",
+        label: "Type",
+        options: [
+          { value: "FINANCIAL", label: "Financial" },
+          { value: "OPERATIONAL", label: "Operational" },
+          { value: "CUSTOMER", label: "Customer" },
+        ],
+      },
+      {
+        type: "select" as const,
+        key: "status",
+        label: "Status",
+        options: [
+          { value: "ACTIVE", label: "Active" },
+          { value: "INACTIVE", label: "Inactive" },
+        ],
+      },
+    ],
+    data: MOCK_REPORTS,
+    emptyMessage: "Get started by creating your first report.",
+  },
+  audit: {
+    id: "audit",
+    title: "Audit Logs",
+    description: "Monitor system activities and security events",
+    icon: FileText,
+    stats: [
+      {
+        label: "Total Logs",
+        value: MOCK_AUDIT_LOGS.length,
+        icon: FileText,
+        color: "text-blue-600",
+      },
+      {
+        label: "Successful",
+        value: MOCK_AUDIT_LOGS.filter((l) => l.status === "SUCCESS").length,
+        icon: CheckCircle,
+        color: "text-green-600",
+      },
+      {
+        label: "Failed",
+        value: MOCK_AUDIT_LOGS.filter((l) => l.status === "FAILED").length,
+        icon: XCircle,
+        color: "text-red-600",
+      },
+      {
+        label: "Warnings",
+        value: MOCK_AUDIT_LOGS.filter((l) => l.severity === "WARNING").length,
+        icon: Clock,
+        color: "text-yellow-600",
+      },
+    ],
+    filters: [
+      { type: "search" as const, key: "search", label: "logs" },
+      {
+        type: "select" as const,
+        key: "action",
+        label: "Action",
+        options: [
+          { value: "LOGIN", label: "Login" },
+          { value: "CREATE_USER", label: "Create User" },
+          { value: "UPDATE_VEHICLE", label: "Update Vehicle" },
+        ],
+      },
+      {
+        type: "select" as const,
+        key: "severity",
+        label: "Severity",
+        options: [
+          { value: "INFO", label: "Info" },
+          { value: "WARNING", label: "Warning" },
+          { value: "ERROR", label: "Error" },
+        ],
+      },
+    ],
+    data: MOCK_AUDIT_LOGS,
+    emptyMessage: "No audit logs available for the selected time period.",
+  },
+};
