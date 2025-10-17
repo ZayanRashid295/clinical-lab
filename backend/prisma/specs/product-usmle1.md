@@ -1,38 +1,23 @@
-# Subjects
-
-## Anatomy
-
-## Behavioral science
-
-## Biochemistry
-
-## Biostatistics
-
-## Embryology
-
-## Genetics
-
-## Histology
-
-## Immunology
-
-## Microbiology
-
-## Pathology
-
-## Pathophysiology
-
-## Pharmacology
-
-## Physiology
+- ProductTag
+  - Anatomy
+  - Behavioral science
+  - Biochemistry
+  - Biostatistics
+  - Embryology
+  - Genetics
+  - Histology
+  - Immunology
+  - Microbiology
+  - Pathology
+  - Pathophysiology
+  - Pharmacology
+  - Physiology
 
 ---
 
-# Systems
+# General Principles
 
-## General Principles
-
-### Biochemistry
+## Biochemistry
 
 - Amino acids, proteins, and enzymes
 - Bioenergetics and carbohydrate metabolism
@@ -40,7 +25,7 @@
 - Lipid metabolism
 - Miscellaneous
 
-### Genetics
+## Genetics
 
 - Clinical genetics
 - DNA structure, replication, and repair
@@ -49,7 +34,7 @@
 - RNA structure, synthesis, and processing
 - Miscellaneous
 
-### Microbiology
+## Microbiology
 
 - Bacteriology
 - Mycology
@@ -57,22 +42,22 @@
 - Virology
 - Miscellaneous
 
-### Pathology
+## Pathology
 
 - Cellular pathology
 - Inflammation and repair
 - Neoplasia
 
-### Pharmacology
+## Pharmacology
 
 - Drug metabolism and toxicity
 - Drug receptors and pharmacodynamics
 - Pharmacokinetics
 - Miscellaneous
 
-## Clinical Sciences
+# Clinical Sciences
 
-### Biostatistics & Epidemiology
+## Biostatistics & Epidemiology
 
 - Epidemiology and population health
 - Measures and distribution of data
@@ -80,14 +65,14 @@
 - Study design and interpretation
 - Miscellaneous
 
-### Poisoning & Environmental Exposure
+## Poisoning & Environmental Exposure
 
 - Environmental exposure
 - Toxicology
 
 ---
 
-### Psychiatric / Behavioral & Substance Use Disorder
+## Psychiatric / Behavioral & Substance Use Disorder
 
 - Normal behavior and development
 - Anxiety and trauma-related disorders
@@ -102,7 +87,7 @@
 
 ---
 
-### Social Sciences (Ethics / Legal / Professional)
+## Social Sciences (Ethics / Legal / Professional)
 
 - Communication and interpersonal skills
 - Healthcare policy and economics
@@ -113,15 +98,15 @@
 
 ---
 
-### Miscellaneous (Multisystem)
+## Miscellaneous (Multisystem)
 
 - Miscellaneous
 
 ---
 
-## Organ Systems
+# Organ Systems
 
-### Allergy & Immunology
+## Allergy & Immunology
 
 - Anaphylaxis and allergic reactions
 - Autoimmune diseases
@@ -132,7 +117,7 @@
 
 ---
 
-### Cardiovascular System
+## Cardiovascular System
 
 - Normal structure and function of the cardiovascular system
 - Aortic and peripheral artery diseases
@@ -148,7 +133,7 @@
 
 ---
 
-### Dermatology
+## Dermatology
 
 - Normal structure and function of skin
 - Disorders of epidermal appendages
@@ -159,13 +144,13 @@
 
 ---
 
-### Ear, Nose & Throat (ENT)
+## Ear, Nose & Throat (ENT)
 
 - Disorders of the ear, nose, and throat
 
 ---
 
-### Endocrine, Diabetes & Metabolism
+## Endocrine, Diabetes & Metabolism
 
 - Normal structure and function of endocrine glands
 - Congenital and developmental anomalies
@@ -180,7 +165,7 @@
 
 ---
 
-### Female Reproductive System & Breast
+## Female Reproductive System & Breast
 
 - Normal structure and function of the female reproductive system and breast
 - Congenital and developmental anomalies
@@ -192,7 +177,7 @@
 
 ---
 
-### Gastrointestinal & Nutrition
+## Gastrointestinal & Nutrition
 
 - Normal structure and function of the GI tract
 - Congenital and developmental anomalies
@@ -207,7 +192,7 @@
 
 ---
 
-### Hematology & Oncology
+## Hematology & Oncology
 
 - Normal hematologic structure and function
 - Hemostasis and thrombosis
@@ -221,7 +206,7 @@
 
 ---
 
-### Infectious Diseases
+## Infectious Diseases
 
 - Antimicrobial drugs
 - Bacterial infections
@@ -234,14 +219,14 @@
 
 ---
 
-### Male Reproductive System
+## Male Reproductive System
 
 - Normal structure and function of the male reproductive system
 - Disorders of the male reproductive system
 
 ---
 
-### Nervous System
+## Nervous System
 
 - Normal structure and function of the nervous system
 - Congenital and developmental anomalies
@@ -262,21 +247,21 @@
 
 ---
 
-### Ophthalmology
+## Ophthalmology
 
 - Normal structure and function of the eye and associated structures
 - Disorders of the eye and associated structures
 
 ---
 
-### Pregnancy, Childbirth & Puerperium
+## Pregnancy, Childbirth & Puerperium
 
 - Normal pregnancy, childbirth, and puerperium
 - Disorders of pregnancy, childbirth, and puerperium
 
 ---
 
-### Pulmonary & Critical Care
+## Pulmonary & Critical Care
 
 - Normal pulmonary structure and function
 - Congenital and developmental anomalies
@@ -291,7 +276,7 @@
 
 ---
 
-### Renal, Urinary Systems & Electrolytes
+## Renal, Urinary Systems & Electrolytes
 
 - Normal structure and function of the kidneys and urinary system
 - Congenital and developmental anomalies
@@ -309,7 +294,7 @@
 
 ---
 
-### Rheumatology / Orthopedics & Sports
+## Rheumatology / Orthopedics & Sports
 
 - Normal structure and function of the musculoskeletal system
 - Congenital and developmental anomalies
@@ -320,3 +305,5 @@
 - Spinal disorders and back pain
 - Metabolic bone disorders
 - Miscellaneous
+
+---------------------=============
