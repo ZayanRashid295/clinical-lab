@@ -35,12 +35,102 @@ export class PaymentsService {
     });
   }
 
-  async findAll() {
-    return this.prisma.payment.findMany({
+  async findAll(queryParams?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    method?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    minAmount?: number;
+    maxAmount?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) {
+    const page = queryParams?.page || 1;
+    const limit = queryParams?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Build where clause for filtering
+    const where: any = {};
+
+    if (queryParams?.status) {
+      where.status = queryParams.status;
+    }
+
+    if (queryParams?.method) {
+      where.method = queryParams.method;
+    }
+
+    if (queryParams?.search) {
+      where.OR = [
+        { transactionId: { contains: queryParams.search, mode: "insensitive" } },
+        { description: { contains: queryParams.search, mode: "insensitive" } },
+        { user: { email: { contains: queryParams.search, mode: "insensitive" } } },
+        { user: { firstName: { contains: queryParams.search, mode: "insensitive" } } },
+        { user: { lastName: { contains: queryParams.search, mode: "insensitive" } } },
+      ];
+    }
+
+    if (queryParams?.dateFrom || queryParams?.dateTo) {
+      where.createdAt = {};
+      if (queryParams.dateFrom) {
+        where.createdAt.gte = new Date(queryParams.dateFrom);
+      }
+      if (queryParams.dateTo) {
+        where.createdAt.lte = new Date(queryParams.dateTo);
+      }
+    }
+
+    if (queryParams?.minAmount || queryParams?.maxAmount) {
+      where.amount = {};
+      if (queryParams.minAmount) {
+        where.amount.gte = queryParams.minAmount;
+      }
+      if (queryParams.maxAmount) {
+        where.amount.lte = queryParams.maxAmount;
+      }
+    }
+
+    // Build orderBy clause
+    let orderBy: any = { createdAt: "desc" }; // Default sort
+    if (queryParams?.sortBy) {
+      orderBy = {};
+      orderBy[queryParams.sortBy] = queryParams.sortOrder || "desc";
+    }
+
+    // Get total count for pagination
+    const total = await this.prisma.payment.count({ where });
+
+    // Get paginated results
+    const payments = await this.prisma.payment.findMany({
+      where,
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
       },
+      orderBy,
+      skip,
+      take: limit,
     });
+
+    return {
+      data: payments,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string) {

@@ -15,6 +15,7 @@ import UnderConstruction from "@/shared/components/placeholders/under-constructi
 import ShadowModeContent from "../shadow-mode/shadow-mode-content";
 import ShadowModeLegacyContent from "../shadow-mode/shadow-mode-legacy-content";
 import ZoomSimulation from "@/app/components/zoom-simulation/zoom-simulation";
+import PaymentHistoryContent from "@/components/payments/payment-history-content";
 
 interface ContentSwitcherProps {
   activeMenu: string;
@@ -278,22 +279,7 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
         />
       );
     case "transactions":
-      return (
-        <UnderConstruction
-          menuTitle="Transaction Management"
-          menuIcon="🧾"
-          description="Complete transaction tracking and management system with detailed financial records."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Transaction history",
-            "Payment processing",
-            "Refund management",
-            "Financial reconciliation",
-            "Audit trails",
-          ]}
-          isFullScreen={false}
-        />
-      );
+      return <PaymentHistoryContent />;
     case "payouts":
       return (
         <UnderConstruction

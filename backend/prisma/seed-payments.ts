@@ -67,7 +67,7 @@ export async function seedPayments(prisma: PrismaClient) {
   console.log("💰 Creating payments...");
   const payments = [];
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 100; i++) {
     const user = users[Math.floor(Math.random() * users.length)];
     const status = statuses[Math.floor(Math.random() * statuses.length)];
     const method = methods[Math.floor(Math.random() * methods.length)];

@@ -33,10 +33,36 @@ export class PaymentsController {
   }
 
   @Get()
-  @ApiOperation({ summary: "Get all payments" })
+  @ApiOperation({ summary: "Get all payments with pagination" })
   @ApiResponse({ status: 200, description: "Payments retrieved successfully" })
-  findAll() {
-    return this.paymentsService.findAll();
+  findAll(
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+    @Query("status") status?: string,
+    @Query("method") method?: string,
+    @Query("search") search?: string,
+    @Query("dateFrom") dateFrom?: string,
+    @Query("dateTo") dateTo?: string,
+    @Query("minAmount") minAmount?: string,
+    @Query("maxAmount") maxAmount?: string,
+    @Query("sortBy") sortBy?: string,
+    @Query("sortOrder") sortOrder?: string,
+  ) {
+    const queryParams = {
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
+      status,
+      method,
+      search,
+      dateFrom,
+      dateTo,
+      minAmount: minAmount ? parseFloat(minAmount) : undefined,
+      maxAmount: maxAmount ? parseFloat(maxAmount) : undefined,
+      sortBy,
+      sortOrder: sortOrder as "asc" | "desc" | undefined,
+    };
+    
+    return this.paymentsService.findAll(queryParams);
   }
 
   // Payment Methods endpoints (must be before @Get(':id') to avoid route conflicts)
