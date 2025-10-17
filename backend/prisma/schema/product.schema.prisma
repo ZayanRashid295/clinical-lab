@@ -1,0 +1,51 @@
+// Product module schema for LMS system
+// This file contains tables for products, tags, and subtypes
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String   @unique // USMLE, SAT, etc.
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sections         Section[]
+  productTags      ProductTag[]
+  productSubtypes  ProductSubtype[]
+
+  @@map("products")
+}
+
+model ProductTag {
+  id          String   @id @default(cuid())
+  name        String   @unique // Anatomy, Biochemistry, Embryology, etc.
+  description String?
+  color       String?  // Hex color for UI display
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  products  Product[]
+  questions Question[]
+
+  @@map("product_tags")
+}
+
+model ProductSubtype {
+  id          String   @id @default(cuid())
+  productId   String
+  name        String   // Qbank, Self-Assessment, Biostatistics Review
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  product            Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  subscriptionPackages SubscriptionPackage[]
+
+  @@unique([productId, name])
+  @@map("product_subtypes")
+}

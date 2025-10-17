@@ -43,7 +43,12 @@ model User {
   learningProgress   LearningProgress?
   learningFeedback   LearningFeedback[]
 
-  // Location module
+  // LMS module
+  questionPapers     QuestionPaper[]
+  subscriptions      Subscription[]
+
+  // Institution management
+  institutionManager InstitutionManager?
 
   @@map("users")
 }
@@ -159,4 +164,34 @@ model SystemSettings {
   updatedAt DateTime @updatedAt
 
   @@map("system_settings")
+}
+
+model Institution {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  managers InstitutionManager[]
+
+  @@map("institutions")
+}
+
+model InstitutionManager {
+  id            String @id @default(cuid())
+  userId        String @unique
+  institutionId String
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@map("institution_managers")
 }

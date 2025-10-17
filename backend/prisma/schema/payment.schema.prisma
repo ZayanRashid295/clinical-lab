@@ -2,21 +2,23 @@
 // This file contains all tables related to payment and billing functionality
 
 model Payment {
-  id            String        @id @default(cuid())
-  userId        String
-  amount        Decimal       @db.Decimal(10, 2)
-  currency      String        @default("USD")
-  status        PaymentStatus @default(PENDING)
-  method        PaymentMethodType
-  transactionId String?       @unique
-  gateway       PaymentGateway
-  gatewayData   Json?
-  description   String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  amount         Decimal       @db.Decimal(10, 2)
+  currency       String        @default("USD")
+  status         PaymentStatus @default(PENDING)
+  method         PaymentMethodType
+  transactionId  String?       @unique
+  gateway        PaymentGateway
+  gatewayData    Json?
+  description    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   // Relations
-  user        User         @relation("UserPayments", fields: [userId], references: [id])
+  user         User         @relation("UserPayments", fields: [userId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
  
   refunds     Refund[]
   walletTransaction WalletTransaction?

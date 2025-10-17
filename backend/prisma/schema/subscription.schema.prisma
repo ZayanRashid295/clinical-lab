@@ -1,0 +1,77 @@
+// Subscription module schema for LMS system
+// This file contains tables for subscription packages, features, and user subscriptions
+
+model PackageFeatures {
+  id          String   @id @default(cuid())
+  name        String   @unique // Qbank, Self Assessment, One Time Reset, Study Planner
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subscriptionFeatures SubscriptionFeatures[]
+
+  @@map("package_features")
+}
+
+model SubscriptionPackage {
+  id              String   @id @default(cuid())
+  productSubtypeId String
+  name            String   // Basic, Premium, Pro
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  currency        String   @default("USD")
+  validityDays    Int      // Number of days the subscription is valid
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  productSubtype      ProductSubtype       @relation(fields: [productSubtypeId], references: [id], onDelete: Cascade)
+  subscriptionFeatures SubscriptionFeatures[]
+  subscriptions       Subscription[]
+
+  @@unique([productSubtypeId, name])
+  @@map("subscription_packages")
+}
+
+model SubscriptionFeatures {
+  id                   String @id @default(cuid())
+  subscriptionPackageId String
+  packageFeatureId     String
+
+  // Relations
+  subscriptionPackage SubscriptionPackage @relation(fields: [subscriptionPackageId], references: [id], onDelete: Cascade)
+  packageFeature     PackageFeatures     @relation(fields: [packageFeatureId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionPackageId, packageFeatureId])
+  @@map("subscription_features")
+}
+
+model Subscription {
+  id                   String            @id @default(cuid())
+  userId               String
+  subscriptionPackageId String
+  status               SubscriptionStatus @default(ACTIVE)
+  startDate            DateTime
+  endDate              DateTime
+  autoRenew            Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  // Relations
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionPackage SubscriptionPackage @relation(fields: [subscriptionPackageId], references: [id])
+  payments            Payment[]
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+  PENDING
+}

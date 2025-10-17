@@ -1,0 +1,93 @@
+// Content module schema for LMS system
+// This file contains tables for hierarchical content structure and questions
+
+model Section {
+  id          String   @id @default(cuid())
+  productId   String
+  name        String   // General Principles, Clinical Sciences, Organ Systems
+  description String?
+  order       Int      @default(0) // For ordering sections
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  product  Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  chapters Chapter[]
+
+  @@unique([productId, name])
+  @@map("sections")
+}
+
+model Chapter {
+  id          String   @id @default(cuid())
+  sectionId   String
+  name        String   // Biochemistry, Microbiology
+  description String?
+  order       Int      @default(0) // For ordering chapters
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  topics  Topic[]
+
+  @@unique([sectionId, name])
+  @@map("chapters")
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  chapterId   String
+  name        String   // Lipid metabolism, Miscellaneous, etc.
+  description String?
+  order       Int      @default(0) // For ordering topics
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  chapter   Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@unique([chapterId, name])
+  @@map("topics")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  topicId     String
+  productTagId String?
+  question    String   // The question text
+  explanation String?  // Explanation for the correct answer
+  difficulty  String   @default("medium") // easy, medium, hard
+  points      Int      @default(1) // Points for correct answer
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  topic                Topic                 @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  productTag           ProductTag?           @relation(fields: [productTagId], references: [id])
+  choices              QuestionChoice[]
+  questionPaperQuestions QuestionPaperQuestion[]
+
+  @@map("questions")
+}
+
+model QuestionChoice {
+  id         String   @id @default(cuid())
+  questionId String
+  text       String   // Choice text
+  isCorrect  Boolean  @default(false)
+  order      Int      @default(0) // For ordering choices (A, B, C, D)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, order])
+  @@map("question_choices")
+}
