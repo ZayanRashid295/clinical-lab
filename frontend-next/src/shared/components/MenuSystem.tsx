@@ -6,8 +6,6 @@ import { MenuSystemProps } from "../../app/types/ui";
 import { User } from "../../app/types/core";
 import AdaptiveLayout from "./Layout/AdaptiveLayout";
 import MenuLayoutSettings from "./Settings/MenuLayoutSettings";
-import ThemeToggle from "./ThemeToggle";
-import ColorPicker from "./ColorPicker";
 import { UIConfigProvider } from "../contexts/UIConfigContext";
 import { typography, spacing } from "../utils/responsive";
 import ContentRenderer from "./Content/ContentRenderer";
@@ -263,16 +261,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
-
-      {/* Color Picker Button */}
-      <div className="fixed bottom-4 right-24 z-30">
-        <ColorPicker />
-      </div>
-
-      {/* Theme Toggle Button */}
-      <div className="fixed bottom-4 right-16 z-30">
-        <ThemeToggle size="md" />
-      </div>
 
       {/* Settings Toggle Button */}
       <button
