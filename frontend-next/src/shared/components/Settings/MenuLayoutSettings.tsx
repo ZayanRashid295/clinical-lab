@@ -113,9 +113,13 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
   if (!isOpen) return null;
 
   const transformClass = isClosing
-    ? "translate-x-full"
+    ? isRTL
+      ? "-translate-x-full"
+      : "translate-x-full"
     : isVisible
     ? "translate-x-0"
+    : isRTL
+    ? "-translate-x-full"
     : "translate-x-full";
 
   return (
@@ -139,14 +143,22 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
       {/* Settings Panel */}
       <div
-        className={`fixed top-0 h-full w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out right-0 z-50 ${transformClass} ${
-          isRTL ? "rtl" : "ltr"
-        }`}
+        className={`fixed top-0 h-full w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out ${
+          isRTL ? "left-0" : "right-0"
+        } z-50 ${transformClass} ${isRTL ? "rtl" : "ltr"}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Settings Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
+        <div
+          className={`flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 ${
+            isRTL ? "flex-row-reverse" : ""
+          }`}
+        >
+          <div
+            className={`flex items-center ${
+              isRTL ? "space-x-reverse space-x-3" : "space-x-3"
+            }`}
+          >
             <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
               <svg
                 className="w-5 h-5 text-gray-600 dark:text-gray-300"
@@ -199,7 +211,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
         <div className="p-6 space-y-8">
           {/* Language Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div
+              className={`flex items-center ${
+                isRTL ? "justify-end" : "justify-between"
+              }`}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("common.language")}
               </h3>
@@ -217,7 +233,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+              <div
+                className={`absolute inset-y-0 ${
+                  isRTL ? "left-0 pl-4" : "right-0 pr-4"
+                } flex items-center pointer-events-none`}
+              >
                 <svg
                   className="w-5 h-5 text-gray-400"
                   fill="none"
@@ -237,7 +257,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
           {/* Menu Layout Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div
+              className={`flex items-center ${
+                isRTL ? "justify-end" : "justify-between"
+              }`}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Menu Layout
               </h3>
@@ -308,7 +332,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
           {/* Theme Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div
+              className={`flex items-center ${
+                isRTL ? "justify-end" : "justify-between"
+              }`}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("common.theme")}
               </h3>
@@ -361,7 +389,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
           {/* Color Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div
+              className={`flex items-center ${
+                isRTL ? "justify-end" : "justify-between"
+              }`}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("common.colors")}
               </h3>
@@ -399,7 +431,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
           {/* Typography Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div
+              className={`flex items-center ${
+                isRTL ? "justify-end" : "justify-between"
+              }`}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("common.typography")}
               </h3>
