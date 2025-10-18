@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MenuItem } from "../../../app/types/menu";
 import { useUIConfigContext } from "../../contexts/UIConfigContext";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { useLanguage } from "../../contexts/LanguageContext";
 import Sidebar from "../Navigation/Sidebar";
 import HorizontalMenu from "../Navigation/HorizontalMenu";
 import Header from "./Header";
@@ -40,6 +41,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
   onLogout,
 }) => {
   const { config } = useUIConfigContext();
+  const { isRTL } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLayoutSwitchNotification, setShowLayoutSwitchNotification] =
     useState(false);
@@ -130,7 +132,11 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
 
   // Vertical Layout (existing sidebar layout)
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div
+      className={`flex h-screen bg-gray-100 dark:bg-gray-900 ${
+        isRTL ? "flex-row-reverse" : ""
+      }`}
+    >
       {/* Layout Switch Notification */}
       {showLayoutSwitchNotification && (
         <div className="fixed top-4 right-4 z-50 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ease-in-out">
@@ -170,7 +176,11 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
             className="fixed inset-0 bg-black bg-opacity-50"
             onClick={handleMobileMenuToggle}
           />
-          <div className="fixed left-0 top-0 h-full w-64 z-50">
+          <div
+            className={`fixed top-0 h-full w-64 z-50 ${
+              isRTL ? "right-0" : "left-0"
+            }`}
+          >
             <Sidebar
               menuItems={menuItems}
               activeMenu={activeMenu}

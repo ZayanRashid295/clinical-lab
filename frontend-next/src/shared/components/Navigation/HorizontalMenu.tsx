@@ -25,7 +25,8 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
   className = "",
 }) => {
   const { config } = useTheme();
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+  const rtldir = isRTL ? "rtl" : "ltr";
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{
@@ -464,12 +465,18 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
           <div className="app-title flex-shrink-0 mr-6">{applicationTitle}</div>
 
           {/* Scrollable Menu Items Container */}
-          <div className="flex-1 flex items-center overflow-x-auto scrollbar-hide relative">
+          <div
+            dir={rtldir}
+            className="flex-1 flex items-center overflow-x-auto scrollbar-hide relative"
+          >
             {/* Gradient fade indicators */}
             <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none z-10"></div>
             <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none z-10"></div>
 
-            <div className="flex items-center space-x-1 min-w-max px-4">
+            <div
+              dir={rtldir}
+              className="flex items-center space-x-1 min-w-max px-4"
+            >
               {menuItems.map((item) => {
                 const IconComponent = iconMap[item.icon] || Home;
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
