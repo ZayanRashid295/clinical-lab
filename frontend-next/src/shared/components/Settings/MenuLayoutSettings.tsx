@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "../../../hooks/useTheme";
-import { Monitor, Layout, Palette, Bell, Search, Zap } from "lucide-react";
+import { COLOR_SCHEMES } from "../../../app/config/theme.service";
 import Toast from "../Common/Toast";
 
 interface MenuLayoutSettingsProps {
@@ -15,18 +15,43 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
   const {
     config,
     setMenuLayout,
-    setMenuStyle,
     setTheme,
     setColorScheme,
     setFontSize,
     setBorderRadius,
-    updateConfig,
   } = useTheme();
 
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "info" | "warning" | "error";
   } | null>(null);
+
+  const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Check if desktop on mount and resize
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
+
+  // Handle opening animation
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [isOpen]);
 
   const showToast = (
     message: string,
@@ -35,14 +60,23 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
     setToast({ message, type });
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 300);
+  };
+
   const handleMenuLayoutChange = (layout: "vertical" | "horizontal") => {
     setMenuLayout(layout);
     showToast(`Menu layout changed to ${layout}`, "success");
-  };
-
-  const handleMenuStyleChange = (style: "sidebar" | "topbar") => {
-    setMenuStyle(style);
-    showToast(`Menu style changed to ${style}`, "success");
   };
 
   const handleThemeChange = (theme: "light" | "dark") => {
@@ -50,23 +84,30 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
     showToast(`Theme changed to ${theme}`, "success");
   };
 
-  const handleConfigUpdate = (updates: any) => {
-    updateConfig(updates);
-    const key = Object.keys(updates)[0];
-    const value = updates[key];
-    showToast(
-      `${key} ${
-        typeof value === "boolean"
-          ? value
-            ? "enabled"
-            : "disabled"
-          : `changed to ${value}`
-      }`,
-      "success"
-    );
+  const handleColorSchemeChange = (colorScheme: string) => {
+    setColorScheme(colorScheme as any);
+    showToast(`Color scheme changed to ${colorScheme}`, "success");
+  };
+
+  const handleFontSizeChange = (fontSize: "small" | "medium" | "large") => {
+    setFontSize(fontSize);
+    showToast(`Font size changed to ${fontSize}`, "success");
+  };
+
+  const handleBorderRadiusChange = (
+    borderRadius: "none" | "small" | "medium" | "large"
+  ) => {
+    setBorderRadius(borderRadius);
+    showToast(`Border radius changed to ${borderRadius}`, "success");
   };
 
   if (!isOpen) return null;
+
+  const transformClass = isClosing
+    ? "translate-x-full"
+    : isVisible
+    ? "translate-x-0"
+    : "translate-x-full";
 
   return (
     <>
@@ -81,252 +122,309 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={onClose}
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
+          isClosing ? "opacity-0" : "opacity-100"
+        }`}
+        onClick={handleOverlayClick}
       />
 
       {/* Settings Panel */}
-      <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl z-50 overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Settings</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              ✕
-            </button>
+      <div
+        className={`fixed top-0 h-full w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out right-0 z-50 ${transformClass}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Settings Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+              <svg
+                className="w-5 h-5 text-gray-600 dark:text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Settings
+            </h2>
           </div>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            aria-label="Close settings"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
+        {/* Settings Content */}
+        <div className="p-6 space-y-8">
           {/* Menu Layout Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-4">
-              <Layout size={20} className="text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Menu Layout
               </h3>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div>
-                  <div className="font-medium text-gray-900">Layout Type</div>
-                  <div className="text-sm text-gray-500">
-                    Choose between vertical sidebar or horizontal top menu
-                  </div>
-                </div>
-                <select
-                  value={config.menuLayout}
-                  onChange={(e) =>
-                    handleMenuLayoutChange(
-                      e.target.value as "vertical" | "horizontal"
-                    )
-                  }
-                  className="px-3 py-1 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {/* Segmented Control */}
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+              <button
+                onClick={() => handleMenuLayoutChange("vertical")}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  config.menuLayout === "vertical"
+                    ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <option value="vertical">Vertical</option>
-                  <option value="horizontal">Horizontal</option>
-                </select>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h6M4 10h6M4 14h6M4 18h6M14 6h6M14 10h6M14 14h6M14 18h6"
+                  />
+                </svg>
+                <span className="font-medium">Vertical</span>
+              </button>
 
-              {config.menuLayout === "horizontal" && (
-                <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div>
-                    <div className="font-medium text-gray-900">Menu Style</div>
-                    <div className="text-sm text-gray-500">
-                      Choose the horizontal menu style
-                    </div>
-                  </div>
-                  <select
-                    value={config.menuStyle}
-                    onChange={(e) =>
-                      handleMenuStyleChange(
-                        e.target.value as "sidebar" | "topbar"
-                      )
-                    }
-                    className="px-3 py-1 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="sidebar">Sidebar Style</option>
-                    <option value="topbar">Top Bar Style</option>
-                  </select>
-                </div>
-              )}
+              <button
+                onClick={() =>
+                  isDesktop && handleMenuLayoutChange("horizontal")
+                }
+                disabled={!isDesktop}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  config.menuLayout === "horizontal"
+                    ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                    : isDesktop
+                    ? "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                    : "text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
+                </svg>
+                <span className="font-medium">Horizontal</span>
+              </button>
             </div>
+
+            {!isDesktop && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Horizontal menu is only available on desktop screens (1024px+)
+              </p>
+            )}
           </div>
 
           {/* Theme Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-4">
-              <Palette size={20} className="text-purple-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Theme</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Theme
+              </h3>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div>
-                  <div className="font-medium text-gray-900">Color Scheme</div>
-                  <div className="text-sm text-gray-500">
-                    Choose your preferred theme
-                  </div>
-                </div>
-                <select
-                  value={config.theme}
-                  onChange={(e) =>
-                    handleThemeChange(e.target.value as "light" | "dark")
-                  }
-                  className="px-3 py-1 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {/* Theme Mode Segmented Control */}
+            <div className="w-full">
+              <div className="flex rounded-xl p-1 bg-gray-100 dark:bg-gray-700">
+                <button
+                  onClick={() => handleThemeChange("light")}
+                  className={`flex items-center justify-center flex-1 px-6 py-3 rounded-lg transition-all duration-200 ${
+                    config.theme === "light"
+                      ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                  }`}
                 >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Light
+                </button>
+                <button
+                  onClick={() => handleThemeChange("dark")}
+                  className={`flex items-center justify-center flex-1 px-6 py-3 rounded-lg transition-all duration-200 ${
+                    config.theme === "dark"
+                      ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                  }`}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  </svg>
+                  Dark
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Features Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-4">
-              <Monitor size={20} className="text-green-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Features</h3>
+          {/* Color Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Colors
+              </h3>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4">
+              {Object.keys(COLOR_SCHEMES).map((scheme) => {
+                const colorScheme = COLOR_SCHEMES[scheme];
+                return (
+                  <label
+                    key={scheme}
+                    className={`cursor-pointer ${
+                      config.colorScheme === scheme
+                        ? "ring-2 ring-gray-400 dark:ring-gray-500"
+                        : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="colorScheme"
+                      value={scheme}
+                      checked={config.colorScheme === scheme}
+                      onChange={() => handleColorSchemeChange(scheme)}
+                      className="sr-only"
+                    />
+                    <div
+                      className="w-12 h-12 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-lg border border-gray-200 dark:border-gray-600"
+                      style={{ backgroundColor: colorScheme.primary[500] }}
+                      title={scheme}
+                    ></div>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Typography Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Typography
+              </h3>
             </div>
 
+            {/* Font Size Segmented Control */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <Search size={16} className="text-gray-600" />
-                  <div>
-                    <div className="font-medium text-gray-900">Search</div>
-                    <div className="text-sm text-gray-500">
-                      Enable global search functionality
-                    </div>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={config.enableSearch}
-                    onChange={(e) =>
-                      handleConfigUpdate({ enableSearch: e.target.checked })
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <Bell size={16} className="text-gray-600" />
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      Notifications
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Enable notification system
-                    </div>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={config.enableNotifications}
-                    onChange={(e) =>
-                      handleConfigUpdate({
-                        enableNotifications: e.target.checked,
-                      })
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <Zap size={16} className="text-gray-600" />
-                  <div>
-                    <div className="font-medium text-gray-900">Animations</div>
-                    <div className="text-sm text-gray-500">
-                      Enable smooth animations and transitions
-                    </div>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={config.enableAnimations}
-                    onChange={(e) =>
-                      handleConfigUpdate({ enableAnimations: e.target.checked })
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Preview Section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Preview
-            </h3>
-            <div className="p-4 border rounded-lg bg-gray-50">
-              <div className="text-sm text-gray-600 mb-2">
-                Current Configuration:
-              </div>
-              <div className="space-y-1 text-sm">
-                <div>
-                  <span className="font-medium">Layout:</span>{" "}
-                  {config.menuLayout}
-                </div>
-                <div>
-                  <span className="font-medium">Style:</span> {config.menuStyle}
-                </div>
-                <div>
-                  <span className="font-medium">Theme:</span> {config.theme}
-                </div>
-                <div>
-                  <span className="font-medium">Search:</span>{" "}
-                  {config.enableSearch ? "Enabled" : "Disabled"}
-                </div>
-                <div>
-                  <span className="font-medium">Notifications:</span>{" "}
-                  {config.enableNotifications ? "Enabled" : "Disabled"}
-                </div>
-                <div>
-                  <span className="font-medium">Animations:</span>{" "}
-                  {config.enableAnimations ? "Enabled" : "Disabled"}
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Font Size
+              </h4>
+              <div className="w-full">
+                <div className="flex rounded-xl p-1 bg-gray-100 dark:bg-gray-700">
+                  {(["small", "medium", "large"] as const).map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => handleFontSizeChange(size)}
+                      className={`flex items-center justify-center flex-1 px-4 py-3 rounded-lg transition-all duration-200 ${
+                        config.fontSize === size
+                          ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                          : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      <span
+                        className={`font-medium ${
+                          size === "small"
+                            ? "text-sm"
+                            : size === "medium"
+                            ? "text-base"
+                            : "text-lg"
+                        }`}
+                      >
+                        Aa
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex space-x-3">
-            <button
-              onClick={() => {
-                // Reset to defaults
-                updateConfig({
-                  menuLayout: "vertical",
-                  menuStyle: "sidebar",
-                  theme: "dark",
-                  enableAnimations: true,
-                  enableSearch: true,
-                  enableNotifications: true,
-                });
-              }}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Reset to Defaults
-            </button>
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Done
-            </button>
+            {/* Border Radius Segmented Control */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Border Radius
+              </h4>
+              <div className="w-full">
+                <div className="flex rounded-xl p-1 bg-gray-100 dark:bg-gray-700">
+                  {(["none", "small", "medium", "large"] as const).map(
+                    (radius) => (
+                      <button
+                        key={radius}
+                        onClick={() => handleBorderRadiusChange(radius)}
+                        className={`flex items-center justify-center flex-1 px-4 py-3 rounded-lg transition-all duration-200 ${
+                          config.borderRadius === radius
+                            ? "bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white"
+                            : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-primary-500 ${
+                            radius === "none"
+                              ? "rounded-none"
+                              : radius === "small"
+                              ? "rounded-sm"
+                              : radius === "medium"
+                              ? "rounded-md"
+                              : "rounded-lg"
+                          }`}
+                        ></div>
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
