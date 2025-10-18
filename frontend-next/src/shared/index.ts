@@ -15,3 +15,7 @@ export * from "./utils/touch";
 // Types
 export * from "../app/types/menu";
 export * from "../app/types/dashboard";
+
+// i18n utilities
+export * from "./config/i18n";
+export { useLanguage } from "./contexts/LanguageContext";

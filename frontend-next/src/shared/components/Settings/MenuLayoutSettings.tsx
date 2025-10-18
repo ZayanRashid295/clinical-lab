@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../../../hooks/useTheme";
 import { COLOR_SCHEMES } from "../../../app/config/theme.service";
+import { getAvailableLocales, type Locale } from "../../config/i18n";
+import { useLanguage } from "../../contexts/LanguageContext";
 import Toast from "../Common/Toast";
 
 interface MenuLayoutSettingsProps {
@@ -20,6 +22,8 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
     setFontSize,
     setBorderRadius,
   } = useTheme();
+
+  const { currentLocale, setLanguage, t, isRTL } = useLanguage();
 
   const [toast, setToast] = useState<{
     message: string;
@@ -101,6 +105,11 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
     showToast(`Border radius changed to ${borderRadius}`, "success");
   };
 
+  const handleLanguageChange = (locale: Locale) => {
+    setLanguage(locale);
+    showToast(`Language changed to ${locale}`, "success");
+  };
+
   if (!isOpen) return null;
 
   const transformClass = isClosing
@@ -130,7 +139,9 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
       {/* Settings Panel */}
       <div
-        className={`fixed top-0 h-full w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out right-0 z-50 ${transformClass}`}
+        className={`fixed top-0 h-full w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out right-0 z-50 ${transformClass} ${
+          isRTL ? "rtl" : "ltr"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Settings Header */}
@@ -159,7 +170,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
               </svg>
             </div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Settings
+              {t("common.settings")}
             </h2>
           </div>
           <button
@@ -186,6 +197,44 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
 
         {/* Settings Content */}
         <div className="p-6 space-y-8">
+          {/* Language Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("common.language")}
+              </h3>
+            </div>
+
+            <div className="relative">
+              <select
+                value={currentLocale}
+                onChange={(e) => handleLanguageChange(e.target.value as Locale)}
+                className="w-full p-4 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer transition-all duration-200"
+              >
+                {getAvailableLocales().map((locale) => (
+                  <option key={locale.code} value={locale.code}>
+                    {locale.flag} {locale.nativeName} ({locale.name})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
           {/* Menu Layout Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -261,7 +310,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Theme
+                {t("common.theme")}
               </h3>
             </div>
 
@@ -287,7 +336,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
                       clipRule="evenodd"
                     />
                   </svg>
-                  Light
+                  {t("common.light")}
                 </button>
                 <button
                   onClick={() => handleThemeChange("dark")}
@@ -304,7 +353,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
                   >
                     <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                   </svg>
-                  Dark
+                  {t("common.dark")}
                 </button>
               </div>
             </div>
@@ -314,7 +363,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Colors
+                {t("common.colors")}
               </h3>
             </div>
             <div className="flex flex-wrap justify-center gap-4">
@@ -352,14 +401,14 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Typography
+                {t("common.typography")}
               </h3>
             </div>
 
             {/* Font Size Segmented Control */}
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Font Size
+                {t("common.fontSize")}
               </h4>
               <div className="w-full">
                 <div className="flex rounded-xl p-1 bg-gray-100 dark:bg-gray-700">
@@ -393,7 +442,7 @@ const MenuLayoutSettings: React.FC<MenuLayoutSettingsProps> = ({
             {/* Border Radius Segmented Control */}
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Border Radius
+                {t("common.borderRadius")}
               </h4>
               <div className="w-full">
                 <div className="flex rounded-xl p-1 bg-gray-100 dark:bg-gray-700">

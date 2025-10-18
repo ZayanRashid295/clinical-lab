@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { authService } from "../src/shared";
+import { authService, useLanguage } from "../src/shared";
 import { LoginForm, FormErrors } from "../src/app/types/core";
 
 const Login = () => {
   const router = useRouter();
+  const { t, isRTL } = useLanguage();
   const [formData, setFormData] = useState<LoginForm>({
     email: "",
     password: "",
@@ -28,15 +29,15 @@ const Login = () => {
     const newErrors: FormErrors = {};
 
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = t("common.emailRequired");
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = t("common.invalidEmail");
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t("common.passwordRequired");
     } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
+      newErrors.password = t("common.passwordTooShort");
     }
 
     setErrors(newErrors);
@@ -68,7 +69,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      setError("Please fill in all fields correctly.");
+      setError(t("common.fillFieldsCorrectly"));
       return;
     }
 
@@ -93,7 +94,7 @@ const Login = () => {
       });
 
       const errorMessage =
-        err instanceof Error ? err.message : "Login failed. Please try again.";
+        err instanceof Error ? err.message : t("common.loginFailed");
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -120,14 +121,18 @@ const Login = () => {
         />
       </Head>
 
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div
+        className={`min-h-screen bg-gray-100 flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8 ${
+          isRTL ? "rtl" : "ltr"
+        }`}
+      >
         <div className="max-w-md w-full space-y-6 sm:space-y-8">
           <div className="text-center">
             <h2 className="mt-4 sm:mt-6 text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Welcome Back
+              {t("common.welcomeBack")}
             </h2>
             <p className="mt-2 text-sm sm:text-base text-gray-600">
-              Sign in to your account
+              {t("common.signInToAccount")}
             </p>
           </div>
 
@@ -141,7 +146,7 @@ const Login = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Email Address
+                  {t("common.email")}
                 </label>
                 <input
                   id="email"
@@ -151,7 +156,7 @@ const Login = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Enter your email"
+                  placeholder={t("common.enterEmail")}
                   className={`mt-1 appearance-none relative block w-full px-3 py-3 sm:py-2 border ${
                     errors.email ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base sm:text-sm`}
@@ -166,7 +171,7 @@ const Login = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Password
+                  {t("common.password")}
                 </label>
                 <input
                   id="password"
@@ -176,7 +181,7 @@ const Login = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Enter your password"
+                  placeholder={t("common.enterPassword")}
                   className={`mt-1 appearance-none relative block w-full px-3 py-3 sm:py-2 border ${
                     errors.password ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base sm:text-sm`}
@@ -199,7 +204,7 @@ const Login = () => {
                 disabled={isLoading}
                 className="group relative w-full flex justify-center py-3 sm:py-2 px-4 border border-transparent text-base sm:text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {isLoading ? t("common.signingIn") : t("common.signIn")}
               </button>
             </div>
 
@@ -223,7 +228,7 @@ const Login = () => {
                   }}
                   className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-2 sm:py-1 rounded border border-purple-300 transition-colors duration-200"
                 >
-                  Passenger
+                  {t("common.passenger")}
                 </button>
                 <button
                   type="button"
@@ -237,7 +242,7 @@ const Login = () => {
                   }}
                   className="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-2 sm:py-1 rounded border border-green-300 transition-colors duration-200"
                 >
-                  Driver
+                  {t("common.driver")}
                 </button>
                 <button
                   type="button"
@@ -251,7 +256,7 @@ const Login = () => {
                   }}
                   className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-2 sm:py-1 rounded border border-blue-300 transition-colors duration-200"
                 >
-                  Admin
+                  {t("common.admin")}
                 </button>
                 <button
                   type="button"
@@ -265,7 +270,7 @@ const Login = () => {
                   }}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-2 sm:py-1 rounded border border-gray-300 transition-colors duration-200"
                 >
-                  Support
+                  {t("common.supportManager")}
                 </button>
                 <button
                   type="button"
