@@ -152,12 +152,21 @@ const Sidebar: React.FC<SidebarProps> = ({
 
                     {hasSubmenu && !isCollapsed && (
                       <div className="flex-shrink-0">
-                        <ChevronRight
-                          size={25}
-                          className={`transition-transform duration-200 ease-in-out ${
-                            isSubmenuActive ? "rotate-90" : "rotate-0"
-                          }`}
-                        />
+                        {isRTL ? (
+                          <ChevronLeft
+                            size={25}
+                            className={`transition-transform duration-200 ease-in-out ${
+                              isSubmenuActive ? "-rotate-90" : "rotate-0"
+                            }`}
+                          />
+                        ) : (
+                          <ChevronRight
+                            size={25}
+                            className={`transition-transform duration-200 ease-in-out ${
+                              isSubmenuActive ? "rotate-90" : "rotate-0"
+                            }`}
+                          />
+                        )}
                       </div>
                     )}
                   </button>

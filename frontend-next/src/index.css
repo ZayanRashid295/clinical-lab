@@ -89,5 +89,43 @@
   left: 0;
 }
 
+/* RTL Icon Transformations for Lucide React Icons */
+.rtl [data-lucide="chevron-right"] {
+  transform: scaleX(-1);
+}
+
+.rtl [data-lucide="chevron-left"] {
+  transform: scaleX(1);
+}
+
+.rtl [data-lucide="chevron-down"] {
+  transform: scaleY(-1);
+}
+
+.rtl [data-lucide="chevron-up"] {
+  transform: scaleY(-1);
+}
+
+.rtl [data-lucide="arrow-left"] {
+  transform: scaleX(-1);
+}
+
+.rtl [data-lucide="arrow-right"] {
+  transform: scaleX(-1);
+}
+
+.rtl [data-lucide="arrow-up-down"] {
+  transform: scaleX(-1);
+}
+
+/* RTL Menu Caret Rotations */
+.rtl [data-lucide="chevron-right"].rotate-90 {
+  transform: scaleX(-1) rotate(90deg);
+}
+
+.rtl [data-lucide="chevron-left"].-rotate-90 {
+  transform: scaleX(1) rotate(-90deg);
+}
+
 /* Import theme styles */
 @import "./styles/theme.css";
