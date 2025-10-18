@@ -8,6 +8,7 @@ import { MenuItem } from "../../../app/types/menu";
 import { iconMap } from "../Common/IconMap";
 import { useState } from "react";
 import { useTheme } from "../../../hooks/useTheme";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 interface SidebarProps {
   menuItems: MenuItem[];
@@ -33,6 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
 }) => {
   const { config } = useTheme();
+  const { t } = useLanguage();
   return (
     <>
       <style jsx>{`
@@ -125,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   } ${
                     hasSubmenu && activeMenu !== item.id ? "hover:pl-5" : ""
                   }`}
-                  title={isCollapsed ? item.label : undefined}
+                  title={isCollapsed ? t(item.label) : undefined}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="flex-shrink-0">
@@ -138,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           : "opacity-0 -translate-x-2"
                       }`}
                     >
-                      {item.label}
+                      {t(item.label)}
                     </span>
                   </div>
 
@@ -189,7 +191,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           >
                             <SubIconComponent size={16} />
                             <span className="whitespace-nowrap">
-                              {subItem.label}
+                              {t(subItem.label)}
                             </span>
                           </button>
                         );
@@ -201,7 +203,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {/* Tooltip for collapsed state */}
                 {isCollapsed && (
                   <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-primary-800 dark:bg-primary-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                    {item.label}
+                    {t(item.label)}
                     {hasSubmenu && item.submenu && (
                       <div className="mt-1 space-y-1 border-t border-primary-600 dark:border-primary-500 pt-1">
                         {item.submenu.map((subItem) => (
@@ -209,7 +211,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             key={subItem.id}
                             className="text-xs text-gray-300"
                           >
-                            {subItem.label}
+                            {t(subItem.label)}
                           </div>
                         ))}
                       </div>

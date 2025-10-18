@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { MenuItem } from "../../../app/types/menu";
 import { iconMap } from "../Common/IconMap";
 import { useTheme } from "../../../hooks/useTheme";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { Home, ChevronDown, ChevronRight } from "lucide-react";
 
 interface HorizontalMenuProps {
@@ -24,6 +25,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
   className = "",
 }) => {
   const { config } = useTheme();
+  const { t } = useLanguage();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{
@@ -492,7 +494,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
                       className="flex items-center space-x-2 px-4 py-3 text-white hover:text-blue-300 transition-colors duration-200 whitespace-nowrap"
                     >
                       <IconComponent size={18} />
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-medium">{t(item.label)}</span>
                       {hasSubmenu && (
                         <ChevronDown
                           size={16}
@@ -535,7 +537,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
                               <div className="flex items-center space-x-3">
                                 <SubIconComponent size={16} />
                                 <span className="font-medium">
-                                  {subItem.label}
+                                  {t(subItem.label)}
                                 </span>
                               </div>
                             </button>

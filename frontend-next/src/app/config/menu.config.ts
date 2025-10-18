@@ -2,7 +2,7 @@ export const MENU_CONFIG = {
   items: [
     {
       id: "dashboard",
-      label: "Dashboard",
+      label: "menu.dashboard",
       icon: "🏠",
       path: "/dashboard",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -10,7 +10,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "rides",
-      label: "Rides",
+      label: "menu.rides",
       icon: "🚗",
       path: "/rides",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -18,7 +18,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "ride-history",
-          label: "Ride History",
+          label: "menu.rideHistory",
           icon: "📋",
           path: "/rides/history",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -26,7 +26,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "active-rides",
-          label: "Active Rides",
+          label: "menu.activeRides",
           icon: "🚗",
           path: "/rides/active",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -34,7 +34,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "ride-requests",
-          label: "Ride Requests",
+          label: "menu.rideRequests",
           icon: "📱",
           path: "/rides/requests",
           roles: ["ADMIN", "DRIVER", "FLEET_MANAGER"],
@@ -42,7 +42,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "rides-management",
-          label: "Rides Management",
+          label: "menu.ridesManagement",
           icon: "🎯",
           path: "/rides/management",
           roles: ["ADMIN"],
@@ -52,7 +52,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "payments",
-      label: "Payments",
+      label: "menu.payments",
       icon: "💳",
       path: "/payments",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -60,7 +60,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "payment-history",
-          label: "Payment History",
+          label: "menu.paymentHistory",
           icon: "📋",
           path: "/payments/history",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -68,7 +68,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "payment-methods",
-          label: "Payment Methods",
+          label: "menu.paymentMethods",
           icon: "💳",
           path: "/payments/methods",
           roles: ["ADMIN", "DRIVER", "PASSENGER"],
@@ -76,7 +76,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "payouts",
-          label: "Payouts",
+          label: "menu.payouts",
           icon: "💰",
           path: "/payments/payouts",
           roles: ["ADMIN", "DRIVER", "FLEET_MANAGER"],
@@ -84,7 +84,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "invoices",
-          label: "Invoices",
+          label: "menu.invoices",
           icon: "🧾",
           path: "/payments/invoices",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -94,7 +94,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "analytics-reports",
-      label: "Analytics & Reports",
+      label: "menu.analytics",
       icon: "📊",
       path: "/analytics",
       roles: ["ADMIN", "FLEET_MANAGER"],
@@ -102,7 +102,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "ride-analytics",
-          label: "Ride Analytics",
+          label: "menu.rideAnalytics",
           icon: "🚗",
           path: "/analytics/rides",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -110,7 +110,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "location-analytics",
-          label: "Location Analytics",
+          label: "menu.locationAnalytics",
           icon: "📍",
           path: "/analytics/locations",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -118,7 +118,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "audit-logs",
-          label: "Audit Logs",
+          label: "menu.auditLogs",
           icon: "📝",
           path: "/analytics/audit",
           roles: ["ADMIN"],
@@ -126,7 +126,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "payment-analytics",
-          label: "Payment Analytics",
+          label: "menu.paymentAnalytics",
           icon: "💳",
           path: "/analytics/payments",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -136,7 +136,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "chat",
-      label: "Messages",
+      label: "menu.messages",
       icon: "💬",
       path: "/chat",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -144,7 +144,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "chat-rooms",
-          label: "Chat Rooms",
+          label: "menu.chat",
           icon: "💬",
           path: "/chat/rooms",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -152,7 +152,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "support",
-          label: "Support",
+          label: "menu.support",
           icon: "🆘",
           path: "/chat/support",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -160,7 +160,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "notifications",
-          label: "Notifications",
+          label: "menu.notifications",
           icon: "🔔",
           path: "/chat/notifications",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -170,7 +170,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "locations",
-      label: "Locations",
+      label: "menu.locations",
       icon: "📍",
       path: "/locations",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -178,7 +178,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "pickup-locations",
-          label: "Pickup Locations",
+          label: "menu.pickupLocations",
           icon: "🚏",
           path: "/locations/pickup",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -186,7 +186,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "dropoff-locations",
-          label: "Drop-off Locations",
+          label: "menu.dropoffLocations",
           icon: "🏁",
           path: "/locations/dropoff",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
@@ -194,7 +194,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "favorite-locations",
-          label: "Favorite Locations",
+          label: "menu.favoriteLocations",
           icon: "⭐",
           path: "/locations/favorites",
           roles: ["ADMIN", "DRIVER", "PASSENGER"],
@@ -204,7 +204,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "fleet",
-      label: "Fleet Management",
+      label: "menu.fleet",
       icon: "🚛",
       path: "/fleet",
       roles: ["ADMIN", "FLEET_MANAGER"],
@@ -212,7 +212,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "vehicles",
-          label: "Vehicles",
+          label: "menu.vehicles",
           icon: "🚗",
           path: "/fleet/vehicles",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -220,7 +220,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "drivers",
-          label: "Drivers",
+          label: "menu.drivers",
           icon: "👨‍💼",
           path: "/fleet/drivers",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -228,7 +228,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "routes",
-          label: "Routes",
+          label: "menu.routes",
           icon: "🗺️",
           path: "/fleet/routes",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -236,7 +236,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "maintenance",
-          label: "Maintenance",
+          label: "menu.maintenance",
           icon: "🔧",
           path: "/fleet/maintenance",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -244,7 +244,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "fuel-tracking",
-          label: "Fuel Tracking",
+          label: "menu.fuelTracking",
           icon: "⛽",
           path: "/fleet/fuel",
           roles: ["ADMIN", "FLEET_MANAGER"],
@@ -254,7 +254,7 @@ export const MENU_CONFIG = {
     },
     {
       id: "admin",
-      label: "Administration",
+      label: "menu.admin",
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
@@ -262,7 +262,7 @@ export const MENU_CONFIG = {
       submenu: [
         {
           id: "users",
-          label: "User Management",
+          label: "menu.users",
           icon: "👥",
           path: "/admin/users",
           roles: ["ADMIN"],
@@ -270,7 +270,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "roles",
-          label: "Role Management",
+          label: "menu.roles",
           icon: "🔐",
           path: "/admin/roles",
           roles: ["ADMIN"],
@@ -278,7 +278,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "system-settings",
-          label: "System Settings",
+          label: "menu.systemSettings",
           icon: "⚙️",
           path: "/admin/settings",
           roles: ["ADMIN"],
@@ -286,7 +286,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "reports",
-          label: "Reports",
+          label: "menu.reports",
           icon: "📊",
           path: "/admin/reports",
           roles: ["ADMIN"],
