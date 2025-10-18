@@ -43,8 +43,11 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
       const isInsideDropdown = Object.values(dropdownRefs.current).some(
         (ref) => ref && ref.contains(target)
       );
+      const isInsideMenuItem = Object.values(menuItemRefs.current).some(
+        (ref) => ref && ref.contains(target)
+      );
 
-      if (!isInsideDropdown) {
+      if (!isInsideDropdown && !isInsideMenuItem) {
         setActiveDropdown(null);
       }
     };
@@ -75,15 +78,19 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
 
   const handleItemClick = (item: MenuItem) => {
     if (item.submenu && item.submenu.length > 0) {
-      const menuItemElement = menuItemRefs.current[item.id];
-      if (menuItemElement) {
-        const rect = menuItemElement.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX,
-        });
+      if (activeDropdown === item.id) {
+        setActiveDropdown(null);
+      } else {
+        const menuItemElement = menuItemRefs.current[item.id];
+        if (menuItemElement) {
+          const rect = menuItemElement.getBoundingClientRect();
+          setDropdownPosition({
+            top: rect.bottom + window.scrollY,
+            left: rect.left + window.scrollX,
+          });
+        }
+        setActiveDropdown(item.id);
       }
-      setActiveDropdown(activeDropdown === item.id ? null : item.id);
     } else {
       onMenuChange(item.id);
       setActiveDropdown(null);
