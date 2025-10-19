@@ -80,31 +80,66 @@ export class PaymentsService extends BaseApiService {
    * Get payment methods for a user
    */
   async getPaymentMethods(userId?: string): Promise<any[]> {
-    const endpoint = userId
-      ? `/payment-methods?userId=${userId}`
-      : "/payment-methods";
-    return this.get(endpoint);
+    // Mock data for payment methods
+    const mockPaymentMethods = [
+      {
+        id: "pm_1",
+        type: "CREDIT_CARD",
+        provider: "Visa",
+        last4: "1234",
+        userId: userId || "user_1",
+        createdAt: "2024-01-15T10:30:00Z",
+        isDefault: true,
+        brand: "visa",
+      },
+      {
+        id: "pm_2",
+        type: "BANK_ACCOUNT",
+        provider: "Chase",
+        last4: "5678",
+        userId: userId || "user_1",
+        createdAt: "2024-01-10T14:20:00Z",
+        isDefault: false,
+        brand: "chase",
+      },
+    ];
+    return new Promise((resolve) =>
+      setTimeout(() => resolve(mockPaymentMethods), 500)
+    );
   }
 
   /**
    * Create a new payment method
    */
   async createPaymentMethod(methodData: any): Promise<any> {
-    return this.post("/payment-methods", methodData);
+    // Mock payment method creation
+    const mockMethod = {
+      id: `pm_${Date.now()}`,
+      ...methodData,
+      createdAt: new Date().toISOString(),
+    };
+    return new Promise((resolve) => setTimeout(() => resolve(mockMethod), 500));
   }
 
   /**
    * Update an existing payment method
    */
   async updatePaymentMethod(id: string, methodData: any): Promise<any> {
-    return this.patch(`/payment-methods/${id}`, methodData);
+    // Mock payment method update
+    const mockMethod = {
+      id: id,
+      ...methodData,
+      updatedAt: new Date().toISOString(),
+    };
+    return new Promise((resolve) => setTimeout(() => resolve(mockMethod), 500));
   }
 
   /**
    * Delete a payment method
    */
   async deletePaymentMethod(id: string): Promise<void> {
-    return this.delete(`/payment-methods/${id}`);
+    // Mock payment method deletion
+    return new Promise((resolve) => setTimeout(() => resolve(), 500));
   }
 }
 
