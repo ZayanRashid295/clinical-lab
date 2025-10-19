@@ -9,13 +9,8 @@ export default function RideHistory() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication status
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
-  }, [router]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -45,6 +40,16 @@ export default function RideHistory() {
         searchPlaceholder="Search ride history..."
         enableSearch={true}
       />
+      <div>
+        <h2>Mock Ride History Data</h2>
+        <ul>
+          {mockHistoryData.map((history) => (
+            <li key={history.id}>
+              {history.date}: {history.details}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

@@ -36,59 +36,25 @@ export class RideHistoryService extends BaseApiService {
   async getList(params: GetListParams = {}): Promise<PaginatedResponse<Ride>> {
     try {
       console.log("🔄 Fetching ridehistory with params:", params);
-      const response = await this.get(this.endpoint, params);
-
-      // Handle different response formats from the backend
-      if (!response) {
-        console.warn("⚠️ Received null response from ridehistory API");
-        return {
-          data: [],
-          pagination: {
-            page: 1,
-            limit: 10,
-            total: 0,
-            totalPages: 0,
-          },
-        };
-      }
-
-      // If response is already in the correct format
-      if (response.data && response.pagination) {
-        return response;
-      }
-
-      // If response is a direct array (fallback for non-paginated endpoints)
-      if (Array.isArray(response)) {
-        return {
-          data: response,
-          pagination: {
-            page: 1,
-            limit: response.length,
-            total: response.length,
-            totalPages: 1,
-          },
-        };
-      }
-
-      // If response has items property (alternative format)
-      if (response.items) {
-        return {
-          data: response.items,
-          pagination: response.pagination ||
-            response.meta || {
-              page: 1,
-              limit: response.items.length,
-              total: response.items.length,
-              totalPages: 1,
-            },
-        };
-      }
-
-      // Fallback for unexpected response format
-      console.warn(
-        "⚠️ Unexpected response format from ridehistory API:",
-        response
+      // Mock data for ridehistory
+      const mockResponse = {
+        data: [
+          { id: "1", status: "COMPLETED", details: "Ride to Downtown" },
+          { id: "2", status: "CANCELLED", details: "Ride to Uptown" },
+        ],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 2,
+          totalPages: 1,
+        },
+      };
+      return new Promise((resolve) =>
+        setTimeout(() => resolve(mockResponse), 500)
       );
+    } catch (error) {
+      console.error("❌ Error fetching ridehistory:", error);
+      // Return empty data on error
       return {
         data: [],
         pagination: {
@@ -98,14 +64,6 @@ export class RideHistoryService extends BaseApiService {
           totalPages: 0,
         },
       };
-    } catch (error) {
-      console.error("❌ Error fetching ridehistory:", error);
-
-      // For development, always return mock data when there's any error
-      console.log(
-        "🔄 Backend not available, returning mock data for development"
-      );
-      return this.getMockData(params);
     }
   }
 

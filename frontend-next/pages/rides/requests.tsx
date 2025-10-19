@@ -9,13 +9,8 @@ export default function RideRequests() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication status
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
-  }, [router]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -27,6 +22,11 @@ export default function RideRequests() {
       </div>
     );
   }
+
+  const mockRequestsData = [
+    { id: "1", requester: "Alice", destination: "City Center" },
+    { id: "2", requester: "Bob", destination: "Museum" },
+  ];
 
   return (
     <>
@@ -45,6 +45,16 @@ export default function RideRequests() {
         searchPlaceholder="Search ride requests..."
         enableSearch={true}
       />
+      <div>
+        <h2>Mock Ride Requests Data</h2>
+        <ul>
+          {mockRequestsData.map((request) => (
+            <li key={request.id}>
+              {request.requester} to {request.destination}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

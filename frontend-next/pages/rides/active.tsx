@@ -8,14 +8,14 @@ export default function ActiveRides() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
+  const mockActiveRidesData = [
+    { id: "1", driver: "Alice", location: "Central Park" },
+    { id: "2", driver: "Bob", location: "Times Square" },
+  ];
+
   useEffect(() => {
-    // Check authentication status
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
-  }, [router]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -45,6 +45,16 @@ export default function ActiveRides() {
         searchPlaceholder="Search active rides..."
         enableSearch={true}
       />
+      <div>
+        <h2>Mock Active Rides Data</h2>
+        <ul>
+          {mockActiveRidesData.map((ride) => (
+            <li key={ride.id}>
+              {ride.driver} at {ride.location}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

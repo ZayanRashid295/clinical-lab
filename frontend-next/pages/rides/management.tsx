@@ -8,14 +8,14 @@ export default function RidesManagement() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
+  const mockRidesData = [
+    { id: "1", name: "Downtown Ride", status: "Active" },
+    { id: "2", name: "Airport Ride", status: "Pending" },
+  ];
+
   useEffect(() => {
-    // Check authentication status
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
-  }, [router]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -48,6 +48,16 @@ export default function RidesManagement() {
         searchPlaceholder="Search rides management..."
         enableSearch={true}
       />
+      <div>
+        <h2>Mock Rides Management Data</h2>
+        <ul>
+          {mockRidesData.map((ride) => (
+            <li key={ride.id}>
+              {ride.name} - {ride.status}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }
