@@ -16,7 +16,7 @@ async function main() {
 
     // Seed other data
     // await seedLearningCases(prisma);
-    // await seedUSMLE(prisma);
+    await seedUSMLE(prisma);
 
     console.log("\n🎉 All seeding completed successfully!");
   } catch (error) {
