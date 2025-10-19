@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../../src/shared";
@@ -35,6 +35,22 @@ export default function MaintenancePage() {
     MOCK_MAINTENANCE_RECORDS
   );
 
+  const findMenuItemByPath = useCallback(
+    (items: MenuItem[], path: string): MenuItem | null => {
+      for (const item of items) {
+        if (item.path === path) {
+          return item;
+        }
+        if (item.submenu) {
+          const found = findMenuItemByPath(item.submenu, path);
+          if (found) return found;
+        }
+      }
+      return null;
+    },
+    []
+  );
+
   useEffect(() => {
     // Check authentication status
     if (!authService.isAuthenticated()) {
@@ -51,7 +67,7 @@ export default function MaintenancePage() {
       const foundItem = findMenuItemByPath(menuItems, "/fleet/maintenance");
       setMenuItem(foundItem);
     }
-  }, [router]);
+  }, [router, findMenuItemByPath]);
 
   useEffect(() => {
     // Filter maintenance records based on search term, status, and type
@@ -77,22 +93,6 @@ export default function MaintenancePage() {
 
     setFilteredRecords(filtered);
   }, [searchTerm, statusFilter, typeFilter]);
-
-  const findMenuItemByPath = (
-    items: MenuItem[],
-    path: string
-  ): MenuItem | null => {
-    for (const item of items) {
-      if (item.path === path) {
-        return item;
-      }
-      if (item.submenu) {
-        const found = findMenuItemByPath(item.submenu, path);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {

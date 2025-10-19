@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   Send,
   Paperclip,
@@ -29,9 +29,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ room, onBack }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get messages for the current room
-  const roomMessages = room
-    ? MOCK_MESSAGES.filter((msg) => msg.chatRoomId === room.id)
-    : [];
+  const roomMessages = useMemo(() => {
+    return room
+      ? MOCK_MESSAGES.filter((msg) => msg.chatRoomId === room.id)
+      : [];
+  }, [room]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

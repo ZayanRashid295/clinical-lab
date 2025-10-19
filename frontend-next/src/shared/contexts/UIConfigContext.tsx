@@ -75,6 +75,16 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
         | "indigo"
         | "pink"
         | "teal"
+        | "cyan"
+        | "emerald"
+        | "violet"
+        | "rose"
+        | "amber"
+        | "lime"
+        | "slate"
+        | "zinc"
+        | "sky"
+        | "fuchsia"
     ) => {
       UIConfigService.getInstance().setColorScheme(colorScheme);
     },

@@ -12,7 +12,7 @@ import {
 } from "../contexts/UIConfigContext";
 import { typography, spacing } from "../utils/responsive";
 import ContentRenderer from "./Content/ContentRenderer";
-import { createContentRegistry } from "../../app/config/content.registry";
+// import { createContentRegistry } from "../../app/config/content.registry";
 import { COLOR_SCHEMES } from "../../app/config/theme.service";
 // import { ContentRegistry } from "../../app/types/dashboard";
 
@@ -210,7 +210,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
 
   // Get the content registry to use
   const registry = useMemo(() => {
-    return contentRegistry || createContentRegistry({});
+    return contentRegistry;
   }, [contentRegistry]);
 
   // Function to get the appropriate page content based on current path
@@ -222,7 +222,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         return <CustomDashboard />;
       }
       // Check if there's a dashboard configuration for this route
-      if (registry.dashboards[currentPath]) {
+      if (registry?.dashboards?.[currentPath]) {
         return (
           <ContentRenderer
             path={currentPath}
@@ -260,10 +260,10 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     return (
       <ContentRenderer
         path={currentPath}
-        contentConfig={registry.content}
-        dashboards={registry.dashboards}
+        contentConfig={registry?.content || {}}
+        dashboards={registry?.dashboards || {}}
         customContent={customContent}
-        defaultContent={registry.defaultContent}
+        defaultContent={registry?.defaultContent}
       >
         {children}
       </ContentRenderer>

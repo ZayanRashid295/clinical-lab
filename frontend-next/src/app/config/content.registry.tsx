@@ -1,5 +1,16 @@
 import { ContentRegistry } from "../types/dashboard";
 
+// Helper function to create a content registry
+// export const createContentRegistry = (
+//   config: Partial<ContentRegistry> = {}
+// ): ContentRegistry => {
+//   return {
+//     content: config.content || {},
+//     dashboards: config.dashboards || {},
+//     defaultContent: config.defaultContent,
+//   };
+// };
+
 // Import ride-sharing specific components
 import { RideManagement } from "../components/Rides";
 import PaymentHistoryContent from "../components/Content/PaymentHistoryContent";
@@ -31,6 +42,7 @@ import {
   analyticsDashboardConfig,
   paymentAnalyticsConfig,
 } from "./dashboard.configs";
+import { ShadowModeContent } from "../components/ShadowMode";
 
 // Ride-sharing specific content registry
 export const rideSharingContentRegistry: ContentRegistry = {
@@ -111,6 +123,7 @@ export const rideSharingContentRegistry: ContentRegistry = {
       </div>
     ),
     "/analytics/audit": () => <AuditLogsContent />,
+    "/shadow-mode": () => <ShadowModeContent />,
   },
 
   dashboards: {
@@ -165,196 +178,3 @@ const PlaceholderComponent = ({
     </div>
   </div>
 );
-
-// Generic content registry - can be overridden by applications
-export const defaultContentRegistry: ContentRegistry = {
-  content: {
-    // Placeholder routes that can be overridden
-    "/payments": () => (
-      <PlaceholderComponent
-        title="Payments"
-        description="Payment management interface"
-        icon="💳"
-      />
-    ),
-
-    // Chat routes
-    "/chat/rooms": () => (
-      <PlaceholderComponent
-        title="Chat Rooms"
-        description="Communication and messaging"
-        icon="💬"
-      />
-    ),
-    "/chat/notifications": () => (
-      <PlaceholderComponent
-        title="Notifications"
-        description="System notifications and alerts"
-        icon="🔔"
-      />
-    ),
-    "/chat/support": () => (
-      <PlaceholderComponent
-        title="Support Chat"
-        description="Customer support and help"
-        icon="🆘"
-      />
-    ),
-
-    // Location routes
-    "/locations": () => (
-      <PlaceholderComponent
-        title="Locations"
-        description="Location management and tracking"
-        icon="📍"
-      />
-    ),
-    "/locations/pickup": () => (
-      <PlaceholderComponent
-        title="Pickup Locations"
-        description="Manage pickup points"
-        icon="🚩"
-      />
-    ),
-    "/locations/dropoff": () => (
-      <PlaceholderComponent
-        title="Dropoff Locations"
-        description="Manage dropoff points"
-        icon="🏁"
-      />
-    ),
-    "/locations/favorites": () => (
-      <PlaceholderComponent
-        title="Favorite Locations"
-        description="User favorite locations"
-        icon="⭐"
-      />
-    ),
-
-    // Fleet routes
-    "/fleet": () => (
-      <PlaceholderComponent
-        title="Fleet Management"
-        description="Vehicle and driver management"
-        icon="🚗"
-      />
-    ),
-    "/fleet/vehicles": () => (
-      <PlaceholderComponent
-        title="Vehicles"
-        description="Vehicle management and tracking"
-        icon="🚙"
-      />
-    ),
-    "/fleet/drivers": () => (
-      <PlaceholderComponent
-        title="Drivers"
-        description="Driver management and profiles"
-        icon="👨‍💼"
-      />
-    ),
-    "/fleet/routes": () => (
-      <PlaceholderComponent
-        title="Routes"
-        description="Route planning and management"
-        icon="🗺️"
-      />
-    ),
-    "/fleet/maintenance": () => (
-      <PlaceholderComponent
-        title="Maintenance"
-        description="Vehicle maintenance tracking"
-        icon="🔧"
-      />
-    ),
-    "/fleet/fuel": () => (
-      <PlaceholderComponent
-        title="Fuel Management"
-        description="Fuel tracking and optimization"
-        icon="⛽"
-      />
-    ),
-
-    // Admin sub-routes
-    "/admin/users": () => (
-      <PlaceholderComponent
-        title="User Management"
-        description="Manage system users and permissions"
-        icon="👥"
-      />
-    ),
-    "/admin/roles": () => (
-      <PlaceholderComponent
-        title="Role Management"
-        description="Define and manage user roles"
-        icon="🔐"
-      />
-    ),
-    "/admin/settings": () => (
-      <PlaceholderComponent
-        title="System Settings"
-        description="Configure system-wide settings"
-        icon="⚙️"
-      />
-    ),
-    "/admin/reports": () => (
-      <PlaceholderComponent
-        title="Reports"
-        description="Generate and manage reports"
-        icon="📊"
-      />
-    ),
-
-    // Analytics sub-routes
-    "/analytics/rides": () => (
-      <PlaceholderComponent
-        title="Ride Analytics"
-        description="Analyze ride patterns and performance"
-        icon="🚗"
-      />
-    ),
-    "/analytics/locations": () => (
-      <PlaceholderComponent
-        title="Location Analytics"
-        description="Track location usage and trends"
-        icon="📍"
-      />
-    ),
-    "/analytics/audit": () => (
-      <PlaceholderComponent
-        title="Audit Logs"
-        description="Monitor system activities and changes"
-        icon="📝"
-      />
-    ),
-  },
-
-  dashboards: {},
-
-  defaultContent: () => (
-    <div className="bg-white rounded-lg shadow border p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        Content Not Configured
-      </h2>
-      <p className="text-gray-600">
-        This section has not been configured yet. Please add content for this
-        path in your content registry.
-      </p>
-    </div>
-  ),
-};
-
-// Helper function to create a custom content registry
-export const createContentRegistry = (
-  overrides: Partial<ContentRegistry>
-): ContentRegistry => {
-  return {
-    content: { ...defaultContentRegistry.content, ...overrides.content },
-    dashboards: {
-      ...defaultContentRegistry.dashboards,
-      ...overrides.dashboards,
-    },
-    defaultContent:
-      overrides.defaultContent || defaultContentRegistry.defaultContent,
-  };
-};

@@ -5,7 +5,7 @@
 The Next.js frontend now includes a comprehensive theme system that allows users to customize the appearance of the application. The theme system supports:
 
 - **Theme Modes**: Light, Dark, and Auto (follows system preference)
-- **Color Schemes**: 8 different color palettes (Blue, Green, Purple, Red, Orange, Indigo, Pink, Teal)
+- **Color Schemes**: 18 different color palettes (Blue, Green, Purple, Red, Orange, Indigo, Pink, Teal, Cyan, Emerald, Violet, Rose, Amber, Lime, Slate, Zinc, Sky, Fuchsia)
 - **Font Sizes**: Small, Medium, Large
 - **Border Radius**: None, Small, Medium, Large
 - **Real-time Preview**: See changes immediately as you customize
@@ -19,7 +19,7 @@ The Next.js frontend now includes a comprehensive theme system that allows users
 
 ### 2. Color Schemes
 
-The system includes 8 predefined color schemes:
+The system includes 18 predefined color schemes:
 
 **Color Consistency**: The actual colors (red, blue, green, etc.) remain exactly the same whether you're in light or dark mode. Only the backgrounds, text colors, and borders change to provide proper contrast and readability.
 
@@ -31,6 +31,16 @@ The system includes 8 predefined color schemes:
 - Indigo
 - Pink
 - Teal
+- Cyan
+- Emerald
+- Violet
+- Rose
+- Amber
+- Lime
+- Slate
+- Zinc
+- Sky
+- Fuchsia
 
 Each color scheme includes a full palette from 50-900 shades for both primary and secondary colors.
 
@@ -58,7 +68,7 @@ Each color scheme includes a full palette from 50-900 shades for both primary an
 
 ### Quick Color Picker
 
-The color picker provides instant access to all 8 color themes:
+The color picker provides instant access to all 18 color themes:
 
 - **Header Color Picker**: Shows current theme name and color swatches
 - **Floating Color Picker**: Compact palette icon in bottom-right corner, opens upward to stay within viewport

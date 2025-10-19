@@ -10,7 +10,17 @@ export interface UIConfig {
     | "orange"
     | "indigo"
     | "pink"
-    | "teal";
+    | "teal"
+    | "cyan"
+    | "emerald"
+    | "violet"
+    | "rose"
+    | "amber"
+    | "lime"
+    | "slate"
+    | "zinc"
+    | "sky"
+    | "fuchsia";
   fontSize: "small" | "medium" | "large";
   borderRadius: "none" | "small" | "medium" | "large";
   enableAnimations: boolean;
@@ -109,6 +119,16 @@ export class UIConfigService {
       | "indigo"
       | "pink"
       | "teal"
+      | "cyan"
+      | "emerald"
+      | "violet"
+      | "rose"
+      | "amber"
+      | "lime"
+      | "slate"
+      | "zinc"
+      | "sky"
+      | "fuchsia"
   ): void {
     this.updateConfig({ colorScheme });
   }
@@ -183,6 +203,16 @@ export const useUIConfig = () => {
         | "indigo"
         | "pink"
         | "teal"
+        | "cyan"
+        | "emerald"
+        | "violet"
+        | "rose"
+        | "amber"
+        | "lime"
+        | "slate"
+        | "zinc"
+        | "sky"
+        | "fuchsia"
     ) => {
       UIConfigService.getInstance().setColorScheme(colorScheme);
     },

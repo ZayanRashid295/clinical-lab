@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../../src/shared";
@@ -29,6 +29,22 @@ export default function FuelTrackingPage() {
   const [vehicleFilter, setVehicleFilter] = useState("ALL");
   const [filteredRecords, setFilteredRecords] = useState(MOCK_FUEL_RECORDS);
 
+  const findMenuItemByPath = useCallback(
+    (items: MenuItem[], path: string): MenuItem | null => {
+      for (const item of items) {
+        if (item.path === path) {
+          return item;
+        }
+        if (item.submenu) {
+          const found = findMenuItemByPath(item.submenu, path);
+          if (found) return found;
+        }
+      }
+      return null;
+    },
+    []
+  );
+
   useEffect(() => {
     // Check authentication status
     if (!authService.isAuthenticated()) {
@@ -45,7 +61,7 @@ export default function FuelTrackingPage() {
       const foundItem = findMenuItemByPath(menuItems, "/fleet/fuel");
       setMenuItem(foundItem);
     }
-  }, [router]);
+  }, [router, findMenuItemByPath]);
 
   useEffect(() => {
     // Filter fuel records based on search term and vehicle
@@ -68,22 +84,6 @@ export default function FuelTrackingPage() {
 
     setFilteredRecords(filtered);
   }, [searchTerm, vehicleFilter]);
-
-  const findMenuItemByPath = (
-    items: MenuItem[],
-    path: string
-  ): MenuItem | null => {
-    for (const item of items) {
-      if (item.path === path) {
-        return item;
-      }
-      if (item.submenu) {
-        const found = findMenuItemByPath(item.submenu, path);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();

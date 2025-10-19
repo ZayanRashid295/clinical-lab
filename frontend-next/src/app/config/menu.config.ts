@@ -294,6 +294,14 @@ export const MENU_CONFIG = {
         },
       ],
     },
+    {
+      id: "shadow-mode",
+      label: "menu.shadowMode",
+      icon: "🌙",
+      path: "/shadow-mode",
+      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+      order: 9,
+    },
   ],
 
   permissions: {
