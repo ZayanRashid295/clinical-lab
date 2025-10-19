@@ -482,7 +482,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
 
             <div
               dir={rtldir}
-              className="flex items-center space-x-1 min-w-max px-4"
+              className="flex items-center gap-1 min-w-max px-4"
             >
               {menuItems.map((item) => {
                 const IconComponent = iconMap[item.icon] || Home;
@@ -505,7 +505,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
                   >
                     <button
                       onClick={() => handleItemClick(item)}
-                      className="flex items-center space-x-2 px-4 py-3 text-white hover:text-blue-300 transition-colors duration-200 whitespace-nowrap"
+                      className="flex items-center gap-2 px-4 py-3 text-white hover:text-blue-300 transition-colors duration-200 whitespace-nowrap"
                     >
                       <IconComponent size={18} />
                       <span className="font-medium">{t(item.label)}</span>
@@ -548,7 +548,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
                                 isSubActive ? "active" : ""
                               }`}
                             >
-                              <div className="flex items-center space-x-3">
+                              <div className="flex items-center gap-3">
                                 <SubIconComponent size={16} />
                                 <span className="font-medium">
                                   {t(subItem.label)}
