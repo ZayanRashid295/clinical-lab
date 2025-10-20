@@ -89,31 +89,33 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Stethoscope className="h-5 w-5 text-primary-foreground" />
+            <div className="h-8 w-8 rounded-lg bg-primary-500 flex items-center justify-center">
+              <Stethoscope className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Clinical Lab</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              Clinical Lab
+            </span>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
             <a
               href="#features"
-              className="text-sm font-medium hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-md transition"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md transition"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="text-sm font-medium hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-md transition"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md transition"
             >
               How It Works
             </a>
             <a
               href="#pricing"
-              className="text-sm font-medium hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-md transition"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md transition"
             >
               Pricing
             </a>
@@ -163,7 +165,7 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Trophy className="h-6 w-6 text-primary" />
+              <Trophy className="h-6 w-6 text-primary-500" />
               Leaderboard
             </DialogTitle>
           </DialogHeader>

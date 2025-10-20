@@ -7,6 +7,8 @@ import { FeatureCard } from "./FeatureCard";
 import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
 import { VideoModal } from "./VideoModal";
+import { SettingsButton } from "./SettingsButton";
+import { SettingsModal } from "./SettingsModal";
 import { Button } from "@/shared/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/shared/utils/cn";
@@ -346,6 +348,7 @@ function HowItWorksSection2() {
 export function LandingPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const handleOpenLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -361,6 +364,14 @@ export function LandingPage() {
 
   const handleCloseVideoModal = () => {
     setIsVideoModalOpen(false);
+  };
+
+  const handleOpenSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const handleCloseSettingsModal = () => {
+    setIsSettingsModalOpen(false);
   };
 
   const heroSlides = [
@@ -399,23 +410,23 @@ export function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <LandingNav onLoginClick={handleOpenLoginModal} />
 
-      <main className="flex-1 bg-background text-foreground">
+      <main className="flex-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <HeroCarousel
           slides={heroSlides}
           onLoginClick={handleOpenLoginModal}
           onDemoClick={handleOpenVideoModal}
         />
 
-        <section id="features" className="py-20 px-6 bg-background">
+        <section id="features" className="py-20 px-6 bg-white dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">
+              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                 Transforming Clinical Education
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Safe, scalable AI-powered training that prepares students for
                 real patient encounters
               </p>
@@ -427,14 +438,14 @@ export function LandingPage() {
 
         <section
           id="how-it-works"
-          className="py-20 px-6 bg-muted/30 dark:bg-muted/20"
+          className="py-20 px-6 bg-gray-50 dark:bg-gray-800"
         >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">
+              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                 How It Works
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Three powerful modes for comprehensive clinical training
               </p>
             </div>
@@ -444,13 +455,13 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="py-20 px-6 bg-background">
+        <section id="pricing" className="py-20 px-6 bg-white dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">
+              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                 Choose Your Plan
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Flexible pricing for students and institutions. All plans
                 include 14-day free trial.
               </p>
@@ -459,20 +470,20 @@ export function LandingPage() {
             <PricingGrid onLoginClick={handleOpenLoginModal} />
 
             <div className="text-center mt-12">
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 All plans include 14-day free trial. No credit card required.
               </p>
               <div className="flex flex-wrap gap-6 justify-center text-sm">
-                <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-chart-3" />
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <Check className="h-4 w-4 text-green-500" />
                   Cancel anytime
                 </span>
-                <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-chart-3" />
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <Check className="h-4 w-4 text-green-500" />
                   Education discounts available
                 </span>
-                <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-chart-3" />
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <Check className="h-4 w-4 text-green-500" />
                   Group pricing for cohorts
                 </span>
               </div>
@@ -481,8 +492,8 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-background py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
+      <footer className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-12 px-6">
+        <div className="max-w-7xl mx-auto text-center text-sm text-gray-600 dark:text-gray-300">
           <p>&copy; 2025 Clinical Lab. All rights reserved.</p>
         </div>
       </footer>
@@ -494,6 +505,11 @@ export function LandingPage() {
         videoSrc="/video/promotional.mp4"
         title="Clinical Lab Demo"
       />
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={handleCloseSettingsModal}
+      />
+      <SettingsButton onClick={handleOpenSettingsModal} />
     </div>
   );
 }

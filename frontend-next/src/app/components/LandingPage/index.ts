@@ -6,3 +6,5 @@ export { PricingCard } from "./PricingCard";
 export { LoginModal } from "./LoginModal";
 export { VideoModal } from "./VideoModal";
 export { LeaderboardTable } from "./LeaderboardTable";
+export { SettingsButton } from "./SettingsButton";
+export { SettingsModal } from "./SettingsModal";
