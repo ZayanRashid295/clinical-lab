@@ -386,6 +386,7 @@ const Login: React.FC = () => {
               style={{
                 transform: get3DTransform(),
                 background: getFormBackgroundGradient(),
+                transition: "transform 0.2s ease-out",
               }}
             >
               {/* Form Header */}
