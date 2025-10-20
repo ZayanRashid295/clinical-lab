@@ -7,6 +7,8 @@ import { FeatureCard } from "./FeatureCard";
 import { PricingCard } from "./PricingCard";
 import { LoginModal } from "./LoginModal";
 import { VideoModal } from "./VideoModal";
+import { SettingsButton } from "@/shared/components/Settings/SettingsButton";
+import MenuLayoutSettings from "@/shared/components/Settings/MenuLayoutSettings";
 import { Button } from "@/shared/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/shared/utils/cn";
@@ -346,6 +348,7 @@ function HowItWorksSection2() {
 export function LandingPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleOpenLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -361,6 +364,14 @@ export function LandingPage() {
 
   const handleCloseVideoModal = () => {
     setIsVideoModalOpen(false);
+  };
+
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    setIsSettingsOpen(false);
   };
 
   const heroSlides = [
@@ -494,6 +505,11 @@ export function LandingPage() {
         videoSrc="/video/promotional.mp4"
         title="Clinical Lab Demo"
       />
+      <MenuLayoutSettings
+        isOpen={isSettingsOpen}
+        onClose={handleCloseSettings}
+      />
+      <SettingsButton onClick={handleOpenSettings} />
     </div>
   );
 }
