@@ -4,6 +4,7 @@ import "../src/index.css";
 import { UIConfigService } from "../src/app/config/ui.config";
 import { ThemeService } from "../src/app/config/theme.service";
 import { LanguageProvider } from "../src/shared/contexts/LanguageContext";
+import { UIConfigProvider } from "../src/shared/contexts/UIConfigContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -14,8 +15,10 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <LanguageProvider>
-      <Component {...pageProps} />
-    </LanguageProvider>
+    <UIConfigProvider>
+      <LanguageProvider>
+        <Component {...pageProps} />
+      </LanguageProvider>
+    </UIConfigProvider>
   );
 }
