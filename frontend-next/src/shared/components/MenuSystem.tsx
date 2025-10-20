@@ -200,11 +200,11 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   const handleLogout = async () => {
     try {
       await authService.logout();
-      console.log("Logout successful, redirecting to login page");
-      router.replace("/login");
+      console.log("Logout successful, redirecting to landing page");
+      router.replace("/landing-page");
     } catch (error) {
       console.error("Logout failed:", error);
-      router.replace("/login");
+      router.replace("/landing-page");
     }
   };
 
