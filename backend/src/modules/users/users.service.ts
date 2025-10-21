@@ -85,4 +85,25 @@ export class UsersService {
       data: { isActive: false },
     });
   }
+
+  async getStats() {
+    const total = await this.prisma.user.count();
+    const active = await this.prisma.user.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.user.count({
+      where: { isActive: false },
+    });
+
+    // For now, we'll set pending to 0 since we don't have a pending status in the schema
+    // You can modify this based on your business logic
+    const pending = 0;
+
+    return {
+      total,
+      active,
+      inactive,
+      pending,
+    };
+  }
 }

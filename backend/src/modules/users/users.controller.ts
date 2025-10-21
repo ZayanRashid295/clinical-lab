@@ -31,6 +31,16 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get("stats")
+  @ApiOperation({ summary: "Get user statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "User statistics retrieved successfully",
+  })
+  getStats() {
+    return this.usersService.getStats();
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get user by ID" })
   @ApiResponse({ status: 200, description: "User retrieved successfully" })

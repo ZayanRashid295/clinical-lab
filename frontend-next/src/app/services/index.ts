@@ -9,6 +9,10 @@ export { authService, AuthService } from "../../shared/services/auth.service";
 export { paymentsService, PaymentsService } from "./payments/payments.service";
 export * from "./payments/payments.types";
 
+// Users services
+export { UsersService } from "./users/users.service";
+export * from "./users/users.types";
+
 // TODO: Add other services as they are created
 // export { payoutsService, PayoutsService } from "./payouts/payouts.service";
 // export { fleetService, FleetService } from "./fleet/fleet.service";
@@ -16,7 +20,6 @@ export * from "./payments/payments.types";
 // export { chatService, ChatService } from "./chat/chat.service";
 // export { notificationsService, NotificationsService } from "./notifications/notifications.service";
 // export { adminService, AdminService } from "./admin/admin.service";
-// export { usersService, UsersService } from "./users/users.service";
 
 // Re-import for the api object
 import { paymentsService } from "./payments/payments.service";

@@ -16,129 +16,58 @@ import {
   XCircle,
   Clock,
   MoreVertical,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import { useTheme } from "../../../hooks/useTheme";
-
-// Mock data for users
-const MOCK_USERS = [
-  {
-    id: "1",
-    name: "John Smith",
-    email: "john.smith@company.com",
-    phone: "+1 (555) 123-4567",
-    role: "ADMIN",
-    status: "ACTIVE",
-    lastLogin: "2024-01-15T10:30:00Z",
-    createdAt: "2023-06-15T09:00:00Z",
-    location: "New York, NY",
-    avatar: null,
-  },
-  {
-    id: "2",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@company.com",
-    phone: "+1 (555) 234-5678",
-    role: "FLEET_MANAGER",
-    status: "ACTIVE",
-    lastLogin: "2024-01-14T16:45:00Z",
-    createdAt: "2023-08-20T14:30:00Z",
-    location: "Los Angeles, CA",
-    avatar: null,
-  },
-  {
-    id: "3",
-    name: "Mike Davis",
-    email: "mike.davis@company.com",
-    phone: "+1 (555) 345-6789",
-    role: "DRIVER",
-    status: "ACTIVE",
-    lastLogin: "2024-01-15T08:15:00Z",
-    createdAt: "2023-09-10T11:20:00Z",
-    location: "Chicago, IL",
-    avatar: null,
-  },
-  {
-    id: "4",
-    name: "Emily Wilson",
-    email: "emily.wilson@company.com",
-    phone: "+1 (555) 456-7890",
-    role: "CUSTOMER_SUPPORT",
-    status: "INACTIVE",
-    lastLogin: "2024-01-10T12:00:00Z",
-    createdAt: "2023-07-05T16:45:00Z",
-    location: "Miami, FL",
-    avatar: null,
-  },
-  {
-    id: "5",
-    name: "David Brown",
-    email: "david.brown@company.com",
-    phone: "+1 (555) 567-8901",
-    role: "DRIVER",
-    status: "PENDING",
-    lastLogin: null,
-    createdAt: "2024-01-12T09:30:00Z",
-    location: "Seattle, WA",
-    avatar: null,
-  },
-];
+import useUsers from "../../../hooks/useUsers";
+import useUserStats from "../../../hooks/useUserStats";
+import { User } from "../../types/user";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [roleFilter, setRoleFilter] = useState("ALL");
-  const [filteredUsers, setFilteredUsers] = useState(MOCK_USERS);
 
+  // Use the custom hooks for data fetching
+  const { users, loading, error, pagination, refetch, updateFilters, filters } =
+    useUsers({
+      page: 1,
+      limit: 12,
+    });
+
+  const { stats, loading: statsLoading, error: statsError } = useUserStats();
+
+  // Update filters when search or filter values change
   useEffect(() => {
-    // Filter users based on search term, status, and role
-    let filtered = MOCK_USERS;
+    const newFilters: any = {};
 
     if (searchTerm) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.phone.includes(searchTerm) ||
-          user.location.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      newFilters.search = searchTerm;
     }
 
     if (statusFilter !== "ALL") {
-      filtered = filtered.filter((user) => user.status === statusFilter);
+      newFilters.status = statusFilter;
     }
 
     if (roleFilter !== "ALL") {
-      filtered = filtered.filter((user) => user.role === roleFilter);
+      newFilters.role = roleFilter;
     }
 
-    setFilteredUsers(filtered);
-  }, [searchTerm, statusFilter, roleFilter]);
+    updateFilters(newFilters);
+  }, [searchTerm, statusFilter, roleFilter, updateFilters]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "INACTIVE":
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case "PENDING":
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
-    }
+  const getStatusIcon = (isActive: boolean) => {
+    return isActive ? (
+      <CheckCircle className="h-5 w-5 text-green-500" />
+    ) : (
+      <XCircle className="h-5 w-5 text-red-500" />
+    );
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "bg-green-100 text-green-800";
-      case "INACTIVE":
-        return "bg-red-100 text-red-800";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getStatusColor = (isActive: boolean) => {
+    return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
   };
 
   const getRoleColor = (role: string) => {
@@ -164,12 +93,33 @@ export default function UserManagementContent() {
     return new Date(dateString).toLocaleString();
   };
 
-  const totalUsers = MOCK_USERS.length;
-  const activeUsers = MOCK_USERS.filter((u) => u.status === "ACTIVE").length;
-  const inactiveUsers = MOCK_USERS.filter(
-    (u) => u.status === "INACTIVE"
-  ).length;
-  const pendingUsers = MOCK_USERS.filter((u) => u.status === "PENDING").length;
+  const getUserDisplayName = (user: User) => {
+    return `${user.firstName} ${user.lastName}`;
+  };
+
+  const getUserRole = (user: User) => {
+    // Get the first role or default to 'USER'
+    return user.roles?.[0]?.role?.name || "USER";
+  };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  const handleViewUser = (user: User) => {
+    console.log("View user:", user);
+    // TODO: Implement user details modal
+  };
+
+  const handleEditUser = (user: User) => {
+    console.log("Edit user:", user);
+    // TODO: Implement user edit modal
+  };
+
+  const handleDeactivateUser = (user: User) => {
+    console.log("Deactivate user:", user);
+    // TODO: Implement user deactivation
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -184,26 +134,38 @@ export default function UserManagementContent() {
               Manage system users and their permissions
             </p>
           </div>
-          <button
-            onClick={() => {
-              /* Add user functionality */
-            }}
-            className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
-            style={{
-              backgroundColor: "var(--color-primary-600)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor =
-                "var(--color-primary-700)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor =
-                "var(--color-primary-600)";
-            }}
-          >
-            <UserPlus className="h-5 w-5 mr-2" />
-            Add User
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw
+                className={`h-5 w-5 mr-2 ${loading ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </button>
+            <button
+              onClick={() => {
+                /* Add user functionality */
+              }}
+              className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
+              style={{
+                backgroundColor: "var(--color-primary-600)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "var(--color-primary-700)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "var(--color-primary-600)";
+              }}
+            >
+              <UserPlus className="h-5 w-5 mr-2" />
+              Add User
+            </button>
+          </div>
         </div>
       </div>
 
@@ -219,7 +181,9 @@ export default function UserManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : stats?.total || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -233,7 +197,9 @@ export default function UserManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Active Users</p>
-              <p className="text-2xl font-bold text-gray-900">{activeUsers}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : stats?.active || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -250,7 +216,7 @@ export default function UserManagementContent() {
                 Inactive Users
               </p>
               <p className="text-2xl font-bold text-gray-900">
-                {inactiveUsers}
+                {statsLoading ? "..." : stats?.inactive || 0}
               </p>
             </div>
           </div>
@@ -265,7 +231,9 @@ export default function UserManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Pending Users</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingUsers}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : stats?.pending || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -313,132 +281,151 @@ export default function UserManagementContent() {
         </div>
       </div>
 
-      {/* Users Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredUsers.map((user) => (
-          <div
-            key={user.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-          >
-            {/* User Header */}
-            <div
-              className="p-6 text-white"
-              style={{
-                background: `linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600))`,
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-lg font-semibold">{user.name}</h3>
-                    <p className="text-sm opacity-90">{user.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(user.status)}
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                      user.status
-                    )}`}
-                  >
-                    {user.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* User Info */}
-            <div className="p-6">
-              {/* Contact Details */}
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="h-4 w-4 mr-2" />
-                  <span className="truncate">{user.email}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="h-4 w-4 mr-2" />
-                  <span>{user.phone}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  <span>{user.location}</span>
-                </div>
-              </div>
-
-              {/* Role and Status */}
-              <div className="flex items-center justify-between mb-4">
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(
-                    user.role
-                  )}`}
-                >
-                  {user.role.replace("_", " ")}
-                </span>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(user.status)}
-                  <span className="text-sm text-gray-600">
-                    {user.status === "ACTIVE"
-                      ? "Active"
-                      : user.status === "INACTIVE"
-                      ? "Inactive"
-                      : "Pending"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span>Joined: {formatDate(user.createdAt)}</span>
-                </div>
-                {user.lastLogin && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span>Last login: {formatDateTime(user.lastLogin)}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    /* View user details */
-                  }}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </button>
-                <button
-                  onClick={() => {
-                    /* Edit user */
-                  }}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    /* More options */
-                  }}
-                  className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-              </div>
+      {/* Error State */}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800">
+                Error loading users
+              </h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+            <p className="mt-2 text-gray-600">Loading users...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Users Grid */}
+      {!loading && !error && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            >
+              {/* User Header */}
+              <div
+                className="p-6 text-white"
+                style={{
+                  background: `linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600))`,
+                }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={getUserDisplayName(user)}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <Users className="h-6 w-6" />
+                      )}
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-lg font-semibold">
+                        {getUserDisplayName(user)}
+                      </h3>
+                      <p className="text-sm opacity-90">{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(user.isActive)}
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                        user.isActive
+                      )}`}
+                    >
+                      {user.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Info */}
+              <div className="p-6">
+                {/* Contact Details */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Mail className="h-4 w-4 mr-2" />
+                    <span className="truncate">{user.email}</span>
+                  </div>
+                  {user.phone && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="h-4 w-4 mr-2" />
+                      <span>{user.phone}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Role and Status */}
+                <div className="flex items-center justify-between mb-4">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(
+                      getUserRole(user)
+                    )}`}
+                  >
+                    {getUserRole(user).replace("_", " ")}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(user.isActive)}
+                    <span className="text-sm text-gray-600">
+                      {user.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Dates */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span>Joined: {formatDate(user.createdAt)}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewUser(user)}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </button>
+                  <button
+                    onClick={() => handleEditUser(user)}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeactivateUser(user)}
+                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {filteredUsers.length === 0 && (
+      {!loading && !error && users.length === 0 && (
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
