@@ -24,6 +24,8 @@ import useUsers from "../../../hooks/useUsers";
 import useUserStats from "../../../hooks/useUserStats";
 import { User } from "../../types/user";
 import UserEditModal from "../Users/UserEditModal";
+import UserViewModal from "../Users/UserViewModal";
+import UserAddModal from "../Users/UserAddModal";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
@@ -31,6 +33,8 @@ export default function UserManagementContent() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Use the custom hooks for data fetching
@@ -110,8 +114,8 @@ export default function UserManagementContent() {
   };
 
   const handleViewUser = (user: User) => {
-    console.log("View user:", user);
-    // TODO: Implement user details modal
+    setSelectedUser(user);
+    setViewModalOpen(true);
   };
 
   const handleEditUser = (user: User) => {
@@ -127,6 +131,24 @@ export default function UserManagementContent() {
   const handleCloseEditModal = () => {
     setEditModalOpen(false);
     setSelectedUser(null);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleAddUser = () => {
+    setAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalOpen(false);
+  };
+
+  const handleUserCreated = (newUser: User) => {
+    // Refresh the users list to show new user
+    refetch();
   };
 
   const handleDeactivateUser = (user: User) => {
@@ -159,9 +181,7 @@ export default function UserManagementContent() {
               Refresh
             </button>
             <button
-              onClick={() => {
-                /* Add user functionality */
-              }}
+              onClick={handleAddUser}
               className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
               style={{
                 backgroundColor: "var(--color-primary-600)",
@@ -458,6 +478,20 @@ export default function UserManagementContent() {
         onClose={handleCloseEditModal}
         user={selectedUser}
         onUserUpdated={handleUserUpdated}
+      />
+
+      {/* View Modal */}
+      <UserViewModal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        user={selectedUser}
+      />
+
+      {/* Add Modal */}
+      <UserAddModal
+        isOpen={addModalOpen}
+        onClose={handleCloseAddModal}
+        onUserCreated={handleUserCreated}
       />
     </div>
   );
