@@ -23,12 +23,15 @@ import { useTheme } from "../../../hooks/useTheme";
 import useUsers from "../../../hooks/useUsers";
 import useUserStats from "../../../hooks/useUserStats";
 import { User } from "../../types/user";
+import UserEditModal from "../Users/UserEditModal";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [roleFilter, setRoleFilter] = useState("ALL");
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Use the custom hooks for data fetching
   const { users, loading, error, pagination, refetch, updateFilters, filters } =
@@ -112,8 +115,18 @@ export default function UserManagementContent() {
   };
 
   const handleEditUser = (user: User) => {
-    console.log("Edit user:", user);
-    // TODO: Implement user edit modal
+    setSelectedUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleUserUpdated = (updatedUser: User) => {
+    // Refresh the users list to show updated data
+    refetch();
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedUser(null);
   };
 
   const handleDeactivateUser = (user: User) => {
@@ -438,6 +451,14 @@ export default function UserManagementContent() {
           </p>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <UserEditModal
+        isOpen={editModalOpen}
+        onClose={handleCloseEditModal}
+        user={selectedUser}
+        onUserUpdated={handleUserUpdated}
+      />
     </div>
   );
 }
