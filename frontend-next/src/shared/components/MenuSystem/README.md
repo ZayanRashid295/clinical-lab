@@ -80,14 +80,14 @@ function App() {
 
 ```tsx
 import { MenuSystem } from "../shared/components/MenuSystem";
-import { rideSharingContentRegistry } from "../shared/examples/ride-sharing-content.registry";
+import { transportationContentRegistry } from "../shared/examples/transportation-content.registry";
 
 function App() {
   return (
     <MenuSystem
-      contentRegistry={rideSharingContentRegistry}
-      customDashboard={RideSharingDashboard}
-      applicationTitle="Ride Sharing App"
+      contentRegistry={transportationContentRegistry}
+      customDashboard={TransportationDashboard}
+      applicationTitle="Transportation App"
     />
   );
 }
@@ -204,7 +204,7 @@ src/shared/
 │   ├── content.registry.tsx
 │   └── dashboard.configs.ts
 ├── examples/
-│   └── ride-sharing-content.registry.tsx
+│   └── transportation-content.registry.tsx
 └── types/
     └── content.config.ts
 ```

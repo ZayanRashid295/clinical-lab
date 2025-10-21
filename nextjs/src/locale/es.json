@@ -79,11 +79,6 @@
   },
   "menu": {
     "dashboard": "Panel de control",
-    "rides": "Viajes",
-    "rideHistory": "Historial de viajes",
-    "activeRides": "Viajes activos",
-    "rideRequests": "Solicitudes de viaje",
-    "ridesManagement": "Gestión de viajes",
     "fleet": "Flota",
     "vehicles": "Vehículos",
     "drivers": "Conductores",

@@ -1,7 +1,6 @@
 // Main API service that aggregates all module-specific services
 import { authService } from "./auth.service";
 import { usersService } from "./users.service";
-import { ridesService } from "./rides.service";
 import { paymentsService } from "./payments.service";
 import { locationsService } from "./locations.service";
 import { notificationsService } from "./notifications.service";
@@ -39,23 +38,6 @@ class ApiService {
 
   async updateUser(id: string, userData: any): Promise<any> {
     return usersService.updateUser(id, userData);
-  }
-
-  // Ride endpoints
-  async getRides(params?: any): Promise<any> {
-    return ridesService.getRides(params);
-  }
-
-  async createRide(rideData: any): Promise<any> {
-    return ridesService.createRide(rideData);
-  }
-
-  async getRide(id: string): Promise<any> {
-    return ridesService.getRide(id);
-  }
-
-  async updateRide(id: string, rideData: any): Promise<any> {
-    return ridesService.updateRide(id, rideData);
   }
 
   // Payment endpoints

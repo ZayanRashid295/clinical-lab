@@ -63,11 +63,6 @@
   },
   "menu": {
     "dashboard": "डैशबोर्ड",
-    "rides": "सवारी",
-    "rideHistory": "सवारी का इतिहास",
-    "activeRides": "सक्रिय सवारी",
-    "rideRequests": "सवारी अनुरोध",
-    "ridesManagement": "सवारी प्रबंधन",
     "fleet": "बेड़ा",
     "vehicles": "वाहन",
     "drivers": "ड्राइवर",

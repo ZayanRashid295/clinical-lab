@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "ダッシュボード",
-    "rides": "ライド",
-    "rideHistory": "ライド履歴",
-    "activeRides": "アクティブなライド",
-    "rideRequests": "ライドリクエスト",
-    "ridesManagement": "ライド管理",
     "fleet": "フリート管理",
     "vehicles": "車両",
     "drivers": "ドライバー",
@@ -135,7 +130,6 @@
     "paymentHistory": "支払い履歴",
     "paymentMethods": "支払い方法",
     "invoices": "請求書",
-    "rideAnalytics": "ライド分析",
     "locationAnalytics": "場所分析",
     "auditLogs": "監査ログ",
     "paymentAnalytics": "支払い分析"

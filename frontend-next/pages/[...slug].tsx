@@ -4,7 +4,7 @@ import Head from "next/head";
 import { Construction, ArrowLeft, Home } from "lucide-react";
 import { MenuSystem, authService } from "../src/shared";
 import { getMenuItemsForRole, MenuItem } from "../src/app/types/menu";
-import { rideSharingContentRegistry } from "../src/app/config/content.registry";
+import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function CatchAllPage() {
   const router = useRouter();
@@ -50,9 +50,10 @@ export default function CatchAllPage() {
         // Also check if this path exists in the content registry
         console.log("Catch-all page checking path:", currentPath, {
           hasMenuItem: !!foundItem,
-          hasContentRegistry: !!rideSharingContentRegistry.content[currentPath],
+          hasContentRegistry:
+            !!transportationContentRegistry.content[currentPath],
           availableContentPaths: Object.keys(
-            rideSharingContentRegistry.content
+            transportationContentRegistry.content
           ).filter((p) => p.includes("chat")),
         });
       }
@@ -75,7 +76,8 @@ export default function CatchAllPage() {
     : "/";
 
   // Check if this path exists in the content registry
-  const hasContentRegistry = !!rideSharingContentRegistry.content[currentPath];
+  const hasContentRegistry =
+    !!transportationContentRegistry.content[currentPath];
 
   const pageTitle =
     menuItem?.label ||
@@ -94,7 +96,7 @@ export default function CatchAllPage() {
       </Head>
 
       <MenuSystem
-        contentRegistry={rideSharingContentRegistry}
+        contentRegistry={transportationContentRegistry}
         applicationTitle="Uber Portal"
         searchPlaceholder="Search..."
         enableSearch={true}

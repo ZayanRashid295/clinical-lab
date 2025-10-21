@@ -1,11 +1,11 @@
 import { DashboardConfig } from "../types/dashboard";
 
 export const mainDashboardConfig: DashboardConfig = {
-  title: "Ride Sharing Dashboard",
-  description: "Monitor and manage your ride sharing platform",
+  title: "Transportation Dashboard",
+  description: "Monitor and manage your transportation platform",
   stats: [
     {
-      label: "Active Rides",
+      label: "Active Vehicles",
       value: "47",
       icon: "🚗",
       color: "blue",
@@ -31,8 +31,8 @@ export const mainDashboardConfig: DashboardConfig = {
   ],
   quickActions: [
     {
-      title: "Manage Rides",
-      description: "View and manage active rides",
+      title: "Manage Fleet",
+      description: "View and manage fleet vehicles",
       icon: "🚗",
       color: "blue",
     },
@@ -70,7 +70,7 @@ export const mainDashboardConfig: DashboardConfig = {
   recentActivity: [
     {
       type: "success",
-      message: "Ride #1234 completed successfully",
+      message: "Vehicle #1234 completed successfully",
       timestamp: "5 minutes ago",
     },
     {
@@ -85,7 +85,7 @@ export const mainDashboardConfig: DashboardConfig = {
     },
     {
       type: "info",
-      message: "Ride #1233 started - Downtown to Airport",
+      message: "Vehicle #1233 started - Downtown to Airport",
       timestamp: "31 minutes ago",
     },
     {
@@ -186,8 +186,8 @@ export const analyticsDashboardConfig: DashboardConfig = {
   description: "Comprehensive analytics and reporting dashboard",
   quickActions: [
     {
-      title: "Ride Analytics",
-      description: "Analyze ride patterns and performance",
+      title: "Fleet Analytics",
+      description: "Analyze fleet patterns and performance",
       icon: "🚗",
       color: "blue",
     },

@@ -80,11 +80,6 @@
   },
   "menu": {
     "dashboard": "لوحة التحكم",
-    "rides": "الرحلات",
-    "rideHistory": "تاريخ الرحلات",
-    "activeRides": "الرحلات النشطة",
-    "rideRequests": "طلبات الرحلات",
-    "ridesManagement": "إدارة الرحلات",
     "fleet": "الأسطول",
     "vehicles": "المركبات",
     "drivers": "السائقون",

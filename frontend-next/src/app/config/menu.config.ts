@@ -9,54 +9,12 @@ export const MENU_CONFIG = {
       order: 1,
     },
     {
-      id: "rides",
-      label: "menu.rides",
-      icon: "🚗",
-      path: "/rides",
-      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 2,
-      submenu: [
-        {
-          id: "ride-history",
-          label: "menu.rideHistory",
-          icon: "📋",
-          path: "/rides/history",
-          roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 1,
-        },
-        {
-          id: "active-rides",
-          label: "menu.activeRides",
-          icon: "🚗",
-          path: "/rides/active",
-          roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 2,
-        },
-        {
-          id: "ride-requests",
-          label: "menu.rideRequests",
-          icon: "📱",
-          path: "/rides/requests",
-          roles: ["ADMIN", "DRIVER", "FLEET_MANAGER"],
-          order: 3,
-        },
-        {
-          id: "rides-management",
-          label: "menu.ridesManagement",
-          icon: "🎯",
-          path: "/rides/management",
-          roles: ["ADMIN"],
-          order: 4,
-        },
-      ],
-    },
-    {
       id: "payments",
       label: "menu.payments",
       icon: "💳",
       path: "/payments",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 3,
+      order: 2,
       submenu: [
         {
           id: "payment-history",
@@ -98,23 +56,15 @@ export const MENU_CONFIG = {
       icon: "📊",
       path: "/analytics",
       roles: ["ADMIN", "FLEET_MANAGER"],
-      order: 4,
+      order: 3,
       submenu: [
-        {
-          id: "ride-analytics",
-          label: "menu.rideAnalytics",
-          icon: "🚗",
-          path: "/analytics/rides",
-          roles: ["ADMIN", "FLEET_MANAGER"],
-          order: 1,
-        },
         {
           id: "location-analytics",
           label: "menu.locationAnalytics",
           icon: "📍",
           path: "/analytics/locations",
           roles: ["ADMIN", "FLEET_MANAGER"],
-          order: 2,
+          order: 1,
         },
         {
           id: "audit-logs",
@@ -122,7 +72,7 @@ export const MENU_CONFIG = {
           icon: "📝",
           path: "/analytics/audit",
           roles: ["ADMIN"],
-          order: 3,
+          order: 2,
         },
         {
           id: "payment-analytics",
@@ -130,7 +80,7 @@ export const MENU_CONFIG = {
           icon: "💳",
           path: "/analytics/payments",
           roles: ["ADMIN", "FLEET_MANAGER"],
-          order: 4,
+          order: 3,
         },
       ],
     },
@@ -140,7 +90,7 @@ export const MENU_CONFIG = {
       icon: "💬",
       path: "/chat",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 5,
+      order: 4,
       submenu: [
         {
           id: "chat-rooms",
@@ -174,7 +124,7 @@ export const MENU_CONFIG = {
       icon: "📍",
       path: "/locations",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 6,
+      order: 5,
       submenu: [
         {
           id: "pickup-locations",
@@ -208,7 +158,7 @@ export const MENU_CONFIG = {
       icon: "🚛",
       path: "/fleet",
       roles: ["ADMIN", "FLEET_MANAGER"],
-      order: 7,
+      order: 6,
       submenu: [
         {
           id: "vehicles",
@@ -258,7 +208,7 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 8,
+      order: 7,
       submenu: [
         {
           id: "users",
@@ -300,7 +250,7 @@ export const MENU_CONFIG = {
       icon: "🌙",
       path: "/shadow-mode",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 9,
+      order: 8,
     },
   ],
 
@@ -312,7 +262,6 @@ export const MENU_CONFIG = {
       canViewAnalytics: true,
       canManageFleet: true,
       canViewReports: true,
-      canManageRides: true,
       canManagePayments: true,
     },
     FLEET_MANAGER: {
@@ -322,7 +271,6 @@ export const MENU_CONFIG = {
       canViewAnalytics: true,
       canManageFleet: true,
       canViewReports: true,
-      canManageRides: true,
       canManagePayments: true,
     },
     DRIVER: {
@@ -332,7 +280,6 @@ export const MENU_CONFIG = {
       canViewAnalytics: false,
       canManageFleet: false,
       canViewReports: false,
-      canManageRides: true,
       canManagePayments: false,
     },
     PASSENGER: {
@@ -342,7 +289,6 @@ export const MENU_CONFIG = {
       canViewAnalytics: false,
       canManageFleet: false,
       canViewReports: false,
-      canManageRides: true,
       canManagePayments: false,
     },
   },

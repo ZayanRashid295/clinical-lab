@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "대시보드",
-    "rides": "라이드",
-    "rideHistory": "라이드 기록",
-    "activeRides": "활성 라이드",
-    "rideRequests": "라이드 요청",
-    "ridesManagement": "라이드 관리",
     "fleet": "차량 관리",
     "vehicles": "차량",
     "drivers": "운전자",
@@ -135,7 +130,6 @@
     "paymentHistory": "결제 기록",
     "paymentMethods": "결제 방법",
     "invoices": "청구서",
-    "rideAnalytics": "라이드 분석",
     "locationAnalytics": "위치 분석",
     "auditLogs": "감사 로그",
     "paymentAnalytics": "결제 분석"

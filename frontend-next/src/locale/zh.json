@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "仪表板",
-    "rides": "行程",
-    "rideHistory": "行程历史",
-    "activeRides": "活跃行程",
-    "rideRequests": "行程请求",
-    "ridesManagement": "行程管理",
     "fleet": "车队管理",
     "vehicles": "车辆",
     "drivers": "司机",
@@ -135,7 +130,6 @@
     "paymentHistory": "支付历史",
     "paymentMethods": "支付方式",
     "invoices": "发票",
-    "rideAnalytics": "行程分析",
     "locationAnalytics": "位置分析",
     "auditLogs": "审计日志",
     "paymentAnalytics": "支付分析"

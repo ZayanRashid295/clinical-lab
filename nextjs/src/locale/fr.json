@@ -79,11 +79,6 @@
   },
   "menu": {
     "dashboard": "Tableau de bord",
-    "rides": "Trajets",
-    "rideHistory": "Historique des trajets",
-    "activeRides": "Trajets actifs",
-    "rideRequests": "Demandes de trajet",
-    "ridesManagement": "Gestion des trajets",
     "fleet": "Flotte",
     "vehicles": "Véhicules",
     "drivers": "Conducteurs",

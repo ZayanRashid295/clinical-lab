@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../../src/shared";
-import { rideSharingContentRegistry } from "../../src/app/config/content.registry";
+import { transportationContentRegistry } from "../../src/app/config/content.registry";
 
 export default function DriversPage() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function DriversPage() {
       </Head>
 
       <MenuSystem
-        contentRegistry={rideSharingContentRegistry}
+        contentRegistry={transportationContentRegistry}
         applicationTitle="Uber Portal"
         searchPlaceholder="Search drivers..."
         enableSearch={true}

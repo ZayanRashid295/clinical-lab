@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { MenuSystem, authService } from "../src/shared";
-import { rideSharingContentRegistry } from "../src/app/config/content.registry";
+import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function Payments() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function Payments() {
 
   return (
     <MenuSystem
-      contentRegistry={rideSharingContentRegistry}
+      contentRegistry={transportationContentRegistry}
       applicationTitle="Uber Portal"
       searchPlaceholder="Search payments, transactions..."
       enableSearch={true}

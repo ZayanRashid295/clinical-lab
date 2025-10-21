@@ -12,7 +12,6 @@ import { ContentRegistry } from "../types/dashboard";
 // };
 
 // Import ride-sharing specific components
-import { RideManagement } from "../components/Rides";
 import PaymentHistoryContent from "../components/Content/PaymentHistoryContent";
 import PaymentMethodsContent from "../components/Content/PaymentMethodsContent";
 import PayoutsContent from "../components/Content/PayoutsContent";
@@ -44,16 +43,9 @@ import {
 } from "./dashboard.configs";
 import { ShadowModeContent } from "../components/ShadowMode";
 
-// Ride-sharing specific content registry
-export const rideSharingContentRegistry: ContentRegistry = {
+// Transportation content registry
+export const transportationContentRegistry: ContentRegistry = {
   content: {
-    // Ride management routes
-    "/rides": () => <RideManagement mode="all" />,
-    "/rides/history": () => <RideManagement mode="history" />,
-    "/rides/active": () => <RideManagement mode="active" />,
-    "/rides/requests": () => <RideManagement mode="requests" />,
-    "/rides/management": () => <RideManagement mode="all" />,
-
     // Payment routes
     "/payments/history": () => <PaymentHistoryContent />,
     "/payments/methods": () => <PaymentMethodsContent />,
@@ -114,9 +106,6 @@ export const rideSharingContentRegistry: ContentRegistry = {
     "/admin/reports": () => <ReportsContent />,
 
     // Analytics sub-routes
-    "/analytics/rides": () => (
-      <RideManagement mode="analytics" showAnalytics={true} />
-    ),
     "/analytics/locations": () => (
       <div className="h-full">
         <LocationAnalytics />

@@ -12,54 +12,12 @@ const defaultMenuItems: MenuItem[] = [
     order: 1,
   },
   {
-    id: "rides",
-    label: "menu.rides",
-    icon: "🚗",
-    path: "/rides",
-    roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    order: 2,
-    submenu: [
-      {
-        id: "ride-history",
-        label: "menu.rideHistory",
-        icon: "📋",
-        path: "/rides/history",
-        roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-        order: 1,
-      },
-      {
-        id: "active-rides",
-        label: "menu.activeRides",
-        icon: "🚗",
-        path: "/rides/active",
-        roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-        order: 2,
-      },
-      {
-        id: "ride-requests",
-        label: "menu.rideRequests",
-        icon: "📱",
-        path: "/rides/requests",
-        roles: ["ADMIN", "DRIVER", "FLEET_MANAGER"],
-        order: 3,
-      },
-      {
-        id: "rides-management",
-        label: "menu.ridesManagement",
-        icon: "🎯",
-        path: "/rides/management",
-        roles: ["ADMIN"],
-        order: 4,
-      },
-    ],
-  },
-  {
     id: "fleet",
     label: "menu.fleet",
     icon: "🚛",
     path: "/fleet",
     roles: ["ADMIN", "FLEET_MANAGER"],
-    order: 3,
+    order: 2,
     submenu: [
       {
         id: "vehicles",
@@ -93,7 +51,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "📊",
     path: "/analytics",
     roles: ["ADMIN", "FLEET_MANAGER"],
-    order: 4,
+    order: 3,
     submenu: [
       {
         id: "revenue",
@@ -127,7 +85,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "💳",
     path: "/payments",
     roles: ["ADMIN", "DRIVER", "PASSENGER"],
-    order: 5,
+    order: 4,
     submenu: [
       {
         id: "transactions",
@@ -161,7 +119,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "📚",
     path: "/study",
     roles: ["ADMIN", "STUDENT", "FACULTY"],
-    order: 6,
+    order: 5,
     submenu: [
       {
         id: "question-bank",
@@ -203,7 +161,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "✏️",
     path: "/test-creation",
     roles: ["ADMIN", "FACULTY"],
-    order: 7,
+    order: 6,
     submenu: [
       {
         id: "create-new-test",
@@ -245,7 +203,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "🎯",
     path: "/test-session",
     roles: ["ADMIN", "STUDENT", "FACULTY"],
-    order: 8,
+    order: 7,
     submenu: [
       {
         id: "active-tests",
@@ -287,7 +245,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "🏥",
     path: "/med-app",
     roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    order: 9,
+    order: 8,
   },
   {
     id: "zoom-simulation",
@@ -295,7 +253,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "📹",
     path: "/zoom",
     roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    order: 10,
+    order: 9,
   },
   {
     id: "shadow-mode",
@@ -303,7 +261,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "👁️",
     path: "/shadow-mode",
     roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    order: 11,
+    order: 10,
   },
   {
     id: "shadow-mode-legacy",
@@ -311,7 +269,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "👁️",
     path: "/shadow-mode-legacy",
     roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    order: 12,
+    order: 11,
   },
   {
     id: "admin",
@@ -319,7 +277,7 @@ const defaultMenuItems: MenuItem[] = [
     icon: "⚙️",
     path: "/admin",
     roles: ["ADMIN"],
-    order: 13,
+    order: 12,
     submenu: [
       {
         id: "users",

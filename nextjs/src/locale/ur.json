@@ -64,11 +64,6 @@
   },
   "menu": {
     "dashboard": "ڈیش بورڈ",
-    "rides": "سفریں",
-    "rideHistory": "سفر کی تاریخ",
-    "activeRides": "فعال سفریں",
-    "rideRequests": "سفر کی درخواستیں",
-    "ridesManagement": "سفروں کا انتظام",
     "fleet": "بیڑا",
     "vehicles": "گاڑیاں",
     "drivers": "ڈرائیورز",

@@ -2,7 +2,6 @@
 
 import React from "react";
 import DashboardContent from "@/shared/components/dashboard/dashboard-content";
-import RidesContent from "@/shared/components/rides/rides-content";
 import MedAppContent from "@/shared/components/med-app/med-app-content";
 import QuestionBankPage from "@/app/components/study/QuestionBankPage";
 import StudyMaterialsPage from "@/app/components/study/StudyMaterialsPage";
@@ -25,8 +24,6 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
   switch (activeMenu) {
     case "dashboard":
       return <DashboardContent isFullScreen={false} />;
-    case "rides":
-      return <RidesContent isFullScreen={false} />;
     case "med-app":
       return <MedAppContent isFullScreen={false} />;
     case "shadow-mode":
@@ -108,74 +105,6 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
         />
       );
     // Submenu items
-    case "ride-history":
-      return (
-        <UnderConstruction
-          menuTitle="Ride History"
-          menuIcon="📋"
-          description="Complete history of all rides with detailed analytics and filtering options."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Comprehensive ride records",
-            "Advanced filtering and search",
-            "Performance analytics",
-            "Export capabilities",
-            "Rating and feedback system",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "active-rides":
-      return (
-        <UnderConstruction
-          menuTitle="Active Rides"
-          menuIcon="🚗"
-          description="Real-time monitoring of all active rides with live tracking and status updates."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Live ride tracking",
-            "Real-time status updates",
-            "Emergency response system",
-            "Driver communication",
-            "Route optimization",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "ride-requests":
-      return (
-        <UnderConstruction
-          menuTitle="Ride Requests"
-          menuIcon="📱"
-          description="Manage incoming ride requests with intelligent matching and assignment algorithms."
-          estimatedCompletion="3 weeks"
-          features={[
-            "Request management system",
-            "Intelligent driver matching",
-            "Priority handling",
-            "Automated notifications",
-            "Request analytics",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "rides-management":
-      return (
-        <UnderConstruction
-          menuTitle="Rides Management"
-          menuIcon="🎯"
-          description="Advanced rides management system with comprehensive control and monitoring capabilities."
-          estimatedCompletion="4 weeks"
-          features={[
-            "Complete ride lifecycle management",
-            "Performance monitoring",
-            "Quality assurance tools",
-            "Customer service integration",
-            "Analytics and reporting",
-          ]}
-          isFullScreen={false}
-        />
-      );
     case "vehicles":
       return (
         <UnderConstruction

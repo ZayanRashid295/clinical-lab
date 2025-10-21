@@ -9,12 +9,6 @@ export { authService, AuthService } from "../../shared/services/auth.service";
 export { paymentsService, PaymentsService } from "./payments/payments.service";
 export * from "./payments/payments.types";
 
-// Ride History services
-export {
-  rideHistoryService,
-  RideHistoryService,
-} from "./ridehistory/ridehistory.service";
-export * from "./ridehistory/ridehistory.types";
 
 // TODO: Add other services as they are created
 // export { payoutsService, PayoutsService } from "./payouts/payouts.service";
@@ -27,13 +21,11 @@ export * from "./ridehistory/ridehistory.types";
 
 // Re-import for the api object
 import { paymentsService } from "./payments/payments.service";
-import { rideHistoryService } from "./ridehistory/ridehistory.service";
 import { authService } from "../../shared/services/auth.service";
 
 // Convenience exports for commonly used services
 export const api = {
   auth: authService,
   payments: paymentsService,
-  rideHistory: rideHistoryService,
   // TODO: Add other services
 };

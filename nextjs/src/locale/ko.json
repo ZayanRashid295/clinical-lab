@@ -79,11 +79,6 @@
   },
   "menu": {
     "dashboard": "대시보드",
-    "rides": "라이드",
-    "rideHistory": "라이드 기록",
-    "activeRides": "활성 라이드",
-    "rideRequests": "라이드 요청",
-    "ridesManagement": "라이드 관리",
     "fleet": "차량",
     "vehicles": "차량",
     "drivers": "운전자",

@@ -54,7 +54,7 @@
     "openSettings": "打开设置"
   },
   "app": {
-    "title": "RideShare Pro",
+    "title": "Transportation Pro",
     "tagline": "革命性城市出行",
     "description": "通过我们尖端的拼车平台体验交通的未来。无缝连接司机和乘客，同时提供实时跟踪、安全支付和智能路线优化。",
     "features": {
@@ -79,11 +79,6 @@
   },
   "menu": {
     "dashboard": "仪表板",
-    "rides": "行程",
-    "rideHistory": "行程历史",
-    "activeRides": "活跃行程",
-    "rideRequests": "行程请求",
-    "ridesManagement": "行程管理",
     "fleet": "车队",
     "vehicles": "车辆",
     "drivers": "司机",

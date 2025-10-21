@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "डैशबोर्ड",
-    "rides": "राइड्स",
-    "rideHistory": "राइड इतिहास",
-    "activeRides": "सक्रिय राइड्स",
-    "rideRequests": "राइड अनुरोध",
-    "ridesManagement": "राइड्स प्रबंधन",
     "fleet": "बेड़ा प्रबंधन",
     "vehicles": "वाहन",
     "drivers": "चालक",
@@ -135,7 +130,6 @@
     "paymentHistory": "भुगतान इतिहास",
     "paymentMethods": "भुगतान विधियां",
     "invoices": "चालान",
-    "rideAnalytics": "राइड विश्लेषण",
     "locationAnalytics": "स्थान विश्लेषण",
     "auditLogs": "ऑडिट लॉग्स",
     "paymentAnalytics": "भुगतान विश्लेषण"

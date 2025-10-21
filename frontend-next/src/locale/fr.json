@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "Tableau de bord",
-    "rides": "Trajets",
-    "rideHistory": "Historique des trajets",
-    "activeRides": "Trajets actifs",
-    "rideRequests": "Demandes de trajet",
-    "ridesManagement": "Gestion des trajets",
     "fleet": "Gestion de Flotte",
     "vehicles": "Véhicules",
     "drivers": "Conducteurs",
@@ -135,7 +130,6 @@
     "paymentHistory": "Historique des Paiements",
     "paymentMethods": "Méthodes de Paiement",
     "invoices": "Factures",
-    "rideAnalytics": "Analyses des Trajets",
     "locationAnalytics": "Analyses des Emplacements",
     "auditLogs": "Journaux d'Audit",
     "paymentAnalytics": "Analyses des Paiements"

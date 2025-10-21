@@ -81,11 +81,6 @@
   },
   "menu": {
     "dashboard": "ڈیش بورڈ",
-    "rides": "رائڈز",
-    "rideHistory": "رائڈ کی تاریخ",
-    "activeRides": "فعال رائڈز",
-    "rideRequests": "رائڈ کی درخواستیں",
-    "ridesManagement": "رائڈز کا انتظام",
     "fleet": "بیڑے کا انتظام",
     "vehicles": "گاڑیاں",
     "drivers": "ڈرائیورز",
@@ -135,7 +130,6 @@
     "paymentHistory": "ادائیگی کی تاریخ",
     "paymentMethods": "ادائیگی کے طریقے",
     "invoices": "انوائسز",
-    "rideAnalytics": "رائڈ تجزیات",
     "locationAnalytics": "مقام تجزیات",
     "auditLogs": "آڈٹ لاگز",
     "paymentAnalytics": "ادائیگی تجزیات"
