@@ -23,18 +23,17 @@ import { useTheme } from "../../../hooks/useTheme";
 import useUsers from "../../../hooks/useUsers";
 import useUserStats from "../../../hooks/useUserStats";
 import { User } from "../../types/user";
-import UserEditModal from "../Users/UserEditModal";
+import UserFormModal from "../Users/UserFormModal";
 import UserViewModal from "../Users/UserViewModal";
-import UserAddModal from "../Users/UserAddModal";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [roleFilter, setRoleFilter] = useState("ALL");
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Use the custom hooks for data fetching
@@ -120,35 +119,29 @@ export default function UserManagementContent() {
 
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
-    setEditModalOpen(true);
+    setFormMode("edit");
+    setFormModalOpen(true);
   };
 
-  const handleUserUpdated = (updatedUser: User) => {
+  const handleAddUser = () => {
+    setSelectedUser(null);
+    setFormMode("create");
+    setFormModalOpen(true);
+  };
+
+  const handleUserSaved = (savedUser: User) => {
     // Refresh the users list to show updated data
     refetch();
   };
 
-  const handleCloseEditModal = () => {
-    setEditModalOpen(false);
+  const handleCloseFormModal = () => {
+    setFormModalOpen(false);
     setSelectedUser(null);
   };
 
   const handleCloseViewModal = () => {
     setViewModalOpen(false);
     setSelectedUser(null);
-  };
-
-  const handleAddUser = () => {
-    setAddModalOpen(true);
-  };
-
-  const handleCloseAddModal = () => {
-    setAddModalOpen(false);
-  };
-
-  const handleUserCreated = (newUser: User) => {
-    // Refresh the users list to show new user
-    refetch();
   };
 
   const handleDeactivateUser = (user: User) => {
@@ -472,12 +465,13 @@ export default function UserManagementContent() {
         </div>
       )}
 
-      {/* Edit Modal */}
-      <UserEditModal
-        isOpen={editModalOpen}
-        onClose={handleCloseEditModal}
+      {/* Form Modal (Create/Edit) */}
+      <UserFormModal
+        isOpen={formModalOpen}
+        onClose={handleCloseFormModal}
         user={selectedUser}
-        onUserUpdated={handleUserUpdated}
+        onUserSaved={handleUserSaved}
+        mode={formMode}
       />
 
       {/* View Modal */}
@@ -485,13 +479,6 @@ export default function UserManagementContent() {
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
         user={selectedUser}
-      />
-
-      {/* Add Modal */}
-      <UserAddModal
-        isOpen={addModalOpen}
-        onClose={handleCloseAddModal}
-        onUserCreated={handleUserCreated}
       />
     </div>
   );

@@ -8,50 +8,78 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
+  Eye,
+  EyeOff,
+  UserPlus,
+  Edit,
 } from "lucide-react";
-import { User as UserType, UpdateUserDto } from "../../types/user";
+import {
+  User as UserType,
+  CreateUserDto,
+  UpdateUserDto,
+} from "../../types/user";
 import { UsersService } from "../../services/users/users.service";
 
-interface UserEditModalProps {
+interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: UserType | null;
-  onUserUpdated: (updatedUser: UserType) => void;
+  user?: UserType | null; // Optional for create mode
+  onUserSaved: (user: UserType) => void;
+  mode: "create" | "edit";
 }
 
-export default function UserEditModal({
+export default function UserFormModal({
   isOpen,
   onClose,
   user,
-  onUserUpdated,
-}: UserEditModalProps) {
-  const [formData, setFormData] = useState<UpdateUserDto>({
+  onUserSaved,
+  mode,
+}: UserFormModalProps) {
+  const [formData, setFormData] = useState<CreateUserDto>({
     email: "",
     firstName: "",
     lastName: "",
     phone: "",
+    password: "",
     isActive: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const usersService = new UsersService();
+  const isCreateMode = mode === "create";
 
   // Reset form when modal opens/closes or user changes
   useEffect(() => {
-    if (isOpen && user) {
-      setFormData({
-        email: user.email || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        phone: user.phone || "",
-        isActive: user.isActive,
-      });
+    if (isOpen) {
+      if (isCreateMode) {
+        // Create mode - empty form
+        setFormData({
+          email: "",
+          firstName: "",
+          lastName: "",
+          phone: "",
+          password: "",
+          isActive: true,
+        });
+      } else if (user) {
+        // Edit mode - pre-fill with user data
+        setFormData({
+          email: user.email || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          phone: user.phone || "",
+          password: "", // Don't pre-fill password
+          isActive: user.isActive,
+        });
+      }
       setError(null);
       setSuccess(false);
+      setShowPassword(false);
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, isCreateMode]);
 
   // Handle escape key
   useEffect(() => {
@@ -93,6 +121,17 @@ export default function UserEditModal({
     if (!formData.lastName.trim()) {
       return "Last name is required";
     }
+
+    // Password validation only for create mode
+    if (isCreateMode) {
+      if (!formData.password.trim()) {
+        return "Password is required";
+      }
+      if (formData.password.length < 6) {
+        return "Password must be at least 6 characters long";
+      }
+    }
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       return "Please enter a valid email address";
     }
@@ -111,7 +150,7 @@ export default function UserEditModal({
       return;
     }
 
-    if (!user) {
+    if (!isCreateMode && !user) {
       setError("No user selected for editing");
       return;
     }
@@ -120,8 +159,24 @@ export default function UserEditModal({
     setError(null);
 
     try {
-      const updatedUser = await usersService.updateUser(user.id, formData);
-      onUserUpdated(updatedUser);
+      let savedUser: UserType;
+
+      if (isCreateMode) {
+        // Create new user
+        savedUser = await usersService.createUser(formData);
+      } else {
+        // Update existing user
+        const updateData: UpdateUserDto = {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          isActive: formData.isActive,
+        };
+        savedUser = await usersService.updateUser(user!.id, updateData);
+      }
+
+      onUserSaved(savedUser);
       setSuccess(true);
 
       // Close modal after a short delay to show success message
@@ -130,11 +185,16 @@ export default function UserEditModal({
         setSuccess(false);
       }, 1500);
     } catch (err) {
-      console.error("Error updating user:", err);
+      console.error(
+        `Error ${isCreateMode ? "creating" : "updating"} user:`,
+        err
+      );
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to update user. Please try again."
+          : `Failed to ${
+              isCreateMode ? "create" : "update"
+            } user. Please try again.`
       );
     } finally {
       setLoading(false);
@@ -147,7 +207,7 @@ export default function UserEditModal({
     }
   };
 
-  if (!isOpen || !user) return null;
+  if (!isOpen) return null;
 
   return (
     <div
@@ -158,8 +218,14 @@ export default function UserEditModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
-            <User className="h-6 w-6 text-blue-600 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-900">Edit User</h2>
+            {isCreateMode ? (
+              <UserPlus className="h-6 w-6 text-green-600 mr-2" />
+            ) : (
+              <Edit className="h-6 w-6 text-blue-600 mr-2" />
+            )}
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isCreateMode ? "Add New User" : "Edit User"}
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -178,7 +244,7 @@ export default function UserEditModal({
               <div className="flex items-center">
                 <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
                 <span className="text-sm font-medium text-green-800">
-                  User updated successfully!
+                  User {isCreateMode ? "created" : "updated"} successfully!
                 </span>
               </div>
             </div>
@@ -212,7 +278,9 @@ export default function UserEditModal({
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 ${
+                  isCreateMode ? "focus:ring-green-500" : "focus:ring-blue-500"
+                }`}
                 placeholder="user@example.com"
                 required
               />
@@ -233,7 +301,9 @@ export default function UserEditModal({
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 ${
+                isCreateMode ? "focus:ring-green-500" : "focus:ring-blue-500"
+              }`}
               placeholder="John"
               required
             />
@@ -253,7 +323,9 @@ export default function UserEditModal({
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 ${
+                isCreateMode ? "focus:ring-green-500" : "focus:ring-blue-500"
+              }`}
               placeholder="Doe"
               required
             />
@@ -275,11 +347,52 @@ export default function UserEditModal({
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 ${
+                  isCreateMode ? "focus:ring-green-500" : "focus:ring-blue-500"
+                }`}
                 placeholder="+1 (555) 123-4567"
               />
             </div>
           </div>
+
+          {/* Password - Only show in create mode */}
+          {isCreateMode && (
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password *
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter password"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Password must be at least 6 characters long
+              </p>
+            </div>
+          )}
 
           {/* Status */}
           <div>
@@ -299,7 +412,9 @@ export default function UserEditModal({
                   isActive: e.target.value === "active",
                 }))
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 ${
+                isCreateMode ? "focus:ring-green-500" : "focus:ring-blue-500"
+              }`}
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -319,17 +434,21 @@ export default function UserEditModal({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 inline-flex items-center justify-center px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flex-1 inline-flex items-center justify-center px-4 py-2 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isCreateMode
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Updating...
+                  {isCreateMode ? "Creating..." : "Updating..."}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Update User
+                  {isCreateMode ? "Create User" : "Update User"}
                 </>
               )}
             </button>

@@ -1,13 +1,12 @@
 import { useState } from "react";
 import UserViewModal from "../src/app/components/Users/UserViewModal";
-import UserEditModal from "../src/app/components/Users/UserEditModal";
-import UserAddModal from "../src/app/components/Users/UserAddModal";
+import UserFormModal from "../src/app/components/Users/UserFormModal";
 import { User } from "../src/app/types/user";
 
 export default function TestUserModals() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [testUser, setTestUser] = useState<User>({
     id: "test-1",
     email: "john.doe@example.com",
@@ -45,14 +44,9 @@ export default function TestUserModals() {
     ],
   });
 
-  const handleUserUpdated = (updatedUser: User) => {
-    console.log("User updated:", updatedUser);
-    setTestUser(updatedUser);
-  };
-
-  const handleUserCreated = (newUser: User) => {
-    console.log("User created:", newUser);
-    // In a real app, you'd add this to your users list
+  const handleUserSaved = (savedUser: User) => {
+    console.log("User saved:", savedUser);
+    setTestUser(savedUser);
   };
 
   return (
@@ -84,7 +78,10 @@ export default function TestUserModals() {
               Test the edit modal to modify user information.
             </p>
             <button
-              onClick={() => setEditModalOpen(true)}
+              onClick={() => {
+                setFormMode("edit");
+                setFormModalOpen(true);
+              }}
               className="w-full bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
             >
               Open Edit Modal
@@ -98,7 +95,10 @@ export default function TestUserModals() {
               Test the add modal to create a new user.
             </p>
             <button
-              onClick={() => setAddModalOpen(true)}
+              onClick={() => {
+                setFormMode("create");
+                setFormModalOpen(true);
+              }}
               className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               Open Add Modal
@@ -145,17 +145,12 @@ export default function TestUserModals() {
           user={testUser}
         />
 
-        <UserEditModal
-          isOpen={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          user={testUser}
-          onUserUpdated={handleUserUpdated}
-        />
-
-        <UserAddModal
-          isOpen={addModalOpen}
-          onClose={() => setAddModalOpen(false)}
-          onUserCreated={handleUserCreated}
+        <UserFormModal
+          isOpen={formModalOpen}
+          onClose={() => setFormModalOpen(false)}
+          user={formMode === "edit" ? testUser : null}
+          onUserSaved={handleUserSaved}
+          mode={formMode}
         />
       </div>
     </div>
