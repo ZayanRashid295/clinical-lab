@@ -15,6 +15,7 @@ import {
   Lock,
   Unlock,
 } from "lucide-react";
+import { useTheme } from "../../../hooks/useTheme";
 
 // Mock data for roles
 const MOCK_ROLES = [
@@ -115,6 +116,7 @@ const PERMISSION_CATEGORIES = {
 };
 
 export default function RoleManagementContent() {
+  const { config } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [filteredRoles, setFilteredRoles] = useState(MOCK_ROLES);
@@ -178,7 +180,18 @@ export default function RoleManagementContent() {
             onClick={() => {
               /* Create role functionality */
             }}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor: "var(--color-primary-600)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-700)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-600)";
+            }}
           >
             <Plus className="h-5 w-5 mr-2" />
             Create Role
@@ -191,7 +204,10 @@ export default function RoleManagementContent() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Shield className="h-8 w-8 text-blue-600" />
+              <Shield
+                className="h-8 w-8"
+                style={{ color: "var(--color-primary-600)" }}
+              />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Roles</p>
@@ -202,7 +218,10 @@ export default function RoleManagementContent() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle
+                className="h-8 w-8"
+                style={{ color: "var(--color-primary-500)" }}
+              />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Active Roles</p>
@@ -213,7 +232,10 @@ export default function RoleManagementContent() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <XCircle className="h-8 w-8 text-red-600" />
+              <XCircle
+                className="h-8 w-8"
+                style={{ color: "var(--color-primary-700)" }}
+              />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">
@@ -228,7 +250,10 @@ export default function RoleManagementContent() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Users className="h-8 w-8 text-purple-600" />
+              <Users
+                className="h-8 w-8"
+                style={{ color: "var(--color-primary-400)" }}
+              />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
@@ -276,7 +301,12 @@ export default function RoleManagementContent() {
             className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
           >
             {/* Role Header */}
-            <div className="bg-gradient-to-r from-purple-500 to-blue-600 p-6 text-white">
+            <div
+              className="p-6 text-white"
+              style={{
+                background: `linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600))`,
+              }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
