@@ -9,7 +9,6 @@ export { authService, AuthService } from "../../shared/services/auth.service";
 export { paymentsService, PaymentsService } from "./payments/payments.service";
 export * from "./payments/payments.types";
 
-
 // TODO: Add other services as they are created
 // export { payoutsService, PayoutsService } from "./payouts/payouts.service";
 // export { fleetService, FleetService } from "./fleet/fleet.service";

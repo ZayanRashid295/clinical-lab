@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  authService,
-  paymentsService,
-  api,
-} from "../../services";
+import { authService, paymentsService, api } from "../../services";
 
 // Test component to verify modular services work correctly
 export default function ModularServicesTest() {
@@ -11,30 +7,6 @@ export default function ModularServicesTest() {
 
   const addResult = (result: string) => {
     setTestResults((prev) => [...prev, result]);
-  };
-
-  const testRidesService = async () => {
-    try {
-      addResult("Testing ride history service...");
-
-      // Test individual service import
-      const rides1 = await rideHistoryService.getList({ page: 1, limit: 5 });
-      addResult("✅ rideHistoryService.getList() - Success");
-
-      // Test api object import
-      const rides2 = await api.rideHistory.getList({ page: 1, limit: 5 });
-      addResult("✅ api.rideHistory.getList() - Success");
-
-      // Test specific method
-      const stats = await rideHistoryService.getStats();
-      addResult("✅ rideHistoryService.getStats() - Success");
-    } catch (error) {
-      addResult(
-        `❌ Rides service error: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
   };
 
   const testAuthService = async () => {
@@ -83,7 +55,6 @@ export default function ModularServicesTest() {
     addResult("🚀 Starting modular services test...");
 
     await testAuthService();
-    await testRidesService();
     await testPaymentsService();
 
     addResult("🏁 Test completed!");
@@ -122,12 +93,9 @@ export default function ModularServicesTest() {
       <div className="mt-6 text-sm text-gray-600">
         <h3 className="font-semibold">What this tests:</h3>
         <ul className="list-disc list-inside mt-2 space-y-1">
-          <li>
-            Individual service imports (ridesService, authService,
-            paymentsService)
-          </li>
+          <li>Individual service imports (authService, paymentsService)</li>
           <li>Barrel exports from services/index.ts</li>
-          <li>API object convenience exports (api.rides, api.auth, etc.)</li>
+          <li>API object convenience exports (api.auth, api.payments, etc.)</li>
           <li>Service method calls and error handling</li>
           <li>TypeScript type checking</li>
         </ul>

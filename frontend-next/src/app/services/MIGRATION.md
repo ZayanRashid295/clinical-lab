@@ -14,11 +14,6 @@ This document outlines the migration from the monolithic `api.service.ts` to mod
 - `services/auth/auth.service.ts` - Authentication operations
 - `services/auth/auth.types.ts` - Auth-specific types
 
-### 3. Rides Service
-
-- `services/rides/rides.service.ts` - Ride operations
-- `services/rides/rides.types.ts` - Ride-specific types
-
 ### 4. Payments Service
 
 - `services/payments/payments.service.ts` - Payment operations
@@ -28,7 +23,6 @@ This document outlines the migration from the monolithic `api.service.ts` to mod
 
 ### Updated Components/Hooks:
 
-- ✅ `hooks/useRides.ts` - Now uses `ridesService`
 - ✅ `shared/services/auth.service.ts` - Now uses `authService`
 
 ### Pending Updates:
@@ -42,16 +36,15 @@ This document outlines the migration from the monolithic `api.service.ts` to mod
 
 ```typescript
 // Import specific services
-import { ridesService } from "../services/rides/rides.service";
 import { authService } from "../services/auth/auth.service";
 import { paymentsService } from "../services/payments/payments.service";
 
 // Or use barrel exports
-import { ridesService, authService, paymentsService } from "../services";
+import { authService, paymentsService } from "../services";
 
 // Or use the api object
 import { api } from "../services";
-const rides = await api.rides.getRides();
+const payments = await api.payments.getPayments();
 ```
 
 ### Old Monolithic Way (Being Phased Out):
