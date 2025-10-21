@@ -5,18 +5,6 @@ export const mainDashboardConfig: DashboardConfig = {
   description: "Monitor and manage your transportation platform",
   stats: [
     {
-      label: "Active Vehicles",
-      value: "47",
-      icon: "🚗",
-      color: "blue",
-    },
-    {
-      label: "Total Drivers",
-      value: "1,234",
-      icon: "👨‍💼",
-      color: "green",
-    },
-    {
       label: "Today's Revenue",
       value: "$12,847",
       icon: "💰",
@@ -31,34 +19,10 @@ export const mainDashboardConfig: DashboardConfig = {
   ],
   quickActions: [
     {
-      title: "Manage Fleet",
-      description: "View and manage fleet vehicles",
-      icon: "🚗",
-      color: "blue",
-    },
-    {
-      title: "Driver Management",
-      description: "Manage driver accounts and status",
-      icon: "👨‍💼",
-      color: "green",
-    },
-    {
       title: "Payment Processing",
       description: "Handle payments and payouts",
       icon: "💳",
       color: "purple",
-    },
-    {
-      title: "Analytics",
-      description: "View performance analytics",
-      icon: "📊",
-      color: "yellow",
-    },
-    {
-      title: "Fleet Management",
-      description: "Manage vehicles and routes",
-      icon: "🚙",
-      color: "red",
     },
     {
       title: "Support",
@@ -82,16 +46,6 @@ export const mainDashboardConfig: DashboardConfig = {
       type: "success",
       message: "Payment of $45.50 processed",
       timestamp: "23 minutes ago",
-    },
-    {
-      type: "info",
-      message: "Vehicle #1233 started - Downtown to Airport",
-      timestamp: "31 minutes ago",
-    },
-    {
-      type: "warning",
-      message: "Driver Mike reported a vehicle issue",
-      timestamp: "1 hour ago",
     },
   ],
 };
@@ -177,62 +131,6 @@ export const adminDashboardConfig: DashboardConfig = {
       type: "info",
       message: "Monthly revenue report generated",
       timestamp: "1 day ago",
-    },
-  ],
-};
-
-export const analyticsDashboardConfig: DashboardConfig = {
-  title: "Analytics & Reports",
-  description: "Comprehensive analytics and reporting dashboard",
-  quickActions: [
-    {
-      title: "Fleet Analytics",
-      description: "Analyze fleet patterns and performance",
-      icon: "🚗",
-      color: "blue",
-    },
-    {
-      title: "Location Analytics",
-      description: "Track location usage and trends",
-      icon: "📍",
-      color: "green",
-    },
-    {
-      title: "Audit Logs",
-      description: "Monitor system activities and changes",
-      icon: "📝",
-      color: "purple",
-    },
-    {
-      title: "Payment Analytics",
-      description: "Analyze payment trends and patterns",
-      icon: "💳",
-      color: "yellow",
-    },
-  ],
-};
-
-export const paymentAnalyticsConfig: DashboardConfig = {
-  title: "Payment Analytics",
-  description: "Comprehensive payment analytics and insights",
-  quickActions: [
-    {
-      title: "Revenue Trends",
-      description: "Coming soon...",
-      icon: "📈",
-      color: "green",
-    },
-    {
-      title: "Payment Methods",
-      description: "Coming soon...",
-      icon: "💳",
-      color: "blue",
-    },
-    {
-      title: "Transaction Analysis",
-      description: "Coming soon...",
-      icon: "📊",
-      color: "purple",
     },
   ],
 };

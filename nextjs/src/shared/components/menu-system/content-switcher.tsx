@@ -11,8 +11,6 @@ import TestCreationPage from "@/app/components/test-creation/TestCreationPage";
 import TestSessionPage from "@/app/components/test-session/TestSessionPage";
 
 import UnderConstruction from "@/shared/components/placeholders/under-construction";
-import ShadowModeContent from "../shadow-mode/shadow-mode-content";
-import ShadowModeLegacyContent from "../shadow-mode/shadow-mode-legacy-content";
 import ZoomSimulation from "@/app/components/zoom-simulation/zoom-simulation";
 import PaymentHistoryContent from "@/components/payments/payment-history-content";
 
@@ -26,46 +24,6 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
       return <DashboardContent isFullScreen={false} />;
     case "med-app":
       return <MedAppContent isFullScreen={false} />;
-    case "shadow-mode":
-      return <ShadowModeContent isFullScreen={false} />;
-    case "shadow-mode-legacy":
-      return <ShadowModeLegacyContent isFullScreen={false} />;
-    case "fleet":
-      return (
-        <UnderConstruction
-          menuTitle="Fleet Management"
-          menuIcon="🚛"
-          description="Comprehensive fleet management system for tracking vehicles, drivers, and maintenance schedules."
-          estimatedCompletion="3 weeks"
-          features={[
-            "Vehicle tracking and monitoring",
-            "Driver management and scheduling",
-            "Maintenance scheduling and alerts",
-            "Fuel consumption analytics",
-            "Route optimization",
-            "Real-time GPS tracking",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "analytics":
-      return (
-        <UnderConstruction
-          menuTitle="Analytics Dashboard"
-          menuIcon="📊"
-          description="Advanced analytics and reporting system with real-time insights and data visualization."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Real-time performance metrics",
-            "Interactive data visualizations",
-            "Custom report generation",
-            "Trend analysis and forecasting",
-            "Export capabilities",
-            "Automated alerts and notifications",
-          ]}
-          isFullScreen={false}
-        />
-      );
     case "payments":
       return (
         <UnderConstruction
@@ -105,108 +63,6 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
         />
       );
     // Submenu items
-    case "vehicles":
-      return (
-        <UnderConstruction
-          menuTitle="Vehicle Management"
-          menuIcon="🚗"
-          description="Comprehensive vehicle fleet management with tracking, maintenance, and analytics."
-          estimatedCompletion="3 weeks"
-          features={[
-            "Vehicle registration and tracking",
-            "Maintenance scheduling",
-            "Performance monitoring",
-            "Fuel efficiency tracking",
-            "Insurance and documentation",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "drivers":
-      return (
-        <UnderConstruction
-          menuTitle="Driver Management"
-          menuIcon="👨‍💼"
-          description="Complete driver management system with scheduling, performance tracking, and communication tools."
-          estimatedCompletion="3 weeks"
-          features={[
-            "Driver profiles and documentation",
-            "Schedule management",
-            "Performance tracking",
-            "Communication tools",
-            "Training and certification",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "maintenance":
-      return (
-        <UnderConstruction
-          menuTitle="Maintenance System"
-          menuIcon="🔧"
-          description="Automated maintenance scheduling and tracking system for fleet vehicles."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Automated maintenance scheduling",
-            "Service history tracking",
-            "Parts inventory management",
-            "Cost tracking and analytics",
-            "Maintenance alerts",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "revenue":
-      return (
-        <UnderConstruction
-          menuTitle="Revenue Analytics"
-          menuIcon="💰"
-          description="Comprehensive revenue tracking and analytics with detailed financial insights."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Revenue tracking and reporting",
-            "Financial analytics",
-            "Profit margin analysis",
-            "Trend identification",
-            "Forecasting and projections",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "performance":
-      return (
-        <UnderConstruction
-          menuTitle="Performance Metrics"
-          menuIcon="📊"
-          description="Advanced performance monitoring and analytics for system optimization."
-          estimatedCompletion="2 weeks"
-          features={[
-            "Real-time performance monitoring",
-            "Key performance indicators",
-            "System optimization insights",
-            "Performance alerts",
-            "Historical analysis",
-          ]}
-          isFullScreen={false}
-        />
-      );
-    case "reports":
-      return (
-        <UnderConstruction
-          menuTitle="Reports & Analytics"
-          menuIcon="📝"
-          description="Comprehensive reporting system with customizable reports and data visualization."
-          estimatedCompletion="3 weeks"
-          features={[
-            "Custom report generation",
-            "Data visualization tools",
-            "Scheduled reporting",
-            "Export capabilities",
-            "Interactive dashboards",
-          ]}
-          isFullScreen={false}
-        />
-      );
     case "transactions":
       return <PaymentHistoryContent />;
     case "payouts":

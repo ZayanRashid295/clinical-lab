@@ -2,10 +2,8 @@
 import { authService } from "./auth.service";
 import { usersService } from "./users.service";
 import { paymentsService } from "./payments.service";
-import { locationsService } from "./locations.service";
 import { notificationsService } from "./notifications.service";
 import { chatService } from "./chat.service";
-import { fleetService } from "./fleet.service";
 import { payoutsService } from "./payouts.service";
 import { adminService } from "./admin.service";
 
@@ -70,30 +68,6 @@ class ApiService {
     return paymentsService.deletePaymentMethod(id);
   }
 
-  // Location endpoints
-  async createLocation(locationData: any): Promise<any> {
-    return locationsService.createLocation(locationData);
-  }
-
-  async getLocations(): Promise<any> {
-    return locationsService.getLocations();
-  }
-
-  async updateDriverLocation(
-    driverId: string,
-    locationData: any
-  ): Promise<any> {
-    return locationsService.updateDriverLocation(driverId, locationData);
-  }
-
-  async getNearbyDrivers(
-    latitude: number,
-    longitude: number,
-    radius: number = 5
-  ): Promise<any> {
-    return locationsService.getNearbyDrivers(latitude, longitude, radius);
-  }
-
   // Notification endpoints
   async getNotifications(): Promise<any> {
     return notificationsService.getNotifications();
@@ -118,19 +92,6 @@ class ApiService {
 
   async getRoomMessages(roomId: string): Promise<any> {
     return chatService.getRoomMessages(roomId);
-  }
-
-  // Fleet endpoints
-  async getFleet(): Promise<any> {
-    return fleetService.getFleet();
-  }
-
-  async getVehicles(): Promise<any> {
-    return fleetService.getVehicles();
-  }
-
-  async getDrivers(): Promise<any> {
-    return fleetService.getDrivers();
   }
 
   // Payout endpoints

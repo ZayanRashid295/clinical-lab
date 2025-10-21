@@ -19,29 +19,10 @@ import InvoicesContent from "../components/Content/InvoicesContent";
 import ChatRoomsList from "../components/Chat/ChatRoomsList";
 import SupportChatRoomsList from "../components/Chat/SupportChatRoomsList";
 import NotificationsList from "../components/Notifications/NotificationsList";
-import LocationsOverview from "../components/Locations/LocationsOverview";
-import PickupLocationsList from "../components/Locations/PickupLocationsList";
-import DropoffLocationsList from "../components/Locations/DropoffLocationsList";
-import FavoriteLocationsList from "../components/Locations/FavoriteLocationsList";
-import LocationAnalytics from "../components/Locations/LocationAnalytics";
-import FleetManagementContent from "../components/Content/FleetManagementContent";
-import VehiclesContent from "../components/Content/VehiclesContent";
-import DriversContent from "../components/Content/DriversContent";
-import RoutesContent from "../components/Content/RoutesContent";
-import MaintenanceContent from "../components/Content/MaintenanceContent";
-import FuelContent from "../components/Content/FuelContent";
 import UserManagementContent from "../components/Content/UserManagementContent";
 import RoleManagementContent from "../components/Content/RoleManagementContent";
 import SystemSettingsContent from "../components/Content/SystemSettingsContent";
-import ReportsContent from "../components/Content/ReportsContent";
-import AuditLogsContent from "../components/Content/AuditLogsContent";
-import {
-  mainDashboardConfig,
-  adminDashboardConfig,
-  analyticsDashboardConfig,
-  paymentAnalyticsConfig,
-} from "./dashboard.configs";
-import { ShadowModeContent } from "../components/ShadowMode";
+import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
@@ -69,58 +50,16 @@ export const transportationContentRegistry: ContentRegistry = {
       </div>
     ),
 
-    // Location routes
-    "/locations": () => (
-      <div className="h-full">
-        <LocationsOverview />
-      </div>
-    ),
-    "/locations/pickup": () => (
-      <div className="h-full">
-        <PickupLocationsList />
-      </div>
-    ),
-    "/locations/dropoff": () => (
-      <div className="h-full">
-        <DropoffLocationsList />
-      </div>
-    ),
-    "/locations/favorites": () => (
-      <div className="h-full">
-        <FavoriteLocationsList />
-      </div>
-    ),
-
-    // Fleet routes
-    "/fleet": () => <FleetManagementContent />,
-    "/fleet/vehicles": () => <VehiclesContent />,
-    "/fleet/drivers": () => <DriversContent />,
-    "/fleet/routes": () => <RoutesContent />,
-    "/fleet/maintenance": () => <MaintenanceContent />,
-    "/fleet/fuel": () => <FuelContent />,
-
     // Admin sub-routes
     "/admin/users": () => <UserManagementContent />,
     "/admin/roles": () => <RoleManagementContent />,
     "/admin/settings": () => <SystemSettingsContent />,
-    "/admin/reports": () => <ReportsContent />,
-
-    // Analytics sub-routes
-    "/analytics/locations": () => (
-      <div className="h-full">
-        <LocationAnalytics />
-      </div>
-    ),
-    "/analytics/audit": () => <AuditLogsContent />,
-    "/shadow-mode": () => <ShadowModeContent />,
   },
 
   dashboards: {
     "/": mainDashboardConfig,
     "/dashboard": mainDashboardConfig,
     "/admin": adminDashboardConfig,
-    "/analytics": analyticsDashboardConfig,
-    "/analytics/payments": paymentAnalyticsConfig,
   },
 
   defaultContent: () => (

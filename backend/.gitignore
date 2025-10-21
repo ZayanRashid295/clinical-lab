@@ -152,4 +152,4 @@ temp/
 *.sw?
 
 # Prisma
-/prisma/migrations
+#/prisma/migrations
