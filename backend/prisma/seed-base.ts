@@ -262,6 +262,150 @@ export async function seedBase(prisma: PrismaClient) {
     },
   });
 
+  // Additional 10 users
+  const additionalUsers = await Promise.all([
+    prisma.user.upsert({
+      where: { email: "alex.brown@example.com" },
+      update: {},
+      create: {
+        email: "alex.brown@example.com",
+        password: hashedPassword,
+        firstName: "Alex",
+        lastName: "Brown",
+        phone: "+1234567897",
+        avatar:
+          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "emma.davis@example.com" },
+      update: {},
+      create: {
+        email: "emma.davis@example.com",
+        password: hashedPassword,
+        firstName: "Emma",
+        lastName: "Davis",
+        phone: "+1234567898",
+        avatar:
+          "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "david.miller@example.com" },
+      update: {},
+      create: {
+        email: "david.miller@example.com",
+        password: hashedPassword,
+        firstName: "David",
+        lastName: "Miller",
+        phone: "+1234567899",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "lisa.garcia@example.com" },
+      update: {},
+      create: {
+        email: "lisa.garcia@example.com",
+        password: hashedPassword,
+        firstName: "Lisa",
+        lastName: "Garcia",
+        phone: "+1234567900",
+        avatar:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "michael.rodriguez@example.com" },
+      update: {},
+      create: {
+        email: "michael.rodriguez@example.com",
+        password: hashedPassword,
+        firstName: "Michael",
+        lastName: "Rodriguez",
+        phone: "+1234567901",
+        avatar:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "sophia.martinez@example.com" },
+      update: {},
+      create: {
+        email: "sophia.martinez@example.com",
+        password: hashedPassword,
+        firstName: "Sophia",
+        lastName: "Martinez",
+        phone: "+1234567902",
+        avatar:
+          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "james.anderson@example.com" },
+      update: {},
+      create: {
+        email: "james.anderson@example.com",
+        password: hashedPassword,
+        firstName: "James",
+        lastName: "Anderson",
+        phone: "+1234567903",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "olivia.taylor@example.com" },
+      update: {},
+      create: {
+        email: "olivia.taylor@example.com",
+        password: hashedPassword,
+        firstName: "Olivia",
+        lastName: "Taylor",
+        phone: "+1234567904",
+        avatar:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "william.thomas@example.com" },
+      update: {},
+      create: {
+        email: "william.thomas@example.com",
+        password: hashedPassword,
+        firstName: "William",
+        lastName: "Thomas",
+        phone: "+1234567905",
+        avatar:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "ava.hernandez@example.com" },
+      update: {},
+      create: {
+        email: "ava.hernandez@example.com",
+        password: hashedPassword,
+        firstName: "Ava",
+        lastName: "Hernandez",
+        phone: "+1234567906",
+        avatar:
+          "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+        isActive: true,
+      },
+    }),
+  ]);
+
   // Assign roles to users
   console.log("🔗 Assigning roles to users...");
 
@@ -318,6 +462,30 @@ export async function seedBase(prisma: PrismaClient) {
     create: { userId: fleetManager.id, roleId: fleetManagerRole.id },
   });
 
+  // Assign roles to additional users (mix of passengers and drivers)
+  const additionalUserRoles = [
+    { user: additionalUsers[0], role: passengerRole }, // Alex Brown - Passenger
+    { user: additionalUsers[1], role: passengerRole }, // Emma Davis - Passenger
+    { user: additionalUsers[2], role: driverRole }, // David Miller - Driver
+    { user: additionalUsers[3], role: passengerRole }, // Lisa Garcia - Passenger
+    { user: additionalUsers[4], role: driverRole }, // Michael Rodriguez - Driver
+    { user: additionalUsers[5], role: passengerRole }, // Sophia Martinez - Passenger
+    { user: additionalUsers[6], role: driverRole }, // James Anderson - Driver
+    { user: additionalUsers[7], role: passengerRole }, // Olivia Taylor - Passenger
+    { user: additionalUsers[8], role: driverRole }, // William Thomas - Driver
+    { user: additionalUsers[9], role: passengerRole }, // Ava Hernandez - Passenger
+  ];
+
+  for (const { user, role } of additionalUserRoles) {
+    await prisma.userRole.upsert({
+      where: {
+        userId_roleId: { userId: user.id, roleId: role.id },
+      },
+      update: {},
+      create: { userId: user.id, roleId: role.id },
+    });
+  }
+
   // Create user settings
   console.log("⚙️ Creating user settings...");
   const users = [
@@ -328,6 +496,7 @@ export async function seedBase(prisma: PrismaClient) {
     admin,
     support,
     fleetManager,
+    ...additionalUsers,
   ];
 
   for (const user of users) {
@@ -388,8 +557,10 @@ export async function seedBase(prisma: PrismaClient) {
 
   // Create wallets
   console.log("💰 Creating wallets...");
-  await prisma.wallet.create({
-    data: {
+  await prisma.wallet.upsert({
+    where: { userId: passenger1.id },
+    update: {},
+    create: {
       userId: passenger1.id,
       balance: 50.0,
       currency: "USD",
@@ -397,8 +568,10 @@ export async function seedBase(prisma: PrismaClient) {
     },
   });
 
-  await prisma.wallet.create({
-    data: {
+  await prisma.wallet.upsert({
+    where: { userId: passenger2.id },
+    update: {},
+    create: {
       userId: passenger2.id,
       balance: 25.0,
       currency: "USD",
@@ -406,8 +579,10 @@ export async function seedBase(prisma: PrismaClient) {
     },
   });
 
-  await prisma.wallet.create({
-    data: {
+  await prisma.wallet.upsert({
+    where: { userId: driver1.id },
+    update: {},
+    create: {
       userId: driver1.id,
       balance: 150.0,
       currency: "USD",
@@ -415,8 +590,10 @@ export async function seedBase(prisma: PrismaClient) {
     },
   });
 
-  await prisma.wallet.create({
-    data: {
+  await prisma.wallet.upsert({
+    where: { userId: driver2.id },
+    update: {},
+    create: {
       userId: driver2.id,
       balance: 200.0,
       currency: "USD",
@@ -544,8 +721,10 @@ export async function seedBase(prisma: PrismaClient) {
   ];
 
   for (const user of allUsers) {
-    await prisma.notificationPreference.create({
-      data: {
+    await prisma.notificationPreference.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
         userId: user.id,
         emailEnabled: true,
         smsEnabled: false,
@@ -562,8 +741,10 @@ export async function seedBase(prisma: PrismaClient) {
 
   // Create promo codes
   console.log("🎟️ Creating promo codes...");
-  await prisma.promoCode.create({
-    data: {
+  await prisma.promoCode.upsert({
+    where: { code: "WELCOME10" },
+    update: {},
+    create: {
       code: "WELCOME10",
       description: "Welcome bonus for new users",
       type: "PERCENTAGE",
@@ -578,8 +759,10 @@ export async function seedBase(prisma: PrismaClient) {
     },
   });
 
-  await prisma.promoCode.create({
-    data: {
+  await prisma.promoCode.upsert({
+    where: { code: "FIRSTRIDE" },
+    update: {},
+    create: {
       code: "FIRSTRIDE",
       description: "Free first ride up to $10",
       type: "FIXED_AMOUNT",
@@ -611,8 +794,10 @@ export async function seedBase(prisma: PrismaClient) {
   ];
 
   for (const setting of systemSettings) {
-    await prisma.systemSettings.create({
-      data: setting,
+    await prisma.systemSettings.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
     });
   }
 

@@ -242,9 +242,9 @@ export default function UserManagementContent() {
       </div>
 
       {/* Controls Row */}
-      <div className="mb-6 flex items-center justify-between">
-        {/* Search Field - Left Side */}
-        <div className="relative">
+      <div className="mb-6 flex items-center gap-4">
+        {/* Search Field - Takes remaining space */}
+        <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-gray-400" />
           </div>
@@ -255,12 +255,12 @@ export default function UserManagementContent() {
             onChange={(e) =>
               handleFiltersChange({ search: e.target.value || undefined })
             }
-            className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
-        {/* All Other Controls - Right Side */}
-        <div className="flex items-center gap-4">
+        {/* All Other Controls - Fixed width */}
+        <div className="flex items-center gap-4 flex-shrink-0">
           {/* View Toggle */}
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
