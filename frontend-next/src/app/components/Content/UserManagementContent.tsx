@@ -29,6 +29,7 @@ import UserFormModal from "../Users/UserFormModal";
 import UserViewModal from "../Users/UserViewModal";
 import UserFilters from "../Users/UserFilters";
 import UsersTable from "../Users/UsersTable";
+import TwoTablesWithPagination from "./TwoTablesWithPagination";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
@@ -534,6 +535,11 @@ export default function UserManagementContent() {
         onClose={handleCloseViewModal}
         user={selectedUser}
       />
+
+      {/* Two Tables with Pagination */}
+      <div className="mt-8">
+        <TwoTablesWithPagination />
+      </div>
     </div>
   );
 }
