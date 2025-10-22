@@ -75,9 +75,17 @@ const LoadingSkeleton = ({ rows = 10, columns = 4 }) => {
   return (
     <>
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <tr key={rowIndex} className="border-b border-gray-200">
+        <tr
+          key={rowIndex}
+          className="border-b border-gray-200"
+          style={{ height: "48px" }}
+        >
           {Array.from({ length: columns }).map((_, colIndex) => (
-            <td key={colIndex} className="px-4 py-3">
+            <td
+              key={colIndex}
+              className="px-4 py-3"
+              style={{ height: "48px", verticalAlign: "middle" }}
+            >
               <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
             </td>
           ))}
@@ -112,6 +120,9 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentData = data.slice(startIndex, endIndex);
+
+  // Calculate empty rows needed to maintain consistent height
+  const emptyRowsCount = pageSize - currentData.length;
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -206,18 +217,43 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
             {isLoading || isPageChanging ? (
               <LoadingSkeleton rows={pageSize} columns={columns.length} />
             ) : (
-              currentData.map((row, index) => (
-                <tr
-                  key={row.id || index}
-                  className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  {columns.map((column) => (
-                    <td key={column.key} className="px-4 py-3 text-gray-700">
-                      {row[column.key]}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              <>
+                {currentData.map((row, index) => (
+                  <tr
+                    key={row.id || index}
+                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                    style={{ height: "48px" }}
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={column.key}
+                        className="px-4 py-3 text-gray-700"
+                        style={{ height: "48px", verticalAlign: "middle" }}
+                      >
+                        {row[column.key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                {/* Empty rows to maintain consistent table height */}
+                {Array.from({ length: emptyRowsCount }).map((_, index) => (
+                  <tr
+                    key={`empty-${index}`}
+                    className="border-b border-gray-200"
+                    style={{ height: "48px" }}
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={column.key}
+                        className="px-4 py-3"
+                        style={{ height: "48px", verticalAlign: "middle" }}
+                      >
+                        &nbsp;
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </>
             )}
           </tbody>
         </table>
