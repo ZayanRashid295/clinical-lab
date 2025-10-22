@@ -9,101 +9,109 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: QueryUserDto) {
-    const {
-      search,
-      status,
-      role,
-      dateFrom,
-      dateTo,
-      page = 1,
-      limit = 10,
-      sortBy = "createdAt",
-      sortOrder = "desc",
-    } = query;
+    try {
+      console.log("Query received:", query);
+      const {
+        search,
+        status,
+        role,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
 
-    // Build where clause
-    const where: any = {};
+      console.log("Search parameter:", search);
 
-    // Search filter
-    if (search) {
-      where.OR = [
-        { email: { contains: search, mode: "insensitive" } },
-        { firstName: { contains: search, mode: "insensitive" } },
-        { lastName: { contains: search, mode: "insensitive" } },
-      ];
-    }
+      // Build where clause
+      const where: any = {};
 
-    // Status filter
-    if (status) {
-      where.isActive = status === "ACTIVE";
-    }
+      // Search filter
+      if (search) {
+        where.OR = [
+          { email: { contains: search } },
+          { firstName: { contains: search } },
+          { lastName: { contains: search } },
+        ];
+      }
 
-    // Role filter
-    if (role) {
-      where.roles = {
-        some: {
-          role: {
-            name: role,
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Role filter
+      if (role) {
+        where.roles = {
+          some: {
+            role: {
+              name: role,
+            },
           },
+        };
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.user.count({ where });
+
+      // Get users with pagination and sorting
+      const users = await this.prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          avatar: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+      });
+
+      // Calculate total pages
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: users,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
         },
       };
+    } catch (error) {
+      console.error("Error in findAll:", error);
+      throw error;
     }
-
-    // Date range filter
-    if (dateFrom || dateTo) {
-      where.createdAt = {};
-      if (dateFrom) {
-        where.createdAt.gte = new Date(dateFrom);
-      }
-      if (dateTo) {
-        where.createdAt.lte = new Date(dateTo);
-      }
-    }
-
-    // Calculate pagination
-    const skip = (page - 1) * limit;
-
-    // Get total count for pagination
-    const total = await this.prisma.user.count({ where });
-
-    // Get users with pagination and sorting
-    const users = await this.prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        avatar: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
-      skip,
-      take: limit,
-      orderBy: {
-        [sortBy]: sortOrder,
-      },
-    });
-
-    // Calculate total pages
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: users,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-      },
-    };
   }
 
   async findOne(id: string) {

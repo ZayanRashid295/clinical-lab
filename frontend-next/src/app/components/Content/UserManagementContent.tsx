@@ -501,7 +501,7 @@ export default function UserManagementContent() {
             No users found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== "ALL" || roleFilter !== "ALL"
+            {filters.search || filters.status || filters.role
               ? "Try adjusting your search or filter criteria."
               : "Get started by adding your first user."}
           </p>
