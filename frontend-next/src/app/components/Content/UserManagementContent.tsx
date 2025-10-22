@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Users,
   UserPlus,
@@ -359,22 +359,22 @@ export default function UserManagementContent() {
         </div>
       )}
 
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center items-center py-12">
-          <div className="text-center">
-            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-            <p className="mt-2 text-gray-600">Loading users...</p>
-          </div>
-        </div>
-      )}
-
       {/* Content Area */}
-      {!loading && !error && (
-        <>
+      {!error && (
+        <div className="min-h-[600px]">
           {viewMode === "table" ? (
-            <div className="bg-white rounded-lg shadow border">
+            <div className="bg-white rounded-lg shadow border relative">
+              {/* Loading Overlay */}
+              {loading && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+                  <div className="text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+                    <p className="mt-2 text-gray-600">Loading users...</p>
+                  </div>
+                </div>
+              )}
               <UsersTable
+                key="users-table"
                 users={users}
                 loading={loading}
                 pagination={pagination}
@@ -387,7 +387,16 @@ export default function UserManagementContent() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+              {/* Loading Overlay for Card View */}
+              {loading && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+                  <div className="text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+                    <p className="mt-2 text-gray-600">Loading users...</p>
+                  </div>
+                </div>
+              )}
               {users.map((user) => (
                 <div
                   key={user.id}
@@ -502,7 +511,7 @@ export default function UserManagementContent() {
               ))}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Empty State */}
@@ -535,8 +544,6 @@ export default function UserManagementContent() {
         onClose={handleCloseViewModal}
         user={selectedUser}
       />
-
-      <div className="min-h-screen"></div>
     </div>
   );
 }

@@ -265,7 +265,10 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => onPageChange?.(pagination.page - 1)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange?.(pagination.page - 1);
+                }}
                 disabled={pagination.page <= 1}
                 className="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >
@@ -287,7 +290,10 @@ const UsersTable: React.FC<UsersTableProps> = ({
                         <span className="px-2 text-gray-500">...</span>
                       )}
                       <button
-                        onClick={() => onPageChange?.(page)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onPageChange?.(page);
+                        }}
                         className={`px-3 py-1 border rounded text-sm ${
                           page === pagination.page
                             ? "bg-blue-600 text-white border-blue-600"
@@ -301,7 +307,10 @@ const UsersTable: React.FC<UsersTableProps> = ({
               </div>
 
               <button
-                onClick={() => onPageChange?.(pagination.page + 1)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange?.(pagination.page + 1);
+                }}
                 disabled={pagination.page >= pagination.totalPages}
                 className="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >

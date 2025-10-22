@@ -74,4 +74,8 @@ export interface UserFilters {
   role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
   dateFrom?: string;
   dateTo?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
