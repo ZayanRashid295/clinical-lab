@@ -163,45 +163,11 @@ export default function UserManagementContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              User Management
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Manage system users and their permissions
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleRefresh}
-              disabled={loading}
-              className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw
-                className={`h-5 w-5 mr-2 ${loading ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </button>
-            <button
-              onClick={handleAddUser}
-              className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
-              style={{
-                backgroundColor: "var(--color-primary-600)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "var(--color-primary-700)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "var(--color-primary-600)";
-              }}
-            >
-              <UserPlus className="h-5 w-5 mr-2" />
-              Add User
-            </button>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+          <p className="mt-2 text-gray-600">
+            Manage system users and their permissions
+          </p>
         </div>
       </div>
 
@@ -275,7 +241,7 @@ export default function UserManagementContent() {
         </div>
       </div>
 
-      {/* View Toggle and Filter Controls */}
+      {/* Controls Row */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           {/* View Toggle */}
@@ -303,10 +269,8 @@ export default function UserManagementContent() {
               <LayoutGrid size={16} />
             </button>
           </div>
-        </div>
 
-        {/* Filter Toggle */}
-        <div className="flex items-center gap-2">
+          {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -317,6 +281,38 @@ export default function UserManagementContent() {
           >
             <Filter className="h-4 w-4 mr-2 inline" />
             {showFilters ? "Hide Filters" : "Show Filters"}
+          </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw
+              className={`h-5 w-5 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+          <button
+            onClick={handleAddUser}
+            className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor: "var(--color-primary-600)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-700)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-600)";
+            }}
+          >
+            <UserPlus className="h-5 w-5 mr-2" />
+            Add User
           </button>
         </div>
       </div>
