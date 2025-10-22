@@ -299,21 +299,17 @@ export default function TwoTablesWithPagination() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-purple-900 p-6">
-      <div className="max-w-6xl mx-auto">
-        <PaginatedTable
-          title="Users Table"
-          data={usersData}
-          columns={userColumns}
-          initialLoadingTime={1500}
-        />
-        <PaginatedTable
-          title="Products Table"
-          data={productsData}
-          columns={productColumns}
-          initialLoadingTime={2500}
-        />
-      </div>
+    <div className="min-h-screen">
+      {
+        // <div className="max-w-6xl mx-auto">
+        //   <PaginatedTable
+        //     title="Users Table"
+        //     data={usersData}
+        //     columns={userColumns}
+        //     initialLoadingTime={1500}
+        //   />
+        // </div>
+      }
     </div>
   );
 }

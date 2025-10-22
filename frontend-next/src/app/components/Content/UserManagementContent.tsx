@@ -536,10 +536,7 @@ export default function UserManagementContent() {
         user={selectedUser}
       />
 
-      {/* Two Tables with Pagination */}
-      <div className="mt-8">
-        <TwoTablesWithPagination />
-      </div>
+      <div className="min-h-screen"></div>
     </div>
   );
 }
