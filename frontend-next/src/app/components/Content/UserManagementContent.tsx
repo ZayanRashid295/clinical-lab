@@ -282,25 +282,25 @@ export default function UserManagementContent() {
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode("table")}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              title="Table View"
+              className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === "table"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
               <Table size={16} />
-              Table
             </button>
             <button
               onClick={() => setViewMode("card")}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              title="Card View"
+              className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === "card"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
               <LayoutGrid size={16} />
-              Cards
             </button>
           </div>
         </div>
