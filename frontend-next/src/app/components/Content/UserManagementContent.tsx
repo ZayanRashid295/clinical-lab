@@ -39,6 +39,8 @@ export default function UserManagementContent() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
 
   // Use the custom hooks for data fetching
   const { users, loading, error, pagination, refetch, updateFilters, filters } =
@@ -46,6 +48,16 @@ export default function UserManagementContent() {
       page: 1,
       limit: 10,
     });
+
+  // Track content height to prevent layout shift
+  useEffect(() => {
+    if (!loading && contentRef.current) {
+      const height = contentRef.current.offsetHeight;
+      if (height > 0) {
+        setMinHeight(height);
+      }
+    }
+  }, [loading, users.length]);
 
   const { stats, loading: statsLoading, error: statsError } = useUserStats();
 
@@ -361,7 +373,10 @@ export default function UserManagementContent() {
 
       {/* Content Area */}
       {!error && (
-        <div className="min-h-[600px]">
+        <div
+          ref={contentRef}
+          style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
+        >
           {viewMode === "table" ? (
             <div className="bg-white rounded-lg shadow border relative">
               {/* Loading Overlay */}
@@ -511,21 +526,6 @@ export default function UserManagementContent() {
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && !error && users.length === 0 && (
-        <div className="text-center py-12">
-          <Users className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No users found
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {filters.search || filters.status || filters.role
-              ? "Try adjusting your search or filter criteria."
-              : "Get started by adding your first user."}
-          </p>
         </div>
       )}
 
