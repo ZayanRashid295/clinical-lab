@@ -30,7 +30,6 @@ import UserViewModal from "../Users/UserViewModal";
 import UserFilters from "../Users/UserFilters";
 import UsersTable from "../Users/UsersTable";
 import Pagination from "../Users/Pagination";
-import TwoTablesWithPagination from "./TwoTablesWithPagination";
 
 export default function UserManagementContent() {
   const { config } = useTheme();
