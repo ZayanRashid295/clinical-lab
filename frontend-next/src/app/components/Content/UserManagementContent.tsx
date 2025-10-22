@@ -399,6 +399,8 @@ export default function UserManagementContent() {
                 onViewUser={handleViewUser}
                 onEditUser={handleEditUser}
                 title="User Management"
+                sortBy={filters.sortBy}
+                sortOrder={filters.sortOrder}
               />
             </div>
           ) : (

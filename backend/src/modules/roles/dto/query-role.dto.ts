@@ -10,10 +10,10 @@ import {
 } from "class-validator";
 import { Transform } from "class-transformer";
 
-export class QueryUserDto {
+export class QueryRoleDto {
   @ApiProperty({
-    description: "Search term for email, first name, or last name",
-    example: "john",
+    description: "Search term for name, display name, or description",
+    example: "admin",
     required: false,
   })
   @IsOptional()
@@ -21,7 +21,7 @@ export class QueryUserDto {
   search?: string;
 
   @ApiProperty({
-    description: "Filter by user status",
+    description: "Filter by role status",
     enum: ["ACTIVE", "INACTIVE"],
     example: "ACTIVE",
     required: false,
@@ -31,17 +31,7 @@ export class QueryUserDto {
   status?: "ACTIVE" | "INACTIVE";
 
   @ApiProperty({
-    description: "Filter by user role",
-    enum: ["ADMIN", "FLEET_MANAGER", "DRIVER", "CUSTOMER_SUPPORT"],
-    example: "ADMIN",
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(["ADMIN", "FLEET_MANAGER", "DRIVER", "CUSTOMER_SUPPORT"])
-  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
-
-  @ApiProperty({
-    description: "Filter users created from this date",
+    description: "Filter roles created from this date",
     example: "2024-01-01",
     required: false,
   })
@@ -50,7 +40,7 @@ export class QueryUserDto {
   dateFrom?: string;
 
   @ApiProperty({
-    description: "Filter users created until this date",
+    description: "Filter roles created until this date",
     example: "2024-12-31",
     required: false,
   })
@@ -86,36 +76,13 @@ export class QueryUserDto {
 
   @ApiProperty({
     description: "Field to sort by",
-    enum: [
-      "createdAt",
-      "updatedAt",
-      "firstName",
-      "lastName",
-      "email",
-      "isActive",
-      "role",
-    ],
+    enum: ["createdAt", "updatedAt", "name", "displayName"],
     example: "createdAt",
     required: false,
   })
   @IsOptional()
-  @IsEnum([
-    "createdAt",
-    "updatedAt",
-    "firstName",
-    "lastName",
-    "email",
-    "isActive",
-    "role",
-  ])
-  sortBy?:
-    | "createdAt"
-    | "updatedAt"
-    | "firstName"
-    | "lastName"
-    | "email"
-    | "isActive"
-    | "role" = "createdAt";
+  @IsEnum(["createdAt", "updatedAt", "name", "displayName"])
+  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName" = "createdAt";
 
   @ApiProperty({
     description: "Sort order",

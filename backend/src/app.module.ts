@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./common/prisma/prisma.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
+import { RolesModule } from "./modules/roles/roles.module";
 
 import { PaymentsModule } from "./modules/payments/payments.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
@@ -24,6 +25,7 @@ import { AssessmentsModule } from "./modules/assessments/assessments.module";
     PrismaModule,
     AuthModule,
     UsersModule,
+    RolesModule,
     PaymentsModule,
     NotificationsModule,
     ChatModule,

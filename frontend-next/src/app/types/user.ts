@@ -43,7 +43,14 @@ export interface Role {
 export interface UserQueryParams {
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "updatedAt" | "firstName" | "lastName" | "email";
+  sortBy?:
+    | "createdAt"
+    | "updatedAt"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "isActive"
+    | "role";
   sortOrder?: "asc" | "desc";
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
@@ -72,6 +79,45 @@ export interface UserFilters {
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
   role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+// Role Management Types
+export interface RoleQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface CreateRoleDto {
+  name: string;
+  displayName: string;
+  description: string;
+  permissions: string[];
+  isActive?: boolean;
+}
+
+export interface UpdateRoleDto {
+  name?: string;
+  displayName?: string;
+  description?: string;
+  permissions?: string[];
+  isActive?: boolean;
+}
+
+export interface RoleFilters {
+  search?: string;
+  status?: "ACTIVE" | "INACTIVE";
   dateFrom?: string;
   dateTo?: string;
   page?: number;

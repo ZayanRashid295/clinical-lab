@@ -70,8 +70,29 @@ export class UsersService {
       // Get total count for pagination
       const total = await this.prisma.user.count({ where });
 
+      // Handle special sorting cases
+      let orderBy: any = {};
+      let needsApplicationSorting = false;
+
+      if (sortBy === "role") {
+        // Need to sort by role name after fetching (application-level sorting)
+        needsApplicationSorting = true;
+        // Fetch without orderBy first, we'll sort in memory
+        orderBy = undefined;
+      } else if (sortBy === "isActive") {
+        // Sort by isActive field
+        orderBy = {
+          isActive: sortOrder,
+        };
+      } else {
+        // Standard sorting
+        orderBy = {
+          [sortBy]: sortOrder,
+        };
+      }
+
       // Get users with pagination and sorting
-      const users = await this.prisma.user.findMany({
+      let users = await this.prisma.user.findMany({
         where,
         select: {
           id: true,
@@ -89,12 +110,25 @@ export class UsersService {
             },
           },
         },
-        skip,
-        take: limit,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        ...(orderBy && { orderBy }),
       });
+
+      // Handle role sorting at application level
+      if (needsApplicationSorting) {
+        users = users.sort((a, b) => {
+          const roleA = a.roles?.[0]?.role?.name || "";
+          const roleB = b.roles?.[0]?.role?.name || "";
+
+          if (sortOrder === "asc") {
+            return roleA.localeCompare(roleB);
+          } else {
+            return roleB.localeCompare(roleA);
+          }
+        });
+
+        // Apply pagination after sorting
+        users = users.slice(skip, skip + limit);
+      }
 
       // Calculate total pages
       const totalPages = Math.ceil(total / limit);

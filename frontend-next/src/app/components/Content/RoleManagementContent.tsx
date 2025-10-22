@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Shield,
   Plus,
@@ -14,133 +14,75 @@ import {
   Key,
   Lock,
   Unlock,
+  AlertCircle,
+  RefreshCw,
+  LayoutGrid,
+  Table,
 } from "lucide-react";
 import { useTheme } from "../../../hooks/useTheme";
-
-// Mock data for roles
-const MOCK_ROLES = [
-  {
-    id: "1",
-    name: "ADMIN",
-    displayName: "Administrator",
-    description: "Full system access with all permissions",
-    permissions: [
-      "USER_MANAGEMENT",
-      "ROLE_MANAGEMENT",
-      "SYSTEM_SETTINGS",
-      "FLEET_MANAGEMENT",
-      "RIDE_MANAGEMENT",
-      "PAYMENT_MANAGEMENT",
-      "REPORT_ACCESS",
-      "AUDIT_ACCESS",
-    ],
-    userCount: 3,
-    isActive: true,
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-12-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    name: "FLEET_MANAGER",
-    displayName: "Fleet Manager",
-    description: "Manage fleet operations, vehicles, and drivers",
-    permissions: [
-      "FLEET_MANAGEMENT",
-      "DRIVER_MANAGEMENT",
-      "VEHICLE_MANAGEMENT",
-      "RIDE_MANAGEMENT",
-      "REPORT_ACCESS",
-    ],
-    userCount: 8,
-    isActive: true,
-    createdAt: "2023-02-15T09:00:00Z",
-    updatedAt: "2023-11-20T14:45:00Z",
-  },
-  {
-    id: "3",
-    name: "DRIVER",
-    displayName: "Driver",
-    description: "Access to driver-specific features and ride management",
-    permissions: ["RIDE_MANAGEMENT", "PROFILE_MANAGEMENT", "EARNING_ACCESS"],
-    userCount: 156,
-    isActive: true,
-    createdAt: "2023-03-01T12:00:00Z",
-    updatedAt: "2023-10-30T16:20:00Z",
-  },
-  {
-    id: "4",
-    name: "CUSTOMER_SUPPORT",
-    displayName: "Customer Support",
-    description: "Handle customer inquiries and support tickets",
-    permissions: [
-      "CUSTOMER_SUPPORT",
-      "RIDE_VIEW",
-      "PAYMENT_VIEW",
-      "PROFILE_MANAGEMENT",
-    ],
-    userCount: 12,
-    isActive: true,
-    createdAt: "2023-04-10T11:30:00Z",
-    updatedAt: "2023-12-01T09:15:00Z",
-  },
-  {
-    id: "5",
-    name: "FINANCE_MANAGER",
-    displayName: "Finance Manager",
-    description: "Access to financial reports and payment management",
-    permissions: ["PAYMENT_MANAGEMENT", "REPORT_ACCESS", "FINANCIAL_ANALYTICS"],
-    userCount: 5,
-    isActive: false,
-    createdAt: "2023-05-20T14:00:00Z",
-    updatedAt: "2023-11-15T13:30:00Z",
-  },
-];
-
-const PERMISSION_CATEGORIES = {
-  USER_MANAGEMENT: "User Management",
-  ROLE_MANAGEMENT: "Role Management",
-  SYSTEM_SETTINGS: "System Settings",
-  FLEET_MANAGEMENT: "Fleet Management",
-  DRIVER_MANAGEMENT: "Driver Management",
-  VEHICLE_MANAGEMENT: "Vehicle Management",
-  RIDE_MANAGEMENT: "Ride Management",
-  PAYMENT_MANAGEMENT: "Payment Management",
-  CUSTOMER_SUPPORT: "Customer Support",
-  REPORT_ACCESS: "Report Access",
-  AUDIT_ACCESS: "Audit Access",
-  PROFILE_MANAGEMENT: "Profile Management",
-  EARNING_ACCESS: "Earning Access",
-  RIDE_VIEW: "Ride View",
-  PAYMENT_VIEW: "Payment View",
-  FINANCIAL_ANALYTICS: "Financial Analytics",
-};
+import useRoles from "../../../hooks/useRoles";
+import useRoleStats from "../../../hooks/useRoleStats";
+import { Role } from "../../types/user";
+import RoleFormModal from "../Roles/RoleFormModal";
+import RoleViewModal from "../Roles/RoleViewModal";
+import RoleFilters from "../Roles/RoleFilters";
+import RolesTable from "../Roles/RolesTable";
+import Pagination from "../Users/Pagination";
 
 export default function RoleManagementContent() {
   const { config } = useTheme();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [filteredRoles, setFilteredRoles] = useState(MOCK_ROLES);
+  const [viewMode, setViewMode] = useState<"card" | "table">("table");
+  const [showFilters, setShowFilters] = useState(true);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
 
+  // Use the custom hooks for data fetching
+  const { roles, loading, error, pagination, refetch, updateFilters, filters } =
+    useRoles({
+      page: 1,
+      limit: 10,
+    });
+
+  // Track content height to prevent layout shift
   useEffect(() => {
-    // Filter roles based on search term and status
-    let filtered = MOCK_ROLES;
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (role) =>
-          role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          role.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          role.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (!loading && contentRef.current) {
+      const height = contentRef.current.offsetHeight;
+      if (height > 0) {
+        setMinHeight(height);
+      }
     }
+  }, [loading, roles.length]);
 
-    if (statusFilter !== "ALL") {
-      const isActive = statusFilter === "ACTIVE";
-      filtered = filtered.filter((role) => role.isActive === isActive);
-    }
+  const { stats, loading: statsLoading, error: statsError } = useRoleStats();
 
-    setFilteredRoles(filtered);
-  }, [searchTerm, statusFilter]);
+  const handleFiltersChange = (newFilters: Partial<any>) => {
+    updateFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    updateFilters({
+      search: undefined,
+      status: undefined,
+      dateFrom: undefined,
+      dateTo: undefined,
+    });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateFilters({ page });
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    updateFilters({ limit: pageSize, page: 1 });
+  };
+
+  const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
+    updateFilters({ sortBy, sortOrder });
+  };
 
   const getStatusIcon = (isActive: boolean) => {
     return isActive ? (
@@ -158,44 +100,60 @@ export default function RoleManagementContent() {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const totalRoles = MOCK_ROLES.length;
-  const activeRoles = MOCK_ROLES.filter((r) => r.isActive).length;
-  const inactiveRoles = MOCK_ROLES.filter((r) => !r.isActive).length;
-  const totalUsers = MOCK_ROLES.reduce((sum, role) => sum + role.userCount, 0);
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  const handleViewRole = (role: Role) => {
+    setSelectedRole(role);
+    setViewModalOpen(true);
+  };
+
+  const handleEditRole = (role: Role) => {
+    setSelectedRole(role);
+    setFormMode("edit");
+    setFormModalOpen(true);
+  };
+
+  const handleAddRole = () => {
+    setSelectedRole(null);
+    setFormMode("create");
+    setFormModalOpen(true);
+  };
+
+  const handleRoleSaved = (savedRole: Role) => {
+    // Refresh the roles list to show updated data
+    refetch();
+  };
+
+  const handleCloseFormModal = () => {
+    setFormModalOpen(false);
+    setSelectedRole(null);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setSelectedRole(null);
+  };
+
+  const handleDeactivateRole = (role: Role) => {
+    console.log("Deactivate role:", role);
+    // TODO: Implement role deactivation
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Role Management
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Define and manage user roles and permissions
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              /* Create role functionality */
-            }}
-            className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
-            style={{
-              backgroundColor: "var(--color-primary-600)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor =
-                "var(--color-primary-700)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor =
-                "var(--color-primary-600)";
-            }}
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Create Role
-          </button>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Role Management</h1>
+          <p className="mt-2 text-gray-600">
+            Define and manage user roles and permissions
+          </p>
         </div>
       </div>
 
@@ -211,7 +169,9 @@ export default function RoleManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Roles</p>
-              <p className="text-2xl font-bold text-gray-900">{totalRoles}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : stats?.total || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -225,7 +185,9 @@ export default function RoleManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Active Roles</p>
-              <p className="text-2xl font-bold text-gray-900">{activeRoles}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : stats?.active || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -242,7 +204,7 @@ export default function RoleManagementContent() {
                 Inactive Roles
               </p>
               <p className="text-2xl font-bold text-gray-900">
-                {inactiveRoles}
+                {statsLoading ? "..." : stats?.inactive || 0}
               </p>
             </div>
           </div>
@@ -257,190 +219,312 @@ export default function RoleManagementContent() {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {statsLoading ? "..." : "..."}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search roles..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+      {/* Controls Row */}
+      <div className="mb-6 flex items-center gap-4">
+        {/* Search Field - Takes remaining space */}
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <input
+            type="text"
+            placeholder="Search roles..."
+            value={filters.search || ""}
+            onChange={(e) =>
+              handleFiltersChange({ search: e.target.value || undefined })
+            }
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* All Other Controls - Fixed width */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {/* View Toggle */}
+          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("table")}
+              title="Table View"
+              className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === "table"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
             >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-            </select>
+              <Table size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode("card")}
+              title="Card View"
+              className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === "card"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <LayoutGrid size={16} />
+            </button>
           </div>
-        </div>
-      </div>
 
-      {/* Roles Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredRoles.map((role) => (
-          <div
-            key={role.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+          {/* Filter Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              showFilters
+                ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            }`}
           >
-            {/* Role Header */}
-            <div
-              className="p-6 text-white"
-              style={{
-                background: `linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600))`,
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-lg font-semibold">
-                      {role.displayName}
-                    </h3>
-                    <p className="text-sm opacity-90">{role.name}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(role.isActive)}
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                      role.isActive
-                    )}`}
-                  >
-                    {role.isActive ? "ACTIVE" : "INACTIVE"}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <Filter className="h-4 w-4 mr-2 inline" />
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </button>
 
-            {/* Role Info */}
-            <div className="p-6">
-              {/* Description */}
-              <p className="text-sm text-gray-600 mb-4">{role.description}</p>
-
-              {/* User Count */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="h-4 w-4 mr-2" />
-                  <span>Users with this role</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900">
-                  {role.userCount}
-                </span>
-              </div>
-
-              {/* Permissions */}
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">
-                  Permissions ({role.permissions.length})
-                </h4>
-                <div className="flex flex-wrap gap-1">
-                  {role.permissions.slice(0, 6).map((permission) => (
-                    <span
-                      key={permission}
-                      className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md"
-                    >
-                      <Key className="h-3 w-3 mr-1" />
-                      {PERMISSION_CATEGORIES[
-                        permission as keyof typeof PERMISSION_CATEGORIES
-                      ] || permission}
-                    </span>
-                  ))}
-                  {role.permissions.length > 6 && (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-md">
-                      +{role.permissions.length - 6} more
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Settings className="h-4 w-4 mr-2" />
-                  <span>Created: {formatDate(role.createdAt)}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Settings className="h-4 w-4 mr-2" />
-                  <span>Updated: {formatDate(role.updatedAt)}</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    /* View role details */
-                  }}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </button>
-                <button
-                  onClick={() => {
-                    /* Edit role */
-                  }}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    /* Toggle role status */
-                  }}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    role.isActive
-                      ? "text-red-700 bg-red-50 border border-red-300 hover:bg-red-100"
-                      : "text-green-700 bg-green-50 border border-green-300 hover:bg-green-100"
-                  }`}
-                >
-                  {role.isActive ? (
-                    <Lock className="h-4 w-4" />
-                  ) : (
-                    <Unlock className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+          {/* Action Buttons */}
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw
+              className={`h-5 w-5 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+          <button
+            onClick={handleAddRole}
+            className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor: "var(--color-primary-600)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-700)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--color-primary-600)";
+            }}
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Add Role
+          </button>
+        </div>
       </div>
 
-      {/* Empty State */}
-      {filteredRoles.length === 0 && (
-        <div className="text-center py-12">
-          <Shield className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No roles found
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== "ALL"
-              ? "Try adjusting your search or filter criteria."
-              : "Get started by creating your first role."}
-          </p>
+      {/* Filters Panel */}
+      {showFilters && (
+        <div className="mb-6">
+          <RoleFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClearFilters={handleClearFilters}
+          />
         </div>
       )}
+
+      {/* Error State */}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800">
+                Error loading roles
+              </h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content Area */}
+      {!error && (
+        <div
+          ref={contentRef}
+          style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
+        >
+          {viewMode === "table" ? (
+            <div className="bg-white rounded-lg shadow border relative">
+              {/* Loading Overlay */}
+              {loading && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+                  <div className="text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+                    <p className="mt-2 text-gray-600">Loading roles...</p>
+                  </div>
+                </div>
+              )}
+              <RolesTable
+                key="roles-table"
+                roles={roles}
+                loading={loading}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                onSortChange={handleSortChange}
+                onViewRole={handleViewRole}
+                onEditRole={handleEditRole}
+                title="Role Management"
+                sortBy={filters.sortBy}
+                sortOrder={filters.sortOrder}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+              {/* Loading Overlay for Card View */}
+              {loading && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+                  <div className="text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+                    <p className="mt-2 text-gray-600">Loading roles...</p>
+                  </div>
+                </div>
+              )}
+              {roles.map((role) => (
+                <div
+                  key={role.id}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {/* Role Header */}
+                  <div
+                    className="p-6 text-white"
+                    style={{
+                      background: `linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600))`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                          <Shield className="h-6 w-6" />
+                        </div>
+                        <div className="ml-3">
+                          <h3 className="text-lg font-semibold">
+                            {role.displayName}
+                          </h3>
+                          <p className="text-sm opacity-90">{role.name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(role.isActive)}
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                            role.isActive
+                          )}`}
+                        >
+                          {role.isActive ? "ACTIVE" : "INACTIVE"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Role Info */}
+                  <div className="p-6">
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 mb-4">
+                      {role.description}
+                    </p>
+
+                    {/* Permissions */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">
+                        Permissions ({role.permissions.length})
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {role.permissions.slice(0, 3).map((permission) => (
+                          <span
+                            key={permission}
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md"
+                          >
+                            <Key className="h-3 w-3 mr-1" />
+                            {permission.split("_")[0]}
+                          </span>
+                        ))}
+                        {role.permissions.length > 3 && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-md">
+                            +{role.permissions.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Settings className="h-4 w-4 mr-2" />
+                        <span>Created: {formatDate(role.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleViewRole(role)}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleEditRole(role)}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeactivateRole(role)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                          role.isActive
+                            ? "text-red-700 bg-red-50 border border-red-300 hover:bg-red-100"
+                            : "text-green-700 bg-green-50 border border-green-300 hover:bg-green-100"
+                        }`}
+                      >
+                        {role.isActive ? (
+                          <Lock className="h-4 w-4" />
+                        ) : (
+                          <Unlock className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination for both views */}
+          {pagination && (
+            <Pagination
+              pagination={pagination}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Form Modal (Create/Edit) */}
+      <RoleFormModal
+        isOpen={formModalOpen}
+        onClose={handleCloseFormModal}
+        role={selectedRole}
+        onRoleSaved={handleRoleSaved}
+        mode={formMode}
+      />
+
+      {/* View Modal */}
+      <RoleViewModal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        role={selectedRole}
+      />
     </div>
   );
 }

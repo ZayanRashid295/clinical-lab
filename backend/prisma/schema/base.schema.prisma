@@ -72,6 +72,7 @@ model UserSettings {
 model Role {
   id          String   @id @default(cuid())
   name        String   @unique
+  displayName String?
   description String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
