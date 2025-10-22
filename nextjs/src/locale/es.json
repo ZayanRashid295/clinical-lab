@@ -113,6 +113,7 @@
     "admin": "Administración",
     "users": "Usuarios",
     "roles": "Roles",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "tables": "Tablas de Datos"
   }
 }

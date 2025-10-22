@@ -219,6 +219,14 @@ const defaultMenuItems: MenuItem[] = [
         roles: ["ADMIN"],
         order: 3,
       },
+      {
+        id: "tables",
+        label: "menu.tables",
+        icon: "📊",
+        path: "/admin/tables",
+        roles: ["ADMIN"],
+        order: 4,
+      },
     ],
   },
 ];
