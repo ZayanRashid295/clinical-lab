@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  Eye,
-  RefreshCw,
-  ChevronLeft,
-  ChevronRight,
-  Edit,
-  Users,
-  Mail,
-  Phone,
-  Shield,
-} from "lucide-react";
+import { Eye, RefreshCw, Edit, Users, Mail, Phone, Shield } from "lucide-react";
 import { User } from "../../types/user";
 
 interface UsersTableProps {
@@ -98,16 +88,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
     <div className="bg-white rounded-lg shadow border">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-          {pagination && (
-            <div className="text-sm text-gray-600">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
-              of {pagination.total} users
-            </div>
-          )}
-        </div>
+        <h3 className="text-lg font-medium text-gray-900">{title}</h3>
       </div>
 
       {/* Table */}
@@ -240,87 +221,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
           </tbody>
         </table>
       </div>
-
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <label htmlFor="pageSize" className="text-sm text-gray-700">
-                Show:
-              </label>
-              <select
-                id="pageSize"
-                value={pagination.limit}
-                onChange={(e) => onPageSizeChange?.(parseInt(e.target.value))}
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
-              <span className="text-sm text-gray-700">per page</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  onPageChange?.(pagination.page - 1);
-                }}
-                disabled={pagination.page <= 1}
-                className="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                <ChevronLeft size={16} />
-                Previous
-              </button>
-
-              <div className="flex items-center gap-1">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (page) =>
-                      page === 1 ||
-                      page === pagination.totalPages ||
-                      Math.abs(page - pagination.page) <= 2
-                  )
-                  .map((page, index, array) => (
-                    <React.Fragment key={page}>
-                      {index > 0 && array[index - 1] !== page - 1 && (
-                        <span className="px-2 text-gray-500">...</span>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onPageChange?.(page);
-                        }}
-                        className={`px-3 py-1 border rounded text-sm ${
-                          page === pagination.page
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    </React.Fragment>
-                  ))}
-              </div>
-
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  onPageChange?.(pagination.page + 1);
-                }}
-                disabled={pagination.page >= pagination.totalPages}
-                className="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Next
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

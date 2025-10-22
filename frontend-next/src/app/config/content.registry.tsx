@@ -22,7 +22,7 @@ import NotificationsList from "../components/Notifications/NotificationsList";
 import UserManagementContent from "../components/Content/UserManagementContent";
 import RoleManagementContent from "../components/Content/RoleManagementContent";
 import SystemSettingsContent from "../components/Content/SystemSettingsContent";
-import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
+// import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
 // Transportation content registry
@@ -55,7 +55,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/users": () => <UserManagementContent />,
     "/admin/roles": () => <RoleManagementContent />,
     "/admin/settings": () => <SystemSettingsContent />,
-    "/admin/tables": () => <TwoTablesWithPagination />,
+    // "/admin/tables": () => <TwoTablesWithPagination />,
   },
 
   dashboards: {
