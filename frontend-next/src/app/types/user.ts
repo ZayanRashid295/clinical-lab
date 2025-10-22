@@ -91,7 +91,7 @@ export interface UserFilters {
 export interface RoleQueryParams {
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName";
+  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName" | "isActive";
   sortOrder?: "asc" | "desc";
   search?: string;
   status?: "ACTIVE" | "INACTIVE";

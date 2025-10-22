@@ -76,13 +76,14 @@ export class QueryRoleDto {
 
   @ApiProperty({
     description: "Field to sort by",
-    enum: ["createdAt", "updatedAt", "name", "displayName"],
+    enum: ["createdAt", "updatedAt", "name", "displayName", "isActive"],
     example: "createdAt",
     required: false,
   })
   @IsOptional()
-  @IsEnum(["createdAt", "updatedAt", "name", "displayName"])
-  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName" = "createdAt";
+  @IsEnum(["createdAt", "updatedAt", "name", "displayName", "isActive"])
+  sortBy?: "createdAt" | "updatedAt" | "name" | "displayName" | "isActive" =
+    "createdAt";
 
   @ApiProperty({
     description: "Sort order",

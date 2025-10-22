@@ -58,6 +58,21 @@ export class RolesService {
       // Get total count for pagination
       const total = await this.prisma.role.count({ where });
 
+      // Handle sorting
+      let orderBy: any = {};
+
+      if (sortBy === "isActive") {
+        // Sort by isActive field
+        orderBy = {
+          isActive: sortOrder,
+        };
+      } else {
+        // Standard sorting
+        orderBy = {
+          [sortBy]: sortOrder,
+        };
+      }
+
       // Get roles with pagination and sorting
       const roles = await this.prisma.role.findMany({
         where,
@@ -77,9 +92,7 @@ export class RolesService {
         },
         skip,
         take: limit,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        orderBy,
       });
 
       // Transform roles to include permissions as array of strings
