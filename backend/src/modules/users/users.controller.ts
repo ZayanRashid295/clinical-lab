@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -17,6 +18,7 @@ import {
 import { UsersService } from "./users.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { QueryUserDto } from "./dto/query-user.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -26,10 +28,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @ApiOperation({ summary: "Get all users" })
+  @ApiOperation({
+    summary: "Get all users with filtering, pagination, and sorting",
+  })
   @ApiResponse({ status: 200, description: "Users retrieved successfully" })
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: QueryUserDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get("stats")

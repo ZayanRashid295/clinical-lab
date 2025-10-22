@@ -1,25 +1,109 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { QueryUserDto } from "./dto/query-user.dto";
 import * as bcrypt from "bcryptjs";
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.user.findMany({
+  async findAll(query: QueryUserDto) {
+    const {
+      search,
+      status,
+      role,
+      dateFrom,
+      dateTo,
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = query;
+
+    // Build where clause
+    const where: any = {};
+
+    // Search filter
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: "insensitive" } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Status filter
+    if (status) {
+      where.isActive = status === "ACTIVE";
+    }
+
+    // Role filter
+    if (role) {
+      where.roles = {
+        some: {
+          role: {
+            name: role,
+          },
+        },
+      };
+    }
+
+    // Date range filter
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) {
+        where.createdAt.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.createdAt.lte = new Date(dateTo);
+      }
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const total = await this.prisma.user.count({ where });
+
+    // Get users with pagination and sorting
+    const users = await this.prisma.user.findMany({
+      where,
       select: {
         id: true,
         email: true,
         firstName: true,
         lastName: true,
+        phone: true,
         avatar: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
       },
     });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: users,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string) {

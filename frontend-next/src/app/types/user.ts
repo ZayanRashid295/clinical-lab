@@ -43,11 +43,13 @@ export interface Role {
 export interface UserQueryParams {
   page?: number;
   limit?: number;
-  sortBy?: string;
+  sortBy?: "createdAt" | "updatedAt" | "firstName" | "lastName" | "email";
   sortOrder?: "asc" | "desc";
   search?: string;
-  status?: "ACTIVE" | "INACTIVE" | "PENDING";
-  role?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface CreateUserDto {
@@ -68,8 +70,8 @@ export interface UpdateUserDto {
 
 export interface UserFilters {
   search?: string;
-  status?: "ACTIVE" | "INACTIVE" | "PENDING";
-  role?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
   dateFrom?: string;
   dateTo?: string;
 }
