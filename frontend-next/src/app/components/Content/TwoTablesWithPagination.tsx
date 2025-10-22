@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Type definitions
 interface Column {
@@ -12,6 +10,7 @@ interface PaginatedTableProps {
   title: string;
   data: any[];
   columns: Column[];
+  initialLoadingTime?: number;
 }
 
 // Sample data
@@ -71,14 +70,43 @@ const productsData = [
   { id: 25, product: "Air Purifier", category: "Appliances", price: "$249" },
 ];
 
+// Loading skeleton component
+const LoadingSkeleton = ({ rows = 10, columns = 4 }) => {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <tr key={rowIndex} className="border-b border-gray-200">
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <td key={colIndex} className="px-4 py-3">
+              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+};
+
 // Reusable PaginatedTable component
 const PaginatedTable: React.FC<PaginatedTableProps> = ({
   title,
   data,
   columns,
+  initialLoadingTime = 2000,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPageChanging, setIsPageChanging] = useState(false);
+
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, initialLoadingTime);
+
+    return () => clearTimeout(timer);
+  }, [initialLoadingTime]);
 
   const totalPages = Math.ceil(data.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
@@ -87,31 +115,71 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
 
   const handlePrevious = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setIsPageChanging(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage - 1);
+        setIsPageChanging(false);
+      }, 500);
     }
   };
 
   const handleNext = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      setIsPageChanging(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage + 1);
+        setIsPageChanging(false);
+      }, 500);
     }
   };
 
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(Number(e.target.value));
-    setCurrentPage(1);
+    setIsPageChanging(true);
+    setTimeout(() => {
+      setPageSize(Number(e.target.value));
+      setCurrentPage(1);
+      setIsPageChanging(false);
+    }, 500);
   };
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-lg mb-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+        {isLoading && (
+          <span className="text-sm text-purple-600 font-medium flex items-center gap-2">
+            <svg
+              className="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Loading...
+          </span>
+        )}
+      </div>
 
       <div className="flex items-center gap-3 mb-4">
         <label className="text-gray-600 text-sm">Rows per page:</label>
         <select
           value={pageSize}
           onChange={handlePageSizeChange}
-          className="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-purple-500"
+          disabled={isLoading || isPageChanging}
+          className="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
@@ -135,18 +203,22 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {currentData.map((row, index) => (
-              <tr
-                key={row.id || index}
-                className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-              >
-                {columns.map((column) => (
-                  <td key={column.key} className="px-4 py-3 text-gray-700">
-                    {row[column.key]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {isLoading || isPageChanging ? (
+              <LoadingSkeleton rows={pageSize} columns={columns.length} />
+            ) : (
+              currentData.map((row, index) => (
+                <tr
+                  key={row.id || index}
+                  className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  {columns.map((column) => (
+                    <td key={column.key} className="px-4 py-3 text-gray-700">
+                      {row[column.key]}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -154,17 +226,17 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
       <div className="flex justify-center items-center gap-4 mt-6">
         <button
           onClick={handlePrevious}
-          disabled={currentPage === 1}
+          disabled={currentPage === 1 || isLoading || isPageChanging}
           className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:-translate-y-0.5 transition-all"
         >
           Previous
         </button>
         <span className="text-gray-600 font-medium">
-          Page {currentPage} of {totalPages}
+          {isLoading ? "Loading..." : `Page ${currentPage} of ${totalPages}`}
         </span>
         <button
           onClick={handleNext}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || isLoading || isPageChanging}
           className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:-translate-y-0.5 transition-all"
         >
           Next
@@ -197,11 +269,13 @@ export default function TwoTablesWithPagination() {
           title="Users Table"
           data={usersData}
           columns={userColumns}
+          initialLoadingTime={1500}
         />
         <PaginatedTable
           title="Products Table"
           data={productsData}
           columns={productColumns}
+          initialLoadingTime={2500}
         />
       </div>
     </div>
