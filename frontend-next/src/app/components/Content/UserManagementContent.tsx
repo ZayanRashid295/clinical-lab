@@ -243,6 +243,23 @@ export default function UserManagementContent() {
 
       {/* Controls Row */}
       <div className="mb-6 flex items-center justify-between">
+        {/* Search Field - Left Side */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={filters.search || ""}
+            onChange={(e) =>
+              handleFiltersChange({ search: e.target.value || undefined })
+            }
+            className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* All Other Controls - Right Side */}
         <div className="flex items-center gap-4">
           {/* View Toggle */}
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
@@ -282,10 +299,8 @@ export default function UserManagementContent() {
             <Filter className="h-4 w-4 mr-2 inline" />
             {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+          {/* Action Buttons */}
           <button
             onClick={handleRefresh}
             disabled={loading}

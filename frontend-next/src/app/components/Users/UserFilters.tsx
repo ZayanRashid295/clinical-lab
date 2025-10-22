@@ -28,32 +28,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow border p-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Search */}
-        <div className="lg:col-span-1">
-          <label
-            htmlFor="search"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Search
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              id="search"
-              placeholder="Name, email..."
-              value={filters.search || ""}
-              onChange={(e) =>
-                onFiltersChange({ search: e.target.value || undefined })
-              }
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Status Filter */}
         <div>
           <label
@@ -193,17 +168,6 @@ const UserFilters: React.FC<UserFiltersProps> = ({
                 <button
                   onClick={() => onFiltersChange({ role: undefined })}
                   className="text-green-600 hover:text-green-800"
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {filters.search && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
-                Search: &quot;{filters.search}&quot;
-                <button
-                  onClick={() => onFiltersChange({ search: undefined })}
-                  className="text-purple-600 hover:text-purple-800"
                 >
                   <X size={12} />
                 </button>
