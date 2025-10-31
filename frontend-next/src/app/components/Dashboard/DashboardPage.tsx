@@ -198,7 +198,7 @@ export default function DashboardPage() {
                   Start your study session with one of these options
                 </p>
               </div>
-              <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col gap-3 w-full md:w-1/2">
                 <div className="grid grid-cols-2 gap-3 w-full">
                   <Button 
                     className="w-full"
