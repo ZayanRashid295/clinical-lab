@@ -40,7 +40,7 @@ import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
 import TestSessionPage from "../components/test-session/TestSessionPage";
 
 // Import dashboard components
-import DashboardPage from "../components/dashboard/DashboardPage";
+import DashboardPage from "../components/Dashboard/DashboardPage";
 
 // Import zoom simulation components
 import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
@@ -143,22 +143,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/zoom": () => <ZoomSimulation />,
 
     // Testing routes
-    "/testing": () => (
-      <UnderConstruction
-        menuTitle="Testing"
-        menuIcon="🧪"
-        description="Comprehensive testing and quality assurance system for clinical lab applications."
-        estimatedCompletion="3 weeks"
-        features={[
-          "Automated test execution",
-          "Test case management",
-          "Quality assurance tracking",
-          "Performance testing",
-          "Regression testing",
-          "Test reporting and analytics",
-        ]}
-      />
-    ),
+    "/testing": () => <DashboardPage />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,

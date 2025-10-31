@@ -44,6 +44,8 @@ export default function ContentSwitcher({ activeMenu }: ContentSwitcherProps) {
       );
     case "zoom-simulation":
       return <ZoomSimulation />;
+    case "testing":
+      return <DashboardContent isFullScreen={false} />;
     case "admin":
       return (
         <UnderConstruction
