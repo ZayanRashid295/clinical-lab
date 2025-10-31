@@ -419,10 +419,10 @@ export default function ZoomSimulation() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
         {/* Main Application Container */}
-        <div className="w-full max-w-4xl rounded-xl shadow-2xl p-6 md:p-8 bg-white">
-          <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        <div className="w-full max-w-4xl rounded-xl shadow-2xl p-6 md:p-8 bg-white dark:bg-gray-800">
+          <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">
             Virtual Consultation Simulation
           </h1>
 
@@ -438,12 +438,12 @@ export default function ZoomSimulation() {
               }}
             >
               {/* Avatar Container (Male Doctor) */}
-              <div className="relative w-32 h-32 bg-gray-600 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
+              <div className="relative w-32 h-32 bg-gray-600 dark:bg-gray-700 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
                 <span className="text-6xl text-white select-none">👨‍⚕️</span>
                 <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               {/* Name Tag */}
-              <div className="absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold bg-black bg-opacity-40">
+              <div className="absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold bg-black dark:bg-gray-800 bg-opacity-40">
                 Doctor
               </div>
             </div>
@@ -458,20 +458,20 @@ export default function ZoomSimulation() {
               }}
             >
               {/* Avatar Container (Female Patient) */}
-              <div className="relative w-32 h-32 bg-gray-600 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
+              <div className="relative w-32 h-32 bg-gray-600 dark:bg-gray-700 rounded-full flex items-center justify-center border-4 border-white z-10 avatar-container">
                 <span className="text-6xl text-white select-none">👩‍🦱</span>
                 <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               {/* Name Tag */}
-              <div className="absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold bg-black bg-opacity-40">
+              <div className="absolute bottom-2 left-2 px-3 py-1 rounded-full text-white text-sm font-semibold bg-black dark:bg-gray-800 bg-opacity-40">
                 Patient
               </div>
             </div>
           </div>
 
           {/* Dialog Text Area */}
-          <div className="min-h-24 p-4 rounded-lg shadow-inner flex items-center justify-center mb-6 bg-gray-100">
-            <p className="text-xl font-medium text-center italic text-gray-700">
+          <div className="min-h-24 p-4 rounded-lg shadow-inner flex items-center justify-center mb-6 bg-gray-100 dark:bg-gray-700">
+            <p className="text-xl font-medium text-center italic text-gray-700 dark:text-gray-300">
               {currentLine}
             </p>
           </div>
@@ -551,7 +551,7 @@ export default function ZoomSimulation() {
                   window.speechSynthesis.cancel();
                   stopTalkingAnimation();
                 }}
-                className="px-6 py-3 bg-gray-600 text-white font-semibold rounded-full shadow-lg hover:bg-gray-700 transition duration-150 ease-in-out"
+                className="px-6 py-3 bg-gray-600 dark:bg-gray-700 text-white font-semibold rounded-full shadow-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition duration-150 ease-in-out"
               >
                 Reset
               </button>
@@ -564,7 +564,7 @@ export default function ZoomSimulation() {
             )}
 
             {/* Voice Status Display */}
-            <div className="text-xs text-center text-gray-600">
+            <div className="text-xs text-center text-gray-600 dark:text-gray-400">
               <p>
                 Doctor Voice: {doctorVoiceRef.current?.name || "Not loaded"}
               </p>
