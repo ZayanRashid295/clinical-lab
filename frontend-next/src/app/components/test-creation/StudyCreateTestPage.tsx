@@ -220,22 +220,20 @@ export default function StudyCreateTestPage() {
 
       const data = await response.json();
 
-      // Show success message
-      showSuccess(`Successfully created a test with ${questionCountNum} question${questionCountNum !== 1 ? "s" : ""}.`);
-      
-      // Reset form
-      setSelectedSubjects([]);
-      setSelectedSystems([]);
-      setQuestionCount("");
-      setMode("tutor");
-      setIsTimed(false);
-      setSelectedPool("unused");
-      
-      // Navigate to test session if test ID is returned
+      // Navigate to test session immediately (like uworld-replit)
       if (data.id) {
-        setTimeout(() => {
-          router.push(`/test-session/${data.id}`);
-        }, 1500);
+        router.push(`/test-session/${data.id}`);
+      } else {
+        // Fallback: Show success message if no ID returned
+        showSuccess(`Successfully created a test with ${questionCountNum} question${questionCountNum !== 1 ? "s" : ""}.`);
+        
+        // Reset form
+        setSelectedSubjects([]);
+        setSelectedSystems([]);
+        setQuestionCount("");
+        setMode("tutor");
+        setIsTimed(false);
+        setSelectedPool("unused");
       }
       
     } catch (err: any) {
