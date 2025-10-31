@@ -180,7 +180,7 @@ export default function StudyMaterialsPage() {
   };
 
   return (
-    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
