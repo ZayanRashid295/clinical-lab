@@ -243,8 +243,8 @@ export default function TestCreationPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <StatCard
           title="Question Score"
-          value={`${questionScore}% (${questionScoreFraction})`}
-          subtitle="Correct"
+          value={`${questionScore}%`}
+          subtitle={`${questionScoreFraction} Correct`}
           icon={CheckCircle2}
           color="success"
         />
