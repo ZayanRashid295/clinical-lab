@@ -76,7 +76,10 @@ export function TestTable({
         <TableBody>
           {tests.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+              <TableCell
+                colSpan={9}
+                className="text-center py-8 text-muted-foreground"
+              >
                 No tests found
               </TableCell>
             </TableRow>
@@ -95,15 +98,22 @@ export function TestTable({
                     {test.score}%
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium" data-testid={`text-name-${test.id}`}>
+                <TableCell
+                  className="font-medium"
+                  data-testid={`text-name-${test.id}`}
+                >
                   {test.name}
                 </TableCell>
-                <TableCell className="text-muted-foreground">{test.date}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {test.date}
+                </TableCell>
                 <TableCell>{test.mode}</TableCell>
                 <TableCell>{test.pool}</TableCell>
                 <TableCell>{test.subjects}</TableCell>
                 <TableCell>{test.systems}</TableCell>
-                <TableCell className="font-mono">{test.questionCount}</TableCell>
+                <TableCell className="font-mono">
+                  {test.questionCount}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
                     <Button
@@ -161,4 +171,3 @@ export function TestTable({
     </div>
   );
 }
-
