@@ -201,20 +201,12 @@ export const MENU_CONFIG = {
       order: 7,
     },
     {
-      id: "testing",
-      label: "menu.testing",
-      icon: "🧪",
-      path: "/testing",
-      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 8,
-    },
-    {
       id: "admin",
       label: "menu.admin",
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 9,
+      order: 8,
       submenu: [
         {
           id: "users",

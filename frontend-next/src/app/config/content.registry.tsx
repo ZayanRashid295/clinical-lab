@@ -41,7 +41,6 @@ import TestSessionPage from "../components/test-session/TestSessionPage";
 
 // Import zoom simulation components
 import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
-import NewZoom from "../components/zoom-simulation/newzoom";
 
 // Import robotic components
 import RobotFace from "../components/robotic/RobotFace";
@@ -145,9 +144,6 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Robotic routes
     "/robotic": () => <RobotFace />,
-
-    // Testing routes
-    "/testing": () => <NewZoom />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
