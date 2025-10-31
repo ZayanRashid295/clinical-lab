@@ -300,156 +300,157 @@ export default function StudyCreateTestPage() {
   };
 
   return (
-    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-4" data-testid="page-create-test">
-        <div className="flex items-center justify-between">
+    <div
+      className="px-[50px] pb-[50px] pt-[25px] space-y-3"
+      data-testid="page-create-test"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Study Create Test
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Configure your custom test parameters
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          data-testid="button-launch-tutorial"
+        >
+          <Rocket className="h-4 w-4 mr-2" />
+          Launch Tutorial
+        </Button>
+      </div>
+
+      {/* Error/Success Messages */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 rounded-lg flex items-start gap-2">
+          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Study Create Test
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Configure your custom test parameters
-            </p>
+            <strong className="font-semibold">Error:</strong> {error}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            data-testid="button-launch-tutorial"
-          >
-            <Rocket className="h-4 w-4 mr-2" />
-            Launch Tutorial
-          </Button>
+        </div>
+      )}
+      {success && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-lg">
+          <strong className="font-semibold">Success:</strong> {success}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-3">
+          <TestModeSelector
+            mode={mode}
+            isTimed={isTimed}
+            onModeChange={setMode}
+            onTimedChange={setIsTimed}
+          />
+          <QuestionPoolSelector
+            selectedPool={selectedPool}
+            onPoolChange={setSelectedPool}
+          />
         </div>
 
-        {/* Error/Success Messages */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 rounded-lg flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+        <div className="space-y-3">
+          <div data-validation-error={!!validationErrors.subjects}>
+            <SubjectSelector
+              selectedSubjects={selectedSubjects}
+              onSubjectToggle={handleSubjectToggle}
+            />
+            {validationErrors.subjects && (
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {validationErrors.subjects}
+              </p>
+            )}
+          </div>
+          <div data-validation-error={!!validationErrors.systems}>
+            <SystemSelector
+              selectedSystems={selectedSystems}
+              onSystemToggle={handleSystemToggle}
+            />
+            {validationErrors.systems && (
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {validationErrors.systems}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-3">
             <div>
-              <strong className="font-semibold">Error:</strong> {error}
-            </div>
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-lg">
-            <strong className="font-semibold">Success:</strong> {success}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <TestModeSelector
-              mode={mode}
-              isTimed={isTimed}
-              onModeChange={setMode}
-              onTimedChange={setIsTimed}
-            />
-            <QuestionPoolSelector
-              selectedPool={selectedPool}
-              onPoolChange={setSelectedPool}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div data-validation-error={!!validationErrors.subjects}>
-              <SubjectSelector
-                selectedSubjects={selectedSubjects}
-                onSubjectToggle={handleSubjectToggle}
-              />
-              {validationErrors.subjects && (
-                <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4" />
-                  {validationErrors.subjects}
-                </p>
-              )}
-            </div>
-            <div data-validation-error={!!validationErrors.systems}>
-              <SystemSelector
-                selectedSystems={selectedSystems}
-                onSystemToggle={handleSystemToggle}
-              />
-              {validationErrors.systems && (
-                <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4" />
-                  {validationErrors.systems}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="question-count"
-                  className="text-gray-900 dark:text-gray-200"
-                >
-                  No. of Questions <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="question-count"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Enter number of questions (1-40)"
-                  value={questionCount}
-                  onChange={handleQuestionCountChange}
-                  onBlur={handleQuestionCountBlur}
-                  className={`mt-2 ${
-                    validationErrors.questionCount
-                      ? "border-red-500 dark:border-red-500 focus:ring-red-500"
-                      : ""
-                  }`}
-                  data-testid="input-question-count"
-                  data-validation-error={!!validationErrors.questionCount}
-                  min="1"
-                  max="40"
-                  disabled={isLoading}
-                />
-                {validationErrors.questionCount && (
-                  <p className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {validationErrors.questionCount}
-                  </p>
-                )}
-                {!validationErrors.questionCount && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Max allowed per block: 40
-                  </p>
-                )}
-              </div>
-
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleGenerateTest}
-                data-testid="button-generate-test"
-                disabled={
-                  isLoading ||
-                  selectedSubjects.length === 0 ||
-                  selectedSystems.length === 0 ||
-                  !questionCount ||
-                  parseInt(questionCount, 10) <= 0 ||
-                  parseInt(questionCount, 10) > 40
-                }
+              <Label
+                htmlFor="question-count"
+                className="text-gray-900 dark:text-gray-200"
               >
-                {isLoading ? "GENERATING..." : "GENERATE TEST"}
-              </Button>
-              {(selectedSubjects.length === 0 ||
+                No. of Questions <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="question-count"
+                type="text"
+                inputMode="numeric"
+                placeholder="Enter number of questions (1-40)"
+                value={questionCount}
+                onChange={handleQuestionCountChange}
+                onBlur={handleQuestionCountBlur}
+                className={`mt-2 ${
+                  validationErrors.questionCount
+                    ? "border-red-500 dark:border-red-500 focus:ring-red-500"
+                    : ""
+                }`}
+                data-testid="input-question-count"
+                data-validation-error={!!validationErrors.questionCount}
+                min="1"
+                max="40"
+                disabled={isLoading}
+              />
+              {validationErrors.questionCount && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {validationErrors.questionCount}
+                </p>
+              )}
+              {!validationErrors.questionCount && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Max allowed per block: 40
+                </p>
+              )}
+            </div>
+
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={handleGenerateTest}
+              data-testid="button-generate-test"
+              disabled={
+                isLoading ||
+                selectedSubjects.length === 0 ||
                 selectedSystems.length === 0 ||
                 !questionCount ||
                 parseInt(questionCount, 10) <= 0 ||
-                parseInt(questionCount, 10) > 40) && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  Please select subjects, systems, and enter a valid question
-                  count (1-40)
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                parseInt(questionCount, 10) > 40
+              }
+            >
+              {isLoading ? "GENERATING..." : "GENERATE TEST"}
+            </Button>
+            {(selectedSubjects.length === 0 ||
+              selectedSystems.length === 0 ||
+              !questionCount ||
+              parseInt(questionCount, 10) <= 0 ||
+              parseInt(questionCount, 10) > 40) && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                Please select subjects, systems, and enter a valid question
+                count (1-40)
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

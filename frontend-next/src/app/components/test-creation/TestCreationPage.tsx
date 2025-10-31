@@ -99,9 +99,8 @@ export default function TestCreationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
+    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+      {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Create Test</h1>
@@ -129,7 +128,7 @@ export default function TestCreationPage() {
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-6"
+          className="space-y-3"
         >
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="config" className="flex items-center gap-2">
@@ -151,7 +150,7 @@ export default function TestCreationPage() {
           </TabsList>
 
           {/* Test Configuration Tab */}
-          <TabsContent value="config" className="space-y-6">
+          <TabsContent value="config" className="space-y-3">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Basic Settings */}
               <Card>
@@ -414,7 +413,6 @@ export default function TestCreationPage() {
             />
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 }
