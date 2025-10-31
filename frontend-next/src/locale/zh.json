@@ -106,6 +106,7 @@
     "testSession": "测试会话",
     "activeTests": "活跃测试",
     "testHistory": "测试历史",
+    "previousTests": "之前的测试",
     "practiceMode": "练习模式",
     "timedTests": "计时测试",
     "medApp": "医疗应用",

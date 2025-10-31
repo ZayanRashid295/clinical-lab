@@ -106,6 +106,7 @@
     "testSession": "테스트 세션",
     "activeTests": "활성 테스트",
     "testHistory": "테스트 기록",
+    "previousTests": "이전 테스트",
     "practiceMode": "연습 모드",
     "timedTests": "시간 제한 테스트",
     "medApp": "의료 앱",

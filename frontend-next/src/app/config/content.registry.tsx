@@ -34,6 +34,7 @@ import NotesPage from "../components/Study/NotesPage";
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
+import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
 
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
@@ -89,6 +90,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/test-creation": () => <TestCreationPage />,
     "/test-creation/new": () => <TestCreationPage />,
     "/test-creation/study-create": () => <StudyCreateTestPage />,
+    "/previous-tests": () => <PreviousTestsPage />,
     "/test-creation/templates": () => (
       <UnderConstruction
         menuTitle="Test Templates"
@@ -133,22 +135,6 @@ export const transportationContentRegistry: ContentRegistry = {
           "Test analytics and reporting",
           "Mobile-responsive design",
           "Progress tracking",
-        ]}
-      />
-    ),
-    "/test-creation/previous": () => (
-      <UnderConstruction
-        menuTitle="Previous Tests"
-        menuIcon="📊"
-        description="View and manage previously created tests with detailed analytics and performance metrics."
-        estimatedCompletion="2 weeks"
-        features={[
-          "Test history and archives",
-          "Performance analytics",
-          "Student progress tracking",
-          "Test modification tools",
-          "Bulk operations",
-          "Export capabilities",
         ]}
       />
     ),

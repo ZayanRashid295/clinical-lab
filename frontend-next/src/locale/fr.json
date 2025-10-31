@@ -106,6 +106,7 @@
     "testSession": "Session de test",
     "activeTests": "Tests actifs",
     "testHistory": "Historique des tests",
+    "previousTests": "Tests Précédents",
     "practiceMode": "Mode pratique",
     "timedTests": "Tests chronométrés",
     "medApp": "App médicale",
