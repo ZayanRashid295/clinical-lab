@@ -29,7 +29,9 @@ export default function StudyCreateTestPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {}
+  );
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   const handleSubjectToggle = (subjectId: string) => {
@@ -37,7 +39,7 @@ export default function StudyCreateTestPage() {
       const newSubjects = prev.includes(subjectId)
         ? prev.filter((id) => id !== subjectId)
         : [...prev, subjectId];
-      
+
       // Clear validation error when subject is selected
       if (newSubjects.length > 0) {
         setValidationErrors((prev) => {
@@ -46,7 +48,7 @@ export default function StudyCreateTestPage() {
           return newErrors;
         });
       }
-      
+
       return newSubjects;
     });
   };
@@ -56,7 +58,7 @@ export default function StudyCreateTestPage() {
       const newSystems = prev.includes(systemId)
         ? prev.filter((id) => id !== systemId)
         : [...prev, systemId];
-      
+
       // Clear validation error when system is selected
       if (newSystems.length > 0) {
         setValidationErrors((prev) => {
@@ -65,41 +67,46 @@ export default function StudyCreateTestPage() {
           return newErrors;
         });
       }
-      
+
       return newSystems;
     });
   };
 
-  const validateQuestionCount = useCallback((value: string): string | undefined => {
-    if (!value || value.trim() === "") {
-      return "Number of questions is required.";
-    }
-    
-    const num = parseInt(value, 10);
-    
-    if (isNaN(num)) {
-      return "Please enter a valid number.";
-    }
-    
-    if (num <= 0) {
-      return "Number of questions must be greater than 0.";
-    }
-    
-    if (num > 40) {
-      return "Maximum 40 questions allowed per test.";
-    }
-    
-    return undefined;
-  }, []);
+  const validateQuestionCount = useCallback(
+    (value: string): string | undefined => {
+      if (!value || value.trim() === "") {
+        return "Number of questions is required.";
+      }
 
-  const handleQuestionCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const num = parseInt(value, 10);
+
+      if (isNaN(num)) {
+        return "Please enter a valid number.";
+      }
+
+      if (num <= 0) {
+        return "Number of questions must be greater than 0.";
+      }
+
+      if (num > 40) {
+        return "Maximum 40 questions allowed per test.";
+      }
+
+      return undefined;
+    },
+    []
+  );
+
+  const handleQuestionCountChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
-    
+
     // Only allow numbers
     if (value === "" || /^\d+$/.test(value)) {
       setQuestionCount(value);
       setTouchedFields((prev) => new Set(prev).add("questionCount"));
-      
+
       // Only validate and show error if field has been touched and has invalid data
       if (touchedFields.has("questionCount") || value !== "") {
         const error = validateQuestionCount(value);
@@ -171,14 +178,16 @@ export default function StudyCreateTestPage() {
     // Clear previous messages
     setError(null);
     setSuccess(null);
-    
+
     // Mark all fields as touched when submitting
     setTouchedFields(new Set(["subjects", "systems", "questionCount"]));
 
     // Validate form
     if (!validateForm()) {
       // Scroll to first error
-      const firstErrorField = document.querySelector('[data-validation-error="true"]');
+      const firstErrorField = document.querySelector(
+        '[data-validation-error="true"]'
+      );
       if (firstErrorField) {
         firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
       }
@@ -191,7 +200,9 @@ export default function StudyCreateTestPage() {
 
     try {
       const testData = {
-        name: `${mode === "tutor" ? "Tutor" : "Timed"} Test - ${new Date().toLocaleDateString()}`,
+        name: `${
+          mode === "tutor" ? "Tutor" : "Timed"
+        } Test - ${new Date().toLocaleDateString()}`,
         mode,
         isTimed,
         questionPool: selectedPool,
@@ -207,26 +218,63 @@ export default function StudyCreateTestPage() {
       // API call to create test
       const response = await fetch("/api/tests", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(testData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Failed to create test" }));
-        throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText}`);
+      // Read response text once
+      const responseText = await response.text();
+      const contentType = response.headers.get("content-type");
+
+      // Check if response is HTML (indicates route not found)
+      if (contentType && !contentType.includes("application/json")) {
+        if (
+          responseText.includes("<!DOCTYPE html>") ||
+          responseText.includes("<html")
+        ) {
+          throw new Error(
+            "API endpoint not found. Please ensure the API route is properly configured."
+          );
+        }
+        throw new Error(`Unexpected response type: ${contentType}`);
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        try {
+          const errorData = JSON.parse(responseText);
+          throw new Error(
+            errorData.error ||
+              errorData.message ||
+              `Server error: ${response.status}`
+          );
+        } catch {
+          throw new Error(
+            `Server error: ${response.status} ${response.statusText}`
+          );
+        }
+      }
+
+      // Parse JSON response
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error("Invalid JSON response from server");
+      }
 
       // Navigate to test session immediately (like uworld-replit)
       if (data.id) {
         router.push(`/test-session/${data.id}`);
       } else {
         // Fallback: Show success message if no ID returned
-        showSuccess(`Successfully created a test with ${questionCountNum} question${questionCountNum !== 1 ? "s" : ""}.`);
-        
+        showSuccess(
+          `Successfully created a test with ${questionCountNum} question${
+            questionCountNum !== 1 ? "s" : ""
+          }.`
+        );
+
         // Reset form
         setSelectedSubjects([]);
         setSelectedSystems([]);
@@ -235,7 +283,6 @@ export default function StudyCreateTestPage() {
         setIsTimed(false);
         setSelectedPool("unused");
       }
-      
     } catch (err: any) {
       // Handle network errors
       if (err.name === "TypeError" && err.message.includes("fetch")) {
@@ -244,7 +291,8 @@ export default function StudyCreateTestPage() {
       }
 
       // Handle API errors
-      const errorMessage = err?.message || "Failed to create test. Please try again.";
+      const errorMessage =
+        err?.message || "Failed to create test. Please try again.";
       showError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -256,12 +304,18 @@ export default function StudyCreateTestPage() {
       <div className="space-y-6" data-testid="page-create-test">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Study Create Test</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Study Create Test
+            </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Configure your custom test parameters
             </p>
           </div>
-          <Button variant="outline" size="sm" data-testid="button-launch-tutorial">
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid="button-launch-tutorial"
+          >
             <Rocket className="h-4 w-4 mr-2" />
             Launch Tutorial
           </Button>
@@ -328,7 +382,10 @@ export default function StudyCreateTestPage() {
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="question-count" className="text-gray-900 dark:text-gray-200">
+                <Label
+                  htmlFor="question-count"
+                  className="text-gray-900 dark:text-gray-200"
+                >
                   No. of Questions <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -385,7 +442,8 @@ export default function StudyCreateTestPage() {
                 parseInt(questionCount, 10) <= 0 ||
                 parseInt(questionCount, 10) > 40) && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  Please select subjects, systems, and enter a valid question count (1-40)
+                  Please select subjects, systems, and enter a valid question
+                  count (1-40)
                 </p>
               )}
             </div>
@@ -395,4 +453,3 @@ export default function StudyCreateTestPage() {
     </div>
   );
 }
-

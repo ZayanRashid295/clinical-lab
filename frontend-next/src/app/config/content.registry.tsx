@@ -35,6 +35,9 @@ import NotesPage from "../components/Study/NotesPage";
 import TestCreationPage from "../components/test-creation/TestCreationPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 
+// Import test session components
+import TestSessionPage from "../components/test-session/TestSessionPage";
+
 // Import zoom simulation components
 import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
 
@@ -149,6 +152,9 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Zoom simulation routes
     "/zoom": () => <ZoomSimulation />,
+
+    // Test session routes
+    "/test-session/:id": () => <TestSessionPage />,
   },
 
   dashboards: {
