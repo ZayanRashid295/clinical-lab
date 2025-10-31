@@ -198,9 +198,10 @@ export default function DashboardPage() {
                   Start your study session with one of these options
                 </p>
               </div>
-              <div className="flex flex-col gap-3 w-full md:w-auto">
-                <div className="flex flex-wrap gap-3 justify-center">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="grid grid-cols-2 gap-3 w-full">
                   <Button 
+                    className="w-full"
                     data-testid="button-view-performance"
                     onClick={() => router.push("/performance")}
                   >
@@ -209,32 +210,38 @@ export default function DashboardPage() {
                   </Button>
                   <Button 
                     variant="outline" 
+                    className="w-full"
                     data-testid="button-create-test"
                     onClick={() => router.push("/test-creation/study-create")}
                   >
                     <FileQuestion className="h-4 w-4 mr-2" />
                     Create a Test
                   </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full">
                   <Button 
                     variant="outline" 
+                    className="w-full"
                     data-testid="button-view-past-tests"
                     onClick={() => router.push("/previous-tests")}
                   >
                     <ClipboardList className="h-4 w-4 mr-2" />
                     View Past Tests
                   </Button>
-                </div>
-                <div className="flex flex-wrap gap-3 justify-center">
                   <Button 
                     variant="outline" 
+                    className="w-full"
                     data-testid="button-continue-last-test"
                     onClick={handleContinueLastTest}
                   >
                     <PlayCircle className="h-4 w-4 mr-2" />
                     Continue Last Test
                   </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full">
                   <Button 
                     variant="outline" 
+                    className="w-full"
                     data-testid="button-view-study-plan"
                     onClick={() => router.push("/study-planner")}
                   >
@@ -243,6 +250,7 @@ export default function DashboardPage() {
                   </Button>
                   <Button 
                     variant="outline" 
+                    className="w-full"
                     data-testid="button-make-study-plan"
                     onClick={() => router.push("/study-planner?action=create")}
                   >
