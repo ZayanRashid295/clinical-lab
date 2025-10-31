@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -29,6 +35,9 @@ import {
   Trash2,
   Save,
   Play,
+  Brain,
+  Heart,
+  Stethoscope,
 } from "lucide-react";
 import {
   TestCreationConfig,
@@ -41,6 +50,9 @@ import {
 import QuestionBank from "./QuestionBank";
 import TestPreview from "./TestPreview";
 import QuestionEditor from "./QuestionEditor";
+import { StudyPlanCard } from "../Dashboard/StudyPlanCard";
+import { ProgressCard } from "../Dashboard/ProgressCard";
+import { StatCard } from "../Dashboard/StatCard";
 
 export default function TestCreationPage() {
   const [activeTab, setActiveTab] = useState("config");
@@ -99,320 +111,179 @@ export default function TestCreationPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
-      {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Create Test</h1>
-            <p className="text-muted-foreground mt-2">
-              Build custom medical assessments with our UWorld-style test
-              creator
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-primary/10 text-primary">
-              {selectedQuestions.length} Questions Selected
-            </Badge>
-            <Button variant="outline" size="sm">
-              <Eye className="h-4 w-4 mr-2" />
-              Preview
-            </Button>
-            <Button onClick={handleSaveTest} size="sm">
-              <Save className="h-4 w-4 mr-2" />
-              Save Test
-            </Button>
-          </div>
-        </div>
+    <div
+      className="space-y-3 px-[50px] pb-[50px] pt-[25px]"
+      data-testid="page-dashboard"
+    >
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Dashboard
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Welcome to your USMLE preparation
+        </p>
+      </div>
 
-        {/* Main Content */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-3"
-        >
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="config" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Configuration
-            </TabsTrigger>
-            <TabsTrigger value="questions" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Question Bank
-            </TabsTrigger>
-            <TabsTrigger value="editor" className="flex items-center gap-2">
-              <Edit className="h-4 w-4" />
-              Create Question
-            </TabsTrigger>
-            <TabsTrigger value="preview" className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              Preview
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Test Configuration Tab */}
-          <TabsContent value="config" className="space-y-3">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Basic Settings */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Basic Settings
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Test Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter test title..."
-                      value={testConfig.title}
-                      onChange={(e) =>
-                        handleConfigChange("title", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Enter test description..."
-                      value={testConfig.description}
-                      onChange={(e) =>
-                        handleConfigChange("description", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="type">Test Type</Label>
-                    <Select
-                      value={testConfig.type}
-                      onValueChange={(value) =>
-                        handleConfigChange("type", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TEST_TYPES.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="difficulty">Difficulty Level</Label>
-                    <Select
-                      value={testConfig.difficulty}
-                      onValueChange={(value) =>
-                        handleConfigChange("difficulty", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DIFFICULTY_LEVELS.map((level) => (
-                          <SelectItem key={level} value={level}>
-                            {level.charAt(0).toUpperCase() + level.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="timeLimit">Time Limit (minutes)</Label>
-                    <Input
-                      id="timeLimit"
-                      type="number"
-                      placeholder="Leave empty for untimed"
-                      value={testConfig.timeLimit || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          "timeLimit",
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
-                      }
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Subject Filters */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Filter className="h-5 w-5" />
-                    Subject Filters
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Medical Subjects</Label>
-                    <div className="max-h-60 overflow-y-auto space-y-2">
-                      {MEDICAL_SUBJECTS.map((subject) => (
-                        <div
-                          key={subject}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={subject}
-                            checked={testConfig.subjectFilters.includes(
-                              subject
-                            )}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                handleConfigChange("subjectFilters", [
-                                  ...testConfig.subjectFilters,
-                                  subject,
-                                ]);
-                              } else {
-                                handleConfigChange(
-                                  "subjectFilters",
-                                  testConfig.subjectFilters.filter(
-                                    (s) => s !== subject
-                                  )
-                                );
-                              }
-                            }}
-                          />
-                          <Label
-                            htmlFor={subject}
-                            className="text-sm font-normal capitalize"
-                          >
-                            {subject.replace("_", " ")}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Selected Questions Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Test Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Total Questions:
-                      </span>
-                      <Badge variant="outline">
-                        {selectedQuestions.length}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Estimated Time:
-                      </span>
-                      <Badge variant="outline">
-                        {testConfig.timeLimit
-                          ? `${testConfig.timeLimit} min`
-                          : "Untimed"}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Difficulty:
-                      </span>
-                      <Badge variant="outline" className="capitalize">
-                        {testConfig.difficulty}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {selectedQuestions.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>Selected Questions</Label>
-                      <div className="max-h-40 overflow-y-auto space-y-1">
-                        {selectedQuestions.map((question, index) => (
-                          <div
-                            key={question.id}
-                            className="flex items-center justify-between p-2 bg-muted rounded"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">
-                                Q{index + 1}:{" "}
-                                {question.content.substring(0, 50)}...
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="secondary" className="text-xs">
-                                  {question.subject}
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {question.difficulty}
-                                </Badge>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleQuestionRemove(question.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedQuestions.length > 0 && (
-                    <Button
-                      onClick={handleStartTest}
-                      className="w-full"
-                      disabled={!testConfig.title}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Test
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+      {/* Learning Modules Cards from Med App */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-red-500/10 dark:bg-red-500/20 rounded-lg">
+                <Heart className="h-6 w-6 text-red-500" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-white">
+                  Cardiology
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Heart conditions and treatments
+                </CardDescription>
+              </div>
             </div>
-          </TabsContent>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Progress
+                </span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  75%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-red-500 h-2 rounded-full"
+                  style={{ width: "75%" }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>12/16 lessons</span>
+                <span>4.8★</span>
+              </div>
+              <Button className="w-full" size="sm">
+                <Play className="h-4 w-4 mr-2" />
+                Continue Learning
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Question Bank Tab */}
-          <TabsContent value="questions">
-            <QuestionBank
-              selectedQuestions={selectedQuestions}
-              onQuestionSelect={handleQuestionSelect}
-              filter={questionFilter}
-              onFilterChange={setQuestionFilter}
-            />
-          </TabsContent>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
+                <Brain className="h-6 w-6 text-blue-500" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-white">
+                  Neurology
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Brain and nervous system
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Progress
+                </span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  45%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full"
+                  style={{ width: "45%" }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>7/15 lessons</span>
+                <span>4.6★</span>
+              </div>
+              <Button className="w-full" size="sm" variant="outline">
+                <Play className="h-4 w-4 mr-2" />
+                Start Learning
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Question Editor Tab */}
-          <TabsContent value="editor">
-            <QuestionEditor
-              onQuestionCreated={(question) => {
-                setSelectedQuestions((prev) => [...prev, question]);
-                setActiveTab("questions");
-              }}
-            />
-          </TabsContent>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-500/10 dark:bg-green-500/20 rounded-lg">
+                <Stethoscope className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-white">
+                  Emergency Medicine
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Critical care and trauma
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Progress
+                </span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  90%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full"
+                  style={{ width: "90%" }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>18/20 lessons</span>
+                <span>4.9★</span>
+              </div>
+              <Button className="w-full" size="sm" variant="outline">
+                <Play className="h-4 w-4 mr-2" />
+                Review
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-          {/* Test Preview Tab */}
-          <TabsContent value="preview">
-            <TestPreview
-              testConfig={testConfig}
-              selectedQuestions={selectedQuestions}
-            />
-          </TabsContent>
-        </Tabs>
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <StatCard
+          title="Question Score"
+          value={`${questionScore}% (${questionScoreFraction})`}
+          subtitle="Correct"
+          icon={CheckCircle2}
+          color="success"
+        />
+        <StatCard
+          title="QBank Usage"
+          value={`${qbankUsagePercent}%`}
+          subtitle={`${qbankUsageFraction} Used`}
+          icon={BookOpen}
+          progress={qbankUsagePercent}
+          color="primary"
+        />
+        <StatCard
+          title="Test Count"
+          value={`${testCompletionPercent}%`}
+          subtitle={`${testCompletionFraction} Completed`}
+          icon={ClipboardCheck}
+          progress={testCompletionPercent}
+          color="primary"
+        />
+      </div> */}
     </div>
   );
 }

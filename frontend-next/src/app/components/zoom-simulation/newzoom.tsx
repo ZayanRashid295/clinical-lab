@@ -418,12 +418,28 @@ export default function NewZoom() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-        {/* Main Application Container */}
-        <div className="w-full max-w-4xl rounded-xl shadow-2xl p-6 md:p-8 bg-white dark:bg-gray-800">
-          <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">
-            Virtual Consultation Simulation
-          </h1>
+      <div
+        className="space-y-3 px-[50px] pb-[50px] pt-[25px]"
+        data-testid="page-dashboard"
+      >
+        <div className="space-y-3 px-[50px] pb-[50px] pt-[25px]">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Dashboard
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Welcome to your USMLE preparation
+            </p>
+          </div>
+        </div>
+
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+          {/* Main Application Container */}
+          <div className="w-full max-w-4xl rounded-xl shadow-2xl p-6 md:p-8 bg-white dark:bg-gray-800">
+            <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">
+              Virtual Consultation Simulation
+            </h1>
+          </div>
         </div>
       </div>
 
