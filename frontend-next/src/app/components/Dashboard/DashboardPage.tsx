@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList } from "lucide-react";
+import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList, PlayCircle, Calendar } from "lucide-react";
 import { StatCard } from "./StatCard";
 import { StudyPlanCard } from "./StudyPlanCard";
 import { ProgressCard } from "./ProgressCard";
@@ -33,15 +33,17 @@ export default function DashboardPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<StudyTask[]>([]);
   const [stats, setStats] = useState<PerformanceStats | null>(null);
+  const [lastTest, setLastTest] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch tasks and stats in parallel
-        const [tasksResponse, statsResponse] = await Promise.all([
+        // Fetch tasks, stats, and last test in parallel
+        const [tasksResponse, statsResponse, testsResponse] = await Promise.all([
           fetch("/api/study-tasks"),
           fetch("/api/performance/stats"),
+          fetch("/api/tests"),
         ]);
 
         if (tasksResponse.ok) {
@@ -53,6 +55,18 @@ export default function DashboardPage() {
           const statsData = await statsResponse.json();
           setStats(statsData);
         }
+
+        // Get the most recent in-progress or created test
+        if (testsResponse.ok) {
+          const testsData = await testsResponse.json();
+          // Filter for in-progress tests, sort by creation date, get the most recent
+          const inProgressTests = testsData
+            .filter((t: any) => !t.completedAt && t.status !== "completed")
+            .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          if (inProgressTests.length > 0) {
+            setLastTest(inProgressTests[0]);
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       } finally {
@@ -62,6 +76,15 @@ export default function DashboardPage() {
 
     fetchData();
   }, []);
+
+  const handleContinueLastTest = () => {
+    if (lastTest?.id) {
+      router.push(`/test-session/${lastTest.id}`);
+    } else {
+      // If no last test, create a new one
+      router.push("/test-creation/study-create");
+    }
+  };
 
   const upcomingTasks = tasks.filter((t) => t.status === "upcoming").slice(0, 3);
   const overdueTasks = tasks.filter((t) => t.status === "overdue");
@@ -175,30 +198,50 @@ export default function DashboardPage() {
                   Start your study session with one of these options
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <Button 
-                  data-testid="button-view-performance"
-                  onClick={() => router.push("/performance")}
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  View Performance
-                </Button>
-                <Button 
-                  variant="outline" 
-                  data-testid="button-create-test"
-                  onClick={() => router.push("/test-creation/study-create")}
-                >
-                  <FileQuestion className="h-4 w-4 mr-2" />
-                  Create a Test
-                </Button>
-                <Button 
-                  variant="outline" 
-                  data-testid="button-view-past-tests"
-                  onClick={() => router.push("/previous-tests")}
-                >
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  View Past Tests
-                </Button>
+              <div className="flex flex-col gap-3 w-full md:w-auto">
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button 
+                    data-testid="button-view-performance"
+                    onClick={() => router.push("/performance")}
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Performance
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-create-test"
+                    onClick={() => router.push("/test-creation/study-create")}
+                  >
+                    <FileQuestion className="h-4 w-4 mr-2" />
+                    Create a Test
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-view-past-tests"
+                    onClick={() => router.push("/previous-tests")}
+                  >
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    View Past Tests
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-continue-last-test"
+                    onClick={handleContinueLastTest}
+                  >
+                    <PlayCircle className="h-4 w-4 mr-2" />
+                    Continue Last Test
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-view-study-plan"
+                    onClick={() => router.push("/study-planner")}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    View Study Plan
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
