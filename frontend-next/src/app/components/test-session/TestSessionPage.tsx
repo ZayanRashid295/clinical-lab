@@ -8,7 +8,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Progress } from "@/shared/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/shared/ui/radio-group";
 import { Label } from "@/shared/ui/label";
-import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, Bookmark } from "lucide-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 interface Test {
@@ -48,6 +48,7 @@ export default function TestSessionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
+  const [markedQuestions, setMarkedQuestions] = useState<Set<number>>(new Set());
   const [showExplanation, setShowExplanation] = useState(false);
   const [startTime] = useState(Date.now());
   const [error, setError] = useState<string | null>(null);
@@ -65,9 +66,42 @@ export default function TestSessionPage() {
         const testData = await response.json();
         setTest(testData);
 
-        // TODO: Fetch actual questions from API when available
-        // For now, use empty array
-        setQuestions([]);
+        // Load saved answers and marked questions from test
+        if (testData.answers) {
+          const answers: Record<number, string> = {};
+          Object.keys(testData.answers).forEach((qId, idx) => {
+            const questionIndex = testData.questions.indexOf(qId);
+            if (questionIndex !== -1) {
+              answers[questionIndex] = testData.answers[qId];
+            }
+          });
+          setSelectedAnswers(answers);
+        }
+        if (testData.markedQuestions) {
+          const marked = new Set<number>();
+          testData.markedQuestions.forEach((qId: string) => {
+            const questionIndex = testData.questions.indexOf(qId);
+            if (questionIndex !== -1) {
+              marked.add(questionIndex);
+            }
+          });
+          setMarkedQuestions(marked);
+        }
+
+        // Fetch questions by their IDs
+        if (testData.questions && testData.questions.length > 0) {
+          const questionPromises = testData.questions.map(async (questionId: string) => {
+            const qResponse = await fetch(`/api/questions/${questionId}`);
+            if (!qResponse.ok) {
+              throw new Error(`Failed to fetch question ${questionId}`);
+            }
+            return qResponse.json();
+          });
+          const fetchedQuestions = await Promise.all(questionPromises);
+          setQuestions(fetchedQuestions);
+        } else {
+          setQuestions([]);
+        }
       } catch (err: any) {
         setError(err?.message || "Failed to load test");
       } finally {
@@ -79,13 +113,63 @@ export default function TestSessionPage() {
   }, [id]);
 
   const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswers((prev) => ({
-      ...prev,
+    const newAnswers = {
+      ...selectedAnswers,
       [currentQuestionIndex]: answer,
-    }));
+    };
+    setSelectedAnswers(newAnswers);
+
+    // Save answer to test
+    if (test && test.questions && test.questions[currentQuestionIndex]) {
+      const questionId = test.questions[currentQuestionIndex];
+      const updatedAnswers = {
+        ...(test.answers || {}),
+        [questionId]: answer,
+      };
+
+      // Update test state and backend
+      setTest({
+        ...test,
+        answers: updatedAnswers,
+      });
+
+      // Update test in backend
+      fetch(`/api/tests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: updatedAnswers }),
+      }).catch(console.error);
+    }
 
     if (!test?.isTimed) {
       setShowExplanation(true);
+    }
+  };
+
+  const handleToggleMark = () => {
+    const newMarked = new Set(markedQuestions);
+    if (newMarked.has(currentQuestionIndex)) {
+      newMarked.delete(currentQuestionIndex);
+    } else {
+      newMarked.add(currentQuestionIndex);
+    }
+    setMarkedQuestions(newMarked);
+
+    // Save marked questions to test
+    if (test && test.questions) {
+      const markedIds = Array.from(newMarked).map((idx) => test.questions[idx]);
+      
+      // Update test state and backend
+      setTest({
+        ...test,
+        markedQuestions: markedIds,
+      });
+
+      fetch(`/api/tests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markedQuestions: markedIds }),
+      }).catch(console.error);
     }
   };
 
@@ -104,6 +188,8 @@ export default function TestSessionPage() {
   };
 
   const handleSubmitTest = async () => {
+    if (!test) return;
+
     const duration = Math.floor((Date.now() - startTime) / 1000 / 60);
     let correctCount = 0;
 
@@ -115,15 +201,28 @@ export default function TestSessionPage() {
 
     const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
 
-    // TODO: Submit test to API
-    // await fetch(`/api/tests/${id}`, {
-    //   method: "PATCH",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ status: "completed", score, duration }),
-    // });
+    try {
+      // Submit test to API
+      const response = await fetch(`/api/tests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "completed",
+          score,
+          duration,
+          completedAt: new Date().toISOString(),
+        }),
+      });
 
-    // Navigate to results page
-    router.push(`/test-results/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to submit test");
+      }
+
+      // Navigate to results page
+      router.push(`/test-results/${id}`);
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit test");
+    }
   };
 
   if (isLoading) {
@@ -226,9 +325,18 @@ export default function TestSessionPage() {
                 <CardTitle className="text-lg flex-1 text-gray-900 dark:text-white">
                   {currentQuestion.text}
                 </CardTitle>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <Badge variant="secondary">{currentQuestion.subject}</Badge>
                   <Badge variant="outline">{currentQuestion.difficulty}</Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleToggleMark}
+                    className={markedQuestions.has(currentQuestionIndex) ? "text-yellow-500" : ""}
+                    title={markedQuestions.has(currentQuestionIndex) ? "Unmark question" : "Mark question"}
+                  >
+                    <Bookmark className={`h-4 w-4 ${markedQuestions.has(currentQuestionIndex) ? "fill-current" : ""}`} />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -324,14 +432,13 @@ export default function TestSessionPage() {
             </Button>
 
             <div className="flex gap-3">
-              {currentQuestionIndex === questions.length - 1 ? (
-                <Button
-                  onClick={handleSubmitTest}
-                  disabled={totalAnswered < questions.length}
-                  data-testid="button-submit-test"
-                >
-                  Submit Test
-                </Button>
+          {currentQuestionIndex === questions.length - 1 ? (
+            <Button
+              onClick={handleSubmitTest}
+              data-testid="button-submit-test"
+            >
+              Submit Test
+            </Button>
               ) : (
                 <Button onClick={handleNext} data-testid="button-next">
                   Next

@@ -1,5 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+// In-memory storage for tests (should match the one in index.ts)
+// In production, use a shared database or storage service
+declare global {
+  // eslint-disable-next-line no-var
+  var testStorage: Map<string, any> | undefined;
+}
+
+const testStorage = global.testStorage || new Map<string, any>();
+if (process.env.NODE_ENV !== "production") {
+  global.testStorage = testStorage;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -7,46 +19,60 @@ export default async function handler(
   // Set JSON content type
   res.setHeader("Content-Type", "application/json");
 
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method === "GET") {
+    try {
+      const { id } = req.query;
 
-  try {
-    const { id } = req.query;
+      if (!id || typeof id !== "string") {
+        return res.status(400).json({ error: "Test ID is required" });
+      }
 
-    if (!id || typeof id !== "string") {
-      return res.status(400).json({ error: "Test ID is required" });
+      const test = testStorage.get(id);
+
+      if (!test) {
+        return res.status(404).json({ error: "Test not found" });
+      }
+
+      return res.status(200).json(test);
+    } catch (error: any) {
+      console.error("Error fetching test:", error);
+      return res.status(500).json({ 
+        error: error?.message || "Failed to fetch test" 
+      });
     }
-
-    // TODO: Fetch test from database/storage when backend is ready
-    // For now, return a mock test structure
-    
-    // In a real implementation, this would fetch from storage:
-    // const test = await storage.getTest(id);
-    
-    // Mock test response - replace with actual database query
-    const mockTest = {
-      id,
-      name: "Test Session",
-      mode: "tutor",
-      isTimed: false,
-      questionPool: "unused",
-      subjects: [],
-      systems: [],
-      questionCount: 0,
-      questions: [], // Array of question IDs
-      answers: {},
-      markedQuestions: [],
-      status: "in-progress",
-      createdAt: new Date().toISOString(),
-    };
-
-    return res.status(200).json(mockTest);
-  } catch (error: any) {
-    console.error("Error fetching test:", error);
-    return res.status(500).json({ 
-      error: error?.message || "Failed to fetch test" 
-    });
   }
+
+  if (req.method === "PATCH") {
+    try {
+      const { id } = req.query;
+
+      if (!id || typeof id !== "string") {
+        return res.status(400).json({ error: "Test ID is required" });
+      }
+
+      const test = testStorage.get(id);
+
+      if (!test) {
+        return res.status(404).json({ error: "Test not found" });
+      }
+
+      // Update test with provided data
+      const updatedTest = {
+        ...test,
+        ...req.body,
+      };
+
+      testStorage.set(id, updatedTest);
+
+      return res.status(200).json(updatedTest);
+    } catch (error: any) {
+      console.error("Error updating test:", error);
+      return res.status(500).json({ 
+        error: error?.message || "Failed to update test" 
+      });
+    }
+  }
+
+  return res.status(405).json({ error: "Method not allowed" });
 }
 
