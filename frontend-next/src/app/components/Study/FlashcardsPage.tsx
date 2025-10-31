@@ -23,6 +23,7 @@ import {
   XCircle,
   Eye,
   EyeOff,
+  RotateCw,
 } from "lucide-react";
 
 interface Flashcard {
@@ -480,12 +481,15 @@ export default function FlashcardsPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
-                    <div className="text-center space-y-6 w-full">
-                      <div className="w-full max-w-md mx-auto">
-                        <div className="w-full h-64 bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6">
-                          <p className="text-xl leading-relaxed text-gray-800">
+                    <div className="text-center w-full">
+                      <div className="w-full max-w-2xl mx-auto">
+                        <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-8 relative">
+                          <p className="text-2xl leading-relaxed text-gray-800">
                             {previousCard.front}
                           </p>
+                          <div className="absolute bottom-4 right-4 text-blue-400 opacity-50">
+                            <RotateCw className="h-6 w-6" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -542,77 +546,70 @@ export default function FlashcardsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
-                  <div className="text-center space-y-6 w-full">
+                  <div className="text-center w-full">
                     <div
-                      className="w-full max-w-md mx-auto"
-                      style={{ perspective: "1000px" }}
+                      className="w-full max-w-2xl mx-auto"
+                      style={{ perspective: "1500px" }}
                     >
                       <div
-                        className="relative w-full h-64 transition-transform duration-700"
+                        className="relative w-full h-96 transition-transform duration-700 cursor-pointer"
                         style={{
                           transformStyle: "preserve-3d",
                           transform: isFlipped
                             ? "rotateY(180deg)"
                             : "rotateY(0deg)",
                         }}
+                        onClick={handleFlip}
                       >
                         {/* Front of Card */}
                         <div
-                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6"
+                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-8 hover:shadow-xl transition-shadow"
                           style={{ backfaceVisibility: "hidden" }}
                         >
-                          <p className="text-xl leading-relaxed text-gray-800">
+                          <p className="text-2xl leading-relaxed text-gray-800">
                             {currentCard.front}
                           </p>
+                          <div className="absolute bottom-4 right-4 text-blue-400">
+                            <RotateCw className="h-6 w-6" />
+                          </div>
                         </div>
 
                         {/* Back of Card */}
                         <div
-                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-6"
+                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-8 hover:shadow-xl transition-shadow"
                           style={{
                             backfaceVisibility: "hidden",
                             transform: "rotateY(180deg)",
                           }}
                         >
-                          <p className="text-xl leading-relaxed text-gray-800">
+                          <p className="text-2xl leading-relaxed text-gray-800">
                             {currentCard.back}
                           </p>
+                          <div className="absolute bottom-4 right-4 text-green-400">
+                            <RotateCw className="h-6 w-6" />
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        variant="outline"
-                        onClick={handleFlip}
-                        className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
-                      >
-                        {isFlipped ? (
-                          <>
-                            <EyeOff className="h-4 w-4" />
-                            Show Question
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4" />
-                            Show Answer
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
                     {studyMode === "practice" && isFlipped && (
-                      <div className="flex items-center justify-center gap-4 pt-4">
+                      <div className="flex items-center justify-center gap-4 mt-6">
                         <Button
                           variant="outline"
-                          onClick={() => handleAnswer(false)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAnswer(false);
+                          }}
                           className="text-red-600 border-red-600 hover:bg-red-50"
                         >
                           <XCircle className="h-4 w-4 mr-2" />
                           Incorrect
                         </Button>
                         <Button
-                          onClick={() => handleAnswer(true)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAnswer(true);
+                          }}
                           className="text-green-600 border-green-600 hover:bg-green-50"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
