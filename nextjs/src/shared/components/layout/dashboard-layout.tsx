@@ -54,11 +54,14 @@ export default function DashboardLayout({
 
   // Set active menu based on pathname or prop (only for initial load)
   useEffect(() => {
-    if (activeMenuId && !activeMenu) {
-      // Only set from activeMenuId if no activeMenu is set yet (initial load)
+    // Priority 1: activeMenuId prop (immediate)
+    if (activeMenuId && activeMenu !== activeMenuId) {
       setActiveMenu(activeMenuId);
-    } else if (menuItems.length > 0 && !activeMenu) {
-      // Only sync from pathname if no activeMenu is set yet (initial load)
+      return; // Don't check pathname if activeMenuId is provided
+    }
+    
+    // Priority 2: Sync from pathname only if no activeMenuId and no activeMenu
+    if (!activeMenuId && menuItems.length > 0 && !activeMenu) {
       syncMenuStateFromPath(pathname);
     }
   }, [
@@ -94,9 +97,11 @@ export default function DashboardLayout({
         </div>
       );
     }
-    // Prioritize activeMenu state over activeMenuId prop for navigation
-    // activeMenuId is only used for initial page load, not for menu navigation
-    const currentActiveMenu = activeMenu;
+    
+    // Use activeMenuId prop if activeMenu is empty (prevents showing default case)
+    // This ensures we show the correct content immediately when navigating to a route
+    const currentActiveMenu = activeMenu || activeMenuId || "";
+    
     return <ContentSwitcher activeMenu={currentActiveMenu} />;
   };
 
@@ -124,9 +129,10 @@ export default function DashboardLayout({
 
     const menuItem = findMenuItemById(menuItems, menuId);
     if (menuItem && menuItem.path) {
-      // Update URL without causing page reload
+      // Use Next.js router.push instead of window.history.pushState
+      // This ensures proper route transitions and prevents flicker
       if (pathname !== menuItem.path) {
-        window.history.pushState(null, "", menuItem.path);
+        router.push(menuItem.path);
       }
     }
   };
