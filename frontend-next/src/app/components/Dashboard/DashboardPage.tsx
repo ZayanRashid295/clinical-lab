@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList, PlayCircle, Calendar, PlusCircle } from "lucide-react";
+import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList, PlayCircle, Calendar, PlusCircle, Heart, Brain, Stethoscope, Play } from "lucide-react";
 import { StatCard } from "./StatCard";
 import { StudyPlanCard } from "./StudyPlanCard";
 import { ProgressCard } from "./ProgressCard";
 import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 interface PerformanceStats {
@@ -187,6 +187,119 @@ export default function DashboardPage() {
               incomplete: 3,
             }}
           />
+        </div>
+
+        {/* Learning Modules Cards from Med App */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-red-500/10 dark:bg-red-500/20 rounded-lg">
+                  <Heart className="h-6 w-6 text-red-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-gray-900 dark:text-white">Cardiology</CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Heart conditions and treatments
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-medium text-gray-900 dark:text-white">75%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-red-500 h-2 rounded-full"
+                    style={{ width: "75%" }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <span>12/16 lessons</span>
+                  <span>4.8★</span>
+                </div>
+                <Button className="w-full" size="sm">
+                  <Play className="h-4 w-4 mr-2" />
+                  Continue Learning
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
+                  <Brain className="h-6 w-6 text-blue-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-gray-900 dark:text-white">Neurology</CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">Brain and nervous system</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-medium text-gray-900 dark:text-white">45%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full"
+                    style={{ width: "45%" }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <span>7/15 lessons</span>
+                  <span>4.6★</span>
+                </div>
+                <Button className="w-full" size="sm" variant="outline">
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Learning
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-500/10 dark:bg-green-500/20 rounded-lg">
+                  <Stethoscope className="h-6 w-6 text-green-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-gray-900 dark:text-white">Emergency Medicine</CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">Critical care and trauma</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-medium text-gray-900 dark:text-white">90%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-green-500 h-2 rounded-full"
+                    style={{ width: "90%" }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <span>18/20 lessons</span>
+                  <span>4.9★</span>
+                </div>
+                <Button className="w-full" size="sm" variant="outline">
+                  <Play className="h-4 w-4 mr-2" />
+                  Review
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
