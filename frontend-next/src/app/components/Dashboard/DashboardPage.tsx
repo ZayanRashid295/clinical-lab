@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList, PlayCircle, Calendar } from "lucide-react";
+import { CheckCircle2, BookOpen, ClipboardCheck, BarChart3, FileQuestion, ClipboardList, PlayCircle, Calendar, PlusCircle } from "lucide-react";
 import { StatCard } from "./StatCard";
 import { StudyPlanCard } from "./StudyPlanCard";
 import { ProgressCard } from "./ProgressCard";
@@ -240,6 +240,14 @@ export default function DashboardPage() {
                   >
                     <Calendar className="h-4 w-4 mr-2" />
                     View Study Plan
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-make-study-plan"
+                    onClick={() => router.push("/study-planner?action=create")}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Make Study Plan
                   </Button>
                 </div>
               </div>
