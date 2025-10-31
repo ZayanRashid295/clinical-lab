@@ -169,12 +169,20 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "zoom-simulation",
+      label: "menu.zoomSimulation",
+      icon: "📹",
+      path: "/zoom",
+      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+      order: 6,
+    },
+    {
       id: "admin",
       label: "menu.admin",
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 5,
+      order: 7,
       submenu: [
         {
           id: "users",

@@ -34,6 +34,9 @@ import NotesPage from "../components/Study/NotesPage";
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
 
+// Import zoom simulation components
+import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
+
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
 
@@ -141,6 +144,9 @@ export const transportationContentRegistry: ContentRegistry = {
         ]}
       />
     ),
+
+    // Zoom simulation routes
+    "/zoom": () => <ZoomSimulation />,
   },
 
   dashboards: {
