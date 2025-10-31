@@ -44,16 +44,16 @@ export function TestTable({
   onViewResults,
   onViewAnalysis,
 }: TestTableProps) {
-  const getScoreBackgroundColor = (score: number) => {
+  const getScoreBadgeClassName = (score: number) => {
     if (score > 90) {
-      // Success green - matches chart-2: 142 71% 35% (light) / 55% (dark)
-      return "bg-green-50 dark:bg-green-950/40";
+      // Success green - solid green background with white text
+      return "font-mono border-transparent bg-green-600 dark:bg-green-500 text-white hover:bg-green-700 dark:hover:bg-green-600";
     } else if (score > 80) {
-      // Warning amber - matches chart-4: 38 92% 40% (light) / 60% (dark)
-      return "bg-amber-50 dark:bg-amber-950/40";
+      // Warning orange - solid orange background with white text
+      return "font-mono border-transparent bg-orange-600 dark:bg-orange-500 text-white hover:bg-orange-700 dark:hover:bg-orange-600";
     } else {
-      // Error red - matches chart-3: 0 72% 45% (light) / 60% (dark)
-      return "bg-red-50 dark:bg-red-950/40";
+      // Error red - solid red background with white text
+      return "font-mono border-transparent bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600";
     }
   };
 
@@ -87,10 +87,9 @@ export function TestTable({
                 className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
                 data-testid={`row-test-${test.id}`}
               >
-                <TableCell className={getScoreBackgroundColor(test.score)}>
+                <TableCell>
                   <Badge
-                    variant={test.score >= 70 ? "default" : "destructive"}
-                    className="font-mono"
+                    className={getScoreBadgeClassName(test.score)}
                     data-testid={`badge-score-${test.id}`}
                   >
                     {test.score}%
