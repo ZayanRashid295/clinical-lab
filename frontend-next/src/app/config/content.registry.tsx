@@ -33,6 +33,7 @@ import NotesPage from "../components/Study/NotesPage";
 
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
+import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 
 // Import zoom simulation components
 import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
@@ -81,6 +82,7 @@ export const transportationContentRegistry: ContentRegistry = {
     // Test creation routes
     "/test-creation": () => <TestCreationPage />,
     "/test-creation/new": () => <TestCreationPage />,
+    "/test-creation/study-create": () => <StudyCreateTestPage />,
     "/test-creation/templates": () => (
       <UnderConstruction
         menuTitle="Test Templates"
