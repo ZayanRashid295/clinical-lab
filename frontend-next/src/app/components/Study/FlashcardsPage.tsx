@@ -595,9 +595,9 @@ export default function FlashcardsPage() {
                         className="flashcard-flip-container relative w-full h-96 cursor-pointer"
                         style={{
                           animation: flipDirection === "forward"
-                            ? "flipForward 0.8s ease-in-out forwards"
+                            ? "flipForward 0.6s linear forwards"
                             : flipDirection === "backward"
-                            ? "flipBackward 0.8s ease-in-out forwards"
+                            ? "flipBackward 0.6s linear forwards"
                             : "none",
                         }}
                         onClick={handleFlip}
