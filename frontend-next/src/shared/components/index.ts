@@ -16,5 +16,8 @@ export * from "./Form";
 // Common utilities
 export { iconMap } from "./Common/IconMap";
 
+// Placeholder components
+export { default as UnderConstruction } from "./placeholders/under-construction";
+
 // Default export
 export { default } from "./MenuSystem";

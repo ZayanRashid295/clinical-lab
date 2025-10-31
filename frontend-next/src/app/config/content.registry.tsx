@@ -34,6 +34,9 @@ import NotesPage from "../components/Study/NotesPage";
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
 
+// Import placeholder components
+import UnderConstruction from "../../shared/components/placeholders/under-construction";
+
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
   content: {
@@ -76,56 +79,67 @@ export const transportationContentRegistry: ContentRegistry = {
     "/test-creation": () => <TestCreationPage />,
     "/test-creation/new": () => <TestCreationPage />,
     "/test-creation/templates": () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Templates</h2>
-          <p className="text-gray-600">
-            Pre-built test templates for quick test creation with customizable questions and formats.
-          </p>
-          <div className="mt-6 text-center text-gray-500">
-            Coming Soon - Template Library
-          </div>
-        </div>
-      </div>
+      <UnderConstruction
+        menuTitle="Test Templates"
+        menuIcon="📋"
+        description="Pre-built test templates for quick test creation with customizable questions and formats."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Template library with medical specialties",
+          "Customizable question sets",
+          "Difficulty level adjustments",
+          "Subject-specific templates",
+          "One-click test generation",
+        ]}
+      />
     ),
     "/test-creation/builder": () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Question Builder</h2>
-          <p className="text-gray-600">
-            Advanced question creation tool with multiple question types and multimedia support.
-          </p>
-          <div className="mt-6 text-center text-gray-500">
-            Coming Soon - Question Builder
-          </div>
-        </div>
-      </div>
+      <UnderConstruction
+        menuTitle="Question Builder"
+        menuIcon="🔨"
+        description="Advanced question creation tool with multiple question types and multimedia support."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Multiple choice questions",
+          "True/False questions",
+          "Essay and short answer formats",
+          "Image and diagram support",
+          "Question difficulty tagging",
+          "Answer explanation editor",
+        ]}
+      />
     ),
     "/test-creation/settings": () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Settings</h2>
-          <p className="text-gray-600">
-            Comprehensive test configuration and settings management for optimal test experience.
-          </p>
-          <div className="mt-6 text-center text-gray-500">
-            Coming Soon - Test Settings
-          </div>
-        </div>
-      </div>
+      <UnderConstruction
+        menuTitle="Test Settings"
+        menuIcon="⚙️"
+        description="Comprehensive test configuration and settings management for optimal test experience."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Time limits and scheduling",
+          "Scoring and grading options",
+          "Access control and permissions",
+          "Test analytics and reporting",
+          "Mobile-responsive design",
+          "Progress tracking",
+        ]}
+      />
     ),
     "/test-creation/previous": () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Previous Tests</h2>
-          <p className="text-gray-600">
-            View and manage previously created tests.
-          </p>
-          <div className="mt-6 text-center text-gray-500">
-            Coming Soon - Previous Tests
-          </div>
-        </div>
-      </div>
+      <UnderConstruction
+        menuTitle="Previous Tests"
+        menuIcon="📊"
+        description="View and manage previously created tests with detailed analytics and performance metrics."
+        estimatedCompletion="2 weeks"
+        features={[
+          "Test history and archives",
+          "Performance analytics",
+          "Student progress tracking",
+          "Test modification tools",
+          "Bulk operations",
+          "Export capabilities",
+        ]}
+      />
     ),
   },
 
