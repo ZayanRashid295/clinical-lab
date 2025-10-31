@@ -294,18 +294,18 @@ export default function QuestionBankPage() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
       case "intermediate":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
       case "advanced":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
     }
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -456,7 +456,7 @@ export default function QuestionBankPage() {
                 <p className="text-sm text-muted-foreground">Total Questions</p>
                 <p className="text-2xl font-bold">{mockQuestions.length}</p>
               </div>
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
           </CardContent>
         </Card>
@@ -469,7 +469,7 @@ export default function QuestionBankPage() {
                 </p>
                 <p className="text-2xl font-bold">{filteredQuestions.length}</p>
               </div>
-              <Target className="h-8 w-8 text-green-600" />
+              <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
           </CardContent>
         </Card>
@@ -480,7 +480,7 @@ export default function QuestionBankPage() {
                 <p className="text-sm text-muted-foreground">Selected</p>
                 <p className="text-2xl font-bold">{selectedQuestions.size}</p>
               </div>
-              <Check className="h-8 w-8 text-purple-600" />
+              <Check className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
           </CardContent>
         </Card>
@@ -491,7 +491,7 @@ export default function QuestionBankPage() {
                 <p className="text-sm text-muted-foreground">Bookmarked</p>
                 <p className="text-2xl font-bold">{bookmarkedQuestions.size}</p>
               </div>
-              <Bookmark className="h-8 w-8 text-orange-600" />
+              <Bookmark className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
           </CardContent>
         </Card>

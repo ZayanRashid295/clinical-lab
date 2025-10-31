@@ -165,22 +165,22 @@ export default function StudyMaterialsPage() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case "textbook":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
       case "video":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
       case "article":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
       case "presentation":
-        return "bg-purple-100 text-purple-800";
+        return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
       case "notes":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
     }
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -221,7 +221,7 @@ export default function StudyMaterialsPage() {
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="all">All Types</option>
                 <option value="textbook">Textbooks</option>
@@ -234,7 +234,7 @@ export default function StudyMaterialsPage() {
               <select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="all">All Subjects</option>
                 <option value="cardiology">Cardiology</option>
@@ -244,7 +244,7 @@ export default function StudyMaterialsPage() {
               </select>
 
               {/* View Mode Toggle */}
-              <div className="flex border border-gray-300 rounded-md">
+              <div className="flex border border-gray-300 dark:border-gray-700 rounded-md">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
@@ -276,7 +276,7 @@ export default function StudyMaterialsPage() {
                 <p className="text-sm text-muted-foreground">Total Materials</p>
                 <p className="text-2xl font-bold">{mockMaterials.length}</p>
               </div>
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
           </CardContent>
         </Card>
@@ -289,7 +289,7 @@ export default function StudyMaterialsPage() {
                   {mockMaterials.filter(m => m.type === "video").length}
                 </p>
               </div>
-              <Video className="h-8 w-8 text-red-600" />
+              <Video className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
           </CardContent>
         </Card>
@@ -302,7 +302,7 @@ export default function StudyMaterialsPage() {
                   {mockMaterials.filter(m => m.type === "textbook").length}
                 </p>
               </div>
-              <FileText className="h-8 w-8 text-green-600" />
+              <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
           </CardContent>
         </Card>
@@ -313,7 +313,7 @@ export default function StudyMaterialsPage() {
                 <p className="text-sm text-muted-foreground">Bookmarked</p>
                 <p className="text-2xl font-bold">{bookmarkedMaterials.size}</p>
               </div>
-              <Bookmark className="h-8 w-8 text-orange-600" />
+              <Bookmark className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
           </CardContent>
         </Card>
@@ -370,7 +370,7 @@ export default function StudyMaterialsPage() {
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <Star className="h-3 w-3 fill-yellow-400 dark:fill-yellow-500 text-yellow-400 dark:text-yellow-500" />
                     <span>{material.rating}</span>
                   </div>
                   <div className="flex items-center gap-1">

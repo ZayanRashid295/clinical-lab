@@ -34,6 +34,30 @@ module.exports = {
           800: "var(--color-secondary-800)",
           900: "var(--color-secondary-900)",
         },
+        card: {
+          DEFAULT: "white",
+          dark: "#1f2937",
+        },
+        background: {
+          DEFAULT: "#f9fafb",
+          dark: "#111827",
+        },
+        foreground: {
+          DEFAULT: "#111827",
+          dark: "#f3f4f6",
+        },
+        muted: {
+          DEFAULT: "#f3f4f6",
+          dark: "#1f2937",
+          foreground: {
+            DEFAULT: "#6b7280",
+            dark: "#9ca3af",
+          },
+        },
+        border: {
+          DEFAULT: "#e5e7eb",
+          dark: "#374151",
+        },
       },
       fontSize: {
         xs: ["0.75rem", { lineHeight: "1rem" }],

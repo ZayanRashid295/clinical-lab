@@ -38,9 +38,9 @@ html {
   font-size: var(--base-font-size);
 }
 
-/* Global dark mode text colors */
+/* Global dark mode text colors - softer for better eye comfort */
 body {
-  @apply text-gray-900 dark:text-gray-100;
+  @apply text-gray-900 dark:text-gray-200;
 }
 
 /* Theme-aware utility classes */
