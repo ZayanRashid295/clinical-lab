@@ -31,6 +31,9 @@ import StudyMaterialsPage from "../components/Study/StudyMaterialsPage";
 import FlashcardsPage from "../components/Study/FlashcardsPage";
 import NotesPage from "../components/Study/NotesPage";
 
+// Import test creation components
+import TestCreationPage from "../components/test-creation/TestCreationPage";
+
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
   content: {
@@ -68,6 +71,62 @@ export const transportationContentRegistry: ContentRegistry = {
     "/study/materials": () => <StudyMaterialsPage />,
     "/study/flashcards": () => <FlashcardsPage />,
     "/study/notes": () => <NotesPage />,
+
+    // Test creation routes
+    "/test-creation": () => <TestCreationPage />,
+    "/test-creation/new": () => <TestCreationPage />,
+    "/test-creation/templates": () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Templates</h2>
+          <p className="text-gray-600">
+            Pre-built test templates for quick test creation with customizable questions and formats.
+          </p>
+          <div className="mt-6 text-center text-gray-500">
+            Coming Soon - Template Library
+          </div>
+        </div>
+      </div>
+    ),
+    "/test-creation/builder": () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Question Builder</h2>
+          <p className="text-gray-600">
+            Advanced question creation tool with multiple question types and multimedia support.
+          </p>
+          <div className="mt-6 text-center text-gray-500">
+            Coming Soon - Question Builder
+          </div>
+        </div>
+      </div>
+    ),
+    "/test-creation/settings": () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Settings</h2>
+          <p className="text-gray-600">
+            Comprehensive test configuration and settings management for optimal test experience.
+          </p>
+          <div className="mt-6 text-center text-gray-500">
+            Coming Soon - Test Settings
+          </div>
+        </div>
+      </div>
+    ),
+    "/test-creation/previous": () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Previous Tests</h2>
+          <p className="text-gray-600">
+            View and manage previously created tests.
+          </p>
+          <div className="mt-6 text-center text-gray-500">
+            Coming Soon - Previous Tests
+          </div>
+        </div>
+      </div>
+    ),
   },
 
   dashboards: {
