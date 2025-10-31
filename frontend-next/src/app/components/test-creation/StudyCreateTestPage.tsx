@@ -300,8 +300,8 @@ export default function StudyCreateTestPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-6" data-testid="page-create-test">
+    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="space-y-4" data-testid="page-create-test">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -337,7 +337,7 @@ export default function StudyCreateTestPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
+          <div className="space-y-4">
             <TestModeSelector
               mode={mode}
               isTimed={isTimed}
@@ -350,7 +350,7 @@ export default function StudyCreateTestPage() {
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div data-validation-error={!!validationErrors.subjects}>
               <SubjectSelector
                 selectedSubjects={selectedSubjects}

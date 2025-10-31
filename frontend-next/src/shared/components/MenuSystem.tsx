@@ -256,7 +256,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         }}
         onLogout={handleLogout}
       >
-        <div key={activeMenu} className={spacing.container.sm}>
+        <div key={activeMenu}>
           {renderContent()}
         </div>
       </AdaptiveLayout>

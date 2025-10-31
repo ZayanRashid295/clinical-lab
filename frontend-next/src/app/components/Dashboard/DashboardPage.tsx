@@ -131,15 +131,14 @@ export default function DashboardPage() {
   const testCompletionFraction = `${completedTests}/${totalTests}`;
 
   return (
-    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-6 max-w-7xl mx-auto" data-testid="page-dashboard">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Welcome to your USMLE preparation</p>
-        </div>
+    <div className="space-y-3 px-[50px] pb-[50px] pt-[25px]" data-testid="page-dashboard">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400">Welcome to your USMLE preparation</p>
+      </div>
 
-        {/* Learning Modules Cards from Med App */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Learning Modules Cards from Med App */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
             <CardHeader>
               <div className="flex items-center space-x-3">
@@ -249,9 +248,9 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <StatCard
             title="Question Score"
             value={`${questionScore}% (${questionScoreFraction})`}
@@ -275,19 +274,19 @@ export default function DashboardPage() {
             progress={testCompletionPercent}
             color="primary"
           />
-        </div>
+      </div>
 
-        <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+        <CardContent className="pt-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
               <div className="flex-1 text-center md:text-left">
                 <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Quick Actions</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Start your study session with one of these options
                 </p>
               </div>
-              <div className="flex flex-col gap-3 w-full md:w-1/2">
-                <div className="grid grid-cols-2 gap-3 w-full">
+              <div className="flex flex-col gap-2 w-full md:w-1/2">
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <Button 
                     variant="outline" 
                     className="w-full"
@@ -307,7 +306,7 @@ export default function DashboardPage() {
                     Create a Test
                   </Button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 w-full">
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <Button 
                     variant="outline" 
                     className="w-full"
@@ -327,7 +326,7 @@ export default function DashboardPage() {
                     Continue Last Test
                   </Button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 w-full">
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <Button 
                     variant="outline" 
                     className="w-full"
@@ -352,7 +351,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StudyPlanCard 
             tasks={upcomingTasks.map(t => ({
               id: t.id,
@@ -375,7 +374,6 @@ export default function DashboardPage() {
               incomplete: 3,
             }}
           />
-        </div>
       </div>
     </div>
   );

@@ -305,7 +305,7 @@ export default function QuestionBankPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

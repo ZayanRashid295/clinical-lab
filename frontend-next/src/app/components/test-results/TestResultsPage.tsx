@@ -86,8 +86,8 @@ export default function TestResultsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-        <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+        <div className="space-y-4 max-w-5xl mx-auto">
           <Skeleton className="h-8 w-64" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
@@ -122,8 +122,8 @@ export default function TestResultsPage() {
   const incorrectCount = test.questionCount - correctCount;
 
   return (
-    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-6 max-w-5xl mx-auto" data-testid="page-test-results">
+    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="space-y-4 max-w-5xl mx-auto" data-testid="page-test-results">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Test Results</h1>

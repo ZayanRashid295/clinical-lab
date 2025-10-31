@@ -227,8 +227,8 @@ export default function TestSessionPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-        <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+        <div className="space-y-4 max-w-5xl mx-auto">
           <Skeleton className="h-8 w-64" />
           <Card>
             <CardHeader>
@@ -267,8 +267,8 @@ export default function TestSessionPage() {
   const isIncorrect = isAnswered && selectedAnswer !== currentQuestion?.correctAnswer;
 
   return (
-    <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-6 max-w-5xl mx-auto" data-testid="page-test-session">
+    <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="space-y-4 max-w-5xl mx-auto" data-testid="page-test-session">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{test.name}</h1>
