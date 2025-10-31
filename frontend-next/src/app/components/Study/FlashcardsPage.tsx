@@ -108,6 +108,7 @@ export default function FlashcardsPage() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [previousCardIndex, setPreviousCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [flipDirection, setFlipDirection] = useState<"forward" | "backward" | null>(null);
   const [studyMode, setStudyMode] = useState<"review" | "practice">("review");
   const [showAnswer, setShowAnswer] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<string>("all");
@@ -146,6 +147,7 @@ export default function FlashcardsPage() {
     setStudyCards(filtered);
     setCurrentCardIndex(0);
     setIsFlipped(false);
+    setFlipDirection(null);
     setShowAnswer(false);
   }, [selectedSubject, selectedDifficulty, isShuffled]);
 
@@ -154,7 +156,9 @@ export default function FlashcardsPage() {
 
   const handleFlip = () => {
     if (!isAnimating) {
-      setIsFlipped(!isFlipped);
+      const newFlipState = !isFlipped;
+      setIsFlipped(newFlipState);
+      setFlipDirection(newFlipState ? "forward" : "backward");
       setShowAnswer(!showAnswer);
     }
   };
@@ -166,6 +170,7 @@ export default function FlashcardsPage() {
       setAnimationDirection("next");
       setCurrentCardIndex(currentCardIndex + 1);
       setIsFlipped(false);
+      setFlipDirection(null);
       setShowAnswer(false);
 
       setTimeout(() => {
@@ -182,6 +187,7 @@ export default function FlashcardsPage() {
       setAnimationDirection("prev");
       setCurrentCardIndex(currentCardIndex - 1);
       setIsFlipped(false);
+      setFlipDirection(null);
       setShowAnswer(false);
 
       setTimeout(() => {
@@ -288,9 +294,34 @@ export default function FlashcardsPage() {
           }
         }
 
+        @keyframes flipForward {
+          0% {
+            transform: rotateY(0deg);
+          }
+          50% {
+            transform: rotateY(90deg);
+            transform-origin: center;
+          }
+          100% {
+            transform: rotateY(180deg);
+          }
+        }
+
+        @keyframes flipBackward {
+          0% {
+            transform: rotateY(180deg);
+          }
+          50% {
+            transform: rotateY(90deg);
+            transform-origin: center;
+          }
+          100% {
+            transform: rotateY(0deg);
+          }
+        }
+
         .flashcard-flip-container {
           transform-style: preserve-3d;
-          transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
           will-change: transform;
         }
       `}</style>
@@ -560,12 +591,14 @@ export default function FlashcardsPage() {
                       style={{ perspective: "1500px" }}
                     >
                       <div
-                        key={`flip-${currentCard.id}`}
+                        key={`flip-${currentCard.id}-${flipDirection}`}
                         className="flashcard-flip-container relative w-full h-96 cursor-pointer"
                         style={{
-                          transform: isFlipped
-                            ? "rotateY(180deg)"
-                            : "rotateY(0deg)",
+                          animation: flipDirection === "forward"
+                            ? "flipForward 0.8s ease-in-out forwards"
+                            : flipDirection === "backward"
+                            ? "flipBackward 0.8s ease-in-out forwards"
+                            : "none",
                         }}
                         onClick={handleFlip}
                       >
@@ -600,29 +633,36 @@ export default function FlashcardsPage() {
                       </div>
                     </div>
 
-                    {studyMode === "practice" && isFlipped && (
-                      <div className="flex items-center justify-center gap-4 mt-6">
-                        <Button
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAnswer(false);
-                          }}
-                          className="text-red-600 border-red-600 hover:bg-red-50"
+                    {studyMode === "practice" && (
+                      <div className="mt-6 h-12 flex items-center justify-center">
+                        <div
+                          className={`flex items-center justify-center gap-4 transition-opacity duration-300 ${
+                            isFlipped ? "opacity-100" : "opacity-0 pointer-events-none"
+                          }`}
+                          aria-hidden={!isFlipped}
                         >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Incorrect
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAnswer(true);
-                          }}
-                          className="text-green-600 border-green-600 hover:bg-green-50"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Correct
-                        </Button>
+                          <Button
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAnswer(false);
+                            }}
+                            className="text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Incorrect
+                          </Button>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAnswer(true);
+                            }}
+                            className="text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Correct
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
