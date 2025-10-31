@@ -193,12 +193,20 @@ export const MENU_CONFIG = {
       order: 6,
     },
     {
+      id: "robotic",
+      label: "menu.robotic",
+      icon: "🤖",
+      path: "/robotic",
+      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+      order: 7,
+    },
+    {
       id: "testing",
       label: "menu.testing",
       icon: "🧪",
       path: "/testing",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 7,
+      order: 8,
     },
     {
       id: "admin",
@@ -206,7 +214,7 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 8,
+      order: 9,
       submenu: [
         {
           id: "users",
