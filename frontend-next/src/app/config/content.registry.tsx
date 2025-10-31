@@ -25,6 +25,12 @@ import SystemSettingsContent from "../components/Content/SystemSettingsContent";
 // import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
+// Import study components
+import QuestionBankPage from "../components/Study/QuestionBankPage";
+import StudyMaterialsPage from "../components/Study/StudyMaterialsPage";
+import FlashcardsPage from "../components/Study/FlashcardsPage";
+import NotesPage from "../components/Study/NotesPage";
+
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
   content: {
@@ -56,6 +62,12 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/roles": () => <RoleManagementContent />,
     "/admin/settings": () => <SystemSettingsContent />,
     // "/admin/tables": () => <TwoTablesWithPagination />,
+
+    // Study routes
+    "/study/question-bank": () => <QuestionBankPage />,
+    "/study/materials": () => <StudyMaterialsPage />,
+    "/study/flashcards": () => <FlashcardsPage />,
+    "/study/notes": () => <NotesPage />,
   },
 
   dashboards: {
