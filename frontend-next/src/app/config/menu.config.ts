@@ -185,28 +185,12 @@ export const MENU_CONFIG = {
       ],
     },
     {
-      id: "zoom-simulation",
-      label: "menu.zoomSimulation",
-      icon: "📹",
-      path: "/zoom",
-      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 6,
-    },
-    {
-      id: "robotic",
-      label: "menu.robotic",
-      icon: "🤖",
-      path: "/robotic",
-      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 7,
-    },
-    {
       id: "admin",
       label: "menu.admin",
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 8,
+      order: 6,
       submenu: [
         {
           id: "users",
@@ -242,7 +226,38 @@ export const MENU_CONFIG = {
         },
       ],
     },
+    {
+      id: "med-app",
+      label: "menu.medApp",
+      icon: "⚙️",
+      path: "/med-app",
+      roles: ["ADMIN"],
+      order: 6,
+      submenu: [
+        {
+          id: "zoom-simulation",
+          label: "menu.zoomSimulation",
+          icon: "📹",
+          path: "/zoom",
+          roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+          order: 1,
+        },
+        {
+          id: "robotic",
+          label: "menu.robotic",
+          icon: "🤖",
+          path: "/robotic",
+          roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+          order: 2,
+        },
+      ],
+    },
   ],
+
+  /*
+     
+
+  */
 
   permissions: {
     ADMIN: {
