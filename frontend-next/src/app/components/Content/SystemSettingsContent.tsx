@@ -10,7 +10,6 @@ import {
   Mail,
   Smartphone,
   CreditCard,
-  MapPin,
   Clock,
   AlertTriangle,
   CheckCircle,
@@ -52,12 +51,6 @@ export default function SystemSettingsContent() {
     payoutFrequency: "WEEKLY",
     minimumPayout: 50,
 
-    // Fleet Settings
-    maxVehiclesPerDriver: 3,
-    maintenanceReminderDays: 7,
-    fuelTrackingEnabled: true,
-    routeOptimization: true,
-
     // System Settings
     maintenanceMode: false,
     debugMode: false,
@@ -89,7 +82,6 @@ export default function SystemSettingsContent() {
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: Shield },
     { id: "payments", label: "Payments", icon: CreditCard },
-    { id: "fleet", label: "Fleet", icon: MapPin },
     { id: "system", label: "System", icon: Database },
   ];
 
@@ -687,97 +679,6 @@ export default function SystemSettingsContent() {
     </div>
   );
 
-  const renderFleetSettings = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Max Vehicles Per Driver
-          </label>
-          <input
-            type="number"
-            value={settings.maxVehiclesPerDriver}
-            onChange={(e) =>
-              handleSettingChange(
-                "maxVehiclesPerDriver",
-                parseInt(e.target.value)
-              )
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Maintenance Reminder (days)
-          </label>
-          <input
-            type="number"
-            value={settings.maintenanceReminderDays}
-            onChange={(e) =>
-              handleSettingChange(
-                "maintenanceReminderDays",
-                parseInt(e.target.value)
-              )
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-          <div className="flex items-center">
-            <MapPin className="h-5 w-5 text-blue-500 mr-3" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">
-                Fuel Tracking
-              </h3>
-              <p className="text-sm text-gray-500">
-                Enable fuel consumption tracking
-              </p>
-            </div>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.fuelTrackingEnabled}
-              onChange={(e) =>
-                handleSettingChange("fuelTrackingEnabled", e.target.checked)
-              }
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-
-        <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-          <div className="flex items-center">
-            <MapPin className="h-5 w-5 text-green-500 mr-3" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">
-                Route Optimization
-              </h3>
-              <p className="text-sm text-gray-500">
-                Enable automatic route optimization
-              </p>
-            </div>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.routeOptimization}
-              onChange={(e) =>
-                handleSettingChange("routeOptimization", e.target.checked)
-              }
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderSystemSettings = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -879,8 +780,6 @@ export default function SystemSettingsContent() {
         return renderSecuritySettings();
       case "payments":
         return renderPaymentSettings();
-      case "fleet":
-        return renderFleetSettings();
       case "system":
         return renderSystemSettings();
       default:
