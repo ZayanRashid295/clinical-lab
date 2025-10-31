@@ -201,6 +201,7 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-3 w-full md:w-1/2">
                 <div className="grid grid-cols-2 gap-3 w-full">
                   <Button 
+                    variant="outline" 
                     className="w-full"
                     data-testid="button-view-performance"
                     onClick={() => router.push("/performance")}
