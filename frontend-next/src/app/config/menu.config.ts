@@ -226,48 +226,6 @@ export const MENU_CONFIG = {
         },
       ],
     },
-    {
-      id: "admin",
-      label: "menu.admin",
-      icon: "⚙️",
-      path: "/admin",
-      roles: ["ADMIN"],
-      order: 4,
-      submenu: [
-        {
-          id: "users",
-          label: "menu.users",
-          icon: "👥",
-          path: "/admin/users",
-          roles: ["ADMIN"],
-          order: 1,
-        },
-        {
-          id: "roles",
-          label: "menu.roles",
-          icon: "🔐",
-          path: "/admin/roles",
-          roles: ["ADMIN"],
-          order: 2,
-        },
-        {
-          id: "system-settings",
-          label: "menu.systemSettings",
-          icon: "⚙️",
-          path: "/admin/settings",
-          roles: ["ADMIN"],
-          order: 3,
-        },
-        {
-          id: "tables",
-          label: "menu.tables",
-          icon: "📊",
-          path: "/admin/tables",
-          roles: ["ADMIN"],
-          order: 4,
-        },
-      ],
-    },
   ],
 
   permissions: {
