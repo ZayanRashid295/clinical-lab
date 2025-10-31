@@ -142,6 +142,24 @@ export const transportationContentRegistry: ContentRegistry = {
     // Zoom simulation routes
     "/zoom": () => <ZoomSimulation />,
 
+    // Testing routes
+    "/testing": () => (
+      <UnderConstruction
+        menuTitle="Testing"
+        menuIcon="🧪"
+        description="Comprehensive testing and quality assurance system for clinical lab applications."
+        estimatedCompletion="3 weeks"
+        features={[
+          "Automated test execution",
+          "Test case management",
+          "Quality assurance tracking",
+          "Performance testing",
+          "Regression testing",
+          "Test reporting and analytics",
+        ]}
+      />
+    ),
+
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
 
