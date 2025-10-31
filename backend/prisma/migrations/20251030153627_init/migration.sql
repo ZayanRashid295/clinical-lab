@@ -67,6 +67,7 @@ CREATE TABLE `user_settings` (
 CREATE TABLE `roles` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `displayName` VARCHAR(191) NULL,
     `description` VARCHAR(191) NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT true,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
