@@ -227,8 +227,8 @@ export const MENU_CONFIG = {
       ],
     },
     {
-      id: "med-app",
-      label: "menu.medApp",
+      id: "misc",
+      label: "Misc",
       icon: "⚙️",
       path: "/med-app",
       roles: ["ADMIN"],
