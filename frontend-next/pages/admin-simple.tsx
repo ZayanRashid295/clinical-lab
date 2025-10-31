@@ -280,14 +280,14 @@ export default function AdminSimplePage() {
   return (
     <>
       <Head>
-        <title>Administration - Uber Portal</title>
+        <title>Administration - Medical Lab</title>
         <meta
           name="description"
           content="System administration and management"
         />
       </Head>
       <MenuSystem
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search administration..."
         enableSearch={true}
         customContent={customContent}

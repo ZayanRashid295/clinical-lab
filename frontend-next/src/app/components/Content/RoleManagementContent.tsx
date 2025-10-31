@@ -146,7 +146,7 @@ export default function RoleManagementContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
       {/* Header */}
       <div className="mb-8">
         <div>

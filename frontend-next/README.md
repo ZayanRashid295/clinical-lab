@@ -1,4 +1,4 @@
-# Next.js Uber Portal
+# Next.js Medical Lab
 
 A dynamic, role-based dashboard application built with Next.js, TypeScript, and Tailwind CSS, featuring API integration and authentication.
 

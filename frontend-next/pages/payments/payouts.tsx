@@ -31,13 +31,13 @@ export default function Payouts() {
   return (
     <>
       <Head>
-        <title>Driver Payouts - Uber Portal</title>
+        <title>Driver Payouts - Medical Lab</title>
         <meta name="description" content="Manage driver payouts and earnings" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search payouts, drivers..."
         enableSearch={true}
       />

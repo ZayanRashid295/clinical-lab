@@ -30,7 +30,7 @@ export default function Payments() {
   return (
     <MenuSystem
       contentRegistry={transportationContentRegistry}
-      applicationTitle="Uber Portal"
+      applicationTitle="Medical Lab"
       searchPlaceholder="Search payments, transactions..."
       enableSearch={true}
     />

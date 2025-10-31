@@ -31,13 +31,13 @@ export default function Invoices() {
   return (
     <>
       <Head>
-        <title>Invoices - Uber Portal</title>
+        <title>Invoices - Medical Lab</title>
         <meta name="description" content="Manage invoices and billing" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search invoices..."
         enableSearch={true}
       />

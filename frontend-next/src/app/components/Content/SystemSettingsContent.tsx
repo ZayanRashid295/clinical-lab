@@ -27,7 +27,7 @@ export default function SystemSettingsContent() {
 
   const [settings, setSettings] = useState({
     // General Settings
-    appName: "Uber Portal",
+    appName: "Medical Lab",
     appVersion: "2.1.0",
     timezone: "America/New_York",
     language: "en",
@@ -788,7 +788,7 @@ export default function SystemSettingsContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-center">

@@ -31,13 +31,13 @@ export default function Notifications() {
   return (
     <>
       <Head>
-        <title>Notifications - Uber Portal</title>
+        <title>Notifications - Medical Lab</title>
         <meta name="description" content="View and manage your notifications" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search notifications..."
         enableSearch={true}
       />

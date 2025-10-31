@@ -31,7 +31,7 @@ export default function PaymentMethods() {
   return (
     <>
       <Head>
-        <title>Payment Methods - Uber Portal</title>
+        <title>Payment Methods - Medical Lab</title>
         <meta
           name="description"
           content="Manage payment methods and settings"
@@ -40,7 +40,7 @@ export default function PaymentMethods() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search payment methods..."
         enableSearch={true}
       />

@@ -31,13 +31,13 @@ export default function App() {
   return (
     <>
       <Head>
-        <title>App - Uber Portal</title>
+        <title>App - Medical Lab</title>
         <meta name="description" content="Main application interface" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search vehicles, drivers, or passengers..."
         enableSearch={true}
       />

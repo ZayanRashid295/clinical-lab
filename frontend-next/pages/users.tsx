@@ -30,7 +30,7 @@ export default function Users() {
   return (
     <MenuSystem
       contentRegistry={transportationContentRegistry}
-      applicationTitle="Uber Portal"
+      applicationTitle="Medical Lab"
       searchPlaceholder="Search users, roles, permissions..."
       enableSearch={true}
     />

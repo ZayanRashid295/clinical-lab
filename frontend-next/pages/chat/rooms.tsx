@@ -31,7 +31,7 @@ export default function ChatRooms() {
   return (
     <>
       <Head>
-        <title>Chat Rooms - Uber Portal</title>
+        <title>Chat Rooms - Medical Lab</title>
         <meta
           name="description"
           content="Manage chat conversations and messages"
@@ -40,7 +40,7 @@ export default function ChatRooms() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search conversations..."
         enableSearch={true}
       />

@@ -31,13 +31,13 @@ export default function PaymentHistory() {
   return (
     <>
       <Head>
-        <title>Payment History - Uber Portal</title>
+        <title>Payment History - Medical Lab</title>
         <meta name="description" content="View and manage payment history" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search payments, transactions..."
         enableSearch={true}
       />

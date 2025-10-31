@@ -247,7 +247,7 @@ export default function AdminPage() {
   return (
     <>
       <Head>
-        <title>Administration - Uber Portal</title>
+        <title>Administration - Medical Lab</title>
         <meta
           name="description"
           content="System administration and management"
@@ -255,7 +255,7 @@ export default function AdminPage() {
       </Head>
 
       <MenuSystem
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search administration..."
         enableSearch={true}
         customContent={customContent}

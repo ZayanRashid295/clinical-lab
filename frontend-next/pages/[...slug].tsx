@@ -88,7 +88,7 @@ export default function CatchAllPage() {
   return (
     <>
       <Head>
-        <title>{pageTitle} - Uber Portal</title>
+        <title>{pageTitle} - Medical Lab</title>
         <meta
           name="description"
           content={`${pageTitle} page is under construction`}
@@ -97,7 +97,7 @@ export default function CatchAllPage() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Uber Portal"
+        applicationTitle="Medical Lab"
         searchPlaceholder="Search..."
         enableSearch={true}
         customContent={
