@@ -2,24 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "../../../shared/contexts/LanguageContext";
-// Simple placeholder for settings modal
-const SettingsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-        <h3 className="text-lg font-semibold mb-4">Settings</h3>
-        <p className="text-gray-600 mb-4">Settings functionality coming soon.</p>
-        <button
-          onClick={onClose}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  );
-};
 
 interface DialogueLine {
   speaker: string;
@@ -29,7 +11,6 @@ interface DialogueLine {
 export default function ZoomSimulation() {
   const [currentLineIndex, setCurrentLineIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [currentLine, setCurrentLine] = useState(
     "Press 'Start Simulation' to begin the consultation."
   );
@@ -90,14 +71,6 @@ export default function ZoomSimulation() {
   const primaryColor = currentColorScheme.primary[600];
   const primaryHoverColor = currentColorScheme.primary[700];
 
-  // Settings handlers
-  const handleSettingsOpen = () => {
-    setIsSettingsOpen(true);
-  };
-
-  const handleSettingsClose = () => {
-    setIsSettingsOpen(false);
-  };
 
   // Voice Selection Logic
   const loadVoices = () => {
@@ -606,46 +579,6 @@ export default function ZoomSimulation() {
           </div>
         </div>
       </div>
-
-      {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
-
-      {/* Settings Floating Button */}
-      <button
-        onClick={handleSettingsOpen}
-        className="fixed bottom-6 right-6 p-4 text-white rounded-full shadow-lg transition-colors duration-200 z-50"
-        style={{
-          backgroundColor: primaryColor,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = primaryHoverColor;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = primaryColor;
-        }}
-        title="Settings"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
-      </button>
 
       {/* Custom CSS for animations */}
       <style jsx>{`
