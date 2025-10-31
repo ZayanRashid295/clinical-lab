@@ -44,6 +44,7 @@ import DashboardPage from "../components/Dashboard/DashboardPage";
 
 // Import zoom simulation components
 import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
+import NewZoom from "../components/zoom-simulation/newzoom";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -143,7 +144,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/zoom": () => <ZoomSimulation />,
 
     // Testing routes
-    "/testing": () => <DashboardPage />,
+    "/testing": () => <NewZoom />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
