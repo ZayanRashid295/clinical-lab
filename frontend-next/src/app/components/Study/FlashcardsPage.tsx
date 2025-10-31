@@ -153,8 +153,10 @@ export default function FlashcardsPage() {
   const previousCard = studyCards[previousCardIndex];
 
   const handleFlip = () => {
-    setIsFlipped(!isFlipped);
-    setShowAnswer(!showAnswer);
+    if (!isAnimating) {
+      setIsFlipped(!isFlipped);
+      setShowAnswer(!showAnswer);
+    }
   };
 
   const handleNext = () => {
@@ -230,7 +232,7 @@ export default function FlashcardsPage() {
 
   return (
     <>
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes zoomFadeIn {
           0% {
             opacity: 0;
@@ -284,6 +286,12 @@ export default function FlashcardsPage() {
             transform: translateX(100%);
             opacity: 0.3;
           }
+        }
+
+        .flashcard-flip-container {
+          transform-style: preserve-3d;
+          transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform;
         }
       `}</style>
       <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
@@ -552,9 +560,9 @@ export default function FlashcardsPage() {
                       style={{ perspective: "1500px" }}
                     >
                       <div
-                        className="relative w-full h-96 transition-transform duration-700 cursor-pointer"
+                        key={`flip-${currentCard.id}`}
+                        className="flashcard-flip-container relative w-full h-96 cursor-pointer"
                         style={{
-                          transformStyle: "preserve-3d",
                           transform: isFlipped
                             ? "rotateY(180deg)"
                             : "rotateY(0deg)",
