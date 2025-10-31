@@ -63,11 +63,17 @@ will have intitution table
 
 # Subject Module: (subject-product.prisma). Prefix SP
 
-On one extreme, we will have Subject table (Anatomy, Physilology, Mechanics, etc). We will have Product table (USMLE1, SAT, GRE, etc). We will also have a many to many SubjectProduct table. Then we will have 3 levels of depth, SubjectLevel1 (General Principles, Clinical Sciences, etc). The there will be SubjectLevel2 (Biochemistry, Genetics, etc), then there will be SubjectLevel3 (Lipid metabolism, Bacteriology, etc). Each Product will have specific level (1,2,3).
+- On one extreme, we will have Subject table (Anatomy, Physilology, Mechanics, etc).
+- We will have Product table (USMLE1, SAT, GRE, etc). We will also have a many to many SubjectProduct table.
+- Then we will have 3 levels of depth, SubjectLevel1 (General Principles, Clinical Sciences, etc).
+- The there will be SubjectLevel2 (Biochemistry, Genetics, etc),
+- then there will be SubjectLevel3 (Lipid metabolism, Bacteriology, etc).
+- Each Product will have specific level (1,2,3).
 
 # MCQ Module: (multiple-choice-question.prisma). Prefix MQ
 
-On other extreme, there there will be Question and related info, eg, Answers to questions. Each table in this category will have MC prefix. Each question will have info wrt which Subject, Level
+- On other extreme, there there will be Question and related info, eg, Answers to questions.
+- Each table in this category will have MC prefix. Each question will have info wrt which Subject, Level
 
 # Question Paper Module: (question-paper.prisma) prefix QP
 
