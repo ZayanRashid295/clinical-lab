@@ -165,7 +165,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
         .dropdown-item {
           display: block;
           width: 100%;
-          padding: 12px 16px;
+          padding: 8px 16px;
           color: #374151;
           transition: all 0.2s ease;
           border-bottom: 1px solid #f3f4f6;
@@ -433,7 +433,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
             pointer-events: auto;
             box-shadow: none;
             background: rgba(0, 0, 0, 0.1);
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
             border-radius: 4px;
             transition: all 0.3s ease-in-out;
           }
@@ -482,7 +482,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
 
             <div
               dir={rtldir}
-              className="flex items-center gap-1 min-w-max px-4"
+              className="flex items-center gap-0 min-w-max px-4"
             >
               {menuItems.map((item) => {
                 const IconComponent = iconMap[item.icon] || Home;
@@ -505,7 +505,7 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
                   >
                     <button
                       onClick={() => handleItemClick(item)}
-                      className="flex items-center gap-2 px-4 py-3 text-white hover:text-blue-300 transition-colors duration-200 whitespace-nowrap"
+                      className="flex items-center gap-2 px-4 py-2 text-white hover:text-blue-300 transition-colors duration-200 whitespace-nowrap"
                     >
                       <IconComponent size={18} />
                       <span className="font-medium">{t(item.label)}</span>

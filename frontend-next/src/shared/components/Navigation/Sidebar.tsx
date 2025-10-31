@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <div
             dir={rtldir}
-            className={!isCollapsed ? "space-y-1" : "space-y-0"}
+            className={!isCollapsed ? "space-y-0" : "space-y-0"}
           >
             {menuItems.map((item) => {
               const IconComponent = iconMap[item.icon] || Home;
@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onMenuChange(item.id);
                       }
                     }}
-                    className={`w-full flex items-center px-4 py-4 text-left transition-all duration-200 group ${
+                    className={`w-full flex items-center px-4 py-2 text-left transition-all duration-200 group ${
                       activeMenu === item.id
                         ? "bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
                         : "hover:bg-primary-700 dark:hover:bg-primary-800"
@@ -180,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           : "max-h-0 opacity-0"
                       }`}
                     >
-                      <div className="py-1 space-y-1">
+                      <div className="py-0 space-y-0">
                         {item.submenu?.map((subItem) => {
                           const SubIconComponent =
                             iconMap[subItem.icon] || Home;
@@ -188,7 +188,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <button
                               key={subItem.id}
                               onClick={() => onMenuChange(subItem.id)}
-                              className={`w-full flex items-center gap-2 text-left px-4 py-3 text-base rounded transition-all duration-300 ease-out transform ${
+                              className={`w-full flex items-center gap-2 text-left px-4 py-2 text-base rounded transition-all duration-300 ease-out transform ${
                                 activeMenu === subItem.id
                                   ? "bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white"
                                   : "text-gray-300 hover:bg-primary-700 dark:hover:bg-primary-800 hover:text-white"

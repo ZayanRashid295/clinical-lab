@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { seedLearningCases } from "./seed-learning-cases";
+// import { seedLearningCases } from "./seed-learning-cases";
 import { seedBase } from "./seed-base";
 import { seedUSMLE } from "./seed-usmle";
 import { seedPayments } from "./seed-payments";
