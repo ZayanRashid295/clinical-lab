@@ -138,57 +138,6 @@ export default function DashboardPage() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">Welcome to your USMLE preparation</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard
-            title="Question Score"
-            value={`${questionScore}% (${questionScoreFraction})`}
-            subtitle="Correct"
-            icon={CheckCircle2}
-            color="success"
-          />
-          <StatCard
-            title="QBank Usage"
-            value={`${qbankUsagePercent}%`}
-            subtitle={`${qbankUsageFraction} Used`}
-            icon={BookOpen}
-            progress={qbankUsagePercent}
-            color="primary"
-          />
-          <StatCard
-            title="Test Count"
-            value={`${testCompletionPercent}%`}
-            subtitle={`${testCompletionFraction} Completed`}
-            icon={ClipboardCheck}
-            progress={testCompletionPercent}
-            color="primary"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <StudyPlanCard 
-            tasks={upcomingTasks.map(t => ({
-              id: t.id,
-              title: t.title,
-              type: t.type,
-              duration: t.duration,
-              status: t.status,
-            }))} 
-            onViewPlan={() => router.push("/study-planner")} 
-          />
-          <ProgressCard
-            title="Study Plan Progress"
-            progress={76.19}
-            current={1}
-            total={10}
-            daysRemaining={10}
-            stats={{
-              completed: 16,
-              overdue: overdueTasks.length,
-              incomplete: 3,
-            }}
-          />
-        </div>
-
         {/* Learning Modules Cards from Med App */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
@@ -302,6 +251,32 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard
+            title="Question Score"
+            value={`${questionScore}% (${questionScoreFraction})`}
+            subtitle="Correct"
+            icon={CheckCircle2}
+            color="success"
+          />
+          <StatCard
+            title="QBank Usage"
+            value={`${qbankUsagePercent}%`}
+            subtitle={`${qbankUsageFraction} Used`}
+            icon={BookOpen}
+            progress={qbankUsagePercent}
+            color="primary"
+          />
+          <StatCard
+            title="Test Count"
+            value={`${testCompletionPercent}%`}
+            subtitle={`${testCompletionFraction} Completed`}
+            icon={ClipboardCheck}
+            progress={testCompletionPercent}
+            color="primary"
+          />
+        </div>
+
         <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -376,6 +351,31 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <StudyPlanCard 
+            tasks={upcomingTasks.map(t => ({
+              id: t.id,
+              title: t.title,
+              type: t.type,
+              duration: t.duration,
+              status: t.status,
+            }))} 
+            onViewPlan={() => router.push("/study-planner")} 
+          />
+          <ProgressCard
+            title="Study Plan Progress"
+            progress={76.19}
+            current={1}
+            total={10}
+            daysRemaining={10}
+            stats={{
+              completed: 16,
+              overdue: overdueTasks.length,
+              incomplete: 3,
+            }}
+          />
+        </div>
       </div>
     </div>
   );
