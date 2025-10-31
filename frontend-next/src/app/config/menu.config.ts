@@ -8,14 +8,6 @@ export const MENU_CONFIG = {
       roles: ["ADMIN", "FACULTY"],
       order: 1,
     },
-    // {
-    //   id: "dashboard",
-    //   label: "menu.dashboard",
-    //   icon: "🏠",
-    //   path: "/dashboard",
-    //   roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-    //   order: 1,
-    // },
     {
       id: "payments",
       label: "menu.payments",
