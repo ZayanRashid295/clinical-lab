@@ -440,162 +440,189 @@ export default function FlashcardsPage() {
         {/* Flashcard */}
         {currentCard && (
           <div className="max-w-4xl mx-auto">
-            <Card className="min-h-[400px]">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div
-                    className="flex items-center gap-2 transition-all duration-500"
-                    style={{
-                      animation:
-                        animationDirection === null && !isAnimating
-                          ? "zoomFadeIn 0.6s ease-out"
-                          : "none",
-                      opacity: animationDirection ? 0 : 1,
-                      transform: animationDirection ? "scale(0.8)" : "scale(1)",
-                    }}
-                  >
-                    <Badge
-                      className={getDifficultyColor(currentCard.difficulty)}
-                    >
-                      {currentCard.difficulty}
-                    </Badge>
-                    <Badge variant="outline">{currentCard.subject}</Badge>
-                    <Badge variant="secondary">
-                      {currentCard.topic.replace("_", " ")}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Star className="h-4 w-4" />
-                    </Button>
-                    <div className="text-sm text-muted-foreground">
-                      {Math.round(getSuccessRate(currentCard))}% success rate
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col items-center justify-center p-8 overflow-hidden">
-                <div className="text-center space-y-6 w-full">
-                  {/* Card Content Container with Slide Animation */}
-                  <div
-                    className="w-full max-w-md mx-auto relative overflow-hidden"
-                    style={{ height: "280px" }}
-                  >
-                    {/* Previous Card Content - Slides Out */}
-                    {isAnimating && previousCard && (
-                      <div
-                        key={`prev-content-${previousCard.id}`}
-                        className="absolute inset-0 w-full"
-                        style={{
-                          animation:
-                            animationDirection === "next"
-                              ? "slideOutToLeft 0.6s ease-in-out forwards"
-                              : "slideOutToRight 0.6s ease-in-out forwards",
-                        }}
-                      >
-                        <div style={{ perspective: "1000px", height: "100%" }}>
-                          <div className="w-full h-64">
-                            <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6">
-                              <p className="text-xl leading-relaxed text-gray-800">
-                                {previousCard.front}
-                              </p>
-                            </div>
-                          </div>
+            <Card className="min-h-[400px] overflow-hidden relative">
+              {/* Previous Card - Slides Out */}
+              {isAnimating && previousCard && (
+                <div
+                  key={`prev-${previousCard.id}`}
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    animation:
+                      animationDirection === "next"
+                        ? "slideOutToLeft 0.6s ease-in-out forwards"
+                        : "slideOutToRight 0.6s ease-in-out forwards",
+                  }}
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          className={getDifficultyColor(
+                            previousCard.difficulty
+                          )}
+                        >
+                          {previousCard.difficulty}
+                        </Badge>
+                        <Badge variant="outline">{previousCard.subject}</Badge>
+                        <Badge variant="secondary">
+                          {previousCard.topic.replace("_", " ")}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Star className="h-4 w-4" />
+                        </Button>
+                        <div className="text-sm text-muted-foreground">
+                          {Math.round(getSuccessRate(previousCard))}% success
+                          rate
                         </div>
                       </div>
-                    )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
+                    <div className="text-center space-y-6 w-full">
+                      <div className="w-full max-w-md mx-auto">
+                        <div className="w-full h-64 bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6">
+                          <p className="text-xl leading-relaxed text-gray-800">
+                            {previousCard.front}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </div>
+              )}
 
-                    {/* Current Card Content - Slides In with Flip */}
+              {/* Current Card - Slides In */}
+              <div
+                key={`current-${currentCard.id}`}
+                className="relative w-full h-full"
+                style={{
+                  animation:
+                    animationDirection === "next"
+                      ? "slideInFromRight 0.6s ease-in-out forwards"
+                      : animationDirection === "prev"
+                      ? "slideInFromLeft 0.6s ease-in-out forwards"
+                      : "none",
+                }}
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
                     <div
-                      key={`current-content-${currentCard.id}`}
-                      className="absolute inset-0 w-full"
+                      className="flex items-center gap-2 transition-all duration-500"
                       style={{
                         animation:
-                          animationDirection === "next"
-                            ? "slideInFromRight 0.6s ease-in-out forwards"
-                            : animationDirection === "prev"
-                            ? "slideInFromLeft 0.6s ease-in-out forwards"
+                          animationDirection === null && !isAnimating
+                            ? "zoomFadeIn 0.6s ease-out"
                             : "none",
+                        opacity: animationDirection ? 0 : 1,
+                        transform: animationDirection
+                          ? "scale(0.8)"
+                          : "scale(1)",
                       }}
                     >
-                      <div style={{ perspective: "1000px", height: "100%" }}>
-                        <div
-                          className="relative w-full h-64 transition-transform duration-700"
-                          style={{
-                            transformStyle: "preserve-3d",
-                            transform: isFlipped
-                              ? "rotateY(180deg)"
-                              : "rotateY(0deg)",
-                          }}
-                        >
-                          {/* Front of Card */}
-                          <div
-                            className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6"
-                            style={{ backfaceVisibility: "hidden" }}
-                          >
-                            <p className="text-xl leading-relaxed text-gray-800">
-                              {currentCard.front}
-                            </p>
-                          </div>
-
-                          {/* Back of Card */}
-                          <div
-                            className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-6"
-                            style={{
-                              backfaceVisibility: "hidden",
-                              transform: "rotateY(180deg)",
-                            }}
-                          >
-                            <p className="text-xl leading-relaxed text-gray-800">
-                              {currentCard.back}
-                            </p>
-                          </div>
-                        </div>
+                      <Badge
+                        className={getDifficultyColor(currentCard.difficulty)}
+                      >
+                        {currentCard.difficulty}
+                      </Badge>
+                      <Badge variant="outline">{currentCard.subject}</Badge>
+                      <Badge variant="secondary">
+                        {currentCard.topic.replace("_", " ")}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm">
+                        <Star className="h-4 w-4" />
+                      </Button>
+                      <div className="text-sm text-muted-foreground">
+                        {Math.round(getSuccessRate(currentCard))}% success rate
                       </div>
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      variant="outline"
-                      onClick={handleFlip}
-                      className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
+                  <div className="text-center space-y-6 w-full">
+                    <div
+                      className="w-full max-w-md mx-auto"
+                      style={{ perspective: "1000px" }}
                     >
-                      {isFlipped ? (
-                        <>
-                          <EyeOff className="h-4 w-4" />
-                          Show Question
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="h-4 w-4" />
-                          Show Answer
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                      <div
+                        className="relative w-full h-64 transition-transform duration-700"
+                        style={{
+                          transformStyle: "preserve-3d",
+                          transform: isFlipped
+                            ? "rotateY(180deg)"
+                            : "rotateY(0deg)",
+                        }}
+                      >
+                        {/* Front of Card */}
+                        <div
+                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-6"
+                          style={{ backfaceVisibility: "hidden" }}
+                        >
+                          <p className="text-xl leading-relaxed text-gray-800">
+                            {currentCard.front}
+                          </p>
+                        </div>
 
-                  {studyMode === "practice" && isFlipped && (
-                    <div className="flex items-center justify-center gap-4 pt-4">
+                        {/* Back of Card */}
+                        <div
+                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-6"
+                          style={{
+                            backfaceVisibility: "hidden",
+                            transform: "rotateY(180deg)",
+                          }}
+                        >
+                          <p className="text-xl leading-relaxed text-gray-800">
+                            {currentCard.back}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4">
                       <Button
                         variant="outline"
-                        onClick={() => handleAnswer(false)}
-                        className="text-red-600 border-red-600 hover:bg-red-50"
+                        onClick={handleFlip}
+                        className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
                       >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Incorrect
-                      </Button>
-                      <Button
-                        onClick={() => handleAnswer(true)}
-                        className="text-green-600 border-green-600 hover:bg-green-50"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Correct
+                        {isFlipped ? (
+                          <>
+                            <EyeOff className="h-4 w-4" />
+                            Show Question
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4" />
+                            Show Answer
+                          </>
+                        )}
                       </Button>
                     </div>
-                  )}
-                </div>
-              </CardContent>
+
+                    {studyMode === "practice" && isFlipped && (
+                      <div className="flex items-center justify-center gap-4 pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleAnswer(false)}
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Incorrect
+                        </Button>
+                        <Button
+                          onClick={() => handleAnswer(true)}
+                          className="text-green-600 border-green-600 hover:bg-green-50"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Correct
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </div>
             </Card>
 
             {/* Navigation */}
