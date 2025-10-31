@@ -4,10 +4,18 @@ export const MENU_CONFIG = {
       id: "dashboard",
       label: "menu.dashboard",
       icon: "🏠",
-      path: "/dashboard",
-      roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+      path: "/test-creation/new",
+      roles: ["ADMIN", "FACULTY"],
       order: 1,
     },
+    // {
+    //   id: "dashboard",
+    //   label: "menu.dashboard",
+    //   icon: "🏠",
+    //   path: "/dashboard",
+    //   roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+    //   order: 1,
+    // },
     {
       id: "payments",
       label: "menu.payments",
@@ -135,20 +143,12 @@ export const MENU_CONFIG = {
       order: 4,
       submenu: [
         {
-          id: "create-new-test",
-          label: "menu.createNewTest",
-          icon: "➕",
-          path: "/test-creation/new",
-          roles: ["ADMIN", "FACULTY"],
-          order: 1,
-        },
-        {
           id: "study-create-test",
           label: "menu.studyCreateTest",
           icon: "📝",
           path: "/test-creation/study-create",
           roles: ["ADMIN", "FACULTY"],
-          order: 2,
+          order: 1,
         },
         {
           id: "previous-tests",
@@ -156,7 +156,7 @@ export const MENU_CONFIG = {
           icon: "📊",
           path: "/previous-tests",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 3,
+          order: 2,
         },
         {
           id: "test-templates",
@@ -164,7 +164,7 @@ export const MENU_CONFIG = {
           icon: "📋",
           path: "/test-creation/templates",
           roles: ["ADMIN", "FACULTY"],
-          order: 4,
+          order: 3,
         },
         {
           id: "question-builder",
@@ -172,7 +172,7 @@ export const MENU_CONFIG = {
           icon: "🔨",
           path: "/test-creation/builder",
           roles: ["ADMIN", "FACULTY"],
-          order: 5,
+          order: 4,
         },
         {
           id: "test-settings",
@@ -180,7 +180,7 @@ export const MENU_CONFIG = {
           icon: "⚙️",
           path: "/test-creation/settings",
           roles: ["ADMIN", "FACULTY"],
-          order: 6,
+          order: 5,
         },
       ],
     },

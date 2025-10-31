@@ -23,30 +23,6 @@ export interface StatCard {
   textColor?: string;
 }
 
-// Data table types
-export interface Column<T = any> {
-  key: keyof T | string;
-  label: string;
-  render?: (value: any, row?: T) => React.ReactNode;
-}
-
-export interface Action<T = any> {
-  label: string;
-  onClick: (row: T) => void;
-  className?: string;
-  disabled?: (row: T) => boolean;
-}
-
-export interface DataTableProps<T = any> {
-  data: T[];
-  columns: Column<T>[];
-  actions?: Action<T>[];
-  title?: string;
-  loading?: boolean;
-  error?: string;
-  emptyMessage?: string;
-}
-
 // Menu types
 export interface MenuItem {
   id: string;
@@ -68,16 +44,6 @@ export interface HeaderProps {
   onMobileMenuToggle?: () => void;
   onSidebarToggle?: () => void;
   isSidebarCollapsed?: boolean;
-}
-
-export interface DashboardContentProps {
-  title?: string;
-  showQuickAction?: boolean;
-  quickActionLabel?: string;
-  onQuickAction?: () => void;
-  customStats?: React.ReactNode;
-  customAlerts?: React.ReactNode;
-  customTable?: React.ReactNode;
 }
 
 export interface MenuSystemProps {

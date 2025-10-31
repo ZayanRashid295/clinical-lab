@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../src/shared";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
-import DashboardPage from "../src/app/components/dashboard/DashboardPage";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -44,7 +43,6 @@ export default function Dashboard() {
         applicationTitle="Clinical Lab"
         searchPlaceholder="Search..."
         enableSearch={true}
-        customDashboard={DashboardPage}
       />
     </>
   );

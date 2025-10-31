@@ -53,7 +53,7 @@ export default function TestResultsPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch test
         const testResponse = await fetch(`/api/tests/${id}`);
         if (!testResponse.ok) {
@@ -64,13 +64,15 @@ export default function TestResultsPage() {
 
         // Fetch questions
         if (testData.questions && testData.questions.length > 0) {
-          const questionPromises = testData.questions.map(async (questionId: string) => {
-            const qResponse = await fetch(`/api/questions/${questionId}`);
-            if (!qResponse.ok) {
-              throw new Error(`Failed to fetch question ${questionId}`);
+          const questionPromises = testData.questions.map(
+            async (questionId: string) => {
+              const qResponse = await fetch(`/api/questions/${questionId}`);
+              if (!qResponse.ok) {
+                throw new Error(`Failed to fetch question ${questionId}`);
+              }
+              return qResponse.json();
             }
-            return qResponse.json();
-          });
+          );
           const fetchedQuestions = await Promise.all(questionPromises);
           setQuestions(fetchedQuestions);
         }
@@ -107,9 +109,16 @@ export default function TestResultsPage() {
     return (
       <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Test not found</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">{error || "The test results could not be loaded."}</p>
-          <Button onClick={() => router.push("/test-creation/study-create")} className="mt-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Test not found
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {error || "The test results could not be loaded."}
+          </p>
+          <Button
+            onClick={() => router.push("/test-creation/study-create")}
+            className="mt-4"
+          >
             Create New Test
           </Button>
         </div>
@@ -123,10 +132,15 @@ export default function TestResultsPage() {
 
   return (
     <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="space-y-4 max-w-5xl mx-auto" data-testid="page-test-results">
+      <div
+        className="space-y-4 max-w-5xl mx-auto"
+        data-testid="page-test-results"
+      >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Test Results</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Test Results
+            </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">{test.name}</p>
           </div>
           <div className="flex gap-2">
@@ -155,7 +169,10 @@ export default function TestResultsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-score">
+              <div
+                className="text-3xl font-bold text-gray-900 dark:text-white"
+                data-testid="text-score"
+              >
                 {score}%
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -172,10 +189,15 @@ export default function TestResultsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400" data-testid="text-correct">
+              <div
+                className="text-3xl font-bold text-green-600 dark:text-green-400"
+                data-testid="text-correct"
+              >
                 {correctCount}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Correct answers</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Correct answers
+              </p>
             </CardContent>
           </Card>
 
@@ -187,17 +209,24 @@ export default function TestResultsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-duration">
+              <div
+                className="text-3xl font-bold text-gray-900 dark:text-white"
+                data-testid="text-duration"
+              >
                 {test.duration || 0} min
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Time spent</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Time spent
+              </p>
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Performance Summary</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Performance Summary
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
@@ -223,27 +252,40 @@ export default function TestResultsPage() {
                   {incorrectCount} ({100 - score}%)
                 </span>
               </div>
-              <Progress value={100 - score} className="h-2 bg-gray-200 dark:bg-gray-700" />
+              <Progress
+                value={100 - score}
+                className="h-2 bg-gray-200 dark:bg-gray-700"
+              />
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Test Details</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Test Details
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Mode</p>
-                <p className="font-medium text-gray-900 dark:text-white">{test.isTimed ? "Timed" : "Tutor"}</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {test.isTimed ? "Timed" : "Tutor"}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Question Pool</p>
-                <p className="font-medium text-gray-900 dark:text-white capitalize">{test.questionPool}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Question Pool
+                </p>
+                <p className="font-medium text-gray-900 dark:text-white capitalize">
+                  {test.questionPool}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Subjects</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Subjects
+                </p>
                 <div className="flex gap-1 flex-wrap mt-1">
                   {test.subjects.map((subject, idx) => (
                     <Badge key={idx} variant="secondary" className="text-xs">
@@ -253,7 +295,9 @@ export default function TestResultsPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Systems</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Systems
+                </p>
                 <div className="flex gap-1 flex-wrap mt-1">
                   {test.systems.map((system, idx) => (
                     <Badge key={idx} variant="outline" className="text-xs">
@@ -284,4 +328,3 @@ export default function TestResultsPage() {
     </div>
   );
 }
-
