@@ -26,6 +26,10 @@
   /* Base font size and border radius */
   --base-font-size: 16px;
   --base-border-radius: 0.5rem;
+
+  /* Elevation system for hover/active effects */
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
 }
 
 /* Dark mode - colors will be dynamically set by ThemeService */
@@ -102,4 +106,52 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Elevation system for interactive elements */
+.hover-elevate,
+.active-elevate,
+.hover-elevate-2,
+.active-elevate-2 {
+  position: relative;
+  z-index: 0;
+}
+
+.hover-elevate::after,
+.active-elevate::after,
+.hover-elevate-2::after,
+.active-elevate-2::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.hover-elevate:hover::after,
+.active-elevate:active::after {
+  opacity: 1;
+  background-color: var(--elevate-1);
+}
+
+.hover-elevate-2:hover::after,
+.active-elevate-2:active::after {
+  opacity: 1;
+  background-color: var(--elevate-2);
+}
+
+/* If there's a border, adjust the inset */
+.border.hover-elevate::after,
+.border.active-elevate::after,
+.border.hover-elevate-2::after,
+.border.active-elevate-2::after {
+  inset: -1px;
+}
+
+/* Dark mode elevation adjustments */
+.dark {
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
 }

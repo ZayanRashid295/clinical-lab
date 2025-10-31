@@ -34,10 +34,10 @@ export function QuestionPoolSelector({ selectedPool, onPoolChange }: QuestionPoo
           </div>
 
           <div className="flex gap-2 mb-4">
-            <button className="px-4 py-2 text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+            <button className="px-4 py-2 text-sm font-medium bg-primary-500 dark:bg-primary-600 text-white rounded-md hover-elevate active-elevate-2 border border-primary-500/20 dark:border-primary-600/20">
               Standard
             </button>
-            <button className="px-4 py-2 text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <button className="px-4 py-2 text-sm font-medium bg-secondary-200 dark:bg-secondary-700 text-secondary-900 dark:text-secondary-200 rounded-md hover-elevate active-elevate-2 border border-secondary-300/20 dark:border-secondary-600/20">
               Custom
             </button>
           </div>
