@@ -35,7 +35,10 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [currentPath, setCurrentPath] = useState<string>("");
+  // Initialize currentPath from router or window location
+  const [currentPath, setCurrentPath] = useState<string>(
+    typeof window !== "undefined" ? window.location.pathname : ""
+  );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
@@ -170,41 +173,28 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
 
   // Function to get the appropriate page content based on current path
   const getPageContent = useCallback(() => {
+    // Determine the effective path (use router pathname as fallback)
+    const effectivePath = currentPath || (typeof window !== "undefined" ? window.location.pathname : "/");
+    
     // Handle dashboard routes specially
-    if (currentPath === "/" || currentPath === "/dashboard") {
+    if (effectivePath === "/" || effectivePath === "/dashboard") {
       if (customDashboard) {
         const CustomDashboard = customDashboard;
         return <CustomDashboard />;
       }
-      // Check if there's a dashboard configuration for this route
-      // Also check for "/" when currentPath is "/dashboard"
-      const dashboardPath = currentPath === "/dashboard" ? "/" : currentPath;
-      if (registry?.dashboards?.[currentPath] || registry?.dashboards?.[dashboardPath]) {
-        const effectivePath = registry?.dashboards?.[currentPath] ? currentPath : dashboardPath;
-        return (
-          <ContentRenderer
-            path={effectivePath}
-            contentConfig={registry.content}
-            dashboards={registry.dashboards}
-            customContent={customContent}
-            defaultContent={registry.defaultContent}
-          >
-            {children}
-          </ContentRenderer>
-        );
-      }
+      
+      // Use ContentRenderer which handles both content and dashboards properly
+      // It checks content first, then dashboards, then defaultContent
       return (
-        <div
-          className={`bg-white rounded-lg shadow border ${spacing.component.md}`}
+        <ContentRenderer
+          path={effectivePath === "/dashboard" ? "/" : effectivePath}
+          contentConfig={registry?.content || {}}
+          dashboards={registry?.dashboards || {}}
+          customContent={customContent}
+          defaultContent={registry?.defaultContent}
         >
-          <h2 className={`${typography.heading[1]} text-gray-900 mb-4`}>
-            Dashboard
-          </h2>
-          <p className={typography.body.regular}>
-            Please provide a customDashboard component for your
-            application-specific dashboard content.
-          </p>
-        </div>
+          {children}
+        </ContentRenderer>
       );
     }
 
