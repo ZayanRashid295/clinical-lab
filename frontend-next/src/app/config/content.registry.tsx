@@ -35,6 +35,7 @@ import NotesPage from "../components/Study/NotesPage";
 import TestCreationPage from "../components/test-creation/TestCreationPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
+import EnhancedQuestionBuilder from "../components/test-creation/EnhancedQuestionBuilder";
 
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
@@ -107,20 +108,14 @@ export const transportationContentRegistry: ContentRegistry = {
       />
     ),
     "/test-creation/builder": () => (
-      <UnderConstruction
-        menuTitle="Question Builder"
-        menuIcon="🔨"
-        description="Advanced question creation tool with multiple question types and multimedia support."
-        estimatedCompletion="3 weeks"
-        features={[
-          "Multiple choice questions",
-          "True/False questions",
-          "Essay and short answer formats",
-          "Image and diagram support",
-          "Question difficulty tagging",
-          "Answer explanation editor",
-        ]}
-      />
+      <div className="p-6">
+        <EnhancedQuestionBuilder
+          onQuestionCreated={(question) => {
+            console.log("Question created:", question);
+            // TODO: Implement API call to save question
+          }}
+        />
+      </div>
     ),
     "/test-creation/settings": () => (
       <UnderConstruction
