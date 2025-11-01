@@ -25,6 +25,9 @@ import SystemSettingsContent from "../components/Content/SystemSettingsContent";
 import SubscriptionManagementContent from "../components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../components/Content/PackageFeatureManagementContent";
+import ProductManagementContent from "../components/Content/ProductManagementContent";
+import ProductTagManagementContent from "../components/Content/ProductTagManagementContent";
+import ProductSubtypeManagementContent from "../components/Content/ProductSubtypeManagementContent";
 // import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
@@ -97,6 +100,11 @@ export const transportationContentRegistry: ContentRegistry = {
       <SubscriptionPackageManagementContent />
     ),
     "/admin/subscriptions/features": () => <PackageFeatureManagementContent />,
+
+    // Product routes
+    "/admin/products": () => <ProductManagementContent />,
+    "/admin/products/tags": () => <ProductTagManagementContent />,
+    "/admin/products/subtypes": () => <ProductSubtypeManagementContent />,
 
     // Study routes
     "/study/question-bank": () => <QuestionBankPage />,

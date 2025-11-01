@@ -137,6 +137,10 @@
     "subscriptions": "Subscriptions",
     "subscriptionsList": "Subscriptions",
     "subscriptionPackages": "Subscription Packages",
-    "packageFeatures": "Package Features"
+    "packageFeatures": "Package Features",
+    "products": "Products",
+    "productsList": "Products",
+    "productTags": "Product Tags",
+    "productSubtypes": "Product Subtypes"
   }
 }

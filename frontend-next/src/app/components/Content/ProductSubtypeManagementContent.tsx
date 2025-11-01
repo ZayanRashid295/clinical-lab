@@ -1,0 +1,129 @@
+import React, { useState } from "react";
+import useProductSubtypes from "../../../hooks/useProductSubtypes";
+import useProductSubtypeStats from "../../../hooks/useProductSubtypeStats";
+import { ProductSubtype } from "../../types/product";
+import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
+import { productSubtypeTableConfig } from "../../config/tables/product-subtype-table.config";
+
+export default function ProductSubtypeManagementContent() {
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [selectedSubtype, setSelectedSubtype] = useState<ProductSubtype | null>(null);
+
+  const {
+    subtypes,
+    loading,
+    error,
+    pagination,
+    refetch,
+    updateFilters,
+    filters,
+  } = useProductSubtypes({
+    page: 1,
+    limit: 10,
+  });
+
+  const {
+    stats,
+    loading: statsLoading,
+  } = useProductSubtypeStats();
+
+  const handleFiltersChange = (newFilters: Partial<any>) => {
+    updateFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    updateFilters({
+      search: undefined,
+      status: undefined,
+      productId: undefined,
+      dateFrom: undefined,
+      dateTo: undefined,
+    });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateFilters({ page });
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    updateFilters({ limit: pageSize, page: 1 });
+  };
+
+  const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
+    updateFilters({ sortBy, sortOrder });
+  };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  const handleViewSubtype = (subtype: ProductSubtype) => {
+    setSelectedSubtype(subtype);
+    setViewModalOpen(true);
+  };
+
+  const handleEditSubtype = (subtype: ProductSubtype) => {
+    setSelectedSubtype(subtype);
+    setFormMode("edit");
+    setFormModalOpen(true);
+  };
+
+  const handleCloseFormModal = () => {
+    setFormModalOpen(false);
+    setSelectedSubtype(null);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setSelectedSubtype(null);
+  };
+
+  const handleSubtypeSaved = () => {
+    refetch();
+    handleCloseFormModal();
+  };
+
+  const configWithHandlers = {
+    ...productSubtypeTableConfig,
+    onAdd: () => {
+      setFormMode("create");
+      setSelectedSubtype(null);
+      setFormModalOpen(true);
+    },
+  };
+
+  return (
+    <DataManagementContent
+      config={configWithHandlers}
+      data={subtypes}
+      loading={loading}
+      error={error}
+      pagination={pagination}
+      filters={filters}
+      stats={stats}
+      statsLoading={statsLoading}
+      onFiltersChange={handleFiltersChange}
+      onClearFilters={handleClearFilters}
+      onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
+      onSortChange={handleSortChange}
+      onRefresh={handleRefresh}
+      onView={handleViewSubtype}
+      onEdit={handleEditSubtype}
+      FormModal={undefined}
+      ViewModal={undefined}
+      formModalOpen={formModalOpen}
+      viewModalOpen={viewModalOpen}
+      selectedItem={selectedSubtype}
+      formMode={formMode}
+      onCloseFormModal={handleCloseFormModal}
+      onCloseViewModal={handleCloseViewModal}
+      onItemSaved={handleSubtypeSaved}
+      getFormModalProps={undefined}
+      getViewModalProps={undefined}
+    />
+  );
+}
+

@@ -10,6 +10,9 @@ import AuditLogsContent from "../src/app/components/Content/AuditLogsContent";
 import SubscriptionManagementContent from "../src/app/components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../src/app/components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../src/app/components/Content/PackageFeatureManagementContent";
+import ProductManagementContent from "../src/app/components/Content/ProductManagementContent";
+import ProductTagManagementContent from "../src/app/components/Content/ProductTagManagementContent";
+import ProductSubtypeManagementContent from "../src/app/components/Content/ProductSubtypeManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -229,6 +232,10 @@ export default function AdminPage() {
       "subscriptions-list": () => <SubscriptionManagementContent />,
       "subscription-packages": () => <SubscriptionPackageManagementContent />,
       "package-features": () => <PackageFeatureManagementContent />,
+      products: () => <ProductManagementContent />,
+      "products-list": () => <ProductManagementContent />,
+      "product-tags": () => <ProductTagManagementContent />,
+      "product-subtypes": () => <ProductSubtypeManagementContent />,
     };
     return content;
   }, []);
