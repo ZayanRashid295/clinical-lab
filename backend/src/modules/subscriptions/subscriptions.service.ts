@@ -420,6 +420,43 @@ export class SubscriptionsService {
     }
   }
 
+  async findOne(id: string) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        subscriptionPackage: {
+          include: {
+            productSubtype: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            subscriptionFeatures: {
+              include: {
+                packageFeature: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException(`Subscription with ID ${id} not found`);
+    }
+
+    return subscription;
+  }
+
   async getUserSubscriptions(userId: string, status?: string) {
     const where: any = { userId };
 

@@ -140,6 +140,20 @@ export class SubscriptionsController {
     return this.subscriptionsService.getStats();
   }
 
+  @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get subscription by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Subscription retrieved successfully",
+  })
+  @ApiResponse({ status: 404, description: "Subscription not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  findOne(@Param("id") id: string) {
+    return this.subscriptionsService.findOne(id);
+  }
+
   @Get("user/:userId")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
