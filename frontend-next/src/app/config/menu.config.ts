@@ -417,12 +417,46 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "content",
+      label: "menu.content",
+      icon: "📚",
+      path: "/admin/content",
+      roles: ["ADMIN"],
+      order: 8,
+      submenu: [
+        {
+          id: "sections",
+          label: "menu.sections",
+          icon: "📑",
+          path: "/admin/content/sections",
+          roles: ["ADMIN"],
+          order: 1,
+        },
+        {
+          id: "chapters",
+          label: "menu.chapters",
+          icon: "📖",
+          path: "/admin/content/chapters",
+          roles: ["ADMIN"],
+          order: 2,
+        },
+        {
+          id: "topics",
+          label: "menu.topics",
+          icon: "📝",
+          path: "/admin/content/topics",
+          roles: ["ADMIN"],
+          order: 3,
+        },
+      ],
+    },
+    {
       id: "misc",
       label: "Misc",
       icon: "⚙️",
       path: "/med-app",
       roles: ["ADMIN"],
-      order: 8,
+      order: 9,
       submenu: [
         {
           id: "zoom-simulation",

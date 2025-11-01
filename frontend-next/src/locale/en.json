@@ -141,6 +141,10 @@
     "products": "Products",
     "productsList": "Products",
     "productTags": "Product Tags",
-    "productSubtypes": "Product Subtypes"
+    "productSubtypes": "Product Subtypes",
+    "content": "Content Management",
+    "sections": "Sections",
+    "chapters": "Chapters",
+    "topics": "Topics"
   }
 }

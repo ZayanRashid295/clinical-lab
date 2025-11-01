@@ -24,6 +24,9 @@ import { CreateChapterDto } from "./dto/create-chapter.dto";
 import { UpdateChapterDto } from "./dto/update-chapter.dto";
 import { CreateTopicDto } from "./dto/create-topic.dto";
 import { UpdateTopicDto } from "./dto/update-topic.dto";
+import { QuerySectionDto } from "./dto/query-section.dto";
+import { QueryChapterDto } from "./dto/query-chapter.dto";
+import { QueryTopicDto } from "./dto/query-topic.dto";
 
 @ApiTags("content")
 @Controller("content")
@@ -32,21 +35,37 @@ export class ContentController {
 
   // ========== SECTIONS ==========
   @Get("sections")
-  @ApiOperation({ summary: "Get all sections" })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all sections with filtering, pagination, and sorting",
+  })
   @ApiResponse({ status: 200, description: "Sections retrieved successfully" })
-  @ApiQuery({ name: "productId", required: false, type: String })
-  @ApiQuery({ name: "isActive", required: false, type: Boolean })
-  async getSections(
-    @Query("productId") productId?: string,
-    @Query("isActive") isActive?: boolean
-  ) {
-    return this.contentService.getSections(productId, isActive);
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllSections(@Query() query: QuerySectionDto) {
+    return this.contentService.findAllSections(query);
+  }
+
+  @Get("sections/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get section statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Section statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getSectionStats() {
+    return this.contentService.getSectionStats();
   }
 
   @Get("sections/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get section by ID" })
   @ApiResponse({ status: 200, description: "Section retrieved successfully" })
   @ApiResponse({ status: 404, description: "Section not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getSection(@Param("id") id: string) {
     return this.contentService.getSection(id);
   }
@@ -101,21 +120,43 @@ export class ContentController {
 
   // ========== CHAPTERS ==========
   @Get("chapters")
-  @ApiOperation({ summary: "Get all chapters" })
-  @ApiResponse({ status: 200, description: "Chapters retrieved successfully" })
-  @ApiQuery({ name: "sectionId", required: false, type: String })
-  @ApiQuery({ name: "isActive", required: false, type: Boolean })
-  async getChapters(
-    @Query("sectionId") sectionId?: string,
-    @Query("isActive") isActive?: boolean
-  ) {
-    return this.contentService.getChapters(sectionId, isActive);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all chapters with filtering, pagination, and sorting",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Chapters retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllChapters(@Query() query: QueryChapterDto) {
+    return this.contentService.findAllChapters(query);
+  }
+
+  @Get("chapters/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get chapter statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Chapter statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getChapterStats() {
+    return this.contentService.getChapterStats();
   }
 
   @Get("chapters/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get chapter by ID" })
-  @ApiResponse({ status: 200, description: "Chapter retrieved successfully" })
+  @ApiResponse({
+    status: 200,
+    description: "Chapter retrieved successfully",
+  })
   @ApiResponse({ status: 404, description: "Chapter not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getChapter(@Param("id") id: string) {
     return this.contentService.getChapter(id);
   }
@@ -170,21 +211,37 @@ export class ContentController {
 
   // ========== TOPICS ==========
   @Get("topics")
-  @ApiOperation({ summary: "Get all topics" })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all topics with filtering, pagination, and sorting",
+  })
   @ApiResponse({ status: 200, description: "Topics retrieved successfully" })
-  @ApiQuery({ name: "chapterId", required: false, type: String })
-  @ApiQuery({ name: "isActive", required: false, type: Boolean })
-  async getTopics(
-    @Query("chapterId") chapterId?: string,
-    @Query("isActive") isActive?: boolean
-  ) {
-    return this.contentService.getTopics(chapterId, isActive);
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllTopics(@Query() query: QueryTopicDto) {
+    return this.contentService.findAllTopics(query);
+  }
+
+  @Get("topics/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get topic statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Topic statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getTopicStats() {
+    return this.contentService.getTopicStats();
   }
 
   @Get("topics/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get topic by ID" })
   @ApiResponse({ status: 200, description: "Topic retrieved successfully" })
   @ApiResponse({ status: 404, description: "Topic not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getTopic(@Param("id") id: string) {
     return this.contentService.getTopic(id);
   }

@@ -6,12 +6,109 @@ import { CreateChapterDto } from "./dto/create-chapter.dto";
 import { UpdateChapterDto } from "./dto/update-chapter.dto";
 import { CreateTopicDto } from "./dto/create-topic.dto";
 import { UpdateTopicDto } from "./dto/update-topic.dto";
+import { QuerySectionDto } from "./dto/query-section.dto";
+import { QueryChapterDto } from "./dto/query-chapter.dto";
+import { QueryTopicDto } from "./dto/query-topic.dto";
 
 @Injectable()
 export class ContentService {
   constructor(private prisma: PrismaService) {}
 
   // ========== SECTIONS ==========
+  async findAllSections(query: QuerySectionDto) {
+    try {
+      const {
+        search,
+        status,
+        productId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "order",
+        sortOrder = "asc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Product ID filter
+      if (productId) {
+        where.productId = productId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.section.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get sections with pagination and sorting
+      const sections = await this.prisma.section.findMany({
+        where,
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              chapters: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: sections,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching sections:", error);
+      throw error;
+    }
+  }
+
   async getSections(productId?: string, isActive?: boolean) {
     const where: any = {};
 
@@ -42,6 +139,22 @@ export class ContentService {
         order: "asc",
       },
     });
+  }
+
+  async getSectionStats() {
+    const total = await this.prisma.section.count();
+    const active = await this.prisma.section.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.section.count({
+      where: { isActive: false },
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+    };
   }
 
   async getSection(id: string) {
@@ -164,6 +277,106 @@ export class ContentService {
   }
 
   // ========== CHAPTERS ==========
+  async findAllChapters(query: QueryChapterDto) {
+    try {
+      const {
+        search,
+        status,
+        sectionId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "order",
+        sortOrder = "asc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Section ID filter
+      if (sectionId) {
+        where.sectionId = sectionId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.chapter.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get chapters with pagination and sorting
+      const chapters = await this.prisma.chapter.findMany({
+        where,
+        include: {
+          section: {
+            select: {
+              id: true,
+              name: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              topics: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: chapters,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+      throw error;
+    }
+  }
+
   async getChapters(sectionId?: string, isActive?: boolean) {
     const where: any = {};
 
@@ -200,6 +413,22 @@ export class ContentService {
         order: "asc",
       },
     });
+  }
+
+  async getChapterStats() {
+    const total = await this.prisma.chapter.count();
+    const active = await this.prisma.chapter.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.chapter.count({
+      where: { isActive: false },
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+    };
   }
 
   async getChapter(id: string) {
@@ -334,6 +563,108 @@ export class ContentService {
   }
 
   // ========== TOPICS ==========
+  async findAllTopics(query: QueryTopicDto) {
+    try {
+      const {
+        search,
+        status,
+        chapterId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "order",
+        sortOrder = "asc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Chapter ID filter
+      if (chapterId) {
+        where.chapterId = chapterId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.topic.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get topics with pagination and sorting
+      const topics = await this.prisma.topic.findMany({
+        where,
+        include: {
+          chapter: {
+            include: {
+              section: {
+                include: {
+                  product: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              questions: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: topics,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      throw error;
+    }
+  }
+
   async getTopics(chapterId?: string, isActive?: boolean) {
     const where: any = {};
 
@@ -372,6 +703,22 @@ export class ContentService {
         order: "asc",
       },
     });
+  }
+
+  async getTopicStats() {
+    const total = await this.prisma.topic.count();
+    const active = await this.prisma.topic.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.topic.count({
+      where: { isActive: false },
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+    };
   }
 
   async getTopic(id: string) {

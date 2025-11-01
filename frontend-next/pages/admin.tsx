@@ -13,6 +13,9 @@ import PackageFeatureManagementContent from "../src/app/components/Content/Packa
 import ProductManagementContent from "../src/app/components/Content/ProductManagementContent";
 import ProductTagManagementContent from "../src/app/components/Content/ProductTagManagementContent";
 import ProductSubtypeManagementContent from "../src/app/components/Content/ProductSubtypeManagementContent";
+import SectionManagementContent from "../src/app/components/Content/SectionManagementContent";
+import ChapterManagementContent from "../src/app/components/Content/ChapterManagementContent";
+import TopicManagementContent from "../src/app/components/Content/TopicManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -236,6 +239,10 @@ export default function AdminPage() {
       "products-list": () => <ProductManagementContent />,
       "product-tags": () => <ProductTagManagementContent />,
       "product-subtypes": () => <ProductSubtypeManagementContent />,
+      content: () => <SectionManagementContent />,
+      sections: () => <SectionManagementContent />,
+      chapters: () => <ChapterManagementContent />,
+      topics: () => <TopicManagementContent />,
     };
     return content;
   }, []);
