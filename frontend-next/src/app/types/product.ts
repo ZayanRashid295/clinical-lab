@@ -92,12 +92,14 @@ export interface CreateProductDto {
   name: string;
   description?: string;
   isActive?: boolean;
+  tagIds?: string[];
 }
 
 export interface UpdateProductDto {
   name?: string;
   description?: string;
   isActive?: boolean;
+  tagIds?: string[];
 }
 
 export interface CreateProductTagDto {

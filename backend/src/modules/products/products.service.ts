@@ -331,8 +331,17 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto) {
+    const { tagIds, ...productData } = createProductDto;
+
     return this.prisma.product.create({
-      data: createProductDto,
+      data: {
+        ...productData,
+        productTags: tagIds && tagIds.length > 0
+          ? {
+              connect: tagIds.map((tagId) => ({ id: tagId })),
+            }
+          : undefined,
+      },
       include: {
         productTags: true,
         productSubtypes: true,
@@ -350,9 +359,20 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
+    const { tagIds, ...productData } = updateProductDto;
+
     return this.prisma.product.update({
       where: { id },
-      data: updateProductDto,
+      data: {
+        ...productData,
+        productTags: tagIds !== undefined
+          ? {
+              set: tagIds.length > 0
+                ? tagIds.map((tagId) => ({ id: tagId }))
+                : [],
+            }
+          : undefined,
+      },
       include: {
         productTags: true,
         productSubtypes: true,

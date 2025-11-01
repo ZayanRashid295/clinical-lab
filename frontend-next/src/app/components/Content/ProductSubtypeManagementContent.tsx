@@ -4,6 +4,8 @@ import useProductSubtypeStats from "../../../hooks/useProductSubtypeStats";
 import { ProductSubtype } from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productSubtypeTableConfig } from "../../config/tables/product-subtype-table.config";
+import ProductSubtypeFormModal from "./ProductSubtypeFormModal";
+import ProductSubtypeViewModal from "./ProductSubtypeViewModal";
 
 export default function ProductSubtypeManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -85,6 +87,20 @@ export default function ProductSubtypeManagementContent() {
     handleCloseFormModal();
   };
 
+  const getFormModalProps = (subtype: ProductSubtype | null, mode: "create" | "edit") => {
+    return {
+      subtype: subtype,
+      mode: mode,
+      onSubtypeSaved: handleSubtypeSaved,
+    };
+  };
+
+  const getViewModalProps = (subtype: ProductSubtype | null) => {
+    return {
+      subtype: subtype,
+    };
+  };
+
   const configWithHandlers = {
     ...productSubtypeTableConfig,
     onAdd: () => {
@@ -112,8 +128,8 @@ export default function ProductSubtypeManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewSubtype}
       onEdit={handleEditSubtype}
-      FormModal={undefined}
-      ViewModal={undefined}
+      FormModal={ProductSubtypeFormModal}
+      ViewModal={ProductSubtypeViewModal}
       formModalOpen={formModalOpen}
       viewModalOpen={viewModalOpen}
       selectedItem={selectedSubtype}
@@ -121,8 +137,8 @@ export default function ProductSubtypeManagementContent() {
       onCloseFormModal={handleCloseFormModal}
       onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleSubtypeSaved}
-      getFormModalProps={undefined}
-      getViewModalProps={undefined}
+      getFormModalProps={getFormModalProps}
+      getViewModalProps={getViewModalProps}
     />
   );
 }

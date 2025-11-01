@@ -4,6 +4,8 @@ import useProductTagStats from "../../../hooks/useProductTagStats";
 import { ProductTag } from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productTagTableConfig } from "../../config/tables/product-tag-table.config";
+import ProductTagFormModal from "./ProductTagFormModal";
+import ProductTagViewModal from "./ProductTagViewModal";
 
 export default function ProductTagManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -84,6 +86,20 @@ export default function ProductTagManagementContent() {
     handleCloseFormModal();
   };
 
+  const getFormModalProps = (tag: ProductTag | null, mode: "create" | "edit") => {
+    return {
+      tag: tag,
+      mode: mode,
+      onTagSaved: handleTagSaved,
+    };
+  };
+
+  const getViewModalProps = (tag: ProductTag | null) => {
+    return {
+      tag: tag,
+    };
+  };
+
   const configWithHandlers = {
     ...productTagTableConfig,
     onAdd: () => {
@@ -111,8 +127,8 @@ export default function ProductTagManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewTag}
       onEdit={handleEditTag}
-      FormModal={undefined}
-      ViewModal={undefined}
+      FormModal={ProductTagFormModal}
+      ViewModal={ProductTagViewModal}
       formModalOpen={formModalOpen}
       viewModalOpen={viewModalOpen}
       selectedItem={selectedTag}
@@ -120,8 +136,8 @@ export default function ProductTagManagementContent() {
       onCloseFormModal={handleCloseFormModal}
       onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleTagSaved}
-      getFormModalProps={undefined}
-      getViewModalProps={undefined}
+      getFormModalProps={getFormModalProps}
+      getViewModalProps={getViewModalProps}
     />
   );
 }

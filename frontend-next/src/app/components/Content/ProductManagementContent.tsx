@@ -5,6 +5,8 @@ import useProductStats from "../../../hooks/useProductStats";
 import { Product } from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productTableConfig } from "../../config/tables/product-table.config";
+import ProductFormModal from "./ProductFormModal";
+import ProductViewModal from "./ProductViewModal";
 
 export default function ProductManagementContent() {
   const { config } = useTheme();
@@ -87,6 +89,20 @@ export default function ProductManagementContent() {
     handleCloseFormModal();
   };
 
+  const getFormModalProps = (product: Product | null, mode: "create" | "edit") => {
+    return {
+      product: product,
+      mode: mode,
+      onProductSaved: handleProductSaved,
+    };
+  };
+
+  const getViewModalProps = (product: Product | null) => {
+    return {
+      product: product,
+    };
+  };
+
   const configWithHandlers = {
     ...productTableConfig,
     onAdd: () => {
@@ -114,8 +130,8 @@ export default function ProductManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewProduct}
       onEdit={handleEditProduct}
-      FormModal={undefined}
-      ViewModal={undefined}
+      FormModal={ProductFormModal}
+      ViewModal={ProductViewModal}
       formModalOpen={formModalOpen}
       viewModalOpen={viewModalOpen}
       selectedItem={selectedProduct}
@@ -123,8 +139,8 @@ export default function ProductManagementContent() {
       onCloseFormModal={handleCloseFormModal}
       onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleProductSaved}
-      getFormModalProps={undefined}
-      getViewModalProps={undefined}
+      getFormModalProps={getFormModalProps}
+      getViewModalProps={getViewModalProps}
     />
   );
 }

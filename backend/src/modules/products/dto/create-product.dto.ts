@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsBoolean } from "class-validator";
+import { IsString, IsOptional, IsBoolean, IsArray } from "class-validator";
 
 export class CreateProductDto {
   @ApiProperty({
@@ -28,4 +28,15 @@ export class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({
+    description: "Array of product tag IDs to associate with this product",
+    example: ["cmguoh2b30000lj45cqti52mx", "cmguoh2b30000lj45cqti52my"],
+    required: false,
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tagIds?: string[];
 }
