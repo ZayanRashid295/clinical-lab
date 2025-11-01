@@ -6,12 +6,115 @@ import { CreateQuestionPaperQuestionDto } from "./dto/create-question-paper-ques
 import { UpdateQuestionPaperQuestionDto } from "./dto/update-question-paper-question.dto";
 import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
+import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 
 @Injectable()
 export class AssessmentsService {
   constructor(private prisma: PrismaService) {}
 
   // ========== QUESTION PAPERS ==========
+  async findAll(query: QueryQuestionPaperDto) {
+    try {
+      const {
+        search,
+        status,
+        type,
+        userId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Type filter
+      if (type) {
+        where.type = type;
+      }
+
+      // User ID filter
+      if (userId) {
+        where.userId = userId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.questionPaper.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get question papers with pagination and sorting
+      const questionPapers = await this.prisma.questionPaper.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              questionPaperQuestions: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: questionPapers,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching question papers:", error);
+      throw error;
+    }
+  }
+
   async getUserQuestionPapers(
     userId: string,
     type?: string,
@@ -40,6 +143,38 @@ export class AssessmentsService {
         createdAt: "desc",
       },
     });
+  }
+
+  async getStats() {
+    const total = await this.prisma.questionPaper.count();
+    const active = await this.prisma.questionPaper.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.questionPaper.count({
+      where: { isActive: false },
+    });
+
+    const byType = await this.prisma.questionPaper.groupBy({
+      by: ["type"],
+      _count: true,
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+      byType: byType.reduce(
+        (acc, item) => {
+          acc[item.type] = item._count;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+    };
+  }
+
+  async findOne(id: string) {
+    return this.getQuestionPaper(id);
   }
 
   async getQuestionPaper(id: string) {
@@ -154,6 +289,10 @@ export class AssessmentsService {
     });
   }
 
+  async create(createQuestionPaperDto: CreateQuestionPaperDto) {
+    return this.createQuestionPaper(createQuestionPaperDto);
+  }
+
   async createQuestionPaper(createQuestionPaperDto: CreateQuestionPaperDto) {
     return this.prisma.questionPaper.create({
       data: createQuestionPaperDto,
@@ -173,6 +312,10 @@ export class AssessmentsService {
         },
       },
     });
+  }
+
+  async update(id: string, updateQuestionPaperDto: UpdateQuestionPaperDto) {
+    return this.updateQuestionPaper(id, updateQuestionPaperDto);
   }
 
   async updateQuestionPaper(
@@ -206,6 +349,10 @@ export class AssessmentsService {
         },
       },
     });
+  }
+
+  async remove(id: string) {
+    return this.removeQuestionPaper(id);
   }
 
   async removeQuestionPaper(id: string) {

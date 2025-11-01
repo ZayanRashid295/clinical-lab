@@ -16,6 +16,7 @@ import ProductSubtypeManagementContent from "../src/app/components/Content/Produ
 import SectionManagementContent from "../src/app/components/Content/SectionManagementContent";
 import ChapterManagementContent from "../src/app/components/Content/ChapterManagementContent";
 import TopicManagementContent from "../src/app/components/Content/TopicManagementContent";
+import QuestionPaperManagementContent from "../src/app/components/Content/QuestionPaperManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -243,6 +244,8 @@ export default function AdminPage() {
       sections: () => <SectionManagementContent />,
       chapters: () => <ChapterManagementContent />,
       topics: () => <TopicManagementContent />,
+      assessments: () => <QuestionPaperManagementContent />,
+      "question-papers": () => <QuestionPaperManagementContent />,
     };
     return content;
   }, []);

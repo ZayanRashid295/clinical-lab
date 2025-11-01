@@ -329,12 +329,30 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "assessments",
+      label: "menu.assessments",
+      icon: "📝",
+      path: "/admin/assessments",
+      roles: ["ADMIN"],
+      order: 9,
+      submenu: [
+        {
+          id: "question-papers",
+          label: "menu.questionPapers",
+          icon: "📄",
+          path: "/admin/assessments/question-papers",
+          roles: ["ADMIN"],
+          order: 1,
+        },
+      ],
+    },
+    {
       id: "misc",
       label: "Misc",
       icon: "⚙️",
       path: "/med-app",
       roles: ["ADMIN"],
-      order: 9,
+      order: 10,
       submenu: [
         {
           id: "zoom-simulation",

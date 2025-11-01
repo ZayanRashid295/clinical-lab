@@ -31,6 +31,7 @@ import ProductSubtypeManagementContent from "../components/Content/ProductSubtyp
 import SectionManagementContent from "../components/Content/SectionManagementContent";
 import ChapterManagementContent from "../components/Content/ChapterManagementContent";
 import TopicManagementContent from "../components/Content/TopicManagementContent";
+import QuestionPaperManagementContent from "../components/Content/QuestionPaperManagementContent";
 // import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
@@ -113,6 +114,11 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/content/sections": () => <SectionManagementContent />,
     "/admin/content/chapters": () => <ChapterManagementContent />,
     "/admin/content/topics": () => <TopicManagementContent />,
+
+    // Assessment routes
+    "/admin/assessments/question-papers": () => (
+      <QuestionPaperManagementContent />
+    ),
 
     // Study routes
     "/study/question-bank": () => <QuestionBankPage />,

@@ -24,6 +24,7 @@ import { CreateQuestionPaperQuestionDto } from "./dto/create-question-paper-ques
 import { UpdateQuestionPaperQuestionDto } from "./dto/update-question-paper-question.dto";
 import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
+import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 
 @ApiTags("assessments")
 @Controller("assessments")
@@ -31,6 +32,34 @@ export class AssessmentsController {
   constructor(private readonly assessmentsService: AssessmentsService) {}
 
   // ========== QUESTION PAPERS ==========
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all question papers with filtering, pagination, and sorting",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Question papers retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAll(@Query() query: QueryQuestionPaperDto) {
+    return this.assessmentsService.findAll(query);
+  }
+
+  @Get("stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get question paper statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Question paper statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getStats() {
+    return this.assessmentsService.getStats();
+  }
+
   @Get("user/:userId")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -64,8 +93,8 @@ export class AssessmentsController {
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async getQuestionPaper(@Param("id") id: string) {
-    return this.assessmentsService.getQuestionPaper(id);
+  async findOne(@Param("id") id: string) {
+    return this.assessmentsService.findOne(id);
   }
 
   @Get(":id/questions")
@@ -85,51 +114,46 @@ export class AssessmentsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Create new question paper" })
+  @ApiOperation({ summary: "Create new question paper (Admin only)" })
   @ApiResponse({
     status: 201,
     description: "Question paper created successfully",
   })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async createQuestionPaper(
-    @Body() createQuestionPaperDto: CreateQuestionPaperDto
-  ) {
-    return this.assessmentsService.createQuestionPaper(createQuestionPaperDto);
+  async create(@Body() createQuestionPaperDto: CreateQuestionPaperDto) {
+    return this.assessmentsService.create(createQuestionPaperDto);
   }
 
   @Patch(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update question paper" })
+  @ApiOperation({ summary: "Update question paper (Admin only)" })
   @ApiResponse({
     status: 200,
     description: "Question paper updated successfully",
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async updateQuestionPaper(
+  async update(
     @Param("id") id: string,
     @Body() updateQuestionPaperDto: UpdateQuestionPaperDto
   ) {
-    return this.assessmentsService.updateQuestionPaper(
-      id,
-      updateQuestionPaperDto
-    );
+    return this.assessmentsService.update(id, updateQuestionPaperDto);
   }
 
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate question paper" })
+  @ApiOperation({ summary: "Deactivate question paper (Admin only)" })
   @ApiResponse({
     status: 200,
     description: "Question paper deactivated successfully",
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async removeQuestionPaper(@Param("id") id: string) {
-    return this.assessmentsService.removeQuestionPaper(id);
+  async remove(@Param("id") id: string) {
+    return this.assessmentsService.remove(id);
   }
 
   // ========== ASSESSMENT ACTIONS ==========
