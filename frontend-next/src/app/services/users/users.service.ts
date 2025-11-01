@@ -1,4 +1,4 @@
-import { BaseApiService } from "../base/base-api.service";
+import { BaseDataService } from "../base/base-data.service";
 import {
   PaginatedResponse,
   CreateResponse,
@@ -7,8 +7,8 @@ import {
 import { User } from "../../types/user";
 import { UserQueryParams, CreateUserDto, UpdateUserDto } from "./users.types";
 
-export class UsersService extends BaseApiService {
-  private readonly endpoint = "/users";
+export class UsersService extends BaseDataService<User, UserQueryParams, CreateUserDto, UpdateUserDto> {
+  protected readonly endpoint = "/users";
 
   /**
    * Get users with optional filtering and pagination
@@ -16,21 +16,21 @@ export class UsersService extends BaseApiService {
   async getUsers(
     params?: UserQueryParams
   ): Promise<PaginatedResponse<User> | User[]> {
-    return this.get(this.endpoint, params);
+    return this.getAll(params);
   }
 
   /**
    * Get a specific user by ID
    */
   async getUser(id: string): Promise<User> {
-    return this.get(`${this.endpoint}/${id}`);
+    return this.getById(id);
   }
 
   /**
    * Create a new user
    */
   async createUser(userData: CreateUserDto): Promise<CreateResponse<User>> {
-    return this.post(this.endpoint, userData);
+    return this.create(userData);
   }
 
   /**
@@ -40,14 +40,14 @@ export class UsersService extends BaseApiService {
     id: string,
     userData: UpdateUserDto
   ): Promise<UpdateResponse<User>> {
-    return this.patch(`${this.endpoint}/${id}`, userData);
+    return this.update(id, userData);
   }
 
   /**
    * Deactivate a user (soft delete)
    */
   async deactivateUser(id: string): Promise<{ message: string }> {
-    return this.delete(`${this.endpoint}/${id}`);
+    return this.delete(id);
   }
 
   /**
