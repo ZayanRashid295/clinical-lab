@@ -3,6 +3,13 @@ import { IsString, IsOptional, IsInt, Min } from "class-validator";
 
 export class CreateQuestionPaperQuestionDto {
   @ApiProperty({
+    description: "Question paper ID",
+    example: "cmguoh2b30000lj45cqti52mx",
+  })
+  @IsString()
+  questionPaperId: string;
+
+  @ApiProperty({
     description: "Question ID to add to the paper",
     example: "cmguoh2b30000lj45cqti52mx",
   })

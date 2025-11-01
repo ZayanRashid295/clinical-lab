@@ -5,8 +5,6 @@ import { MenuSystem, authService } from "../src/shared";
 import UserManagementContent from "../src/app/components/Content/UserManagementContent";
 import RoleManagementContent from "../src/app/components/Content/RoleManagementContent";
 import SystemSettingsContent from "../src/app/components/Content/SystemSettingsContent";
-import ReportsContent from "../src/app/components/Content/ReportsContent";
-import AuditLogsContent from "../src/app/components/Content/AuditLogsContent";
 import SubscriptionManagementContent from "../src/app/components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../src/app/components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../src/app/components/Content/PackageFeatureManagementContent";
@@ -17,6 +15,7 @@ import SectionManagementContent from "../src/app/components/Content/SectionManag
 import ChapterManagementContent from "../src/app/components/Content/ChapterManagementContent";
 import TopicManagementContent from "../src/app/components/Content/TopicManagementContent";
 import QuestionPaperManagementContent from "../src/app/components/Content/QuestionPaperManagementContent";
+import QuestionPaperQuestionManagementContent from "../src/app/components/Content/QuestionPaperQuestionManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -230,8 +229,8 @@ export default function AdminPage() {
       users: () => <UserManagementContent />,
       roles: () => <RoleManagementContent />,
       "system-settings": () => <SystemSettingsContent />,
-      reports: () => <ReportsContent />,
-      "audit-logs": () => <AuditLogsContent />,
+      reports: () => <SystemSettingsContent />, // Placeholder - ReportsContent not yet implemented
+      "audit-logs": () => <SystemSettingsContent />, // Placeholder - AuditLogsContent not yet implemented
       subscriptions: () => <SubscriptionManagementContent />,
       "subscriptions-list": () => <SubscriptionManagementContent />,
       "subscription-packages": () => <SubscriptionPackageManagementContent />,
@@ -246,6 +245,9 @@ export default function AdminPage() {
       topics: () => <TopicManagementContent />,
       assessments: () => <QuestionPaperManagementContent />,
       "question-papers": () => <QuestionPaperManagementContent />,
+      "question-paper-questions": () => (
+        <QuestionPaperQuestionManagementContent />
+      ),
     };
     return content;
   }, []);

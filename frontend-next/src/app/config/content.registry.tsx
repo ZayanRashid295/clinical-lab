@@ -32,6 +32,7 @@ import SectionManagementContent from "../components/Content/SectionManagementCon
 import ChapterManagementContent from "../components/Content/ChapterManagementContent";
 import TopicManagementContent from "../components/Content/TopicManagementContent";
 import QuestionPaperManagementContent from "../components/Content/QuestionPaperManagementContent";
+import QuestionPaperQuestionManagementContent from "../components/Content/QuestionPaperQuestionManagementContent";
 // import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
@@ -118,6 +119,9 @@ export const transportationContentRegistry: ContentRegistry = {
     // Assessment routes
     "/admin/assessments/question-papers": () => (
       <QuestionPaperManagementContent />
+    ),
+    "/admin/assessments/question-paper-questions": () => (
+      <QuestionPaperQuestionManagementContent />
     ),
 
     // Study routes

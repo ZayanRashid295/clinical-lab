@@ -344,6 +344,14 @@ export const MENU_CONFIG = {
           roles: ["ADMIN"],
           order: 1,
         },
+        {
+          id: "question-paper-questions",
+          label: "menu.questionPaperQuestions",
+          icon: "❓",
+          path: "/admin/assessments/question-paper-questions",
+          roles: ["ADMIN"],
+          order: 2,
+        },
       ],
     },
     {

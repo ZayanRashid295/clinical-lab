@@ -25,6 +25,7 @@ import { UpdateQuestionPaperQuestionDto } from "./dto/update-question-paper-ques
 import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
 import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
+import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
 
 @ApiTags("assessments")
 @Controller("assessments")
@@ -81,6 +82,55 @@ export class AssessmentsController {
       type,
       isActive
     );
+  }
+
+  // ========== QUESTION PAPER QUESTIONS (must come before :id routes) ==========
+  @Get("questions")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      "Get all question paper questions with filtering, pagination, and sorting",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Question paper questions retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllQuestionPaperQuestions(
+    @Query() query: QueryQuestionPaperQuestionDto
+  ) {
+    return this.assessmentsService.findAllQuestionPaperQuestions(query);
+  }
+
+  @Get("questions/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get question paper question statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Question paper question statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getQuestionPaperQuestionStats() {
+    return this.assessmentsService.getQuestionPaperQuestionStats();
+  }
+
+  @Get("questions/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get question paper question by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Question paper question retrieved successfully",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Question paper question not found",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findOneQuestionPaperQuestion(@Param("id") id: string) {
+    return this.assessmentsService.findOneQuestionPaperQuestion(id);
   }
 
   @Get(":id")
@@ -205,7 +255,24 @@ export class AssessmentsController {
     return this.assessmentsService.getAssessmentResults(id);
   }
 
-  // ========== QUESTION PAPER QUESTIONS ==========
+  @Post("questions")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Create question paper question (Admin only)" })
+  @ApiResponse({
+    status: 201,
+    description: "Question paper question created successfully",
+  })
+  @ApiResponse({ status: 400, description: "Invalid input data" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async createQuestionPaperQuestion(
+    @Body() createQuestionPaperQuestionDto: CreateQuestionPaperQuestionDto
+  ) {
+    return this.assessmentsService.createQuestionPaperQuestion(
+      createQuestionPaperQuestionDto
+    );
+  }
+
   @Post(":questionPaperId/questions")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -226,10 +293,10 @@ export class AssessmentsController {
     );
   }
 
-  @Patch("questions/:questionPaperQuestionId")
+  @Patch("questions/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update question paper question" })
+  @ApiOperation({ summary: "Update question paper question (Admin only)" })
   @ApiResponse({
     status: 200,
     description: "Question updated successfully",
@@ -237,30 +304,28 @@ export class AssessmentsController {
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async updateQuestionPaperQuestion(
-    @Param("questionPaperQuestionId") questionPaperQuestionId: string,
+    @Param("id") id: string,
     @Body() updateQuestionPaperQuestionDto: UpdateQuestionPaperQuestionDto
   ) {
     return this.assessmentsService.updateQuestionPaperQuestion(
-      questionPaperQuestionId,
+      id,
       updateQuestionPaperQuestionDto
     );
   }
 
-  @Delete("questions/:questionPaperQuestionId")
+  @Delete("questions/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Remove question from question paper" })
+  @ApiOperation({
+    summary: "Remove question from question paper (Admin only)",
+  })
   @ApiResponse({
     status: 200,
     description: "Question removed successfully",
   })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async removeQuestionFromPaper(
-    @Param("questionPaperQuestionId") questionPaperQuestionId: string
-  ) {
-    return this.assessmentsService.removeQuestionFromPaper(
-      questionPaperQuestionId
-    );
+  async removeQuestionPaperQuestion(@Param("id") id: string) {
+    return this.assessmentsService.removeQuestionPaperQuestion(id);
   }
 }

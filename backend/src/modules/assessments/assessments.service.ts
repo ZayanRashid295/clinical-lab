@@ -7,6 +7,7 @@ import { UpdateQuestionPaperQuestionDto } from "./dto/update-question-paper-ques
 import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
 import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
+import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
 
 @Injectable()
 export class AssessmentsService {
@@ -567,6 +568,312 @@ export class AssessmentsService {
   }
 
   // ========== QUESTION PAPER QUESTIONS ==========
+  async findAllQuestionPaperQuestions(query: QueryQuestionPaperQuestionDto) {
+    try {
+      const {
+        questionPaperId,
+        questionId,
+        hasAnswer,
+        isCorrect,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "order",
+        sortOrder = "asc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Question paper ID filter
+      if (questionPaperId) {
+        where.questionPaperId = questionPaperId;
+      }
+
+      // Question ID filter
+      if (questionId) {
+        where.questionId = questionId;
+      }
+
+      // Has answer filter
+      if (hasAnswer !== undefined) {
+        if (hasAnswer) {
+          where.userAnswer = { not: null };
+        } else {
+          where.userAnswer = null;
+        }
+      }
+
+      // Correctness filter
+      if (isCorrect !== undefined) {
+        where.isCorrect = isCorrect;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.questionPaperQuestion.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get question paper questions with pagination and sorting
+      const questionPaperQuestions =
+        await this.prisma.questionPaperQuestion.findMany({
+          where,
+          include: {
+            questionPaper: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+              },
+            },
+            question: {
+              include: {
+                choices: {
+                  orderBy: {
+                    order: "asc",
+                  },
+                },
+                productTag: true,
+                topic: {
+                  include: {
+                    chapter: {
+                      include: {
+                        section: {
+                          include: {
+                            product: {
+                              select: {
+                                id: true,
+                                name: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          skip,
+          take: limit,
+          orderBy,
+        });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: questionPaperQuestions,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching question paper questions:", error);
+      throw error;
+    }
+  }
+
+  async getQuestionPaperQuestionStats() {
+    const total = await this.prisma.questionPaperQuestion.count();
+    const answered = await this.prisma.questionPaperQuestion.count({
+      where: { userAnswer: { not: null } },
+    });
+    const unanswered = await this.prisma.questionPaperQuestion.count({
+      where: { userAnswer: null },
+    });
+    const correct = await this.prisma.questionPaperQuestion.count({
+      where: { isCorrect: true },
+    });
+    const incorrect = await this.prisma.questionPaperQuestion.count({
+      where: { isCorrect: false },
+    });
+
+    return {
+      total,
+      answered,
+      unanswered,
+      correct,
+      incorrect,
+    };
+  }
+
+  async findOneQuestionPaperQuestion(id: string) {
+    const questionPaperQuestion =
+      await this.prisma.questionPaperQuestion.findUnique({
+        where: { id },
+        include: {
+          questionPaper: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+          question: {
+            include: {
+              choices: {
+                orderBy: {
+                  order: "asc",
+                },
+              },
+              productTag: true,
+              topic: {
+                include: {
+                  chapter: {
+                    include: {
+                      section: {
+                        include: {
+                          product: {
+                            select: {
+                              id: true,
+                              name: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+    if (!questionPaperQuestion) {
+      throw new NotFoundException(
+        `Question paper question with ID ${id} not found`
+      );
+    }
+
+    return questionPaperQuestion;
+  }
+
+  async createQuestionPaperQuestion(
+    createQuestionPaperQuestionDto: CreateQuestionPaperQuestionDto
+  ) {
+    // First check if question paper exists
+    const questionPaper = await this.prisma.questionPaper.findUnique({
+      where: { id: createQuestionPaperQuestionDto.questionPaperId },
+    });
+
+    if (!questionPaper) {
+      throw new NotFoundException(
+        `Question paper with ID ${createQuestionPaperQuestionDto.questionPaperId} not found`
+      );
+    }
+
+    // Check if question exists
+    const question = await this.prisma.question.findUnique({
+      where: { id: createQuestionPaperQuestionDto.questionId },
+    });
+
+    if (!question) {
+      throw new NotFoundException(
+        `Question with ID ${createQuestionPaperQuestionDto.questionId} not found`
+      );
+    }
+
+    // Check if question already exists in this paper
+    const existing = await this.prisma.questionPaperQuestion.findUnique({
+      where: {
+        questionPaperId_questionId: {
+          questionPaperId: createQuestionPaperQuestionDto.questionPaperId,
+          questionId: createQuestionPaperQuestionDto.questionId,
+        },
+      },
+    });
+
+    if (existing) {
+      throw new NotFoundException(
+        "This question is already in the question paper"
+      );
+    }
+
+    // Get the maximum order value for this question paper
+    const maxOrder = await this.prisma.questionPaperQuestion.findFirst({
+      where: {
+        questionPaperId: createQuestionPaperQuestionDto.questionPaperId,
+      },
+      orderBy: {
+        order: "desc",
+      },
+      select: {
+        order: true,
+      },
+    });
+
+    const order =
+      createQuestionPaperQuestionDto.order ??
+      (maxOrder ? maxOrder.order + 1 : 0);
+
+    return this.prisma.questionPaperQuestion.create({
+      data: {
+        questionPaperId: createQuestionPaperQuestionDto.questionPaperId,
+        questionId: createQuestionPaperQuestionDto.questionId,
+        order,
+      },
+      include: {
+        questionPaper: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+        question: {
+          include: {
+            choices: {
+              orderBy: {
+                order: "asc",
+              },
+            },
+            productTag: true,
+            topic: {
+              include: {
+                chapter: {
+                  include: {
+                    section: {
+                      include: {
+                        product: {
+                          select: {
+                            id: true,
+                            name: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async addQuestionToPaper(
     questionPaperId: string,
     createQuestionPaperQuestionDto: CreateQuestionPaperQuestionDto
@@ -611,6 +918,16 @@ export class AssessmentsService {
   }
 
   async updateQuestionPaperQuestion(
+    id: string,
+    updateQuestionPaperQuestionDto: UpdateQuestionPaperQuestionDto
+  ) {
+    return this.updateQuestionPaperQuestionById(
+      id,
+      updateQuestionPaperQuestionDto
+    );
+  }
+
+  async updateQuestionPaperQuestionById(
     questionPaperQuestionId: string,
     updateQuestionPaperQuestionDto: UpdateQuestionPaperQuestionDto
   ) {
@@ -637,6 +954,10 @@ export class AssessmentsService {
         },
       },
     });
+  }
+
+  async removeQuestionPaperQuestion(id: string) {
+    return this.removeQuestionFromPaper(id);
   }
 
   async removeQuestionFromPaper(questionPaperQuestionId: string) {
