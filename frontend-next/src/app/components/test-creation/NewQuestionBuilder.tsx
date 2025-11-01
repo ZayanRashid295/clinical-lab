@@ -202,13 +202,27 @@ const App: React.FC = () => {
 
                     {/* Internal Comment Block */}
                     {opt.comment && (
-                      <div className="mt-2 ml-8 p-2 text-xs bg-muted rounded-lg flex items-center">
+                      <div
+                        className="mt-2 ml-8 px-3 py-2 rounded-lg border flex items-center"
+                        style={{
+                          backgroundColor: "#FFFBEB",
+                          borderColor: "#FEE39B",
+                        }}
+                      >
                         <MessageSquare
                           size={14}
                           className="mr-2 flex-shrink-0"
+                          style={{ color: "#8B572A" }}
                         />
-                        <span className="font-semibold">Internal Note:</span>{" "}
-                        {opt.comment}
+                        <span
+                          className="font-bold"
+                          style={{ color: "#8B572A" }}
+                        >
+                          Internal Note:
+                        </span>
+                        <span className="ml-1" style={{ color: "#8B572A" }}>
+                          {opt.comment}
+                        </span>
                       </div>
                     )}
                   </li>
