@@ -118,11 +118,7 @@ export const transportationContentRegistry: ContentRegistry = {
         />
       </div>
     ),
-    "/test-creation/new-builder": () => (
-      <div className="p-6">
-        <NewQuestionBuilder />
-      </div>
-    ),
+    "/test-creation/new-builder": () => <NewQuestionBuilder />,
     "/test-creation/settings": () => (
       <UnderConstruction
         menuTitle="Test Settings"
