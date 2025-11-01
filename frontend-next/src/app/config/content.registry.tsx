@@ -38,6 +38,8 @@ import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
 import EnhancedQuestionBuilder from "../components/test-creation/EnhancedQuestionBuilder";
 import NewQuestionBuilder from "../components/test-creation/NewQuestionBuilder";
 
+// Import dashboard - using TestCreationPage as the main dashboard
+
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
 
@@ -53,6 +55,10 @@ import UnderConstruction from "../../shared/components/placeholders/under-constr
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
   content: {
+    // Dashboard routes - use TestCreationPage as the main dashboard
+    "/": () => <TestCreationPage />,
+    "/dashboard": () => <TestCreationPage />,
+
     // Payment routes
     "/payments/history": () => <PaymentHistoryContent />,
     "/payments/methods": () => <PaymentMethodsContent />,
@@ -147,7 +153,7 @@ export const transportationContentRegistry: ContentRegistry = {
   },
 
   dashboards: {
-    "/": mainDashboardConfig,
+    // Keep admin dashboard config
     "/admin": adminDashboardConfig,
   },
 

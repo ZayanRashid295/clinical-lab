@@ -177,10 +177,13 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         return <CustomDashboard />;
       }
       // Check if there's a dashboard configuration for this route
-      if (registry?.dashboards?.[currentPath]) {
+      // Also check for "/" when currentPath is "/dashboard"
+      const dashboardPath = currentPath === "/dashboard" ? "/" : currentPath;
+      if (registry?.dashboards?.[currentPath] || registry?.dashboards?.[dashboardPath]) {
+        const effectivePath = registry?.dashboards?.[currentPath] ? currentPath : dashboardPath;
         return (
           <ContentRenderer
-            path={currentPath}
+            path={effectivePath}
             contentConfig={registry.content}
             dashboards={registry.dashboards}
             customContent={customContent}
