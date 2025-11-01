@@ -24,6 +24,9 @@ import { CreateSubscriptionPackageDto } from "./dto/create-subscription-package.
 import { UpdateSubscriptionPackageDto } from "./dto/update-subscription-package.dto";
 import { CreatePackageFeatureDto } from "./dto/create-package-feature.dto";
 import { UpdatePackageFeatureDto } from "./dto/update-package-feature.dto";
+import { QuerySubscriptionDto } from "./dto/query-subscription.dto";
+import { QuerySubscriptionPackageDto } from "./dto/query-subscription-package.dto";
+import { QueryPackageFeatureDto } from "./dto/query-package-feature.dto";
 
 @ApiTags("subscriptions")
 @Controller("subscriptions")
@@ -32,15 +35,28 @@ export class SubscriptionsController {
 
   // ========== SUBSCRIPTION PACKAGES ==========
   @Get("packages")
-  @ApiOperation({ summary: "Get all subscription packages" })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all subscription packages with filtering, pagination, and sorting",
+  })
   @ApiResponse({ status: 200, description: "Packages retrieved successfully" })
-  @ApiQuery({ name: "productSubtypeId", required: false, type: String })
-  @ApiQuery({ name: "isActive", required: false, type: Boolean })
-  async getPackages(
-    @Query("productSubtypeId") productSubtypeId?: string,
-    @Query("isActive") isActive?: boolean
-  ) {
-    return this.subscriptionsService.getPackages(productSubtypeId, isActive);
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllPackages(@Query() query: QuerySubscriptionPackageDto) {
+    return this.subscriptionsService.findAllPackages(query);
+  }
+
+  @Get("packages/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get subscription package statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Package statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getPackageStats() {
+    return this.subscriptionsService.getPackageStats();
   }
 
   @Get("packages/:id")
@@ -96,6 +112,34 @@ export class SubscriptionsController {
   }
 
   // ========== USER SUBSCRIPTIONS ==========
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all subscriptions with filtering, pagination, and sorting",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Subscriptions retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  findAll(@Query() query: QuerySubscriptionDto) {
+    return this.subscriptionsService.findAll(query);
+  }
+
+  @Get("stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get subscription statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Subscription statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getStats() {
+    return this.subscriptionsService.getStats();
+  }
+
   @Get("user/:userId")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -165,11 +209,28 @@ export class SubscriptionsController {
 
   // ========== PACKAGE FEATURES ==========
   @Get("features")
-  @ApiOperation({ summary: "Get all package features" })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get all package features with filtering, pagination, and sorting",
+  })
   @ApiResponse({ status: 200, description: "Features retrieved successfully" })
-  @ApiQuery({ name: "isActive", required: false, type: Boolean })
-  async getFeatures(@Query("isActive") isActive?: boolean) {
-    return this.subscriptionsService.getFeatures(isActive);
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllFeatures(@Query() query: QueryPackageFeatureDto) {
+    return this.subscriptionsService.findAllFeatures(query);
+  }
+
+  @Get("features/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get package feature statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Feature statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getFeatureStats() {
+    return this.subscriptionsService.getFeatureStats();
   }
 
   @Get("features/:id")

@@ -7,6 +7,10 @@ import RoleManagementContent from "../src/app/components/Content/RoleManagementC
 import SystemSettingsContent from "../src/app/components/Content/SystemSettingsContent";
 import ReportsContent from "../src/app/components/Content/ReportsContent";
 import AuditLogsContent from "../src/app/components/Content/AuditLogsContent";
+import SubscriptionManagementContent from "../src/app/components/Content/SubscriptionManagementContent";
+import SubscriptionPackageManagementContent from "../src/app/components/Content/SubscriptionPackageManagementContent";
+import PackageFeatureManagementContent from "../src/app/components/Content/PackageFeatureManagementContent";
+import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -221,6 +225,10 @@ export default function AdminPage() {
       "system-settings": () => <SystemSettingsContent />,
       reports: () => <ReportsContent />,
       "audit-logs": () => <AuditLogsContent />,
+      subscriptions: () => <SubscriptionManagementContent />,
+      "subscriptions-list": () => <SubscriptionManagementContent />,
+      "subscription-packages": () => <SubscriptionPackageManagementContent />,
+      "package-features": () => <PackageFeatureManagementContent />,
     };
     return content;
   }, []);
@@ -259,6 +267,7 @@ export default function AdminPage() {
         searchPlaceholder="Search administration..."
         enableSearch={true}
         customContent={customContent}
+        contentRegistry={transportationContentRegistry}
       />
     </>
   );

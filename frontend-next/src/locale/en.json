@@ -133,6 +133,10 @@
     "learningSystemItem11": "Item 11",
     "learningSystemItem12": "Item 12",
     "learningSystemItem13": "Item 13",
-    "learningSystemItem14": "Item 14"
+    "learningSystemItem14": "Item 14",
+    "subscriptions": "Subscriptions",
+    "subscriptionsList": "Subscriptions",
+    "subscriptionPackages": "Subscription Packages",
+    "packageFeatures": "Package Features"
   }
 }

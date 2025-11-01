@@ -6,12 +6,109 @@ import { CreateSubscriptionPackageDto } from "./dto/create-subscription-package.
 import { UpdateSubscriptionPackageDto } from "./dto/update-subscription-package.dto";
 import { CreatePackageFeatureDto } from "./dto/create-package-feature.dto";
 import { UpdatePackageFeatureDto } from "./dto/update-package-feature.dto";
+import { QuerySubscriptionDto } from "./dto/query-subscription.dto";
+import { QuerySubscriptionPackageDto } from "./dto/query-subscription-package.dto";
+import { QueryPackageFeatureDto } from "./dto/query-package-feature.dto";
 
 @Injectable()
 export class SubscriptionsService {
   constructor(private prisma: PrismaService) {}
 
   // ========== SUBSCRIPTION PACKAGES ==========
+  async findAllPackages(query: QuerySubscriptionPackageDto) {
+    try {
+      const {
+        search,
+        status,
+        productSubtypeId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Product subtype filter
+      if (productSubtypeId) {
+        where.productSubtypeId = productSubtypeId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.subscriptionPackage.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get packages with pagination and sorting
+      const packages = await this.prisma.subscriptionPackage.findMany({
+        where,
+        include: {
+          productSubtype: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          subscriptionFeatures: {
+            include: {
+              packageFeature: true,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: packages,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching subscription packages:", error);
+      throw error;
+    }
+  }
+
   async getPackages(productSubtypeId?: string, isActive?: boolean) {
     const where: any = {};
 
@@ -51,6 +148,22 @@ export class SubscriptionsService {
         price: "asc",
       },
     });
+  }
+
+  async getPackageStats() {
+    const total = await this.prisma.subscriptionPackage.count();
+    const active = await this.prisma.subscriptionPackage.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.subscriptionPackage.count({
+      where: { isActive: false },
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+    };
   }
 
   async getPackage(id: string) {
@@ -197,6 +310,116 @@ export class SubscriptionsService {
   }
 
   // ========== USER SUBSCRIPTIONS ==========
+  async findAll(query: QuerySubscriptionDto) {
+    try {
+      const {
+        search,
+        status,
+        userId,
+        subscriptionPackageId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter - search in user name or email
+      if (search) {
+        where.user = {
+          OR: [
+            { email: { contains: search, mode: "insensitive" } },
+            { firstName: { contains: search, mode: "insensitive" } },
+            { lastName: { contains: search, mode: "insensitive" } },
+          ],
+        };
+      }
+
+      // Status filter
+      if (status) {
+        where.status = status;
+      }
+
+      // User ID filter
+      if (userId) {
+        where.userId = userId;
+      }
+
+      // Package ID filter
+      if (subscriptionPackageId) {
+        where.subscriptionPackageId = subscriptionPackageId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.subscription.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get subscriptions with pagination and sorting
+      const subscriptions = await this.prisma.subscription.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          subscriptionPackage: {
+            include: {
+              productSubtype: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: subscriptions,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching subscriptions:", error);
+      throw error;
+    }
+  }
+
   async getUserSubscriptions(userId: string, status?: string) {
     const where: any = { userId };
 
@@ -377,7 +600,110 @@ export class SubscriptionsService {
     });
   }
 
+  async getStats() {
+    const total = await this.prisma.subscription.count();
+    const active = await this.prisma.subscription.count({
+      where: { status: "ACTIVE" },
+    });
+    const expired = await this.prisma.subscription.count({
+      where: { status: "EXPIRED" },
+    });
+    const cancelled = await this.prisma.subscription.count({
+      where: { status: "CANCELLED" },
+    });
+    const suspended = await this.prisma.subscription.count({
+      where: { status: "SUSPENDED" },
+    });
+    const pending = await this.prisma.subscription.count({
+      where: { status: "PENDING" },
+    });
+
+    return {
+      total,
+      active,
+      expired,
+      cancelled,
+      suspended,
+      pending,
+    };
+  }
+
   // ========== PACKAGE FEATURES ==========
+  async findAllFeatures(query: QueryPackageFeatureDto) {
+    try {
+      const {
+        search,
+        status,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.packageFeatures.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get features with pagination and sorting
+      const features = await this.prisma.packageFeatures.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: features,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching package features:", error);
+      throw error;
+    }
+  }
+
   async getFeatures(isActive?: boolean) {
     const where = isActive !== undefined ? { isActive } : {};
 
@@ -394,6 +720,22 @@ export class SubscriptionsService {
         name: "asc",
       },
     });
+  }
+
+  async getFeatureStats() {
+    const total = await this.prisma.packageFeatures.count();
+    const active = await this.prisma.packageFeatures.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.packageFeatures.count({
+      where: { isActive: false },
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+    };
   }
 
   async getFeature(id: string) {
