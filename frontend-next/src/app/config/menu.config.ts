@@ -9,12 +9,54 @@ export const MENU_CONFIG = {
       order: 1,
     },
     {
+      id: "study",
+      label: "menu.study",
+      icon: "📚",
+      path: "/study",
+      roles: ["ADMIN", "STUDENT", "FACULTY"],
+      order: 2,
+      submenu: [
+        {
+          id: "question-bank",
+          label: "menu.questionBank",
+          icon: "🗂️",
+          path: "/study/question-bank",
+          roles: ["ADMIN", "STUDENT", "FACULTY"],
+          order: 1,
+        },
+        {
+          id: "study-materials",
+          label: "menu.studyMaterials",
+          icon: "📄",
+          path: "/study/materials",
+          roles: ["ADMIN", "STUDENT", "FACULTY"],
+          order: 2,
+        },
+        {
+          id: "flashcards",
+          label: "menu.flashcards",
+          icon: "🃏",
+          path: "/study/flashcards",
+          roles: ["ADMIN", "STUDENT", "FACULTY"],
+          order: 3,
+        },
+        {
+          id: "notes",
+          label: "menu.notes",
+          icon: "📝",
+          path: "/study/notes",
+          roles: ["ADMIN", "STUDENT", "FACULTY"],
+          order: 4,
+        },
+      ],
+    },
+    {
       id: "payments",
       label: "menu.payments",
       icon: "💳",
       path: "/payments",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 2,
+      order: 6,
       submenu: [
         {
           id: "payment-history",
@@ -56,7 +98,7 @@ export const MENU_CONFIG = {
       icon: "💬",
       path: "/chat",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 3,
+      order: 7,
       submenu: [
         {
           id: "chat-rooms",
@@ -81,48 +123,6 @@ export const MENU_CONFIG = {
           path: "/chat/notifications",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
           order: 3,
-        },
-      ],
-    },
-    {
-      id: "study",
-      label: "menu.study",
-      icon: "📚",
-      path: "/study",
-      roles: ["ADMIN", "STUDENT", "FACULTY"],
-      order: 3,
-      submenu: [
-        {
-          id: "question-bank",
-          label: "menu.questionBank",
-          icon: "🗂️",
-          path: "/study/question-bank",
-          roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 1,
-        },
-        {
-          id: "study-materials",
-          label: "menu.studyMaterials",
-          icon: "📄",
-          path: "/study/materials",
-          roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 2,
-        },
-        {
-          id: "flashcards",
-          label: "menu.flashcards",
-          icon: "🃏",
-          path: "/study/flashcards",
-          roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 3,
-        },
-        {
-          id: "notes",
-          label: "menu.notes",
-          icon: "📝",
-          path: "/study/notes",
-          roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 4,
         },
       ],
     },
@@ -190,7 +190,7 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 6,
+      order: 5,
       submenu: [
         {
           id: "users",
@@ -232,7 +232,7 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/med-app",
       roles: ["ADMIN"],
-      order: 6,
+      order: 8,
       submenu: [
         {
           id: "zoom-simulation",
