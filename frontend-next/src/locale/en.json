@@ -131,6 +131,8 @@
     "sections": "Sections",
     "chapters": "Chapters",
     "topics": "Topics",
+    "questions": "Questions",
+    "questionChoices": "Question Choices",
     "assessments": "Assessments",
     "questionPapers": "Question Papers",
     "questionPaperQuestions": "Question Paper Questions"

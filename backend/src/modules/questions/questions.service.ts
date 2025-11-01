@@ -4,6 +4,8 @@ import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
 import { UpdateQuestionChoiceDto } from "./dto/update-question-choice.dto";
+import { QueryQuestionDto } from "./dto/query-question.dto";
+import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 
 interface QuestionFilters {
   topicId?: string;
@@ -25,7 +27,126 @@ interface RandomQuestionFilters {
 export class QuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(filters: QuestionFilters) {
+  async findAll(query: QueryQuestionDto) {
+    try {
+      const {
+        search,
+        status,
+        difficulty,
+        topicId,
+        productTagId,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Search filter
+      if (search) {
+        where.OR = [
+          { question: { contains: search, mode: "insensitive" } },
+          { explanation: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      // Status filter
+      if (status) {
+        where.isActive = status === "ACTIVE";
+      }
+
+      // Difficulty filter
+      if (difficulty) {
+        where.difficulty = difficulty;
+      }
+
+      // Topic ID filter
+      if (topicId) {
+        where.topicId = topicId;
+      }
+
+      // Product tag ID filter
+      if (productTagId) {
+        where.productTagId = productTagId;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.question.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get questions with pagination and sorting
+      const questions = await this.prisma.question.findMany({
+        where,
+        include: {
+          choices: {
+            orderBy: {
+              order: "asc",
+            },
+          },
+          productTag: true,
+          topic: {
+            include: {
+              chapter: {
+                include: {
+                  section: {
+                    include: {
+                      product: {
+                        select: {
+                          id: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: questions,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      throw error;
+    }
+  }
+
+  async findAllLegacy(filters: QuestionFilters) {
     const where: any = {};
 
     if (filters.topicId) {
@@ -267,6 +388,34 @@ export class QuestionsService {
     };
   }
 
+  async getStats() {
+    const total = await this.prisma.question.count();
+    const active = await this.prisma.question.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.question.count({
+      where: { isActive: false },
+    });
+
+    const byDifficulty = await this.prisma.question.groupBy({
+      by: ["difficulty"],
+      _count: true,
+    });
+
+    return {
+      total,
+      active,
+      inactive,
+      byDifficulty: byDifficulty.reduce(
+        (acc, item) => {
+          acc[item.difficulty] = item._count;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+    };
+  }
+
   async findOne(id: string) {
     const question = await this.prisma.question.findUnique({
       where: { id },
@@ -386,6 +535,134 @@ export class QuestionsService {
   }
 
   // ========== QUESTION CHOICES ==========
+  async findAllQuestionChoices(query: QueryQuestionChoiceDto) {
+    try {
+      const {
+        questionId,
+        isCorrect,
+        dateFrom,
+        dateTo,
+        page = 1,
+        limit = 10,
+        sortBy = "order",
+        sortOrder = "asc",
+      } = query;
+
+      // Build where clause
+      const where: any = {};
+
+      // Question ID filter
+      if (questionId) {
+        where.questionId = questionId;
+      }
+
+      // Correctness filter
+      if (isCorrect !== undefined) {
+        where.isCorrect = isCorrect;
+      }
+
+      // Date range filter
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) {
+          where.createdAt.gte = new Date(dateFrom);
+        }
+        if (dateTo) {
+          where.createdAt.lte = new Date(dateTo);
+        }
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await this.prisma.questionChoice.count({ where });
+
+      // Build orderBy
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      // Get question choices with pagination and sorting
+      const questionChoices = await this.prisma.questionChoice.findMany({
+        where,
+        include: {
+          question: {
+            select: {
+              id: true,
+              question: true,
+              topic: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: questionChoices,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching question choices:", error);
+      throw error;
+    }
+  }
+
+  async getQuestionChoiceStats() {
+    const total = await this.prisma.questionChoice.count();
+    const correct = await this.prisma.questionChoice.count({
+      where: { isCorrect: true },
+    });
+    const incorrect = await this.prisma.questionChoice.count({
+      where: { isCorrect: false },
+    });
+
+    return {
+      total,
+      correct,
+      incorrect,
+    };
+  }
+
+  async findOneQuestionChoice(id: string) {
+    const questionChoice = await this.prisma.questionChoice.findUnique({
+      where: { id },
+      include: {
+        question: {
+          include: {
+            topic: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!questionChoice) {
+      throw new NotFoundException(
+        `Question choice with ID ${id} not found`
+      );
+    }
+
+    return questionChoice;
+  }
+
   async addChoice(
     questionId: string,
     createChoiceDto: CreateQuestionChoiceDto
@@ -403,6 +680,52 @@ export class QuestionsService {
       data: {
         ...createChoiceDto,
         questionId,
+      },
+      include: {
+        question: {
+          select: {
+            id: true,
+            question: true,
+          },
+        },
+      },
+    });
+  }
+
+  async createQuestionChoice(createChoiceDto: CreateQuestionChoiceDto & {
+    questionId: string;
+  }) {
+    // First check if question exists
+    const question = await this.prisma.question.findUnique({
+      where: { id: createChoiceDto.questionId },
+    });
+
+    if (!question) {
+      throw new NotFoundException(
+        `Question with ID ${createChoiceDto.questionId} not found`
+      );
+    }
+
+    return this.prisma.questionChoice.create({
+      data: {
+        questionId: createChoiceDto.questionId,
+        text: createChoiceDto.text,
+        isCorrect: createChoiceDto.isCorrect || false,
+        order: createChoiceDto.order || 0,
+      },
+      include: {
+        question: {
+          select: {
+            id: true,
+            question: true,
+            topic: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -422,7 +745,22 @@ export class QuestionsService {
     return this.prisma.questionChoice.update({
       where: { id: choiceId },
       data: updateChoiceDto,
+      include: {
+        question: {
+          select: {
+            id: true,
+            question: true,
+          },
+        },
+      },
     });
+  }
+
+  async updateQuestionChoice(
+    id: string,
+    updateChoiceDto: UpdateQuestionChoiceDto
+  ) {
+    return this.updateChoice(id, updateChoiceDto);
   }
 
   async removeChoice(choiceId: string) {
@@ -437,5 +775,9 @@ export class QuestionsService {
     return this.prisma.questionChoice.delete({
       where: { id: choiceId },
     });
+  }
+
+  async removeQuestionChoice(id: string) {
+    return this.removeChoice(id);
   }
 }

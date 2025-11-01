@@ -33,6 +33,8 @@ import ChapterManagementContent from "../components/Content/ChapterManagementCon
 import TopicManagementContent from "../components/Content/TopicManagementContent";
 import QuestionPaperManagementContent from "../components/Content/QuestionPaperManagementContent";
 import QuestionPaperQuestionManagementContent from "../components/Content/QuestionPaperQuestionManagementContent";
+import QuestionManagementContent from "../components/Content/QuestionManagementContent";
+import QuestionChoiceManagementContent from "../components/Content/QuestionChoiceManagementContent";
 // import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
@@ -115,6 +117,10 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/content/sections": () => <SectionManagementContent />,
     "/admin/content/chapters": () => <ChapterManagementContent />,
     "/admin/content/topics": () => <TopicManagementContent />,
+    "/admin/content/questions": () => <QuestionManagementContent />,
+    "/admin/content/question-choices": () => (
+      <QuestionChoiceManagementContent />
+    ),
 
     // Assessment routes
     "/admin/assessments/question-papers": () => (

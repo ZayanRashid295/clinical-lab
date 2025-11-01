@@ -16,6 +16,8 @@ import ChapterManagementContent from "../src/app/components/Content/ChapterManag
 import TopicManagementContent from "../src/app/components/Content/TopicManagementContent";
 import QuestionPaperManagementContent from "../src/app/components/Content/QuestionPaperManagementContent";
 import QuestionPaperQuestionManagementContent from "../src/app/components/Content/QuestionPaperQuestionManagementContent";
+import QuestionManagementContent from "../src/app/components/Content/QuestionManagementContent";
+import QuestionChoiceManagementContent from "../src/app/components/Content/QuestionChoiceManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -243,6 +245,8 @@ export default function AdminPage() {
       sections: () => <SectionManagementContent />,
       chapters: () => <ChapterManagementContent />,
       topics: () => <TopicManagementContent />,
+      questions: () => <QuestionManagementContent />,
+      "question-choices": () => <QuestionChoiceManagementContent />,
       assessments: () => <QuestionPaperManagementContent />,
       "question-papers": () => <QuestionPaperManagementContent />,
       "question-paper-questions": () => (

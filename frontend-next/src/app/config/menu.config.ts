@@ -326,6 +326,22 @@ export const MENU_CONFIG = {
           roles: ["ADMIN"],
           order: 3,
         },
+        {
+          id: "questions",
+          label: "menu.questions",
+          icon: "❓",
+          path: "/admin/content/questions",
+          roles: ["ADMIN"],
+          order: 4,
+        },
+        {
+          id: "question-choices",
+          label: "menu.questionChoices",
+          icon: "⭕",
+          path: "/admin/content/question-choices",
+          roles: ["ADMIN"],
+          order: 5,
+        },
       ],
     },
     {
