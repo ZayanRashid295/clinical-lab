@@ -39,18 +39,22 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       <style jsx>{`
-        .sidebar-scroll::-webkit-scrollbar {
+        .sidebar-scroll::-webkit-scrollbar,
+        .submenu-scroll::-webkit-scrollbar {
           width: 6px;
         }
-        .sidebar-scroll::-webkit-scrollbar-track {
+        .sidebar-scroll::-webkit-scrollbar-track,
+        .submenu-scroll::-webkit-scrollbar-track {
           background: #374151;
           border-radius: 3px;
         }
-        .sidebar-scroll::-webkit-scrollbar-thumb {
+        .sidebar-scroll::-webkit-scrollbar-thumb,
+        .submenu-scroll::-webkit-scrollbar-thumb {
           background: #4b5563;
           border-radius: 3px;
         }
-        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover,
+        .submenu-scroll::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
         }
       `}</style>
@@ -174,11 +178,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {/* Submenu */}
                   {hasSubmenu && !isCollapsed && (
                     <div
-                      className={`ml-8 overflow-hidden transition-all duration-300 ease-out ${
+                      className={`ml-8 transition-all duration-300 ease-out submenu-scroll ${
                         isSubmenuActive
-                          ? "max-h-96 opacity-100"
-                          : "max-h-0 opacity-0"
+                          ? "max-h-[600px] opacity-100 overflow-y-auto"
+                          : "max-h-0 opacity-0 overflow-hidden"
                       }`}
+                      style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#4B5563 #374151",
+                      }}
                     >
                       <div className="py-0 space-y-0">
                         {item.submenu?.map((subItem) => {
