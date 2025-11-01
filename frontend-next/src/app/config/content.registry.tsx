@@ -36,6 +36,7 @@ import TestCreationPage from "../components/test-creation/TestCreationPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
 import EnhancedQuestionBuilder from "../components/test-creation/EnhancedQuestionBuilder";
+import NewQuestionBuilder from "../components/test-creation/NewQuestionBuilder";
 
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
@@ -115,6 +116,11 @@ export const transportationContentRegistry: ContentRegistry = {
             // TODO: Implement API call to save question
           }}
         />
+      </div>
+    ),
+    "/test-creation/new-builder": () => (
+      <div className="p-6">
+        <NewQuestionBuilder />
       </div>
     ),
     "/test-creation/settings": () => (
