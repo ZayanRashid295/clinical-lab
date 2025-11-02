@@ -1317,6 +1317,10 @@ const ModuleManager = () => {
     x: 0,
     y: 0,
   });
+  const [dragPreviewPosition, setDragPreviewPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [typeSelector, setTypeSelector] = useState<TypeSelector | null>(null);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
   const resizeStateRef = useRef<{
@@ -1519,12 +1523,13 @@ const ModuleManager = () => {
   const handleMouseDown = (e: React.MouseEvent, tableId: string) => {
     if (e.button !== 0) return;
     setDraggingTable(tableId);
-    const table = findTableById(tableId);
-    if (table) {
+    const tablePosition = tablePositions.get(tableId);
+    if (tablePosition) {
       setDragOffset({
-        x: e.clientX - table.x * zoom,
-        y: e.clientY - table.y * zoom,
+        x: e.clientX - tablePosition.x * zoom,
+        y: e.clientY - tablePosition.y * zoom,
       });
+      setDragPreviewPosition(tablePosition);
     }
   };
 
@@ -1534,7 +1539,21 @@ const ModuleManager = () => {
     const newX = (e.clientX - dragOffset.x) / zoom;
     const newY = (e.clientY - dragOffset.y) / zoom;
 
-    // Determine which column the table should belong to based on X position
+    // Update preview position
+    setDragPreviewPosition({
+      x: Math.max(0, newX),
+      y: Math.max(0, newY),
+    });
+  };
+
+  const handleMouseUp = () => {
+    if (!draggingTable || !dragPreviewPosition) {
+      setDraggingTable(null);
+      setDragPreviewPosition(null);
+      return;
+    }
+
+    // Determine which column based on X position
     const determineColumn = (x: number): number => {
       for (let col = 0; col < NUM_COLUMNS; col++) {
         const columnX = COLUMN_START_X + col * COLUMN_WIDTH;
@@ -1543,54 +1562,75 @@ const ModuleManager = () => {
           return col;
         }
       }
-      // If beyond all columns, assign to the last column
       return NUM_COLUMNS - 1;
     };
 
-    const updateTablePosition = (
-      tables: Table[],
-      tableId: string,
-      x: number,
-      y: number
-    ): Table[] =>
-      tables.map((t) =>
-        t.id === tableId
-          ? {
-              ...t,
-              x: Math.max(0, x),
-              y: Math.max(0, y),
-              column: determineColumn(x),
-            }
-          : t
-      );
+    const targetColumn = determineColumn(dragPreviewPosition.x);
+
+    // Reorder tables: move dragged table to the correct position in the target column
+    const reorderTables = (tables: Table[]): Table[] => {
+      const draggedTable = tables.find((t) => t.id === draggingTable);
+      if (!draggedTable) return tables;
+
+      // Get all tables in the target column (excluding the dragged table)
+      const tablesInTargetColumn = tables
+        .filter((t) => t.id !== draggingTable && t.column === targetColumn)
+        .sort((a, b) => {
+          const posA = tablePositions.get(a.id);
+          const posB = tablePositions.get(b.id);
+          return (posA?.y || 0) - (posB?.y || 0);
+        });
+
+      // Find insertion position based on Y coordinate
+      // Consider the middle of each table for better insertion logic
+      let insertIndex = 0;
+      for (let i = 0; i < tablesInTargetColumn.length; i++) {
+        const tablePos = tablePositions.get(tablesInTargetColumn[i].id);
+        const tableHeight = estimateTableHeight(tablesInTargetColumn[i]);
+        const tableMidY = (tablePos?.y || 0) + tableHeight / 2;
+
+        if (dragPreviewPosition.y > tableMidY) {
+          insertIndex = i + 1;
+        }
+      }
+
+      // Insert the dragged table at the correct position
+      tablesInTargetColumn.splice(insertIndex, 0, draggedTable);
+
+      // Update all tables: reset x,y to 0 for column positioning, update column assignment
+      const updatedTablesInColumn = tablesInTargetColumn.map((t, idx) => ({
+        ...t,
+        column: targetColumn,
+        x: 0,
+        y: 0,
+      }));
+
+      // Combine with tables from other columns
+      const otherTables = tables
+        .filter((t) => t.id !== draggingTable && t.column !== targetColumn)
+        .map((t) => ({ ...t, x: 0, y: 0 }));
+
+      return [...otherTables, ...updatedTablesInColumn];
+    };
 
     if (showBase) {
       setData({
         ...data,
-        base: updateTablePosition(data.base, draggingTable, newX, newY),
+        base: reorderTables(data.base),
       });
     } else {
       setData({
         ...data,
         modules: data.modules.map((m, idx) =>
           idx === selectedModuleIndex
-            ? {
-                ...m,
-                tables: updateTablePosition(
-                  m.tables,
-                  draggingTable,
-                  newX,
-                  newY
-                ),
-              }
+            ? { ...m, tables: reorderTables(m.tables) }
             : m
         ),
       });
     }
-  };
 
-  const handleMouseUp = () => {
     setDraggingTable(null);
+    setDragPreviewPosition(null);
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
@@ -1877,6 +1917,29 @@ const ModuleManager = () => {
               className="absolute top-0 left-0 pointer-events-none"
             />
 
+            {/* Column guides (visible when dragging) */}
+            {draggingTable && (
+              <div
+                style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
+              >
+                {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => (
+                  <div
+                    key={`column-guide-${colIndex}`}
+                    style={{
+                      position: "absolute",
+                      left: `${COLUMN_START_X + colIndex * COLUMN_WIDTH}px`,
+                      top: `${COLUMN_START_Y}px`,
+                      width: "240px",
+                      height: "2000px",
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                      border: "2px dashed rgba(59, 130, 246, 0.3)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
             {/* Tables */}
             <div
               style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
@@ -1887,16 +1950,24 @@ const ModuleManager = () => {
                   y: COLUMN_START_Y,
                 };
 
+                // Use drag preview position if this table is being dragged
+                const displayPosition =
+                  draggingTable === table.id && dragPreviewPosition
+                    ? dragPreviewPosition
+                    : position;
+
                 return (
                   <div
                     key={table.id}
                     onMouseDown={(e) => handleMouseDown(e, table.id)}
                     style={{
                       position: "absolute",
-                      left: `${position.x}px`,
-                      top: `${position.y}px`,
+                      left: `${displayPosition.x}px`,
+                      top: `${displayPosition.y}px`,
                       width: "240px",
                       cursor: draggingTable === table.id ? "grabbing" : "grab",
+                      opacity: draggingTable === table.id ? 0.7 : 1,
+                      zIndex: draggingTable === table.id ? 1000 : "auto",
                     }}
                     className={`rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors ${
                       getTableColor(table.id).body
