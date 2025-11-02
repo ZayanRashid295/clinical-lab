@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   Send,
   Paperclip,
@@ -81,29 +82,39 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ room, onBack }) => {
       case "IMAGE":
         return (
           <div className="space-y-2">
-            <div className="relative group">
-              <img
-                src={message.content}
-                alt="Shared image"
-                className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  target.nextElementSibling?.classList.remove("hidden");
-                }}
-              />
-              <div className="hidden absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <ImageIcon size={32} className="mx-auto mb-2" />
-                  <p className="text-sm">Image not available</p>
+            <div className="relative group w-full h-auto">
+              <div className="relative w-full h-auto rounded-lg overflow-hidden">
+                <Image
+                  src={message.content}
+                  alt="Shared image"
+                  width={800}
+                  height={600}
+                  className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  unoptimized
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    const container = target.closest('.relative');
+                    if (container) {
+                      const imageElement = container.querySelector('img');
+                      const fallback = container.querySelector('.hidden') as HTMLElement;
+                      if (imageElement) imageElement.style.display = "none";
+                      if (fallback) fallback.classList.remove("hidden");
+                    }
+                  }}
+                />
+                <div className="hidden absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10">
+                  <div className="text-center text-gray-500">
+                    <ImageIcon size={32} className="mx-auto mb-2" />
+                    <p className="text-sm">Image not available</p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => window.open(message.content, "_blank")}
+                  className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                >
+                  <ExternalLink size={14} />
+                </button>
               </div>
-              <button
-                onClick={() => window.open(message.content, "_blank")}
-                className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ExternalLink size={14} />
-              </button>
             </div>
             {message.metadata?.fileName && (
               <p className="text-xs text-gray-500 truncate">
