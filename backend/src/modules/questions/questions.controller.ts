@@ -151,6 +151,53 @@ export class QuestionsController {
     );
   }
 
+  // ========== QUESTION CHOICES (must come before :id routes) ==========
+  @Get("choices")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      "Get all question choices with filtering, pagination, and sorting",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Question choices retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllQuestionChoices(@Query() query: QueryQuestionChoiceDto) {
+    return this.questionsService.findAllQuestionChoices(query);
+  }
+
+  @Get("choices/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get question choice statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Question choice statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  getQuestionChoiceStats() {
+    return this.questionsService.getQuestionChoiceStats();
+  }
+
+  @Get("choices/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get question choice by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Question choice retrieved successfully",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Question choice not found",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findOneQuestionChoice(@Param("id") id: string) {
+    return this.questionsService.findOneQuestionChoice(id);
+  }
+
   @Get(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -196,53 +243,6 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async remove(@Param("id") id: string) {
     return this.questionsService.remove(id);
-  }
-
-  // ========== QUESTION CHOICES ==========
-  @Get("choices")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary:
-      "Get all question choices with filtering, pagination, and sorting",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Question choices retrieved successfully",
-  })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async findAllQuestionChoices(@Query() query: QueryQuestionChoiceDto) {
-    return this.questionsService.findAllQuestionChoices(query);
-  }
-
-  @Get("choices/stats")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Get question choice statistics" })
-  @ApiResponse({
-    status: 200,
-    description: "Question choice statistics retrieved successfully",
-  })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  getQuestionChoiceStats() {
-    return this.questionsService.getQuestionChoiceStats();
-  }
-
-  @Get("choices/:id")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Get question choice by ID" })
-  @ApiResponse({
-    status: 200,
-    description: "Question choice retrieved successfully",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Question choice not found",
-  })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async findOneQuestionChoice(@Param("id") id: string) {
-    return this.questionsService.findOneQuestionChoice(id);
   }
 
   @Post("choices")
