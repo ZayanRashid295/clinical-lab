@@ -1874,6 +1874,12 @@ const ModuleManager = () => {
                             </button>
                           </div>
                         </div>
+
+                        {/* Small connector lines outside table */}
+                        <div className="absolute inset-0 pointer-events-none">
+                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-2 h-px bg-gray-400 -translate-x-full" />
+                          <div className="absolute top-1/2 -translate-y-1/2 right-0 w-2 h-px bg-gray-400 translate-x-full" />
+                        </div>
                       </div>
                     ))}
                   </div>
