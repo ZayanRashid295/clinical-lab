@@ -14,7 +14,11 @@ interface MenuItemListProps {
   onDragStart: (id: string) => void;
   onDragEnd: () => void;
   onDragOver: (targetId: string, position: "before" | "after") => void;
-  onDrop: (draggedId: string, targetId: string, position: "before" | "after") => void;
+  onDrop: (
+    draggedId: string,
+    targetId: string,
+    position: "before" | "after"
+  ) => void;
   onToggleExpand: (id: string) => void;
   onEdit: (item: MenuItem) => void;
   onDelete: (id: string) => void;
@@ -66,6 +70,26 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   // Get the dragged item if it exists
   const draggedItem = draggedItemId ? findItemById(items, draggedItemId) : null;
 
+  // State to track items that should be hidden (after drag image is captured)
+  const [hiddenItems, setHiddenItems] = React.useState<Set<string>>(new Set());
+
+  // Hide item after drag image is captured
+  React.useEffect(() => {
+    if (draggedItemId) {
+      // Use requestAnimationFrame to delay hiding until after drag image is captured
+      const timer = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setHiddenItems(new Set([draggedItemId]));
+        });
+      });
+      return () => {
+        cancelAnimationFrame(timer);
+      };
+    } else {
+      setHiddenItems(new Set());
+    }
+  }, [draggedItemId]);
+
   const renderMenuItem = (
     item: MenuItem,
     depth = 0,
@@ -75,10 +99,13 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
     const isExpanded = expandedItems.has(item.id);
     const isEditing = editingId === item.id;
     const isDragging = draggedItemId === item.id;
+    const shouldHide = hiddenItems.has(item.id);
     const showDropZoneBefore =
-      dragOverPosition?.targetId === item.id && dragOverPosition.position === "before";
+      dragOverPosition?.targetId === item.id &&
+      dragOverPosition.position === "before";
     const showDropZoneAfter =
-      dragOverPosition?.targetId === item.id && dragOverPosition.position === "after";
+      dragOverPosition?.targetId === item.id &&
+      dragOverPosition.position === "after";
 
     return (
       <React.Fragment key={item.id}>
@@ -162,40 +189,46 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
           />
         )}
 
-        <MenuItemCard
-          item={item}
-          depth={depth}
-          isExpanded={isExpanded}
-          isEditing={isEditing}
-          isDragging={isDragging}
-          editData={editData}
-          draggedItemId={draggedItemId}
-          dragOverPosition={dragOverPosition}
-          onDragStart={() => onDragStart(item.id)}
-          onDragEnd={onDragEnd}
-          onDragOver={onDragOver}
-          onDrop={onDrop}
-          onToggleExpand={() => onToggleExpand(item.id)}
-          onEdit={() => onEdit(item)}
-          onDelete={() => onDelete(item.id)}
-          onMoveUp={() => onMoveUp(item.id)}
-          onMoveDown={() => onMoveDown(item.id)}
-          onPromote={() => onPromote(item.id)}
-          onDemote={() => onDemote(item.id)}
-          onEditChange={onEditChange}
-          onSaveEdit={onSaveEdit}
-          onCancelEdit={onCancelEdit}
-        >
-          {isExpanded &&
-            item.submenu &&
-            item.submenu.length > 0 && (
+        {/* Hide the item visually when dragging but keep it rendered for drag image */}
+        <div style={{ display: shouldHide ? "none" : "block" }}>
+          <MenuItemCard
+            item={item}
+            depth={depth}
+            isExpanded={isExpanded}
+            isEditing={isEditing}
+            isDragging={isDragging}
+            editData={editData}
+            draggedItemId={draggedItemId}
+            dragOverPosition={dragOverPosition}
+            onDragStart={() => onDragStart(item.id)}
+            onDragEnd={onDragEnd}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            onToggleExpand={() => onToggleExpand(item.id)}
+            onEdit={() => onEdit(item)}
+            onDelete={() => onDelete(item.id)}
+            onMoveUp={() => onMoveUp(item.id)}
+            onMoveDown={() => onMoveDown(item.id)}
+            onPromote={() => onPromote(item.id)}
+            onDemote={() => onDemote(item.id)}
+            onEditChange={onEditChange}
+            onSaveEdit={onSaveEdit}
+            onCancelEdit={onCancelEdit}
+          >
+            {isExpanded && item.submenu && item.submenu.length > 0 && (
               <>
                 {item.submenu.map((subItem, subIndex) =>
-                  renderMenuItem(subItem, depth + 1, subIndex, item.submenu || [])
+                  renderMenuItem(
+                    subItem,
+                    depth + 1,
+                    subIndex,
+                    item.submenu || []
+                  )
                 )}
               </>
             )}
-        </MenuItemCard>
+          </MenuItemCard>
+        </div>
 
         {/* Drop zone after item */}
         {showDropZoneAfter && draggedItem ? (

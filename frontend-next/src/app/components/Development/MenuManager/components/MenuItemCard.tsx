@@ -86,8 +86,26 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
     <div className={`${depth > 0 ? "ml-6" : ""}`}>
       <div
         draggable={!isEditing}
+        ref={(el) => {
+          if (el && !isEditing) {
+            // Store ref for drag image creation
+            (el as any)._menuItemRef = el;
+          }
+        }}
         onDragStart={(e) => {
           if (!isEditing) {
+            // Create custom drag image from element clone
+            const dragElement = e.currentTarget;
+            const clone = dragElement.cloneNode(true) as HTMLElement;
+            clone.style.position = "absolute";
+            clone.style.top = "-9999px";
+            clone.style.opacity = "0.8";
+            document.body.appendChild(clone);
+            const rect = dragElement.getBoundingClientRect();
+            e.dataTransfer.setDragImage(clone, e.clientX - rect.left, e.clientY - rect.top);
+            // Remove clone after drag starts
+            setTimeout(() => document.body.removeChild(clone), 0);
+            
             onDragStart();
             e.dataTransfer.effectAllowed = "move";
             e.dataTransfer.setData("text/plain", item.id);
