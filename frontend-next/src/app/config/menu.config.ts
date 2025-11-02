@@ -349,6 +349,22 @@ export const MENU_CONFIG = {
         },
       ],
     },
+    {
+      id: "development",
+      label: "Development",
+      icon: "🛠️",
+      path: "/development",
+      roles: ["ADMIN"],
+      submenu: [
+        {
+          id: "menu-manager",
+          label: "Menu Manager",
+          icon: "📋",
+          path: "/development/menu-manager",
+          roles: ["ADMIN"],
+        },
+      ],
+    },
   ],
 
   /*

@@ -62,6 +62,9 @@ import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
 // Import robotic components
 import RobotFace from "../components/robotic/RobotFace";
 
+// Import development components
+import MenuManager from "../components/Development/MenuManager";
+
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
 
@@ -189,6 +192,9 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Robotic routes
     "/robotic": () => <RobotFace />,
+
+    // Development routes
+    "/development/menu-manager": () => <MenuManager />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
