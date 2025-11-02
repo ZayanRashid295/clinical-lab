@@ -1,13 +1,6 @@
 export const MENU_CONFIG = {
   items: [
     {
-      id: "dashboard",
-      label: "menu.dashboard",
-      icon: "🏠",
-      path: "/test-creation/new",
-      roles: ["ADMIN", "FACULTY"],
-    },
-    {
       id: "study",
       label: "menu.study",
       icon: "📚",
@@ -43,6 +36,13 @@ export const MENU_CONFIG = {
           roles: ["ADMIN", "STUDENT", "FACULTY"],
         },
       ],
+    },
+    {
+      id: "dashboard",
+      label: "menu.dashboard",
+      icon: "🏠",
+      path: "/test-creation/new",
+      roles: ["ADMIN", "FACULTY"],
     },
     {
       id: "payments",
@@ -361,6 +361,13 @@ export const MENU_CONFIG = {
           label: "Menu Manager",
           icon: "📋",
           path: "/development/menu-manager",
+          roles: ["ADMIN"],
+        },
+        {
+          id: "ref-design",
+          label: "Ref Design",
+          icon: "🎨",
+          path: "/development/ref-design",
           roles: ["ADMIN"],
         },
       ],

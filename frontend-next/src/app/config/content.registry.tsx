@@ -64,6 +64,7 @@ import RobotFace from "../components/robotic/RobotFace";
 
 // Import development components
 import MenuManager from "../components/Development/MenuManager";
+import RefDesign from "../components/Development/ref-design";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -195,6 +196,7 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Development routes
     "/development/menu-manager": () => <MenuManager />,
+    "/development/ref-design": () => <RefDesign />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
@@ -217,35 +219,3 @@ export const transportationContentRegistry: ContentRegistry = {
     </div>
   ),
 };
-
-// Generic placeholder components for common use cases
-const PlaceholderComponent = ({
-  title,
-  description,
-  icon = "📄",
-}: {
-  title: string;
-  description: string;
-  icon?: string;
-}) => (
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-      <p className="mt-2 text-gray-600">{description}</p>
-    </div>
-    <div className="bg-white rounded-lg shadow border p-6">
-      <div className="text-center py-12">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-gray-600 text-2xl">{icon}</span>
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          {title} Dashboard
-        </h3>
-        <p className="text-gray-600 mb-6">
-          This is a placeholder for the {title} dashboard. Configure specific
-          content for this section in your content registry.
-        </p>
-      </div>
-    </div>
-  </div>
-);

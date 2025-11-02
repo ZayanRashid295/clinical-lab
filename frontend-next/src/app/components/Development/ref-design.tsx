@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { MenuItem } from "../../types/menu";
 
-const MenuManager = () => {
+const RefDesign = () => {
   const initialItems = [
     {
       id: "dashboard",
@@ -890,4 +890,4 @@ const EditItemForm = ({
   );
 };
 
-export default MenuManager;
+export default RefDesign;
