@@ -1,5 +1,5 @@
 import { useState } from "react";
-import UserEditModal from "../src/app/components/Users/UserEditModal";
+import UserFormModal from "../src/app/components/Users/UserFormModal";
 import { User } from "../src/app/types/user";
 
 export default function TestUserEdit() {
@@ -53,11 +53,12 @@ export default function TestUserEdit() {
           Open Edit Modal
         </button>
 
-        <UserEditModal
+        <UserFormModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           user={testUser}
-          onUserUpdated={handleUserUpdated}
+          onUserSaved={handleUserUpdated}
+          mode="edit"
         />
       </div>
     </div>
