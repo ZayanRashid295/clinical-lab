@@ -146,7 +146,7 @@ const ModuleManager = () => {
 
   // Column-based positioning constants
   const NUM_COLUMNS = 4;
-  const COLUMN_WIDTH = 400; // Space between column starts
+  const COLUMN_WIDTH = 350; // Space between column starts
   const COLUMN_START_X = 50;
   const COLUMN_START_Y = 50;
   const TABLE_VERTICAL_GAP = 40; // Gap between tables in a column
