@@ -1588,8 +1588,8 @@ const ModuleManager = () => {
           >
             <canvas
               ref={canvasRef}
-              width={1400}
-              height={800}
+              width={1600}
+              height={1000}
               className="absolute top-0 left-0 pointer-events-none"
             />
 
@@ -1605,7 +1605,7 @@ const ModuleManager = () => {
                     position: "absolute",
                     left: `${table.x}px`,
                     top: `${table.y}px`,
-                    width: "180px",
+                    width: "240px",
                     cursor: draggingTable === table.id ? "grabbing" : "grab",
                   }}
                   className="bg-white rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors"
@@ -1660,8 +1660,12 @@ const ModuleManager = () => {
                           }
                         }}
                         onClick={(e) => e.stopPropagation()}
-                        className="font-bold text-xs leading-tight bg-transparent outline-none text-white placeholder-gray-200 flex-1 min-w-0 px-1 rounded hover:bg-blue-500 focus:bg-blue-500 truncate"
+                        className="font-bold text-xs leading-tight bg-transparent outline-none text-white placeholder-gray-200 w-auto min-w-0 px-1 rounded hover:bg-blue-500 focus:bg-blue-500"
+                        style={{
+                          width: `${Math.max(table.name.length + 1, 8)}ch`,
+                        }}
                         placeholder="Table name"
+                        title={table.name}
                       />
                       <button
                         onClick={(e) => {
@@ -1710,6 +1714,7 @@ const ModuleManager = () => {
                                 }
                               }}
                               className="font-medium text-gray-800 bg-transparent outline-none text-xs px-1 rounded flex-1 min-w-0 hover:bg-gray-200 focus:bg-gray-200 truncate"
+                              title={field.name}
                             />
                           </div>
                           <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -1726,6 +1731,7 @@ const ModuleManager = () => {
                                 });
                               }}
                               className="text-xs text-blue-600 hover:text-blue-800 font-medium px-1 py-0.5 rounded hover:bg-blue-50 flex-shrink-0 whitespace-nowrap"
+                              title={field.type}
                             >
                               {field.type}
                             </button>
