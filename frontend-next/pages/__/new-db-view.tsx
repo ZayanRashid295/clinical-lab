@@ -100,20 +100,44 @@ const ModuleManager = () => {
     "bg-rose-500",
   ];
 
-  // Get color for a relationship based on the foreign key field
-  const getRelationshipColor = (fromTableId: string, fromFieldId: string) => {
+  // Get relationship number and color
+  const getRelationshipInfo = (fromTableId: string, fromFieldId: string) => {
     const key = `${fromTableId}-${fromFieldId}`;
+
+    // Generate consistent hash for color
     let hash = 0;
     for (let i = 0; i < key.length; i++) {
       hash = (hash << 5) - hash + key.charCodeAt(i);
       hash = hash & hash; // Convert to 32-bit integer
     }
-    const index = Math.abs(hash) % relationshipColors.length;
-    return relationshipColors[index];
+    const colorIndex = Math.abs(hash) % relationshipColors.length;
+
+    // Collect all foreign keys in order to assign relationship numbers
+    const allForeignKeys: Array<{ tableId: string; fieldId: string }> = [];
+    [...data.base, ...data.modules.flatMap((m) => m.tables)].forEach(
+      (table) => {
+        table.fields.forEach((field) => {
+          if (field.foreignKey) {
+            allForeignKeys.push({ tableId: table.id, fieldId: field.id });
+          }
+        });
+      }
+    );
+
+    // Find the index of this foreign key to determine its relationship number
+    const relationshipNumber =
+      allForeignKeys.findIndex(
+        (fk) => fk.tableId === fromTableId && fk.fieldId === fromFieldId
+      ) + 1;
+
+    return {
+      number: relationshipNumber,
+      color: relationshipColors[colorIndex],
+    };
   };
 
-  // Get color for a primary key field by finding its referencing foreign key
-  const getRelationshipColorForPrimaryKey = (
+  // Get relationship info for a primary key field by finding its referencing foreign key
+  const getRelationshipInfoForPrimaryKey = (
     tableId: string,
     fieldId: string
   ) => {
@@ -128,13 +152,13 @@ const ModuleManager = () => {
           field.foreignKey.columnName === fieldId
         ) {
           // Found a foreign key that references this primary key
-          return getRelationshipColor(table.id, field.id);
+          return getRelationshipInfo(table.id, field.id);
         }
       }
     }
 
     // Fallback if no foreign key found
-    return "bg-gray-400";
+    return { number: 0, color: "bg-gray-400" };
   };
 
   // Get color for a table based on a stable hash of its ID (so color doesn't change when reordering)
@@ -2267,38 +2291,64 @@ const ModuleManager = () => {
                           <div className="absolute inset-0 pointer-events-none">
                             <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-px bg-gray-400 -translate-x-[120%]" />
                             <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-px bg-gray-400 translate-x-[120%]" />
-                            {field.foreignKey && (
-                              <>
-                                <div
-                                  className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
+                            {field.foreignKey &&
+                              (() => {
+                                const relationInfo = getRelationshipInfo(
+                                  table.id,
+                                  field.id
+                                );
+                                return (
+                                  <>
+                                    {/* Left connector circle */}
+                                    <div
+                                      className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] ${relationInfo.color}`}
+                                    />
+                                    {/* Left label (independent, above circle) */}
+                                    <span className="absolute top-1/2 left-0 -translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                      {relationInfo.number}a
+                                    </span>
+
+                                    {/* Right connector circle */}
+                                    <div
+                                      className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] ${relationInfo.color}`}
+                                    />
+                                    {/* Right label (independent, above circle) */}
+                                    <span className="absolute top-1/2 right-0 translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                      {relationInfo.number}b
+                                    </span>
+                                  </>
+                                );
+                              })()}
+                            {field.primaryKey &&
+                              (() => {
+                                const relationInfo =
+                                  getRelationshipInfoForPrimaryKey(
                                     table.id,
                                     field.id
-                                  )}`}
-                                />
-                                <div
-                                  className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
-                                    table.id,
-                                    field.id
-                                  )}`}
-                                />
-                              </>
-                            )}
-                            {field.primaryKey && (
-                              <>
-                                <div
-                                  className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
-                                    table.id,
-                                    field.id
-                                  )}`}
-                                />
-                                <div
-                                  className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
-                                    table.id,
-                                    field.id
-                                  )}`}
-                                />
-                              </>
-                            )}
+                                  );
+                                if (relationInfo.number === 0) return null; // No relationship
+                                return (
+                                  <>
+                                    {/* Left connector circle */}
+                                    <div
+                                      className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] ${relationInfo.color}`}
+                                    />
+                                    {/* Left label (independent, above circle) */}
+                                    <span className="absolute top-1/2 left-0 -translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                      {relationInfo.number}c
+                                    </span>
+
+                                    {/* Right connector circle */}
+                                    <div
+                                      className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] ${relationInfo.color}`}
+                                    />
+                                    {/* Right label (independent, above circle) */}
+                                    <span className="absolute top-1/2 right-0 translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                      {relationInfo.number}d
+                                    </span>
+                                  </>
+                                );
+                              })()}
                           </div>
                         </div>
                       ))}
