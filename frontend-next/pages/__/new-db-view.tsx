@@ -1244,8 +1244,8 @@ const ModuleManager = () => {
   // Calculate field position within a table
   const getFieldPosition = (table: Table, fieldIndex: number) => {
     const tableHeaderHeight = 36; // Header height with padding
-    const fieldHeight = 16; // Actual field height (py-0.5 = 2px * 2 + content)
-    const fieldVerticalGap = 2; // Gap between fields (py-0.5 creates 2px gap)
+    const fieldHeight = 20; // Actual field height (py-1 = 4px * 2 + content)
+    const fieldVerticalGap = 8; // Gap between fields (border-b-2 = 2px + py-1 spacing)
 
     // Calculate Y position: table top + header + field index * (field height + gap) + field center
     const fieldY =
@@ -1259,7 +1259,7 @@ const ModuleManager = () => {
     const isForeignKey = field?.foreignKey;
 
     // Position based on field type: FK fields connect from left edge, PK fields from right edge
-    const fieldX = isForeignKey ? table.x + 8 : table.x + 232; // 8px from left for FK, 8px from right (240-8) for PK
+    const fieldX = isForeignKey ? table.x : table.x + 240; // Left edge for FK, right edge for PK
 
     return { x: fieldX, y: fieldY };
   };
@@ -1271,29 +1271,6 @@ const ModuleManager = () => {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid every 5 pixels
-    ctx.strokeStyle = "#f1f5f9"; // Very light slate color
-    ctx.lineWidth = 0.5;
-    ctx.setLineDash([]);
-
-    // Vertical lines
-    for (let x = 0; x < canvas.width; x += 5) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-
-    // Horizontal lines
-    for (let y = 0; y < canvas.height; y += 5) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-
-    // Reset for connection drawing
     ctx.strokeStyle = "#64748b";
     ctx.lineWidth = 2;
     ctx.setLineDash([]);
@@ -1831,11 +1808,11 @@ const ModuleManager = () => {
                   </div>
 
                   {/* Fields */}
-                  <div className="max-h-48 overflow-y-auto relative">
+                  <div className="relative">
                     {table.fields.map((field, fieldIndex) => (
                       <div
                         key={field.id}
-                        className="py-0.5 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0 relative"
+                        className="py-1 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0 relative border-b-2 border-gray-300 last:border-b-0"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex-1 min-w-0 flex items-center gap-0.5">
@@ -1896,34 +1873,6 @@ const ModuleManager = () => {
                               <Trash2 size={12} />
                             </button>
                           </div>
-                        </div>
-
-                        {/* Connector line for the field */}
-                        <div
-                          className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
-                          style={{
-                            left: field.foreignKey ? "-12px" : "100%",
-                            width: "12px",
-                          }}
-                        >
-                          {/* Horizontal line */}
-                          <div
-                            className="absolute top-1/2 -translate-y-1/2 bg-slate-500"
-                            style={{
-                              left: field.foreignKey ? "0" : "auto",
-                              right: field.foreignKey ? "auto" : "0",
-                              width: "8px",
-                              height: "1px",
-                            }}
-                          />
-                          {/* Circle at the end */}
-                          <div
-                            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-slate-500 rounded-full border border-white"
-                            style={{
-                              left: field.foreignKey ? "-2px" : "auto",
-                              right: field.foreignKey ? "auto" : "-2px",
-                            }}
-                          />
                         </div>
                       </div>
                     ))}
