@@ -49,6 +49,23 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   onSaveEdit,
   onCancelEdit,
 }) => {
+  // Helper function to find an item by ID recursively
+  const findItemById = (arr: MenuItem[], id: string): MenuItem | null => {
+    for (const item of arr) {
+      if (item.id === id) {
+        return item;
+      }
+      if (item.submenu) {
+        const found = findItemById(item.submenu, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Get the dragged item if it exists
+  const draggedItem = draggedItemId ? findItemById(items, draggedItemId) : null;
+
   const renderMenuItem = (
     item: MenuItem,
     depth = 0,
@@ -66,34 +83,84 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
     return (
       <React.Fragment key={item.id}>
         {/* Drop zone before item */}
-        <div
-          className={`transition-all ${
-            showDropZoneBefore
-              ? "h-8 -my-1 bg-blue-400 border-2 border-blue-600 border-dashed rounded z-10"
-              : draggedItemId && draggedItemId !== item.id
-              ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
-              : "h-1"
-          }`}
-          onDragOver={(e) => {
-            if (draggedItemId && draggedItemId !== item.id) {
+        {showDropZoneBefore && draggedItem ? (
+          <div
+            className="opacity-60 border-2 border-blue-600 border-dashed rounded -my-1 z-10 pointer-events-auto"
+            onDragOver={(e) => {
+              if (draggedItemId && draggedItemId !== item.id) {
+                e.preventDefault();
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                if (y < rect.height / 2) {
+                  onDragOver(item.id, "before");
+                }
+              }
+            }}
+            onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const rect = e.currentTarget.getBoundingClientRect();
-              const y = e.clientY - rect.top;
-              if (y < rect.height / 2) {
-                onDragOver(item.id, "before");
+              if (draggedItemId && draggedItemId !== item.id) {
+                onDrop(draggedItemId, item.id, "before");
+                onDragEnd();
               }
-            }
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (draggedItemId && draggedItemId !== item.id) {
-              onDrop(draggedItemId, item.id, "before");
-              onDragEnd();
-            }
-          }}
-        />
+            }}
+          >
+            <div className="pointer-events-none">
+              <MenuItemCard
+                item={draggedItem}
+                depth={depth}
+                isExpanded={false}
+                isEditing={false}
+                isDragging={false}
+                editData={editData}
+                draggedItemId={draggedItemId}
+                dragOverPosition={dragOverPosition}
+                onDragStart={() => {}}
+                onDragEnd={onDragEnd}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                onToggleExpand={() => {}}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                onMoveUp={() => {}}
+                onMoveDown={() => {}}
+                onPromote={() => {}}
+                onDemote={() => {}}
+                onEditChange={onEditChange}
+                onSaveEdit={onSaveEdit}
+                onCancelEdit={onCancelEdit}
+              />
+            </div>
+          </div>
+        ) : (
+          <div
+            className={`transition-all ${
+              draggedItemId && draggedItemId !== item.id
+                ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
+                : "h-1"
+            }`}
+            onDragOver={(e) => {
+              if (draggedItemId && draggedItemId !== item.id) {
+                e.preventDefault();
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                if (y < rect.height / 2) {
+                  onDragOver(item.id, "before");
+                }
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (draggedItemId && draggedItemId !== item.id) {
+                onDrop(draggedItemId, item.id, "before");
+                onDragEnd();
+              }
+            }}
+          />
+        )}
 
         <MenuItemCard
           item={item}
@@ -131,34 +198,84 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
         </MenuItemCard>
 
         {/* Drop zone after item */}
-        <div
-          className={`transition-all ${
-            showDropZoneAfter
-              ? "h-8 -my-1 bg-blue-400 border-2 border-blue-600 border-dashed rounded z-10"
-              : draggedItemId && draggedItemId !== item.id
-              ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
-              : "h-1"
-          }`}
-          onDragOver={(e) => {
-            if (draggedItemId && draggedItemId !== item.id) {
+        {showDropZoneAfter && draggedItem ? (
+          <div
+            className="opacity-60 border-2 border-blue-600 border-dashed rounded -my-1 z-10 pointer-events-auto"
+            onDragOver={(e) => {
+              if (draggedItemId && draggedItemId !== item.id) {
+                e.preventDefault();
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                if (y > rect.height / 2) {
+                  onDragOver(item.id, "after");
+                }
+              }
+            }}
+            onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const rect = e.currentTarget.getBoundingClientRect();
-              const y = e.clientY - rect.top;
-              if (y > rect.height / 2) {
-                onDragOver(item.id, "after");
+              if (draggedItemId && draggedItemId !== item.id) {
+                onDrop(draggedItemId, item.id, "after");
+                onDragEnd();
               }
-            }
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (draggedItemId && draggedItemId !== item.id) {
-              onDrop(draggedItemId, item.id, "after");
-              onDragEnd();
-            }
-          }}
-        />
+            }}
+          >
+            <div className="pointer-events-none">
+              <MenuItemCard
+                item={draggedItem}
+                depth={depth}
+                isExpanded={false}
+                isEditing={false}
+                isDragging={false}
+                editData={editData}
+                draggedItemId={draggedItemId}
+                dragOverPosition={dragOverPosition}
+                onDragStart={() => {}}
+                onDragEnd={onDragEnd}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                onToggleExpand={() => {}}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                onMoveUp={() => {}}
+                onMoveDown={() => {}}
+                onPromote={() => {}}
+                onDemote={() => {}}
+                onEditChange={onEditChange}
+                onSaveEdit={onSaveEdit}
+                onCancelEdit={onCancelEdit}
+              />
+            </div>
+          </div>
+        ) : (
+          <div
+            className={`transition-all ${
+              draggedItemId && draggedItemId !== item.id
+                ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
+                : "h-1"
+            }`}
+            onDragOver={(e) => {
+              if (draggedItemId && draggedItemId !== item.id) {
+                e.preventDefault();
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                if (y > rect.height / 2) {
+                  onDragOver(item.id, "after");
+                }
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (draggedItemId && draggedItemId !== item.id) {
+                onDrop(draggedItemId, item.id, "after");
+                onDragEnd();
+              }
+            }}
+          />
+        )}
       </React.Fragment>
     );
   };
