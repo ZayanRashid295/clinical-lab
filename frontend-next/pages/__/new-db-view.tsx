@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   Plus,
   Trash2,
@@ -143,17 +143,22 @@ const ModuleManager = () => {
     return tableColors[tableIndex % tableColors.length];
   };
 
-  // Helper to generate table positions in columns
+  // Helper to generate table positions in columns (simplified for initial data)
   const getTablePosition = (
     index: number,
     startX = 50,
     startY = 50,
-    spacingX = 400, // Increased horizontal spacing between columns
+    spacingX = 400, // Horizontal spacing between columns
     spacingY = 350 // Vertical spacing between tables in a column
   ) => {
-    const perColumn = 4; // 4 tables per column
-    const column = Math.floor(index / perColumn); // Which column (0, 1, 2, etc.)
-    const row = index % perColumn; // Which row in that column (0-3)
+    // For initial data, assume we want 4 columns and distribute tables evenly
+    const totalTables = 25; // Approximate total based on current structure
+    const numColumns = 4; // Fixed at 4 columns as requested
+    const tablesPerColumn = Math.ceil(totalTables / numColumns);
+
+    const column = Math.floor(index / tablesPerColumn); // Which column
+    const row = index % tablesPerColumn; // Which row in that column
+
     return {
       x: startX + column * spacingX,
       y: startY + row * spacingY,
@@ -1248,6 +1253,27 @@ const ModuleManager = () => {
   }>({ isResizing: false, startX: 0, startWidth: 400 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Dynamic table positioning function that can access current data
+  const getDynamicTablePosition = useMemo(() => {
+    return (
+      index: number,
+      startX = 50,
+      startY = 50,
+      spacingX = 400, // Horizontal spacing between tables in a row
+      spacingY = 350 // Vertical spacing between rows
+    ) => {
+      const tablesPerRow = 4; // 4 tables per row
+
+      const row = Math.floor(index / tablesPerRow); // Which row
+      const col = index % tablesPerRow; // Which column in that row
+
+      return {
+        x: startX + col * spacingX,
+        y: startY + row * spacingY,
+      };
+    };
+  }, [data]);
+
   const currentModule = data.modules[selectedModuleIndex];
   const currentTables = showBase ? data.base : currentModule?.tables || [];
   const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
@@ -1299,13 +1325,21 @@ const ModuleManager = () => {
 
   // Calculate field position within a table
   const getFieldPosition = (table: Table, fieldIndex: number) => {
+    // Get the table's current position (use stored position if dragged, otherwise dynamic)
+    const tableIndex = currentTables.findIndex((t) => t.id === table.id);
+    const dynamicPosition = getDynamicTablePosition(tableIndex);
+    const tablePosition = {
+      x: table.x !== undefined ? table.x : dynamicPosition.x,
+      y: table.y !== undefined ? table.y : dynamicPosition.y,
+    };
+
     const tableHeaderHeight = 36; // Header height with padding
     const fieldHeight = 20; // Actual field height (py-1 = 4px * 2 + content)
     const fieldVerticalGap = 8; // Gap between fields (border-b-2 = 2px + py-1 spacing)
 
     // Calculate Y position: table top + header + field index * (field height + gap) + field center
     const fieldY =
-      table.y +
+      tablePosition.y +
       tableHeaderHeight +
       fieldIndex * (fieldHeight + fieldVerticalGap) +
       fieldHeight / 2;
@@ -1315,7 +1349,7 @@ const ModuleManager = () => {
     const isForeignKey = field?.foreignKey;
 
     // Position based on field type: FK fields connect from left edge, PK fields from right edge
-    const fieldX = isForeignKey ? table.x : table.x + 240; // Left edge for FK, right edge for PK
+    const fieldX = isForeignKey ? tablePosition.x : tablePosition.x + 240; // Left edge for FK, right edge for PK
 
     return { x: fieldX, y: fieldY };
   };
@@ -1721,216 +1755,225 @@ const ModuleManager = () => {
             <div
               style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
             >
-              {currentTables.map((table) => (
-                <div
-                  key={table.id}
-                  onMouseDown={(e) => handleMouseDown(e, table.id)}
-                  style={{
-                    position: "absolute",
-                    left: `${table.x}px`,
-                    top: `${table.y}px`,
-                    width: "240px",
-                    cursor: draggingTable === table.id ? "grabbing" : "grab",
-                  }}
-                  className={`rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors ${
-                    getTableColor(table.id).body
-                  }`}
-                >
-                  {/* Table Header */}
+              {currentTables.map((table, index) => {
+                // Use stored position if table has been dragged, otherwise use dynamic position
+                const dynamicPosition = getDynamicTablePosition(index);
+                const position = {
+                  x: table.x !== undefined ? table.x : dynamicPosition.x,
+                  y: table.y !== undefined ? table.y : dynamicPosition.y,
+                };
+
+                return (
                   <div
-                    className={`bg-gradient-to-r ${
-                      getTableColor(table.id).header
-                    } text-white p-2 rounded-t-md`}
-                  >
-                    <div className="flex items-center justify-between gap-1 min-w-0">
-                      <input
-                        type="text"
-                        value={table.name}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          const updateTableName = (
-                            tables: Table[],
-                            tableId: string,
-                            name: string
-                          ): Table[] =>
-                            tables.map((t) =>
-                              t.id === tableId ? { ...t, name } : t
-                            );
-
-                          if (showBase) {
-                            setData({
-                              ...data,
-                              base: updateTableName(
-                                data.base,
-                                table.id,
-                                e.target.value
-                              ),
-                            });
-                          } else {
-                            setData({
-                              ...data,
-                              modules: data.modules.map((m, idx) =>
-                                idx === selectedModuleIndex
-                                  ? {
-                                      ...m,
-                                      tables: updateTableName(
-                                        m.tables,
-                                        table.id,
-                                        e.target.value
-                                      ),
-                                    }
-                                  : m
-                              ),
-                            });
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.currentTarget.blur();
-                          }
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                        className="font-bold text-xs leading-tight bg-transparent outline-none text-white placeholder-gray-200 w-auto min-w-0 px-1 rounded hover:bg-blue-500 focus:bg-blue-500"
-                        style={{
-                          width: `${Math.max(table.name.length + 1, 8)}ch`,
-                        }}
-                        placeholder="Table name"
-                        title={table.name}
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteTable(table.id);
-                        }}
-                        className="p-1 hover:bg-red-600 rounded transition-colors opacity-80 hover:opacity-100 flex-shrink-0"
-                        title="Delete table"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Fields */}
-                  <div className="relative">
-                    {table.fields.map((field, fieldIndex) => (
-                      <div
-                        key={field.id}
-                        className="py-1 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0 relative border-b-2 border-gray-300 last:border-b-0"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="flex-1 min-w-0 flex items-center gap-0.5">
-                          <div className="flex items-center gap-1 mb-0.5 min-w-0 flex-1">
-                            {field.primaryKey && (
-                              <span className="text-yellow-600 font-bold flex-shrink-0">
-                                🔑
-                              </span>
-                            )}
-                            {field.foreignKey && (
-                              <span className="text-purple-600 font-bold flex-shrink-0">
-                                🔗
-                              </span>
-                            )}
-                            <input
-                              type="text"
-                              value={field.name}
-                              onChange={(e) =>
-                                updateField(table.id, field.id, {
-                                  name: e.target.value,
-                                })
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.currentTarget.blur();
-                                }
-                              }}
-                              className="font-medium text-gray-800 bg-transparent outline-none text-xs px-1 rounded flex-1 min-w-0 hover:bg-gray-200 focus:bg-gray-200 truncate"
-                              title={field.name}
-                            />
-                          </div>
-                          <div className="flex items-center gap-0.5 flex-shrink-0">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const rect =
-                                  e.currentTarget.getBoundingClientRect();
-                                setTypeSelector({
-                                  tableId: table.id,
-                                  fieldId: field.id,
-                                  x: rect.left,
-                                  y: rect.top,
-                                });
-                              }}
-                              className="text-xs text-blue-600 hover:text-blue-800 font-medium px-1 py-0.5 rounded hover:bg-blue-50 flex-shrink-0 whitespace-nowrap"
-                              title={field.type}
-                            >
-                              {field.type}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteColumn(table.id, field.id);
-                              }}
-                              className="p-0.5 hover:bg-red-100 rounded opacity-0 group-hover:opacity-100 transition-all text-red-600 flex-shrink-0"
-                              title="Delete field"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Small connector lines outside table */}
-                        <div className="absolute inset-0 pointer-events-none">
-                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-px bg-gray-400 -translate-x-[120%]" />
-                          <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-px bg-gray-400 translate-x-[120%]" />
-                          {field.foreignKey && (
-                            <>
-                              <div
-                                className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
-                                  table.id,
-                                  field.id
-                                )}`}
-                              />
-                              <div
-                                className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
-                                  table.id,
-                                  field.id
-                                )}`}
-                              />
-                            </>
-                          )}
-                          {field.primaryKey && (
-                            <>
-                              <div
-                                className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
-                                  table.id,
-                                  field.id
-                                )}`}
-                              />
-                              <div
-                                className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
-                                  table.id,
-                                  field.id
-                                )}`}
-                              />
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add Field Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addColumn(table.id);
+                    key={table.id}
+                    onMouseDown={(e) => handleMouseDown(e, table.id)}
+                    style={{
+                      position: "absolute",
+                      left: `${position.x}px`,
+                      top: `${position.y}px`,
+                      width: "240px",
+                      cursor: draggingTable === table.id ? "grabbing" : "grab",
                     }}
-                    className="w-full text-blue-600 hover:text-blue-700 font-medium text-xs py-0.25 border-t border-gray-200 hover:bg-blue-50 transition-colors"
+                    className={`rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors ${
+                      getTableColor(table.id).body
+                    }`}
                   >
-                    + Column
-                  </button>
-                </div>
-              ))}
+                    {/* Table Header */}
+                    <div
+                      className={`bg-gradient-to-r ${
+                        getTableColor(table.id).header
+                      } text-white p-2 rounded-t-md`}
+                    >
+                      <div className="flex items-center justify-between gap-1 min-w-0">
+                        <input
+                          type="text"
+                          value={table.name}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            const updateTableName = (
+                              tables: Table[],
+                              tableId: string,
+                              name: string
+                            ): Table[] =>
+                              tables.map((t) =>
+                                t.id === tableId ? { ...t, name } : t
+                              );
+
+                            if (showBase) {
+                              setData({
+                                ...data,
+                                base: updateTableName(
+                                  data.base,
+                                  table.id,
+                                  e.target.value
+                                ),
+                              });
+                            } else {
+                              setData({
+                                ...data,
+                                modules: data.modules.map((m, idx) =>
+                                  idx === selectedModuleIndex
+                                    ? {
+                                        ...m,
+                                        tables: updateTableName(
+                                          m.tables,
+                                          table.id,
+                                          e.target.value
+                                        ),
+                                      }
+                                    : m
+                                ),
+                              });
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-bold text-xs leading-tight bg-transparent outline-none text-white placeholder-gray-200 w-auto min-w-0 px-1 rounded hover:bg-blue-500 focus:bg-blue-500"
+                          style={{
+                            width: `${Math.max(table.name.length + 1, 8)}ch`,
+                          }}
+                          placeholder="Table name"
+                          title={table.name}
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteTable(table.id);
+                          }}
+                          className="p-1 hover:bg-red-600 rounded transition-colors opacity-80 hover:opacity-100 flex-shrink-0"
+                          title="Delete table"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Fields */}
+                    <div className="relative">
+                      {table.fields.map((field, fieldIndex) => (
+                        <div
+                          key={field.id}
+                          className="py-1 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0 relative border-b-2 border-gray-300 last:border-b-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="flex-1 min-w-0 flex items-center gap-0.5">
+                            <div className="flex items-center gap-1 mb-0.5 min-w-0 flex-1">
+                              {field.primaryKey && (
+                                <span className="text-yellow-600 font-bold flex-shrink-0">
+                                  🔑
+                                </span>
+                              )}
+                              {field.foreignKey && (
+                                <span className="text-purple-600 font-bold flex-shrink-0">
+                                  🔗
+                                </span>
+                              )}
+                              <input
+                                type="text"
+                                value={field.name}
+                                onChange={(e) =>
+                                  updateField(table.id, field.id, {
+                                    name: e.target.value,
+                                  })
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.currentTarget.blur();
+                                  }
+                                }}
+                                className="font-medium text-gray-800 bg-transparent outline-none text-xs px-1 rounded flex-1 min-w-0 hover:bg-gray-200 focus:bg-gray-200 truncate"
+                                title={field.name}
+                              />
+                            </div>
+                            <div className="flex items-center gap-0.5 flex-shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect =
+                                    e.currentTarget.getBoundingClientRect();
+                                  setTypeSelector({
+                                    tableId: table.id,
+                                    fieldId: field.id,
+                                    x: rect.left,
+                                    y: rect.top,
+                                  });
+                                }}
+                                className="text-xs text-blue-600 hover:text-blue-800 font-medium px-1 py-0.5 rounded hover:bg-blue-50 flex-shrink-0 whitespace-nowrap"
+                                title={field.type}
+                              >
+                                {field.type}
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteColumn(table.id, field.id);
+                                }}
+                                className="p-0.5 hover:bg-red-100 rounded opacity-0 group-hover:opacity-100 transition-all text-red-600 flex-shrink-0"
+                                title="Delete field"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Small connector lines outside table */}
+                          <div className="absolute inset-0 pointer-events-none">
+                            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-px bg-gray-400 -translate-x-[120%]" />
+                            <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-px bg-gray-400 translate-x-[120%]" />
+                            {field.foreignKey && (
+                              <>
+                                <div
+                                  className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
+                                    table.id,
+                                    field.id
+                                  )}`}
+                                />
+                                <div
+                                  className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
+                                    table.id,
+                                    field.id
+                                  )}`}
+                                />
+                              </>
+                            )}
+                            {field.primaryKey && (
+                              <>
+                                <div
+                                  className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
+                                    table.id,
+                                    field.id
+                                  )}`}
+                                />
+                                <div
+                                  className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
+                                    table.id,
+                                    field.id
+                                  )}`}
+                                />
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add Field Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addColumn(table.id);
+                      }}
+                      className="w-full text-blue-600 hover:text-blue-700 font-medium text-xs py-0.25 border-t border-gray-200 hover:bg-blue-50 transition-colors"
+                    >
+                      + Column
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {currentTables.length === 0 && (
