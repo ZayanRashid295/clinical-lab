@@ -1335,6 +1335,7 @@ const ModuleManager = () => {
     startWidth: number;
   }>({ isResizing: false, startX: 0, startWidth: 400 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Combine tables from all selected modules and base if selected
   const getSelectedTables = (): Table[] => {
@@ -1519,6 +1520,31 @@ const ModuleManager = () => {
   useEffect(() => {
     drawConnections();
   }, [currentTables, zoom]);
+
+  // Prevent browser back/forward gesture on Mac when scrolling horizontally at edges
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+      const isAtLeftEdge = scrollLeft === 0;
+      const isAtRightEdge = scrollLeft + clientWidth >= scrollWidth - 1;
+
+      // If scrolling horizontally and at an edge, prevent default to stop browser navigation
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if ((isAtLeftEdge && e.deltaX < 0) || (isAtRightEdge && e.deltaX > 0)) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    scrollContainer.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      scrollContainer.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -1963,6 +1989,7 @@ const ModuleManager = () => {
 
           {/* Canvas */}
           <div
+            ref={scrollContainerRef}
             className="flex-1 bg-gray-800 relative overflow-auto cursor-move"
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
