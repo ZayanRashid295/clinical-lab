@@ -9,13 +9,20 @@ import {
   ZoomOut,
 } from "lucide-react";
 
+interface ForeignKeyInfo {
+  tableName: string;
+  columnName: string;
+  relationName?: string;
+  reverseRelationName?: string;
+}
+
 interface Field {
   id: string;
   name: string;
   type: string;
   primaryKey?: boolean;
   unique?: boolean;
-  foreignKey?: string;
+  foreignKey?: ForeignKeyInfo;
 }
 
 interface Table {
@@ -50,7 +57,7 @@ interface FieldUpdates {
   type?: string;
   primaryKey?: boolean;
   unique?: boolean;
-  foreignKey?: string;
+  foreignKey?: ForeignKeyInfo;
 }
 
 const ModuleManager = () => {
@@ -103,7 +110,11 @@ const ModuleManager = () => {
             id: "userId",
             name: "userId",
             type: "string",
-            foreignKey: "users.id",
+            foreignKey: {
+              tableName: "users",
+              columnName: "id",
+              reverseRelationName: "userSettings",
+            },
             unique: true,
           },
           { id: "language", name: "language", type: "string" },
@@ -153,13 +164,21 @@ const ModuleManager = () => {
             id: "userId",
             name: "userId",
             type: "string",
-            foreignKey: "users.id",
+            foreignKey: {
+              tableName: "users",
+              columnName: "id",
+              reverseRelationName: "roles",
+            },
           },
           {
             id: "roleId",
             name: "roleId",
             type: "string",
-            foreignKey: "roles.id",
+            foreignKey: {
+              tableName: "roles",
+              columnName: "id",
+              reverseRelationName: "users",
+            },
           },
         ],
       },
@@ -173,13 +192,21 @@ const ModuleManager = () => {
             id: "userId",
             name: "userId",
             type: "string",
-            foreignKey: "users.id",
+            foreignKey: {
+              tableName: "users",
+              columnName: "id",
+              reverseRelationName: "permissions",
+            },
           },
           {
             id: "permissionId",
             name: "permissionId",
             type: "string",
-            foreignKey: "permissions.id",
+            foreignKey: {
+              tableName: "permissions",
+              columnName: "id",
+              reverseRelationName: "users",
+            },
           },
         ],
       },
@@ -193,13 +220,21 @@ const ModuleManager = () => {
             id: "roleId",
             name: "roleId",
             type: "string",
-            foreignKey: "roles.id",
+            foreignKey: {
+              tableName: "roles",
+              columnName: "id",
+              reverseRelationName: "permissions",
+            },
           },
           {
             id: "permissionId",
             name: "permissionId",
             type: "string",
-            foreignKey: "permissions.id",
+            foreignKey: {
+              tableName: "permissions",
+              columnName: "id",
+              reverseRelationName: "roles",
+            },
           },
         ],
       },
@@ -260,14 +295,22 @@ const ModuleManager = () => {
             id: "userId",
             name: "userId",
             type: "string",
-            foreignKey: "users.id",
+            foreignKey: {
+              tableName: "users",
+              columnName: "id",
+              reverseRelationName: "institutionManager",
+            },
             unique: true,
           },
           {
             id: "institutionId",
             name: "institutionId",
             type: "string",
-            foreignKey: "institutions.id",
+            foreignKey: {
+              tableName: "institutions",
+              columnName: "id",
+              reverseRelationName: "managers",
+            },
           },
         ],
       },
@@ -286,7 +329,11 @@ const ModuleManager = () => {
                 id: "productId",
                 name: "productId",
                 type: "string",
-                foreignKey: "products.id",
+                foreignKey: {
+                  tableName: "products",
+                  columnName: "id",
+                  reverseRelationName: "sections",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -306,7 +353,11 @@ const ModuleManager = () => {
                 id: "sectionId",
                 name: "sectionId",
                 type: "string",
-                foreignKey: "sections.id",
+                foreignKey: {
+                  tableName: "sections",
+                  columnName: "id",
+                  reverseRelationName: "chapters",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -326,7 +377,11 @@ const ModuleManager = () => {
                 id: "chapterId",
                 name: "chapterId",
                 type: "string",
-                foreignKey: "chapters.id",
+                foreignKey: {
+                  tableName: "chapters",
+                  columnName: "id",
+                  reverseRelationName: "topics",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -346,13 +401,21 @@ const ModuleManager = () => {
                 id: "topicId",
                 name: "topicId",
                 type: "string",
-                foreignKey: "topics.id",
+                foreignKey: {
+                  tableName: "topics",
+                  columnName: "id",
+                  reverseRelationName: "questions",
+                },
               },
               {
                 id: "productTagId",
                 name: "productTagId",
                 type: "string",
-                foreignKey: "product_tags.id",
+                foreignKey: {
+                  tableName: "product_tags",
+                  columnName: "id",
+                  reverseRelationName: "questions",
+                },
               },
               { id: "question", name: "question", type: "text" },
               { id: "explanation", name: "explanation", type: "text" },
@@ -373,7 +436,11 @@ const ModuleManager = () => {
                 id: "questionId",
                 name: "questionId",
                 type: "string",
-                foreignKey: "questions.id",
+                foreignKey: {
+                  tableName: "questions",
+                  columnName: "id",
+                  reverseRelationName: "question_choices",
+                },
               },
               { id: "text", name: "text", type: "text" },
               { id: "isCorrect", name: "isCorrect", type: "boolean" },
@@ -397,13 +464,20 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               {
                 id: "subscriptionId",
                 name: "subscriptionId",
                 type: "string",
-                foreignKey: "subscriptions.id",
+                foreignKey: {
+                  tableName: "subscriptions",
+                  columnName: "id",
+                  reverseRelationName: "payments",
+                },
               },
               { id: "amount", name: "amount", type: "decimal" },
               { id: "currency", name: "currency", type: "string" },
@@ -432,7 +506,10 @@ const ModuleManager = () => {
                 id: "paymentId",
                 name: "paymentId",
                 type: "string",
-                foreignKey: "payments.id",
+                foreignKey: {
+                  tableName: "payments",
+                  columnName: "id",
+                },
               },
               { id: "amount", name: "amount", type: "decimal" },
               { id: "reason", name: "reason", type: "string" },
@@ -457,7 +534,10 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
                 unique: true,
               },
               { id: "balance", name: "balance", type: "decimal" },
@@ -477,13 +557,20 @@ const ModuleManager = () => {
                 id: "walletId",
                 name: "walletId",
                 type: "string",
-                foreignKey: "wallets.id",
+                foreignKey: {
+                  tableName: "wallets",
+                  columnName: "id",
+                  reverseRelationName: "transactions",
+                },
               },
               {
                 id: "paymentId",
                 name: "paymentId",
                 type: "string",
-                foreignKey: "payments.id",
+                foreignKey: {
+                  tableName: "payments",
+                  columnName: "id",
+                },
                 unique: true,
               },
               { id: "type", name: "type", type: "enum" },
@@ -504,7 +591,10 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "type", name: "type", type: "enum" },
               { id: "provider", name: "provider", type: "string" },
@@ -547,19 +637,29 @@ const ModuleManager = () => {
                 id: "promoCodeId",
                 name: "promoCodeId",
                 type: "string",
-                foreignKey: "promo_codes.id",
+                foreignKey: {
+                  tableName: "promo_codes",
+                  columnName: "id",
+                  reverseRelationName: "usages",
+                },
               },
               {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               {
                 id: "paymentId",
                 name: "paymentId",
                 type: "string",
-                foreignKey: "payments.id",
+                foreignKey: {
+                  tableName: "payments",
+                  columnName: "id",
+                },
               },
               { id: "discount", name: "discount", type: "decimal" },
               { id: "createdAt", name: "createdAt", type: "timestamp" },
@@ -607,7 +707,11 @@ const ModuleManager = () => {
                 id: "productId",
                 name: "productId",
                 type: "string",
-                foreignKey: "products.id",
+                foreignKey: {
+                  tableName: "products",
+                  columnName: "id",
+                  reverseRelationName: "sections",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -644,7 +748,11 @@ const ModuleManager = () => {
                 id: "productSubtypeId",
                 name: "productSubtypeId",
                 type: "string",
-                foreignKey: "product_subtypes.id",
+                foreignKey: {
+                  tableName: "product_subtypes",
+                  columnName: "id",
+                  reverseRelationName: "subscriptionPackages",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -666,13 +774,20 @@ const ModuleManager = () => {
                 id: "subscriptionPackageId",
                 name: "subscriptionPackageId",
                 type: "string",
-                foreignKey: "subscription_packages.id",
+                foreignKey: {
+                  tableName: "subscription_packages",
+                  columnName: "id",
+                },
               },
               {
                 id: "packageFeatureId",
                 name: "packageFeatureId",
                 type: "string",
-                foreignKey: "package_features.id",
+                foreignKey: {
+                  tableName: "package_features",
+                  columnName: "id",
+                  reverseRelationName: "subscriptionFeatures",
+                },
               },
             ],
           },
@@ -686,13 +801,19 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               {
                 id: "subscriptionPackageId",
                 name: "subscriptionPackageId",
                 type: "string",
-                foreignKey: "subscription_packages.id",
+                foreignKey: {
+                  tableName: "subscription_packages",
+                  columnName: "id",
+                },
               },
               { id: "status", name: "status", type: "enum" },
               { id: "startDate", name: "startDate", type: "timestamp" },
@@ -717,7 +838,10 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "name", name: "name", type: "string" },
               { id: "description", name: "description", type: "string" },
@@ -739,13 +863,21 @@ const ModuleManager = () => {
                 id: "questionPaperId",
                 name: "questionPaperId",
                 type: "string",
-                foreignKey: "question_papers.id",
+                foreignKey: {
+                  tableName: "question_papers",
+                  columnName: "id",
+                  reverseRelationName: "questionPaperQuestions",
+                },
               },
               {
                 id: "questionId",
                 name: "questionId",
                 type: "string",
-                foreignKey: "questions.id",
+                foreignKey: {
+                  tableName: "questions",
+                  columnName: "id",
+                  reverseRelationName: "question_choices",
+                },
               },
               { id: "userAnswer", name: "userAnswer", type: "string" },
               { id: "isCorrect", name: "isCorrect", type: "boolean" },
@@ -783,13 +915,19 @@ const ModuleManager = () => {
                 id: "chatRoomId",
                 name: "chatRoomId",
                 type: "string",
-                foreignKey: "chat_rooms.id",
+                foreignKey: {
+                  tableName: "chat_rooms",
+                  columnName: "id",
+                },
               },
               {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "role", name: "role", type: "enum" },
               { id: "joinedAt", name: "joinedAt", type: "timestamp" },
@@ -806,13 +944,19 @@ const ModuleManager = () => {
                 id: "chatRoomId",
                 name: "chatRoomId",
                 type: "string",
-                foreignKey: "chat_rooms.id",
+                foreignKey: {
+                  tableName: "chat_rooms",
+                  columnName: "id",
+                },
               },
               {
                 id: "senderId",
                 name: "senderId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "content", name: "content", type: "text" },
               { id: "type", name: "type", type: "enum" },
@@ -834,13 +978,20 @@ const ModuleManager = () => {
                 id: "messageId",
                 name: "messageId",
                 type: "string",
-                foreignKey: "chat_messages.id",
+                foreignKey: {
+                  tableName: "chat_messages",
+                  columnName: "id",
+                  reverseRelationName: "reactions",
+                },
               },
               {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "emoji", name: "emoji", type: "string" },
               { id: "createdAt", name: "createdAt", type: "timestamp" },
@@ -856,13 +1007,19 @@ const ModuleManager = () => {
                 id: "chatRoomId",
                 name: "chatRoomId",
                 type: "string",
-                foreignKey: "chat_rooms.id",
+                foreignKey: {
+                  tableName: "chat_rooms",
+                  columnName: "id",
+                },
               },
               {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               {
                 id: "lastReadMessageId",
@@ -887,7 +1044,10 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
               },
               { id: "type", name: "type", type: "enum" },
               { id: "title", name: "title", type: "string" },
@@ -925,7 +1085,10 @@ const ModuleManager = () => {
                 id: "userId",
                 name: "userId",
                 type: "string",
-                foreignKey: "users.id",
+                foreignKey: {
+                  tableName: "users",
+                  columnName: "id",
+                },
                 unique: true,
               },
               { id: "emailEnabled", name: "emailEnabled", type: "boolean" },
@@ -1012,8 +1175,10 @@ const ModuleManager = () => {
 
   const getRelatedTables = (table: Table): Table[] => {
     return table.fields
-      .filter((f): f is Field & { foreignKey: string } => !!f.foreignKey)
-      .map((f) => f.foreignKey.split(".")[0])
+      .filter(
+        (f): f is Field & { foreignKey: ForeignKeyInfo } => !!f.foreignKey
+      )
+      .map((f) => f.foreignKey.tableName)
       .map((tableId) => findTableById(tableId))
       .filter((t): t is Table => !!t);
   };
