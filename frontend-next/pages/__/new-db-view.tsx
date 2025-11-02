@@ -1557,12 +1557,23 @@ const ModuleManager = () => {
       return;
     }
 
-    // Determine which column based on X position
+    // Determine which column based on table center position
+    // Column boundaries are at the middle line between columns
     const determineColumn = (x: number): number => {
+      const tableWidth = 240;
+      const tableCenterX = x + tableWidth / 2;
+
       for (let col = 0; col < NUM_COLUMNS; col++) {
-        const columnX = COLUMN_START_X + col * COLUMN_WIDTH;
-        const nextColumnX = COLUMN_START_X + (col + 1) * COLUMN_WIDTH;
-        if (x >= columnX && x < nextColumnX) {
+        const prevBoundary =
+          col === 0
+            ? -Infinity
+            : COLUMN_START_X + (col - 0.5) * COLUMN_WIDTH + tableWidth / 2;
+        const nextBoundary =
+          col === NUM_COLUMNS - 1
+            ? Infinity
+            : COLUMN_START_X + (col + 0.5) * COLUMN_WIDTH + tableWidth / 2;
+
+        if (tableCenterX >= prevBoundary && tableCenterX < nextBoundary) {
           return col;
         }
       }
@@ -1926,21 +1937,35 @@ const ModuleManager = () => {
               <div
                 style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
               >
+                {/* Column areas */}
                 {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => {
-                  // Determine if this is the target column
-                  const columnX = COLUMN_START_X + colIndex * COLUMN_WIDTH;
-                  const nextColumnX =
-                    COLUMN_START_X + (colIndex + 1) * COLUMN_WIDTH;
+                  // Calculate table center position
+                  const tableWidth = 240;
+                  const tableCenterX = dragPreviewPosition.x + tableWidth / 2;
+
+                  // Column boundaries are at the middle line between columns
+                  const prevBoundary =
+                    colIndex === 0
+                      ? -Infinity
+                      : COLUMN_START_X +
+                        (colIndex - 0.5) * COLUMN_WIDTH +
+                        tableWidth / 2;
+                  const nextBoundary =
+                    colIndex === NUM_COLUMNS - 1
+                      ? Infinity
+                      : COLUMN_START_X +
+                        (colIndex + 0.5) * COLUMN_WIDTH +
+                        tableWidth / 2;
+
                   const isTargetColumn =
-                    dragPreviewPosition.x >= columnX &&
-                    dragPreviewPosition.x < nextColumnX;
+                    tableCenterX >= prevBoundary && tableCenterX < nextBoundary;
 
                   return (
                     <div
                       key={`column-guide-${colIndex}`}
                       style={{
                         position: "absolute",
-                        left: `${columnX}px`,
+                        left: `${COLUMN_START_X + colIndex * COLUMN_WIDTH}px`,
                         top: `${COLUMN_START_Y}px`,
                         width: "240px",
                         height: "2000px",
@@ -1956,6 +1981,32 @@ const ModuleManager = () => {
                     />
                   );
                 })}
+
+                {/* Middle line separators between columns */}
+                {Array.from({ length: NUM_COLUMNS - 1 }).map(
+                  (_, separatorIndex) => {
+                    const tableWidth = 240;
+                    const separatorX =
+                      COLUMN_START_X +
+                      (separatorIndex + 0.5) * COLUMN_WIDTH +
+                      tableWidth / 2;
+
+                    return (
+                      <div
+                        key={`separator-${separatorIndex}`}
+                        style={{
+                          position: "absolute",
+                          left: `${separatorX}px`,
+                          top: `${COLUMN_START_Y}px`,
+                          width: "2px",
+                          height: "2000px",
+                          backgroundColor: "rgba(239, 68, 68, 0.4)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    );
+                  }
+                )}
               </div>
             )}
 
