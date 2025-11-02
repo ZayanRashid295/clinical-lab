@@ -1403,7 +1403,7 @@ const ModuleManager = () => {
   };
 
   // Column-based positioning system
-  const tablePositions = useMemo(() => {
+  const { tablePositions, columnHeights } = useMemo(() => {
     const positions = new Map<string, { x: number; y: number }>();
 
     // Track the current Y position for each column
@@ -1440,38 +1440,7 @@ const ModuleManager = () => {
       columnYPositions[columnIndex] = currentY;
     });
 
-    return positions;
-  }, [currentTables]);
-
-  // Calculate column heights (same logic as tablePositions)
-  const columnHeights = useMemo(() => {
-    const heights = new Array(NUM_COLUMNS).fill(COLUMN_START_Y);
-
-    // Group tables by column
-    const tablesByColumn: Map<number, Table[]> = new Map();
-    for (let col = 0; col < NUM_COLUMNS; col++) {
-      tablesByColumn.set(col, []);
-    }
-
-    currentTables.forEach((table) => {
-      const column = table.column % NUM_COLUMNS;
-      tablesByColumn.get(column)?.push(table);
-    });
-
-    // Calculate heights for each column
-    tablesByColumn.forEach((tables, columnIndex) => {
-      let currentY = COLUMN_START_Y;
-
-      tables.forEach((table) => {
-        const y = table.y !== 0 ? table.y : currentY;
-        const tableHeight = estimateTableHeight(table);
-        currentY = Math.max(currentY, y + tableHeight + TABLE_VERTICAL_GAP);
-      });
-
-      heights[columnIndex] = currentY;
-    });
-
-    return heights;
+    return { tablePositions: positions, columnHeights: columnYPositions };
   }, [currentTables]);
 
   const findTableById = (id: string): Table | undefined =>
@@ -1778,11 +1747,13 @@ const ModuleManager = () => {
   const addTable = () => {
     const newTableId = `table_${Date.now()}`;
     // Find the column with minimum height
+    const heights = columnHeights;
     let minColumn = 0;
-    let minHeight = columnHeights[0];
+    let minHeight = heights[0] ?? COLUMN_START_Y;
     for (let col = 1; col < NUM_COLUMNS; col++) {
-      if (columnHeights[col] < minHeight) {
-        minHeight = columnHeights[col];
+      const height = heights[col] ?? COLUMN_START_Y;
+      if (height < minHeight) {
+        minHeight = height;
         minColumn = col;
       }
     }
