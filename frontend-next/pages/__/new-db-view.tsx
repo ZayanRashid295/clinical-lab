@@ -2134,13 +2134,11 @@ const ModuleManager = () => {
                 return (
                   <div
                     key={table.id}
-                    onMouseDown={(e) => handleMouseDown(e, table.id)}
                     style={{
                       position: "absolute",
                       left: `${displayPosition.x}px`,
                       top: `${displayPosition.y}px`,
                       width: "240px",
-                      cursor: draggingTable === table.id ? "grabbing" : "grab",
                       opacity: draggingTable === table.id ? 0.7 : 1,
                       zIndex: draggingTable === table.id ? 1000 : "auto",
                     }}
@@ -2150,6 +2148,11 @@ const ModuleManager = () => {
                   >
                     {/* Table Header */}
                     <div
+                      onMouseDown={(e) => handleMouseDown(e, table.id)}
+                      style={{
+                        cursor:
+                          draggingTable === table.id ? "grabbing" : "grab",
+                      }}
                       className={`bg-gradient-to-r ${
                         getTableColor(table.id).header
                       } text-white p-2 rounded-t-md`}
@@ -2199,6 +2202,7 @@ const ModuleManager = () => {
                             }
                           }}
                           onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className="font-bold text-xs leading-tight bg-transparent outline-none text-white placeholder-gray-200 w-auto min-w-0 px-1 rounded hover:bg-blue-500 focus:bg-blue-500"
                           style={{
                             width: `${Math.max(table.name.length + 1, 8)}ch`,
@@ -2211,6 +2215,7 @@ const ModuleManager = () => {
                             e.stopPropagation();
                             deleteTable(table.id);
                           }}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className="p-1 hover:bg-red-600 rounded transition-colors opacity-80 hover:opacity-100 flex-shrink-0"
                           title="Delete table"
                         >
