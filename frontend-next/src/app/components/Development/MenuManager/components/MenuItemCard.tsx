@@ -15,7 +15,11 @@ interface MenuItemCardProps {
   depth: number;
   isExpanded: boolean;
   isEditing: boolean;
+  isDragging: boolean;
   editData: MenuItem;
+  draggedItemId: string | null;
+  onDragStart: () => void;
+  onDragEnd: () => void;
   onToggleExpand: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -34,7 +38,11 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   depth,
   isExpanded,
   isEditing,
+  isDragging,
   editData,
+  draggedItemId,
+  onDragStart,
+  onDragEnd,
   onToggleExpand,
   onEdit,
   onDelete,
@@ -66,7 +74,35 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
 
   return (
     <div className={`${depth > 0 ? "ml-6" : ""}`}>
-      <div className="flex items-center gap-2 p-2 rounded border transition-all bg-white border-gray-200 hover:bg-gray-50">
+      <div
+        draggable={!isEditing}
+        onDragStart={(e) => {
+          if (!isEditing) {
+            onDragStart();
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", item.id);
+          }
+        }}
+        onDragEnd={(e) => {
+          onDragEnd();
+        }}
+        onDragOver={(e) => {
+          if (draggedItemId && draggedItemId !== item.id && !isEditing) {
+            e.preventDefault();
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            // Position detection is handled by drop zones, this just allows the drag
+          }
+        }}
+        className={`flex items-center gap-2 p-2 rounded border transition-all select-none ${
+          isDragging
+            ? "opacity-50 cursor-grabbing"
+            : draggedItemId
+            ? "cursor-grab"
+            : "bg-white border-gray-200 hover:bg-gray-50"
+        }`}
+      >
         {hasSubmenu ? (
           <button
             onClick={onToggleExpand}

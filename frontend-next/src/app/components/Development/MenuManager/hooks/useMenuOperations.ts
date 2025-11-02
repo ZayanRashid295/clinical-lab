@@ -6,6 +6,11 @@ export const useMenuOperations = (initialItems: MenuItem[]) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<MenuItem>({} as MenuItem);
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const [dragOverPosition, setDragOverPosition] = useState<{
+    targetId: string;
+    position: "before" | "after";
+  } | null>(null);
 
   const toggleExpand = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -149,6 +154,107 @@ export const useMenuOperations = (initialItems: MenuItem[]) => {
     setItems(newItems);
   };
 
+  const findItemPath = (
+    arr: MenuItem[],
+    targetId: string,
+    path: Array<{ array: MenuItem[]; index: number }> = []
+  ): Array<{ array: MenuItem[]; index: number }> | null => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].id === targetId) {
+        return [...path, { array: arr, index: i }];
+      }
+      if (arr[i].submenu) {
+        const found = findItemPath(arr[i].submenu!, targetId, [
+          ...path,
+          { array: arr, index: i },
+        ]);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const dragReorderItem = (
+    draggedId: string,
+    targetId: string,
+    position: "before" | "after"
+  ) => {
+    if (draggedId === targetId) return;
+
+    // Deep clone the entire structure
+    const newItems = JSON.parse(JSON.stringify(items)) as MenuItem[];
+
+    // Find paths to both items
+    const draggedPath = findItemPath(newItems, draggedId);
+    const targetPath = findItemPath(newItems, targetId);
+
+    if (!draggedPath || !targetPath) {
+      console.error("Could not find dragged or target item");
+      return;
+    }
+
+    // Get the dragged item (deep clone)
+    const draggedPathLast = draggedPath[draggedPath.length - 1];
+    const draggedItem = JSON.parse(
+      JSON.stringify(draggedPathLast.array[draggedPathLast.index])
+    ) as MenuItem;
+
+    // Get source and target arrays and indices
+    const sourceArray = draggedPathLast.array;
+    const targetArray = targetPath[targetPath.length - 1].array;
+    const draggedIndex = draggedPathLast.index;
+    let targetIndex = targetPath[targetPath.length - 1].index;
+
+    // Check if moving within the same array
+    const sameArray = sourceArray === targetArray;
+
+    if (sameArray) {
+      // Same array - remove first, then adjust target index
+      sourceArray.splice(draggedIndex, 1);
+
+      // Adjust target index if we removed an item before it
+      if (draggedIndex < targetIndex) {
+        targetIndex -= 1;
+      }
+
+      // Adjust based on position
+      if (position === "after") {
+        targetIndex += 1;
+      } else {
+        // position === "before", targetIndex is already correct
+      }
+
+      // Insert at target position
+      targetArray.splice(targetIndex, 0, draggedItem);
+    } else {
+      // Different arrays - remove from source first
+      sourceArray.splice(draggedIndex, 1);
+
+      // Adjust target index based on position
+      if (position === "after") {
+        targetIndex += 1;
+      }
+
+      // Insert at target position
+      targetArray.splice(targetIndex, 0, draggedItem);
+    }
+
+    // Create a completely new array structure to ensure React detects the change
+    const createNewArrayStructure = (arr: MenuItem[]): MenuItem[] => {
+      return arr.map((item) => {
+        const newItem = { ...item };
+        if (item.submenu && item.submenu.length > 0) {
+          newItem.submenu = createNewArrayStructure(item.submenu);
+        }
+        return newItem;
+      });
+    };
+
+    // Force React to see this as a completely new structure
+    const updatedItems = createNewArrayStructure(newItems);
+    setItems(updatedItems);
+  };
+
   return {
     items,
     setItems,
@@ -156,6 +262,10 @@ export const useMenuOperations = (initialItems: MenuItem[]) => {
     editingId,
     editData,
     setEditData,
+    draggedItemId,
+    dragOverPosition,
+    setDraggedItemId,
+    setDragOverPosition,
     toggleExpand,
     startEdit,
     saveEdit,
@@ -164,6 +274,7 @@ export const useMenuOperations = (initialItems: MenuItem[]) => {
     moveItem,
     promoteItem,
     demoteItem,
+    dragReorderItem,
   };
 };
 

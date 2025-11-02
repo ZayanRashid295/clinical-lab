@@ -9,6 +9,12 @@ interface MenuItemListProps {
   expandedItems: Set<string>;
   editingId: string | null;
   editData: MenuItem;
+  draggedItemId: string | null;
+  dragOverPosition: { targetId: string; position: "before" | "after" } | null;
+  onDragStart: (id: string) => void;
+  onDragEnd: () => void;
+  onDragOver: (targetId: string, position: "before" | "after") => void;
+  onDrop: (draggedId: string, targetId: string, position: "before" | "after") => void;
   onToggleExpand: (id: string) => void;
   onEdit: (item: MenuItem) => void;
   onDelete: (id: string) => void;
@@ -26,6 +32,12 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   expandedItems,
   editingId,
   editData,
+  draggedItemId,
+  dragOverPosition,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
   onToggleExpand,
   onEdit,
   onDelete,
@@ -37,34 +49,114 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   onSaveEdit,
   onCancelEdit,
 }) => {
-  const renderMenuItem = (item: MenuItem, depth = 0): React.ReactNode => {
+  const renderMenuItem = (
+    item: MenuItem,
+    depth = 0,
+    index: number = 0,
+    siblings: MenuItem[] = []
+  ): React.ReactNode => {
     const isExpanded = expandedItems.has(item.id);
     const isEditing = editingId === item.id;
+    const isDragging = draggedItemId === item.id;
+    const showDropZoneBefore =
+      dragOverPosition?.targetId === item.id && dragOverPosition.position === "before";
+    const showDropZoneAfter =
+      dragOverPosition?.targetId === item.id && dragOverPosition.position === "after";
 
     return (
-      <MenuItemCard
-        key={item.id}
-        item={item}
-        depth={depth}
-        isExpanded={isExpanded}
-        isEditing={isEditing}
-        editData={editData}
-        onToggleExpand={() => onToggleExpand(item.id)}
-        onEdit={() => onEdit(item)}
-        onDelete={() => onDelete(item.id)}
-        onMoveUp={() => onMoveUp(item.id)}
-        onMoveDown={() => onMoveDown(item.id)}
-        onPromote={() => onPromote(item.id)}
-        onDemote={() => onDemote(item.id)}
-        onEditChange={onEditChange}
-        onSaveEdit={onSaveEdit}
-        onCancelEdit={onCancelEdit}
-      >
-        {isExpanded &&
-          item.submenu &&
-          item.submenu.length > 0 &&
-          item.submenu.map((subItem) => renderMenuItem(subItem, depth + 1))}
-      </MenuItemCard>
+      <React.Fragment key={item.id}>
+        {/* Drop zone before item */}
+        <div
+          className={`transition-all ${
+            showDropZoneBefore
+              ? "h-8 -my-1 bg-blue-400 border-2 border-blue-600 border-dashed rounded z-10"
+              : draggedItemId && draggedItemId !== item.id
+              ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
+              : "h-1"
+          }`}
+          onDragOver={(e) => {
+            if (draggedItemId && draggedItemId !== item.id) {
+              e.preventDefault();
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const y = e.clientY - rect.top;
+              if (y < rect.height / 2) {
+                onDragOver(item.id, "before");
+              }
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (draggedItemId && draggedItemId !== item.id) {
+              onDrop(draggedItemId, item.id, "before");
+              onDragEnd();
+            }
+          }}
+        />
+
+        <MenuItemCard
+          item={item}
+          depth={depth}
+          isExpanded={isExpanded}
+          isEditing={isEditing}
+          isDragging={isDragging}
+          editData={editData}
+          draggedItemId={draggedItemId}
+          onDragStart={() => onDragStart(item.id)}
+          onDragEnd={onDragEnd}
+          onToggleExpand={() => onToggleExpand(item.id)}
+          onEdit={() => onEdit(item)}
+          onDelete={() => onDelete(item.id)}
+          onMoveUp={() => onMoveUp(item.id)}
+          onMoveDown={() => onMoveDown(item.id)}
+          onPromote={() => onPromote(item.id)}
+          onDemote={() => onDemote(item.id)}
+          onEditChange={onEditChange}
+          onSaveEdit={onSaveEdit}
+          onCancelEdit={onCancelEdit}
+        >
+          {isExpanded &&
+            item.submenu &&
+            item.submenu.length > 0 && (
+              <>
+                {item.submenu.map((subItem, subIndex) =>
+                  renderMenuItem(subItem, depth + 1, subIndex, item.submenu || [])
+                )}
+              </>
+            )}
+        </MenuItemCard>
+
+        {/* Drop zone after item */}
+        <div
+          className={`transition-all ${
+            showDropZoneAfter
+              ? "h-8 -my-1 bg-blue-400 border-2 border-blue-600 border-dashed rounded z-10"
+              : draggedItemId && draggedItemId !== item.id
+              ? "h-2 hover:h-6 hover:bg-blue-100 hover:-my-1"
+              : "h-1"
+          }`}
+          onDragOver={(e) => {
+            if (draggedItemId && draggedItemId !== item.id) {
+              e.preventDefault();
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const y = e.clientY - rect.top;
+              if (y > rect.height / 2) {
+                onDragOver(item.id, "after");
+              }
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (draggedItemId && draggedItemId !== item.id) {
+              onDrop(draggedItemId, item.id, "after");
+              onDragEnd();
+            }
+          }}
+        />
+      </React.Fragment>
     );
   };
 
@@ -84,8 +176,8 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
 
   return (
     <div className="border border-gray-200 rounded-lg p-4 max-h-screen overflow-y-auto bg-gray-50 mb-6">
-      <div className="space-y-1">
-        {items.map((item) => renderMenuItem(item))}
+      <div>
+        {items.map((item, index) => renderMenuItem(item, 0, index, items))}
       </div>
     </div>
   );

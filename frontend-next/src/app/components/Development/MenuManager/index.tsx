@@ -15,6 +15,10 @@ const MenuManager = () => {
     editingId,
     editData,
     setEditData,
+    draggedItemId,
+    dragOverPosition,
+    setDraggedItemId,
+    setDragOverPosition,
     toggleExpand,
     startEdit,
     saveEdit,
@@ -23,6 +27,7 @@ const MenuManager = () => {
     moveItem,
     promoteItem,
     demoteItem,
+    dragReorderItem,
   } = useMenuOperations(MENU_CONFIG.items);
 
   const downloadJSON = () => {
@@ -50,6 +55,17 @@ const MenuManager = () => {
         expandedItems={expandedItems}
         editingId={editingId}
         editData={editData}
+        draggedItemId={draggedItemId}
+        dragOverPosition={dragOverPosition}
+        onDragStart={setDraggedItemId}
+        onDragEnd={() => {
+          setDraggedItemId(null);
+          setDragOverPosition(null);
+        }}
+        onDragOver={(targetId, position) =>
+          setDragOverPosition({ targetId, position })
+        }
+        onDrop={dragReorderItem}
         onToggleExpand={toggleExpand}
         onEdit={startEdit}
         onDelete={deleteItem}
