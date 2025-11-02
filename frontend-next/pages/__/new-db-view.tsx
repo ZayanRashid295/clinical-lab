@@ -137,11 +137,15 @@ const ModuleManager = () => {
     return "bg-gray-400";
   };
 
-  // Get color for a table based on its index in allTables array
+  // Get color for a table based on a stable hash of its ID (so color doesn't change when reordering)
   const getTableColor = (tableId: string) => {
-    const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
-    const tableIndex = allTables.findIndex((t) => t.id === tableId);
-    return tableColors[tableIndex % tableColors.length];
+    let hash = 0;
+    for (let i = 0; i < tableId.length; i++) {
+      hash = (hash << 5) - hash + tableId.charCodeAt(i);
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    const index = Math.abs(hash) % tableColors.length;
+    return tableColors[index];
   };
 
   // Column-based positioning constants
@@ -1918,25 +1922,40 @@ const ModuleManager = () => {
             />
 
             {/* Column guides (visible when dragging) */}
-            {draggingTable && (
+            {draggingTable && dragPreviewPosition && (
               <div
                 style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
               >
-                {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => (
-                  <div
-                    key={`column-guide-${colIndex}`}
-                    style={{
-                      position: "absolute",
-                      left: `${COLUMN_START_X + colIndex * COLUMN_WIDTH}px`,
-                      top: `${COLUMN_START_Y}px`,
-                      width: "240px",
-                      height: "2000px",
-                      backgroundColor: "rgba(59, 130, 246, 0.1)",
-                      border: "2px dashed rgba(59, 130, 246, 0.3)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                ))}
+                {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => {
+                  // Determine if this is the target column
+                  const columnX = COLUMN_START_X + colIndex * COLUMN_WIDTH;
+                  const nextColumnX =
+                    COLUMN_START_X + (colIndex + 1) * COLUMN_WIDTH;
+                  const isTargetColumn =
+                    dragPreviewPosition.x >= columnX &&
+                    dragPreviewPosition.x < nextColumnX;
+
+                  return (
+                    <div
+                      key={`column-guide-${colIndex}`}
+                      style={{
+                        position: "absolute",
+                        left: `${columnX}px`,
+                        top: `${COLUMN_START_Y}px`,
+                        width: "240px",
+                        height: "2000px",
+                        backgroundColor: isTargetColumn
+                          ? "rgba(59, 130, 246, 0.25)"
+                          : "rgba(59, 130, 246, 0.08)",
+                        border: isTargetColumn
+                          ? "3px solid rgba(59, 130, 246, 0.6)"
+                          : "2px dashed rgba(59, 130, 246, 0.25)",
+                        pointerEvents: "none",
+                        transition: "all 0.15s ease",
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
 
