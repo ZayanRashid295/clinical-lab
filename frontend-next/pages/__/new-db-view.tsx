@@ -1717,7 +1717,7 @@ const ModuleManager = () => {
                     {table.fields.map((field) => (
                       <div
                         key={field.id}
-                        className="py-1 px-1.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0"
+                        className="py-0.5 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex-1 min-w-0 flex items-center gap-0.5">
@@ -1789,7 +1789,7 @@ const ModuleManager = () => {
                       e.stopPropagation();
                       addColumn(table.id);
                     }}
-                    className="w-full text-blue-600 hover:text-blue-700 font-medium text-xs py-0.5 border-t border-gray-200 hover:bg-blue-50 transition-colors"
+                    className="w-full text-blue-600 hover:text-blue-700 font-medium text-xs py-0.25 border-t border-gray-200 hover:bg-blue-50 transition-colors"
                   >
                     + Column
                   </button>
