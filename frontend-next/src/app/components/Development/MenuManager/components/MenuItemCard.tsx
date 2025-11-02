@@ -16,6 +16,7 @@ interface MenuItemCardProps {
   isExpanded: boolean;
   isEditing: boolean;
   isDragging: boolean;
+  isSelected: boolean;
   editData: MenuItem;
   draggedItemId: string | null;
   dragOverPosition: { targetId: string; position: "before" | "after" } | null;
@@ -24,10 +25,9 @@ interface MenuItemCardProps {
   onDragOver: (targetId: string, position: "before" | "after") => void;
   onDrop: (draggedId: string, targetId: string, position: "before" | "after") => void;
   onToggleExpand: () => void;
+  onSelect: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
   onPromote: () => void;
   onDemote: () => void;
   onEditChange: (item: MenuItem) => void;
@@ -42,6 +42,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   isExpanded,
   isEditing,
   isDragging,
+  isSelected,
   editData,
   draggedItemId,
   dragOverPosition,
@@ -50,10 +51,9 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   onDragOver,
   onDrop,
   onToggleExpand,
+  onSelect,
   onEdit,
   onDelete,
-  onMoveUp,
-  onMoveDown,
   onPromote,
   onDemote,
   onEditChange,
@@ -86,6 +86,12 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
     <div className={`${depth > 0 ? "ml-6" : ""}`}>
       <div
         draggable={!isEditing}
+        onClick={(e) => {
+          // Only select if clicking on the main card area, not on buttons
+          if (!isEditing && !(e.target as HTMLElement).closest('button')) {
+            onSelect();
+          }
+        }}
         ref={(el) => {
           if (el && !isEditing) {
             // Store ref for drag image creation
@@ -137,8 +143,10 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
             onDragEnd();
           }
         }}
-        className={`flex items-center gap-2 p-2 rounded border transition-all select-none ${
-          isDragging
+        className={`flex items-center gap-2 p-2 rounded border transition-all select-none cursor-pointer ${
+          isSelected
+            ? "bg-blue-50 border-blue-300 ring-2 ring-blue-200"
+            : isDragging
             ? "opacity-50 cursor-grabbing"
             : isDropTarget
             ? "cursor-pointer"
@@ -177,20 +185,6 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={onMoveUp}
-            className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-colors"
-            title="Move up"
-          >
-            <ArrowUp size={16} />
-          </button>
-          <button
-            onClick={onMoveDown}
-            className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-colors"
-            title="Move down"
-          >
-            <ArrowDown size={16} />
-          </button>
           {depth > 0 && (
             <button
               onClick={onPromote}

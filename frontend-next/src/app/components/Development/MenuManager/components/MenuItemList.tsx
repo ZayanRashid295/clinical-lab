@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/shared/ui/card";
-import { Menu } from "lucide-react";
+import { Menu, ArrowUp, ArrowDown } from "lucide-react";
 import { MenuItem } from "../../../../types/menu";
 import { MenuItemCard } from "./MenuItemCard";
 
@@ -73,6 +73,76 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   // State to track items that should be hidden (after drag image is captured)
   const [hiddenItems, setHiddenItems] = React.useState<Set<string>>(new Set());
 
+  // State to track selected item
+  const [selectedItemId, setSelectedItemId] = React.useState<string | null>(
+    null
+  );
+
+  // Helper to check if item can move up/down
+  const canMoveUp = React.useMemo(() => {
+    if (!selectedItemId) return false;
+    const findItemPosition = (
+      arr: MenuItem[],
+      targetId: string,
+      path: number[] = []
+    ): number[] | null => {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].id === targetId) {
+          return [...path, i];
+        }
+        if (arr[i].submenu) {
+          const found = findItemPosition(arr[i].submenu!, targetId, [
+            ...path,
+            i,
+          ]);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    const position = findItemPosition(items, selectedItemId);
+    if (!position || position.length === 0) return false;
+    return position[position.length - 1] > 0;
+  }, [selectedItemId, items]);
+
+  const canMoveDown = React.useMemo(() => {
+    if (!selectedItemId) return false;
+    const findItemPosition = (
+      arr: MenuItem[],
+      targetId: string,
+      path: number[] = []
+    ): number[] | null => {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].id === targetId) {
+          return [...path, i];
+        }
+        if (arr[i].submenu) {
+          const found = findItemPosition(arr[i].submenu!, targetId, [
+            ...path,
+            i,
+          ]);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    const findParentArray = (arr: MenuItem[], path: number[]): MenuItem[] => {
+      if (path.length === 1) return arr;
+      let current: MenuItem[] = arr;
+      for (let i = 0; i < path.length - 1; i++) {
+        const idx = path[i];
+        if (current[idx]?.submenu) {
+          current = current[idx].submenu!;
+        }
+      }
+      return current;
+    };
+    const position = findItemPosition(items, selectedItemId);
+    if (!position || position.length === 0) return false;
+    const parentArray = findParentArray(items, position);
+    return position[position.length - 1] < parentArray.length - 1;
+  }, [selectedItemId, items]);
+
   // Hide item after drag image is captured
   React.useEffect(() => {
     if (draggedItemId) {
@@ -100,6 +170,7 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
     const isEditing = editingId === item.id;
     const isDragging = draggedItemId === item.id;
     const shouldHide = hiddenItems.has(item.id);
+    const isSelected = selectedItemId === item.id;
     const showDropZoneBefore =
       dragOverPosition?.targetId === item.id &&
       dragOverPosition.position === "before";
@@ -197,6 +268,7 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
             isExpanded={isExpanded}
             isEditing={isEditing}
             isDragging={isDragging}
+            isSelected={isSelected}
             editData={editData}
             draggedItemId={draggedItemId}
             dragOverPosition={dragOverPosition}
@@ -205,10 +277,9 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
             onDragOver={onDragOver}
             onDrop={onDrop}
             onToggleExpand={() => onToggleExpand(item.id)}
+            onSelect={() => setSelectedItemId(item.id)}
             onEdit={() => onEdit(item)}
             onDelete={() => onDelete(item.id)}
-            onMoveUp={() => onMoveUp(item.id)}
-            onMoveDown={() => onMoveDown(item.id)}
             onPromote={() => onPromote(item.id)}
             onDemote={() => onDemote(item.id)}
             onEditChange={onEditChange}
@@ -328,9 +399,46 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 max-h-screen overflow-y-auto bg-gray-50 mb-6">
-      <div>
-        {items.map((item, index) => renderMenuItem(item, 0, index, items))}
+    <div className="mb-6">
+      {/* Move controls */}
+      <div className="mb-3 flex items-center gap-2 px-2">
+        <span className="text-sm text-gray-600">Move:</span>
+        <button
+          onClick={() => {
+            if (selectedItemId) {
+              onMoveUp(selectedItemId);
+            }
+          }}
+          disabled={!selectedItemId || !canMoveUp}
+          className="p-2 hover:bg-blue-100 rounded text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+          title="Move selected item up"
+        >
+          <ArrowUp size={18} />
+        </button>
+        <button
+          onClick={() => {
+            if (selectedItemId) {
+              onMoveDown(selectedItemId);
+            }
+          }}
+          disabled={!selectedItemId || !canMoveDown}
+          className="p-2 hover:bg-blue-100 rounded text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+          title="Move selected item down"
+        >
+          <ArrowDown size={18} />
+        </button>
+        {selectedItemId && (
+          <span className="text-sm text-gray-500 ml-2">
+            Selected: {findItemById(items, selectedItemId)?.label}
+          </span>
+        )}
+      </div>
+
+      {/* Menu items tree */}
+      <div className="border border-gray-200 rounded-lg p-4 max-h-screen overflow-y-auto bg-gray-50">
+        <div>
+          {items.map((item, index) => renderMenuItem(item, 0, index, items))}
+        </div>
       </div>
     </div>
   );
