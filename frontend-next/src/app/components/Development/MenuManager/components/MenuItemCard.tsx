@@ -70,7 +70,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
         {hasSubmenu ? (
           <button
             onClick={onToggleExpand}
-            className="p-1 hover:bg-gray-200 rounded flex-shrink-0 chevron-rotate"
+            className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
             style={{
               transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
             }}
@@ -147,7 +147,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
       </div>
 
       {isExpanded && hasSubmenu && children && (
-        <div className="mt-1">{children}</div>
+        <div className="mt-1 space-y-1">{children}</div>
       )}
     </div>
   );

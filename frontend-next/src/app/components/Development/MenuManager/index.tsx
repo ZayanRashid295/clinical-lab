@@ -43,11 +43,6 @@ const MenuManager = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 bg-white">
-      <style>{`
-        .chevron-rotate {
-          transition: transform 0.5s ease-out;
-        }
-      `}</style>
       <MenuHeader />
       <ControlsInfo />
       <MenuItemList

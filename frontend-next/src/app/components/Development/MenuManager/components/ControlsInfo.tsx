@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/shared/ui/card";
 
 export const ControlsInfo: React.FC = () => {
   return (
-    <Card className="bg-blue-50 border-blue-200">
+    <Card className="bg-blue-50 border-blue-200 mb-6">
       <CardContent className="p-4">
         <h3 className="font-semibold text-sm text-blue-900 mb-3">Controls:</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-blue-800">
