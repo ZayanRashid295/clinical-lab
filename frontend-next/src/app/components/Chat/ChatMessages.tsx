@@ -275,7 +275,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ room, onBack }) => {
                 <div className="flex items-center gap-2 mb-1">
                   {getMessageTypeIcon(message.type)}
                   <span className="text-xs opacity-75">
-                    {message.sender?.name}
+                    sender
+                    {/* {message.sender?.name} */}
                   </span>
                 </div>
                 <div

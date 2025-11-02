@@ -74,6 +74,10 @@ export function SystemSelector({ selectedSystems, onSystemToggle }: SystemSelect
     setExpandedItems(expandedItems.length === allItems.length ? [] : allItems);
   };
 
+  const handleValueChange = (value: string | string[]) => {
+    setExpandedItems(Array.isArray(value) ? value : [value]);
+  };
+
   return (
     <Card data-testid="card-systems">
       <CardContent className="pt-6">
@@ -86,7 +90,7 @@ export function SystemSelector({ selectedSystems, onSystemToggle }: SystemSelect
           </div>
 
           <ScrollArea className="h-[400px] pr-4">
-            <Accordion type="multiple" value={expandedItems} onValueChange={setExpandedItems} className="space-y-2">
+            <Accordion type="multiple" value={expandedItems} onValueChange={handleValueChange} className="space-y-2">
               {systemGroups.map((group, idx) => (
                 <AccordionItem key={idx} value={`item-${idx}`} className="border border-gray-200 dark:border-gray-700 rounded-lg px-3">
                   <AccordionTrigger className="hover:no-underline py-3" data-testid={`accordion-${group.category.toLowerCase().replace(/\s+/g, '-')}`}>

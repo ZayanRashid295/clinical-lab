@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useTopics from "../../../hooks/useTopics";
 import useTopicStats from "../../../hooks/useTopicStats";
-import { Topic } from "../../types/content";
+import { Topic, TopicQueryParams } from "../../types/content";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { topicTableConfig } from "../../config/tables/topic-table.config";
 import TopicFormModal from "./TopicFormModal";
@@ -54,7 +54,10 @@ export default function TopicManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as TopicQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

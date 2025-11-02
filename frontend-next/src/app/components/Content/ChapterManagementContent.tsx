@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useChapters from "../../../hooks/useChapters";
 import useChapterStats from "../../../hooks/useChapterStats";
-import { Chapter } from "../../types/content";
+import { Chapter, ChapterQueryParams } from "../../types/content";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { chapterTableConfig } from "../../config/tables/chapter-table.config";
 import ChapterFormModal from "./ChapterFormModal";
@@ -54,7 +54,10 @@ export default function ChapterManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as ChapterQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

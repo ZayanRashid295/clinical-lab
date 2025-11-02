@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTheme } from "../../../hooks/useTheme";
 import useProducts from "../../../hooks/useProducts";
 import useProductStats from "../../../hooks/useProductStats";
-import { Product } from "../../types/product";
+import { Product, ProductQueryParams } from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productTableConfig } from "../../config/tables/product-table.config";
 import ProductFormModal from "./ProductFormModal";
@@ -56,7 +56,10 @@ export default function ProductManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as ProductQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

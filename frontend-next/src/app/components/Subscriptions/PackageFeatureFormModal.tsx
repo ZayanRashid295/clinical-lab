@@ -13,6 +13,7 @@ import {
   UpdatePackageFeatureDto,
 } from "../../types/subscription";
 import { PackageFeaturesService } from "../../services/subscriptions/package-features.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface PackageFeatureFormModalProps {
   isOpen: boolean;
@@ -119,8 +120,24 @@ export default function PackageFeatureFormModal({
         const response = await featuresService.createFeature(formData);
         setSuccess(true);
         setTimeout(() => {
-          onFeatureSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or PackageFeature
+          if ("name" in response && !("message" in response)) {
+            // It's a PackageFeature
+            onFeatureSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            featuresService
+              .getFeature(createResponse.id)
+              .then((entity) => {
+                onFeatureSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (feature) {
         const updateData: UpdatePackageFeatureDto = {
@@ -134,8 +151,23 @@ export default function PackageFeatureFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onFeatureSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or PackageFeature
+          if ("name" in response && !("message" in response)) {
+            // It's a PackageFeature
+            onFeatureSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            featuresService
+              .getFeature(feature.id)
+              .then((entity) => {
+                onFeatureSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

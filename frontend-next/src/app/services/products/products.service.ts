@@ -40,7 +40,7 @@ export class ProductsService extends BaseDataService<
    */
   async createProduct(
     productData: CreateProductDto
-  ): Promise<CreateResponse<Product>> {
+  ): Promise<CreateResponse | Product> {
     return this.create(productData);
   }
 
@@ -50,7 +50,7 @@ export class ProductsService extends BaseDataService<
   async updateProduct(
     id: string,
     productData: UpdateProductDto
-  ): Promise<UpdateResponse<Product>> {
+  ): Promise<UpdateResponse | Product> {
     return this.update(id, productData);
   }
 

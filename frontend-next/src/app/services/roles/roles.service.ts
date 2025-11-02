@@ -29,7 +29,7 @@ export class RolesService extends BaseDataService<Role, RoleQueryParams, CreateR
   /**
    * Create a new role
    */
-  async createRole(roleData: CreateRoleDto): Promise<CreateResponse<Role>> {
+  async createRole(roleData: CreateRoleDto): Promise<CreateResponse | Role> {
     return this.create(roleData);
   }
 
@@ -39,7 +39,7 @@ export class RolesService extends BaseDataService<Role, RoleQueryParams, CreateR
   async updateRole(
     id: string,
     roleData: UpdateRoleDto
-  ): Promise<UpdateResponse<Role>> {
+  ): Promise<UpdateResponse | Role> {
     return this.update(id, roleData);
   }
 

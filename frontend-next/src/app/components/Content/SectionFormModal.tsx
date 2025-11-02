@@ -16,6 +16,7 @@ import {
 import { SectionsService } from "../../services/content/sections.service";
 import { ProductsService } from "../../services/products/products.service";
 import { Product } from "../../types/product";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface SectionFormModalProps {
   isOpen: boolean;
@@ -154,8 +155,24 @@ export default function SectionFormModal({
         const response = await sectionsService.createSection(formData);
         setSuccess(true);
         setTimeout(() => {
-          onSectionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or Section
+          if ("productId" in response && "name" in response) {
+            // It's a Section
+            onSectionSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            sectionsService
+              .getSection(createResponse.id)
+              .then((entity) => {
+                onSectionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (section) {
         const updateData: UpdateSectionDto = {
@@ -171,8 +188,23 @@ export default function SectionFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onSectionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or Section
+          if ("productId" in response && "name" in response) {
+            // It's a Section
+            onSectionSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            sectionsService
+              .getSection(section.id)
+              .then((entity) => {
+                onSectionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

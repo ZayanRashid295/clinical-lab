@@ -20,6 +20,7 @@ import { TopicsService } from "../../services/content/topics.service";
 import { ProductTagsService } from "../../services/products/product-tags.service";
 import { Topic } from "../../types/content";
 import { ProductTag } from "../../types/product";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface QuestionFormModalProps {
   isOpen: boolean;
@@ -194,8 +195,24 @@ export default function QuestionFormModal({
         const response = await questionsService.createQuestion(createData);
         setSuccess(true);
         setTimeout(() => {
-          onQuestionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or Question
+          if ("topicId" in response && "question" in response) {
+            // It's a Question
+            onQuestionSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            questionsService
+              .getQuestion(createResponse.id)
+              .then((entity) => {
+                onQuestionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (question) {
         const updateData: UpdateQuestionDto = {
@@ -213,8 +230,23 @@ export default function QuestionFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or Question
+          if ("topicId" in response && "question" in response) {
+            // It's a Question
+            onQuestionSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            questionsService
+              .getQuestion(question.id)
+              .then((entity) => {
+                onQuestionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

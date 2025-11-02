@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Role, CreateRoleDto, UpdateRoleDto } from "../../types/user";
 import { RolesService } from "../../services/roles/roles.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface RoleFormModalProps {
   isOpen: boolean;
@@ -173,11 +174,29 @@ export default function RoleFormModal({
     setError(null);
 
     try {
-      let savedRole: Role;
-
       if (isCreateMode) {
         // Create new role
-        savedRole = await rolesService.createRole(formData);
+        const response = await rolesService.createRole(formData);
+        // Handle union type: response is either CreateResponse or Role
+        if ("name" in response && "displayName" in response) {
+          // It's a Role
+          onRoleSaved(response);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        } else {
+          // It's a CreateResponse, refetch the created entity
+          const createResponse = response as CreateResponse;
+          const savedRole = await rolesService.getRole(createResponse.id);
+          onRoleSaved(savedRole);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        }
       } else {
         // Update existing role
         const updateData: UpdateRoleDto = {
@@ -187,17 +206,27 @@ export default function RoleFormModal({
           permissions: formData.permissions,
           isActive: formData.isActive,
         };
-        savedRole = await rolesService.updateRole(role!.id, updateData);
+        const response = await rolesService.updateRole(role!.id, updateData);
+        // Handle union type: response is either UpdateResponse or Role
+        if ("name" in response && "displayName" in response) {
+          // It's a Role
+          onRoleSaved(response);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        } else {
+          // It's an UpdateResponse, refetch the updated entity
+          const savedRole = await rolesService.getRole(role!.id);
+          onRoleSaved(savedRole);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        }
       }
-
-      onRoleSaved(savedRole);
-      setSuccess(true);
-
-      // Close modal after a short delay to show success message
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-      }, 1500);
     } catch (err) {
       console.error(
         `Error ${isCreateMode ? "creating" : "updating"} role:`,

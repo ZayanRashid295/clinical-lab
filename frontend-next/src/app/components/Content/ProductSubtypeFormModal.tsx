@@ -16,6 +16,7 @@ import {
 import { ProductSubtypesService } from "../../services/products/product-subtypes.service";
 import { ProductsService } from "../../services/products/products.service";
 import { Product } from "../../types/product";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface ProductSubtypeFormModalProps {
   isOpen: boolean;
@@ -149,8 +150,24 @@ export default function ProductSubtypeFormModal({
         const response = await subtypesService.createSubtype(formData);
         setSuccess(true);
         setTimeout(() => {
-          onSubtypeSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or ProductSubtype
+          if ("productId" in response && "name" in response) {
+            // It's a ProductSubtype
+            onSubtypeSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            subtypesService
+              .getSubtype(createResponse.id)
+              .then((entity) => {
+                onSubtypeSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (subtype) {
         const updateData: UpdateProductSubtypeDto = {
@@ -165,8 +182,23 @@ export default function ProductSubtypeFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onSubtypeSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or ProductSubtype
+          if ("productId" in response && "name" in response) {
+            // It's a ProductSubtype
+            onSubtypeSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            subtypesService
+              .getSubtype(subtype.id)
+              .then((entity) => {
+                onSubtypeSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

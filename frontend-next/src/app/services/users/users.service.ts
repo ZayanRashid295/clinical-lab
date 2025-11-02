@@ -29,7 +29,7 @@ export class UsersService extends BaseDataService<User, UserQueryParams, CreateU
   /**
    * Create a new user
    */
-  async createUser(userData: CreateUserDto): Promise<CreateResponse<User>> {
+  async createUser(userData: CreateUserDto): Promise<CreateResponse | User> {
     return this.create(userData);
   }
 
@@ -39,7 +39,7 @@ export class UsersService extends BaseDataService<User, UserQueryParams, CreateU
   async updateUser(
     id: string,
     userData: UpdateUserDto
-  ): Promise<UpdateResponse<User>> {
+  ): Promise<UpdateResponse | User> {
     return this.update(id, userData);
   }
 

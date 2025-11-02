@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useProductTags from "../../../hooks/useProductTags";
 import useProductTagStats from "../../../hooks/useProductTagStats";
-import { ProductTag } from "../../types/product";
+import { ProductTag, ProductTagQueryParams } from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productTagTableConfig } from "../../config/tables/product-tag-table.config";
 import ProductTagFormModal from "./ProductTagFormModal";
@@ -53,7 +53,10 @@ export default function ProductTagManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as ProductTagQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

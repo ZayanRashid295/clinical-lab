@@ -40,7 +40,7 @@ export class ChaptersService extends BaseDataService<
    */
   async createChapter(
     chapterData: CreateChapterDto
-  ): Promise<CreateResponse<Chapter>> {
+  ): Promise<CreateResponse | Chapter> {
     return this.create(chapterData);
   }
 
@@ -50,7 +50,7 @@ export class ChaptersService extends BaseDataService<
   async updateChapter(
     id: string,
     chapterData: UpdateChapterDto
-  ): Promise<UpdateResponse<Chapter>> {
+  ): Promise<UpdateResponse | Chapter> {
     return this.update(id, chapterData);
   }
 

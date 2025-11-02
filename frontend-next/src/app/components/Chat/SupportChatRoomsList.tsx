@@ -242,7 +242,7 @@ const SupportChatRoomsList: React.FC<SupportChatRoomsListProps> = ({
                     {room.lastMessage && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 truncate">
-                          <strong>{room.lastMessage.sender?.name}:</strong>{" "}
+                          {/* <strong>{room.lastMessage.sender?.name}:</strong>{" "} */}
                           {getRichContentPreview(room.lastMessage)}
                         </span>
                       </div>

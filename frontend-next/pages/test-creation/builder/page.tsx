@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../src/shared/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../src/shared/ui/card";
 import { Button } from "../../../src/shared/ui/button";
 import { Badge } from "../../../src/shared/ui/badge";
 import { Wrench, Plus, Search, Filter } from "lucide-react";
@@ -44,8 +49,8 @@ export default function QuestionBuilderPage() {
               Question Builder Coming Soon
             </h2>
             <p className="text-muted-foreground mb-6">
-              This feature is under development. You'll be able to create and
-              edit questions with advanced tools here.
+              This feature is under development. You&apos;ll be able to create
+              and edit questions with advanced tools here.
             </p>
             <div className="flex justify-center gap-4">
               <Badge variant="outline">Multiple Choice</Badge>

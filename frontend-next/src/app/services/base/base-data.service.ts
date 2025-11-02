@@ -9,7 +9,7 @@ import {
  * Base interface for data service operations
  * All domain-specific services should implement these methods
  */
-export interface IBaseDataService<T, TQueryParams = any, TCreateDto = any, TUpdateDto = any> {
+export interface IBaseDataService<T, TQueryParams extends Record<string, any> = any, TCreateDto = any, TUpdateDto = any> {
   /**
    * Get all items with optional filtering and pagination
    */
@@ -45,7 +45,7 @@ export interface IBaseDataService<T, TQueryParams = any, TCreateDto = any, TUpda
  * Abstract base class for data services
  * Provides common structure but allows flexibility
  */
-export abstract class BaseDataService<T, TQueryParams = any, TCreateDto = any, TUpdateDto = any>
+export abstract class BaseDataService<T, TQueryParams extends Record<string, any> = any, TCreateDto = any, TUpdateDto = any>
   extends BaseApiService
   implements IBaseDataService<T, TQueryParams, TCreateDto, TUpdateDto>
 {
@@ -55,7 +55,7 @@ export abstract class BaseDataService<T, TQueryParams = any, TCreateDto = any, T
    * Get all items with optional filtering and pagination
    */
   async getAll(params?: TQueryParams): Promise<PaginatedResponse<T> | T[]> {
-    return this.get(this.endpoint, params);
+    return this.get(this.endpoint, params ? (params as Record<string, any>) : undefined);
   }
 
   /**

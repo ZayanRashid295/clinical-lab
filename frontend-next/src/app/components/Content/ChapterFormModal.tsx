@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { ChaptersService } from "../../services/content/chapters.service";
+import { SectionsService } from "../../services/content/sections.service";
+import React, { useState, useEffect, useMemo } from "react";
+import { CreateResponse } from "../../services/base/api-types";
 import {
   X,
   BookOpen,
@@ -13,8 +16,7 @@ import {
   CreateChapterDto,
   UpdateChapterDto,
 } from "../../types/content";
-import { ChaptersService } from "../../services/content/chapters.service";
-import { SectionsService } from "../../services/content/sections.service";
+
 import { Section } from "../../types/content";
 
 interface ChapterFormModalProps {
@@ -45,8 +47,8 @@ export default function ChapterFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const chaptersService = new ChaptersService();
-  const sectionsService = new SectionsService();
+  const chaptersService = useMemo(() => new ChaptersService(), []);
+  const sectionsService = useMemo(() => new SectionsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function ChapterFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, chapter, isCreateMode]);
+  }, [isOpen, chapter, isCreateMode, sectionsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -154,8 +156,25 @@ export default function ChapterFormModal({
         const response = await chaptersService.createChapter(formData);
         setSuccess(true);
         setTimeout(() => {
-          onChapterSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or Chapter
+          if ("sectionId" in response && "name" in response) {
+            // It's a Chapter
+            onChapterSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            chaptersService
+              .getChapter(createResponse.id)
+              .then((entity) => {
+                onChapterSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       } else if (chapter) {
         const updateData: UpdateChapterDto = {
@@ -171,15 +190,29 @@ export default function ChapterFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onChapterSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or Chapter
+          if ("sectionId" in response && "name" in response) {
+            // It's a Chapter
+            onChapterSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            chaptersService
+              .getChapter(chapter.id)
+              .then((entity) => {
+                onChapterSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save chapter"
+        err?.response?.data?.message || err?.message || "Failed to save chapter"
       );
     } finally {
       setLoading(false);
@@ -224,7 +257,9 @@ export default function ChapterFormModal({
           {success && (
             <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md flex items-center">
               <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-              <span className="text-green-700">Chapter saved successfully!</span>
+              <span className="text-green-700">
+                Chapter saved successfully!
+              </span>
             </div>
           )}
 
@@ -248,7 +283,8 @@ export default function ChapterFormModal({
                   <option value="">Select a section</option>
                   {sections.map((section) => (
                     <option key={section.id} value={section.id}>
-                      {section.name} {section.product && `(${section.product.name})`}
+                      {section.name}{" "}
+                      {section.product && `(${section.product.name})`}
                     </option>
                   ))}
                 </select>
@@ -304,9 +340,7 @@ export default function ChapterFormModal({
                 onChange={handleInputChange}
                 className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
               />
-              <label className="ml-2 block text-sm text-gray-700">
-                Active
-              </label>
+              <label className="ml-2 block text-sm text-gray-700">Active</label>
             </div>
           </div>
 
@@ -341,4 +375,3 @@ export default function ChapterFormModal({
     </div>
   );
 }
-

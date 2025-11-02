@@ -36,7 +36,7 @@ export class SubscriptionsService extends BaseDataService<
    */
   async createSubscription(
     subscriptionData: CreateSubscriptionDto
-  ): Promise<CreateResponse<Subscription>> {
+  ): Promise<CreateResponse | Subscription> {
     return this.create(subscriptionData);
   }
 
@@ -46,7 +46,7 @@ export class SubscriptionsService extends BaseDataService<
   async updateSubscription(
     id: string,
     subscriptionData: UpdateSubscriptionDto
-  ): Promise<UpdateResponse<Subscription>> {
+  ): Promise<UpdateResponse | Subscription> {
     return this.update(id, subscriptionData);
   }
 

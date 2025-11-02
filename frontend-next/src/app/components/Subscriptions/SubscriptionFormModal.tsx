@@ -18,6 +18,7 @@ import {
   SubscriptionStatus,
 } from "../../types/subscription";
 import { SubscriptionsService } from "../../services/subscriptions/subscriptions.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface SubscriptionFormModalProps {
   isOpen: boolean;
@@ -145,8 +146,24 @@ export default function SubscriptionFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onSubscriptionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or Subscription
+          if ("userId" in response && "subscriptionPackageId" in response) {
+            // It's a Subscription
+            onSubscriptionSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            subscriptionsService
+              .getSubscription(createResponse.id)
+              .then((entity) => {
+                onSubscriptionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (subscription) {
         const updateData: UpdateSubscriptionDto = {
@@ -161,8 +178,23 @@ export default function SubscriptionFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onSubscriptionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or Subscription
+          if ("userId" in response && "subscriptionPackageId" in response) {
+            // It's a Subscription
+            onSubscriptionSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            subscriptionsService
+              .getSubscription(subscription.id)
+              .then((entity) => {
+                onSubscriptionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

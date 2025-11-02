@@ -35,7 +35,7 @@ export class QuestionsService extends BaseDataService<
    */
   async createQuestion(
     questionData: CreateQuestionDto
-  ): Promise<CreateResponse<Question>> {
+  ): Promise<CreateResponse | Question> {
     return this.create(questionData);
   }
 
@@ -45,7 +45,7 @@ export class QuestionsService extends BaseDataService<
   async updateQuestion(
     id: string,
     questionData: UpdateQuestionDto
-  ): Promise<UpdateResponse<Question>> {
+  ): Promise<UpdateResponse | Question> {
     return this.update(id, questionData);
   }
 

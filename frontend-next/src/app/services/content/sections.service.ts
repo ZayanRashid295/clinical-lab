@@ -40,7 +40,7 @@ export class SectionsService extends BaseDataService<
    */
   async createSection(
     sectionData: CreateSectionDto
-  ): Promise<CreateResponse<Section>> {
+  ): Promise<CreateResponse | Section> {
     return this.create(sectionData);
   }
 
@@ -50,7 +50,7 @@ export class SectionsService extends BaseDataService<
   async updateSection(
     id: string,
     sectionData: UpdateSectionDto
-  ): Promise<UpdateResponse<Section>> {
+  ): Promise<UpdateResponse | Section> {
     return this.update(id, sectionData);
   }
 

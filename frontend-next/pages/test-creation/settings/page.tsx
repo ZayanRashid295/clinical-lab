@@ -40,7 +40,7 @@ export default function TestSettingsPage() {
               Test Settings Coming Soon
             </h2>
             <p className="text-muted-foreground mb-6">
-              This feature is under development. You'll be able to configure
+              This feature is under development. You&apos;ll be able to configure
               test settings here.
             </p>
             <div className="flex justify-center gap-4">

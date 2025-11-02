@@ -1,6 +1,8 @@
 // Chat and messaging type definitions
 
-import { RideUser } from "./ride";
+import { User } from "./user";
+
+// import { RideUser } from "./ride";
 
 export type MessageType = "TEXT" | "IMAGE" | "FILE" | "LOCATION";
 export type ChatType = "SUPPORT" | "RIDE" | "GENERAL";
@@ -16,6 +18,7 @@ export interface ChatRoom {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  sender?: User;
 }
 
 export interface Message {
@@ -38,7 +41,7 @@ export interface Message {
   updatedAt: string;
 
   // Relations
-  sender?: RideUser;
+  sender?: User;
 }
 
 export interface Notification {
@@ -52,5 +55,5 @@ export interface Notification {
   createdAt: string;
 
   // Relations
-  user?: RideUser;
+  user?: User;
 }

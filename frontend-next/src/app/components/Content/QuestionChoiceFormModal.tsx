@@ -17,6 +17,7 @@ import {
 import { QuestionChoicesService } from "../../services/questions/question-choices.service";
 import { QuestionsService } from "../../services/questions/questions.service";
 import { Question } from "../../types/question";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface QuestionChoiceFormModalProps {
   isOpen: boolean;
@@ -158,8 +159,24 @@ export default function QuestionChoiceFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionChoiceSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or QuestionChoice
+          if ("questionId" in response && "text" in response) {
+            // It's a QuestionChoice
+            onQuestionChoiceSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            questionChoicesService
+              .getQuestionChoice(createResponse.id)
+              .then((entity) => {
+                onQuestionChoiceSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (questionChoice) {
         const updateData: UpdateQuestionChoiceDto = {
@@ -173,8 +190,23 @@ export default function QuestionChoiceFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionChoiceSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or QuestionChoice
+          if ("questionId" in response && "text" in response) {
+            // It's a QuestionChoice
+            onQuestionChoiceSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            questionChoicesService
+              .getQuestionChoice(questionChoice.id)
+              .then((entity) => {
+                onQuestionChoiceSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

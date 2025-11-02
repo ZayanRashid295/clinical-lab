@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import useProductSubtypes from "../../../hooks/useProductSubtypes";
 import useProductSubtypeStats from "../../../hooks/useProductSubtypeStats";
-import { ProductSubtype } from "../../types/product";
+import {
+  ProductSubtype,
+  ProductSubtypeQueryParams,
+} from "../../types/product";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { productSubtypeTableConfig } from "../../config/tables/product-subtype-table.config";
 import ProductSubtypeFormModal from "./ProductSubtypeFormModal";
@@ -54,7 +57,10 @@ export default function ProductSubtypeManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as ProductSubtypeQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

@@ -40,7 +40,7 @@ export class PackageFeaturesService extends BaseDataService<
    */
   async createFeature(
     featureData: CreatePackageFeatureDto
-  ): Promise<CreateResponse<PackageFeature>> {
+  ): Promise<CreateResponse | PackageFeature> {
     return this.create(featureData);
   }
 
@@ -50,7 +50,7 @@ export class PackageFeaturesService extends BaseDataService<
   async updateFeature(
     id: string,
     featureData: UpdatePackageFeatureDto
-  ): Promise<UpdateResponse<PackageFeature>> {
+  ): Promise<UpdateResponse | PackageFeature> {
     return this.update(id, featureData);
   }
 

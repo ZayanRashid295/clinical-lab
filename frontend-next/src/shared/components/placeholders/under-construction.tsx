@@ -282,7 +282,7 @@ export default function UnderConstruction({
               Coming Features
             </CardTitle>
             <CardDescription>
-              Exciting features we're working on for {menuTitle}
+              Exciting features we&apos;re working on for {menuTitle}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -309,7 +309,7 @@ export default function UnderConstruction({
                 Stay Updated
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Want to be notified when this feature is ready? We'll keep you
+                Want to be notified when this feature is ready? We&apos;ll keep you
                 posted on our progress.
               </p>
               <div className="flex justify-center space-x-3">

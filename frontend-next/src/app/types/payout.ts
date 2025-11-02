@@ -1,6 +1,6 @@
 // Payout-related type definitions
 
-import { RideUser } from "./ride";
+import { User } from "./user";
 
 export type PayoutStatus =
   | "PENDING"
@@ -42,7 +42,7 @@ export interface Payout {
   updatedAt: string;
 
   // Relations
-  driver?: RideUser;
+  driver?: User;
   payoutItems?: PayoutItem[];
   payoutMethodDetails?: PayoutMethodDetails;
   earnings?: Earnings[];
@@ -91,7 +91,7 @@ export interface PayoutSchedule {
   updatedAt: string;
 
   // Relations
-  driver?: RideUser;
+  driver?: User;
 }
 
 export interface PayoutSettings {
@@ -107,7 +107,7 @@ export interface PayoutSettings {
   updatedAt: string;
 
   // Relations
-  driver?: RideUser;
+  driver?: User;
 }
 
 export interface Earnings {
@@ -125,7 +125,7 @@ export interface Earnings {
   updatedAt: string;
 
   // Relations
-  driver?: RideUser;
+  driver?: User;
   ride?: any; // Ride type - avoiding circular import
   payout?: Payout;
 }

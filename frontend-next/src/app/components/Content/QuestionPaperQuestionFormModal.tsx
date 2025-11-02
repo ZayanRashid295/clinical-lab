@@ -16,6 +16,7 @@ import {
 } from "../../types/question-paper-question";
 import { QuestionPapersService } from "../../services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "../../services/assessments/question-paper-questions.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface QuestionPaperQuestionFormModalProps {
   isOpen: boolean;
@@ -158,8 +159,25 @@ export default function QuestionPaperQuestionFormModal({
           );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionPaperQuestionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or QuestionPaperQuestion
+          if ("questionPaperId" in response) {
+            // It's a QuestionPaperQuestion
+            onQuestionPaperQuestionSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            questionPaperQuestionsService
+              .getQuestionPaperQuestion(createResponse.id)
+              .then((entity) => {
+                onQuestionPaperQuestionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       } else if (questionPaperQuestion) {
         const updateData: UpdateQuestionPaperQuestionDto = {
@@ -172,8 +190,24 @@ export default function QuestionPaperQuestionFormModal({
           );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionPaperQuestionSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or QuestionPaperQuestion
+          if ("questionPaperId" in response) {
+            // It's a QuestionPaperQuestion
+            onQuestionPaperQuestionSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            questionPaperQuestionsService
+              .getQuestionPaperQuestion(questionPaperQuestion.id)
+              .then((entity) => {
+                onQuestionPaperQuestionSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

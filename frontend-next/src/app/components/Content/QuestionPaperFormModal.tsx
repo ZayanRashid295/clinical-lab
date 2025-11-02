@@ -6,7 +6,6 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
-  User,
   Clock,
 } from "lucide-react";
 import {
@@ -17,6 +16,7 @@ import {
 import { QuestionPapersService } from "../../services/assessments/question-papers.service";
 import { UsersService } from "../../services/users/users.service";
 import { User } from "../../types/user";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface QuestionPaperFormModalProps {
   isOpen: boolean;
@@ -128,7 +128,9 @@ export default function QuestionPaperFormModal({
         type === "checkbox"
           ? (e.target as HTMLInputElement).checked
           : type === "number"
-          ? value ? parseInt(value) : undefined
+          ? value
+            ? parseInt(value)
+            : undefined
           : value,
     }));
   };
@@ -172,8 +174,25 @@ export default function QuestionPaperFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionPaperSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or QuestionPaper
+          if ("userId" in response && "name" in response) {
+            // It's a QuestionPaper
+            onQuestionPaperSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            questionPapersService
+              .getQuestionPaper(createResponse.id)
+              .then((entity) => {
+                onQuestionPaperSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       } else if (questionPaper) {
         const updateData: UpdateQuestionPaperDto = {
@@ -191,8 +210,24 @@ export default function QuestionPaperFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onQuestionPaperSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or QuestionPaper
+          if ("userId" in response && "name" in response) {
+            // It's a QuestionPaper
+            onQuestionPaperSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            questionPapersService
+              .getQuestionPaper(questionPaper.id)
+              .then((entity) => {
+                onQuestionPaperSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                // Fallback: close modal anyway if refetch fails
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {
@@ -362,9 +397,7 @@ export default function QuestionPaperFormModal({
                 onChange={handleInputChange}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              <label className="ml-2 block text-sm text-gray-700">
-                Active
-              </label>
+              <label className="ml-2 block text-sm text-gray-700">Active</label>
             </div>
           </div>
 
@@ -399,4 +432,3 @@ export default function QuestionPaperFormModal({
     </div>
   );
 }
-

@@ -40,7 +40,7 @@ export class TopicsService extends BaseDataService<
    */
   async createTopic(
     topicData: CreateTopicDto
-  ): Promise<CreateResponse<Topic>> {
+  ): Promise<CreateResponse | Topic> {
     return this.create(topicData);
   }
 
@@ -50,7 +50,7 @@ export class TopicsService extends BaseDataService<
   async updateTopic(
     id: string,
     topicData: UpdateTopicDto
-  ): Promise<UpdateResponse<Topic>> {
+  ): Promise<UpdateResponse | Topic> {
     return this.update(id, topicData);
   }
 

@@ -40,7 +40,7 @@ export class ProductTagsService extends BaseDataService<
    */
   async createTag(
     tagData: CreateProductTagDto
-  ): Promise<CreateResponse<ProductTag>> {
+  ): Promise<CreateResponse | ProductTag> {
     return this.create(tagData);
   }
 
@@ -50,7 +50,7 @@ export class ProductTagsService extends BaseDataService<
   async updateTag(
     id: string,
     tagData: UpdateProductTagDto
-  ): Promise<UpdateResponse<ProductTag>> {
+  ): Promise<UpdateResponse | ProductTag> {
     return this.update(id, tagData);
   }
 

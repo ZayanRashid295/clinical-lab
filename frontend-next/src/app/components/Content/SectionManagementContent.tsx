@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useSections from "../../../hooks/useSections";
 import useSectionStats from "../../../hooks/useSectionStats";
-import { Section } from "../../types/content";
+import { Section, SectionQueryParams } from "../../types/content";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { sectionTableConfig } from "../../config/tables/section-table.config";
 import SectionFormModal from "./SectionFormModal";
@@ -54,7 +54,10 @@ export default function SectionManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as SectionQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

@@ -191,7 +191,8 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
-                        {payment.user?.name || "Unknown User"}
+                        {/* {payment.user?.name || "Unknown User"} */}
+                        userX
                       </div>
                       <div className="text-sm text-gray-500">
                         {payment.user?.email}

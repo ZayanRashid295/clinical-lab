@@ -1,6 +1,6 @@
 // Payment-related type definitions
 
-import { RideUser } from "./ride";
+import { User } from "./user";
 
 export type PaymentStatus =
   | "PENDING"
@@ -29,7 +29,7 @@ export interface Payment {
   updatedAt: string;
 
   // Relations
-  user?: RideUser;
+  user?: User;
   ride?: any; // Ride type - avoiding circular import
 
   // Additional backend fields

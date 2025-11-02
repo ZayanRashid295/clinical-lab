@@ -16,6 +16,7 @@ import {
   UpdateSubscriptionPackageDto,
 } from "../../types/subscription";
 import { SubscriptionPackagesService } from "../../services/subscriptions/subscription-packages.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface SubscriptionPackageFormModalProps {
   isOpen: boolean;
@@ -145,8 +146,24 @@ export default function SubscriptionPackageFormModal({
         const response = await packagesService.createPackage(formData);
         setSuccess(true);
         setTimeout(() => {
-          onPackageSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or SubscriptionPackage
+          if ("productSubtypeId" in response && "name" in response) {
+            // It's a SubscriptionPackage
+            onPackageSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            packagesService
+              .getPackage(createResponse.id)
+              .then((entity) => {
+                onPackageSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (pkg) {
         const updateData: UpdateSubscriptionPackageDto = {
@@ -164,8 +181,23 @@ export default function SubscriptionPackageFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onPackageSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or SubscriptionPackage
+          if ("productSubtypeId" in response && "name" in response) {
+            // It's a SubscriptionPackage
+            onPackageSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            packagesService
+              .getPackage(pkg.id)
+              .then((entity) => {
+                onPackageSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

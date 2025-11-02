@@ -16,6 +16,7 @@ import {
 import { TopicsService } from "../../services/content/topics.service";
 import { ChaptersService } from "../../services/content/chapters.service";
 import { Chapter } from "../../types/content";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface TopicFormModalProps {
   isOpen: boolean;
@@ -154,8 +155,24 @@ export default function TopicFormModal({
         const response = await topicsService.createTopic(formData);
         setSuccess(true);
         setTimeout(() => {
-          onTopicSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or Topic
+          if ("chapterId" in response && "name" in response) {
+            // It's a Topic
+            onTopicSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            topicsService
+              .getTopic(createResponse.id)
+              .then((entity) => {
+                onTopicSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (topic) {
         const updateData: UpdateTopicDto = {
@@ -171,8 +188,23 @@ export default function TopicFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          onTopicSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or Topic
+          if ("chapterId" in response && "name" in response) {
+            // It's a Topic
+            onTopicSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            topicsService
+              .getTopic(topic.id)
+              .then((entity) => {
+                onTopicSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

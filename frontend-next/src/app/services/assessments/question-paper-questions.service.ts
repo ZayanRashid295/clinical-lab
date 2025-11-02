@@ -44,7 +44,7 @@ export class QuestionPaperQuestionsService extends BaseDataService<
    */
   async createQuestionPaperQuestion(
     questionPaperQuestionData: CreateQuestionPaperQuestionDto
-  ): Promise<CreateResponse<QuestionPaperQuestion>> {
+  ): Promise<CreateResponse | QuestionPaperQuestion> {
     return this.create(questionPaperQuestionData);
   }
 
@@ -54,7 +54,7 @@ export class QuestionPaperQuestionsService extends BaseDataService<
   async updateQuestionPaperQuestion(
     id: string,
     questionPaperQuestionData: UpdateQuestionPaperQuestionDto
-  ): Promise<UpdateResponse<QuestionPaperQuestion>> {
+  ): Promise<UpdateResponse | QuestionPaperQuestion> {
     return this.update(id, questionPaperQuestionData);
   }
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useQuestions from "../../../hooks/useQuestions";
 import useQuestionStats from "../../../hooks/useQuestionStats";
-import { Question } from "../../types/question";
+import { Question, QuestionQueryParams } from "../../types/question";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { questionTableConfig } from "../../config/tables/question-table.config";
 import QuestionFormModal from "./QuestionFormModal";
@@ -56,7 +56,10 @@ export default function QuestionManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as QuestionQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

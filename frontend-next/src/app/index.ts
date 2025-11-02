@@ -6,8 +6,9 @@ export * from "./config/dashboard.configs";
 export * from "./types/core";
 export * from "./types/ui";
 export * from "./types/payment";
-export * from "./types/ride";
-export * from "./types/fleet";
-export * from "./types/location";
 export * from "./types/chat";
 export * from "./types/payout";
+export * from "./types/assessment";
+
+export * from "./types/question";
+export * from "./types/question-paper-question";

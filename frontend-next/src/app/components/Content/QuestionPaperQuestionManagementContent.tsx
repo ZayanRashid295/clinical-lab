@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import useQuestionPaperQuestions from "../../../hooks/useQuestionPaperQuestions";
 import useQuestionPaperQuestionStats from "../../../hooks/useQuestionPaperQuestionStats";
-import { QuestionPaperQuestion } from "../../types/question-paper-question";
+import {
+  QuestionPaperQuestion,
+  QuestionPaperQuestionQueryParams,
+} from "../../types/question-paper-question";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { questionPaperQuestionTableConfig } from "../../config/tables/question-paper-question-table.config";
 import QuestionPaperQuestionFormModal from "./QuestionPaperQuestionFormModal";
@@ -56,7 +59,10 @@ export default function QuestionPaperQuestionManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as QuestionPaperQuestionQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

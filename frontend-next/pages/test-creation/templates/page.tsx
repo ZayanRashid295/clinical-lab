@@ -44,7 +44,7 @@ export default function TestTemplatesPage() {
               Test Templates Coming Soon
             </h2>
             <p className="text-muted-foreground mb-6">
-              This feature is under development. You'll be able to create and
+              This feature is under development. You&apos;ll be able to create and
               manage test templates here.
             </p>
             <div className="flex justify-center gap-4">

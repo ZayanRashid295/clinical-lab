@@ -40,7 +40,7 @@ export class ProductSubtypesService extends BaseDataService<
    */
   async createSubtype(
     subtypeData: CreateProductSubtypeDto
-  ): Promise<CreateResponse<ProductSubtype>> {
+  ): Promise<CreateResponse | ProductSubtype> {
     return this.create(subtypeData);
   }
 
@@ -50,7 +50,7 @@ export class ProductSubtypesService extends BaseDataService<
   async updateSubtype(
     id: string,
     subtypeData: UpdateProductSubtypeDto
-  ): Promise<UpdateResponse<ProductSubtype>> {
+  ): Promise<UpdateResponse | ProductSubtype> {
     return this.update(id, subtypeData);
   }
 

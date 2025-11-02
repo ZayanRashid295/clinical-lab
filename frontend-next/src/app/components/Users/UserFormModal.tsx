@@ -19,6 +19,7 @@ import {
   UpdateUserDto,
 } from "../../types/user";
 import { UsersService } from "../../services/users/users.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -35,7 +36,7 @@ export default function UserFormModal({
   onUserSaved,
   mode,
 }: UserFormModalProps) {
-  const [formData, setFormData] = useState<CreateUserDto>({
+  const [formData, setFormData] = useState<CreateUserDto & { isActive?: boolean }>({
     email: "",
     firstName: "",
     lastName: "",
@@ -159,11 +160,30 @@ export default function UserFormModal({
     setError(null);
 
     try {
-      let savedUser: UserType;
-
       if (isCreateMode) {
-        // Create new user
-        savedUser = await usersService.createUser(formData);
+        // Create new user (exclude isActive from CreateUserDto)
+        const { isActive, ...createData } = formData;
+        const response = await usersService.createUser(createData);
+        // Handle union type: response is either CreateResponse or User
+        if ("email" in response && "firstName" in response) {
+          // It's a User
+          onUserSaved(response);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        } else {
+          // It's a CreateResponse, refetch the created entity
+          const createResponse = response as CreateResponse;
+          const savedUser = await usersService.getUser(createResponse.id);
+          onUserSaved(savedUser);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        }
       } else {
         // Update existing user
         const updateData: UpdateUserDto = {
@@ -173,17 +193,27 @@ export default function UserFormModal({
           phone: formData.phone,
           isActive: formData.isActive,
         };
-        savedUser = await usersService.updateUser(user!.id, updateData);
+        const response = await usersService.updateUser(user!.id, updateData);
+        // Handle union type: response is either UpdateResponse or User
+        if ("email" in response && "firstName" in response) {
+          // It's a User
+          onUserSaved(response);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        } else {
+          // It's an UpdateResponse, refetch the updated entity
+          const savedUser = await usersService.getUser(user!.id);
+          onUserSaved(savedUser);
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            setSuccess(false);
+          }, 1500);
+        }
       }
-
-      onUserSaved(savedUser);
-      setSuccess(true);
-
-      // Close modal after a short delay to show success message
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-      }, 1500);
     } catch (err) {
       console.error(
         `Error ${isCreateMode ? "creating" : "updating"} user:`,

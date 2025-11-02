@@ -14,6 +14,7 @@ import {
   UpdateProductTagDto,
 } from "../../types/product";
 import { ProductTagsService } from "../../services/products/product-tags.service";
+import { CreateResponse } from "../../services/base/api-types";
 
 interface ProductTagFormModalProps {
   isOpen: boolean;
@@ -123,8 +124,24 @@ export default function ProductTagFormModal({
         const response = await tagsService.createTag(formData);
         setSuccess(true);
         setTimeout(() => {
-          onTagSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either CreateResponse or ProductTag
+          if ("name" in response && !("message" in response)) {
+            // It's a ProductTag
+            onTagSaved(response);
+            onClose();
+          } else {
+            // It's a CreateResponse, refetch the created entity
+            const createResponse = response as CreateResponse;
+            tagsService
+              .getTag(createResponse.id)
+              .then((entity) => {
+                onTagSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       } else if (tag) {
         const updateData: UpdateProductTagDto = {
@@ -136,8 +153,23 @@ export default function ProductTagFormModal({
         const response = await tagsService.updateTag(tag.id, updateData);
         setSuccess(true);
         setTimeout(() => {
-          onTagSaved(response.data || response);
-          onClose();
+          // Handle union type: response is either UpdateResponse or ProductTag
+          if ("name" in response && !("message" in response)) {
+            // It's a ProductTag
+            onTagSaved(response);
+            onClose();
+          } else {
+            // It's an UpdateResponse, refetch the updated entity
+            tagsService
+              .getTag(tag.id)
+              .then((entity) => {
+                onTagSaved(entity);
+                onClose();
+              })
+              .catch(() => {
+                onClose();
+              });
+          }
         }, 1000);
       }
     } catch (err: any) {

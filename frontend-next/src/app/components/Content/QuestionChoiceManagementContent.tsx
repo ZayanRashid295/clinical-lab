@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import useQuestionChoices from "../../../hooks/useQuestionChoices";
 import useQuestionChoiceStats from "../../../hooks/useQuestionChoiceStats";
-import { QuestionChoice } from "../../types/question";
+import {
+  QuestionChoice,
+  QuestionChoiceQueryParams,
+} from "../../types/question";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { questionChoiceTableConfig } from "../../config/tables/question-choice-table.config";
 import QuestionChoiceFormModal from "./QuestionChoiceFormModal";
@@ -54,7 +57,10 @@ export default function QuestionChoiceManagementContent() {
   };
 
   const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
-    updateFilters({ sortBy, sortOrder });
+    updateFilters({
+      sortBy: sortBy as QuestionChoiceQueryParams["sortBy"],
+      sortOrder,
+    });
   };
 
   const handleRefresh = () => {

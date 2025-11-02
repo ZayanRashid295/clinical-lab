@@ -17,7 +17,10 @@ export interface UseDataTableResult<T, TFilters> {
   filters: TFilters;
 }
 
-export function useDataTable<T extends { id: string }, TFilters extends Record<string, any>>(
+export function useDataTable<
+  T extends { id: string },
+  TFilters extends Record<string, any>
+>(
   service: IBaseDataService<T, TFilters>,
   initialFilters?: TFilters
 ): UseDataTableResult<T, TFilters> {
@@ -29,7 +32,7 @@ export function useDataTable<T extends { id: string }, TFilters extends Record<s
     page: 1,
     limit: 10,
     ...(initialFilters || {}),
-  } as TFilters);
+  } as unknown as TFilters);
 
   const fetchData = useCallback(async () => {
     try {
@@ -78,4 +81,3 @@ export function useDataTable<T extends { id: string }, TFilters extends Record<s
     filters,
   };
 }
-

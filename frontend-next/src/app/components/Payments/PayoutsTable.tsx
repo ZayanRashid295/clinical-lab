@@ -214,9 +214,9 @@ const PayoutsTable: React.FC<PayoutsTableProps> = ({
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {payout.driver?.firstName && payout.driver?.lastName
+                          {/* {payout.driver?.firstName && payout.driver?.lastName
                             ? `${payout.driver.firstName} ${payout.driver.lastName}`
-                            : payout.driver?.name || "Unknown Driver"}
+                            : payout.driver?.name || "Unknown Driver"} */}
                         </div>
                         <div className="text-sm text-gray-500">
                           {payout.driver?.email}

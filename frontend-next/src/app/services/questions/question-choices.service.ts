@@ -40,7 +40,7 @@ export class QuestionChoicesService extends BaseDataService<
    */
   async createQuestionChoice(
     choiceData: CreateQuestionChoiceDto
-  ): Promise<CreateResponse<QuestionChoice>> {
+  ): Promise<CreateResponse | QuestionChoice> {
     return this.create(choiceData);
   }
 
@@ -50,7 +50,7 @@ export class QuestionChoicesService extends BaseDataService<
   async updateQuestionChoice(
     id: string,
     choiceData: UpdateQuestionChoiceDto
-  ): Promise<UpdateResponse<QuestionChoice>> {
+  ): Promise<UpdateResponse | QuestionChoice> {
     return this.update(id, choiceData);
   }
 
