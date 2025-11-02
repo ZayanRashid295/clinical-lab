@@ -83,15 +83,10 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Menu Items ({items.length})</h3>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Menu className="h-4 w-4" />
-          {items.length} total items
-        </div>
+    <div className="border border-gray-200 rounded-lg p-4 max-h-screen overflow-y-auto bg-gray-50 mb-6">
+      <div className="space-y-1">
+        {items.map((item) => renderMenuItem(item))}
       </div>
-      <div>{items.map((item) => renderMenuItem(item))}</div>
     </div>
   );
 };

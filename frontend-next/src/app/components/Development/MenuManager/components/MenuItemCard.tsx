@@ -1,10 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/shared/ui/card";
-import { Button } from "@/shared/ui/button";
-import { Badge } from "@/shared/ui/badge";
 import {
   ChevronDown,
-  ChevronRight,
   Edit2,
   Trash2,
   ArrowUp,
@@ -68,122 +65,90 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   }
 
   return (
-    <Card
-      className={`mb-2 transition-all duration-200 hover:shadow-md ${
-        depth > 0 ? "ml-6" : ""
-      }`}
-    >
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {hasSubmenu ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleExpand}
-                className="h-8 w-8 p-0"
-              >
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </Button>
-            ) : (
-              <div className="w-8" />
-            )}
+    <div className={`${depth > 0 ? "ml-6" : ""}`}>
+      <div className="flex items-center gap-2 p-2 rounded border transition-all bg-white border-gray-200 hover:bg-gray-50">
+        {hasSubmenu ? (
+          <button
+            onClick={onToggleExpand}
+            className="p-1 hover:bg-gray-200 rounded flex-shrink-0 chevron-rotate"
+            style={{
+              transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+            }}
+          >
+            <ChevronDown size={18} />
+          </button>
+        ) : (
+          <div className="w-6 flex-shrink-0" />
+        )}
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-lg flex-shrink-0">{item.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm text-gray-900 truncate">
+                {item.label}
+              </div>
+              <div className="text-xs text-gray-500 truncate">{item.path}</div>
+            </div>
           </div>
-
-          <div className="flex-1 min-w-0 space-y-3">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="text-2xl flex-shrink-0">{item.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm font-semibold text-foreground">
-                      {item.label}
-                    </h3>
-                    <Badge variant="outline" className="text-xs">
-                      {item.id}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1 truncate">
-                    {item.path}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onMoveUp}
-                  title="Move up"
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onMoveDown}
-                  title="Move down"
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </Button>
-                {depth > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onPromote}
-                    title="Promote to parent level"
-                    className="text-green-600 hover:text-green-700"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                )}
-                {depth === 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onDemote}
-                    title="Demote to submenu"
-                    className="text-yellow-600 hover:text-yellow-700"
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                )}
-                <Button variant="ghost" size="sm" onClick={onEdit} title="Edit">
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onDelete}
-                  title="Delete"
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs">
-                {item.roles.join(", ")}
-              </Badge>
-              {hasSubmenu && (
-                <Badge variant="outline" className="text-xs">
-                  {item.submenu?.length} submenu items
-                </Badge>
-              )}
-            </div>
+          <div className="text-xs text-gray-400 mt-1 ml-6">
+            Roles: {item.roles.join(", ")}
           </div>
         </div>
 
-        {isExpanded && hasSubmenu && children && (
-          <div className="mt-4 pt-4 border-t">{children}</div>
-        )}
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={onMoveUp}
+            className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-colors"
+            title="Move up"
+          >
+            <ArrowUp size={16} />
+          </button>
+          <button
+            onClick={onMoveDown}
+            className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-colors"
+            title="Move down"
+          >
+            <ArrowDown size={16} />
+          </button>
+          {depth > 0 && (
+            <button
+              onClick={onPromote}
+              className="p-1 hover:bg-green-100 rounded text-green-600 transition-colors"
+              title="Promote to parent level"
+            >
+              <ArrowUp size={16} />
+            </button>
+          )}
+          {depth === 0 && (
+            <button
+              onClick={onDemote}
+              className="p-1 hover:bg-yellow-100 rounded text-yellow-600 transition-colors"
+              title="Demote to submenu"
+            >
+              <ArrowDown size={16} />
+            </button>
+          )}
+          <button
+            onClick={onEdit}
+            className="p-1 hover:bg-orange-100 rounded text-orange-600 transition-colors"
+            title="Edit"
+          >
+            <Edit2 size={16} />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-1 hover:bg-red-100 rounded text-red-600 transition-colors"
+            title="Delete"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+
+      {isExpanded && hasSubmenu && children && (
+        <div className="mt-1">{children}</div>
+      )}
+    </div>
   );
 };

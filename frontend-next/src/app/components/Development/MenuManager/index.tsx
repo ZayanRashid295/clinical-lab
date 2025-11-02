@@ -1,19 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { MenuItem } from "../../../types/menu";
+import React from "react";
 import { MENU_CONFIG } from "../../../config/menu.config";
 import { useMenuOperations } from "./hooks/useMenuOperations";
 import { MenuHeader } from "./components/MenuHeader";
-import { MenuSearchBar } from "./components/MenuSearchBar";
 import { ControlsInfo } from "./components/ControlsInfo";
 import { MenuItemList } from "./components/MenuItemList";
 import { JSONOutput } from "./components/JSONOutput";
-import { filterMenuItems } from "./utils/menuFilters";
 
 const MenuManager = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-
   const {
     items,
     expandedItems,
@@ -29,11 +24,6 @@ const MenuManager = () => {
     promoteItem,
     demoteItem,
   } = useMenuOperations(MENU_CONFIG.items);
-
-  const filteredItems = useMemo(
-    () => filterMenuItems(items, searchTerm),
-    [items, searchTerm]
-  );
 
   const downloadJSON = () => {
     const dataStr = JSON.stringify({ items }, null, 2);
@@ -52,12 +42,16 @@ const MenuManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <MenuHeader onCopyJSON={copyJSON} onDownloadJSON={downloadJSON} />
-      <MenuSearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+    <div className="w-full max-w-7xl mx-auto p-6 bg-white">
+      <style>{`
+        .chevron-rotate {
+          transition: transform 0.5s ease-out;
+        }
+      `}</style>
+      <MenuHeader />
       <ControlsInfo />
       <MenuItemList
-        items={filteredItems}
+        items={items}
         expandedItems={expandedItems}
         editingId={editingId}
         editData={editData}
@@ -72,6 +66,20 @@ const MenuManager = () => {
         onSaveEdit={saveEdit}
         onCancelEdit={cancelEdit}
       />
+      <div className="flex gap-3 mb-6">
+        <button
+          onClick={copyJSON}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm"
+        >
+          Copy JSON
+        </button>
+        <button
+          onClick={downloadJSON}
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors text-sm"
+        >
+          Download JSON
+        </button>
+      </div>
       <JSONOutput items={items} />
     </div>
   );

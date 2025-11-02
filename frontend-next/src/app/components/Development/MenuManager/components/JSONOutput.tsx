@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { MenuItem } from "../../../../types/menu";
 
 interface JSONOutputProps {
@@ -8,15 +7,13 @@ interface JSONOutputProps {
 
 export const JSONOutput: React.FC<JSONOutputProps> = ({ items }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-semibold">JSON Output</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <pre className="text-xs bg-muted p-3 rounded border overflow-auto max-h-64 text-foreground font-mono">
-          {JSON.stringify({ items }, null, 2)}
-        </pre>
-      </CardContent>
-    </Card>
+    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <h3 className="font-semibold text-sm text-gray-900 mb-3">
+        JSON Output:
+      </h3>
+      <pre className="text-xs bg-white p-3 rounded border border-gray-300 overflow-auto max-h-64 text-gray-700 font-mono">
+        {JSON.stringify({ items }, null, 2)}
+      </pre>
+    </div>
   );
 };
