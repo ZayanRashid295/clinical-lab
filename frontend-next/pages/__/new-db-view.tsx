@@ -92,8 +92,8 @@ const ModuleManager = () => {
     index: number,
     startX = 50,
     startY = 50,
-    spacingX = 300,
-    spacingY = 250
+    spacingX = 320,
+    spacingY = 300
   ) => {
     const perRow = 3;
     const row = Math.floor(index / perRow);
@@ -1199,14 +1199,69 @@ const ModuleManager = () => {
   const findTableById = (id: string): Table | undefined =>
     allTables.find((t) => t.id === id);
 
-  const getRelatedTables = (table: Table): Table[] => {
-    return table.fields
-      .filter(
-        (f): f is Field & { foreignKey: ForeignKeyInfo } => !!f.foreignKey
-      )
-      .map((f) => f.foreignKey.tableName)
-      .map((tableId) => findTableById(tableId))
-      .filter((t): t is Table => !!t);
+  // Get field-level connections for a table
+  const getFieldConnections = (table: Table) => {
+    const connections: Array<{
+      fromTable: Table;
+      fromField: Field & { foreignKey: ForeignKeyInfo };
+      toTable: Table;
+      toField: Field;
+      fromFieldIndex: number;
+      toFieldIndex: number;
+    }> = [];
+
+    table.fields.forEach((field, fieldIndex) => {
+      if (field.foreignKey) {
+        const foreignKey = field.foreignKey;
+        const toTable = findTableById(foreignKey.tableName);
+        if (toTable && currentTables.find((t) => t.id === toTable.id)) {
+          // Find the target field - prefer exact name match, then primary key
+          let toField = toTable.fields.find(
+            (f) => f.name === foreignKey.columnName
+          );
+          if (!toField) {
+            toField = toTable.fields.find((f) => f.primaryKey);
+          }
+
+          if (toField) {
+            const toFieldIndex = toTable.fields.indexOf(toField);
+            connections.push({
+              fromTable: table,
+              fromField: field as Field & { foreignKey: ForeignKeyInfo },
+              toTable,
+              toField,
+              fromFieldIndex: fieldIndex,
+              toFieldIndex,
+            });
+          }
+        }
+      }
+    });
+
+    return connections;
+  };
+
+  // Calculate field position within a table
+  const getFieldPosition = (table: Table, fieldIndex: number) => {
+    const tableHeaderHeight = 36; // Header height with padding
+    const fieldHeight = 16; // Actual field height (py-0.5 = 2px * 2 + content)
+    const fieldVerticalGap = 2; // Gap between fields (py-0.5 creates 2px gap)
+
+    // Calculate Y position: table top + header + field index * (field height + gap) + field center
+    const fieldY =
+      table.y +
+      tableHeaderHeight +
+      fieldIndex * (fieldHeight + fieldVerticalGap) +
+      fieldHeight / 2;
+
+    // Determine if this field has a foreign key
+    const field = table.fields[fieldIndex];
+    const isForeignKey = field?.foreignKey;
+
+    // Position based on field type: FK fields connect from left edge, PK fields from right edge
+    const fieldX = isForeignKey ? table.x + 8 : table.x + 232; // 8px from left for FK, 8px from right (240-8) for PK
+
+    return { x: fieldX, y: fieldY };
   };
 
   const drawConnections = () => {
@@ -1216,42 +1271,105 @@ const ModuleManager = () => {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#cbd5e1";
+
+    // Draw grid every 5 pixels
+    ctx.strokeStyle = "#f1f5f9"; // Very light slate color
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([]);
+
+    // Vertical lines
+    for (let x = 0; x < canvas.width; x += 5) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let y = 0; y < canvas.height; y += 5) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    // Reset for connection drawing
+    ctx.strokeStyle = "#64748b";
     ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
+    ctx.setLineDash([]);
 
-    currentTables.forEach((table) => {
-      const related = getRelatedTables(table);
-      related.forEach((relTable) => {
-        // Only draw connection if related table is also in current view
-        if (!currentTables.find((t) => t.id === relTable.id)) return;
+    // Get all field connections
+    const allConnections = currentTables.flatMap((table) =>
+      getFieldConnections(table)
+    );
 
-        const fromX = (table.x + 160) * zoom;
-        const fromY = (table.y + 60) * zoom;
-        const toX = relTable.x * zoom;
-        const toY = (relTable.y + 60) * zoom;
+    // Draw each connection with orthogonal routing
+    allConnections.forEach((connection) => {
+      const fromPos = getFieldPosition(
+        connection.fromTable,
+        connection.fromFieldIndex
+      );
+      const toPos = getFieldPosition(
+        connection.toTable,
+        connection.toFieldIndex
+      );
 
-        ctx.beginPath();
+      // Scale positions by zoom
+      const fromX = fromPos.x * zoom;
+      const fromY = fromPos.y * zoom;
+      const toX = toPos.x * zoom;
+      const toY = toPos.y * zoom;
+
+      ctx.beginPath();
+
+      // Determine routing direction based on table positions
+      const fromTable = connection.fromTable;
+      const toTable = connection.toTable;
+
+      // Calculate table centers for routing decisions
+      const fromCenterX = (fromTable.x + 120) * zoom;
+      const toCenterX = (toTable.x + 120) * zoom;
+
+      let lastX = fromX;
+      let lastY = fromY;
+
+      if (fromCenterX < toCenterX) {
+        // Left to right: horizontal first, then vertical
+        const midX = fromX + (toX - fromX) / 2;
         ctx.moveTo(fromX, fromY);
+        ctx.lineTo(midX, fromY);
+        ctx.lineTo(midX, toY);
         ctx.lineTo(toX, toY);
-        ctx.stroke();
+        lastX = midX;
+        lastY = toY;
+      } else {
+        // Right to left: vertical first, then horizontal
+        const midY = fromY + (toY - fromY) / 2;
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(fromX, midY);
+        ctx.lineTo(toX, midY);
+        ctx.lineTo(toX, toY);
+        lastX = toX;
+        lastY = midY;
+      }
 
-        // Arrow
-        const angle = Math.atan2(toY - fromY, toX - fromX);
-        const arrowSize = 8;
-        ctx.fillStyle = "#cbd5e1";
-        ctx.beginPath();
-        ctx.moveTo(toX, toY);
-        ctx.lineTo(
-          toX - arrowSize * Math.cos(angle - Math.PI / 6),
-          toY - arrowSize * Math.sin(angle - Math.PI / 6)
-        );
-        ctx.lineTo(
-          toX - arrowSize * Math.cos(angle + Math.PI / 6),
-          toY - arrowSize * Math.sin(angle + Math.PI / 6)
-        );
-        ctx.fill();
-      });
+      ctx.stroke();
+
+      // Draw arrow at destination pointing towards the destination
+      const angle = Math.atan2(toY - lastY, toX - lastX);
+      const arrowSize = 6;
+      ctx.fillStyle = "#64748b";
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(
+        toX - arrowSize * Math.cos(angle - Math.PI / 6),
+        toY - arrowSize * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        toX - arrowSize * Math.cos(angle + Math.PI / 6),
+        toY - arrowSize * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.fill();
     });
   };
 
@@ -1614,8 +1732,8 @@ const ModuleManager = () => {
           >
             <canvas
               ref={canvasRef}
-              width={1600}
-              height={1000}
+              width={2000}
+              height={1200}
               className="absolute top-0 left-0 pointer-events-none"
             />
 
@@ -1713,11 +1831,11 @@ const ModuleManager = () => {
                   </div>
 
                   {/* Fields */}
-                  <div className="max-h-48 overflow-y-auto">
-                    {table.fields.map((field) => (
+                  <div className="max-h-48 overflow-y-auto relative">
+                    {table.fields.map((field, fieldIndex) => (
                       <div
                         key={field.id}
-                        className="py-0.5 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0"
+                        className="py-0.5 px-0.5 text-xs hover:bg-gray-50 flex items-center justify-between gap-1 group min-w-0 relative"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex-1 min-w-0 flex items-center gap-0.5">
@@ -1778,6 +1896,34 @@ const ModuleManager = () => {
                               <Trash2 size={12} />
                             </button>
                           </div>
+                        </div>
+
+                        {/* Connector line for the field */}
+                        <div
+                          className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{
+                            left: field.foreignKey ? "-12px" : "100%",
+                            width: "12px",
+                          }}
+                        >
+                          {/* Horizontal line */}
+                          <div
+                            className="absolute top-1/2 -translate-y-1/2 bg-slate-500"
+                            style={{
+                              left: field.foreignKey ? "0" : "auto",
+                              right: field.foreignKey ? "auto" : "0",
+                              width: "8px",
+                              height: "1px",
+                            }}
+                          />
+                          {/* Circle at the end */}
+                          <div
+                            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-slate-500 rounded-full border border-white"
+                            style={{
+                              left: field.foreignKey ? "-2px" : "auto",
+                              right: field.foreignKey ? "auto" : "-2px",
+                            }}
+                          />
                         </div>
                       </div>
                     ))}
