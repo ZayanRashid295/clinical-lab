@@ -1878,8 +1878,8 @@ function AdvDbView() {
                   const dx = Math.max(40, Math.abs(to.x - from.x) * 0.4);
                   // Calculate initial direction angle based on curve approach
                   // Make first control point follow the general curve direction
-                  const dyInitial = (to.y - from.y) * 0.2; // Slight vertical component
-                  const control1X = from.x - dx;
+                  const dyInitial = (to.y - from.y) * 0.1; // Slight vertical component
+                  const control1X = (from.x - dx) / 1.2;
                   const control1Y = from.y + dyInitial;
 
                   const d = `M ${from.x},${
