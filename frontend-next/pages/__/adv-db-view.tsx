@@ -1841,16 +1841,23 @@ function AdvDbView() {
                 height={CANVAS_HEIGHT}
               >
                 <defs>
-                  <marker
-                    id="arrow"
-                    markerWidth="10"
-                    markerHeight="10"
-                    refX="10"
-                    refY="5"
-                    orient="auto"
-                  >
-                    <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8" />
-                  </marker>
+                  {relationshipColors.map((colorClass, idx) => {
+                    const color = tailwindToHex[colorClass] || "#64748b";
+                    return (
+                      <marker
+                        key={colorClass}
+                        id={`arrow-${idx}`}
+                        markerWidth="12"
+                        markerHeight="12"
+                        refX="0"
+                        refY="6"
+                        orient="auto"
+                        markerUnits="userSpaceOnUse"
+                      >
+                        <path d="M12,0 L0,6 L12,12 z" fill={color} />
+                      </marker>
+                    );
+                  })}
                 </defs>
 
                 {connections.map((c) => {
@@ -1869,6 +1876,9 @@ function AdvDbView() {
                     to.x + dx
                   },${to.y} ${to.x},${to.y}`;
                   const stroke = tailwindToHex[c.colorClass] || "#64748b";
+                  const arrowId = `arrow-${relationshipColors.indexOf(
+                    c.colorClass
+                  )}`;
 
                   return (
                     <g key={c.id}>
@@ -1877,7 +1887,7 @@ function AdvDbView() {
                         fill="none"
                         stroke={stroke}
                         strokeWidth={2}
-                        markerEnd="url(#arrow)"
+                        markerStart={`url(#${arrowId})`}
                       />
                       {/* Optional relationship label midway */}
                       <text
