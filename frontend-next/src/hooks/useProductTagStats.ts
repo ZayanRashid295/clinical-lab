@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProductTagsService } from "../app/services/products/product-tags.service";
 
 interface ProductTagStats {
@@ -19,9 +19,9 @@ const useProductTagStats = (): UseProductTagStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const tagsService = new ProductTagsService();
+  const tagsService = useMemo(() => new ProductTagsService(), []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -34,11 +34,11 @@ const useProductTagStats = (): UseProductTagStatsResult => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tagsService]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

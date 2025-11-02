@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProductSubtypesService } from "../app/services/products/product-subtypes.service";
 
 interface ProductSubtypeStats {
@@ -19,9 +19,9 @@ const useProductSubtypeStats = (): UseProductSubtypeStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const subtypesService = new ProductSubtypesService();
+  const subtypesService = useMemo(() => new ProductSubtypesService(), []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -34,11 +34,11 @@ const useProductSubtypeStats = (): UseProductSubtypeStatsResult => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [subtypesService]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   FileText,
@@ -46,8 +46,8 @@ export default function TopicFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const topicsService = new TopicsService();
-  const chaptersService = new ChaptersService();
+  const topicsService = useMemo(() => new TopicsService(), []);
+  const chaptersService = useMemo(() => new ChaptersService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function TopicFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, topic, isCreateMode]);
+  }, [isOpen, topic, isCreateMode, chaptersService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

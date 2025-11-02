@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QuestionPaperQuestionsService } from "../app/services/assessments/question-paper-questions.service";
 import {
   QuestionPaperQuestion,
@@ -45,7 +45,7 @@ const useQuestionPaperQuestions = (
       ...initialFilters,
     });
 
-  const questionPaperQuestionsService = new QuestionPaperQuestionsService();
+  const questionPaperQuestionsService = useMemo(() => new QuestionPaperQuestionsService(), []);
 
   const fetchQuestionPaperQuestions = useCallback(async () => {
     try {
@@ -72,7 +72,7 @@ const useQuestionPaperQuestions = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [questionPaperQuestionsService, filters]);
 
   useEffect(() => {
     fetchQuestionPaperQuestions();

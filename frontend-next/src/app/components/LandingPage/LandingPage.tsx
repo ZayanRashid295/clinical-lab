@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { LandingNav } from "./LandingNav";
 import { HeroCarousel } from "./HeroCarousel";
 import { FeatureCard } from "./FeatureCard";
@@ -268,7 +269,14 @@ function HowItWorksSection1() {
           !imageVisible && "translate-x-12"
         )}
       >
-        <img src={studentPracticeImage} alt="Shadow Mode" className="w-full" />
+        <Image
+          src={studentPracticeImage}
+          alt="Shadow Mode"
+          width={800}
+          height={600}
+          className="w-full h-auto"
+          unoptimized
+        />
       </div>
     </div>
   );
@@ -292,10 +300,13 @@ function HowItWorksSection2() {
           !imageVisible && "-translate-x-12"
         )}
       >
-        <img
+        <Image
           src={facultyAnalyticsImage}
           alt="Clinical Interview Mode"
-          className="w-full"
+          width={800}
+          height={600}
+          className="w-full h-auto"
+          unoptimized
         />
       </div>
       <div

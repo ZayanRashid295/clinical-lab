@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   Circle,
@@ -46,8 +46,8 @@ export default function QuestionChoiceFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const questionChoicesService = new QuestionChoicesService();
-  const questionsService = new QuestionsService();
+  const questionChoicesService = useMemo(() => new QuestionChoicesService(), []);
+  const questionsService = useMemo(() => new QuestionsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function QuestionChoiceFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, questionChoice, isCreateMode]);
+  }, [isOpen, questionChoice, isCreateMode, questionsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

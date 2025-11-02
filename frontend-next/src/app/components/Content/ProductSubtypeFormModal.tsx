@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   Layers,
@@ -45,8 +45,8 @@ export default function ProductSubtypeFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const subtypesService = new ProductSubtypesService();
-  const productsService = new ProductsService();
+  const subtypesService = useMemo(() => new ProductSubtypesService(), []);
+  const productsService = useMemo(() => new ProductsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export default function ProductSubtypeFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, subtype, isCreateMode]);
+  }, [isOpen, subtype, isCreateMode, productsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

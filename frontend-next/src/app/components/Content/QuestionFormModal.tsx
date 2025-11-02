@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   HelpCircle,
@@ -54,9 +54,9 @@ export default function QuestionFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const questionsService = new QuestionsService();
-  const topicsService = new TopicsService();
-  const tagsService = new ProductTagsService();
+  const questionsService = useMemo(() => new QuestionsService(), []);
+  const topicsService = useMemo(() => new TopicsService(), []);
+  const tagsService = useMemo(() => new ProductTagsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function QuestionFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, question, isCreateMode]);
+  }, [isOpen, question, isCreateMode, topicsService, tagsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

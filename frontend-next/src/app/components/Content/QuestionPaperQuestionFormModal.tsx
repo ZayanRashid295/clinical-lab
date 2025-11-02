@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   HelpCircle,
@@ -48,8 +48,8 @@ export default function QuestionPaperQuestionFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const questionPaperQuestionsService = new QuestionPaperQuestionsService();
-  const questionPapersService = new QuestionPapersService();
+  const questionPaperQuestionsService = useMemo(() => new QuestionPaperQuestionsService(), []);
+  const questionPapersService = useMemo(() => new QuestionPapersService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function QuestionPaperQuestionFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, questionPaperQuestion, isCreateMode]);
+  }, [isOpen, questionPaperQuestion, isCreateMode, questionPapersService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

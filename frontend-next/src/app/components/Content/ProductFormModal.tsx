@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   Package,
@@ -46,8 +46,8 @@ export default function ProductFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const productsService = new ProductsService();
-  const tagsService = new ProductTagsService();
+  const productsService = useMemo(() => new ProductsService(), []);
+  const tagsService = useMemo(() => new ProductTagsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function ProductFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, product, isCreateMode]);
+  }, [isOpen, product, isCreateMode, tagsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

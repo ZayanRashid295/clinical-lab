@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { RolesService } from "../app/services/roles/roles.service";
 
 interface RoleStats {
@@ -19,7 +19,7 @@ const useRoleStats = (): UseRoleStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const rolesService = new RolesService();
+  const rolesService = useMemo(() => new RolesService(), []);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -36,7 +36,7 @@ const useRoleStats = (): UseRoleStatsResult => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [rolesService]);
 
   useEffect(() => {
     fetchStats();

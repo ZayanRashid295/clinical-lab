@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { UsersService } from "../app/services/users/users.service";
 import { User, UserQueryParams, UserFilters } from "../app/types/user";
 
@@ -35,7 +35,7 @@ const useUsers = (initialFilters: UserQueryParams = {}): UseUsersResult => {
     ...initialFilters,
   });
 
-  const usersService = new UsersService();
+  const usersService = useMemo(() => new UsersService(), []);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -58,7 +58,7 @@ const useUsers = (initialFilters: UserQueryParams = {}): UseUsersResult => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [usersService, filters]);
 
   useEffect(() => {
     fetchUsers();

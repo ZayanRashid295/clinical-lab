@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QuestionChoicesService } from "../app/services/questions/question-choices.service";
 import {
   QuestionChoice,
@@ -42,7 +42,7 @@ const useQuestionChoices = (
     ...initialFilters,
   });
 
-  const questionChoicesService = new QuestionChoicesService();
+  const questionChoicesService = useMemo(() => new QuestionChoicesService(), []);
 
   const fetchQuestionChoices = useCallback(async () => {
     try {
@@ -68,7 +68,7 @@ const useQuestionChoices = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [questionChoicesService, filters]);
 
   useEffect(() => {
     fetchQuestionChoices();

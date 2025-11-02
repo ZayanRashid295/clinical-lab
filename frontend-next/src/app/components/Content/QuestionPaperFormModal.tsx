@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   FileText,
@@ -48,8 +48,8 @@ export default function QuestionPaperFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const questionPapersService = new QuestionPapersService();
-  const usersService = new UsersService();
+  const questionPapersService = useMemo(() => new QuestionPapersService(), []);
+  const usersService = useMemo(() => new UsersService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function QuestionPaperFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, questionPaper, isCreateMode]);
+  }, [isOpen, questionPaper, isCreateMode, usersService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

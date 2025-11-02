@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProductSubtypesService } from "../app/services/products/product-subtypes.service";
 import {
   ProductSubtype,
@@ -40,7 +40,7 @@ const useProductSubtypes = (
     ...initialFilters,
   });
 
-  const subtypesService = new ProductSubtypesService();
+  const subtypesService = useMemo(() => new ProductSubtypesService(), []);
 
   const fetchSubtypes = useCallback(async () => {
     try {
@@ -65,7 +65,7 @@ const useProductSubtypes = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [subtypesService, filters]);
 
   useEffect(() => {
     fetchSubtypes();

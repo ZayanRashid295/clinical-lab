@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QuestionPaperQuestionsService } from "../app/services/assessments/question-paper-questions.service";
 
 interface QuestionPaperQuestionStats {
@@ -21,9 +21,9 @@ const useQuestionPaperQuestionStats = (): UseQuestionPaperQuestionStatsResult =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const questionPaperQuestionsService = new QuestionPaperQuestionsService();
+  const questionPaperQuestionsService = useMemo(() => new QuestionPaperQuestionsService(), []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -39,11 +39,11 @@ const useQuestionPaperQuestionStats = (): UseQuestionPaperQuestionStatsResult =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [questionPaperQuestionsService]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

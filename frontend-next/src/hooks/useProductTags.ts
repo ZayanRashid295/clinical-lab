@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProductTagsService } from "../app/services/products/product-tags.service";
 import { ProductTag, ProductTagQueryParams } from "../app/types/product";
 
@@ -37,7 +37,7 @@ const useProductTags = (
     ...initialFilters,
   });
 
-  const tagsService = new ProductTagsService();
+  const tagsService = useMemo(() => new ProductTagsService(), []);
 
   const fetchTags = useCallback(async () => {
     try {
@@ -62,7 +62,7 @@ const useProductTags = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [tagsService, filters]);
 
   useEffect(() => {
     fetchTags();

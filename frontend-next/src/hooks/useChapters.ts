@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ChaptersService } from "../app/services/content/chapters.service";
 import { Chapter, ChapterQueryParams } from "../app/types/content";
 
@@ -37,7 +37,7 @@ const useChapters = (
     ...initialFilters,
   });
 
-  const chaptersService = new ChaptersService();
+  const chaptersService = useMemo(() => new ChaptersService(), []);
 
   const fetchChapters = useCallback(async () => {
     try {
@@ -61,7 +61,7 @@ const useChapters = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [chaptersService, filters]);
 
   useEffect(() => {
     fetchChapters();

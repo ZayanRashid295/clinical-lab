@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QuestionChoicesService } from "../app/services/questions/question-choices.service";
 
 interface QuestionChoiceStats {
@@ -19,9 +19,9 @@ const useQuestionChoiceStats = (): UseQuestionChoiceStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const questionChoicesService = new QuestionChoicesService();
+  const questionChoicesService = useMemo(() => new QuestionChoicesService(), []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -36,11 +36,11 @@ const useQuestionChoiceStats = (): UseQuestionChoiceStatsResult => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [questionChoicesService]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

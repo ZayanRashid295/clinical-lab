@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { SectionsService } from "../app/services/content/sections.service";
 import { Section, SectionQueryParams } from "../app/types/content";
 
@@ -37,7 +37,7 @@ const useSections = (
     ...initialFilters,
   });
 
-  const sectionsService = new SectionsService();
+  const sectionsService = useMemo(() => new SectionsService(), []);
 
   const fetchSections = useCallback(async () => {
     try {
@@ -61,7 +61,7 @@ const useSections = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [sectionsService, filters]);
 
   useEffect(() => {
     fetchSections();

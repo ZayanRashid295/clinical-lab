@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { PackageFeaturesService } from "../app/services/subscriptions/package-features.service";
 
 interface PackageFeatureStats {
@@ -19,7 +19,7 @@ const usePackageFeatureStats = (): UsePackageFeatureStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const featuresService = new PackageFeaturesService();
+  const featuresService = useMemo(() => new PackageFeaturesService(), []);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -38,7 +38,7 @@ const usePackageFeatureStats = (): UsePackageFeatureStatsResult => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [featuresService]);
 
   useEffect(() => {
     fetchStats();

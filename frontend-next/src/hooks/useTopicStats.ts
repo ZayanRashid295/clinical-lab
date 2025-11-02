@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { TopicsService } from "../app/services/content/topics.service";
 
 interface TopicStats {
@@ -19,9 +19,9 @@ const useTopicStats = (): UseTopicStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const topicsService = new TopicsService();
+  const topicsService = useMemo(() => new TopicsService(), []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -34,11 +34,11 @@ const useTopicStats = (): UseTopicStatsResult => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [topicsService]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

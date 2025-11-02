@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProductsService } from "../app/services/products/products.service";
 import { Product, ProductQueryParams } from "../app/types/product";
 
@@ -37,7 +37,7 @@ const useProducts = (
     ...initialFilters,
   });
 
-  const productsService = new ProductsService();
+  const productsService = useMemo(() => new ProductsService(), []);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -62,7 +62,7 @@ const useProducts = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [productsService, filters]);
 
   useEffect(() => {
     fetchProducts();

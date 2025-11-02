@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   Book,
@@ -46,8 +46,8 @@ export default function SectionFormModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const sectionsService = new SectionsService();
-  const productsService = new ProductsService();
+  const sectionsService = useMemo(() => new SectionsService(), []);
+  const productsService = useMemo(() => new ProductsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function SectionFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, section, isCreateMode]);
+  }, [isOpen, section, isCreateMode, productsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { SubscriptionPackagesService } from "../app/services/subscriptions/subscription-packages.service";
 
 interface SubscriptionPackageStats {
@@ -19,7 +19,7 @@ const useSubscriptionPackageStats = (): UseSubscriptionPackageStatsResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const packagesService = new SubscriptionPackagesService();
+  const packagesService = useMemo(() => new SubscriptionPackagesService(), []);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -38,7 +38,7 @@ const useSubscriptionPackageStats = (): UseSubscriptionPackageStatsResult => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [packagesService]);
 
   useEffect(() => {
     fetchStats();

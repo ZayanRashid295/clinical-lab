@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { RolesService } from "../app/services/roles/roles.service";
 import { Role, RoleQueryParams, RoleFilters } from "../app/types/user";
 
@@ -35,7 +35,7 @@ const useRoles = (initialFilters: RoleQueryParams = {}): UseRolesResult => {
     ...initialFilters,
   });
 
-  const rolesService = new RolesService();
+  const rolesService = useMemo(() => new RolesService(), []);
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -58,7 +58,7 @@ const useRoles = (initialFilters: RoleQueryParams = {}): UseRolesResult => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [rolesService, filters]);
 
   useEffect(() => {
     fetchRoles();

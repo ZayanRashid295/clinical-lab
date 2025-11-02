@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { TopicsService } from "../app/services/content/topics.service";
 import { Topic, TopicQueryParams } from "../app/types/content";
 
@@ -37,7 +37,7 @@ const useTopics = (
     ...initialFilters,
   });
 
-  const topicsService = new TopicsService();
+  const topicsService = useMemo(() => new TopicsService(), []);
 
   const fetchTopics = useCallback(async () => {
     try {
@@ -61,7 +61,7 @@ const useTopics = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [topicsService, filters]);
 
   useEffect(() => {
     fetchTopics();

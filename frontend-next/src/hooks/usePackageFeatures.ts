@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { PackageFeaturesService } from "../app/services/subscriptions/package-features.service";
 import {
   PackageFeature,
@@ -41,7 +41,7 @@ const usePackageFeatures = (
     ...initialFilters,
   });
 
-  const featuresService = new PackageFeaturesService();
+  const featuresService = useMemo(() => new PackageFeaturesService(), []);
 
   const fetchFeatures = useCallback(async () => {
     try {
@@ -66,7 +66,7 @@ const usePackageFeatures = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [featuresService, filters]);
 
   useEffect(() => {
     fetchFeatures();

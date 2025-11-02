@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { SubscriptionsService } from "../app/services/subscriptions/subscriptions.service";
 import {
   Subscription,
@@ -41,7 +41,7 @@ const useSubscriptions = (
     ...initialFilters,
   });
 
-  const subscriptionsService = new SubscriptionsService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
 
   const fetchSubscriptions = useCallback(async () => {
     try {
@@ -66,7 +66,7 @@ const useSubscriptions = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [subscriptionsService, filters]);
 
   useEffect(() => {
     fetchSubscriptions();

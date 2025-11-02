@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QuestionsService } from "../app/services/questions/questions.service";
 import { Question, QuestionQueryParams } from "../app/types/question";
 
@@ -37,7 +37,7 @@ const useQuestions = (
     ...initialFilters,
   });
 
-  const questionsService = new QuestionsService();
+  const questionsService = useMemo(() => new QuestionsService(), []);
 
   const fetchQuestions = useCallback(async () => {
     try {
@@ -61,7 +61,7 @@ const useQuestions = (
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [questionsService, filters]);
 
   useEffect(() => {
     fetchQuestions();
