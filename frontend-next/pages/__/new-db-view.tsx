@@ -151,9 +151,18 @@ const ModuleManager = () => {
   // Column-based positioning constants
   const NUM_COLUMNS = 4;
   const COLUMN_WIDTH = 350; // Space between column starts
-  const COLUMN_START_X = 50;
-  const COLUMN_START_Y = 50;
+  const TABLE_WIDTH = 240; // Width of each table
+  const COLUMN_START_X = 100; // Left padding
+  const COLUMN_START_Y = 100; // Top padding (doubled from 50 to 100)
   const TABLE_VERTICAL_GAP = 40; // Gap between tables in a column
+
+  // Calculate canvas width for symmetry: left padding + (columns * spacing) + table width + right padding
+  const CANVAS_WIDTH =
+    COLUMN_START_X +
+    (NUM_COLUMNS - 1) * COLUMN_WIDTH +
+    TABLE_WIDTH +
+    COLUMN_START_X; // ~1590px
+  const CANVAS_HEIGHT = 2500;
 
   // Helper to assign column to a table based on its index
   const getColumnForIndex = (index: number) => index % NUM_COLUMNS;
@@ -1606,18 +1615,17 @@ const ModuleManager = () => {
     // Determine which column based on table center position
     // Column boundaries are at the middle line between columns
     const determineColumn = (x: number): number => {
-      const tableWidth = 240;
-      const tableCenterX = x + tableWidth / 2;
+      const tableCenterX = x + TABLE_WIDTH / 2;
 
       for (let col = 0; col < NUM_COLUMNS; col++) {
         const prevBoundary =
           col === 0
             ? -Infinity
-            : COLUMN_START_X + (col - 0.5) * COLUMN_WIDTH + tableWidth / 2;
+            : COLUMN_START_X + (col - 0.5) * COLUMN_WIDTH + TABLE_WIDTH / 2;
         const nextBoundary =
           col === NUM_COLUMNS - 1
             ? Infinity
-            : COLUMN_START_X + (col + 0.5) * COLUMN_WIDTH + tableWidth / 2;
+            : COLUMN_START_X + (col + 0.5) * COLUMN_WIDTH + TABLE_WIDTH / 2;
 
         if (tableCenterX >= prevBoundary && tableCenterX < nextBoundary) {
           return col;
@@ -1997,8 +2005,8 @@ const ModuleManager = () => {
           >
             <canvas
               ref={canvasRef}
-              width={2500}
-              height={1600}
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
               className="absolute top-0 left-0 pointer-events-none"
             />
 
@@ -2010,8 +2018,7 @@ const ModuleManager = () => {
                 {/* Column areas */}
                 {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => {
                   // Calculate table center position
-                  const tableWidth = 240;
-                  const tableCenterX = dragPreviewPosition.x + tableWidth / 2;
+                  const tableCenterX = dragPreviewPosition.x + TABLE_WIDTH / 2;
 
                   // Column boundaries are at the middle line between columns
                   const prevBoundary =
@@ -2019,13 +2026,13 @@ const ModuleManager = () => {
                       ? -Infinity
                       : COLUMN_START_X +
                         (colIndex - 0.5) * COLUMN_WIDTH +
-                        tableWidth / 2;
+                        TABLE_WIDTH / 2;
                   const nextBoundary =
                     colIndex === NUM_COLUMNS - 1
                       ? Infinity
                       : COLUMN_START_X +
                         (colIndex + 0.5) * COLUMN_WIDTH +
-                        tableWidth / 2;
+                        TABLE_WIDTH / 2;
 
                   const isTargetColumn =
                     tableCenterX >= prevBoundary && tableCenterX < nextBoundary;
@@ -2055,11 +2062,10 @@ const ModuleManager = () => {
                 {/* Middle line separators between columns */}
                 {Array.from({ length: NUM_COLUMNS - 1 }).map(
                   (_, separatorIndex) => {
-                    const tableWidth = 240;
                     const separatorX =
                       COLUMN_START_X +
                       (separatorIndex + 0.5) * COLUMN_WIDTH +
-                      tableWidth / 2;
+                      TABLE_WIDTH / 2;
 
                     return (
                       <div
@@ -2085,8 +2091,8 @@ const ModuleManager = () => {
               style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: "0 0",
-                minWidth: "2500px",
-                minHeight: "2000px",
+                minWidth: `${CANVAS_WIDTH}px`,
+                minHeight: `${CANVAS_HEIGHT}px`,
               }}
             >
               {currentTables.map((table) => {
