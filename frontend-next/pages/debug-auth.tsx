@@ -1,5 +1,5 @@
 import React from "react";
-import AuthDebug from "../src/app/components/Debug/AuthDebug";
+import AuthDebug from "@/app/components/Debug/AuthDebug";
 
 export default function DebugAuthPage() {
   return <AuthDebug />;

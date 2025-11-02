@@ -265,6 +265,7 @@ const App: React.FC = () => {
                     className="flex items-center justify-between p-3 bg-muted border border-border rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={img.url}
                         alt={`Thumbnail of ${img.name}`}

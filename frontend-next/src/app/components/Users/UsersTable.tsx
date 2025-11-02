@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
   Eye,
   RefreshCw,
@@ -215,10 +216,13 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         {user.avatar ? (
-                          <img
+                          <Image
                             className="h-10 w-10 rounded-full"
                             src={user.avatar}
                             alt={getUserDisplayName(user)}
+                            width={40}
+                            height={40}
+                            unoptimized
                           />
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">

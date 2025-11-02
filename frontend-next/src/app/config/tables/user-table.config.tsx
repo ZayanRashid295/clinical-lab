@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Users, Mail, Phone, Shield } from "lucide-react";
 import {
   TableConfig,
@@ -24,10 +25,13 @@ const userColumns: ColumnConfig<User>[] = [
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
             {row.avatar ? (
-              <img
+              <Image
                 className="h-10 w-10 rounded-full"
                 src={row.avatar}
                 alt={displayName}
+                width={40}
+                height={40}
+                unoptimized
               />
             ) : (
               <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">

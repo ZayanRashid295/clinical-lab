@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
   Eye,
   RefreshCw,
@@ -196,12 +197,15 @@ const PayoutsTable: React.FC<PayoutsTableProps> = ({
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         {payout.driver?.avatar ? (
-                          <img
+                          <Image
                             className="h-10 w-10 rounded-full object-cover"
                             src={payout.driver.avatar}
                             alt={`${payout.driver?.firstName || ""} ${
                               payout.driver?.lastName || ""
                             }`.trim()}
+                            width={40}
+                            height={40}
+                            unoptimized
                           />
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">

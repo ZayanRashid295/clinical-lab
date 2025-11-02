@@ -258,7 +258,7 @@ export default function QuestionBank({
           return bValue.localeCompare(aValue);
         }
       });
-  }, [mockQuestions, filter, searchTerm]);
+  }, [filter, searchTerm]);
 
   const handleFilterChange = (field: keyof QuestionFilter, value: any) => {
     onFilterChange({

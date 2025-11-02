@@ -272,6 +272,7 @@ export default function EnhancedQuestionBuilder({
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {data.images.map((image, index) => (
                     <div key={index} className="relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={URL.createObjectURL(image)}
                         alt={`Preview ${index + 1}`}
@@ -818,6 +819,7 @@ export default function EnhancedQuestionBuilder({
                   <h4 className="font-semibold mb-3">Images:</h4>
                   <div className="grid grid-cols-3 gap-4">
                     {data.images.map((image, index) => (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         key={index}
                         src={URL.createObjectURL(image)}

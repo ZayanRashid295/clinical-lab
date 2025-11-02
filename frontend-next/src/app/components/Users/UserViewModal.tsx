@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import Image from "next/image";
 import {
   X,
   User,
@@ -131,10 +132,13 @@ export default function UserViewModal({
           <div className="flex items-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mr-4">
               {user.avatar ? (
-                <img
+                <Image
                   src={user.avatar}
                   alt={getUserDisplayName(user)}
                   className="w-16 h-16 rounded-full object-cover"
+                  width={64}
+                  height={64}
+                  unoptimized
                 />
               ) : (
                 <User className="h-8 w-8 text-blue-600" />

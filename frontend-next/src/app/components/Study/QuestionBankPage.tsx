@@ -262,7 +262,7 @@ export default function QuestionBankPage() {
           return bValue.localeCompare(aValue);
         }
       });
-  }, [mockQuestions, questionFilter, searchTerm]);
+  }, [questionFilter, searchTerm]);
 
   const handleFilterChange = (field: keyof QuestionFilter, value: any) => {
     setQuestionFilter({
