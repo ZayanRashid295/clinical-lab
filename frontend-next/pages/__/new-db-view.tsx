@@ -80,6 +80,62 @@ const ModuleManager = () => {
     { header: "from-stone-600 to-stone-700", body: "bg-stone-50" },
   ];
 
+  // Colors for relationship connections
+  const relationshipColors = [
+    "bg-red-500",
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+    "bg-teal-500",
+    "bg-orange-500",
+    "bg-cyan-500",
+    "bg-lime-500",
+    "bg-emerald-500",
+    "bg-violet-500",
+    "bg-fuchsia-500",
+    "bg-rose-500",
+  ];
+
+  // Get color for a relationship based on the foreign key field
+  const getRelationshipColor = (fromTableId: string, fromFieldId: string) => {
+    const key = `${fromTableId}-${fromFieldId}`;
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash << 5) - hash + key.charCodeAt(i);
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    const index = Math.abs(hash) % relationshipColors.length;
+    return relationshipColors[index];
+  };
+
+  // Get color for a primary key field by finding its referencing foreign key
+  const getRelationshipColorForPrimaryKey = (
+    tableId: string,
+    fieldId: string
+  ) => {
+    // Find all foreign keys that reference this primary key
+    const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
+
+    for (const table of allTables) {
+      for (const field of table.fields) {
+        if (
+          field.foreignKey &&
+          field.foreignKey.tableName === tableId &&
+          field.foreignKey.columnName === fieldId
+        ) {
+          // Found a foreign key that references this primary key
+          return getRelationshipColor(table.id, field.id);
+        }
+      }
+    }
+
+    // Fallback if no foreign key found
+    return "bg-gray-400";
+  };
+
   // Get color for a table based on its index in allTables array
   const getTableColor = (tableId: string) => {
     const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
@@ -1264,6 +1320,29 @@ const ModuleManager = () => {
     return { x: fieldX, y: fieldY };
   };
 
+  // Convert Tailwind color classes to canvas colors
+  const tailwindToCanvasColor = (tailwindClass: string) => {
+    const colorMap: { [key: string]: string } = {
+      "bg-red-500": "#ef4444",
+      "bg-blue-500": "#3b82f6",
+      "bg-green-500": "#22c55e",
+      "bg-yellow-500": "#eab308",
+      "bg-purple-500": "#a855f7",
+      "bg-pink-500": "#ec4899",
+      "bg-indigo-500": "#6366f1",
+      "bg-teal-500": "#14b8a6",
+      "bg-orange-500": "#f97316",
+      "bg-cyan-500": "#06b6d4",
+      "bg-lime-500": "#84cc16",
+      "bg-emerald-500": "#10b981",
+      "bg-violet-500": "#8b5cf6",
+      "bg-fuchsia-500": "#d946ef",
+      "bg-rose-500": "#f43f5e",
+      "bg-gray-400": "#9ca3af",
+    };
+    return colorMap[tailwindClass] || "#64748b";
+  };
+
   const drawConnections = () => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -1271,9 +1350,6 @@ const ModuleManager = () => {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#64748b";
-    ctx.lineWidth = 2;
-    ctx.setLineDash([]);
 
     // Get all field connections
     const allConnections = currentTables.flatMap((table) =>
@@ -1297,6 +1373,17 @@ const ModuleManager = () => {
       const toX = toPos.x * zoom;
       const toY = toPos.y * zoom;
 
+      // Get the relationship color
+      const relationshipColorClass = getRelationshipColor(
+        connection.fromTable.id,
+        connection.fromField.id
+      );
+      const relationshipColor = tailwindToCanvasColor(relationshipColorClass);
+
+      ctx.strokeStyle = relationshipColor;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+
       ctx.beginPath();
 
       // Determine routing direction based on table positions
@@ -1307,10 +1394,35 @@ const ModuleManager = () => {
       const fromCenterX = (fromTable.x + 120) * zoom;
       const toCenterX = (toTable.x + 120) * zoom;
 
+      // Check if tables are in the same column (within 50px tolerance)
+      const sameColumn = Math.abs(fromTable.x - toTable.x) < 50;
+
       let lastX = fromX;
       let lastY = fromY;
 
-      if (fromCenterX < toCenterX) {
+      if (sameColumn) {
+        // Tables in same column: use left side connectors and route vertically
+        // Always use left connector positions for same-column connections
+        const leftOffset = 30 * zoom; // Move left by 30px before connecting vertically
+
+        if (fromY < toY) {
+          // Top to bottom: move left, then down
+          ctx.moveTo(fromX, fromY);
+          ctx.lineTo(fromX - leftOffset, fromY);
+          ctx.lineTo(fromX - leftOffset, toY);
+          ctx.lineTo(toX, toY);
+          lastX = fromX - leftOffset;
+          lastY = toY;
+        } else {
+          // Bottom to top: move left, then up
+          ctx.moveTo(fromX, fromY);
+          ctx.lineTo(fromX - leftOffset, fromY);
+          ctx.lineTo(fromX - leftOffset, toY);
+          ctx.lineTo(toX, toY);
+          lastX = fromX - leftOffset;
+          lastY = toY;
+        }
+      } else if (fromCenterX < toCenterX) {
         // Left to right: horizontal first, then vertical
         const midX = fromX + (toX - fromX) / 2;
         ctx.moveTo(fromX, fromY);
@@ -1335,7 +1447,7 @@ const ModuleManager = () => {
       // Draw arrow at destination pointing towards the destination
       const angle = Math.atan2(toY - lastY, toX - lastX);
       const arrowSize = 6;
-      ctx.fillStyle = "#64748b";
+      ctx.fillStyle = relationshipColor;
       ctx.beginPath();
       ctx.moveTo(toX, toY);
       ctx.lineTo(
@@ -1877,8 +1989,40 @@ const ModuleManager = () => {
 
                         {/* Small connector lines outside table */}
                         <div className="absolute inset-0 pointer-events-none">
-                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-2 h-px bg-gray-400 -translate-x-full" />
-                          <div className="absolute top-1/2 -translate-y-1/2 right-0 w-2 h-px bg-gray-400 translate-x-full" />
+                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-px bg-gray-400 -translate-x-[120%]" />
+                          <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-px bg-gray-400 translate-x-[120%]" />
+                          {field.foreignKey && (
+                            <>
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
+                                  table.id,
+                                  field.id
+                                )}`}
+                              />
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColor(
+                                  table.id,
+                                  field.id
+                                )}`}
+                              />
+                            </>
+                          )}
+                          {field.primaryKey && (
+                            <>
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
+                                  table.id,
+                                  field.id
+                                )}`}
+                              />
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] -translate-y-1/2 ${getRelationshipColorForPrimaryKey(
+                                  table.id,
+                                  field.id
+                                )}`}
+                              />
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
