@@ -143,19 +143,19 @@ const ModuleManager = () => {
     return tableColors[tableIndex % tableColors.length];
   };
 
-  // Helper to generate table positions in a grid
+  // Helper to generate table positions in columns
   const getTablePosition = (
     index: number,
     startX = 50,
     startY = 50,
-    spacingX = 320,
-    spacingY = 300
+    spacingX = 400, // Increased horizontal spacing between columns
+    spacingY = 350 // Vertical spacing between tables in a column
   ) => {
-    const perRow = 3;
-    const row = Math.floor(index / perRow);
-    const col = index % perRow;
+    const perColumn = 4; // 4 tables per column
+    const column = Math.floor(index / perColumn); // Which column (0, 1, 2, etc.)
+    const row = index % perColumn; // Which row in that column (0-3)
     return {
-      x: startX + col * spacingX,
+      x: startX + column * spacingX,
       y: startY + row * spacingY,
     };
   };
@@ -1712,8 +1712,8 @@ const ModuleManager = () => {
           >
             <canvas
               ref={canvasRef}
-              width={2000}
-              height={1200}
+              width={2500}
+              height={1600}
               className="absolute top-0 left-0 pointer-events-none"
             />
 
