@@ -30,6 +30,7 @@ interface Table {
   name: string;
   x: number;
   y: number;
+  column: number; // Which column this table belongs to (0-3)
   fields: Field[];
 }
 
@@ -143,27 +144,15 @@ const ModuleManager = () => {
     return tableColors[tableIndex % tableColors.length];
   };
 
-  // Helper to generate table positions in columns (simplified for initial data)
-  const getTablePosition = (
-    index: number,
-    startX = 50,
-    startY = 50,
-    spacingX = 400, // Horizontal spacing between columns
-    spacingY = 350 // Vertical spacing between tables in a column
-  ) => {
-    // For initial data, assume we want 4 columns and distribute tables evenly
-    const totalTables = 25; // Approximate total based on current structure
-    const numColumns = 4; // Fixed at 4 columns as requested
-    const tablesPerColumn = Math.ceil(totalTables / numColumns);
+  // Column-based positioning constants
+  const NUM_COLUMNS = 4;
+  const COLUMN_WIDTH = 400; // Space between column starts
+  const COLUMN_START_X = 50;
+  const COLUMN_START_Y = 50;
+  const TABLE_VERTICAL_GAP = 40; // Gap between tables in a column
 
-    const column = Math.floor(index / tablesPerColumn); // Which column
-    const row = index % tablesPerColumn; // Which row in that column
-
-    return {
-      x: startX + column * spacingX,
-      y: startY + row * spacingY,
-    };
-  };
+  // Helper to assign column to a table based on its index
+  const getColumnForIndex = (index: number) => index % NUM_COLUMNS;
 
   const initialData: ProjectData = {
     projectName: "Clinical Lab System",
@@ -173,7 +162,9 @@ const ModuleManager = () => {
       {
         id: "users",
         name: "User",
-        ...getTablePosition(0),
+        x: 0,
+        y: 0,
+        column: 0,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "email", name: "email", type: "string", unique: true },
@@ -190,7 +181,9 @@ const ModuleManager = () => {
       {
         id: "user_settings",
         name: "UserSettings",
-        ...getTablePosition(1),
+        x: 0,
+        y: 0,
+        column: 1,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           {
@@ -215,7 +208,9 @@ const ModuleManager = () => {
       {
         id: "roles",
         name: "Role",
-        ...getTablePosition(2),
+        x: 0,
+        y: 0,
+        column: 2,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "name", name: "name", type: "string", unique: true },
@@ -229,7 +224,9 @@ const ModuleManager = () => {
       {
         id: "permissions",
         name: "Permission",
-        ...getTablePosition(3),
+        x: 0,
+        y: 0,
+        column: 3,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "name", name: "name", type: "string", unique: true },
@@ -244,7 +241,9 @@ const ModuleManager = () => {
       {
         id: "user_roles",
         name: "UserRole",
-        ...getTablePosition(4),
+        x: 0,
+        y: 0,
+        column: 0,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           {
@@ -272,7 +271,9 @@ const ModuleManager = () => {
       {
         id: "user_permissions",
         name: "UserPermission",
-        ...getTablePosition(5),
+        x: 0,
+        y: 0,
+        column: 1,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           {
@@ -300,7 +301,9 @@ const ModuleManager = () => {
       {
         id: "role_permissions",
         name: "RolePermission",
-        ...getTablePosition(6),
+        x: 0,
+        y: 0,
+        column: 2,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           {
@@ -328,7 +331,9 @@ const ModuleManager = () => {
       {
         id: "audit_logs",
         name: "AuditLog",
-        ...getTablePosition(7),
+        x: 0,
+        y: 0,
+        column: 3,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "userId", name: "userId", type: "string" },
@@ -344,7 +349,9 @@ const ModuleManager = () => {
       {
         id: "system_settings",
         name: "SystemSettings",
-        ...getTablePosition(8),
+        x: 0,
+        y: 0,
+        column: 0,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "key", name: "key", type: "string", unique: true },
@@ -358,7 +365,9 @@ const ModuleManager = () => {
       {
         id: "institutions",
         name: "Institution",
-        ...getTablePosition(9),
+        x: 0,
+        y: 0,
+        column: 1,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           { id: "name", name: "name", type: "string", unique: true },
@@ -375,7 +384,9 @@ const ModuleManager = () => {
       {
         id: "institution_managers",
         name: "InstitutionManager",
-        ...getTablePosition(10),
+        x: 0,
+        y: 0,
+        column: 2,
         fields: [
           { id: "id", name: "id", type: "string", primaryKey: true },
           {
@@ -409,7 +420,9 @@ const ModuleManager = () => {
           {
             id: "sections",
             name: "Section",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -433,7 +446,9 @@ const ModuleManager = () => {
           {
             id: "chapters",
             name: "Chapter",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -457,7 +472,9 @@ const ModuleManager = () => {
           {
             id: "topics",
             name: "Topic",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -481,7 +498,9 @@ const ModuleManager = () => {
           {
             id: "questions",
             name: "Question",
-            ...getTablePosition(3),
+            x: 0,
+            y: 0,
+            column: 3,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -516,7 +535,9 @@ const ModuleManager = () => {
           {
             id: "question_choices",
             name: "QuestionChoice",
-            ...getTablePosition(4),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -544,7 +565,9 @@ const ModuleManager = () => {
           {
             id: "payments",
             name: "Payment",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -586,7 +609,9 @@ const ModuleManager = () => {
           {
             id: "refunds",
             name: "Refund",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -614,7 +639,9 @@ const ModuleManager = () => {
           {
             id: "wallets",
             name: "Wallet",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -637,7 +664,9 @@ const ModuleManager = () => {
           {
             id: "wallet_transactions",
             name: "WalletTransaction",
-            ...getTablePosition(3),
+            x: 0,
+            y: 0,
+            column: 3,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -671,7 +700,9 @@ const ModuleManager = () => {
           {
             id: "payment_methods",
             name: "PaymentMethod",
-            ...getTablePosition(4),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -696,7 +727,9 @@ const ModuleManager = () => {
           {
             id: "promo_codes",
             name: "PromoCode",
-            ...getTablePosition(5),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "code", name: "code", type: "string", unique: true },
@@ -717,7 +750,9 @@ const ModuleManager = () => {
           {
             id: "promo_code_usages",
             name: "PromoCodeUsage",
-            ...getTablePosition(6),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -760,7 +795,9 @@ const ModuleManager = () => {
           {
             id: "products",
             name: "Product",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "name", name: "name", type: "string", unique: true },
@@ -773,7 +810,9 @@ const ModuleManager = () => {
           {
             id: "product_tags",
             name: "ProductTag",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "name", name: "name", type: "string", unique: true },
@@ -787,7 +826,9 @@ const ModuleManager = () => {
           {
             id: "product_subtypes",
             name: "ProductSubtype",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -815,7 +856,9 @@ const ModuleManager = () => {
           {
             id: "package_features",
             name: "PackageFeatures",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "name", name: "name", type: "string", unique: true },
@@ -828,7 +871,9 @@ const ModuleManager = () => {
           {
             id: "subscription_packages",
             name: "SubscriptionPackage",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -854,7 +899,9 @@ const ModuleManager = () => {
           {
             id: "subscription_features",
             name: "SubscriptionFeatures",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -881,7 +928,9 @@ const ModuleManager = () => {
           {
             id: "subscriptions",
             name: "Subscription",
-            ...getTablePosition(3),
+            x: 0,
+            y: 0,
+            column: 3,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -918,7 +967,9 @@ const ModuleManager = () => {
           {
             id: "question_papers",
             name: "QuestionPaper",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -943,7 +994,9 @@ const ModuleManager = () => {
           {
             id: "question_paper_questions",
             name: "QuestionPaperQuestion",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -982,7 +1035,9 @@ const ModuleManager = () => {
           {
             id: "chat_rooms",
             name: "ChatRoom",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "name", name: "name", type: "string" },
@@ -995,7 +1050,9 @@ const ModuleManager = () => {
           {
             id: "chat_participants",
             name: "ChatParticipant",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1024,7 +1081,9 @@ const ModuleManager = () => {
           {
             id: "chat_messages",
             name: "ChatMessage",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1058,7 +1117,9 @@ const ModuleManager = () => {
           {
             id: "chat_message_reactions",
             name: "ChatMessageReaction",
-            ...getTablePosition(3),
+            x: 0,
+            y: 0,
+            column: 3,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1087,7 +1148,9 @@ const ModuleManager = () => {
           {
             id: "chat_read_status",
             name: "ChatReadStatus",
-            ...getTablePosition(4),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1124,7 +1187,9 @@ const ModuleManager = () => {
           {
             id: "notifications",
             name: "Notification",
-            ...getTablePosition(0),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1150,7 +1215,9 @@ const ModuleManager = () => {
           {
             id: "notification_templates",
             name: "NotificationTemplate",
-            ...getTablePosition(1),
+            x: 0,
+            y: 0,
+            column: 1,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "name", name: "name", type: "string", unique: true },
@@ -1165,7 +1232,9 @@ const ModuleManager = () => {
           {
             id: "notification_preferences",
             name: "NotificationPreference",
-            ...getTablePosition(2),
+            x: 0,
+            y: 0,
+            column: 2,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               {
@@ -1189,7 +1258,9 @@ const ModuleManager = () => {
           {
             id: "notification_queue",
             name: "NotificationQueue",
-            ...getTablePosition(3),
+            x: 0,
+            y: 0,
+            column: 3,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "userId", name: "userId", type: "string" },
@@ -1213,7 +1284,9 @@ const ModuleManager = () => {
           {
             id: "notification_logs",
             name: "NotificationLog",
-            ...getTablePosition(4),
+            x: 0,
+            y: 0,
+            column: 0,
             fields: [
               { id: "id", name: "id", type: "string", primaryKey: true },
               { id: "notificationId", name: "notificationId", type: "string" },
@@ -1253,30 +1326,60 @@ const ModuleManager = () => {
   }>({ isResizing: false, startX: 0, startWidth: 400 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Dynamic table positioning function that can access current data
-  const getDynamicTablePosition = useMemo(() => {
-    return (
-      index: number,
-      startX = 50,
-      startY = 50,
-      spacingX = 400, // Horizontal spacing between tables in a row
-      spacingY = 350 // Vertical spacing between rows
-    ) => {
-      const tablesPerRow = 4; // 4 tables per row
-
-      const row = Math.floor(index / tablesPerRow); // Which row
-      const col = index % tablesPerRow; // Which column in that row
-
-      return {
-        x: startX + col * spacingX,
-        y: startY + row * spacingY,
-      };
-    };
-  }, [data]);
-
   const currentModule = data.modules[selectedModuleIndex];
   const currentTables = showBase ? data.base : currentModule?.tables || [];
   const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
+
+  const estimateTableHeight = (table: Table) => {
+    const headerHeight = 40;
+    const fieldHeight = 28; // Includes padding and borders
+    const footerHeight = 48; // Buttons and padding at bottom
+    const connectorHeight = 24; // Space for connector indicators
+    const fieldCount = table.fields.length;
+    const bodyHeight = fieldCount > 0 ? fieldCount * fieldHeight : 0;
+    return headerHeight + bodyHeight + footerHeight + connectorHeight;
+  };
+
+  // Column-based positioning system
+  const tablePositions = useMemo(() => {
+    const positions = new Map<string, { x: number; y: number }>();
+
+    // Track the current Y position for each column
+    const columnYPositions = new Array(NUM_COLUMNS).fill(COLUMN_START_Y);
+
+    // Group tables by column
+    const tablesByColumn: Map<number, Table[]> = new Map();
+    for (let col = 0; col < NUM_COLUMNS; col++) {
+      tablesByColumn.set(col, []);
+    }
+
+    currentTables.forEach((table) => {
+      const column = table.column % NUM_COLUMNS; // Ensure column is within bounds
+      tablesByColumn.get(column)?.push(table);
+    });
+
+    // Position tables within each column
+    tablesByColumn.forEach((tables, columnIndex) => {
+      let currentY = COLUMN_START_Y;
+      const columnX = COLUMN_START_X + columnIndex * COLUMN_WIDTH;
+
+      tables.forEach((table) => {
+        // Use stored x,y if they differ from default, otherwise calculate from column
+        const x = table.x !== 0 ? table.x : columnX;
+        const y = table.y !== 0 ? table.y : currentY;
+
+        positions.set(table.id, { x, y });
+
+        // Update the column's Y position for the next table
+        const tableHeight = estimateTableHeight(table);
+        currentY = Math.max(currentY, y + tableHeight + TABLE_VERTICAL_GAP);
+      });
+
+      columnYPositions[columnIndex] = currentY;
+    });
+
+    return positions;
+  }, [currentTables]);
 
   const findTableById = (id: string): Table | undefined =>
     allTables.find((t) => t.id === id);
@@ -1326,11 +1429,9 @@ const ModuleManager = () => {
   // Calculate field position within a table
   const getFieldPosition = (table: Table, fieldIndex: number) => {
     // Get the table's current position (use stored position if dragged, otherwise dynamic)
-    const tableIndex = currentTables.findIndex((t) => t.id === table.id);
-    const dynamicPosition = getDynamicTablePosition(tableIndex);
-    const tablePosition = {
-      x: table.x !== undefined ? table.x : dynamicPosition.x,
-      y: table.y !== undefined ? table.y : dynamicPosition.y,
+    const tablePosition = tablePositions.get(table.id) ?? {
+      x: COLUMN_START_X,
+      y: COLUMN_START_Y,
     };
 
     const tableHeaderHeight = 36; // Header height with padding
@@ -1433,6 +1534,19 @@ const ModuleManager = () => {
     const newX = (e.clientX - dragOffset.x) / zoom;
     const newY = (e.clientY - dragOffset.y) / zoom;
 
+    // Determine which column the table should belong to based on X position
+    const determineColumn = (x: number): number => {
+      for (let col = 0; col < NUM_COLUMNS; col++) {
+        const columnX = COLUMN_START_X + col * COLUMN_WIDTH;
+        const nextColumnX = COLUMN_START_X + (col + 1) * COLUMN_WIDTH;
+        if (x >= columnX && x < nextColumnX) {
+          return col;
+        }
+      }
+      // If beyond all columns, assign to the last column
+      return NUM_COLUMNS - 1;
+    };
+
     const updateTablePosition = (
       tables: Table[],
       tableId: string,
@@ -1440,7 +1554,14 @@ const ModuleManager = () => {
       y: number
     ): Table[] =>
       tables.map((t) =>
-        t.id === tableId ? { ...t, x: Math.max(0, x), y: Math.max(0, y) } : t
+        t.id === tableId
+          ? {
+              ...t,
+              x: Math.max(0, x),
+              y: Math.max(0, y),
+              column: determineColumn(x),
+            }
+          : t
       );
 
     if (showBase) {
@@ -1488,11 +1609,16 @@ const ModuleManager = () => {
 
   const addTable = () => {
     const newTableId = `table_${Date.now()}`;
+    // Determine the column for the new table based on the current number of tables
+    const currentTableCount = currentTables.length;
+    const assignedColumn = getColumnForIndex(currentTableCount);
+
     const newTable: Table = {
       id: newTableId,
       name: "New Table",
-      x: 50 + Math.random() * 300,
-      y: 50 + Math.random() * 300,
+      x: 0, // Will be calculated by column positioning
+      y: 0, // Will be calculated by column positioning
+      column: assignedColumn,
       fields: [{ id: "id", name: "ID", type: "uuid", primaryKey: true }],
     };
 
@@ -1755,12 +1881,10 @@ const ModuleManager = () => {
             <div
               style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
             >
-              {currentTables.map((table, index) => {
-                // Use stored position if table has been dragged, otherwise use dynamic position
-                const dynamicPosition = getDynamicTablePosition(index);
-                const position = {
-                  x: table.x !== undefined ? table.x : dynamicPosition.x,
-                  y: table.y !== undefined ? table.y : dynamicPosition.y,
+              {currentTables.map((table) => {
+                const position = tablePositions.get(table.id) ?? {
+                  x: COLUMN_START_X,
+                  y: COLUMN_START_Y,
                 };
 
                 return (
