@@ -1,6 +1,14 @@
 import React from "react";
-import MenuManager from "../../src/app/components/Development/MenuManager";
+import { MenuSystem } from "../../src/shared";
+import { transportationContentRegistry } from "../../src/app/config/content.registry";
 
 export default function MenuManagerPage() {
-  return <MenuManager />;
+  return (
+    <MenuSystem
+      contentRegistry={transportationContentRegistry}
+      applicationTitle="Medical Lab"
+      searchPlaceholder="Search..."
+      enableSearch={true}
+    />
+  );
 }
