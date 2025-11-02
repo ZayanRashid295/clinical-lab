@@ -6,7 +6,6 @@ export const MENU_CONFIG = {
       icon: "🏠",
       path: "/test-creation/new",
       roles: ["ADMIN", "FACULTY"],
-      order: 1,
     },
     {
       id: "study",
@@ -14,7 +13,6 @@ export const MENU_CONFIG = {
       icon: "📚",
       path: "/study",
       roles: ["ADMIN", "STUDENT", "FACULTY"],
-      order: 2,
       submenu: [
         {
           id: "question-bank",
@@ -22,7 +20,6 @@ export const MENU_CONFIG = {
           icon: "🗂️",
           path: "/study/question-bank",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 1,
         },
         {
           id: "study-materials",
@@ -30,7 +27,6 @@ export const MENU_CONFIG = {
           icon: "📄",
           path: "/study/materials",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 2,
         },
         {
           id: "flashcards",
@@ -38,7 +34,6 @@ export const MENU_CONFIG = {
           icon: "🃏",
           path: "/study/flashcards",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 3,
         },
         {
           id: "notes",
@@ -46,7 +41,6 @@ export const MENU_CONFIG = {
           icon: "📝",
           path: "/study/notes",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 4,
         },
       ],
     },
@@ -56,7 +50,6 @@ export const MENU_CONFIG = {
       icon: "💳",
       path: "/payments",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 6,
       submenu: [
         {
           id: "payment-history",
@@ -64,7 +57,6 @@ export const MENU_CONFIG = {
           icon: "📋",
           path: "/payments/history",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 1,
         },
         {
           id: "payment-methods",
@@ -72,7 +64,6 @@ export const MENU_CONFIG = {
           icon: "💳",
           path: "/payments/methods",
           roles: ["ADMIN", "DRIVER", "PASSENGER"],
-          order: 2,
         },
         {
           id: "payouts",
@@ -80,7 +71,6 @@ export const MENU_CONFIG = {
           icon: "💰",
           path: "/payments/payouts",
           roles: ["ADMIN", "DRIVER", "FLEET_MANAGER"],
-          order: 3,
         },
         {
           id: "invoices",
@@ -88,7 +78,6 @@ export const MENU_CONFIG = {
           icon: "🧾",
           path: "/payments/invoices",
           roles: ["ADMIN", "FLEET_MANAGER"],
-          order: 4,
         },
       ],
     },
@@ -98,7 +87,6 @@ export const MENU_CONFIG = {
       icon: "💬",
       path: "/chat",
       roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-      order: 7,
       submenu: [
         {
           id: "chat-rooms",
@@ -106,7 +94,6 @@ export const MENU_CONFIG = {
           icon: "💬",
           path: "/chat/rooms",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 1,
         },
         {
           id: "support",
@@ -114,7 +101,6 @@ export const MENU_CONFIG = {
           icon: "🆘",
           path: "/chat/support",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 2,
         },
         {
           id: "notifications",
@@ -122,7 +108,6 @@ export const MENU_CONFIG = {
           icon: "🔔",
           path: "/chat/notifications",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 3,
         },
       ],
     },
@@ -132,7 +117,6 @@ export const MENU_CONFIG = {
       icon: "✏️",
       path: "/test-creation",
       roles: ["ADMIN", "FACULTY"],
-      order: 4,
       submenu: [
         {
           id: "study-create-test",
@@ -140,7 +124,6 @@ export const MENU_CONFIG = {
           icon: "📝",
           path: "/test-creation/study-create",
           roles: ["ADMIN", "FACULTY"],
-          order: 1,
         },
         {
           id: "previous-tests",
@@ -148,7 +131,6 @@ export const MENU_CONFIG = {
           icon: "📊",
           path: "/previous-tests",
           roles: ["ADMIN", "STUDENT", "FACULTY"],
-          order: 2,
         },
         {
           id: "test-templates",
@@ -156,7 +138,6 @@ export const MENU_CONFIG = {
           icon: "📋",
           path: "/test-creation/templates",
           roles: ["ADMIN", "FACULTY"],
-          order: 3,
         },
         {
           id: "question-builder",
@@ -164,7 +145,6 @@ export const MENU_CONFIG = {
           icon: "🔨",
           path: "/test-creation/builder",
           roles: ["ADMIN", "FACULTY"],
-          order: 4,
         },
         {
           id: "new-question-builder",
@@ -172,7 +152,6 @@ export const MENU_CONFIG = {
           icon: "🆕",
           path: "/test-creation/new-builder",
           roles: ["ADMIN", "FACULTY"],
-          order: 5,
         },
         {
           id: "test-settings",
@@ -180,7 +159,6 @@ export const MENU_CONFIG = {
           icon: "⚙️",
           path: "/test-creation/settings",
           roles: ["ADMIN", "FACULTY"],
-          order: 6,
         },
       ],
     },
@@ -190,7 +168,6 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/admin",
       roles: ["ADMIN"],
-      order: 5,
       submenu: [
         {
           id: "users",
@@ -198,7 +175,6 @@ export const MENU_CONFIG = {
           icon: "👥",
           path: "/admin/users",
           roles: ["ADMIN"],
-          order: 1,
         },
         {
           id: "roles",
@@ -206,7 +182,6 @@ export const MENU_CONFIG = {
           icon: "🔐",
           path: "/admin/roles",
           roles: ["ADMIN"],
-          order: 2,
         },
         {
           id: "system-settings",
@@ -214,7 +189,6 @@ export const MENU_CONFIG = {
           icon: "⚙️",
           path: "/admin/settings",
           roles: ["ADMIN"],
-          order: 3,
         },
         {
           id: "tables",
@@ -222,7 +196,6 @@ export const MENU_CONFIG = {
           icon: "📊",
           path: "/admin/tables",
           roles: ["ADMIN"],
-          order: 4,
         },
       ],
     },
@@ -232,7 +205,6 @@ export const MENU_CONFIG = {
       icon: "💳",
       path: "/admin/subscriptions",
       roles: ["ADMIN"],
-      order: 6,
       submenu: [
         {
           id: "subscriptions-list",
@@ -240,7 +212,6 @@ export const MENU_CONFIG = {
           icon: "📋",
           path: "/admin/subscriptions",
           roles: ["ADMIN"],
-          order: 1,
         },
         {
           id: "subscription-packages",
@@ -248,7 +219,6 @@ export const MENU_CONFIG = {
           icon: "📦",
           path: "/admin/subscriptions/packages",
           roles: ["ADMIN"],
-          order: 2,
         },
         {
           id: "package-features",
@@ -256,7 +226,6 @@ export const MENU_CONFIG = {
           icon: "⭐",
           path: "/admin/subscriptions/features",
           roles: ["ADMIN"],
-          order: 3,
         },
       ],
     },
@@ -266,7 +235,6 @@ export const MENU_CONFIG = {
       icon: "📦",
       path: "/admin/products",
       roles: ["ADMIN"],
-      order: 7,
       submenu: [
         {
           id: "products-list",
@@ -274,7 +242,6 @@ export const MENU_CONFIG = {
           icon: "📋",
           path: "/admin/products",
           roles: ["ADMIN"],
-          order: 1,
         },
         {
           id: "product-tags",
@@ -282,7 +249,6 @@ export const MENU_CONFIG = {
           icon: "🏷️",
           path: "/admin/products/tags",
           roles: ["ADMIN"],
-          order: 2,
         },
         {
           id: "product-subtypes",
@@ -290,7 +256,6 @@ export const MENU_CONFIG = {
           icon: "🔖",
           path: "/admin/products/subtypes",
           roles: ["ADMIN"],
-          order: 3,
         },
       ],
     },
@@ -300,7 +265,6 @@ export const MENU_CONFIG = {
       icon: "📚",
       path: "/admin/content",
       roles: ["ADMIN"],
-      order: 8,
       submenu: [
         {
           id: "sections",
@@ -308,7 +272,6 @@ export const MENU_CONFIG = {
           icon: "📑",
           path: "/admin/content/sections",
           roles: ["ADMIN"],
-          order: 1,
         },
         {
           id: "chapters",
@@ -316,7 +279,6 @@ export const MENU_CONFIG = {
           icon: "📖",
           path: "/admin/content/chapters",
           roles: ["ADMIN"],
-          order: 2,
         },
         {
           id: "topics",
@@ -324,7 +286,6 @@ export const MENU_CONFIG = {
           icon: "📝",
           path: "/admin/content/topics",
           roles: ["ADMIN"],
-          order: 3,
         },
         {
           id: "questions",
@@ -332,7 +293,6 @@ export const MENU_CONFIG = {
           icon: "❓",
           path: "/admin/content/questions",
           roles: ["ADMIN"],
-          order: 4,
         },
         {
           id: "question-choices",
@@ -340,7 +300,6 @@ export const MENU_CONFIG = {
           icon: "⭕",
           path: "/admin/content/question-choices",
           roles: ["ADMIN"],
-          order: 5,
         },
       ],
     },
@@ -350,7 +309,6 @@ export const MENU_CONFIG = {
       icon: "📝",
       path: "/admin/assessments",
       roles: ["ADMIN"],
-      order: 9,
       submenu: [
         {
           id: "question-papers",
@@ -358,7 +316,6 @@ export const MENU_CONFIG = {
           icon: "📄",
           path: "/admin/assessments/question-papers",
           roles: ["ADMIN"],
-          order: 1,
         },
         {
           id: "question-paper-questions",
@@ -366,7 +323,6 @@ export const MENU_CONFIG = {
           icon: "❓",
           path: "/admin/assessments/question-paper-questions",
           roles: ["ADMIN"],
-          order: 2,
         },
       ],
     },
@@ -376,7 +332,6 @@ export const MENU_CONFIG = {
       icon: "⚙️",
       path: "/med-app",
       roles: ["ADMIN"],
-      order: 10,
       submenu: [
         {
           id: "zoom-simulation",
@@ -384,7 +339,6 @@ export const MENU_CONFIG = {
           icon: "📹",
           path: "/zoom",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 1,
         },
         {
           id: "robotic",
@@ -392,7 +346,6 @@ export const MENU_CONFIG = {
           icon: "🤖",
           path: "/robotic",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
-          order: 2,
         },
       ],
     },

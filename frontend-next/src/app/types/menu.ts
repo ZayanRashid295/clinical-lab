@@ -6,7 +6,6 @@ export interface MenuItem {
   icon: string;
   path: string;
   roles: string[];
-  order: number;
   submenu?: MenuItem[] | null;
 }
 
@@ -37,8 +36,7 @@ export function getMenuItemsForRole(userRoles: string[]): MenuItem[] {
             subItem.roles.some((role) => userRoles.includes(role))
           )
         : null,
-    }))
-    .sort((a, b) => a.order - b.order);
+    }));
 }
 
 export function hasPermission(

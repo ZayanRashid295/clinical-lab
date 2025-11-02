@@ -30,7 +30,6 @@ export interface MenuItem {
   icon: string;
   path: string;
   roles: string[];
-  order: number;
   submenu?: MenuItem[] | null;
 }
 
