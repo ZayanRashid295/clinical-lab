@@ -2303,8 +2303,8 @@ const ModuleManager = () => {
                                     <div
                                       className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] ${relationInfo.color}`}
                                     />
-                                    {/* Left label (independent, above circle) */}
-                                    <span className="absolute top-1/2 left-0 -translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                    {/* Left label (centered on circle, above it) */}
+                                    <span className="absolute top-1/2 left-0 -translate-x-[1.15rem] -translate-x-1/2 -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
                                       {relationInfo.number}a
                                     </span>
 
@@ -2312,8 +2312,8 @@ const ModuleManager = () => {
                                     <div
                                       className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] ${relationInfo.color}`}
                                     />
-                                    {/* Right label (independent, above circle) */}
-                                    <span className="absolute top-1/2 right-0 translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                    {/* Right label (centered on circle, above it) */}
+                                    <span className="absolute top-1/2 right-0 translate-x-[1.15rem] translate-x-1/2 -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
                                       {relationInfo.number}b
                                     </span>
                                   </>
@@ -2333,8 +2333,8 @@ const ModuleManager = () => {
                                     <div
                                       className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full border border-white -translate-x-[280%] ${relationInfo.color}`}
                                     />
-                                    {/* Left label (independent, above circle) */}
-                                    <span className="absolute top-1/2 left-0 -translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                    {/* Left label (centered on circle, above it) */}
+                                    <span className="absolute top-1/2 left-0 -translate-x-[1.15rem] -translate-x-1/2 -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
                                       {relationInfo.number}c
                                     </span>
 
@@ -2342,8 +2342,8 @@ const ModuleManager = () => {
                                     <div
                                       className={`absolute top-1/2 -translate-y-1/2 right-0 w-2 h-2 rounded-full border border-white translate-x-[280%] ${relationInfo.color}`}
                                     />
-                                    {/* Right label (independent, above circle) */}
-                                    <span className="absolute top-1/2 right-0 translate-x-[280%] -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
+                                    {/* Right label (centered on circle, above it) */}
+                                    <span className="absolute top-1/2 right-0 translate-x-[1.15rem] translate-x-1/2 -translate-y-[calc(50%+10px)] text-[9px] font-bold text-gray-300 bg-gray-800 px-0.5 rounded">
                                       {relationInfo.number}d
                                     </span>
                                   </>
