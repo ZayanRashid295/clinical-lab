@@ -1854,7 +1854,11 @@ function AdvDbView() {
                         orient="auto"
                         markerUnits="userSpaceOnUse"
                       >
-                        <path d="M12,0 L0,6 L12,12 z" fill={color} />
+                        <path
+                          d="M12,0 L0,6 L12,12 z"
+                          fill={color}
+                          stroke="none"
+                        />
                       </marker>
                     );
                   })}
@@ -1872,9 +1876,17 @@ function AdvDbView() {
                   if (!from || !to) return null;
 
                   const dx = Math.max(40, Math.abs(to.x - from.x) * 0.4);
-                  const d = `M ${from.x},${from.y} C ${from.x - dx},${from.y} ${
-                    to.x + dx
-                  },${to.y} ${to.x},${to.y}`;
+                  // Calculate initial direction angle based on curve approach
+                  // Make first control point follow the general curve direction
+                  const dyInitial = (to.y - from.y) * 0.2; // Slight vertical component
+                  const control1X = from.x - dx;
+                  const control1Y = from.y + dyInitial;
+
+                  const d = `M ${from.x},${
+                    from.y
+                  } C ${control1X},${control1Y} ${to.x + dx},${to.y} ${to.x},${
+                    to.y
+                  }`;
                   const stroke = tailwindToHex[c.colorClass] || "#64748b";
                   const arrowId = `arrow-${relationshipColors.indexOf(
                     c.colorClass
