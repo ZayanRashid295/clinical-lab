@@ -14,12 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/shared/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import {
   Plus,
   Trash2,
@@ -59,7 +54,9 @@ interface QuestionBuilderData {
 }
 
 interface EnhancedQuestionBuilderProps {
-  onQuestionCreated?: (question: Question & { answers: ExtendedAnswer[]; images?: File[] }) => void;
+  onQuestionCreated?: (
+    question: Question & { answers: ExtendedAnswer[]; images?: File[] }
+  ) => void;
 }
 
 export default function EnhancedQuestionBuilder({
@@ -77,10 +74,38 @@ export default function EnhancedQuestionBuilder({
       isActive: true,
     },
     answers: [
-      { id: "", questionId: "", content: "", isCorrect: false, order: 1, createdAt: "" },
-      { id: "", questionId: "", content: "", isCorrect: false, order: 2, createdAt: "" },
-      { id: "", questionId: "", content: "", isCorrect: false, order: 3, createdAt: "" },
-      { id: "", questionId: "", content: "", isCorrect: false, order: 4, createdAt: "" },
+      {
+        id: "",
+        questionId: "",
+        content: "",
+        isCorrect: false,
+        order: 1,
+        createdAt: "",
+      },
+      {
+        id: "",
+        questionId: "",
+        content: "",
+        isCorrect: false,
+        order: 2,
+        createdAt: "",
+      },
+      {
+        id: "",
+        questionId: "",
+        content: "",
+        isCorrect: false,
+        order: 3,
+        createdAt: "",
+      },
+      {
+        id: "",
+        questionId: "",
+        content: "",
+        isCorrect: false,
+        order: 4,
+        createdAt: "",
+      },
     ],
     images: [],
     correctAnswerReason: "",
@@ -172,7 +197,10 @@ export default function EnhancedQuestionBuilder({
       return;
     }
 
-    const newQuestion: Question & { answers: ExtendedAnswer[]; images?: File[] } = {
+    const newQuestion: Question & {
+      answers: ExtendedAnswer[];
+      images?: File[];
+    } = {
       id: `q_${Date.now()}`,
       content: data.question.content!,
       type: data.question.type!,
@@ -193,7 +221,9 @@ export default function EnhancedQuestionBuilder({
         createdAt: new Date().toISOString(),
         comment: answer.comment,
         reasonWhyWrong: answer.reasonWhyWrong,
-        reasonWhyCorrect: answer.isCorrect ? data.correctAnswerReason || answer.reasonWhyCorrect : answer.reasonWhyWrong,
+        reasonWhyCorrect: answer.isCorrect
+          ? data.correctAnswerReason || answer.reasonWhyCorrect
+          : answer.reasonWhyWrong,
       })),
       images: data.images.length > 0 ? data.images : undefined,
     };
@@ -212,10 +242,38 @@ export default function EnhancedQuestionBuilder({
         isActive: true,
       },
       answers: [
-        { id: "", questionId: "", content: "", isCorrect: false, order: 1, createdAt: "" },
-        { id: "", questionId: "", content: "", isCorrect: false, order: 2, createdAt: "" },
-        { id: "", questionId: "", content: "", isCorrect: false, order: 3, createdAt: "" },
-        { id: "", questionId: "", content: "", isCorrect: false, order: 4, createdAt: "" },
+        {
+          id: "",
+          questionId: "",
+          content: "",
+          isCorrect: false,
+          order: 1,
+          createdAt: "",
+        },
+        {
+          id: "",
+          questionId: "",
+          content: "",
+          isCorrect: false,
+          order: 2,
+          createdAt: "",
+        },
+        {
+          id: "",
+          questionId: "",
+          content: "",
+          isCorrect: false,
+          order: 3,
+          createdAt: "",
+        },
+        {
+          id: "",
+          questionId: "",
+          content: "",
+          isCorrect: false,
+          order: 4,
+          createdAt: "",
+        },
       ],
       images: [],
       correctAnswerReason: "",
@@ -240,7 +298,9 @@ export default function EnhancedQuestionBuilder({
                 id="content"
                 placeholder="Enter your question here..."
                 value={data.question.content}
-                onChange={(e) => handleQuestionChange("content", e.target.value)}
+                onChange={(e) =>
+                  handleQuestionChange("content", e.target.value)
+                }
                 className="min-h-[120px]"
               />
             </div>
@@ -259,13 +319,17 @@ export default function EnhancedQuestionBuilder({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => document.getElementById("image-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("image-upload")?.click()
+                  }
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Add Images
                 </Button>
                 {data.images.length > 0 && (
-                  <Badge variant="secondary">{data.images.length} image(s)</Badge>
+                  <Badge variant="secondary">
+                    {data.images.length} image(s)
+                  </Badge>
                 )}
               </div>
               {data.images.length > 0 && (
@@ -298,7 +362,9 @@ export default function EnhancedQuestionBuilder({
                 id="explanation"
                 placeholder="Provide a detailed explanation..."
                 value={data.question.explanation}
-                onChange={(e) => handleQuestionChange("explanation", e.target.value)}
+                onChange={(e) =>
+                  handleQuestionChange("explanation", e.target.value)
+                }
                 className="min-h-[100px]"
               />
             </div>
@@ -353,9 +419,13 @@ export default function EnhancedQuestionBuilder({
                   <div className="space-y-2">
                     <Label>Answer Text *</Label>
                     <Input
-                      placeholder={`Enter option ${String.fromCharCode(65 + index)} text`}
+                      placeholder={`Enter option ${String.fromCharCode(
+                        65 + index
+                      )} text`}
                       value={answer.content}
-                      onChange={(e) => handleAnswerChange(index, "content", e.target.value)}
+                      onChange={(e) =>
+                        handleAnswerChange(index, "content", e.target.value)
+                      }
                     />
                   </div>
 
@@ -367,7 +437,9 @@ export default function EnhancedQuestionBuilder({
                       </Label>
                       <Textarea
                         placeholder="Explain why this answer is correct..."
-                        value={answer.reasonWhyCorrect || data.correctAnswerReason}
+                        value={
+                          answer.reasonWhyCorrect || data.correctAnswerReason
+                        }
                         onChange={(e) => {
                           const value = e.target.value;
                           if (answer.isCorrect) {
@@ -375,11 +447,17 @@ export default function EnhancedQuestionBuilder({
                               ...prev,
                               correctAnswerReason: value,
                               answers: prev.answers.map((a, i) =>
-                                i === index ? { ...a, reasonWhyCorrect: value } : a
+                                i === index
+                                  ? { ...a, reasonWhyCorrect: value }
+                                  : a
                               ),
                             }));
                           } else {
-                            handleAnswerChange(index, "reasonWhyCorrect", value);
+                            handleAnswerChange(
+                              index,
+                              "reasonWhyCorrect",
+                              value
+                            );
                           }
                         }}
                         className="min-h-[80px]"
@@ -396,7 +474,13 @@ export default function EnhancedQuestionBuilder({
                       <Textarea
                         placeholder="Explain why this answer is wrong..."
                         value={answer.reasonWhyWrong}
-                        onChange={(e) => handleAnswerChange(index, "reasonWhyWrong", e.target.value)}
+                        onChange={(e) =>
+                          handleAnswerChange(
+                            index,
+                            "reasonWhyWrong",
+                            e.target.value
+                          )
+                        }
                         className="min-h-[80px]"
                       />
                     </div>
@@ -410,7 +494,9 @@ export default function EnhancedQuestionBuilder({
                     <Textarea
                       placeholder="Add any additional comments or notes..."
                       value={answer.comment}
-                      onChange={(e) => handleAnswerChange(index, "comment", e.target.value)}
+                      onChange={(e) =>
+                        handleAnswerChange(index, "comment", e.target.value)
+                      }
                       className="min-h-[60px]"
                     />
                   </div>
@@ -436,7 +522,9 @@ export default function EnhancedQuestionBuilder({
               <Label htmlFor="difficulty">Difficulty Level</Label>
               <Select
                 value={data.question.difficulty}
-                onValueChange={(value) => handleQuestionChange("difficulty", value)}
+                onValueChange={(value) =>
+                  handleQuestionChange("difficulty", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -455,7 +543,9 @@ export default function EnhancedQuestionBuilder({
               <Label htmlFor="subject">Medical Subject</Label>
               <Select
                 value={data.question.subject}
-                onValueChange={(value) => handleQuestionChange("subject", value)}
+                onValueChange={(value) =>
+                  handleQuestionChange("subject", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -534,7 +624,9 @@ export default function EnhancedQuestionBuilder({
               placeholder={`Option A\n*Option B (correct)\nOption C\nOption D`}
               className="min-h-[150px] font-mono text-sm"
               onChange={(e) => {
-                const lines = e.target.value.split("\n").filter((l) => l.trim());
+                const lines = e.target.value
+                  .split("\n")
+                  .filter((l) => l.trim());
                 const newAnswers = lines.map((line, index) => {
                   const isCorrect = line.trim().startsWith("*");
                   const content = line.replace(/^\*/, "").trim();
@@ -560,7 +652,9 @@ export default function EnhancedQuestionBuilder({
               <Label>Difficulty</Label>
               <Select
                 value={data.question.difficulty}
-                onValueChange={(value) => handleQuestionChange("difficulty", value)}
+                onValueChange={(value) =>
+                  handleQuestionChange("difficulty", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -579,7 +673,9 @@ export default function EnhancedQuestionBuilder({
               <Label>Subject</Label>
               <Select
                 value={data.question.subject}
-                onValueChange={(value) => handleQuestionChange("subject", value)}
+                onValueChange={(value) =>
+                  handleQuestionChange("subject", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -611,26 +707,33 @@ export default function EnhancedQuestionBuilder({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>CSV Format (Question, Option1, Option2, Option3, Option4, CorrectOption, Explanation)</Label>
+            <Label>
+              CSV Format (Question, Option1, Option2, Option3, Option4,
+              CorrectOption, Explanation)
+            </Label>
             <Textarea
               placeholder="What is the normal heart rate?,60-80,80-100,100-120,120-140,2,The normal resting heart rate for adults ranges from 60-100 bpm..."
               className="min-h-[200px] font-mono text-sm"
               onChange={(e) => {
                 // Parse CSV and update question
-                const lines = e.target.value.split("\n").filter((l) => l.trim());
+                const lines = e.target.value
+                  .split("\n")
+                  .filter((l) => l.trim());
                 if (lines.length > 0) {
                   const parts = lines[0].split(",").map((p) => p.trim());
                   if (parts.length >= 6) {
                     handleQuestionChange("content", parts[0]);
                     const correctIndex = parseInt(parts[5]) - 1;
-                    const newAnswers = parts.slice(1, 5).map((content, index) => ({
-                      id: "",
-                      questionId: "",
-                      content,
-                      isCorrect: index === correctIndex,
-                      order: index + 1,
-                      createdAt: "",
-                    }));
+                    const newAnswers = parts
+                      .slice(1, 5)
+                      .map((content, index) => ({
+                        id: "",
+                        questionId: "",
+                        content,
+                        isCorrect: index === correctIndex,
+                        order: index + 1,
+                        createdAt: "",
+                      }));
                     if (parts[6]) {
                       handleQuestionChange("explanation", parts[6]);
                     }
@@ -640,7 +743,8 @@ export default function EnhancedQuestionBuilder({
               }}
             />
             <p className="text-xs text-muted-foreground">
-              Format: Question, Option1, Option2, Option3, Option4, CorrectOption (1-4), Explanation
+              Format: Question, Option1, Option2, Option3, Option4,
+              CorrectOption (1-4), Explanation
             </p>
           </div>
         </CardContent>
@@ -658,7 +762,8 @@ export default function EnhancedQuestionBuilder({
       },
       {
         name: "Case Study",
-        question: "A [patient description] presents with [symptoms]. What is the most likely diagnosis?",
+        question:
+          "A [patient description] presents with [symptoms]. What is the most likely diagnosis?",
         options: ["Diagnosis A", "Diagnosis B", "Diagnosis C", "Diagnosis D"],
       },
       {
@@ -734,7 +839,9 @@ export default function EnhancedQuestionBuilder({
               <Textarea
                 placeholder="Enter your question..."
                 value={data.question.content}
-                onChange={(e) => handleQuestionChange("content", e.target.value)}
+                onChange={(e) =>
+                  handleQuestionChange("content", e.target.value)
+                }
                 className="min-h-[100px]"
               />
             </div>
@@ -762,7 +869,9 @@ export default function EnhancedQuestionBuilder({
                     <Input
                       placeholder={`Option ${String.fromCharCode(65 + index)}`}
                       value={answer.content}
-                      onChange={(e) => handleAnswerChange(index, "content", e.target.value)}
+                      onChange={(e) =>
+                        handleAnswerChange(index, "content", e.target.value)
+                      }
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -785,7 +894,10 @@ export default function EnhancedQuestionBuilder({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setPreviewMode(!previewMode)}>
+          <Button
+            variant="outline"
+            onClick={() => setPreviewMode(!previewMode)}
+          >
             <Eye className="h-4 w-4 mr-2" />
             {previewMode ? "Edit" : "Preview"}
           </Button>
@@ -811,7 +923,9 @@ export default function EnhancedQuestionBuilder({
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">Question:</h3>
-                <p className="text-base leading-relaxed">{data.question.content}</p>
+                <p className="text-base leading-relaxed">
+                  {data.question.content}
+                </p>
               </div>
 
               {data.images.length > 0 && (
@@ -854,14 +968,19 @@ export default function EnhancedQuestionBuilder({
                           </Badge>
                         )}
                       </div>
-                      {answer.isCorrect && (answer.reasonWhyCorrect || data.correctAnswerReason) && (
-                        <div className="mt-2 p-2 bg-green-100 rounded text-sm">
-                          <strong>Why correct:</strong> {answer.reasonWhyCorrect || data.correctAnswerReason}
-                        </div>
-                      )}
+                      {answer.isCorrect &&
+                        (answer.reasonWhyCorrect ||
+                          data.correctAnswerReason) && (
+                          <div className="mt-2 p-2 bg-green-100 rounded text-sm">
+                            <strong>Why correct:</strong>{" "}
+                            {answer.reasonWhyCorrect ||
+                              data.correctAnswerReason}
+                          </div>
+                        )}
                       {!answer.isCorrect && answer.reasonWhyWrong && (
                         <div className="mt-2 p-2 bg-red-100 rounded text-sm">
-                          <strong>Why incorrect:</strong> {answer.reasonWhyWrong}
+                          <strong>Why incorrect:</strong>{" "}
+                          {answer.reasonWhyWrong}
                         </div>
                       )}
                       {answer.comment && (
@@ -937,4 +1056,3 @@ export default function EnhancedQuestionBuilder({
     </div>
   );
 }
-
