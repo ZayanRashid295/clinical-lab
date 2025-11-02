@@ -18,8 +18,11 @@ interface MenuItemCardProps {
   isDragging: boolean;
   editData: MenuItem;
   draggedItemId: string | null;
+  dragOverPosition: { targetId: string; position: "before" | "after" } | null;
   onDragStart: () => void;
   onDragEnd: () => void;
+  onDragOver: (targetId: string, position: "before" | "after") => void;
+  onDrop: (draggedId: string, targetId: string, position: "before" | "after") => void;
   onToggleExpand: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -41,8 +44,11 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   isDragging,
   editData,
   draggedItemId,
+  dragOverPosition,
   onDragStart,
   onDragEnd,
+  onDragOver,
+  onDrop,
   onToggleExpand,
   onEdit,
   onDelete,
@@ -55,6 +61,10 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   onCancelEdit,
   children,
 }) => {
+  const isDropTarget =
+    draggedItemId &&
+    draggedItemId !== item.id &&
+    dragOverPosition?.targetId === item.id;
   const hasSubmenu = item.submenu && item.submenu.length > 0;
 
   if (isEditing) {
@@ -92,12 +102,28 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
             e.stopPropagation();
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
-            // Position detection is handled by drop zones, this just allows the drag
+            const middle = rect.height / 2;
+            // Determine if we're in upper or lower half
+            if (y < middle) {
+              onDragOver(item.id, "before");
+            } else {
+              onDragOver(item.id, "after");
+            }
+          }
+        }}
+        onDrop={(e) => {
+          if (draggedItemId && draggedItemId !== item.id && !isEditing && isDropTarget) {
+            e.preventDefault();
+            e.stopPropagation();
+            onDrop(draggedItemId, item.id, dragOverPosition!.position);
+            onDragEnd();
           }
         }}
         className={`flex items-center gap-2 p-2 rounded border transition-all select-none ${
           isDragging
             ? "opacity-50 cursor-grabbing"
+            : isDropTarget
+            ? "cursor-pointer"
             : draggedItemId
             ? "cursor-grab"
             : "bg-white border-gray-200 hover:bg-gray-50"

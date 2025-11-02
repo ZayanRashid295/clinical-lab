@@ -103,8 +103,11 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
           isDragging={isDragging}
           editData={editData}
           draggedItemId={draggedItemId}
+          dragOverPosition={dragOverPosition}
           onDragStart={() => onDragStart(item.id)}
           onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
           onToggleExpand={() => onToggleExpand(item.id)}
           onEdit={() => onEdit(item)}
           onDelete={() => onDelete(item.id)}
