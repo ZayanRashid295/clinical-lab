@@ -72,9 +72,9 @@ const useSubscriptionPackages = (
     fetchPackages();
   }, [fetchPackages]);
 
-  const updateFilters = useCallback(
-    (newFilters: Partial<SubscriptionPackageQueryParams>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
+  const updateFilters: (newFilters: Partial<SubscriptionPackageFilters>) => void = useCallback(
+    (newFilters: Partial<SubscriptionPackageFilters>) => {
+      setFilters((prev) => ({ ...prev, ...newFilters } as SubscriptionPackageQueryParams));
     },
     []
   );

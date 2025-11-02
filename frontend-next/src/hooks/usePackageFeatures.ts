@@ -72,9 +72,9 @@ const usePackageFeatures = (
     fetchFeatures();
   }, [fetchFeatures]);
 
-  const updateFilters = useCallback(
-    (newFilters: Partial<PackageFeatureQueryParams>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
+  const updateFilters: (newFilters: Partial<PackageFeatureFilters>) => void = useCallback(
+    (newFilters: Partial<PackageFeatureFilters>) => {
+      setFilters((prev) => ({ ...prev, ...newFilters } as PackageFeatureQueryParams));
     },
     []
   );

@@ -70,7 +70,7 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
   }, [loading, data.length]);
 
   const handleSearchChange = (value: string) => {
-    onFiltersChange({ search: value || undefined } as Partial<TFilters>);
+    onFiltersChange({ search: value || undefined } as unknown as Partial<TFilters>);
   };
 
   const searchValue = (filters as any).search || "";

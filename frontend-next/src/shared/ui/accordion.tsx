@@ -17,7 +17,7 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            const itemValue = child.props.value;
+            const itemValue = (child as React.ReactElement<AccordionItemProps>).props.value;
             const isOpen = type === "multiple"
               ? Array.isArray(value) && value.includes(itemValue)
               : value === itemValue;

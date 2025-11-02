@@ -64,8 +64,8 @@ const useUsers = (initialFilters: UserQueryParams = {}): UseUsersResult => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const updateFilters = useCallback((newFilters: Partial<UserQueryParams>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+  const updateFilters: (newFilters: Partial<UserFilters>) => void = useCallback((newFilters: Partial<UserFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters } as UserQueryParams));
   }, []);
 
   const refetch = useCallback(() => {

@@ -24,11 +24,11 @@ function GenericFilters<TFilters extends Record<string, any>>({
   );
 
   const handleFilterChange = (key: keyof TFilters, value: any) => {
-    onFiltersChange({ [key]: value } as Partial<TFilters>);
+    onFiltersChange({ [key]: value } as unknown as Partial<TFilters>);
   };
 
   const removeFilter = (key: keyof TFilters) => {
-    onFiltersChange({ [key]: undefined } as Partial<TFilters>);
+    onFiltersChange({ [key]: undefined } as unknown as Partial<TFilters>);
   };
 
   const renderFilterField = (field: typeof filterConfig.fields[0]) => {
@@ -38,7 +38,7 @@ function GenericFilters<TFilters extends Record<string, any>>({
     switch (field.type) {
       case "text":
         return (
-          <div key={field.key}>
+          <div key={String(field.key)}>
             <label
               htmlFor={fieldId}
               className="block text-sm font-medium text-gray-700 mb-1"
@@ -60,7 +60,7 @@ function GenericFilters<TFilters extends Record<string, any>>({
 
       case "select":
         return (
-          <div key={field.key}>
+          <div key={String(field.key)}>
             <label
               htmlFor={fieldId}
               className="block text-sm font-medium text-gray-700 mb-1"
@@ -87,7 +87,7 @@ function GenericFilters<TFilters extends Record<string, any>>({
 
       case "date":
         return (
-          <div key={field.key}>
+          <div key={String(field.key)}>
             <label
               htmlFor={fieldId}
               className="block text-sm font-medium text-gray-700 mb-1"
@@ -112,7 +112,7 @@ function GenericFilters<TFilters extends Record<string, any>>({
         const fromKey = `${String(field.key)}From` as keyof TFilters;
         const toKey = `${String(field.key)}To` as keyof TFilters;
         return (
-          <div key={field.key} className="grid grid-cols-2 gap-4">
+          <div key={String(field.key)} className="grid grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor={`${fieldId}-from`}
@@ -153,7 +153,7 @@ function GenericFilters<TFilters extends Record<string, any>>({
       case "multiselect":
         const selectedValues = Array.isArray(fieldValue) ? fieldValue : [];
         return (
-          <div key={field.key}>
+          <div key={String(field.key)}>
             <label
               htmlFor={fieldId}
               className="block text-sm font-medium text-gray-700 mb-1"

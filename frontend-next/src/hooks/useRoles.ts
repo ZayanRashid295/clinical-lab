@@ -64,8 +64,8 @@ const useRoles = (initialFilters: RoleQueryParams = {}): UseRolesResult => {
     fetchRoles();
   }, [fetchRoles]);
 
-  const updateFilters = useCallback((newFilters: Partial<RoleQueryParams>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+  const updateFilters: (newFilters: Partial<RoleFilters>) => void = useCallback((newFilters: Partial<RoleFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters } as RoleQueryParams));
   }, []);
 
   const refetch = useCallback(() => {
