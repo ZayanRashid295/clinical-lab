@@ -1851,15 +1851,21 @@ const ModuleManager = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 flex flex-col">
+    <div className="w-full h-screen bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-950 border-b border-gray-800 p-4">
+      <div className="bg-gray-950 border-b border-gray-800 p-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4">
-            <h1 className="text-3xl font-bold text-white mb-2">
-              {data.projectName}
-            </h1>
-            <p className="text-gray-400">{data.description}</p>
+            <div className="flex items-baseline gap-4">
+              <h1 className="text-3xl font-bold text-white">
+                {data.projectName}
+              </h1>
+              <span className="text-lg font-semibold text-blue-400">
+                {currentTables.length}{" "}
+                {currentTables.length === 1 ? "table" : "tables"}
+              </span>
+            </div>
+            <p className="text-gray-400 mt-2">{data.description}</p>
           </div>
 
           {/* Module Selector */}
@@ -1914,7 +1920,7 @@ const ModuleManager = () => {
           style={{ minWidth: 0 }}
         >
           {/* Toolbar */}
-          <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center">
+          <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center flex-shrink-0">
             <button
               onClick={addTable}
               className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
@@ -1957,7 +1963,7 @@ const ModuleManager = () => {
 
           {/* Canvas */}
           <div
-            className="flex-1 bg-gray-800 relative overflow-hidden cursor-move"
+            className="flex-1 bg-gray-800 relative overflow-auto cursor-move"
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -2049,7 +2055,12 @@ const ModuleManager = () => {
 
             {/* Tables */}
             <div
-              style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: "0 0",
+                minWidth: "2500px",
+                minHeight: "2000px",
+              }}
             >
               {currentTables.map((table) => {
                 const position = tablePositions.get(table.id) ?? {
@@ -2313,10 +2324,10 @@ const ModuleManager = () => {
 
         {/* JSON Panel */}
         <div
-          className="bg-gray-950 border-l border-gray-800 overflow-hidden flex flex-col flex-shrink-0"
+          className="bg-gray-950 border-l border-gray-800 flex flex-col flex-shrink-0"
           style={{ width: `${jsonPanelWidth}px` }}
         >
-          <div className="bg-gray-900 p-2 border-b border-gray-800 flex items-center justify-between">
+          <div className="bg-gray-900 p-2 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
             <h3 className="text-sm font-bold text-white">JSON Configuration</h3>
           </div>
           <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono">
