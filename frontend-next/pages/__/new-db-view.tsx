@@ -61,6 +61,32 @@ interface FieldUpdates {
 }
 
 const ModuleManager = () => {
+  // Color palette for table headers and backgrounds
+  const tableColors = [
+    { header: "from-violet-600 to-violet-700", body: "bg-violet-50" },
+    { header: "from-cyan-600 to-cyan-700", body: "bg-cyan-50" },
+    { header: "from-blue-600 to-blue-700", body: "bg-blue-50" },
+    { header: "from-purple-600 to-purple-700", body: "bg-purple-50" },
+    { header: "from-amber-600 to-amber-700", body: "bg-amber-50" },
+    { header: "from-red-600 to-red-700", body: "bg-red-50" },
+    { header: "from-pink-600 to-pink-700", body: "bg-pink-50" },
+    { header: "from-green-600 to-green-700", body: "bg-green-50" },
+    { header: "from-indigo-600 to-indigo-700", body: "bg-indigo-50" },
+    { header: "from-teal-600 to-teal-700", body: "bg-teal-50" },
+    { header: "from-orange-600 to-orange-700", body: "bg-orange-50" },
+    { header: "from-rose-600 to-rose-700", body: "bg-rose-50" },
+    { header: "from-emerald-600 to-emerald-700", body: "bg-emerald-50" },
+    { header: "from-slate-600 to-slate-700", body: "bg-slate-50" },
+    { header: "from-stone-600 to-stone-700", body: "bg-stone-50" },
+  ];
+
+  // Get color for a table based on its index in allTables array
+  const getTableColor = (tableId: string) => {
+    const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
+    const tableIndex = allTables.findIndex((t) => t.id === tableId);
+    return tableColors[tableIndex % tableColors.length];
+  };
+
   // Helper to generate table positions in a grid
   const getTablePosition = (
     index: number,
@@ -1608,10 +1634,16 @@ const ModuleManager = () => {
                     width: "240px",
                     cursor: draggingTable === table.id ? "grabbing" : "grab",
                   }}
-                  className="bg-white rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors"
+                  className={`rounded-lg shadow-xl border-2 border-gray-300 hover:border-blue-500 transition-colors ${
+                    getTableColor(table.id).body
+                  }`}
                 >
                   {/* Table Header */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-2 rounded-t-md">
+                  <div
+                    className={`bg-gradient-to-r ${
+                      getTableColor(table.id).header
+                    } text-white p-2 rounded-t-md`}
+                  >
                     <div className="flex items-center justify-between gap-1 min-w-0">
                       <input
                         type="text"
