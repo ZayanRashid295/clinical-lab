@@ -57,7 +57,9 @@ const MenuManager = () => {
         editData={editData}
         draggedItemId={draggedItemId}
         dragOverPosition={dragOverPosition}
-        onDragStart={setDraggedItemId}
+        onDragStart={(id: string) => {
+          setDraggedItemId(id);
+        }}
         onDragEnd={() => {
           setDraggedItemId(null);
           setDragOverPosition(null);
