@@ -1313,7 +1313,9 @@ const ModuleManager = () => {
   };
 
   const [data, setData] = useState<ProjectData>(initialData);
-  const [selectedModuleIndex, setSelectedModuleIndex] = useState<number>(0);
+  const [selectedModuleIndices, setSelectedModuleIndices] = useState<number[]>([
+    0,
+  ]);
   const [showBase, setShowBase] = useState<boolean>(false);
   const [zoom, setZoom] = useState<number>(1);
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
@@ -1334,8 +1336,22 @@ const ModuleManager = () => {
   }>({ isResizing: false, startX: 0, startWidth: 400 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const currentModule = data.modules[selectedModuleIndex];
-  const currentTables = showBase ? data.base : currentModule?.tables || [];
+  // Combine tables from all selected modules
+  const getSelectedTables = (): Table[] => {
+    if (showBase) {
+      return data.base;
+    }
+
+    const selectedTables: Table[] = [];
+    selectedModuleIndices.forEach((index) => {
+      if (data.modules[index]) {
+        selectedTables.push(...data.modules[index].tables);
+      }
+    });
+    return selectedTables;
+  };
+
+  const currentTables = getSelectedTables();
   const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
 
   const estimateTableHeight = (table: Table) => {
@@ -1634,14 +1650,18 @@ const ModuleManager = () => {
         base: reorderTables(data.base),
       });
     } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: reorderTables(m.tables) }
-            : m
-        ),
-      });
+      // Find which module contains the dragged table and reorder it there
+      const draggedTable = allTables.find((t) => t.id === draggingTable);
+      if (draggedTable) {
+        setData({
+          ...data,
+          modules: data.modules.map((m) =>
+            m.tables.some((t) => t.id === draggingTable)
+              ? { ...m, tables: reorderTables(m.tables) }
+              : m
+          ),
+        });
+      }
     }
 
     setDraggingTable(null);
@@ -1683,14 +1703,18 @@ const ModuleManager = () => {
         base: [...data.base, newTable],
       });
     } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: [...m.tables, newTable] }
-            : m
-        ),
-      });
+      // Add to the first selected module
+      const targetModuleIndex = selectedModuleIndices[0];
+      if (targetModuleIndex !== undefined) {
+        setData({
+          ...data,
+          modules: data.modules.map((m, idx) =>
+            idx === targetModuleIndex
+              ? { ...m, tables: [...m.tables, newTable] }
+              : m
+          ),
+        });
+      }
     }
   };
 
@@ -1701,13 +1725,13 @@ const ModuleManager = () => {
         base: data.base.filter((t) => t.id !== tableId),
       });
     } else {
+      // Find and delete from any module
       setData({
         ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: m.tables.filter((t) => t.id !== tableId) }
-            : m
-        ),
+        modules: data.modules.map((m) => ({
+          ...m,
+          tables: m.tables.filter((t) => t.id !== tableId),
+        })),
       });
     }
   };
@@ -1736,13 +1760,13 @@ const ModuleManager = () => {
         base: updateTableFields(data.base, tableId),
       });
     } else {
+      // Update in any module that contains this table
       setData({
         ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: updateTableFields(m.tables, tableId) }
-            : m
-        ),
+        modules: data.modules.map((m) => ({
+          ...m,
+          tables: updateTableFields(m.tables, tableId),
+        })),
       });
     }
   };
@@ -1761,13 +1785,13 @@ const ModuleManager = () => {
         base: updateTableFields(data.base, tableId),
       });
     } else {
+      // Update in any module that contains this table
       setData({
         ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: updateTableFields(m.tables, tableId) }
-            : m
-        ),
+        modules: data.modules.map((m) => ({
+          ...m,
+          tables: updateTableFields(m.tables, tableId),
+        })),
       });
     }
   };
@@ -1795,13 +1819,13 @@ const ModuleManager = () => {
         base: updateTableFields(data.base, tableId),
       });
     } else {
+      // Update in any module that contains this table
       setData({
         ...data,
-        modules: data.modules.map((m, idx) =>
-          idx === selectedModuleIndex
-            ? { ...m, tables: updateTableFields(m.tables, tableId) }
-            : m
-        ),
+        modules: data.modules.map((m) => ({
+          ...m,
+          tables: updateTableFields(m.tables, tableId),
+        })),
       });
     }
   };
@@ -1838,33 +1862,47 @@ const ModuleManager = () => {
           <div className="flex gap-2 flex-wrap items-center">
             <button
               onClick={() => {
-                setShowBase(true);
-                setSelectedModuleIndex(-1);
+                setShowBase(!showBase);
+                if (!showBase) {
+                  // When turning on base, turn off all modules
+                  setSelectedModuleIndices([]);
+                }
               }}
               className={`px-3 py-2 rounded font-medium text-sm transition-all ${
                 showBase
-                  ? "bg-purple-600 text-white"
+                  ? "bg-purple-600 text-white shadow-lg"
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
               Base Tables
             </button>
-            {data.modules.map((module, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setShowBase(false);
-                  setSelectedModuleIndex(index);
-                }}
-                className={`px-3 py-2 rounded font-medium text-sm transition-all ${
-                  !showBase && selectedModuleIndex === index
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
-              >
-                {module.moduleName}
-              </button>
-            ))}
+            {data.modules.map((module, index) => {
+              const isSelected = selectedModuleIndices.includes(index);
+              return (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setShowBase(false);
+                    setSelectedModuleIndices((prev) => {
+                      if (prev.includes(index)) {
+                        // Remove from selection
+                        return prev.filter((i) => i !== index);
+                      } else {
+                        // Add to selection
+                        return [...prev, index];
+                      }
+                    });
+                  }}
+                  className={`px-3 py-2 rounded font-medium text-sm transition-all ${
+                    !showBase && isSelected
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  {module.moduleName}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -2074,20 +2112,17 @@ const ModuleManager = () => {
                                 ),
                               });
                             } else {
+                              // Update in any module that contains this table
                               setData({
                                 ...data,
-                                modules: data.modules.map((m, idx) =>
-                                  idx === selectedModuleIndex
-                                    ? {
-                                        ...m,
-                                        tables: updateTableName(
-                                          m.tables,
-                                          table.id,
-                                          e.target.value
-                                        ),
-                                      }
-                                    : m
-                                ),
+                                modules: data.modules.map((m) => ({
+                                  ...m,
+                                  tables: updateTableName(
+                                    m.tables,
+                                    table.id,
+                                    e.target.value
+                                  ),
+                                })),
                               });
                             }
                           }}
@@ -2245,14 +2280,20 @@ const ModuleManager = () => {
               <div className="absolute inset-0 flex items-center justify-center text-center">
                 <div className="text-gray-500">
                   <p className="text-lg mb-4">
-                    No tables in {showBase ? "base" : currentModule?.moduleName}
+                    {showBase
+                      ? "No tables in base"
+                      : selectedModuleIndices.length === 0
+                      ? "No modules selected"
+                      : "No tables in selected modules"}
                   </p>
-                  <button
-                    onClick={addTable}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  >
-                    <Plus size={18} /> Create First Table
-                  </button>
+                  {(showBase || selectedModuleIndices.length > 0) && (
+                    <button
+                      onClick={addTable}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus size={18} /> Create First Table
+                    </button>
+                  )}
                 </div>
               </div>
             )}
