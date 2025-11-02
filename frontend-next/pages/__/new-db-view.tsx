@@ -1336,18 +1336,22 @@ const ModuleManager = () => {
   }>({ isResizing: false, startX: 0, startWidth: 400 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Combine tables from all selected modules
+  // Combine tables from all selected modules and base if selected
   const getSelectedTables = (): Table[] => {
+    const selectedTables: Table[] = [];
+
+    // Add base tables if base is shown
     if (showBase) {
-      return data.base;
+      selectedTables.push(...data.base);
     }
 
-    const selectedTables: Table[] = [];
+    // Add tables from selected modules
     selectedModuleIndices.forEach((index) => {
       if (data.modules[index]) {
         selectedTables.push(...data.modules[index].tables);
       }
     });
+
     return selectedTables;
   };
 
@@ -1863,10 +1867,6 @@ const ModuleManager = () => {
             <button
               onClick={() => {
                 setShowBase(!showBase);
-                if (!showBase) {
-                  // When turning on base, turn off all modules
-                  setSelectedModuleIndices([]);
-                }
               }}
               className={`px-3 py-2 rounded font-medium text-sm transition-all ${
                 showBase
@@ -1882,7 +1882,6 @@ const ModuleManager = () => {
                 <button
                   key={index}
                   onClick={() => {
-                    setShowBase(false);
                     setSelectedModuleIndices((prev) => {
                       if (prev.includes(index)) {
                         // Remove from selection
@@ -1894,7 +1893,7 @@ const ModuleManager = () => {
                     });
                   }}
                   className={`px-3 py-2 rounded font-medium text-sm transition-all ${
-                    !showBase && isSelected
+                    isSelected
                       ? "bg-blue-600 text-white shadow-lg"
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
@@ -2280,11 +2279,13 @@ const ModuleManager = () => {
               <div className="absolute inset-0 flex items-center justify-center text-center">
                 <div className="text-gray-500">
                   <p className="text-lg mb-4">
-                    {showBase
+                    {!showBase && selectedModuleIndices.length === 0
+                      ? "No modules or base selected. Click a button above to view tables."
+                      : showBase && selectedModuleIndices.length === 0
                       ? "No tables in base"
-                      : selectedModuleIndices.length === 0
-                      ? "No modules selected"
-                      : "No tables in selected modules"}
+                      : !showBase && selectedModuleIndices.length > 0
+                      ? "No tables in selected modules"
+                      : "No tables in base or selected modules"}
                   </p>
                   {(showBase || selectedModuleIndices.length > 0) && (
                     <button
