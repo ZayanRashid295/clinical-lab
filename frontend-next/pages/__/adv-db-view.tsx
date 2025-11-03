@@ -1452,6 +1452,14 @@ function AdvDbView() {
     return { tablePositions: positions, columnHeights: columnYPositions };
   }, [currentTables]);
 
+  // Calculate dynamic canvas height based on content
+  const dynamicCanvasHeight = useMemo(() => {
+    if (columnHeights.length === 0) return CANVAS_HEIGHT;
+    const maxHeight = Math.max(...columnHeights);
+    // Add padding to ensure connections are visible
+    return Math.max(CANVAS_HEIGHT, maxHeight + 200);
+  }, [columnHeights]);
+
   const deleteTable = (tableId: string) => {
     if (showBase) {
       setData({ ...data, base: data.base.filter((t) => t.id !== tableId) });
@@ -1931,7 +1939,14 @@ function AdvDbView() {
   // Re-measure on zoom, drag, layout changes, scroll, resize
   useEffect(() => {
     measureAnchors();
-  }, [zoom, draggingTable, dragPreviewPosition, currentTables, jsonPanelWidth]);
+  }, [
+    zoom,
+    draggingTable,
+    dragPreviewPosition,
+    currentTables,
+    jsonPanelWidth,
+    dynamicCanvasHeight,
+  ]);
 
   useEffect(() => {
     const sc = scrollContainerRef.current;
@@ -2347,14 +2362,14 @@ function AdvDbView() {
                 transform: `scale(${zoom})`,
                 transformOrigin: "0 0",
                 minWidth: `${CANVAS_WIDTH}px`,
-                minHeight: `${CANVAS_HEIGHT}px`,
+                minHeight: `${dynamicCanvasHeight}px`,
               }}
             >
               {/* SVG connections overlay */}
               <svg
                 className="absolute top-0 left-0 pointer-events-none"
                 width={CANVAS_WIDTH}
-                height={CANVAS_HEIGHT}
+                height={dynamicCanvasHeight}
               >
                 <defs>
                   {relationshipColors.map((colorClass, idx) => {
