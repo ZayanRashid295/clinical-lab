@@ -1318,7 +1318,7 @@ function AdvDbView() {
     new Set()
   );
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
-  const [showJsonPanel, setShowJsonPanel] = useState<boolean>(true);
+  const [showJsonPanel, setShowJsonPanel] = useState<boolean>(false);
 
   const resizeStateRef = useRef<{
     isResizing: boolean;
