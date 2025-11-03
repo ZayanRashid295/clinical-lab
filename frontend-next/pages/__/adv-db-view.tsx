@@ -168,10 +168,9 @@ function buildConnections(
 
 function AdvDbView() {
   const [data, setData] = useState<ProjectData>(initialData);
-  const [selectedModuleIndices, setSelectedModuleIndices] = useState<number[]>([
-    0,
-  ]);
-  const [showBase, setShowBase] = useState<boolean>(false);
+  const [selectedModuleIndices, setSelectedModuleIndices] = useState<number[]>(
+    []
+  );
   const [zoom, setZoom] = useState<number>(1);
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({
@@ -219,22 +218,8 @@ function AdvDbView() {
     return tableVisibility.get(tableId) !== false; // Default to true
   };
 
-  const getBaseModuleIndex = (): number => {
-    return data.modules.findIndex((m) => m.moduleName === "Base");
-  };
-
-  const getBaseTables = (): Table[] => {
-    const baseModuleIndex = getBaseModuleIndex();
-    return baseModuleIndex >= 0 ? data.modules[baseModuleIndex].tables : [];
-  };
-
   const getSelectedTables = (): Table[] => {
     const selectedTables: Table[] = [];
-    if (showBase) {
-      selectedTables.push(
-        ...getBaseTables().filter((t) => isTableVisible(t.id))
-      );
-    }
     selectedModuleIndices.forEach((index) => {
       if (data.modules[index]) {
         selectedTables.push(
@@ -267,22 +252,6 @@ function AdvDbView() {
     setTableVisibility((prev) => {
       const next = new Map(prev);
       module.tables.forEach((t) => {
-        next.set(t.id, hasHidden);
-      });
-      return next;
-    });
-  };
-
-  const toggleBaseTables = () => {
-    const baseTables = getBaseTables();
-    // Check if any base table is hidden
-    const hasHidden = baseTables.some(
-      (t) => tableVisibility.get(t.id) === false
-    );
-
-    setTableVisibility((prev) => {
-      const next = new Map(prev);
-      baseTables.forEach((t) => {
         next.set(t.id, hasHidden);
       });
       return next;
@@ -383,12 +352,7 @@ function AdvDbView() {
       fields: [{ id: "id", name: "ID", type: "uuid", primaryKey: true }],
     };
 
-    let targetModuleIndex: number | undefined;
-    if (showBase) {
-      targetModuleIndex = getBaseModuleIndex();
-    } else {
-      targetModuleIndex = selectedModuleIndices[0];
-    }
+    const targetModuleIndex = selectedModuleIndices[0];
 
     if (targetModuleIndex !== undefined && targetModuleIndex >= 0) {
       setData({
@@ -965,80 +929,6 @@ function AdvDbView() {
                 Tables
               </h3>
 
-              {/* Base Tables */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2 py-1.5 rounded bg-gray-800/50">
-                  <button
-                    onClick={() => setShowBase(!showBase)}
-                    className={`flex items-center gap-1 text-base font-normal transition-colors flex-1 text-left ${
-                      showBase
-                        ? "text-purple-300 hover:text-purple-200"
-                        : "text-gray-400 hover:text-gray-300"
-                    }`}
-                  >
-                    <span>Base Tables</span>
-                  </button>
-                  <button
-                    onClick={toggleBaseTables}
-                    className="p-1 hover:bg-gray-700 rounded transition-opacity"
-                    title="Toggle all base tables visibility"
-                  >
-                    {!showBase ||
-                    getBaseTables().some(
-                      (t) => tableVisibility.get(t.id) === false
-                    ) ? (
-                      <EyeOff
-                        size={16}
-                        className={showBase ? "text-gray-400" : "text-gray-500"}
-                      />
-                    ) : (
-                      <Eye size={16} className="text-purple-300" />
-                    )}
-                  </button>
-                </div>
-                {showBase && (
-                  <div className="ml-2 space-y-1">
-                    {getBaseTables().map((table) => {
-                      const isVisible = isTableVisible(table.id);
-                      const isTableReallyVisible = showBase && isVisible;
-                      return (
-                        <div
-                          key={table.id}
-                          className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
-                        >
-                          <span className="text-xs text-gray-400 truncate flex-1">
-                            {table.name}
-                          </span>
-                          <button
-                            onClick={() => toggleTableVisibility(table.id)}
-                            className="p-1 hover:bg-gray-700 rounded transition-opacity"
-                            title={
-                              isTableReallyVisible ? "Hide table" : "Show table"
-                            }
-                          >
-                            {isTableReallyVisible ? (
-                              <Eye
-                                size={14}
-                                className={
-                                  showBase ? "text-purple-300" : "text-white"
-                                }
-                              />
-                            ) : (
-                              <EyeOff
-                                size={14}
-                                className={
-                                  showBase ? "text-gray-400" : "text-gray-500"
-                                }
-                              />
-                            )}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
               {/* Modules */}
               <div className="space-y-3">
                 {data.modules.map((module, moduleIndex) => {
@@ -1477,15 +1367,11 @@ function AdvDbView() {
               <div className="absolute inset-0 flex items-center justify-center text-center">
                 <div className="text-gray-500">
                   <p className="text-lg mb-4">
-                    {!showBase && selectedModuleIndices.length === 0
-                      ? "No modules or base selected. Click a button above to view tables."
-                      : showBase && selectedModuleIndices.length === 0
-                      ? "No tables in base"
-                      : !showBase && selectedModuleIndices.length > 0
-                      ? "No tables in selected modules"
-                      : "No tables in base or selected modules"}
+                    {selectedModuleIndices.length === 0
+                      ? "No modules selected. Select a module from the sidebar to view tables."
+                      : "No tables in selected modules"}
                   </p>
-                  {(showBase || selectedModuleIndices.length > 0) && (
+                  {selectedModuleIndices.length > 0 && (
                     <button
                       onClick={addTable}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
