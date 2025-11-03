@@ -1808,6 +1808,31 @@ function AdvDbView() {
 
   return (
     <div className="w-full h-screen bg-gray-900 flex flex-col">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 10px;
+          height: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1f2937;
+          border-radius: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #4b5563;
+          border-radius: 5px;
+          border: 2px solid #1f2937;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #6b7280;
+        }
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          background: #1f2937;
+        }
+      `,
+        }}
+      />
       <div className="bg-gray-950 border-b border-gray-800 p-4 flex-shrink-0 w-full">
         <div className="w-full">
           <div className="mb-4">
@@ -1929,7 +1954,7 @@ function AdvDbView() {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Menu */}
         <div
-          className={`bg-gray-900 border-r border-gray-800 flex-shrink-0 overflow-y-auto transition-all duration-300 ease-in-out ${
+          className={`bg-gray-900 border-r border-gray-800 flex-shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300 ease-in-out ${
             showSidebar ? "w-64 opacity-100" : "w-0 opacity-0 overflow-hidden"
           }`}
         >
@@ -2093,7 +2118,7 @@ function AdvDbView() {
         >
           <div
             ref={scrollContainerRef}
-            className="flex-1 bg-gray-800 relative overflow-auto cursor-move"
+            className="flex-1 bg-gray-800 relative overflow-auto cursor-move custom-scrollbar"
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -2443,7 +2468,7 @@ function AdvDbView() {
                   JSON Configuration
                 </h3>
               </div>
-              <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono">
+              <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono custom-scrollbar">
                 {JSON.stringify(data, null, 2)}
               </pre>
             </>
@@ -2468,7 +2493,7 @@ function AdvDbView() {
             <div className="bg-gray-100 px-3 py-2 border-b border-gray-300">
               <p className="text-xs font-semibold text-gray-700">Select Type</p>
             </div>
-            <div className="max-h-64 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto custom-scrollbar">
               {[
                 "uuid",
                 "string",
