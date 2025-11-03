@@ -1,5 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Trash2, Copy, Download, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Copy,
+  Download,
+  ZoomIn,
+  ZoomOut,
+  Eye,
+  EyeOff,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
 
 interface ForeignKeyInfo {
   tableName: string;
@@ -1289,6 +1300,12 @@ function AdvDbView() {
   );
   const [typeSelector, setTypeSelector] = useState<TypeSelector | null>(null);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
+  const [tableVisibility, setTableVisibility] = useState<Map<string, boolean>>(
+    new Map()
+  );
+  const [expandedModules, setExpandedModules] = useState<Set<number>>(
+    new Set(data.modules.map((_, idx) => idx))
+  );
 
   const resizeStateRef = useRef<{
     isResizing: boolean;
@@ -1304,14 +1321,78 @@ function AdvDbView() {
   // Wrapper holds both tables and SVG, shares the same transform scale
   const transformWrapperRef = useRef<HTMLDivElement>(null);
 
+  const isTableVisible = (tableId: string): boolean => {
+    return tableVisibility.get(tableId) !== false; // Default to true
+  };
+
   const getSelectedTables = (): Table[] => {
     const selectedTables: Table[] = [];
-    if (showBase) selectedTables.push(...data.base);
+    if (showBase) {
+      selectedTables.push(...data.base.filter((t) => isTableVisible(t.id)));
+    }
     selectedModuleIndices.forEach((index) => {
-      if (data.modules[index])
-        selectedTables.push(...data.modules[index].tables);
+      if (data.modules[index]) {
+        selectedTables.push(
+          ...data.modules[index].tables.filter((t) => isTableVisible(t.id))
+        );
+      }
     });
     return selectedTables;
+  };
+
+  const toggleTableVisibility = (tableId: string) => {
+    setTableVisibility((prev) => {
+      const next = new Map(prev);
+      const current = next.get(tableId) !== false;
+      next.set(tableId, !current);
+      return next;
+    });
+  };
+
+  const toggleModuleTables = (moduleIndex: number) => {
+    const module = data.modules[moduleIndex];
+    if (!module) return;
+
+    // Check if any table in module is hidden
+    const hasHidden = module.tables.some(
+      (t) => tableVisibility.get(t.id) === false
+    );
+
+    // If any hidden, show all; otherwise hide all
+    setTableVisibility((prev) => {
+      const next = new Map(prev);
+      module.tables.forEach((t) => {
+        next.set(t.id, hasHidden);
+      });
+      return next;
+    });
+  };
+
+  const toggleBaseTables = () => {
+    // Check if any base table is hidden
+    const hasHidden = data.base.some(
+      (t) => tableVisibility.get(t.id) === false
+    );
+
+    setTableVisibility((prev) => {
+      const next = new Map(prev);
+      data.base.forEach((t) => {
+        next.set(t.id, hasHidden);
+      });
+      return next;
+    });
+  };
+
+  const toggleModuleExpansion = (moduleIndex: number) => {
+    setExpandedModules((prev) => {
+      const next = new Set(prev);
+      if (next.has(moduleIndex)) {
+        next.delete(moduleIndex);
+      } else {
+        next.add(moduleIndex);
+      }
+      return next;
+    });
   };
 
   const currentTables = getSelectedTables();
@@ -1717,8 +1798,8 @@ function AdvDbView() {
 
   return (
     <div className="w-full h-screen bg-gray-900 flex flex-col">
-      <div className="bg-gray-950 border-b border-gray-800 p-4 flex-shrink-0">
-        <div className="max-w-7xl mx-auto">
+      <div className="bg-gray-950 border-b border-gray-800 p-4 flex-shrink-0 w-full">
+        <div className="w-full">
           <div className="mb-4">
             <div className="flex items-baseline gap-4">
               <h1 className="text-3xl font-bold text-white">
@@ -1770,52 +1851,200 @@ function AdvDbView() {
         </div>
       </div>
 
+      {/* Toolbar - spans across both canvas and JSON panel */}
+      <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center flex-shrink-0">
+        <button
+          onClick={addTable}
+          className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
+        >
+          <Plus size={16} /> Add Table
+        </button>
+        <div className="flex gap-2 items-center ml-auto">
+          <button
+            onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
+            className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+            title="Zoom out"
+          >
+            <ZoomOut size={18} />
+          </button>
+          <span className="text-gray-400 text-sm w-12 text-center">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            onClick={() => setZoom(Math.min(2, zoom + 0.1))}
+            className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+            title="Zoom in"
+          >
+            <ZoomIn size={18} />
+          </button>
+          <div className="w-px h-6 bg-gray-600 mx-2" />
+          <button
+            onClick={copyJSON}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+          >
+            <Copy size={16} /> Copy
+          </button>
+          <button
+            onClick={downloadJSON}
+            className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm transition-colors"
+          >
+            <Download size={16} /> Download
+          </button>
+        </div>
+      </div>
+
       <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar Menu */}
+        <div className="bg-gray-900 border-r border-gray-800 w-64 flex-shrink-0 overflow-y-auto">
+          <div className="p-3">
+            <h3 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
+              Tables
+            </h3>
+
+            {/* Base Tables */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1 group">
+                <button
+                  onClick={toggleBaseTables}
+                  className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1 text-left"
+                >
+                  <span>Base Tables</span>
+                </button>
+                <button
+                  onClick={toggleBaseTables}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
+                  title="Toggle all base tables"
+                >
+                  {data.base.some(
+                    (t) => tableVisibility.get(t.id) === false
+                  ) ? (
+                    <EyeOff size={14} className="text-gray-400" />
+                  ) : (
+                    <Eye size={14} className="text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {showBase && (
+                <div className="ml-4 space-y-1">
+                  {data.base.map((table) => {
+                    const isVisible = isTableVisible(table.id);
+                    return (
+                      <div
+                        key={table.id}
+                        className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
+                      >
+                        <span className="text-xs text-gray-500 truncate flex-1">
+                          {table.name}
+                        </span>
+                        <button
+                          onClick={() => toggleTableVisibility(table.id)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                          title={isVisible ? "Hide table" : "Show table"}
+                        >
+                          {isVisible ? (
+                            <Eye size={12} className="text-gray-400" />
+                          ) : (
+                            <EyeOff size={12} className="text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modules */}
+            <div className="space-y-2">
+              {data.modules.map((module, moduleIndex) => {
+                const isExpanded = expandedModules.has(moduleIndex);
+                const moduleTables = module.tables;
+                const hasHiddenInModule = moduleTables.some(
+                  (t) => tableVisibility.get(t.id) === false
+                );
+
+                return (
+                  <div key={moduleIndex} className="mb-2">
+                    <div className="flex items-center justify-between group">
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleModuleExpansion(moduleIndex);
+                          }}
+                          className="p-0 hover:bg-transparent"
+                        >
+                          {isExpanded ? (
+                            <ChevronDown size={14} />
+                          ) : (
+                            <ChevronRight size={14} />
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleModuleTables(moduleIndex);
+                          }}
+                          className="text-left flex-1"
+                        >
+                          {module.moduleName}
+                        </button>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleModuleTables(moduleIndex);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
+                        title="Toggle all module tables"
+                      >
+                        {hasHiddenInModule ? (
+                          <EyeOff size={14} className="text-gray-400" />
+                        ) : (
+                          <Eye size={14} className="text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="ml-6 space-y-1 mt-1">
+                        {moduleTables.map((table) => {
+                          const isVisible = isTableVisible(table.id);
+                          return (
+                            <div
+                              key={table.id}
+                              className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
+                            >
+                              <span className="text-xs text-gray-500 truncate flex-1">
+                                {table.name}
+                              </span>
+                              <button
+                                onClick={() => toggleTableVisibility(table.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                                title={isVisible ? "Hide table" : "Show table"}
+                              >
+                                {isVisible ? (
+                                  <Eye size={12} className="text-gray-400" />
+                                ) : (
+                                  <EyeOff size={12} className="text-gray-400" />
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div
           className="flex-1 flex flex-col overflow-hidden"
           style={{ minWidth: 0 }}
         >
-          <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center flex-shrink-0">
-            <button
-              onClick={addTable}
-              className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
-            >
-              <Plus size={16} /> Add Table
-            </button>
-            <div className="flex gap-2 items-center ml-auto">
-              <button
-                onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
-                className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
-                title="Zoom out"
-              >
-                <ZoomOut size={18} />
-              </button>
-              <span className="text-gray-400 text-sm w-12 text-center">
-                {Math.round(zoom * 100)}%
-              </span>
-              <button
-                onClick={() => setZoom(Math.min(2, zoom + 0.1))}
-                className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
-                title="Zoom in"
-              >
-                <ZoomIn size={18} />
-              </button>
-              <div className="w-px h-6 bg-gray-600 mx-2" />
-              <button
-                onClick={copyJSON}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
-              >
-                <Copy size={16} /> Copy
-              </button>
-              <button
-                onClick={downloadJSON}
-                className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm transition-colors"
-              >
-                <Download size={16} /> Download
-              </button>
-            </div>
-          </div>
-
           <div
             ref={scrollContainerRef}
             className="flex-1 bg-gray-800 relative overflow-auto cursor-move"
