@@ -10,6 +10,10 @@ import {
   EyeOff,
   ChevronRight,
   ChevronDown,
+  PanelLeft,
+  PanelLeftClose,
+  PanelRight,
+  PanelRightClose,
 } from "lucide-react";
 
 interface ForeignKeyInfo {
@@ -1306,6 +1310,8 @@ function AdvDbView() {
   const [expandedModules, setExpandedModules] = useState<Set<number>>(
     new Set(data.modules.map((_, idx) => idx))
   );
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [showJsonPanel, setShowJsonPanel] = useState<boolean>(true);
 
   const resizeStateRef = useRef<{
     isResizing: boolean;
@@ -1890,155 +1896,191 @@ function AdvDbView() {
           >
             <Download size={16} /> Download
           </button>
+          <div className="w-px h-6 bg-gray-600 mx-2" />
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+            title={showSidebar ? "Hide sidebar" : "Show sidebar"}
+          >
+            {showSidebar ? (
+              <PanelLeftClose size={18} />
+            ) : (
+              <PanelLeft size={18} />
+            )}
+          </button>
+          <button
+            onClick={() => setShowJsonPanel(!showJsonPanel)}
+            className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+            title={showJsonPanel ? "Hide JSON panel" : "Show JSON panel"}
+          >
+            {showJsonPanel ? (
+              <PanelRightClose size={18} />
+            ) : (
+              <PanelRight size={18} />
+            )}
+          </button>
         </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Menu */}
-        <div className="bg-gray-900 border-r border-gray-800 w-64 flex-shrink-0 overflow-y-auto">
-          <div className="p-3">
-            <h3 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
-              Tables
-            </h3>
+        <div
+          className={`bg-gray-900 border-r border-gray-800 flex-shrink-0 overflow-y-auto transition-all duration-300 ease-in-out ${
+            showSidebar ? "w-64 opacity-100" : "w-0 opacity-0 overflow-hidden"
+          }`}
+        >
+          {showSidebar && (
+            <div className="p-3">
+              <h3 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
+                Tables
+              </h3>
 
-            {/* Base Tables */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-1 group">
-                <button
-                  onClick={toggleBaseTables}
-                  className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1 text-left"
-                >
-                  <span>Base Tables</span>
-                </button>
-                <button
-                  onClick={toggleBaseTables}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
-                  title="Toggle all base tables"
-                >
-                  {data.base.some(
-                    (t) => tableVisibility.get(t.id) === false
-                  ) ? (
-                    <EyeOff size={14} className="text-gray-400" />
-                  ) : (
-                    <Eye size={14} className="text-gray-400" />
-                  )}
-                </button>
-              </div>
-              {showBase && (
-                <div className="ml-4 space-y-1">
-                  {data.base.map((table) => {
-                    const isVisible = isTableVisible(table.id);
-                    return (
-                      <div
-                        key={table.id}
-                        className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
-                      >
-                        <span className="text-xs text-gray-500 truncate flex-1">
-                          {table.name}
-                        </span>
-                        <button
-                          onClick={() => toggleTableVisibility(table.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
-                          title={isVisible ? "Hide table" : "Show table"}
-                        >
-                          {isVisible ? (
-                            <Eye size={12} className="text-gray-400" />
-                          ) : (
-                            <EyeOff size={12} className="text-gray-400" />
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
+              {/* Base Tables */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1 group">
+                  <button
+                    onClick={toggleBaseTables}
+                    className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1 text-left"
+                  >
+                    <span>Base Tables</span>
+                  </button>
+                  <button
+                    onClick={toggleBaseTables}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
+                    title="Toggle all base tables"
+                  >
+                    {data.base.some(
+                      (t) => tableVisibility.get(t.id) === false
+                    ) ? (
+                      <EyeOff size={14} className="text-gray-400" />
+                    ) : (
+                      <Eye size={14} className="text-gray-400" />
+                    )}
+                  </button>
                 </div>
-              )}
-            </div>
-
-            {/* Modules */}
-            <div className="space-y-2">
-              {data.modules.map((module, moduleIndex) => {
-                const isExpanded = expandedModules.has(moduleIndex);
-                const moduleTables = module.tables;
-                const hasHiddenInModule = moduleTables.some(
-                  (t) => tableVisibility.get(t.id) === false
-                );
-
-                return (
-                  <div key={moduleIndex} className="mb-2">
-                    <div className="flex items-center justify-between group">
-                      <div className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleModuleExpansion(moduleIndex);
-                          }}
-                          className="p-0 hover:bg-transparent"
+                {showBase && (
+                  <div className="ml-4 space-y-1">
+                    {data.base.map((table) => {
+                      const isVisible = isTableVisible(table.id);
+                      return (
+                        <div
+                          key={table.id}
+                          className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
                         >
-                          {isExpanded ? (
-                            <ChevronDown size={14} />
-                          ) : (
-                            <ChevronRight size={14} />
-                          )}
-                        </button>
+                          <span className="text-xs text-gray-500 truncate flex-1">
+                            {table.name}
+                          </span>
+                          <button
+                            onClick={() => toggleTableVisibility(table.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                            title={isVisible ? "Hide table" : "Show table"}
+                          >
+                            {isVisible ? (
+                              <Eye size={12} className="text-gray-400" />
+                            ) : (
+                              <EyeOff size={12} className="text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Modules */}
+              <div className="space-y-2">
+                {data.modules.map((module, moduleIndex) => {
+                  const isExpanded = expandedModules.has(moduleIndex);
+                  const moduleTables = module.tables;
+                  const hasHiddenInModule = moduleTables.some(
+                    (t) => tableVisibility.get(t.id) === false
+                  );
+
+                  return (
+                    <div key={moduleIndex} className="mb-2">
+                      <div className="flex items-center justify-between group">
+                        <div className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleModuleExpansion(moduleIndex);
+                            }}
+                            className="p-0 hover:bg-transparent"
+                          >
+                            {isExpanded ? (
+                              <ChevronDown size={14} />
+                            ) : (
+                              <ChevronRight size={14} />
+                            )}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleModuleTables(moduleIndex);
+                            }}
+                            className="text-left flex-1"
+                          >
+                            {module.moduleName}
+                          </button>
+                        </div>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleModuleTables(moduleIndex);
                           }}
-                          className="text-left flex-1"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
+                          title="Toggle all module tables"
                         >
-                          {module.moduleName}
+                          {hasHiddenInModule ? (
+                            <EyeOff size={14} className="text-gray-400" />
+                          ) : (
+                            <Eye size={14} className="text-gray-400" />
+                          )}
                         </button>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleModuleTables(moduleIndex);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
-                        title="Toggle all module tables"
-                      >
-                        {hasHiddenInModule ? (
-                          <EyeOff size={14} className="text-gray-400" />
-                        ) : (
-                          <Eye size={14} className="text-gray-400" />
-                        )}
-                      </button>
-                    </div>
 
-                    {isExpanded && (
-                      <div className="ml-6 space-y-1 mt-1">
-                        {moduleTables.map((table) => {
-                          const isVisible = isTableVisible(table.id);
-                          return (
-                            <div
-                              key={table.id}
-                              className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
-                            >
-                              <span className="text-xs text-gray-500 truncate flex-1">
-                                {table.name}
-                              </span>
-                              <button
-                                onClick={() => toggleTableVisibility(table.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
-                                title={isVisible ? "Hide table" : "Show table"}
+                      {isExpanded && (
+                        <div className="ml-6 space-y-1 mt-1">
+                          {moduleTables.map((table) => {
+                            const isVisible = isTableVisible(table.id);
+                            return (
+                              <div
+                                key={table.id}
+                                className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
                               >
-                                {isVisible ? (
-                                  <Eye size={12} className="text-gray-400" />
-                                ) : (
-                                  <EyeOff size={12} className="text-gray-400" />
-                                )}
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                                <span className="text-xs text-gray-500 truncate flex-1">
+                                  {table.name}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    toggleTableVisibility(table.id)
+                                  }
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                                  title={
+                                    isVisible ? "Hide table" : "Show table"
+                                  }
+                                >
+                                  {isVisible ? (
+                                    <Eye size={12} className="text-gray-400" />
+                                  ) : (
+                                    <EyeOff
+                                      size={12}
+                                      className="text-gray-400"
+                                    />
+                                  )}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div
@@ -2371,25 +2413,37 @@ function AdvDbView() {
           </div>
         </div>
 
-        <div
-          className="w-1 bg-gray-700 hover:bg-blue-600 cursor-col-resize transition-colors flex-shrink-0 relative group"
-          onMouseDown={handleResizeStart}
-          style={{ cursor: "col-resize" }}
-        >
-          <div className="absolute inset-0 w-full h-full" />
-          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-transparent group-hover:bg-blue-400/20 transition-colors" />
-        </div>
+        {showJsonPanel && (
+          <div
+            className="w-1 bg-gray-700 hover:bg-blue-600 cursor-col-resize transition-colors flex-shrink-0 relative group"
+            onMouseDown={handleResizeStart}
+            style={{ cursor: "col-resize" }}
+          >
+            <div className="absolute inset-0 w-full h-full" />
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-transparent group-hover:bg-blue-400/20 transition-colors" />
+          </div>
+        )}
 
         <div
-          className="bg-gray-950 border-l border-gray-800 flex flex-col flex-shrink-0"
-          style={{ width: `${jsonPanelWidth}px` }}
+          className={`bg-gray-950 border-l border-gray-800 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${
+            showJsonPanel ? "opacity-100" : "w-0 opacity-0 overflow-hidden"
+          }`}
+          style={
+            showJsonPanel ? { width: `${jsonPanelWidth}px` } : { width: "0px" }
+          }
         >
-          <div className="bg-gray-900 p-2 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
-            <h3 className="text-sm font-bold text-white">JSON Configuration</h3>
-          </div>
-          <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono">
-            {JSON.stringify(data, null, 2)}
-          </pre>
+          {showJsonPanel && (
+            <>
+              <div className="bg-gray-900 p-2 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                <h3 className="text-sm font-bold text-white">
+                  JSON Configuration
+                </h3>
+              </div>
+              <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono">
+                {JSON.stringify(data, null, 2)}
+              </pre>
+            </>
+          )}
         </div>
       </div>
 
