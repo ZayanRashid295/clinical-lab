@@ -1315,7 +1315,7 @@ function AdvDbView() {
     new Map()
   );
   const [expandedModules, setExpandedModules] = useState<Set<number>>(
-    new Set(data.modules.map((_, idx) => idx))
+    new Set()
   );
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [showJsonPanel, setShowJsonPanel] = useState<boolean>(true);
