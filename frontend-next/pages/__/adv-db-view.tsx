@@ -1965,30 +1965,34 @@ function AdvDbView() {
               </h3>
 
               {/* Base Tables */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-1 group">
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2 px-2 py-1.5 rounded bg-gray-800/50">
                   <button
-                    onClick={toggleBaseTables}
-                    className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1 text-left"
+                    onClick={() => setShowBase(!showBase)}
+                    className={`flex items-center gap-1 text-base font-normal transition-colors flex-1 text-left ${
+                      showBase
+                        ? "text-purple-300 hover:text-purple-200"
+                        : "text-gray-400 hover:text-gray-300"
+                    }`}
                   >
                     <span>Base Tables</span>
                   </button>
                   <button
                     onClick={toggleBaseTables}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
-                    title="Toggle all base tables"
+                    className="p-1 hover:bg-gray-700 rounded transition-opacity"
+                    title="Toggle all base tables visibility"
                   >
                     {data.base.some(
                       (t) => tableVisibility.get(t.id) === false
                     ) ? (
-                      <EyeOff size={14} className="text-gray-400" />
+                      <EyeOff size={16} className="text-gray-400" />
                     ) : (
-                      <Eye size={14} className="text-gray-400" />
+                      <Eye size={16} className="text-gray-400" />
                     )}
                   </button>
                 </div>
                 {showBase && (
-                  <div className="ml-4 space-y-1">
+                  <div className="ml-2 space-y-1">
                     {data.base.map((table) => {
                       const isVisible = isTableVisible(table.id);
                       return (
@@ -1996,18 +2000,18 @@ function AdvDbView() {
                           key={table.id}
                           className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
                         >
-                          <span className="text-xs text-gray-500 truncate flex-1">
+                          <span className="text-xs text-gray-400 truncate flex-1">
                             {table.name}
                           </span>
                           <button
                             onClick={() => toggleTableVisibility(table.id)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                            className="p-1 hover:bg-gray-700 rounded transition-opacity"
                             title={isVisible ? "Hide table" : "Show table"}
                           >
                             {isVisible ? (
-                              <Eye size={12} className="text-gray-400" />
+                              <Eye size={14} className="text-gray-400" />
                             ) : (
-                              <EyeOff size={12} className="text-gray-400" />
+                              <EyeOff size={14} className="text-gray-400" />
                             )}
                           </button>
                         </div>
@@ -2018,37 +2022,54 @@ function AdvDbView() {
               </div>
 
               {/* Modules */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {data.modules.map((module, moduleIndex) => {
                   const isExpanded = expandedModules.has(moduleIndex);
+                  const isSelected =
+                    selectedModuleIndices.includes(moduleIndex);
                   const moduleTables = module.tables;
                   const hasHiddenInModule = moduleTables.some(
                     (t) => tableVisibility.get(t.id) === false
                   );
 
                   return (
-                    <div key={moduleIndex} className="mb-2">
-                      <div className="flex items-center justify-between group">
-                        <div className="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors flex-1">
+                    <div key={moduleIndex} className="mb-3">
+                      <div className="flex items-center justify-between px-2 py-1.5 rounded bg-gray-800/50">
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleModuleExpansion(moduleIndex);
                             }}
-                            className="p-0 hover:bg-transparent"
+                            className="p-0.5 hover:bg-gray-700 rounded flex-shrink-0"
                           >
                             {isExpanded ? (
-                              <ChevronDown size={14} />
+                              <ChevronDown
+                                size={16}
+                                className="text-gray-400"
+                              />
                             ) : (
-                              <ChevronRight size={14} />
+                              <ChevronRight
+                                size={16}
+                                className="text-gray-400"
+                              />
                             )}
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleModuleTables(moduleIndex);
+                              setSelectedModuleIndices((prev) =>
+                                prev.includes(moduleIndex)
+                                  ? prev.filter((i) => i !== moduleIndex)
+                                  : [...prev, moduleIndex]
+                              );
                             }}
-                            className="text-left flex-1"
+                            className={`text-left flex-1 text-base font-normal transition-colors truncate ${
+                              isSelected
+                                ? "text-blue-300 hover:text-blue-200"
+                                : "text-gray-400 hover:text-gray-300"
+                            }`}
+                            title={isSelected ? "Hide module" : "Show module"}
                           >
                             {module.moduleName}
                           </button>
@@ -2058,19 +2079,19 @@ function AdvDbView() {
                             e.stopPropagation();
                             toggleModuleTables(moduleIndex);
                           }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
-                          title="Toggle all module tables"
+                          className="p-1 hover:bg-gray-700 rounded transition-opacity flex-shrink-0"
+                          title="Toggle all module tables visibility"
                         >
                           {hasHiddenInModule ? (
-                            <EyeOff size={14} className="text-gray-400" />
+                            <EyeOff size={16} className="text-gray-400" />
                           ) : (
-                            <Eye size={14} className="text-gray-400" />
+                            <Eye size={16} className="text-gray-400" />
                           )}
                         </button>
                       </div>
 
                       {isExpanded && (
-                        <div className="ml-6 space-y-1 mt-1">
+                        <div className="ml-4 space-y-1 mt-1.5">
                           {moduleTables.map((table) => {
                             const isVisible = isTableVisible(table.id);
                             return (
@@ -2078,23 +2099,23 @@ function AdvDbView() {
                                 key={table.id}
                                 className="flex items-center justify-between group hover:bg-gray-800 rounded px-2 py-1"
                               >
-                                <span className="text-xs text-gray-500 truncate flex-1">
+                                <span className="text-xs text-gray-400 truncate flex-1">
                                   {table.name}
                                 </span>
                                 <button
                                   onClick={() =>
                                     toggleTableVisibility(table.id)
                                   }
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                                  className="p-1 hover:bg-gray-700 rounded transition-opacity"
                                   title={
                                     isVisible ? "Hide table" : "Show table"
                                   }
                                 >
                                   {isVisible ? (
-                                    <Eye size={12} className="text-gray-400" />
+                                    <Eye size={14} className="text-gray-400" />
                                   ) : (
                                     <EyeOff
-                                      size={12}
+                                      size={14}
                                       className="text-gray-400"
                                     />
                                   )}
