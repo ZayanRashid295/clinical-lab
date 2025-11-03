@@ -1770,7 +1770,11 @@ function AdvDbView() {
     nodes.forEach((el) => {
       const key = el.dataset.anchor as AnchorKey;
       const r = el.getBoundingClientRect();
-      next[key] = { x: r.left - wrapperRect.left, y: r.top - wrapperRect.top };
+      // Convert viewport coordinates to SVG coordinate space (account for zoom)
+      // Since the wrapper is scaled, we need to divide by zoom to get logical coordinates
+      const x = (r.left - wrapperRect.left) / zoom;
+      const y = (r.top - wrapperRect.top) / zoom;
+      next[key] = { x, y };
     });
     setAnchorPoints(next as Record<AnchorKey, Point>);
   };
@@ -1788,7 +1792,7 @@ function AdvDbView() {
     };
     sc.addEventListener("scroll", onScroll);
     return () => sc.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [zoom]);
 
   useEffect(() => {
     const wrapper = transformWrapperRef.current;
@@ -1800,7 +1804,7 @@ function AdvDbView() {
       ro.disconnect();
       window.removeEventListener("resize", measureAnchors);
     };
-  }, []);
+  }, [zoom]);
 
   return (
     <div className="w-full h-screen bg-gray-900 flex flex-col">
