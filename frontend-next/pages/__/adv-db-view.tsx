@@ -1302,6 +1302,13 @@ function AdvDbView() {
   const [dragPreviewPosition, setDragPreviewPosition] = useState<Point | null>(
     null
   );
+  const [isPanning, setIsPanning] = useState<boolean>(false);
+  const [panStart, setPanStart] = useState<{
+    x: number;
+    y: number;
+    scrollLeft: number;
+    scrollTop: number;
+  } | null>(null);
   const [typeSelector, setTypeSelector] = useState<TypeSelector | null>(null);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
   const [tableVisibility, setTableVisibility] = useState<Map<string, boolean>>(
@@ -1326,6 +1333,8 @@ function AdvDbView() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   // Wrapper holds both tables and SVG, shares the same transform scale
   const transformWrapperRef = useRef<HTMLDivElement>(null);
+  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragPreviewPositionRef = useRef<Point | null>(null);
 
   const isTableVisible = (tableId: string): boolean => {
     return tableVisibility.get(tableId) !== false; // Default to true
@@ -1578,30 +1587,132 @@ function AdvDbView() {
     }
   };
 
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    // Only start panning if:
+    // 1. Left mouse button
+    // 2. Not clicking on a table (table drag handler stops propagation)
+    // 3. Not already dragging a table
+    if (e.button !== 0 || draggingTable) return;
+
+    const target = e.target as HTMLElement;
+
+    // Check if clicking on a table - tables have specific styling classes
+    // The table header's onMouseDown stops propagation, but we check here for safety
+    const isOnTable =
+      target.closest(".rounded-lg.shadow-xl") !== null &&
+      (
+        target.closest(".rounded-lg.shadow-xl") as HTMLElement
+      )?.classList.contains("border-2");
+
+    // Allow panning only if not on a table
+    if (isOnTable) return;
+
+    e.preventDefault();
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      setIsPanning(true);
+      setPanStart({
+        x: e.clientX,
+        y: e.clientY,
+        scrollLeft: scrollContainer.scrollLeft,
+        scrollTop: scrollContainer.scrollTop,
+      });
+    }
+  };
+
   const handleMouseDown = (e: React.MouseEvent, tableId: string) => {
     if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
     setDraggingTable(tableId);
     const pos = tablePositions.get(tableId);
-    if (pos) {
-      setDragOffset({
-        x: e.clientX - pos.x * zoom,
-        y: e.clientY - pos.y * zoom,
-      });
+    const scrollContainer = scrollContainerRef.current;
+    if (pos && scrollContainer) {
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const scrollLeft = scrollContainer.scrollLeft;
+      const scrollTop = scrollContainer.scrollTop;
+
+      // With CSS transform scale, scrollLeft/scrollTop are in scaled coordinates
+      // Table logical position is pos.x, but after scale it's pos.x * zoom visually
+      // Screen position = container.left + (logicalX * zoom) - scrollLeft
+      // But scrollLeft is already scaled, so: container.left + logicalX * zoom - scrollLeft
+      const tableScreenX = containerRect.left + pos.x * zoom - scrollLeft;
+      const tableScreenY = containerRect.top + pos.y * zoom - scrollTop;
+
+      // Offset from mouse to table corner (in screen coordinates)
+      dragOffsetRef.current = {
+        x: e.clientX - tableScreenX,
+        y: e.clientY - tableScreenY,
+      };
+
+      dragPreviewPositionRef.current = pos;
+      setDragOffset(dragOffsetRef.current);
       setDragPreviewPosition(pos);
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+
+    // Handle panning
+    if (isPanning && panStart) {
+      e.preventDefault();
+      const scrollContainer = scrollContainerRef.current;
+      const deltaX = panStart.x - e.clientX;
+      const deltaY = panStart.y - e.clientY;
+
+      scrollContainer.scrollLeft = panStart.scrollLeft + deltaX;
+      scrollContainer.scrollTop = panStart.scrollTop + deltaY;
+      return;
+    }
+
+    // Handle table dragging
     if (!draggingTable) return;
-    const newX = (e.clientX - dragOffset.x) / zoom;
-    const newY = (e.clientY - dragOffset.y) / zoom;
-    setDragPreviewPosition({ x: Math.max(0, newX), y: Math.max(0, newY) });
+    e.preventDefault();
+    const scrollContainer = scrollContainerRef.current;
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const scrollLeft = scrollContainer.scrollLeft;
+    const scrollTop = scrollContainer.scrollTop;
+
+    // Mouse position relative to container
+    const mouseXInContainer = e.clientX - containerRect.left;
+    const mouseYInContainer = e.clientY - containerRect.top;
+
+    // Convert to logical coordinates:
+    // Screen position + scroll (which is in scaled coords) gives us position in scaled space
+    // Divide by zoom to get logical coordinates
+    const logicalX = (mouseXInContainer + scrollLeft) / zoom;
+    const logicalY = (mouseYInContainer + scrollTop) / zoom;
+
+    // Apply the offset (convert offset from screen to logical coords)
+    const offsetX = dragOffsetRef.current.x / zoom;
+    const offsetY = dragOffsetRef.current.y / zoom;
+
+    const newX = logicalX - offsetX;
+    const newY = logicalY - offsetY;
+
+    dragPreviewPositionRef.current = {
+      x: Math.max(0, newX),
+      y: Math.max(0, newY),
+    };
+    setDragPreviewPosition(dragPreviewPositionRef.current);
   };
 
   const handleMouseUp = () => {
-    if (!draggingTable || !dragPreviewPosition) {
+    // Handle panning end
+    if (isPanning) {
+      setIsPanning(false);
+      setPanStart(null);
+      return;
+    }
+
+    // Handle table dragging end
+    if (!draggingTable || !dragPreviewPositionRef.current) {
       setDraggingTable(null);
       setDragPreviewPosition(null);
+      setDragOffset({ x: 0, y: 0 });
+      dragOffsetRef.current = { x: 0, y: 0 };
+      dragPreviewPositionRef.current = null;
       return;
     }
 
@@ -1622,7 +1733,7 @@ function AdvDbView() {
       return NUM_COLUMNS - 1;
     };
 
-    const targetColumn = determineColumn(dragPreviewPosition.x);
+    const targetColumn = determineColumn(dragPreviewPositionRef.current.x);
 
     const reorderTables = (tables: Table[]): Table[] => {
       const dragged = tables.find((t) => t.id === draggingTable);
@@ -1637,11 +1748,14 @@ function AdvDbView() {
         });
 
       let insertIndex = 0;
-      for (let i = 0; i < tablesInTarget.length; i++) {
-        const tablePos = tablePositions.get(tablesInTarget[i].id);
-        const tableHeight = estimateTableHeight(tablesInTarget[i]);
-        const tableMidY = (tablePos?.y || 0) + tableHeight / 2;
-        if (dragPreviewPosition.y > tableMidY) insertIndex = i + 1;
+      const previewPos = dragPreviewPositionRef.current;
+      if (previewPos) {
+        for (let i = 0; i < tablesInTarget.length; i++) {
+          const tablePos = tablePositions.get(tablesInTarget[i].id);
+          const tableHeight = estimateTableHeight(tablesInTarget[i]);
+          const tableMidY = (tablePos?.y || 0) + tableHeight / 2;
+          if (previewPos.y > tableMidY) insertIndex = i + 1;
+        }
       }
 
       tablesInTarget.splice(insertIndex, 0, dragged);
@@ -1677,6 +1791,9 @@ function AdvDbView() {
 
     setDraggingTable(null);
     setDragPreviewPosition(null);
+    setDragOffset({ x: 0, y: 0 });
+    dragOffsetRef.current = { x: 0, y: 0 };
+    dragPreviewPositionRef.current = null;
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
@@ -1734,6 +1851,38 @@ function AdvDbView() {
       window.removeEventListener("mouseup", handleGlobalMouseUp);
     };
   }, []);
+
+  // Global mouse events for table dragging and panning
+  useEffect(() => {
+    if (!draggingTable && !isPanning) return;
+
+    const handleGlobalDragMove = (e: MouseEvent) => {
+      handleMouseMove(e);
+    };
+
+    const handleGlobalDragUp = () => {
+      handleMouseUp();
+    };
+
+    // Prevent text selection while dragging or panning
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = isPanning
+      ? "grabbing"
+      : draggingTable
+      ? "grabbing"
+      : "";
+
+    window.addEventListener("mousemove", handleGlobalDragMove);
+    window.addEventListener("mouseup", handleGlobalDragUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleGlobalDragMove);
+      window.removeEventListener("mouseup", handleGlobalDragUp);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draggingTable, isPanning]);
 
   const copyJSON = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -2186,10 +2335,9 @@ function AdvDbView() {
         >
           <div
             ref={scrollContainerRef}
-            className="flex-1 bg-gray-800 relative overflow-auto cursor-move custom-scrollbar"
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            className="flex-1 bg-gray-800 relative overflow-auto custom-scrollbar"
+            onMouseDown={handleCanvasMouseDown}
+            style={{ cursor: isPanning ? "grabbing" : "grab" }}
           >
             {/* Shared transform wrapper for tables and SVG */}
             <div
