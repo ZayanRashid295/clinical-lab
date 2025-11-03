@@ -16,72 +16,17 @@ import {
   PanelRightClose,
 } from "lucide-react";
 
-interface ForeignKeyInfo {
-  tableName: string;
-  columnName: string;
-  relationName?: string;
-  reverseRelationName?: string;
-}
-
-interface Field {
-  id: string;
-  name: string;
-  type: string;
-  primaryKey?: boolean;
-  unique?: boolean;
-  foreignKey?: ForeignKeyInfo;
-}
-
-interface Table {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  column: number;
-  fields: Field[];
-}
-
-interface Module {
-  moduleName: string;
-  tables: Table[];
-}
-
-interface ProjectData {
-  projectName: string;
-  description: string;
-  modules: Module[];
-  base: Table[];
-}
-
-interface TypeSelector {
-  tableId: string;
-  fieldId: string;
-  x: number;
-  y: number;
-}
-
-interface FieldUpdates {
-  name?: string;
-  type?: string;
-  primaryKey?: boolean;
-  unique?: boolean;
-  foreignKey?: ForeignKeyInfo;
-}
-
-type AnchorSide = "left" | "right";
-
-type AnchorKey = `${string}:${string}:${AnchorSide}`;
-
-type Point = { x: number; y: number };
-
-type Connection = {
-  id: string;
-  from: { tableId: string; fieldId: string };
-  to: { tableId: string; fieldId: string };
-  colorClass: string;
-  number: number;
-};
-
+import {
+  ProjectData,
+  Table,
+  Connection,
+  TypeSelector,
+  FieldUpdates,
+  AnchorKey,
+  AnchorSide,
+  Point,
+} from "./db-types/db-model";
+import { initialData } from "./project-db";
 const tableColors = [
   { header: "from-violet-600 to-violet-700", body: "bg-violet-50" },
   { header: "from-cyan-600 to-cyan-700", body: "bg-cyan-50" },
@@ -164,1072 +109,6 @@ function getTableColor(tableId: string) {
   const index = hashToIndex(tableId, tableColors.length);
   return tableColors[index];
 }
-
-const initialData: ProjectData = {
-  projectName: "Clinical Lab System",
-  description:
-    "Clinical laboratory management system with modules for authentication, content, payments, subscriptions, assessments, chat, and notifications",
-  base: [
-    {
-      id: "users",
-      name: "User",
-      x: 0,
-      y: 0,
-      column: 0,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "email", name: "email", type: "string", unique: true },
-        { id: "password", name: "password", type: "string" },
-        { id: "phone", name: "phone", type: "string" },
-        { id: "firstName", name: "firstName", type: "string" },
-        { id: "lastName", name: "lastName", type: "string" },
-        { id: "avatar", name: "avatar", type: "string" },
-        { id: "isActive", name: "isActive", type: "boolean" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "user_settings",
-      name: "UserSettings",
-      x: 0,
-      y: 0,
-      column: 1,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        {
-          id: "userId",
-          name: "userId",
-          type: "string",
-          foreignKey: {
-            tableName: "users",
-            columnName: "id",
-            reverseRelationName: "userSettings",
-          },
-          unique: true,
-        },
-        { id: "language", name: "language", type: "string" },
-        { id: "timezone", name: "timezone", type: "string" },
-        { id: "notifications", name: "notifications", type: "json" },
-        { id: "privacySettings", name: "privacySettings", type: "json" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "roles",
-      name: "Role",
-      x: 0,
-      y: 0,
-      column: 2,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "name", name: "name", type: "string", unique: true },
-        { id: "displayName", name: "displayName", type: "string" },
-        { id: "description", name: "description", type: "string" },
-        { id: "isActive", name: "isActive", type: "boolean" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "permissions",
-      name: "Permission",
-      x: 0,
-      y: 0,
-      column: 3,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "name", name: "name", type: "string", unique: true },
-        { id: "description", name: "description", type: "string" },
-        { id: "resource", name: "resource", type: "string" },
-        { id: "action", name: "action", type: "string" },
-        { id: "isActive", name: "isActive", type: "boolean" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "user_roles",
-      name: "UserRole",
-      x: 0,
-      y: 0,
-      column: 0,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        {
-          id: "userId",
-          name: "userId",
-          type: "string",
-          foreignKey: {
-            tableName: "users",
-            columnName: "id",
-            reverseRelationName: "roles",
-          },
-        },
-        {
-          id: "roleId",
-          name: "roleId",
-          type: "string",
-          foreignKey: {
-            tableName: "roles",
-            columnName: "id",
-            reverseRelationName: "users",
-          },
-        },
-      ],
-    },
-    {
-      id: "user_permissions",
-      name: "UserPermission",
-      x: 0,
-      y: 0,
-      column: 1,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        {
-          id: "userId",
-          name: "userId",
-          type: "string",
-          foreignKey: {
-            tableName: "users",
-            columnName: "id",
-            reverseRelationName: "permissions",
-          },
-        },
-        {
-          id: "permissionId",
-          name: "permissionId",
-          type: "string",
-          foreignKey: {
-            tableName: "permissions",
-            columnName: "id",
-            reverseRelationName: "users",
-          },
-        },
-      ],
-    },
-    {
-      id: "audit_logs",
-      name: "AuditLog",
-      x: 0,
-      y: 0,
-      column: 3,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "userId", name: "userId", type: "string" },
-        { id: "action", name: "action", type: "string" },
-        { id: "resource", name: "resource", type: "string" },
-        { id: "resourceId", name: "resourceId", type: "string" },
-        { id: "details", name: "details", type: "json" },
-        { id: "ipAddress", name: "ipAddress", type: "string" },
-        { id: "userAgent", name: "userAgent", type: "string" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "system_settings",
-      name: "SystemSettings",
-      x: 0,
-      y: 0,
-      column: 0,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "key", name: "key", type: "string", unique: true },
-        { id: "value", name: "value", type: "string" },
-        { id: "type", name: "type", type: "string" },
-        { id: "isActive", name: "isActive", type: "boolean" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "institutions",
-      name: "Institution",
-      x: 0,
-      y: 0,
-      column: 1,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        { id: "name", name: "name", type: "string", unique: true },
-        { id: "description", name: "description", type: "string" },
-        { id: "address", name: "address", type: "string" },
-        { id: "phone", name: "phone", type: "string" },
-        { id: "email", name: "email", type: "string" },
-        { id: "website", name: "website", type: "string" },
-        { id: "isActive", name: "isActive", type: "boolean" },
-        { id: "createdAt", name: "createdAt", type: "timestamp" },
-        { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-      ],
-    },
-    {
-      id: "institution_managers",
-      name: "InstitutionManager",
-      x: 0,
-      y: 0,
-      column: 2,
-      fields: [
-        { id: "id", name: "id", type: "string", primaryKey: true },
-        {
-          id: "userId",
-          name: "userId",
-          type: "string",
-          foreignKey: {
-            tableName: "users",
-            columnName: "id",
-            reverseRelationName: "institutionManager",
-          },
-          unique: true,
-        },
-        {
-          id: "institutionId",
-          name: "institutionId",
-          type: "string",
-          foreignKey: {
-            tableName: "institutions",
-            columnName: "id",
-            reverseRelationName: "managers",
-          },
-        },
-      ],
-    },
-  ],
-  modules: [
-    {
-      moduleName: "Content",
-      tables: [
-        {
-          id: "sections",
-          name: "Section",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "productId",
-              name: "productId",
-              type: "string",
-              foreignKey: {
-                tableName: "products",
-                columnName: "id",
-                reverseRelationName: "sections",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "chapters",
-          name: "Chapter",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "sectionId",
-              name: "sectionId",
-              type: "string",
-              foreignKey: {
-                tableName: "sections",
-                columnName: "id",
-                reverseRelationName: "chapters",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "topics",
-          name: "Topic",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "chapterId",
-              name: "chapterId",
-              type: "string",
-              foreignKey: {
-                tableName: "chapters",
-                columnName: "id",
-                reverseRelationName: "topics",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "questions",
-          name: "Question",
-          x: 0,
-          y: 0,
-          column: 3,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "topicId",
-              name: "topicId",
-              type: "string",
-              foreignKey: {
-                tableName: "topics",
-                columnName: "id",
-                reverseRelationName: "questions",
-              },
-            },
-            {
-              id: "productTagId",
-              name: "productTagId",
-              type: "string",
-              foreignKey: {
-                tableName: "product_tags",
-                columnName: "id",
-                reverseRelationName: "questions",
-              },
-            },
-            { id: "question", name: "question", type: "text" },
-            { id: "explanation", name: "explanation", type: "text" },
-            { id: "difficulty", name: "difficulty", type: "string" },
-            { id: "points", name: "points", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "question_choices",
-          name: "QuestionChoice",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "questionId",
-              name: "questionId",
-              type: "string",
-              foreignKey: {
-                tableName: "questions",
-                columnName: "id",
-                reverseRelationName: "question_choices",
-              },
-            },
-            { id: "text", name: "text", type: "text" },
-            { id: "isCorrect", name: "isCorrect", type: "boolean" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Payment",
-      tables: [
-        {
-          id: "payments",
-          name: "Payment",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            {
-              id: "subscriptionId",
-              name: "subscriptionId",
-              type: "string",
-              foreignKey: {
-                tableName: "subscriptions",
-                columnName: "id",
-                reverseRelationName: "payments",
-              },
-            },
-            { id: "amount", name: "amount", type: "decimal" },
-            { id: "currency", name: "currency", type: "string" },
-            { id: "status", name: "status", type: "enum" },
-            { id: "method", name: "method", type: "enum" },
-            {
-              id: "transactionId",
-              name: "transactionId",
-              type: "string",
-              unique: true,
-            },
-            { id: "gateway", name: "gateway", type: "enum" },
-            { id: "gatewayData", name: "gatewayData", type: "json" },
-            { id: "description", name: "description", type: "string" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "refunds",
-          name: "Refund",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "paymentId",
-              name: "paymentId",
-              type: "string",
-              foreignKey: { tableName: "payments", columnName: "id" },
-            },
-            { id: "amount", name: "amount", type: "decimal" },
-            { id: "reason", name: "reason", type: "string" },
-            { id: "status", name: "status", type: "enum" },
-            { id: "gatewayRefundId", name: "gatewayRefundId", type: "string" },
-            { id: "processedAt", name: "processedAt", type: "timestamp" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "wallets",
-          name: "Wallet",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-              unique: true,
-            },
-            { id: "balance", name: "balance", type: "decimal" },
-            { id: "currency", name: "currency", type: "string" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "wallet_transactions",
-          name: "WalletTransaction",
-          x: 0,
-          y: 0,
-          column: 3,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "walletId",
-              name: "walletId",
-              type: "string",
-              foreignKey: {
-                tableName: "wallets",
-                columnName: "id",
-                reverseRelationName: "transactions",
-              },
-            },
-            {
-              id: "paymentId",
-              name: "paymentId",
-              type: "string",
-              foreignKey: { tableName: "payments", columnName: "id" },
-              unique: true,
-            },
-            { id: "type", name: "type", type: "enum" },
-            { id: "amount", name: "amount", type: "decimal" },
-            { id: "balance", name: "balance", type: "decimal" },
-            { id: "description", name: "description", type: "string" },
-            { id: "reference", name: "reference", type: "string" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "payment_methods",
-          name: "PaymentMethod",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "type", name: "type", type: "enum" },
-            { id: "provider", name: "provider", type: "string" },
-            { id: "providerId", name: "providerId", type: "string" },
-            { id: "isDefault", name: "isDefault", type: "boolean" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "metadata", name: "metadata", type: "json" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "promo_codes",
-          name: "PromoCode",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "code", name: "code", type: "string", unique: true },
-            { id: "description", name: "description", type: "string" },
-            { id: "type", name: "type", type: "enum" },
-            { id: "value", name: "value", type: "decimal" },
-            { id: "minAmount", name: "minAmount", type: "decimal" },
-            { id: "maxDiscount", name: "maxDiscount", type: "decimal" },
-            { id: "usageLimit", name: "usageLimit", type: "integer" },
-            { id: "usedCount", name: "usedCount", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "validFrom", name: "validFrom", type: "timestamp" },
-            { id: "validUntil", name: "validUntil", type: "timestamp" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "promo_code_usages",
-          name: "PromoCodeUsage",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "promoCodeId",
-              name: "promoCodeId",
-              type: "string",
-              foreignKey: {
-                tableName: "promo_codes",
-                columnName: "id",
-                reverseRelationName: "usages",
-              },
-            },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            {
-              id: "paymentId",
-              name: "paymentId",
-              type: "string",
-              foreignKey: { tableName: "payments", columnName: "id" },
-            },
-            { id: "discount", name: "discount", type: "decimal" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Product",
-      tables: [
-        {
-          id: "products",
-          name: "Product",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "name", name: "name", type: "string", unique: true },
-            { id: "description", name: "description", type: "string" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "product_tags",
-          name: "ProductTag",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "name", name: "name", type: "string", unique: true },
-            { id: "description", name: "description", type: "string" },
-            { id: "color", name: "color", type: "string" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "product_subtypes",
-          name: "ProductSubtype",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "productId",
-              name: "productId",
-              type: "string",
-              foreignKey: {
-                tableName: "products",
-                columnName: "id",
-                reverseRelationName: "sections",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Subscription",
-      tables: [
-        {
-          id: "package_features",
-          name: "PackageFeatures",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "name", name: "name", type: "string", unique: true },
-            { id: "description", name: "description", type: "string" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "subscription_packages",
-          name: "SubscriptionPackage",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "productSubtypeId",
-              name: "productSubtypeId",
-              type: "string",
-              foreignKey: {
-                tableName: "product_subtypes",
-                columnName: "id",
-                reverseRelationName: "subscriptionPackages",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "price", name: "price", type: "decimal" },
-            { id: "currency", name: "currency", type: "string" },
-            { id: "validityDays", name: "validityDays", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "subscription_features",
-          name: "SubscriptionFeatures",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "subscriptionPackageId",
-              name: "subscriptionPackageId",
-              type: "string",
-              foreignKey: {
-                tableName: "subscription_packages",
-                columnName: "id",
-              },
-            },
-            {
-              id: "packageFeatureId",
-              name: "packageFeatureId",
-              type: "string",
-              foreignKey: {
-                tableName: "package_features",
-                columnName: "id",
-                reverseRelationName: "subscriptionFeatures",
-              },
-            },
-          ],
-        },
-        {
-          id: "subscriptions",
-          name: "Subscription",
-          x: 0,
-          y: 0,
-          column: 3,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            {
-              id: "subscriptionPackageId",
-              name: "subscriptionPackageId",
-              type: "string",
-              foreignKey: {
-                tableName: "subscription_packages",
-                columnName: "id",
-              },
-            },
-            { id: "status", name: "status", type: "enum" },
-            { id: "startDate", name: "startDate", type: "timestamp" },
-            { id: "endDate", name: "endDate", type: "timestamp" },
-            { id: "autoRenew", name: "autoRenew", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Assessment",
-      tables: [
-        {
-          id: "question_papers",
-          name: "QuestionPaper",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "type", name: "type", type: "string" },
-            { id: "totalQuestions", name: "totalQuestions", type: "integer" },
-            { id: "timeLimit", name: "timeLimit", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "question_paper_questions",
-          name: "QuestionPaperQuestion",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "questionPaperId",
-              name: "questionPaperId",
-              type: "string",
-              foreignKey: {
-                tableName: "question_papers",
-                columnName: "id",
-                reverseRelationName: "questionPaperQuestions",
-              },
-            },
-            {
-              id: "questionId",
-              name: "questionId",
-              type: "string",
-              foreignKey: {
-                tableName: "questions",
-                columnName: "id",
-                reverseRelationName: "question_choices",
-              },
-            },
-            { id: "userAnswer", name: "userAnswer", type: "string" },
-            { id: "isCorrect", name: "isCorrect", type: "boolean" },
-            { id: "timeSpent", name: "timeSpent", type: "integer" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Chat",
-      tables: [
-        {
-          id: "chat_rooms",
-          name: "ChatRoom",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "name", name: "name", type: "string" },
-            { id: "type", name: "type", type: "enum" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "chat_participants",
-          name: "ChatParticipant",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "chatRoomId",
-              name: "chatRoomId",
-              type: "string",
-              foreignKey: { tableName: "chat_rooms", columnName: "id" },
-            },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "role", name: "role", type: "enum" },
-            { id: "joinedAt", name: "joinedAt", type: "timestamp" },
-            { id: "leftAt", name: "leftAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "chat_messages",
-          name: "ChatMessage",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "chatRoomId",
-              name: "chatRoomId",
-              type: "string",
-              foreignKey: { tableName: "chat_rooms", columnName: "id" },
-            },
-            {
-              id: "senderId",
-              name: "senderId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "content", name: "content", type: "text" },
-            { id: "type", name: "type", type: "enum" },
-            { id: "metadata", name: "metadata", type: "json" },
-            { id: "isEdited", name: "isEdited", type: "boolean" },
-            { id: "editedAt", name: "editedAt", type: "timestamp" },
-            { id: "isDeleted", name: "isDeleted", type: "boolean" },
-            { id: "deletedAt", name: "deletedAt", type: "timestamp" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "chat_message_reactions",
-          name: "ChatMessageReaction",
-          x: 0,
-          y: 0,
-          column: 3,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "messageId",
-              name: "messageId",
-              type: "string",
-              foreignKey: {
-                tableName: "chat_messages",
-                columnName: "id",
-                reverseRelationName: "reactions",
-              },
-            },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "emoji", name: "emoji", type: "string" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "chat_read_status",
-          name: "ChatReadStatus",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "chatRoomId",
-              name: "chatRoomId",
-              type: "string",
-              foreignKey: { tableName: "chat_rooms", columnName: "id" },
-            },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            {
-              id: "lastReadMessageId",
-              name: "lastReadMessageId",
-              type: "string",
-            },
-            { id: "lastReadAt", name: "lastReadAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-    {
-      moduleName: "Notification",
-      tables: [
-        {
-          id: "notifications",
-          name: "Notification",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-            },
-            { id: "type", name: "type", type: "enum" },
-            { id: "title", name: "title", type: "string" },
-            { id: "message", name: "message", type: "text" },
-            { id: "data", name: "data", type: "json" },
-            { id: "isRead", name: "isRead", type: "boolean" },
-            { id: "isSent", name: "isSent", type: "boolean" },
-            { id: "sentAt", name: "sentAt", type: "timestamp" },
-            { id: "readAt", name: "readAt", type: "timestamp" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "notification_templates",
-          name: "NotificationTemplate",
-          x: 0,
-          y: 0,
-          column: 1,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "name", name: "name", type: "string", unique: true },
-            { id: "type", name: "type", type: "enum" },
-            { id: "title", name: "title", type: "string" },
-            { id: "message", name: "message", type: "text" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "notification_preferences",
-          name: "NotificationPreference",
-          x: 0,
-          y: 0,
-          column: 2,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "userId",
-              name: "userId",
-              type: "string",
-              foreignKey: { tableName: "users", columnName: "id" },
-              unique: true,
-            },
-            { id: "emailEnabled", name: "emailEnabled", type: "boolean" },
-            { id: "smsEnabled", name: "smsEnabled", type: "boolean" },
-            { id: "pushEnabled", name: "pushEnabled", type: "boolean" },
-            { id: "preferences", name: "preferences", type: "json" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "notification_queue",
-          name: "NotificationQueue",
-          x: 0,
-          y: 0,
-          column: 3,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "userId", name: "userId", type: "string" },
-            { id: "type", name: "type", type: "enum" },
-            { id: "title", name: "title", type: "string" },
-            { id: "message", name: "message", type: "text" },
-            { id: "data", name: "data", type: "json" },
-            { id: "channel", name: "channel", type: "enum" },
-            { id: "status", name: "status", type: "enum" },
-            { id: "priority", name: "priority", type: "integer" },
-            { id: "attempts", name: "attempts", type: "integer" },
-            { id: "maxAttempts", name: "maxAttempts", type: "integer" },
-            { id: "scheduledAt", name: "scheduledAt", type: "timestamp" },
-            { id: "processedAt", name: "processedAt", type: "timestamp" },
-            { id: "failedAt", name: "failedAt", type: "timestamp" },
-            { id: "error", name: "error", type: "string" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
-          id: "notification_logs",
-          name: "NotificationLog",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            { id: "notificationId", name: "notificationId", type: "string" },
-            { id: "userId", name: "userId", type: "string" },
-            { id: "type", name: "type", type: "enum" },
-            { id: "channel", name: "channel", type: "enum" },
-            { id: "status", name: "status", type: "enum" },
-            { id: "provider", name: "provider", type: "string" },
-            { id: "providerId", name: "providerId", type: "string" },
-            { id: "error", name: "error", type: "string" },
-            { id: "sentAt", name: "sentAt", type: "timestamp" },
-            { id: "deliveredAt", name: "deliveredAt", type: "timestamp" },
-            { id: "readAt", name: "readAt", type: "timestamp" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-          ],
-        },
-      ],
-    },
-  ],
-};
 
 function buildConnections(
   currentTables: Table[],
@@ -1340,10 +219,21 @@ function AdvDbView() {
     return tableVisibility.get(tableId) !== false; // Default to true
   };
 
+  const getBaseModuleIndex = (): number => {
+    return data.modules.findIndex((m) => m.moduleName === "Base");
+  };
+
+  const getBaseTables = (): Table[] => {
+    const baseModuleIndex = getBaseModuleIndex();
+    return baseModuleIndex >= 0 ? data.modules[baseModuleIndex].tables : [];
+  };
+
   const getSelectedTables = (): Table[] => {
     const selectedTables: Table[] = [];
     if (showBase) {
-      selectedTables.push(...data.base.filter((t) => isTableVisible(t.id)));
+      selectedTables.push(
+        ...getBaseTables().filter((t) => isTableVisible(t.id))
+      );
     }
     selectedModuleIndices.forEach((index) => {
       if (data.modules[index]) {
@@ -1384,14 +274,15 @@ function AdvDbView() {
   };
 
   const toggleBaseTables = () => {
+    const baseTables = getBaseTables();
     // Check if any base table is hidden
-    const hasHidden = data.base.some(
+    const hasHidden = baseTables.some(
       (t) => tableVisibility.get(t.id) === false
     );
 
     setTableVisibility((prev) => {
       const next = new Map(prev);
-      data.base.forEach((t) => {
+      baseTables.forEach((t) => {
         next.set(t.id, hasHidden);
       });
       return next;
@@ -1411,7 +302,7 @@ function AdvDbView() {
   };
 
   const currentTables = getSelectedTables();
-  const allTables = [...data.base, ...data.modules.flatMap((m) => m.tables)];
+  const allTables = data.modules.flatMap((m) => m.tables);
 
   const estimateTableHeight = (table: Table) => {
     const headerHeight = 40;
@@ -1461,17 +352,13 @@ function AdvDbView() {
   }, [columnHeights]);
 
   const deleteTable = (tableId: string) => {
-    if (showBase) {
-      setData({ ...data, base: data.base.filter((t) => t.id !== tableId) });
-    } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m) => ({
-          ...m,
-          tables: m.tables.filter((t) => t.id !== tableId),
-        })),
-      });
-    }
+    setData({
+      ...data,
+      modules: data.modules.map((m) => ({
+        ...m,
+        tables: m.tables.filter((t) => t.id !== tableId),
+      })),
+    });
   };
 
   const addTable = () => {
@@ -1496,20 +383,22 @@ function AdvDbView() {
       fields: [{ id: "id", name: "ID", type: "uuid", primaryKey: true }],
     };
 
+    let targetModuleIndex: number | undefined;
     if (showBase) {
-      setData({ ...data, base: [...data.base, newTable] });
+      targetModuleIndex = getBaseModuleIndex();
     } else {
-      const targetModuleIndex = selectedModuleIndices[0];
-      if (targetModuleIndex !== undefined) {
-        setData({
-          ...data,
-          modules: data.modules.map((m, idx) =>
-            idx === targetModuleIndex
-              ? { ...m, tables: [...m.tables, newTable] }
-              : m
-          ),
-        });
-      }
+      targetModuleIndex = selectedModuleIndices[0];
+    }
+
+    if (targetModuleIndex !== undefined && targetModuleIndex >= 0) {
+      setData({
+        ...data,
+        modules: data.modules.map((m, idx) =>
+          idx === targetModuleIndex
+            ? { ...m, tables: [...m.tables, newTable] }
+            : m
+        ),
+      });
     }
   };
 
@@ -1531,17 +420,13 @@ function AdvDbView() {
           : t
       );
 
-    if (showBase) {
-      setData({ ...data, base: updateTableFields(data.base, tableId) });
-    } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m) => ({
-          ...m,
-          tables: updateTableFields(m.tables, tableId),
-        })),
-      });
-    }
+    setData({
+      ...data,
+      modules: data.modules.map((m) => ({
+        ...m,
+        tables: updateTableFields(m.tables, tableId),
+      })),
+    });
   };
 
   const deleteColumn = (tableId: string, fieldId: string) => {
@@ -1552,17 +437,13 @@ function AdvDbView() {
           : t
       );
 
-    if (showBase) {
-      setData({ ...data, base: updateTableFields(data.base, tableId) });
-    } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m) => ({
-          ...m,
-          tables: updateTableFields(m.tables, tableId),
-        })),
-      });
-    }
+    setData({
+      ...data,
+      modules: data.modules.map((m) => ({
+        ...m,
+        tables: updateTableFields(m.tables, tableId),
+      })),
+    });
   };
 
   const updateField = (
@@ -1582,17 +463,13 @@ function AdvDbView() {
           : t
       );
 
-    if (showBase) {
-      setData({ ...data, base: updateTableFields(data.base, tableId) });
-    } else {
-      setData({
-        ...data,
-        modules: data.modules.map((m) => ({
-          ...m,
-          tables: updateTableFields(m.tables, tableId),
-        })),
-      });
-    }
+    setData({
+      ...data,
+      modules: data.modules.map((m) => ({
+        ...m,
+        tables: updateTableFields(m.tables, tableId),
+      })),
+    });
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
@@ -1781,20 +658,16 @@ function AdvDbView() {
       return [...otherTables, ...updatedInColumn];
     };
 
-    if (showBase) {
-      setData({ ...data, base: reorderTables(data.base) });
-    } else {
-      const dragged = allTables.find((t) => t.id === draggingTable);
-      if (dragged) {
-        setData({
-          ...data,
-          modules: data.modules.map((m) =>
-            m.tables.some((t) => t.id === draggingTable)
-              ? { ...m, tables: reorderTables(m.tables) }
-              : m
-          ),
-        });
-      }
+    const dragged = allTables.find((t) => t.id === draggingTable);
+    if (dragged) {
+      setData({
+        ...data,
+        modules: data.modules.map((m) =>
+          m.tables.some((t) => t.id === draggingTable)
+            ? { ...m, tables: reorderTables(m.tables) }
+            : m
+        ),
+      });
     }
 
     setDraggingTable(null);
@@ -2111,7 +984,7 @@ function AdvDbView() {
                     title="Toggle all base tables visibility"
                   >
                     {!showBase ||
-                    data.base.some(
+                    getBaseTables().some(
                       (t) => tableVisibility.get(t.id) === false
                     ) ? (
                       <EyeOff
@@ -2125,7 +998,7 @@ function AdvDbView() {
                 </div>
                 {showBase && (
                   <div className="ml-2 space-y-1">
-                    {data.base.map((table) => {
+                    {getBaseTables().map((table) => {
                       const isVisible = isTableVisible(table.id);
                       const isTableReallyVisible = showBase && isVisible;
                       return (
@@ -2464,28 +1337,17 @@ function AdvDbView() {
                                 t.id === tableId ? { ...t, name } : t
                               );
 
-                            if (showBase) {
-                              setData({
-                                ...data,
-                                base: updateTableName(
-                                  data.base,
+                            setData({
+                              ...data,
+                              modules: data.modules.map((m) => ({
+                                ...m,
+                                tables: updateTableName(
+                                  m.tables,
                                   table.id,
                                   e.target.value
                                 ),
-                              });
-                            } else {
-                              setData({
-                                ...data,
-                                modules: data.modules.map((m) => ({
-                                  ...m,
-                                  tables: updateTableName(
-                                    m.tables,
-                                    table.id,
-                                    e.target.value
-                                  ),
-                                })),
-                              });
-                            }
+                              })),
+                            });
                           }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") e.currentTarget.blur();
