@@ -1985,7 +1985,7 @@ function AdvDbView() {
                     {data.base.some(
                       (t) => tableVisibility.get(t.id) === false
                     ) ? (
-                      <EyeOff size={16} className="text-gray-600" />
+                      <EyeOff size={16} className="text-gray-400" />
                     ) : (
                       <Eye size={16} className="text-white" />
                     )}
@@ -2011,7 +2011,7 @@ function AdvDbView() {
                             {isVisible ? (
                               <Eye size={14} className="text-white" />
                             ) : (
-                              <EyeOff size={14} className="text-gray-600" />
+                              <EyeOff size={14} className="text-gray-400" />
                             )}
                           </button>
                         </div>
@@ -2083,7 +2083,7 @@ function AdvDbView() {
                           title="Toggle all module tables visibility"
                         >
                           {hasHiddenInModule ? (
-                            <EyeOff size={16} className="text-gray-600" />
+                            <EyeOff size={16} className="text-gray-400" />
                           ) : (
                             <Eye size={16} className="text-white" />
                           )}
@@ -2116,7 +2116,7 @@ function AdvDbView() {
                                   ) : (
                                     <EyeOff
                                       size={14}
-                                      className="text-gray-600"
+                                      className="text-gray-400"
                                     />
                                   )}
                                 </button>
