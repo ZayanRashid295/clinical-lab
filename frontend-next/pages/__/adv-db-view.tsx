@@ -1985,9 +1985,9 @@ function AdvDbView() {
                     {data.base.some(
                       (t) => tableVisibility.get(t.id) === false
                     ) ? (
-                      <EyeOff size={16} className="text-gray-400" />
+                      <EyeOff size={16} className="text-gray-600" />
                     ) : (
-                      <Eye size={16} className="text-gray-400" />
+                      <Eye size={16} className="text-white" />
                     )}
                   </button>
                 </div>
@@ -2009,9 +2009,9 @@ function AdvDbView() {
                             title={isVisible ? "Hide table" : "Show table"}
                           >
                             {isVisible ? (
-                              <Eye size={14} className="text-gray-400" />
+                              <Eye size={14} className="text-white" />
                             ) : (
-                              <EyeOff size={14} className="text-gray-400" />
+                              <EyeOff size={14} className="text-gray-600" />
                             )}
                           </button>
                         </div>
@@ -2083,9 +2083,9 @@ function AdvDbView() {
                           title="Toggle all module tables visibility"
                         >
                           {hasHiddenInModule ? (
-                            <EyeOff size={16} className="text-gray-400" />
+                            <EyeOff size={16} className="text-gray-600" />
                           ) : (
-                            <Eye size={16} className="text-gray-400" />
+                            <Eye size={16} className="text-white" />
                           )}
                         </button>
                       </div>
@@ -2112,11 +2112,11 @@ function AdvDbView() {
                                   }
                                 >
                                   {isVisible ? (
-                                    <Eye size={14} className="text-gray-400" />
+                                    <Eye size={14} className="text-white" />
                                   ) : (
                                     <EyeOff
                                       size={14}
-                                      className="text-gray-400"
+                                      className="text-gray-600"
                                     />
                                   )}
                                 </button>
