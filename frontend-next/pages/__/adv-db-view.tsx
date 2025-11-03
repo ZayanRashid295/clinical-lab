@@ -1982,12 +1982,16 @@ function AdvDbView() {
                     className="p-1 hover:bg-gray-700 rounded transition-opacity"
                     title="Toggle all base tables visibility"
                   >
-                    {data.base.some(
+                    {!showBase ||
+                    data.base.some(
                       (t) => tableVisibility.get(t.id) === false
                     ) ? (
-                      <EyeOff size={16} className="text-gray-400" />
+                      <EyeOff
+                        size={16}
+                        className={showBase ? "text-gray-400" : "text-gray-500"}
+                      />
                     ) : (
-                      <Eye size={16} className="text-white" />
+                      <Eye size={16} className="text-purple-300" />
                     )}
                   </button>
                 </div>
@@ -1995,6 +1999,7 @@ function AdvDbView() {
                   <div className="ml-2 space-y-1">
                     {data.base.map((table) => {
                       const isVisible = isTableVisible(table.id);
+                      const isTableReallyVisible = showBase && isVisible;
                       return (
                         <div
                           key={table.id}
@@ -2006,12 +2011,24 @@ function AdvDbView() {
                           <button
                             onClick={() => toggleTableVisibility(table.id)}
                             className="p-1 hover:bg-gray-700 rounded transition-opacity"
-                            title={isVisible ? "Hide table" : "Show table"}
+                            title={
+                              isTableReallyVisible ? "Hide table" : "Show table"
+                            }
                           >
-                            {isVisible ? (
-                              <Eye size={14} className="text-white" />
+                            {isTableReallyVisible ? (
+                              <Eye
+                                size={14}
+                                className={
+                                  showBase ? "text-purple-300" : "text-white"
+                                }
+                              />
                             ) : (
-                              <EyeOff size={14} className="text-gray-400" />
+                              <EyeOff
+                                size={14}
+                                className={
+                                  showBase ? "text-gray-400" : "text-gray-500"
+                                }
+                              />
                             )}
                           </button>
                         </div>
@@ -2034,7 +2051,13 @@ function AdvDbView() {
 
                   return (
                     <div key={moduleIndex} className="mb-3">
-                      <div className="flex items-center justify-between px-2 py-1.5 rounded bg-gray-800/50">
+                      <div
+                        className={`flex items-center justify-between px-2 py-1.5 rounded transition-all ${
+                          isSelected
+                            ? "bg-blue-600/30 border border-blue-500/50"
+                            : "bg-gray-800/50"
+                        }`}
+                      >
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
                           <button
                             onClick={(e) => {
@@ -2046,12 +2069,16 @@ function AdvDbView() {
                             {isExpanded ? (
                               <ChevronDown
                                 size={16}
-                                className="text-gray-400"
+                                className={
+                                  isSelected ? "text-blue-300" : "text-gray-400"
+                                }
                               />
                             ) : (
                               <ChevronRight
                                 size={16}
-                                className="text-gray-400"
+                                className={
+                                  isSelected ? "text-blue-300" : "text-gray-400"
+                                }
                               />
                             )}
                           </button>
@@ -2066,7 +2093,7 @@ function AdvDbView() {
                             }}
                             className={`text-left flex-1 text-base font-normal transition-colors truncate ${
                               isSelected
-                                ? "text-blue-300 hover:text-blue-200"
+                                ? "text-blue-300 hover:text-blue-200 font-semibold"
                                 : "text-gray-400 hover:text-gray-300"
                             }`}
                             title={isSelected ? "Hide module" : "Show module"}
@@ -2082,10 +2109,15 @@ function AdvDbView() {
                           className="p-1 hover:bg-gray-700 rounded transition-opacity flex-shrink-0"
                           title="Toggle all module tables visibility"
                         >
-                          {hasHiddenInModule ? (
-                            <EyeOff size={16} className="text-gray-400" />
+                          {!isSelected || hasHiddenInModule ? (
+                            <EyeOff
+                              size={16}
+                              className={
+                                isSelected ? "text-gray-400" : "text-gray-500"
+                              }
+                            />
                           ) : (
-                            <Eye size={16} className="text-white" />
+                            <Eye size={16} className="text-blue-300" />
                           )}
                         </button>
                       </div>
@@ -2094,6 +2126,8 @@ function AdvDbView() {
                         <div className="ml-4 space-y-1 mt-1.5">
                           {moduleTables.map((table) => {
                             const isVisible = isTableVisible(table.id);
+                            const isTableReallyVisible =
+                              isSelected && isVisible;
                             return (
                               <div
                                 key={table.id}
@@ -2108,15 +2142,28 @@ function AdvDbView() {
                                   }
                                   className="p-1 hover:bg-gray-700 rounded transition-opacity"
                                   title={
-                                    isVisible ? "Hide table" : "Show table"
+                                    isTableReallyVisible
+                                      ? "Hide table"
+                                      : "Show table"
                                   }
                                 >
-                                  {isVisible ? (
-                                    <Eye size={14} className="text-white" />
+                                  {isTableReallyVisible ? (
+                                    <Eye
+                                      size={14}
+                                      className={
+                                        isSelected
+                                          ? "text-blue-300"
+                                          : "text-white"
+                                      }
+                                    />
                                   ) : (
                                     <EyeOff
                                       size={14}
-                                      className="text-gray-400"
+                                      className={
+                                        isSelected
+                                          ? "text-gray-400"
+                                          : "text-gray-500"
+                                      }
                                     />
                                   )}
                                 </button>
