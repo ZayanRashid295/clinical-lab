@@ -41,6 +41,7 @@ function OrgChartView() {
   const [debugPanelWidth, setDebugPanelWidth] = useState<number>(400);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
   const [isScrollEnabled, setIsScrollEnabled] = useState<boolean>(true);
+  const [isHorizontalLayout, setIsHorizontalLayout] = useState<boolean>(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,10 @@ function OrgChartView() {
     [data.hierarchy, refreshTrigger]
   );
 
-  const positions = useMemo(() => calculatePositions(flatNodes), [flatNodes]);
+  const positions = useMemo(
+    () => calculatePositions(flatNodes, isHorizontalLayout),
+    [flatNodes, isHorizontalLayout]
+  );
   const connections = useMemo(
     () => buildConnections(flatNodes, positions),
     [flatNodes, positions]
@@ -64,8 +68,8 @@ function OrgChartView() {
 
   // Calculate canvas dimensions
   const { canvasWidth, canvasHeight } = useMemo(
-    () => calculateCanvasDimensions(positions),
-    [positions]
+    () => calculateCanvasDimensions(positions, isHorizontalLayout),
+    [positions, isHorizontalLayout]
   );
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
@@ -240,6 +244,8 @@ function OrgChartView() {
         onToggleJsonPanel={() => setShowJsonPanel(!showJsonPanel)}
         showDebugPanel={showDebugPanel}
         onToggleDebugPanel={handleToggleDebugPanel}
+        isHorizontalLayout={isHorizontalLayout}
+        onToggleLayout={() => setIsHorizontalLayout(!isHorizontalLayout)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -299,6 +305,7 @@ function OrgChartView() {
                 positions={positions}
                 canvasWidth={canvasWidth}
                 canvasHeight={canvasHeight}
+                isHorizontalLayout={isHorizontalLayout}
               />
 
               {/* Nodes */}
@@ -330,6 +337,7 @@ function OrgChartView() {
                     onStartEdit={editState.handleStartEdit}
                     onSaveEdit={editState.handleSaveEdit}
                     onCancelEdit={editState.handleCancelEdit}
+                    isHorizontalLayout={isHorizontalLayout}
                   />
                 );
               })}

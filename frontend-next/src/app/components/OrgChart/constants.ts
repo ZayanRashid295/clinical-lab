@@ -1,8 +1,10 @@
 // Node dimensions and spacing
-export const NODE_WIDTH = 200;
-export const NODE_HEIGHT = 80;
+export const NODE_WIDTH = 320; // Increased width for side-by-side layout
+export const NODE_HEIGHT = 80; // Height for horizontal layout
+export const NODE_HEIGHT_VERTICAL = 100; // Height for vertical layout (increased)
 export const NODE_HORIZONTAL_GAP = 50;
-export const NODE_VERTICAL_GAP = 100;
+export const NODE_VERTICAL_GAP = 30; // Vertical gap for horizontal layout
+export const NODE_VERTICAL_GAP_VERTICAL = 60; // Vertical gap for vertical layout (increased)
 export const LEVEL_START_Y = 100;
 export const CANVAS_PADDING = 100;
 

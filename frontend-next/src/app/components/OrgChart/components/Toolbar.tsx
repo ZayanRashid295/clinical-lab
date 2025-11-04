@@ -11,6 +11,8 @@ import {
   PanelRight,
   PanelRightClose,
   RefreshCw,
+  ArrowRight,
+  ArrowDown,
 } from "lucide-react";
 
 interface ToolbarProps {
@@ -28,6 +30,8 @@ interface ToolbarProps {
   onToggleJsonPanel: () => void;
   showDebugPanel: boolean;
   onToggleDebugPanel: () => void;
+  isHorizontalLayout: boolean;
+  onToggleLayout: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -45,6 +49,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onToggleJsonPanel,
   showDebugPanel,
   onToggleDebugPanel,
+  isHorizontalLayout,
+  onToggleLayout,
 }) => {
   return (
     <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center flex-shrink-0">
@@ -99,6 +105,19 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm transition-colors"
         >
           <Download size={16} /> Download
+        </button>
+        <div className="w-px h-6 bg-gray-600 mx-2" />
+        <button
+          onClick={onToggleLayout}
+          className={`flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors ${
+            isHorizontalLayout
+              ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+              : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+          }`}
+          title={isHorizontalLayout ? "Switch to vertical layout" : "Switch to horizontal layout"}
+        >
+          {isHorizontalLayout ? <ArrowDown size={16} /> : <ArrowRight size={16} />}
+          {isHorizontalLayout ? "Vertical" : "Horizontal"}
         </button>
         <div className="w-px h-6 bg-gray-600 mx-2" />
         <button
