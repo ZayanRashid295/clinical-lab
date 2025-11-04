@@ -398,17 +398,58 @@ function OrgChartView() {
     // Create a custom drag image that respects the zoom level
     const target = e.currentTarget as HTMLElement;
 
-    // Clone the element and scale it according to zoom
+    // Clone the element
     const dragImage = target.cloneNode(true) as HTMLElement;
 
-    // Style the drag image
+    // Function to scale all font sizes and relevant properties recursively
+    const scaleElement = (element: HTMLElement, scale: number) => {
+      // Get computed style
+      const computedStyle = window.getComputedStyle(element);
+
+      // Scale font size
+      const fontSize = parseFloat(computedStyle.fontSize);
+      if (!isNaN(fontSize)) {
+        element.style.fontSize = `${fontSize * scale}px`;
+      }
+
+      // Scale padding
+      const paddingTop = parseFloat(computedStyle.paddingTop);
+      const paddingRight = parseFloat(computedStyle.paddingRight);
+      const paddingBottom = parseFloat(computedStyle.paddingBottom);
+      const paddingLeft = parseFloat(computedStyle.paddingLeft);
+      if (!isNaN(paddingTop))
+        element.style.paddingTop = `${paddingTop * scale}px`;
+      if (!isNaN(paddingRight))
+        element.style.paddingRight = `${paddingRight * scale}px`;
+      if (!isNaN(paddingBottom))
+        element.style.paddingBottom = `${paddingBottom * scale}px`;
+      if (!isNaN(paddingLeft))
+        element.style.paddingLeft = `${paddingLeft * scale}px`;
+
+      // Scale border width
+      const borderWidth = parseFloat(computedStyle.borderWidth);
+      if (!isNaN(borderWidth)) {
+        element.style.borderWidth = `${borderWidth * scale}px`;
+      }
+
+      // Recursively scale children
+      Array.from(element.children).forEach((child) => {
+        if (child instanceof HTMLElement) {
+          scaleElement(child, scale);
+        }
+      });
+    };
+
+    // Apply the original element's computed styles and scale them
+    scaleElement(dragImage, zoom);
+
+    // Set dimensions
+    dragImage.style.width = `${NODE_WIDTH * zoom}px`;
+    dragImage.style.height = `${NODE_HEIGHT * zoom}px`;
     dragImage.style.position = "fixed";
     dragImage.style.left = "-9999px";
     dragImage.style.top = "-9999px";
-    dragImage.style.width = `${NODE_WIDTH * zoom}px`;
-    dragImage.style.height = `${NODE_HEIGHT * zoom}px`;
-    dragImage.style.transform = "none";
-    dragImage.style.opacity = "1";
+    dragImage.style.opacity = "10%";
     dragImage.style.pointerEvents = "none";
     dragImage.style.zIndex = "999999";
 
@@ -418,7 +459,7 @@ function OrgChartView() {
     // Force reflow to ensure element is rendered
     void dragImage.offsetHeight;
 
-    // Set the drag image
+    // Set the drag image - offset needs to account for scale
     const offsetX = (NODE_WIDTH * zoom) / 2;
     const offsetY = (NODE_HEIGHT * zoom) / 2;
     e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
