@@ -65,6 +65,7 @@ import RobotFace from "../components/robotic/RobotFace";
 // Import development components
 import MenuManager from "../components/Development/MenuManager";
 import RefDesign from "../components/Development/ref-design";
+import AdvDbView from "../components/Development/AdvDbView";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -197,6 +198,7 @@ export const transportationContentRegistry: ContentRegistry = {
     // Development routes
     "/development/menu-manager": () => <MenuManager />,
     "/development/ref-design": () => <RefDesign />,
+    "/development/adv-db-view": () => <AdvDbView />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,

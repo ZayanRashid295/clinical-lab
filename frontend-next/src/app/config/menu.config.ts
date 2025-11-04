@@ -371,6 +371,13 @@ export const MENU_CONFIG = {
           path: "/development/ref-design",
           roles: ["ADMIN"],
         },
+        {
+          id: "adv-db-view",
+          label: "Advanced DB Viewer",
+          icon: "🗄️",
+          path: "/development/adv-db-view",
+          roles: ["ADMIN"],
+        },
       ],
     },
   ],

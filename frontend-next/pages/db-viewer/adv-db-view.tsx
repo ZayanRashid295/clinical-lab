@@ -25,8 +25,8 @@ import {
   AnchorKey,
   AnchorSide,
   Point,
-} from "./db-types/db-model";
-import { initialData } from "./project-db";
+} from "@/app/components/DbViewer/db-types/db-model";
+import { initialData } from "@/app/components/DbViewer/project-db";
 const tableColors = [
   { header: "from-violet-600 to-violet-700", body: "bg-violet-50" },
   { header: "from-cyan-600 to-cyan-700", body: "bg-cyan-50" },
