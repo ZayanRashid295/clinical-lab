@@ -269,7 +269,7 @@ function OrgChartView() {
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
   const [dragOverPosition, setDragOverPosition] = useState<
-    "top" | "bottom" | "center"
+    "top" | "bottom" | "left" | "right" | "center"
   >("center");
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [showJsonPanel, setShowJsonPanel] = useState<boolean>(false);
@@ -418,15 +418,29 @@ function OrgChartView() {
     e.stopPropagation();
 
     const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    const width = rect.width;
     const height = rect.height;
 
-    // Determine drop position: top (as sibling before), bottom (as sibling after), or center (as child)
-    if (y < height * 0.3) {
+    // Calculate which region the cursor is in
+    // Use a 25% threshold for edges to make center region larger
+    const edgeThreshold = 0.25;
+
+    // Check vertical position first (above/below)
+    if (y < height * edgeThreshold) {
       setDragOverPosition("top");
-    } else if (y > height * 0.7) {
+    } else if (y > height * (1 - edgeThreshold)) {
       setDragOverPosition("bottom");
-    } else {
+    }
+    // Check horizontal position (left/right)
+    else if (x < width * edgeThreshold) {
+      setDragOverPosition("left");
+    } else if (x > width * (1 - edgeThreshold)) {
+      setDragOverPosition("right");
+    }
+    // Center region (as child)
+    else {
       setDragOverPosition("center");
     }
 
@@ -447,6 +461,97 @@ function OrgChartView() {
       }
     }
     return null;
+  };
+
+  // Function to find node and its siblings at the same level
+  const findNodeAndSiblings = (
+    nodes: OrgChartNode[],
+    nodeId: string
+  ): { parent: OrgChartNode | null; siblings: OrgChartNode[] } | null => {
+    // Check root nodes first
+    const rootIndex = nodes.findIndex((n) => n.id === nodeId);
+    if (rootIndex >= 0) {
+      return { parent: null, siblings: nodes };
+    }
+
+    // Recursively search in children
+    const searchInChildren = (
+      nodeList: OrgChartNode[],
+      currentParent: OrgChartNode | null = null
+    ): { parent: OrgChartNode | null; siblings: OrgChartNode[] } | null => {
+      for (const node of nodeList) {
+        if (node.children) {
+          const index = node.children.findIndex((n) => n.id === nodeId);
+          if (index >= 0) {
+            return { parent: node, siblings: node.children };
+          }
+          const found = searchInChildren(node.children, node);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    return searchInChildren(nodes);
+  };
+
+  // Function to add node as sibling at specific position
+  const addNodeAsSibling = (
+    nodes: OrgChartNode[],
+    targetNodeId: string,
+    nodeToMove: OrgChartNode,
+    position: "before" | "after"
+  ): OrgChartNode[] => {
+    const result = findNodeAndSiblings(nodes, targetNodeId);
+    if (!result) {
+      // If target is not found, add as root sibling
+      return [...nodes, nodeToMove];
+    }
+
+    const { parent, siblings } = result;
+    const targetIndex = siblings.findIndex((n) => n.id === targetNodeId);
+    if (targetIndex < 0) {
+      console.error("Target node not found in siblings array");
+      return nodes;
+    }
+
+    // Make sure we don't add the node if it's already there (shouldn't happen after removal, but safety check)
+    const nodeAlreadyExists = siblings.some((n) => n.id === nodeToMove.id);
+    if (nodeAlreadyExists) {
+      console.warn("Node already exists in siblings, skipping");
+      return nodes;
+    }
+
+    const newSiblings = [...siblings];
+    if (position === "before") {
+      newSiblings.splice(targetIndex, 0, nodeToMove);
+    } else {
+      newSiblings.splice(targetIndex + 1, 0, nodeToMove);
+    }
+
+    if (parent === null) {
+      // Target is root, replace root nodes
+      return newSiblings;
+    } else {
+      // Update parent's children recursively
+      const updateParentChildren = (
+        nodeList: OrgChartNode[]
+      ): OrgChartNode[] => {
+        return nodeList.map((n) => {
+          if (n.id === parent.id) {
+            return { ...n, children: newSiblings };
+          }
+          if (n.children) {
+            return {
+              ...n,
+              children: updateParentChildren(n.children),
+            };
+          }
+          return n;
+        });
+      };
+      return updateParentChildren(nodes);
+    }
   };
 
   const handleDrop = (e: React.DragEvent, targetNodeId: string) => {
@@ -490,38 +595,77 @@ function OrgChartView() {
         : [],
     };
 
-    // Remove node from current location
+    // Remove node from current location FIRST
+    // Deep clone the hierarchy to ensure we're working with a fresh copy
+    const hierarchyBeforeRemoval = JSON.parse(JSON.stringify(data.hierarchy));
     let updatedHierarchy = removeNodeFromHierarchy(
-      data.hierarchy,
+      hierarchyBeforeRemoval,
       draggingNodeId
     );
 
+    // Verify target node still exists after removal
+    const targetStillExists = findNodeInHierarchy(
+      updatedHierarchy,
+      targetNodeId
+    );
+    if (!targetStillExists) {
+      console.error("Target node not found after removal");
+      handleDragEnd();
+      return;
+    }
+
+    // Verify the dragged node was actually removed
+    const draggedNodeStillExists = findNodeInHierarchy(
+      updatedHierarchy,
+      draggingNodeId
+    );
+    if (draggedNodeStillExists) {
+      console.error("Dragged node still exists after removal");
+      handleDragEnd();
+      return;
+    }
+
     // Add node to new location based on drag position
+    let finalHierarchy: OrgChartNode[];
     if (dragOverPosition === "center") {
       // Add as child of target node
-      updatedHierarchy = addNodeToParent(
+      finalHierarchy = addNodeToParent(
         updatedHierarchy,
         targetNodeId,
         nodeToMove
       );
+    } else if (dragOverPosition === "left" || dragOverPosition === "right") {
+      // Add as sibling at same level (left = before, right = after)
+      finalHierarchy = addNodeAsSibling(
+        updatedHierarchy,
+        targetNodeId,
+        nodeToMove,
+        dragOverPosition === "left" ? "before" : "after"
+      );
     } else {
-      // Find target node's parent and add as sibling
-      const parent = findParent(updatedHierarchy, targetNodeId);
-      if (parent) {
-        updatedHierarchy = addNodeToParent(
-          updatedHierarchy,
-          parent.id,
-          nodeToMove
-        );
-      } else {
-        // Target is root, add as root sibling
-        updatedHierarchy = [...updatedHierarchy, nodeToMove];
-      }
+      // Top or bottom: add as sibling (top = before, bottom = after)
+      finalHierarchy = addNodeAsSibling(
+        updatedHierarchy,
+        targetNodeId,
+        nodeToMove,
+        dragOverPosition === "top" ? "before" : "after"
+      );
     }
 
+    // Verify the node was added
+    const nodeWasAdded = findNodeInHierarchy(finalHierarchy, draggingNodeId);
+    if (!nodeWasAdded) {
+      console.error("Node was not added to new location");
+      handleDragEnd();
+      return;
+    }
+
+    // Update state with new hierarchy - create a completely new object to ensure React detects the change
+    // This will trigger recalculation of positions via useMemo dependencies
     setData({
-      ...data,
-      hierarchy: updatedHierarchy,
+      organizationName: data.organizationName,
+      description: data.description,
+      hierarchy: finalHierarchy,
     });
 
     handleDragEnd();
@@ -843,7 +987,10 @@ function OrgChartView() {
                   isDragOver && dragOverPosition === "center";
                 const canDropAsSibling =
                   isDragOver &&
-                  (dragOverPosition === "top" || dragOverPosition === "bottom");
+                  (dragOverPosition === "top" ||
+                    dragOverPosition === "bottom" ||
+                    dragOverPosition === "left" ||
+                    dragOverPosition === "right");
 
                 return (
                   <div key={node.id}>
@@ -858,6 +1005,44 @@ function OrgChartView() {
                             top: `${y - 10}px`,
                             width: `${NODE_WIDTH}px`,
                             height: "4px",
+                            backgroundColor: "#3b82f6",
+                            borderRadius: "2px",
+                            zIndex: 1000,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+
+                    {/* Drop zone indicator - left (as sibling before at same level) */}
+                    {isDragOver &&
+                      dragOverPosition === "left" &&
+                      draggingNodeId !== node.id && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: `${x - 10}px`,
+                            top: `${y}px`,
+                            width: "4px",
+                            height: `${NODE_HEIGHT}px`,
+                            backgroundColor: "#3b82f6",
+                            borderRadius: "2px",
+                            zIndex: 1000,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+
+                    {/* Drop zone indicator - right (as sibling after at same level) */}
+                    {isDragOver &&
+                      dragOverPosition === "right" &&
+                      draggingNodeId !== node.id && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: `${x + NODE_WIDTH + 6}px`,
+                            top: `${y}px`,
+                            width: "4px",
+                            height: `${NODE_HEIGHT}px`,
                             backgroundColor: "#3b82f6",
                             borderRadius: "2px",
                             zIndex: 1000,
