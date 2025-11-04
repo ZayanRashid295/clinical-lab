@@ -10,6 +10,8 @@ import {
   ZoomOut,
   Download,
   Copy,
+  ClipboardPaste,
+  FileEdit,
   PanelLeft,
   PanelLeftClose,
   PanelRight,
@@ -127,6 +129,24 @@ function calculatePositions(
     });
   };
 
+  // Helper to get the actual bounds of a subtree (min and max X)
+  const getSubtreeBounds = (nodeId: string): { minX: number; maxX: number } => {
+    const pos = positions.get(nodeId);
+    if (!pos) return { minX: 0, maxX: 0 };
+    
+    let minX = pos.x;
+    let maxX = pos.x + NODE_WIDTH;
+    
+    const children = hierarchy.get(nodeId) || [];
+    children.forEach((child) => {
+      const childBounds = getSubtreeBounds(child.id);
+      minX = Math.min(minX, childBounds.minX);
+      maxX = Math.max(maxX, childBounds.maxX);
+    });
+    
+    return { minX, maxX };
+  };
+
   // Recursive function to calculate positions
   const calculateNodePosition = (
     nodeId: string,
@@ -157,10 +177,6 @@ function calculatePositions(
       const childPos = calculateNodePosition(children[0].id, level + 1, 0);
 
       // Center the child directly below the parent
-      // Parent center is at: parentX + NODE_WIDTH / 2
-      // Child center should align with parent center
-      // So child left edge should be at: (parentX + NODE_WIDTH / 2) - NODE_WIDTH / 2 = parentX
-      // This means child.left = parent.left, which centers them
       const parentCenterX = parentX + NODE_WIDTH / 2;
       const centeredChildX = parentCenterX - NODE_WIDTH / 2;
 
@@ -172,8 +188,8 @@ function calculatePositions(
         adjustSubtree(children[0].id, offset);
       }
 
-      // For single-child chains, only return NODE_WIDTH to create compact layout
-      // The child's full width is only needed when it actually spreads horizontally
+      // COMPACTION: Always return NODE_WIDTH for single-child nodes
+      // This creates maximum compaction - overlaps will be fixed when positioning siblings
       return {
         x: parentX,
         width: NODE_WIDTH,
@@ -183,30 +199,58 @@ function calculatePositions(
     // Multiple children - calculate positions for all children
     let currentX = startX;
     let totalChildrenWidth = 0;
-    const childPositions: Array<{ x: number; width: number }> = [];
+    const childPositions: Array<{ x: number; width: number; id: string }> = [];
 
+    // First pass: position all children compactly
     children.forEach((child) => {
       const childPos = calculateNodePosition(child.id, level + 1, currentX);
-      childPositions.push(childPos);
-      currentX += childPos.width + NODE_HORIZONTAL_GAP;
-      totalChildrenWidth += childPos.width;
+      childPositions.push({ ...childPos, id: child.id });
+      currentX += NODE_WIDTH + NODE_HORIZONTAL_GAP;
+      totalChildrenWidth += NODE_WIDTH;
     });
+
+    // Second pass: fix overlaps by checking actual bounds and adjusting
+    for (let i = 1; i < childPositions.length; i++) {
+      const prevChild = childPositions[i - 1];
+      const currentChild = childPositions[i];
+      
+      const prevBounds = getSubtreeBounds(prevChild.id);
+      const currentBounds = getSubtreeBounds(currentChild.id);
+      
+      // Check if there's overlap or insufficient gap
+      const actualGap = currentBounds.minX - prevBounds.maxX;
+      const requiredGap = NODE_HORIZONTAL_GAP;
+      
+      if (actualGap < requiredGap) {
+        // Shift this child and all subsequent children
+        const shiftAmount = requiredGap - actualGap;
+        for (let j = i; j < childPositions.length; j++) {
+          adjustSubtree(childPositions[j].id, shiftAmount);
+          childPositions[j].x += shiftAmount;
+        }
+      }
+    }
 
     // Remove last gap
     totalChildrenWidth += (children.length - 1) * NODE_HORIZONTAL_GAP;
 
-    // Position parent in the center of its children
-    const firstChildX = childPositions[0]?.x ?? startX;
-    const lastChildX = childPositions[childPositions.length - 1]?.x ?? startX;
-    const centerX = (firstChildX + lastChildX) / 2;
+    // Position parent in the center of its children based on actual bounds
+    const firstChildBounds = getSubtreeBounds(childPositions[0].id);
+    const lastChildBounds = getSubtreeBounds(childPositions[childPositions.length - 1].id);
+    
+    const actualMinX = firstChildBounds.minX;
+    const actualMaxX = lastChildBounds.maxX;
+    const centerX = (actualMinX + actualMaxX) / 2;
     const x = centerX - NODE_WIDTH / 2;
 
     const y = LEVEL_START_Y + level * (NODE_HEIGHT + NODE_VERTICAL_GAP);
     positions.set(nodeId, { x, y });
 
+    // Return the actual width based on bounds
+    const actualWidth = actualMaxX - actualMinX;
     return {
-      x: firstChildX,
-      width: Math.max(NODE_WIDTH, totalChildrenWidth),
+      x: actualMinX,
+      width: Math.max(NODE_WIDTH, actualWidth),
     };
   };
 
@@ -298,6 +342,8 @@ function OrgChartView() {
     field: "role" | "name";
   } | null>(null);
   const [editValue, setEditValue] = useState<string>("");
+  const [showJsonEditor, setShowJsonEditor] = useState<boolean>(false);
+  const [jsonEditorValue, setJsonEditorValue] = useState<string>("");
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -819,6 +865,67 @@ function OrgChartView() {
     setEditValue("");
   };
 
+  const handlePasteJSON = async () => {
+    try {
+      // Try to read from clipboard
+      const text = await navigator.clipboard.readText();
+      const parsedData = JSON.parse(text);
+
+      // Validate the structure (check if it has hierarchy)
+      if (!parsedData.hierarchy || !Array.isArray(parsedData.hierarchy)) {
+        alert("Invalid JSON format. Must contain a 'hierarchy' array.");
+        return;
+      }
+
+      // Update the data
+      setData({
+        organizationName: parsedData.organizationName || "Organization",
+        description: parsedData.description || "Organizational hierarchy",
+        hierarchy: parsedData.hierarchy,
+      });
+
+      alert("Chart updated successfully!");
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      alert("Failed to parse JSON. Please check the format and try again.");
+    }
+  };
+
+  const handleOpenJsonEditor = () => {
+    setJsonEditorValue(JSON.stringify(data, null, 2));
+    setShowJsonEditor(true);
+  };
+
+  const handleSaveJsonEdit = () => {
+    try {
+      const parsedData = JSON.parse(jsonEditorValue);
+
+      // Validate the structure
+      if (!parsedData.hierarchy || !Array.isArray(parsedData.hierarchy)) {
+        alert("Invalid JSON format. Must contain a 'hierarchy' array.");
+        return;
+      }
+
+      // Update the data
+      setData({
+        organizationName: parsedData.organizationName || "Organization",
+        description: parsedData.description || "Organizational hierarchy",
+        hierarchy: parsedData.hierarchy,
+      });
+
+      setShowJsonEditor(false);
+      alert("Chart updated successfully!");
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      alert("Failed to parse JSON. Please check the format and try again.");
+    }
+  };
+
+  const handleCancelJsonEdit = () => {
+    setShowJsonEditor(false);
+    setJsonEditorValue("");
+  };
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       // Don't pan if dragging a node
@@ -997,6 +1104,20 @@ function OrgChartView() {
             className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
           >
             <Copy size={16} /> Copy
+          </button>
+          <button
+            onClick={handlePasteJSON}
+            className="flex items-center gap-2 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded text-sm transition-colors"
+            title="Paste JSON from clipboard"
+          >
+            <ClipboardPaste size={16} /> Paste
+          </button>
+          <button
+            onClick={handleOpenJsonEditor}
+            className="flex items-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded text-sm transition-colors"
+            title="Edit JSON"
+          >
+            <FileEdit size={16} /> Edit
           </button>
           <button
             onClick={downloadJSON}
@@ -1570,6 +1691,51 @@ function OrgChartView() {
           )}
         </div>
       </div>
+
+      {/* JSON Editor Modal */}
+      {showJsonEditor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+          <div className="bg-gray-900 rounded-lg shadow-2xl border border-gray-700 w-[90%] h-[90%] max-w-6xl max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between rounded-t-lg">
+              <h2 className="text-xl font-bold text-white">Edit JSON</h2>
+              <button
+                onClick={handleCancelJsonEdit}
+                className="text-gray-400 hover:text-white transition-colors"
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Editor */}
+            <div className="flex-1 p-4 overflow-auto">
+              <textarea
+                value={jsonEditorValue}
+                onChange={(e) => setJsonEditorValue(e.target.value)}
+                className="w-full h-full bg-gray-950 text-green-400 p-4 font-mono text-sm rounded border border-gray-700 focus:outline-none focus:border-blue-500 resize-none"
+                spellCheck={false}
+              />
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-800 p-4 border-t border-gray-700 flex gap-3 justify-end rounded-b-lg">
+              <button
+                onClick={handleCancelJsonEdit}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveJsonEdit}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
