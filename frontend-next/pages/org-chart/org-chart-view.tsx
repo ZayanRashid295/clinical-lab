@@ -118,10 +118,10 @@ function calculatePositions(
     if (currentPos) {
       positions.set(nodeId, { ...currentPos, x: currentPos.x + offset });
     }
-    
+
     // Recursively adjust all children
     const children = hierarchy.get(nodeId) || [];
-    children.forEach(child => {
+    children.forEach((child) => {
       adjustSubtree(child.id, offset);
     });
   };
@@ -136,7 +136,7 @@ function calculatePositions(
     if (!node) return { x: startX, width: NODE_WIDTH };
 
     const children = hierarchy.get(nodeId) || [];
-    
+
     if (children.length === 0) {
       // Leaf node - position at startX
       const x = startX;
@@ -154,7 +154,7 @@ function calculatePositions(
 
       // Calculate child subtree width first (recursively, starting at 0)
       const childPos = calculateNodePosition(children[0].id, level + 1, 0);
-      
+
       // Center the child directly below the parent
       // Parent center is at: parentX + NODE_WIDTH / 2
       // Child center should align with parent center
@@ -162,7 +162,7 @@ function calculatePositions(
       // This means child.left = parent.left, which centers them
       const parentCenterX = parentX + NODE_WIDTH / 2;
       const centeredChildX = parentCenterX - NODE_WIDTH / 2;
-      
+
       // Get the child's current position and adjust it
       const childCurrentPos = positions.get(children[0].id);
       if (childCurrentPos) {
@@ -194,8 +194,7 @@ function calculatePositions(
 
     // Position parent in the center of its children
     const firstChildX = childPositions[0]?.x ?? startX;
-    const lastChildX =
-      childPositions[childPositions.length - 1]?.x ?? startX;
+    const lastChildX = childPositions[childPositions.length - 1]?.x ?? startX;
     const centerX = (firstChildX + lastChildX) / 2;
     const x = centerX - NODE_WIDTH / 2;
 
@@ -227,7 +226,7 @@ function calculatePositions(
   // Add padding to ensure we can scroll left if needed
   const leftPadding = CANVAS_PADDING;
   const offset = leftPadding - minX;
-  
+
   // Apply offset to all positions
   positions.forEach((pos, nodeId) => {
     positions.set(nodeId, { ...pos, x: pos.x + offset });
@@ -267,6 +266,11 @@ function OrgChartView() {
     scrollLeft: number;
     scrollTop: number;
   } | null>(null);
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
+  const [dragOverPosition, setDragOverPosition] = useState<
+    "top" | "bottom" | "center"
+  >("center");
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [showJsonPanel, setShowJsonPanel] = useState<boolean>(false);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
@@ -280,10 +284,7 @@ function OrgChartView() {
     [data.hierarchy]
   );
 
-  const positions = useMemo(
-    () => calculatePositions(flatNodes),
-    [flatNodes]
-  );
+  const positions = useMemo(() => calculatePositions(flatNodes), [flatNodes]);
   const connections = useMemo(
     () => buildConnections(flatNodes, positions),
     [flatNodes, positions]
@@ -309,7 +310,8 @@ function OrgChartView() {
   }, [positions]);
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return;
+    // Don't start panning if dragging a node
+    if (e.button !== 0 || draggingNodeId) return;
     e.preventDefault();
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
@@ -323,9 +325,218 @@ function OrgChartView() {
     }
   };
 
+  // Function to find node in hierarchy and remove it
+  const removeNodeFromHierarchy = (
+    nodes: OrgChartNode[],
+    nodeId: string
+  ): OrgChartNode[] => {
+    return nodes
+      .filter((node) => node.id !== nodeId)
+      .map((node) => {
+        if (node.children && node.children.length > 0) {
+          return {
+            ...node,
+            children: removeNodeFromHierarchy(node.children, nodeId),
+          };
+        }
+        return node;
+      });
+  };
+
+  // Function to find node in hierarchy
+  const findNodeInHierarchy = (
+    nodes: OrgChartNode[],
+    nodeId: string
+  ): OrgChartNode | null => {
+    for (const node of nodes) {
+      if (node.id === nodeId) return node;
+      if (node.children) {
+        const found = findNodeInHierarchy(node.children, nodeId);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Function to add node to a parent in hierarchy
+  const addNodeToParent = (
+    nodes: OrgChartNode[],
+    parentId: string | null,
+    node: OrgChartNode
+  ): OrgChartNode[] => {
+    if (parentId === null) {
+      // Add as root node
+      return [...nodes, { ...node, children: [] }];
+    }
+
+    return nodes.map((n) => {
+      if (n.id === parentId) {
+        return {
+          ...n,
+          children: [
+            ...(n.children || []),
+            { ...node, children: node.children || [] },
+          ],
+        };
+      }
+      if (n.children) {
+        return {
+          ...n,
+          children: addNodeToParent(n.children, parentId, node),
+        };
+      }
+      return n;
+    });
+  };
+
+  const handleDragStart = (e: React.DragEvent, nodeId: string) => {
+    e.stopPropagation();
+    setDraggingNodeId(nodeId);
+
+    // Prevent scrolling during drag
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.style.overflow = "hidden";
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggingNodeId(null);
+    setDragOverNodeId(null);
+
+    // Re-enable scrolling after drag
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.style.overflow = "auto";
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, nodeId: string) => {
+    if (!draggingNodeId || draggingNodeId === nodeId) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const height = rect.height;
+
+    // Determine drop position: top (as sibling before), bottom (as sibling after), or center (as child)
+    if (y < height * 0.3) {
+      setDragOverPosition("top");
+    } else if (y > height * 0.7) {
+      setDragOverPosition("bottom");
+    } else {
+      setDragOverPosition("center");
+    }
+
+    setDragOverNodeId(nodeId);
+  };
+
+  // Function to find parent of a node
+  const findParent = (
+    nodes: OrgChartNode[],
+    childId: string,
+    parent: OrgChartNode | null = null
+  ): OrgChartNode | null => {
+    for (const node of nodes) {
+      if (node.id === childId) return parent;
+      if (node.children) {
+        const found = findParent(node.children, childId, node);
+        if (found !== null) return found;
+      }
+    }
+    return null;
+  };
+
+  const handleDrop = (e: React.DragEvent, targetNodeId: string) => {
+    if (!draggingNodeId || draggingNodeId === targetNodeId) return;
+
+    // Prevent dropping on descendants (can't make a node a child of its own descendant)
+    const isDescendant = (
+      ancestorId: string,
+      descendantId: string
+    ): boolean => {
+      const ancestor = findNodeInHierarchy(data.hierarchy, ancestorId);
+      if (!ancestor || !ancestor.children) return false;
+      if (ancestor.children.some((child) => child.id === descendantId))
+        return true;
+      return ancestor.children.some((child) =>
+        isDescendant(child.id, descendantId)
+      );
+    };
+
+    if (isDescendant(draggingNodeId, targetNodeId)) {
+      handleDragEnd();
+      return; // Can't drop on descendant
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const draggedNode = findNodeInHierarchy(data.hierarchy, draggingNodeId);
+    if (!draggedNode) {
+      handleDragEnd();
+      return;
+    }
+
+    // Create a deep copy of the node to move
+    const nodeToMove: OrgChartNode = {
+      id: draggedNode.id,
+      role: draggedNode.role,
+      name: draggedNode.name,
+      children: draggedNode.children
+        ? JSON.parse(JSON.stringify(draggedNode.children))
+        : [],
+    };
+
+    // Remove node from current location
+    let updatedHierarchy = removeNodeFromHierarchy(
+      data.hierarchy,
+      draggingNodeId
+    );
+
+    // Add node to new location based on drag position
+    if (dragOverPosition === "center") {
+      // Add as child of target node
+      updatedHierarchy = addNodeToParent(
+        updatedHierarchy,
+        targetNodeId,
+        nodeToMove
+      );
+    } else {
+      // Find target node's parent and add as sibling
+      const parent = findParent(updatedHierarchy, targetNodeId);
+      if (parent) {
+        updatedHierarchy = addNodeToParent(
+          updatedHierarchy,
+          parent.id,
+          nodeToMove
+        );
+      } else {
+        // Target is root, add as root sibling
+        updatedHierarchy = [...updatedHierarchy, nodeToMove];
+      }
+    }
+
+    setData({
+      ...data,
+      hierarchy: updatedHierarchy,
+    });
+
+    handleDragEnd();
+  };
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!scrollContainerRef.current || !isPanning || !panStart) return;
+      // Don't pan if dragging a node
+      if (
+        !scrollContainerRef.current ||
+        !isPanning ||
+        !panStart ||
+        draggingNodeId
+      )
+        return;
       e.preventDefault();
       const scrollContainer = scrollContainerRef.current;
       const deltaX = panStart.x - e.clientX;
@@ -334,7 +545,7 @@ function OrgChartView() {
       scrollContainer.scrollLeft = panStart.scrollLeft + deltaX;
       scrollContainer.scrollTop = panStart.scrollTop + deltaY;
     },
-    [isPanning, panStart]
+    [isPanning, panStart, draggingNodeId]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -532,7 +743,9 @@ function OrgChartView() {
                       key={node.id}
                       className="p-2 bg-gray-800 rounded text-xs text-gray-400 hover:bg-gray-700 transition-colors"
                     >
-                      <div className="font-semibold text-white">{node.role}</div>
+                      <div className="font-semibold text-white">
+                        {node.role}
+                      </div>
                       <div className="text-gray-400">{node.name}</div>
                       {pos && (
                         <div className="text-gray-500 mt-1">
@@ -584,10 +797,7 @@ function OrgChartView() {
                     refY="5"
                     orient="auto"
                   >
-                    <polygon
-                      points="0,0 10,5 0,10"
-                      fill="#6b7280"
-                    />
+                    <polygon points="0,0 10,5 0,10" fill="#6b7280" />
                   </marker>
                 </defs>
                 {connections.map((conn) => {
@@ -595,15 +805,21 @@ function OrgChartView() {
                   const toPos = positions.get(conn.to);
                   if (!fromPos || !toPos) return null;
 
+                  // Calculate connection points
                   const fromX = fromPos.x + NODE_WIDTH / 2;
                   const fromY = fromPos.y + NODE_HEIGHT;
                   const toX = toPos.x + NODE_WIDTH / 2;
                   const toY = toPos.y;
 
+                  // Create horizontal-vertical path (right-angle)
+                  // Go down from parent, then horizontally to child's x, then down to child
+                  const midY = fromY + (toY - fromY) / 2;
+                  const d = `M ${fromX},${fromY} L ${fromX},${midY} L ${toX},${midY} L ${toX},${toY}`;
+
                   return (
                     <path
                       key={conn.id}
-                      d={`M ${fromX},${fromY} L ${toX},${toY}`}
+                      d={d}
                       fill="none"
                       stroke="#6b7280"
                       strokeWidth={2}
@@ -621,31 +837,105 @@ function OrgChartView() {
                 const nodeColor = getNodeColor(node.id);
                 const x = pos.x;
                 const y = pos.y;
+                const isDragging = draggingNodeId === node.id;
+                const isDragOver = dragOverNodeId === node.id;
+                const canDropAsChild =
+                  isDragOver && dragOverPosition === "center";
+                const canDropAsSibling =
+                  isDragOver &&
+                  (dragOverPosition === "top" || dragOverPosition === "bottom");
 
                 return (
-                  <div
-                    key={node.id}
-                    style={{
-                      position: "absolute",
-                      left: `${x}px`,
-                      top: `${y}px`,
-                      width: `${NODE_WIDTH}px`,
-                      height: `${NODE_HEIGHT}px`,
-                    }}
-                    className="rounded-lg shadow-xl border-2 border-gray-300 overflow-hidden"
-                  >
-                    {/* Role header */}
+                  <div key={node.id}>
+                    {/* Drop zone indicator - top (as sibling before) */}
+                    {isDragOver &&
+                      dragOverPosition === "top" &&
+                      draggingNodeId !== node.id && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: `${x}px`,
+                            top: `${y - 10}px`,
+                            width: `${NODE_WIDTH}px`,
+                            height: "4px",
+                            backgroundColor: "#3b82f6",
+                            borderRadius: "2px",
+                            zIndex: 1000,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+
                     <div
-                      className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 text-center font-bold text-sm`}
+                      draggable
+                      onDragStart={(e) => {
+                        e.stopPropagation();
+                        e.dataTransfer.effectAllowed = "move";
+                        e.dataTransfer.setData("text/plain", node.id);
+                        handleDragStart(e, node.id);
+                      }}
+                      onDragEnd={(e) => {
+                        e.stopPropagation();
+                        handleDragEnd();
+                      }}
+                      onDragOver={(e) => handleDragOver(e, node.id)}
+                      onDrop={(e) => handleDrop(e, node.id)}
+                      onMouseDown={(e) => {
+                        // Prevent canvas panning when clicking on node
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        position: "absolute",
+                        left: `${x}px`,
+                        top: `${y}px`,
+                        width: `${NODE_WIDTH}px`,
+                        height: `${NODE_HEIGHT}px`,
+                        opacity: isDragging ? 0.5 : 1,
+                        cursor: isDragging ? "grabbing" : "grab",
+                        zIndex: isDragging ? 1000 : "auto",
+                      }}
+                      className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all ${
+                        canDropAsChild
+                          ? "border-blue-500 ring-4 ring-blue-300"
+                          : canDropAsSibling
+                          ? "border-blue-400"
+                          : isDragOver
+                          ? "border-blue-300"
+                          : "border-gray-300 hover:border-blue-400"
+                      }`}
                     >
-                      {node.role}
+                      {/* Role header */}
+                      <div
+                        className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 text-center font-bold text-sm`}
+                      >
+                        {node.role}
+                      </div>
+                      {/* Name section */}
+                      <div
+                        className={`${nodeColor.body} p-3 text-center text-sm font-medium text-gray-800`}
+                      >
+                        {node.name}
+                      </div>
                     </div>
-                    {/* Name section */}
-                    <div
-                      className={`${nodeColor.body} p-3 text-center text-sm font-medium text-gray-800`}
-                    >
-                      {node.name}
-                    </div>
+
+                    {/* Drop zone indicator - bottom (as sibling after) */}
+                    {isDragOver &&
+                      dragOverPosition === "bottom" &&
+                      draggingNodeId !== node.id && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: `${x}px`,
+                            top: `${y + NODE_HEIGHT + 6}px`,
+                            width: `${NODE_WIDTH}px`,
+                            height: "4px",
+                            backgroundColor: "#3b82f6",
+                            borderRadius: "2px",
+                            zIndex: 1000,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
                   </div>
                 );
               })}
@@ -690,4 +980,3 @@ function OrgChartView() {
 }
 
 export default OrgChartView;
-
