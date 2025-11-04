@@ -133,17 +133,17 @@ function calculatePositions(
   const getSubtreeBounds = (nodeId: string): { minX: number; maxX: number } => {
     const pos = positions.get(nodeId);
     if (!pos) return { minX: 0, maxX: 0 };
-    
+
     let minX = pos.x;
     let maxX = pos.x + NODE_WIDTH;
-    
+
     const children = hierarchy.get(nodeId) || [];
     children.forEach((child) => {
       const childBounds = getSubtreeBounds(child.id);
       minX = Math.min(minX, childBounds.minX);
       maxX = Math.max(maxX, childBounds.maxX);
     });
-    
+
     return { minX, maxX };
   };
 
@@ -213,14 +213,14 @@ function calculatePositions(
     for (let i = 1; i < childPositions.length; i++) {
       const prevChild = childPositions[i - 1];
       const currentChild = childPositions[i];
-      
+
       const prevBounds = getSubtreeBounds(prevChild.id);
       const currentBounds = getSubtreeBounds(currentChild.id);
-      
+
       // Check if there's overlap or insufficient gap
       const actualGap = currentBounds.minX - prevBounds.maxX;
       const requiredGap = NODE_HORIZONTAL_GAP;
-      
+
       if (actualGap < requiredGap) {
         // Shift this child and all subsequent children
         const shiftAmount = requiredGap - actualGap;
@@ -236,8 +236,10 @@ function calculatePositions(
 
     // Position parent in the center of its children based on actual bounds
     const firstChildBounds = getSubtreeBounds(childPositions[0].id);
-    const lastChildBounds = getSubtreeBounds(childPositions[childPositions.length - 1].id);
-    
+    const lastChildBounds = getSubtreeBounds(
+      childPositions[childPositions.length - 1].id
+    );
+
     const actualMinX = firstChildBounds.minX;
     const actualMaxX = lastChildBounds.maxX;
     const centerX = (actualMinX + actualMaxX) / 2;
