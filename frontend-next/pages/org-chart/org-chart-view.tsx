@@ -295,6 +295,12 @@ function OrgChartView() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
 
+  // Store last valid drop target to enable dropping even when mouse moves away
+  const lastValidDropTarget = useRef<{
+    nodeId: string;
+    position: "top" | "bottom" | "left" | "right" | "center";
+  } | null>(null);
+
   // Flatten hierarchical structure for rendering
   const flatNodes = useMemo(
     () => flattenHierarchy(data.hierarchy),
@@ -447,6 +453,7 @@ function OrgChartView() {
     // Clear drag state but keep releasedNodeId for visual feedback
     setDraggingNodeId(null);
     setDragOverNodeId(null);
+    lastValidDropTarget.current = null;
 
     // Re-enable scrolling after drag using state
     setIsScrollEnabled(true);
@@ -461,6 +468,9 @@ function OrgChartView() {
     // Calculate drop position using shared function
     const position = calculateDropPosition(e);
     setDragOverPosition(position);
+
+    // Store the last valid drop target
+    lastValidDropTarget.current = { nodeId, position };
 
     // Only log snap if it's a different node or different position
     if (dragOverNodeId !== nodeId || dragOverPosition !== position) {
@@ -535,18 +545,25 @@ function OrgChartView() {
     });
   };
 
-  const handleDrop = (e: React.DragEvent, targetNodeId: string) => {
+  const handleDrop = (e: React.DragEvent, targetNodeId?: string) => {
+    // If no targetNodeId provided, use the last valid drop target
+    const actualTargetId = targetNodeId || lastValidDropTarget.current?.nodeId;
+    const dropPosition = targetNodeId
+      ? calculateDropPosition(e)
+      : lastValidDropTarget.current?.position || "center";
+
     // Validate drop conditions
-    if (!draggingNodeId || draggingNodeId === targetNodeId) {
+    if (
+      !draggingNodeId ||
+      !actualTargetId ||
+      draggingNodeId === actualTargetId
+    ) {
       handleDragEnd();
       return;
     }
 
     e.preventDefault();
     e.stopPropagation();
-
-    // Calculate drop position using shared function
-    const dropPosition = calculateDropPosition(e);
     const insertPosition: "before" | "after" | "child" =
       dropPosition === "center"
         ? "child"
@@ -556,7 +573,7 @@ function OrgChartView() {
 
     // Store IDs before clearing state
     const currentDraggingId = draggingNodeId;
-    const currentTargetId = targetNodeId;
+    const currentTargetId = actualTargetId;
 
     // Deep clone the entire structure (like Menu Manager)
     const newHierarchy = JSON.parse(
@@ -1022,6 +1039,18 @@ function OrgChartView() {
                 width: `${canvasWidth}px`,
                 height: `${canvasHeight}px`,
                 minWidth: `${canvasWidth}px`,
+              }}
+              onDragOver={(e) => {
+                // Prevent default to allow drop
+                if (draggingNodeId && lastValidDropTarget.current) {
+                  e.preventDefault();
+                }
+              }}
+              onDrop={(e) => {
+                // Handle drop using last valid target if mouse is not over a node
+                if (draggingNodeId && lastValidDropTarget.current) {
+                  handleDrop(e);
+                }
               }}
             >
               {/* SVG connections overlay */}
