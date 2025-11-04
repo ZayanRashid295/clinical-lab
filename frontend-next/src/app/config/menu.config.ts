@@ -378,6 +378,13 @@ export const MENU_CONFIG = {
           path: "/development/adv-db-view",
           roles: ["ADMIN"],
         },
+        {
+          id: "org-chart",
+          label: "Org Chart",
+          icon: "📊",
+          path: "/development/org-chart",
+          roles: ["ADMIN"],
+        },
       ],
     },
   ],

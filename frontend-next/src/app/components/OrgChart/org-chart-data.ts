@@ -1,0 +1,113 @@
+import { OrgChartData } from "./org-chart-types/org-chart-model";
+
+export const initialOrgData: OrgChartData = {
+  organizationName: "Corporate Organization",
+  description: "Organizational hierarchy with roles and reporting structure",
+  nodes: [
+    {
+      id: "ceo",
+      role: "CEO",
+      name: "Sebastian Bennett",
+      level: 0,
+    },
+    {
+      id: "director1",
+      role: "DIRECTOR",
+      name: "Alfredo Torres",
+      parentId: "ceo",
+      level: 1,
+    },
+    {
+      id: "finance",
+      role: "FINANCE",
+      name: "Donna Stroupe",
+      parentId: "ceo",
+      level: 1,
+    },
+    {
+      id: "marketing",
+      role: "MARKETING",
+      name: "Juliana Silva",
+      parentId: "ceo",
+      level: 1,
+    },
+    {
+      id: "manager1",
+      role: "MANAGER",
+      name: "Phyllis Schwaiger",
+      parentId: "director1",
+      level: 2,
+    },
+    {
+      id: "manager2",
+      role: "MANAGER",
+      name: "Bailey Dupont",
+      parentId: "finance",
+      level: 2,
+    },
+    {
+      id: "manager3",
+      role: "MANAGER",
+      name: "Francois Mercer",
+      parentId: "marketing",
+      level: 2,
+    },
+    {
+      id: "worker1",
+      role: "WORKER",
+      name: "Matt Zhang",
+      parentId: "manager1",
+      level: 3,
+    },
+    {
+      id: "worker2",
+      role: "WORKER",
+      name: "Samira Hadid",
+      parentId: "manager2",
+      level: 3,
+    },
+    {
+      id: "worker3",
+      role: "WORKER",
+      name: "Richard Sanchez",
+      parentId: "manager2",
+      level: 3,
+    },
+    {
+      id: "worker4",
+      role: "WORKER",
+      name: "Kyrie Petrakis",
+      parentId: "manager3",
+      level: 3,
+    },
+    {
+      id: "intern1",
+      role: "INTERN",
+      name: "Murad Naser",
+      parentId: "worker1",
+      level: 4,
+    },
+    {
+      id: "intern2",
+      role: "INTERN",
+      name: "Howard Ong",
+      parentId: "worker2",
+      level: 4,
+    },
+    {
+      id: "intern3",
+      role: "INTERN",
+      name: "Chiaki Sato",
+      parentId: "worker3",
+      level: 4,
+    },
+    {
+      id: "intern4",
+      role: "INTERN",
+      name: "Dani Martinez",
+      parentId: "worker4",
+      level: 4,
+    },
+  ],
+};
+
