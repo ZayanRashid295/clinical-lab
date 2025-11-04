@@ -274,6 +274,18 @@ function OrgChartView() {
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [showJsonPanel, setShowJsonPanel] = useState<boolean>(false);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
+  const [showDebugPanel, setShowDebugPanel] = useState<boolean>(false);
+  const [debugPanelWidth, setDebugPanelWidth] = useState<number>(400);
+  const [debugLog, setDebugLog] = useState<
+    Array<{
+      timestamp: string;
+      sourceNode: string;
+      destinationNode: string;
+      position: string;
+      beforeHierarchy: OrgChartNode[];
+      afterHierarchy: OrgChartNode[];
+    }>
+  >([]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -515,24 +527,41 @@ function OrgChartView() {
     const height = rect.height;
 
     // Calculate which region the cursor is in at drop time
+    // Use the same logic as handleDragOver to ensure consistency
     const edgeThreshold = 0.25;
+    let dropPosition: "top" | "bottom" | "left" | "right" | "center";
     let insertPosition: "before" | "after" | "child";
 
+    // Check vertical position first (above/below)
     if (y < height * edgeThreshold) {
+      dropPosition = "top";
       insertPosition = "before";
     } else if (y > height * (1 - edgeThreshold)) {
+      dropPosition = "bottom";
       insertPosition = "after";
-    } else if (x < width * edgeThreshold) {
+    }
+    // Check horizontal position (left/right)
+    else if (x < width * edgeThreshold) {
+      dropPosition = "left";
       insertPosition = "before";
     } else if (x > width * (1 - edgeThreshold)) {
+      dropPosition = "right";
       insertPosition = "after";
-    } else {
+    }
+    // Center region (as child)
+    else {
+      dropPosition = "center";
       insertPosition = "child";
     }
 
     // Store IDs before clearing state
     const currentDraggingId = draggingNodeId;
     const currentTargetId = targetNodeId;
+
+    // Store before hierarchy for debug
+    const beforeHierarchy = JSON.parse(
+      JSON.stringify(data.hierarchy)
+    ) as OrgChartNode[];
 
     // Deep clone the entire structure (like Menu Manager)
     const newHierarchy = JSON.parse(
@@ -568,11 +597,16 @@ function OrgChartView() {
       return; // Can't drop on descendant
     }
 
-    // Get the dragged item (deep clone)
+    // Get the dragged item (deep clone) - this includes all children recursively
     const draggedPathLast = draggedPath[draggedPath.length - 1];
     const draggedItem = JSON.parse(
       JSON.stringify(draggedPathLast.array[draggedPathLast.index])
     ) as OrgChartNode;
+
+    // Ensure children array exists (even if empty)
+    if (!draggedItem.children) {
+      draggedItem.children = [];
+    }
 
     // Get source and target arrays and indices
     const sourceArray = draggedPathLast.array;
@@ -597,24 +631,48 @@ function OrgChartView() {
       // Add to target's children
       targetArray[targetIndex].children!.push(draggedItem);
     } else {
-      // Add as sibling (before or after)
+      // Add as sibling (before or after) - for left/right/top/bottom
       if (sameArray) {
-        // Same array - remove first, then adjust target index
-        sourceArray.splice(draggedIndex, 1);
-
-        // Adjust target index if we removed an item before it
-        if (draggedIndex < targetIndex) {
-          targetIndex -= 1;
-        }
-
-        // Adjust based on position
+        // Same array - handle carefully to avoid index issues
         if (insertPosition === "after") {
-          targetIndex += 1;
+          // For "after" (right or bottom), we want to insert AFTER the target
+          if (draggedIndex < targetIndex) {
+            // Dragging item is before target
+            // Remove dragged item first
+            sourceArray.splice(draggedIndex, 1);
+            // Target index is now targetIndex - 1, so insert at targetIndex (after original target)
+            targetArray.splice(targetIndex, 0, draggedItem);
+          } else if (draggedIndex > targetIndex) {
+            // Dragging item is after target
+            // Remove dragged item first
+            sourceArray.splice(draggedIndex, 1);
+            // Insert after target (targetIndex + 1)
+            targetArray.splice(targetIndex + 1, 0, draggedItem);
+          } else {
+            // Same index (shouldn't happen due to validation, but handle it)
+            targetArray.splice(targetIndex + 1, 0, draggedItem);
+            sourceArray.splice(draggedIndex, 1);
+          }
+        } else {
+          // "before" (left or top) - insert BEFORE the target
+          if (draggedIndex < targetIndex) {
+            // Dragging item is before target
+            // Remove dragged item first
+            sourceArray.splice(draggedIndex, 1);
+            // Target index is now targetIndex - 1, so insert at targetIndex - 1 (before original target)
+            targetArray.splice(targetIndex - 1, 0, draggedItem);
+          } else if (draggedIndex > targetIndex) {
+            // Dragging item is after target
+            // Remove dragged item first
+            sourceArray.splice(draggedIndex, 1);
+            // Target index doesn't change, insert at targetIndex (before target)
+            targetArray.splice(targetIndex, 0, draggedItem);
+          } else {
+            // Same index (shouldn't happen)
+            targetArray.splice(targetIndex, 0, draggedItem);
+            sourceArray.splice(draggedIndex, 1);
+          }
         }
-        // else insertPosition === "before", targetIndex is already correct
-
-        // Insert at target position
-        targetArray.splice(targetIndex, 0, draggedItem);
       } else {
         // Different arrays - remove from source first
         sourceArray.splice(draggedIndex, 1);
@@ -623,6 +681,7 @@ function OrgChartView() {
         if (insertPosition === "after") {
           targetIndex += 1;
         }
+        // For "before", targetIndex is already correct
 
         // Insert at target position
         targetArray.splice(targetIndex, 0, draggedItem);
@@ -633,15 +692,49 @@ function OrgChartView() {
     // (exactly like Menu Manager does)
     const updatedHierarchy = createNewArrayStructure(newHierarchy);
 
+    // Capture after hierarchy for debug
+    const afterHierarchy = JSON.parse(
+      JSON.stringify(updatedHierarchy)
+    ) as OrgChartNode[];
+
+    // Find node names for debug display
+    const sourceNode = findNodeInHierarchy(beforeHierarchy, currentDraggingId);
+    const destNode = findNodeInHierarchy(beforeHierarchy, currentTargetId);
+
+    // Add debug log entry
+    setDebugLog((prevLog) => [
+      {
+        timestamp: new Date().toLocaleTimeString(),
+        sourceNode: sourceNode
+          ? `${sourceNode.name} (${currentDraggingId})`
+          : `${currentDraggingId}`,
+        destinationNode: destNode
+          ? `${destNode.name} (${currentTargetId})`
+          : `${currentTargetId}`,
+        position: dropPosition,
+        beforeHierarchy,
+        afterHierarchy,
+      },
+      ...prevLog.slice(0, 49), // Keep last 50 entries
+    ]);
+
     // Clear drag state first (before state update)
     handleDragEnd();
 
-    // Update state with new hierarchy using functional update to ensure we have latest state
-    setData((prevData) => ({
-      organizationName: prevData.organizationName,
-      description: prevData.description,
-      hierarchy: updatedHierarchy,
-    }));
+    // Update state with new hierarchy - this will trigger:
+    // 1. flatNodes recalculation (via useMemo dependency on data.hierarchy)
+    // 2. positions recalculation (via useMemo dependency on flatNodes)
+    // 3. connections recalculation (via useMemo dependency on flatNodes and positions)
+    // 4. Component re-render with new positions
+    // 5. JSON panel will automatically update since it displays data
+    setData((prevData) => {
+      // Create a completely new object to ensure React detects the change
+      return {
+        organizationName: prevData.organizationName,
+        description: prevData.description,
+        hierarchy: updatedHierarchy,
+      };
+    });
   };
 
   const handleMouseMove = useCallback(
@@ -713,16 +806,24 @@ function OrgChartView() {
     URL.revokeObjectURL(url);
   };
 
-  const handleResizeStart = (e: React.MouseEvent) => {
+  const handleResizeStart = (
+    e: React.MouseEvent,
+    panelType: "json" | "debug"
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     const startX = e.clientX;
-    const startWidth = jsonPanelWidth;
+    const startWidth = panelType === "json" ? jsonPanelWidth : debugPanelWidth;
 
     const handleMouseMove = (e: MouseEvent) => {
       const deltaX = startX - e.clientX;
       const newWidth = startWidth + deltaX;
-      setJsonPanelWidth(Math.max(250, Math.min(800, newWidth)));
+      const clampedWidth = Math.max(250, Math.min(800, newWidth));
+      if (panelType === "json") {
+        setJsonPanelWidth(clampedWidth);
+      } else {
+        setDebugPanelWidth(clampedWidth);
+      }
     };
 
     const handleMouseUp = () => {
@@ -836,6 +937,22 @@ function OrgChartView() {
             ) : (
               <PanelRight size={18} />
             )}
+          </button>
+          <button
+            onClick={() => {
+              setShowDebugPanel(!showDebugPanel);
+              if (showJsonPanel && showDebugPanel) {
+                setShowJsonPanel(false);
+              }
+            }}
+            className={`p-2 rounded transition-colors ${
+              showDebugPanel
+                ? "bg-purple-600 hover:bg-purple-700 text-white"
+                : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+            }`}
+            title={showDebugPanel ? "Hide Debug panel" : "Show Debug panel"}
+          >
+            🐛
           </button>
         </div>
       </div>
@@ -1096,13 +1213,24 @@ function OrgChartView() {
         {showJsonPanel && (
           <div
             className="w-1 bg-gray-700 hover:bg-blue-600 cursor-col-resize flex-shrink-0 relative group"
-            onMouseDown={handleResizeStart}
+            onMouseDown={(e) => handleResizeStart(e, "json")}
             style={{ cursor: "col-resize" }}
           >
             <div className="absolute inset-0 w-full h-full" />
           </div>
         )}
 
+        {showDebugPanel && (
+          <div
+            className="w-1 bg-gray-700 hover:bg-purple-600 cursor-col-resize flex-shrink-0 relative group"
+            onMouseDown={(e) => handleResizeStart(e, "debug")}
+            style={{ cursor: "col-resize" }}
+          >
+            <div className="absolute inset-0 w-full h-full" />
+          </div>
+        )}
+
+        {/* JSON Panel */}
         <div
           className={`bg-gray-950 border-l border-gray-800 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${
             showJsonPanel ? "opacity-100" : "w-0 opacity-0 overflow-hidden"
@@ -1121,6 +1249,89 @@ function OrgChartView() {
               <pre className="flex-1 bg-gray-900 text-green-400 p-3 overflow-auto text-xs font-mono custom-scrollbar">
                 {JSON.stringify(data, null, 2)}
               </pre>
+            </>
+          )}
+        </div>
+
+        {/* Debug Panel */}
+        <div
+          className={`bg-gray-950 border-l border-gray-800 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${
+            showDebugPanel ? "opacity-100" : "w-0 opacity-0 overflow-hidden"
+          }`}
+          style={
+            showDebugPanel
+              ? { width: `${debugPanelWidth}px` }
+              : { width: "0px" }
+          }
+        >
+          {showDebugPanel && (
+            <>
+              <div className="bg-gray-900 p-2 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                <h3 className="text-sm font-bold text-white">Debug Log</h3>
+                <button
+                  onClick={() => setDebugLog([])}
+                  className="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                  title="Clear debug log"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="flex-1 bg-gray-900 text-gray-300 p-3 overflow-auto text-xs font-mono custom-scrollbar">
+                {debugLog.length === 0 ? (
+                  <div className="text-gray-500 italic">
+                    No debug entries yet. Drag and drop nodes to see debug info.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {debugLog.map((entry, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-700 rounded p-3 bg-gray-800"
+                      >
+                        <div className="text-purple-400 font-bold mb-2">
+                          [{entry.timestamp}]
+                        </div>
+                        <div className="space-y-1 mb-3">
+                          <div>
+                            <span className="text-blue-400">Source:</span>{" "}
+                            <span className="text-white">
+                              {entry.sourceNode}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-green-400">Destination:</span>{" "}
+                            <span className="text-white">
+                              {entry.destinationNode}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-yellow-400">Position:</span>{" "}
+                            <span className="text-white font-bold">
+                              {entry.position}
+                            </span>
+                          </div>
+                        </div>
+                        <details className="mt-2">
+                          <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
+                            View Before Hierarchy
+                          </summary>
+                          <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
+                            {JSON.stringify(entry.beforeHierarchy, null, 2)}
+                          </pre>
+                        </details>
+                        <details className="mt-2">
+                          <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
+                            View After Hierarchy
+                          </summary>
+                          <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
+                            {JSON.stringify(entry.afterHierarchy, null, 2)}
+                          </pre>
+                        </details>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
