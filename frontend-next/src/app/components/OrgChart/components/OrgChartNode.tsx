@@ -162,7 +162,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({
               : "grab",
           zIndex: isDragging ? 1000 : "auto",
         }}
-        className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all relative ${
+        className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all relative flex flex-col ${
           canDropAsChild
             ? "border-blue-500 ring-4 ring-blue-300"
             : canDropAsSibling
@@ -213,7 +213,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({
 
         {/* Name section */}
         <div
-          className={`${nodeColor.body} p-3 text-center text-[17.5px] font-medium text-gray-800 flex items-center justify-center`}
+          className={`${nodeColor.body} flex-1 flex items-center justify-center text-center text-[17.5px] font-medium text-gray-800 px-3`}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "name", node.name);
