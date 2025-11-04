@@ -2,16 +2,13 @@ interface OrgChartNode {
   id: string;
   role: string;
   name: string;
-  parentId?: string;
-  x?: number;
-  y?: number;
-  level?: number;
+  children?: OrgChartNode[];
 }
 
 interface OrgChartData {
   organizationName: string;
   description: string;
-  nodes: OrgChartNode[];
+  hierarchy: OrgChartNode[];
 }
 
 type Point = { x: number; y: number };
@@ -22,5 +19,13 @@ type Connection = {
   to: string;
 };
 
-export type { OrgChartNode, OrgChartData, Point, Connection };
+type FlatNode = {
+  id: string;
+  role: string;
+  name: string;
+  parentId?: string;
+  level: number;
+};
+
+export type { OrgChartNode, OrgChartData, Point, Connection, FlatNode };
 

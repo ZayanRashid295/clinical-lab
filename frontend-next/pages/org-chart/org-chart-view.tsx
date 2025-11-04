@@ -20,6 +20,7 @@ import {
   OrgChartNode,
   Point,
   Connection,
+  FlatNode,
 } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
 import { initialOrgData } from "@/app/components/OrgChart/org-chart-data";
 
@@ -62,9 +63,34 @@ function getNodeColor(nodeId: string) {
   return nodeColors[index];
 }
 
-function buildHierarchy(nodes: OrgChartNode[]): Map<string, OrgChartNode[]> {
-  const hierarchy = new Map<string, OrgChartNode[]>();
+// Flatten hierarchical structure to flat nodes with parentId and level
+function flattenHierarchy(
+  nodes: OrgChartNode[],
+  parentId?: string,
+  level: number = 0
+): FlatNode[] {
+  const flatNodes: FlatNode[] = [];
   nodes.forEach((node) => {
+    const flatNode: FlatNode = {
+      id: node.id,
+      role: node.role,
+      name: node.name,
+      parentId,
+      level,
+    };
+    flatNodes.push(flatNode);
+    if (node.children && node.children.length > 0) {
+      const childNodes = flattenHierarchy(node.children, node.id, level + 1);
+      flatNodes.push(...childNodes);
+    }
+  });
+  return flatNodes;
+}
+
+// Build hierarchy map from flat nodes
+function buildHierarchyMap(flatNodes: FlatNode[]): Map<string, FlatNode[]> {
+  const hierarchy = new Map<string, FlatNode[]>();
+  flatNodes.forEach((node) => {
     const parentId = node.parentId || "root";
     if (!hierarchy.has(parentId)) {
       hierarchy.set(parentId, []);
@@ -75,15 +101,15 @@ function buildHierarchy(nodes: OrgChartNode[]): Map<string, OrgChartNode[]> {
 }
 
 function calculatePositions(
-  nodes: OrgChartNode[]
+  flatNodes: FlatNode[]
 ): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
-  const hierarchy = buildHierarchy(nodes);
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const hierarchy = buildHierarchyMap(flatNodes);
+  const nodeMap = new Map(flatNodes.map((n) => [n.id, n]));
 
-  // Find root node
-  const rootNode = nodes.find((n) => !n.parentId);
-  if (!rootNode) return positions;
+  // Find root nodes (nodes without parentId)
+  const rootNodes = flatNodes.filter((n) => !n.parentId);
+  if (rootNodes.length === 0) return positions;
 
   // Recursive function to calculate positions
   const calculateNodePosition = (
@@ -135,8 +161,12 @@ function calculatePositions(
     };
   };
 
-  // Calculate from root
-  calculateNodePosition(rootNode.id, 0, 0);
+  // Calculate from all root nodes
+  let totalRootWidth = 0;
+  rootNodes.forEach((rootNode) => {
+    const rootPos = calculateNodePosition(rootNode.id, 0, totalRootWidth);
+    totalRootWidth += rootPos.width + NODE_HORIZONTAL_GAP;
+  });
 
   // Center the entire tree
   let minX = Infinity;
@@ -155,11 +185,11 @@ function calculatePositions(
 }
 
 function buildConnections(
-  nodes: OrgChartNode[],
+  flatNodes: FlatNode[],
   positions: Map<string, { x: number; y: number }>
 ): Connection[] {
   const connections: Connection[] = [];
-  nodes.forEach((node) => {
+  flatNodes.forEach((node) => {
     if (node.parentId) {
       const fromPos = positions.get(node.parentId);
       const toPos = positions.get(node.id);
@@ -192,10 +222,19 @@ function OrgChartView() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
 
-  const positions = useMemo(() => calculatePositions(data.nodes), [data.nodes]);
+  // Flatten hierarchical structure for rendering
+  const flatNodes = useMemo(
+    () => flattenHierarchy(data.hierarchy),
+    [data.hierarchy]
+  );
+
+  const positions = useMemo(
+    () => calculatePositions(flatNodes),
+    [flatNodes]
+  );
   const connections = useMemo(
-    () => buildConnections(data.nodes, positions),
-    [data.nodes, positions]
+    () => buildConnections(flatNodes, positions),
+    [flatNodes, positions]
   );
 
   // Calculate canvas dimensions
@@ -340,7 +379,7 @@ function OrgChartView() {
                 {data.organizationName}
               </h1>
               <span className="text-lg font-semibold text-blue-400">
-                {data.nodes.length} {data.nodes.length === 1 ? "node" : "nodes"}
+                {flatNodes.length} {flatNodes.length === 1 ? "node" : "nodes"}
               </span>
             </div>
             <p className="text-gray-400 mt-2">{data.description}</p>
@@ -420,7 +459,7 @@ function OrgChartView() {
                 Organization
               </h3>
               <div className="space-y-2">
-                {data.nodes.map((node) => {
+                {flatNodes.map((node) => {
                   const pos = positions.get(node.id);
                   return (
                     <div
@@ -431,7 +470,7 @@ function OrgChartView() {
                       <div className="text-gray-400">{node.name}</div>
                       {pos && (
                         <div className="text-gray-500 mt-1">
-                          Level {node.level ?? 0}
+                          Level {node.level}
                         </div>
                       )}
                     </div>
@@ -509,7 +548,7 @@ function OrgChartView() {
               </svg>
 
               {/* Nodes */}
-              {data.nodes.map((node) => {
+              {flatNodes.map((node) => {
                 const pos = positions.get(node.id);
                 if (!pos) return null;
 
