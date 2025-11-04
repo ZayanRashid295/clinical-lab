@@ -14,6 +14,7 @@ import {
   PanelLeftClose,
   PanelRight,
   PanelRightClose,
+  RefreshCw,
 } from "lucide-react";
 import {
   OrgChartData,
@@ -271,6 +272,7 @@ function OrgChartView() {
   const [dragOverPosition, setDragOverPosition] = useState<
     "top" | "bottom" | "left" | "right" | "center"
   >("center");
+  const [releasedNodeId, setReleasedNodeId] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [showJsonPanel, setShowJsonPanel] = useState<boolean>(false);
   const [jsonPanelWidth, setJsonPanelWidth] = useState<number>(400);
@@ -279,13 +281,15 @@ function OrgChartView() {
   const [debugLog, setDebugLog] = useState<
     Array<{
       timestamp: string;
-      sourceNode: string;
-      destinationNode: string;
-      position: string;
-      beforeHierarchy: OrgChartNode[];
-      afterHierarchy: OrgChartNode[];
+      type: "drag-start" | "snap" | "release";
+      sourceNode?: string;
+      destinationNode?: string;
+      position?: string;
+      beforeHierarchy?: OrgChartNode[];
+      afterHierarchy?: OrgChartNode[];
     }>
   >([]);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -293,7 +297,7 @@ function OrgChartView() {
   // Flatten hierarchical structure for rendering
   const flatNodes = useMemo(
     () => flattenHierarchy(data.hierarchy),
-    [data.hierarchy]
+    [data.hierarchy, refreshTrigger]
   );
 
   const positions = useMemo(() => calculatePositions(flatNodes), [flatNodes]);
@@ -405,6 +409,19 @@ function OrgChartView() {
     e.stopPropagation();
     setDraggingNodeId(nodeId);
 
+    // Find node for debug display
+    const sourceNode = findNodeInHierarchy(data.hierarchy, nodeId);
+
+    // Add debug log entry for drag start
+    setDebugLog((prevLog) => [
+      {
+        timestamp: new Date().toLocaleTimeString(),
+        type: "drag-start",
+        sourceNode: sourceNode ? `${sourceNode.name} (${nodeId})` : nodeId,
+      },
+      ...prevLog.slice(0, 49), // Keep last 50 entries
+    ]);
+
     // Prevent scrolling during drag
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
@@ -413,6 +430,7 @@ function OrgChartView() {
   };
 
   const handleDragEnd = () => {
+    // Clear drag state but keep releasedNodeId for visual feedback
     setDraggingNodeId(null);
     setDragOverNodeId(null);
 
@@ -438,22 +456,48 @@ function OrgChartView() {
     // Calculate which region the cursor is in
     // Use a 25% threshold for edges to make center region larger
     const edgeThreshold = 0.25;
+    let position: "top" | "bottom" | "left" | "right" | "center";
 
     // Check vertical position first (above/below)
     if (y < height * edgeThreshold) {
+      position = "top";
       setDragOverPosition("top");
     } else if (y > height * (1 - edgeThreshold)) {
+      position = "bottom";
       setDragOverPosition("bottom");
     }
     // Check horizontal position (left/right)
     else if (x < width * edgeThreshold) {
+      position = "left";
       setDragOverPosition("left");
     } else if (x > width * (1 - edgeThreshold)) {
+      position = "right";
       setDragOverPosition("right");
     }
     // Center region (as child)
     else {
+      position = "center";
       setDragOverPosition("center");
+    }
+
+    // Only log snap if it's a different node or different position
+    if (dragOverNodeId !== nodeId || dragOverPosition !== position) {
+      const sourceNode = findNodeInHierarchy(data.hierarchy, draggingNodeId);
+      const destNode = findNodeInHierarchy(data.hierarchy, nodeId);
+
+      // Add debug log entry for snap
+      setDebugLog((prevLog) => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: "snap",
+          sourceNode: sourceNode
+            ? `${sourceNode.name} (${draggingNodeId})`
+            : draggingNodeId,
+          destinationNode: destNode ? `${destNode.name} (${nodeId})` : nodeId,
+          position,
+        },
+        ...prevLog.slice(0, 49), // Keep last 50 entries
+      ]);
     }
 
     setDragOverNodeId(nodeId);
@@ -701,10 +745,11 @@ function OrgChartView() {
     const sourceNode = findNodeInHierarchy(beforeHierarchy, currentDraggingId);
     const destNode = findNodeInHierarchy(beforeHierarchy, currentTargetId);
 
-    // Add debug log entry
+    // Add debug log entry for release
     setDebugLog((prevLog) => [
       {
         timestamp: new Date().toLocaleTimeString(),
+        type: "release",
         sourceNode: sourceNode
           ? `${sourceNode.name} (${currentDraggingId})`
           : `${currentDraggingId}`,
@@ -718,8 +763,16 @@ function OrgChartView() {
       ...prevLog.slice(0, 49), // Keep last 50 entries
     ]);
 
+    // Set released node for visual feedback (green strip)
+    setReleasedNodeId(currentTargetId);
+
     // Clear drag state first (before state update)
     handleDragEnd();
+
+    // Clear released indicator after a short delay
+    setTimeout(() => {
+      setReleasedNodeId(null);
+    }, 2000);
 
     // Update state with new hierarchy - this will trigger:
     // 1. flatNodes recalculation (via useMemo dependency on data.hierarchy)
@@ -884,9 +937,16 @@ function OrgChartView() {
 
       {/* Toolbar */}
       <div className="bg-gray-800 border-b border-gray-700 p-3 flex gap-3 items-center flex-shrink-0">
+        <button
+          onClick={() => setRefreshTrigger((prev) => prev + 1)}
+          className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
+          title="Refresh view"
+        >
+          <RefreshCw size={16} /> Refresh
+        </button>
         <div className="flex gap-2 items-center ml-auto">
           <button
-            onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
+            onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
             className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
             title="Zoom out"
           >
@@ -1060,6 +1120,7 @@ function OrgChartView() {
                 const y = pos.y;
                 const isDragging = draggingNodeId === node.id;
                 const isDragOver = dragOverNodeId === node.id;
+                const isReleased = releasedNodeId === node.id;
                 const canDropAsChild =
                   isDragOver && dragOverPosition === "center";
                 const canDropAsSibling =
@@ -1068,6 +1129,16 @@ function OrgChartView() {
                     dragOverPosition === "bottom" ||
                     dragOverPosition === "left" ||
                     dragOverPosition === "right");
+
+                // Determine side strip color
+                let sideStripColor = "";
+                if (isDragging) {
+                  sideStripColor = "bg-blue-500"; // Blue for drag start
+                } else if (isDragOver) {
+                  sideStripColor = "bg-gray-400"; // Grey for snap
+                } else if (isReleased) {
+                  sideStripColor = "bg-green-500"; // Green for release
+                }
 
                 return (
                   <div key={node.id}>
@@ -1161,7 +1232,7 @@ function OrgChartView() {
                         cursor: isDragging ? "grabbing" : "grab",
                         zIndex: isDragging ? 1000 : "auto",
                       }}
-                      className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all ${
+                      className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all relative ${
                         canDropAsChild
                           ? "border-blue-500 ring-4 ring-blue-300"
                           : canDropAsSibling
@@ -1171,6 +1242,12 @@ function OrgChartView() {
                           : "border-gray-300 hover:border-blue-400"
                       }`}
                     >
+                      {/* Side strip indicator */}
+                      {sideStripColor && (
+                        <div
+                          className={`absolute left-0 top-0 bottom-0 w-1 ${sideStripColor} z-10`}
+                        />
+                      )}
                       {/* Role header */}
                       <div
                         className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 text-center font-bold text-sm`}
@@ -1283,52 +1360,106 @@ function OrgChartView() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {debugLog.map((entry, index) => (
-                      <div
-                        key={index}
-                        className="border border-gray-700 rounded p-3 bg-gray-800"
-                      >
-                        <div className="text-purple-400 font-bold mb-2">
-                          [{entry.timestamp}]
+                    {debugLog.map((entry, index) => {
+                      // Determine side strip color based on type
+                      let sideStripColor = "";
+                      let typeLabel = "";
+                      let typeColor = "";
+                      if (entry.type === "drag-start") {
+                        sideStripColor = "bg-blue-500";
+                        typeLabel = "DRAG START";
+                        typeColor = "text-blue-400";
+                      } else if (entry.type === "snap") {
+                        sideStripColor = "bg-gray-400";
+                        typeLabel = "SNAP";
+                        typeColor = "text-gray-400";
+                      } else if (entry.type === "release") {
+                        sideStripColor = "bg-green-500";
+                        typeLabel = "RELEASE";
+                        typeColor = "text-green-400";
+                      }
+
+                      return (
+                        <div
+                          key={index}
+                          className="border border-gray-700 rounded p-3 bg-gray-800 relative overflow-hidden"
+                        >
+                          {/* Side strip indicator */}
+                          {sideStripColor && (
+                            <div
+                              className={`absolute left-0 top-0 bottom-0 w-1 ${sideStripColor}`}
+                            />
+                          )}
+                          <div className="ml-2">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span
+                                className={`${typeColor} font-bold text-sm`}
+                              >
+                                [{entry.timestamp}] {typeLabel}
+                              </span>
+                            </div>
+                            <div className="space-y-1 mb-3">
+                              {entry.sourceNode && (
+                                <div>
+                                  <span className="text-blue-400">Source:</span>{" "}
+                                  <span className="text-white">
+                                    {entry.sourceNode}
+                                  </span>
+                                </div>
+                              )}
+                              {entry.destinationNode && (
+                                <div>
+                                  <span className="text-green-400">
+                                    Destination:
+                                  </span>{" "}
+                                  <span className="text-white">
+                                    {entry.destinationNode}
+                                  </span>
+                                </div>
+                              )}
+                              {entry.position && (
+                                <div>
+                                  <span className="text-yellow-400">
+                                    Position:
+                                  </span>{" "}
+                                  <span className="text-white font-bold">
+                                    {entry.position}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            {entry.beforeHierarchy && (
+                              <details className="mt-2">
+                                <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
+                                  View Before Hierarchy
+                                </summary>
+                                <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
+                                  {JSON.stringify(
+                                    entry.beforeHierarchy,
+                                    null,
+                                    2
+                                  )}
+                                </pre>
+                              </details>
+                            )}
+                            {entry.afterHierarchy && (
+                              <details className="mt-2">
+                                <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
+                                  View After Hierarchy
+                                </summary>
+                                <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
+                                  {JSON.stringify(
+                                    entry.afterHierarchy,
+                                    null,
+                                    2
+                                  )}
+                                </pre>
+                              </details>
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1 mb-3">
-                          <div>
-                            <span className="text-blue-400">Source:</span>{" "}
-                            <span className="text-white">
-                              {entry.sourceNode}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-green-400">Destination:</span>{" "}
-                            <span className="text-white">
-                              {entry.destinationNode}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-yellow-400">Position:</span>{" "}
-                            <span className="text-white font-bold">
-                              {entry.position}
-                            </span>
-                          </div>
-                        </div>
-                        <details className="mt-2">
-                          <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
-                            View Before Hierarchy
-                          </summary>
-                          <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
-                            {JSON.stringify(entry.beforeHierarchy, null, 2)}
-                          </pre>
-                        </details>
-                        <details className="mt-2">
-                          <summary className="text-cyan-400 cursor-pointer hover:text-cyan-300">
-                            View After Hierarchy
-                          </summary>
-                          <pre className="mt-2 text-green-400 text-xs overflow-auto max-h-40">
-                            {JSON.stringify(entry.afterHierarchy, null, 2)}
-                          </pre>
-                        </details>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
