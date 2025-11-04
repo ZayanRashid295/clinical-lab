@@ -172,9 +172,11 @@ function calculatePositions(
         adjustSubtree(children[0].id, offset);
       }
 
+      // For single-child chains, only return NODE_WIDTH to create compact layout
+      // The child's full width is only needed when it actually spreads horizontally
       return {
         x: parentX,
-        width: Math.max(NODE_WIDTH, childPos.width),
+        width: NODE_WIDTH,
       };
     }
 
