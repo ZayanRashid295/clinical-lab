@@ -1,11 +1,28 @@
 // Node dimensions and spacing
-export const NODE_WIDTH = 320; // Width for vertical layout
+export const NODE_WIDTH_VERTICAL = 220; // Width for vertical layout
+export const NODE_HEIGHT_VERTICAL = 120; // Height for vertical layout (increased)
+
 export const NODE_WIDTH_HORIZONTAL = 450; // Width for horizontal layout (increased)
-export const NODE_HEIGHT = 80; // Height for horizontal layout
-export const NODE_HEIGHT_VERTICAL = 100; // Height for vertical layout (increased)
-export const NODE_HORIZONTAL_GAP = 50;
-export const NODE_VERTICAL_GAP = 30; // Vertical gap for horizontal layout
+export const NODE_HEIGHT_HORIZONTAL = 80; // Height for horizontal layout
+
+// Horizontal gaps (spacing between nodes horizontally)
+export const NODE_HORIZONTAL_GAP_VERTICAL = 50; // Horizontal gap for vertical layout
+export const NODE_HORIZONTAL_GAP_HORIZONTAL = 50; // Horizontal gap for horizontal layout
+
+// Vertical gaps (spacing between nodes vertically)
 export const NODE_VERTICAL_GAP_VERTICAL = 60; // Vertical gap for vertical layout (increased)
+export const NODE_VERTICAL_GAP_HORIZONTAL = 30; // Vertical gap for horizontal layout
+
+// Title dimensions
+export const TITLE_HEIGHT_VERTICAL = 40; // Height of title section in vertical layout
+export const TITLE_WIDTH_HORIZONTAL = 225; // Width of title section in horizontal layout (50% of NODE_WIDTH_HORIZONTAL)
+
+// Font sizes
+export const FONT_SIZE_TITLE_VERTICAL = 21; // Font size for title in vertical layout
+export const FONT_SIZE_TITLE_HORIZONTAL = 21; // Font size for title in horizontal layout
+export const FONT_SIZE_NAME_VERTICAL = 21.875; // Font size for name in vertical layout
+export const FONT_SIZE_NAME_HORIZONTAL = 21.875; // Font size for name in horizontal layout
+
 export const LEVEL_START_Y = 100;
 export const CANVAS_PADDING = 100;
 
@@ -27,4 +44,3 @@ export const nodeColors = [
   { header: "from-slate-600 to-slate-700", body: "bg-slate-50" },
   { header: "from-stone-600 to-stone-700", body: "bg-stone-50" },
 ];
-

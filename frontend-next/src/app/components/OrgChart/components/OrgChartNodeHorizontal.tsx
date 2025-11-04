@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatNode } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH_HORIZONTAL, NODE_HEIGHT } from "../constants";
+import { NODE_WIDTH_HORIZONTAL, NODE_HEIGHT_HORIZONTAL } from "../constants";
 import { getNodeColor } from "../utils/color-utils";
 import { DropPosition } from "../hooks/useOrgChartDrag";
 
@@ -98,7 +98,7 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
               left: `${x - 10}px`,
               top: `${y}px`,
               width: "4px",
-              height: `${NODE_HEIGHT}px`,
+              height: `${NODE_HEIGHT_HORIZONTAL}px`,
               backgroundColor: "#3b82f6",
               borderRadius: "2px",
               zIndex: 1000,
@@ -116,7 +116,7 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
               left: `${x + NODE_WIDTH_HORIZONTAL + 6}px`,
               top: `${y}px`,
               width: "4px",
-              height: `${NODE_HEIGHT}px`,
+              height: `${NODE_HEIGHT_HORIZONTAL}px`,
               backgroundColor: "#3b82f6",
               borderRadius: "2px",
               zIndex: 1000,
@@ -152,7 +152,7 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
           left: `${x}px`,
           top: `${y}px`,
           width: `${NODE_WIDTH_HORIZONTAL}px`,
-          height: `${NODE_HEIGHT}px`,
+          height: `${NODE_HEIGHT_HORIZONTAL}px`,
           opacity: isDragging ? 0.5 : 1,
           cursor:
             editingNode?.nodeId === node.id
@@ -256,7 +256,7 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
             style={{
               position: "absolute",
               left: `${x}px`,
-              top: `${y + NODE_HEIGHT + 6}px`,
+              top: `${y + NODE_HEIGHT_HORIZONTAL + 6}px`,
               width: `${NODE_WIDTH_HORIZONTAL}px`,
               height: "4px",
               backgroundColor: "#3b82f6",

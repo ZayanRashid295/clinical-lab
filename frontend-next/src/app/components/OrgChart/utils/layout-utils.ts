@@ -3,9 +3,9 @@ import {
   Connection,
 } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
 import {
-  NODE_WIDTH,
+  NODE_WIDTH_VERTICAL,
   NODE_WIDTH_HORIZONTAL,
-  NODE_HEIGHT,
+  NODE_HEIGHT_HORIZONTAL,
   NODE_HEIGHT_VERTICAL,
   NODE_HORIZONTAL_GAP,
   NODE_VERTICAL_GAP,
@@ -55,7 +55,7 @@ function calculatePositionsVertical(
     if (!pos) return { minX: 0, maxX: 0 };
 
     let minX = pos.x;
-    let maxX = pos.x + NODE_WIDTH;
+    let maxX = pos.x + NODE_WIDTH_VERTICAL;
 
     const children = hierarchy.get(nodeId) || [];
     children.forEach((child) => {
@@ -74,31 +74,35 @@ function calculatePositionsVertical(
     startX: number
   ): { x: number; width: number } => {
     const node = nodeMap.get(nodeId);
-    if (!node) return { x: startX, width: NODE_WIDTH };
+    if (!node) return { x: startX, width: NODE_WIDTH_VERTICAL };
 
     const children = hierarchy.get(nodeId) || [];
 
     if (children.length === 0) {
       // Leaf node - position at startX
       const x = startX;
-      const y = LEVEL_START_Y + level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
+      const y =
+        LEVEL_START_Y +
+        level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
       positions.set(nodeId, { x, y });
-      return { x, width: NODE_WIDTH };
+      return { x, width: NODE_WIDTH_VERTICAL };
     }
 
     // If there's only one child, center it directly below the parent
     if (children.length === 1) {
       // Position the parent at startX
       const parentX = startX;
-      const parentY = LEVEL_START_Y + level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
+      const parentY =
+        LEVEL_START_Y +
+        level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
       positions.set(nodeId, { x: parentX, y: parentY });
 
       // Calculate child subtree width first (recursively, starting at 0)
       const childPos = calculateNodePosition(children[0].id, level + 1, 0);
 
       // Center the child directly below the parent
-      const parentCenterX = parentX + NODE_WIDTH / 2;
-      const centeredChildX = parentCenterX - NODE_WIDTH / 2;
+      const parentCenterX = parentX + NODE_WIDTH_VERTICAL / 2;
+      const centeredChildX = parentCenterX - NODE_WIDTH_VERTICAL / 2;
 
       // Get the child's current position and adjust it
       const childCurrentPos = positions.get(children[0].id);
@@ -111,7 +115,7 @@ function calculatePositionsVertical(
       // COMPACTION: Always return NODE_WIDTH for single-child nodes
       return {
         x: parentX,
-        width: NODE_WIDTH,
+        width: NODE_WIDTH_VERTICAL,
       };
     }
 
@@ -124,8 +128,8 @@ function calculatePositionsVertical(
     children.forEach((child) => {
       const childPos = calculateNodePosition(child.id, level + 1, currentX);
       childPositions.push({ ...childPos, id: child.id });
-      currentX += NODE_WIDTH + NODE_HORIZONTAL_GAP;
-      totalChildrenWidth += NODE_WIDTH;
+      currentX += NODE_WIDTH_VERTICAL + NODE_HORIZONTAL_GAP;
+      totalChildrenWidth += NODE_WIDTH_VERTICAL;
     });
 
     // Second pass: fix overlaps by checking actual bounds and adjusting
@@ -159,16 +163,18 @@ function calculatePositionsVertical(
     const actualMinX = firstChildBounds.minX;
     const actualMaxX = lastChildBounds.maxX;
     const centerX = (actualMinX + actualMaxX) / 2;
-    const x = centerX - NODE_WIDTH / 2;
+    const x = centerX - NODE_WIDTH_VERTICAL / 2;
 
-    const y = LEVEL_START_Y + level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
+    const y =
+      LEVEL_START_Y +
+      level * (NODE_HEIGHT_VERTICAL + NODE_VERTICAL_GAP_VERTICAL);
     positions.set(nodeId, { x, y });
 
     // Return the actual width based on bounds
     const actualWidth = actualMaxX - actualMinX;
     return {
       x: actualMinX,
-      width: Math.max(NODE_WIDTH, actualWidth),
+      width: Math.max(NODE_WIDTH_VERTICAL, actualWidth),
     };
   };
 
@@ -184,7 +190,7 @@ function calculatePositionsVertical(
   let maxX = -Infinity;
   positions.forEach((pos) => {
     minX = Math.min(minX, pos.x);
-    maxX = Math.max(maxX, pos.x + NODE_WIDTH);
+    maxX = Math.max(maxX, pos.x + NODE_WIDTH_VERTICAL);
   });
 
   // Calculate offset to ensure all nodes are visible (pad left side)
@@ -228,7 +234,7 @@ function calculatePositionsHorizontal(
     if (!pos) return { minY: 0, maxY: 0 };
 
     let minY = pos.y;
-    let maxY = pos.y + NODE_HEIGHT;
+    let maxY = pos.y + NODE_HEIGHT_HORIZONTAL;
 
     const children = hierarchy.get(nodeId) || [];
     children.forEach((child) => {
@@ -247,31 +253,33 @@ function calculatePositionsHorizontal(
     startY: number
   ): { y: number; height: number } => {
     const node = nodeMap.get(nodeId);
-    if (!node) return { y: startY, height: NODE_HEIGHT };
+    if (!node) return { y: startY, height: NODE_HEIGHT_HORIZONTAL };
 
     const children = hierarchy.get(nodeId) || [];
 
     if (children.length === 0) {
       // Leaf node - position at startY
       const y = startY;
-      const x = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+      const x =
+        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
       positions.set(nodeId, { x, y });
-      return { y, height: NODE_HEIGHT };
+      return { y, height: NODE_HEIGHT_HORIZONTAL };
     }
 
     // If there's only one child, center it directly to the right of the parent
     if (children.length === 1) {
       // Position the parent at startY
       const parentY = startY;
-      const parentX = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+      const parentX =
+        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
       positions.set(nodeId, { x: parentX, y: parentY });
 
       // Calculate child subtree height first (recursively, starting at 0)
       const childPos = calculateNodePosition(children[0].id, level + 1, 0);
 
       // Center the child directly to the right of the parent
-      const parentCenterY = parentY + NODE_HEIGHT / 2;
-      const centeredChildY = parentCenterY - NODE_HEIGHT / 2;
+      const parentCenterY = parentY + NODE_HEIGHT_HORIZONTAL / 2;
+      const centeredChildY = parentCenterY - NODE_HEIGHT_HORIZONTAL / 2;
 
       // Get the child's current position and adjust it
       const childCurrentPos = positions.get(children[0].id);
@@ -284,7 +292,7 @@ function calculatePositionsHorizontal(
       // COMPACTION: Always return NODE_HEIGHT for single-child nodes
       return {
         y: parentY,
-        height: NODE_HEIGHT,
+        height: NODE_HEIGHT_HORIZONTAL,
       };
     }
 
@@ -297,8 +305,8 @@ function calculatePositionsHorizontal(
     children.forEach((child) => {
       const childPos = calculateNodePosition(child.id, level + 1, currentY);
       childPositions.push({ ...childPos, id: child.id });
-      currentY += NODE_HEIGHT + NODE_VERTICAL_GAP;
-      totalChildrenHeight += NODE_HEIGHT;
+      currentY += NODE_HEIGHT_HORIZONTAL + NODE_VERTICAL_GAP;
+      totalChildrenHeight += NODE_HEIGHT_HORIZONTAL;
     });
 
     // Second pass: fix overlaps by checking actual bounds and adjusting
@@ -332,16 +340,17 @@ function calculatePositionsHorizontal(
     const actualMinY = firstChildBounds.minY;
     const actualMaxY = lastChildBounds.maxY;
     const centerY = (actualMinY + actualMaxY) / 2;
-    const y = centerY - NODE_HEIGHT / 2;
+    const y = centerY - NODE_HEIGHT_HORIZONTAL / 2;
 
-    const x = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+    const x =
+      LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
     positions.set(nodeId, { x, y });
 
     // Return the actual height based on bounds
     const actualHeight = actualMaxY - actualMinY;
     return {
       y: actualMinY,
-      height: Math.max(NODE_HEIGHT, actualHeight),
+      height: Math.max(NODE_HEIGHT_HORIZONTAL, actualHeight),
     };
   };
 
@@ -357,7 +366,7 @@ function calculatePositionsHorizontal(
   let maxY = -Infinity;
   positions.forEach((pos) => {
     minY = Math.min(minY, pos.y);
-    maxY = Math.max(maxY, pos.y + NODE_HEIGHT);
+    maxY = Math.max(maxY, pos.y + NODE_HEIGHT_HORIZONTAL);
   });
 
   // Calculate offset to ensure all nodes are visible (pad top side)
@@ -397,8 +406,10 @@ export function calculateCanvasDimensions(
   positions: Map<string, { x: number; y: number }>,
   isHorizontal: boolean = false
 ): { canvasWidth: number; canvasHeight: number } {
-  const nodeHeight = isHorizontal ? NODE_HEIGHT : NODE_HEIGHT_VERTICAL;
-  const nodeWidth = isHorizontal ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
+  const nodeHeight = isHorizontal
+    ? NODE_HEIGHT_HORIZONTAL
+    : NODE_HEIGHT_VERTICAL;
+  const nodeWidth = isHorizontal ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH_VERTICAL;
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;

@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatNode } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH, NODE_HEIGHT_VERTICAL } from "../constants";
+import { NODE_WIDTH_VERTICAL, NODE_HEIGHT_VERTICAL } from "../constants";
 import { getNodeColor } from "../utils/color-utils";
 import { DropPosition } from "../hooks/useOrgChartDrag";
 
@@ -79,7 +79,7 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
               position: "absolute",
               left: `${x}px`,
               top: `${y - 10}px`,
-              width: `${NODE_WIDTH}px`,
+              width: `${NODE_WIDTH_VERTICAL}px`,
               height: "4px",
               backgroundColor: "#3b82f6",
               borderRadius: "2px",
@@ -113,7 +113,7 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
           <div
             style={{
               position: "absolute",
-              left: `${x + NODE_WIDTH + 6}px`,
+              left: `${x + NODE_WIDTH_VERTICAL + 6}px`,
               top: `${y}px`,
               width: "4px",
               height: `${NODE_HEIGHT_VERTICAL}px`,
@@ -151,7 +151,7 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
           position: "absolute",
           left: `${x}px`,
           top: `${y}px`,
-          width: `${NODE_WIDTH}px`,
+          width: `${NODE_WIDTH_VERTICAL}px`,
           height: `${NODE_HEIGHT_VERTICAL}px`,
           opacity: isDragging ? 0.5 : 1,
           cursor:
@@ -255,7 +255,7 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
               position: "absolute",
               left: `${x}px`,
               top: `${y + NODE_HEIGHT_VERTICAL + 6}px`,
-              width: `${NODE_WIDTH}px`,
+              width: `${NODE_WIDTH_VERTICAL}px`,
               height: "4px",
               backgroundColor: "#3b82f6",
               borderRadius: "2px",
@@ -267,4 +267,3 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
     </div>
   );
 };
-

@@ -3,7 +3,11 @@ import {
   OrgChartNode,
   OrgChartData,
 } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH, NODE_WIDTH_HORIZONTAL, NODE_HEIGHT } from "../constants";
+import {
+  NODE_WIDTH_VERTICAL,
+  NODE_WIDTH_HORIZONTAL,
+  NODE_HEIGHT_HORIZONTAL,
+} from "../constants";
 import {
   findNodeInHierarchy,
   findNodePath,
@@ -86,11 +90,13 @@ export function useOrgChartDrag(
       const dragImage = target.cloneNode(false) as HTMLElement;
 
       // Use correct width based on layout mode
-      const nodeWidth = isHorizontalLayout ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
+      const nodeWidth = isHorizontalLayout
+        ? NODE_WIDTH_HORIZONTAL
+        : NODE_WIDTH_VERTICAL;
 
       // Set dimensions - scale the container size
       dragImage.style.width = `${nodeWidth * zoom}px`;
-      dragImage.style.height = `${NODE_HEIGHT * zoom}px`;
+      dragImage.style.height = `${NODE_HEIGHT_HORIZONTAL * zoom}px`;
       dragImage.style.position = "fixed";
       dragImage.style.left = "-9999px";
       dragImage.style.top = "-9999px";
@@ -106,7 +112,7 @@ export function useOrgChartDrag(
 
       // Set the drag image - offset needs to account for scale
       const offsetX = (nodeWidth * zoom) / 2;
-      const offsetY = (NODE_HEIGHT * zoom) / 2;
+      const offsetY = (NODE_HEIGHT_HORIZONTAL * zoom) / 2;
       e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 
       // Clean up after drag starts

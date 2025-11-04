@@ -1,6 +1,11 @@
 import React from "react";
 import { Connection } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH, NODE_WIDTH_HORIZONTAL, NODE_HEIGHT, NODE_HEIGHT_VERTICAL } from "../constants";
+import {
+  NODE_WIDTH_VERTICAL,
+  NODE_WIDTH_HORIZONTAL,
+  NODE_HEIGHT_HORIZONTAL,
+  NODE_HEIGHT_VERTICAL,
+} from "../constants";
 
 interface ConnectionsLayerProps {
   connections: Connection[];
@@ -17,9 +22,13 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
   canvasHeight,
   isHorizontalLayout,
 }) => {
-  const nodeHeight = isHorizontalLayout ? NODE_HEIGHT : NODE_HEIGHT_VERTICAL;
-  const nodeWidth = isHorizontalLayout ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
-  
+  const nodeHeight = isHorizontalLayout
+    ? NODE_HEIGHT_HORIZONTAL
+    : NODE_HEIGHT_VERTICAL;
+  const nodeWidth = isHorizontalLayout
+    ? NODE_WIDTH_HORIZONTAL
+    : NODE_WIDTH_VERTICAL;
+
   return (
     <svg
       className="absolute top-0 left-0 pointer-events-none"
