@@ -5,9 +5,12 @@ This directory contains a refactored, modular implementation of the organization
 ## Directory Structure
 
 ```
-org-chart/
+OrgChart/
 ├── constants.ts                    # All constants (dimensions, colors, etc.)
-├── org-chart-view.tsx             # Main component (orchestrates everything)
+├── OrgChartView.tsx               # Main component (orchestrates everything)
+├── org-chart-data.ts              # Sample data for the chart
+├── org-chart-types/               # TypeScript type definitions
+│   └── org-chart-model.ts
 ├── README.md                       # This file
 │
 ├── utils/                          # Utility functions
@@ -32,7 +35,7 @@ org-chart/
 
 ## Component Breakdown
 
-### Main Component (`org-chart-view.tsx`)
+### Main Component (`OrgChartView.tsx`)
 - **Lines**: ~340 (down from 1746)
 - **Purpose**: Orchestrates all sub-components and hooks
 - **Responsibilities**:
@@ -180,7 +183,7 @@ No breaking changes to external APIs or data structures.
 1. **Utility Function**: Add to appropriate utils file
 2. **State Logic**: Create or extend a custom hook
 3. **UI Component**: Create new component or extend existing
-4. **Integration**: Wire up in `org-chart-view.tsx`
+4. **Integration**: Wire up in `OrgChartView.tsx`
 
 ### Modifying Existing Features
 
