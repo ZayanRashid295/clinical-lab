@@ -8,7 +8,7 @@ export const NODE_HORIZONTAL_GAP_VERTICAL = 50; // Horizontal gap for vertical l
 export const NODE_VERTICAL_GAP_VERTICAL = 200; // Vertical gap for vertical layout (increased)
 export const FONT_SIZE_TITLE_VERTICAL = FONT_SIZE; // Font size for title in vertical layout
 
-export const TITLE_WIDTH_HORIZONTAL = 425; // Width of title section in horizontal layout (50% of NODE_WIDTH_HORIZONTAL)
+export const TITLE_WIDTH_HORIZONTAL = 380; // Width of title section in horizontal layout (50% of NODE_WIDTH_HORIZONTAL)
 export const NODE_WIDTH_HORIZONTAL = 750; // Width for horizontal layout (increased)
 export const NODE_HEIGHT_HORIZONTAL = 100; // Height for horizontal layout
 export const NODE_HORIZONTAL_GAP_HORIZONTAL = 200; // Horizontal gap for horizontal layout
@@ -23,6 +23,9 @@ export const FONT_SIZE_NAME_HORIZONTAL = FONT_SIZE; // Font size for name in hor
 
 export const LEVEL_START_Y = 100;
 export const CANVAS_PADDING = 100;
+
+// Connection stroke width
+export const CONNECTION_STROKE_WIDTH = 6; // Stroke width for connection lines
 
 // Color schemes for nodes
 export const nodeColors = [

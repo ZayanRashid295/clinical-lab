@@ -5,6 +5,7 @@ import {
   NODE_WIDTH_HORIZONTAL,
   NODE_HEIGHT_HORIZONTAL,
   NODE_HEIGHT_VERTICAL,
+  CONNECTION_STROKE_WIDTH,
 } from "../constants";
 
 interface ConnectionsLayerProps {
@@ -59,7 +60,7 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
               d={d}
               fill="none"
               stroke="#6b7280"
-              strokeWidth={2}
+              strokeWidth={CONNECTION_STROKE_WIDTH}
             />
           );
         } else {
@@ -80,7 +81,7 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
               d={d}
               fill="none"
               stroke="#6b7280"
-              strokeWidth={2}
+              strokeWidth={CONNECTION_STROKE_WIDTH}
             />
           );
         }
