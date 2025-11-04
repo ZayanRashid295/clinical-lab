@@ -7,9 +7,10 @@ import {
   NODE_WIDTH_HORIZONTAL,
   NODE_HEIGHT_HORIZONTAL,
   NODE_HEIGHT_VERTICAL,
-  NODE_HORIZONTAL_GAP,
-  NODE_VERTICAL_GAP,
+  NODE_HORIZONTAL_GAP_VERTICAL,
+  NODE_HORIZONTAL_GAP_HORIZONTAL,
   NODE_VERTICAL_GAP_VERTICAL,
+  NODE_VERTICAL_GAP_HORIZONTAL,
   LEVEL_START_Y,
   CANVAS_PADDING,
 } from "../constants";
@@ -128,7 +129,7 @@ function calculatePositionsVertical(
     children.forEach((child) => {
       const childPos = calculateNodePosition(child.id, level + 1, currentX);
       childPositions.push({ ...childPos, id: child.id });
-      currentX += NODE_WIDTH_VERTICAL + NODE_HORIZONTAL_GAP;
+      currentX += NODE_WIDTH_VERTICAL + NODE_HORIZONTAL_GAP_VERTICAL;
       totalChildrenWidth += NODE_WIDTH_VERTICAL;
     });
 
@@ -142,7 +143,7 @@ function calculatePositionsVertical(
 
       // Check if there's overlap or insufficient gap
       const actualGap = currentBounds.minX - prevBounds.maxX;
-      const requiredGap = NODE_HORIZONTAL_GAP;
+      const requiredGap = NODE_HORIZONTAL_GAP_VERTICAL;
 
       if (actualGap < requiredGap) {
         // Shift this child and all subsequent children
@@ -182,7 +183,7 @@ function calculatePositionsVertical(
   let totalRootWidth = 0;
   rootNodes.forEach((rootNode) => {
     const rootPos = calculateNodePosition(rootNode.id, 0, totalRootWidth);
-    totalRootWidth += rootPos.width + NODE_HORIZONTAL_GAP;
+    totalRootWidth += rootPos.width + NODE_HORIZONTAL_GAP_VERTICAL;
   });
 
   // Find the actual bounds of all nodes
@@ -261,7 +262,7 @@ function calculatePositionsHorizontal(
       // Leaf node - position at startY
       const y = startY;
       const x =
-        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP_HORIZONTAL);
       positions.set(nodeId, { x, y });
       return { y, height: NODE_HEIGHT_HORIZONTAL };
     }
@@ -271,7 +272,7 @@ function calculatePositionsHorizontal(
       // Position the parent at startY
       const parentY = startY;
       const parentX =
-        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+        LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP_HORIZONTAL);
       positions.set(nodeId, { x: parentX, y: parentY });
 
       // Calculate child subtree height first (recursively, starting at 0)
@@ -305,7 +306,7 @@ function calculatePositionsHorizontal(
     children.forEach((child) => {
       const childPos = calculateNodePosition(child.id, level + 1, currentY);
       childPositions.push({ ...childPos, id: child.id });
-      currentY += NODE_HEIGHT_HORIZONTAL + NODE_VERTICAL_GAP;
+      currentY += NODE_HEIGHT_HORIZONTAL + NODE_VERTICAL_GAP_HORIZONTAL;
       totalChildrenHeight += NODE_HEIGHT_HORIZONTAL;
     });
 
@@ -319,7 +320,7 @@ function calculatePositionsHorizontal(
 
       // Check if there's overlap or insufficient gap
       const actualGap = currentBounds.minY - prevBounds.maxY;
-      const requiredGap = NODE_VERTICAL_GAP;
+      const requiredGap = NODE_VERTICAL_GAP_HORIZONTAL;
 
       if (actualGap < requiredGap) {
         // Shift this child and all subsequent children
@@ -343,7 +344,7 @@ function calculatePositionsHorizontal(
     const y = centerY - NODE_HEIGHT_HORIZONTAL / 2;
 
     const x =
-      LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
+      LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP_HORIZONTAL);
     positions.set(nodeId, { x, y });
 
     // Return the actual height based on bounds
@@ -358,7 +359,7 @@ function calculatePositionsHorizontal(
   let totalRootHeight = 0;
   rootNodes.forEach((rootNode) => {
     const rootPos = calculateNodePosition(rootNode.id, 0, totalRootHeight);
-    totalRootHeight += rootPos.height + NODE_VERTICAL_GAP;
+    totalRootHeight += rootPos.height + NODE_VERTICAL_GAP_HORIZONTAL;
   });
 
   // Find the actual bounds of all nodes

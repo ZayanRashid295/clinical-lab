@@ -1,6 +1,12 @@
 import React from "react";
 import { FlatNode } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH_HORIZONTAL, NODE_HEIGHT_HORIZONTAL } from "../constants";
+import {
+  NODE_WIDTH_HORIZONTAL,
+  NODE_HEIGHT_HORIZONTAL,
+  TITLE_WIDTH_HORIZONTAL,
+  FONT_SIZE_TITLE_HORIZONTAL,
+  FONT_SIZE_NAME_HORIZONTAL,
+} from "../constants";
 import { getNodeColor } from "../utils/color-utils";
 import { DropPosition } from "../hooks/useOrgChartDrag";
 
@@ -179,10 +185,13 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
           />
         )}
 
-        {/* Role header - Left side (50%) */}
+        {/* Role header - Left side */}
         <div
-          className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 flex items-center justify-center font-bold text-[21px] flex-shrink-0 border-r-2 border-white/20`}
-          style={{ width: "50%" }}
+          className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 flex items-center justify-center font-bold flex-shrink-0 border-r-2 border-white/20`}
+          style={{
+            width: `${TITLE_WIDTH_HORIZONTAL}px`,
+            fontSize: `${FONT_SIZE_TITLE_HORIZONTAL}px`,
+          }}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "role", node.role);
@@ -205,7 +214,8 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-bold text-[21px] rounded border-2 border-blue-500 focus:outline-none"
+              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-bold rounded border-2 border-blue-500 focus:outline-none"
+              style={{ fontSize: `${FONT_SIZE_TITLE_HORIZONTAL}px` }}
             />
           ) : (
             <span className="truncate block text-center w-full">
@@ -214,10 +224,13 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
           )}
         </div>
 
-        {/* Name section - Right side (50%) */}
+        {/* Name section - Right side */}
         <div
-          className={`${nodeColor.body} flex-1 flex items-center justify-center text-center text-[21.875px] font-medium text-gray-800 px-3`}
-          style={{ width: "50%" }}
+          className={`${nodeColor.body} flex-1 flex items-center justify-center text-center font-medium text-gray-800 px-3`}
+          style={{
+            width: `${NODE_WIDTH_HORIZONTAL - TITLE_WIDTH_HORIZONTAL}px`,
+            fontSize: `${FONT_SIZE_NAME_HORIZONTAL}px`,
+          }}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "name", node.name);
@@ -240,7 +253,8 @@ export const OrgChartNodeHorizontal: React.FC<OrgChartNodeHorizontalProps> = ({
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium text-[21.875px] rounded border-2 border-blue-500 focus:outline-none"
+              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium rounded border-2 border-blue-500 focus:outline-none"
+              style={{ fontSize: `${FONT_SIZE_NAME_HORIZONTAL}px` }}
             />
           ) : (
             <span className="truncate block w-full">{node.name}</span>

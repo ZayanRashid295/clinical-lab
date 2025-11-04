@@ -1,6 +1,12 @@
 import React from "react";
 import { FlatNode } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH_VERTICAL, NODE_HEIGHT_VERTICAL } from "../constants";
+import {
+  NODE_WIDTH_VERTICAL,
+  NODE_HEIGHT_VERTICAL,
+  TITLE_HEIGHT_VERTICAL,
+  FONT_SIZE_TITLE_VERTICAL,
+  FONT_SIZE_NAME_VERTICAL,
+} from "../constants";
 import { getNodeColor } from "../utils/color-utils";
 import { DropPosition } from "../hooks/useOrgChartDrag";
 
@@ -181,7 +187,11 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
 
         {/* Role header */}
         <div
-          className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 flex items-center justify-center font-bold text-[21px] flex-shrink-0 border-b-2 border-white/20`}
+          className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 flex items-center justify-center font-bold flex-shrink-0 border-b-2 border-white/20`}
+          style={{
+            height: `${TITLE_HEIGHT_VERTICAL}px`,
+            fontSize: `${FONT_SIZE_TITLE_VERTICAL}px`,
+          }}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "role", node.role);
@@ -204,7 +214,8 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-bold text-[21px] rounded border-2 border-blue-500 focus:outline-none"
+              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-bold rounded border-2 border-blue-500 focus:outline-none"
+              style={{ fontSize: `${FONT_SIZE_TITLE_VERTICAL}px` }}
             />
           ) : (
             <span className="truncate block text-center w-full">
@@ -215,7 +226,8 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
 
         {/* Name section */}
         <div
-          className={`${nodeColor.body} flex-1 flex items-center justify-center text-center text-[21.875px] font-medium text-gray-800 px-3 min-h-0`}
+          className={`${nodeColor.body} flex-1 flex items-center justify-center text-center font-medium text-gray-800 px-3 min-h-0`}
+          style={{ fontSize: `${FONT_SIZE_NAME_VERTICAL}px` }}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "name", node.name);
@@ -238,7 +250,8 @@ export const OrgChartNodeVertical: React.FC<OrgChartNodeVerticalProps> = ({
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium text-[21.875px] rounded border-2 border-blue-500 focus:outline-none"
+              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium rounded border-2 border-blue-500 focus:outline-none"
+              style={{ fontSize: `${FONT_SIZE_NAME_VERTICAL}px` }}
             />
           ) : (
             <span className="truncate block w-full">{node.name}</span>

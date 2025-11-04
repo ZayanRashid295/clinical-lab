@@ -7,6 +7,7 @@ import {
   NODE_WIDTH_VERTICAL,
   NODE_WIDTH_HORIZONTAL,
   NODE_HEIGHT_HORIZONTAL,
+  NODE_HEIGHT_VERTICAL,
 } from "../constants";
 import {
   findNodeInHierarchy,
@@ -89,14 +90,17 @@ export function useOrgChartDrag(
       // Clone the element
       const dragImage = target.cloneNode(false) as HTMLElement;
 
-      // Use correct width based on layout mode
+      // Use correct width and height based on layout mode
       const nodeWidth = isHorizontalLayout
         ? NODE_WIDTH_HORIZONTAL
         : NODE_WIDTH_VERTICAL;
+      const nodeHeight = isHorizontalLayout
+        ? NODE_HEIGHT_HORIZONTAL
+        : NODE_HEIGHT_VERTICAL;
 
       // Set dimensions - scale the container size
       dragImage.style.width = `${nodeWidth * zoom}px`;
-      dragImage.style.height = `${NODE_HEIGHT_HORIZONTAL * zoom}px`;
+      dragImage.style.height = `${nodeHeight * zoom}px`;
       dragImage.style.position = "fixed";
       dragImage.style.left = "-9999px";
       dragImage.style.top = "-9999px";
@@ -112,7 +116,7 @@ export function useOrgChartDrag(
 
       // Set the drag image - offset needs to account for scale
       const offsetX = (nodeWidth * zoom) / 2;
-      const offsetY = (NODE_HEIGHT_HORIZONTAL * zoom) / 2;
+      const offsetY = (nodeHeight * zoom) / 2;
       e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 
       // Clean up after drag starts
