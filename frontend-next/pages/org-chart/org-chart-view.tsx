@@ -463,95 +463,38 @@ function OrgChartView() {
     return null;
   };
 
-  // Function to find node and its siblings at the same level
-  const findNodeAndSiblings = (
+  // Function to find path to a node (similar to Menu Manager's findItemPath)
+  const findNodePath = (
     nodes: OrgChartNode[],
-    nodeId: string
-  ): { parent: OrgChartNode | null; siblings: OrgChartNode[] } | null => {
-    // Check root nodes first
-    const rootIndex = nodes.findIndex((n) => n.id === nodeId);
-    if (rootIndex >= 0) {
-      return { parent: null, siblings: nodes };
-    }
-
-    // Recursively search in children
-    const searchInChildren = (
-      nodeList: OrgChartNode[],
-      currentParent: OrgChartNode | null = null
-    ): { parent: OrgChartNode | null; siblings: OrgChartNode[] } | null => {
-      for (const node of nodeList) {
-        if (node.children) {
-          const index = node.children.findIndex((n) => n.id === nodeId);
-          if (index >= 0) {
-            return { parent: node, siblings: node.children };
-          }
-          const found = searchInChildren(node.children, node);
-          if (found) return found;
-        }
+    targetId: string,
+    path: Array<{ array: OrgChartNode[]; index: number }> = []
+  ): Array<{ array: OrgChartNode[]; index: number }> | null => {
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      if (!node) continue;
+      if (node.id === targetId) {
+        return [...path, { array: nodes, index: i }];
       }
-      return null;
-    };
-
-    return searchInChildren(nodes);
+      if (node.children && node.children.length > 0) {
+        const found = findNodePath(node.children, targetId, [
+          ...path,
+          { array: nodes, index: i },
+        ]);
+        if (found) return found;
+      }
+    }
+    return null;
   };
 
-  // Function to add node as sibling at specific position
-  const addNodeAsSibling = (
-    nodes: OrgChartNode[],
-    targetNodeId: string,
-    nodeToMove: OrgChartNode,
-    position: "before" | "after"
-  ): OrgChartNode[] => {
-    const result = findNodeAndSiblings(nodes, targetNodeId);
-    if (!result) {
-      // If target is not found, add as root sibling
-      return [...nodes, nodeToMove];
-    }
-
-    const { parent, siblings } = result;
-    const targetIndex = siblings.findIndex((n) => n.id === targetNodeId);
-    if (targetIndex < 0) {
-      console.error("Target node not found in siblings array");
-      return nodes;
-    }
-
-    // Make sure we don't add the node if it's already there (shouldn't happen after removal, but safety check)
-    const nodeAlreadyExists = siblings.some((n) => n.id === nodeToMove.id);
-    if (nodeAlreadyExists) {
-      console.warn("Node already exists in siblings, skipping");
-      return nodes;
-    }
-
-    const newSiblings = [...siblings];
-    if (position === "before") {
-      newSiblings.splice(targetIndex, 0, nodeToMove);
-    } else {
-      newSiblings.splice(targetIndex + 1, 0, nodeToMove);
-    }
-
-    if (parent === null) {
-      // Target is root, replace root nodes
-      return newSiblings;
-    } else {
-      // Update parent's children recursively
-      const updateParentChildren = (
-        nodeList: OrgChartNode[]
-      ): OrgChartNode[] => {
-        return nodeList.map((n) => {
-          if (n.id === parent.id) {
-            return { ...n, children: newSiblings };
-          }
-          if (n.children) {
-            return {
-              ...n,
-              children: updateParentChildren(n.children),
-            };
-          }
-          return n;
-        });
-      };
-      return updateParentChildren(nodes);
-    }
+  // Function to create a new array structure (ensures React detects changes)
+  const createNewArrayStructure = (nodes: OrgChartNode[]): OrgChartNode[] => {
+    return nodes.map((node) => {
+      const newNode = { ...node };
+      if (node.children && node.children.length > 0) {
+        newNode.children = createNewArrayStructure(node.children);
+      }
+      return newNode;
+    });
   };
 
   const handleDrop = (e: React.DragEvent, targetNodeId: string) => {
@@ -579,93 +522,102 @@ function OrgChartView() {
     e.preventDefault();
     e.stopPropagation();
 
-    const draggedNode = findNodeInHierarchy(data.hierarchy, draggingNodeId);
-    if (!draggedNode) {
+    // Deep clone the entire structure (like Menu Manager)
+    const newHierarchy = JSON.parse(
+      JSON.stringify(data.hierarchy)
+    ) as OrgChartNode[];
+
+    // Find paths to both items
+    const draggedPath = findNodePath(newHierarchy, draggingNodeId);
+    const targetPath = findNodePath(newHierarchy, targetNodeId);
+
+    if (!draggedPath || !targetPath) {
+      console.error("Could not find dragged or target node");
       handleDragEnd();
       return;
     }
 
-    // Create a deep copy of the node to move
-    const nodeToMove: OrgChartNode = {
-      id: draggedNode.id,
-      role: draggedNode.role,
-      name: draggedNode.name,
-      children: draggedNode.children
-        ? JSON.parse(JSON.stringify(draggedNode.children))
-        : [],
-    };
+    // Get the dragged item (deep clone)
+    const draggedPathLast = draggedPath[draggedPath.length - 1];
+    const draggedItem = JSON.parse(
+      JSON.stringify(draggedPathLast.array[draggedPathLast.index])
+    ) as OrgChartNode;
 
-    // Remove node from current location FIRST
-    // Deep clone the hierarchy to ensure we're working with a fresh copy
-    const hierarchyBeforeRemoval = JSON.parse(JSON.stringify(data.hierarchy));
-    let updatedHierarchy = removeNodeFromHierarchy(
-      hierarchyBeforeRemoval,
-      draggingNodeId
-    );
+    // Get source and target arrays and indices
+    const sourceArray = draggedPathLast.array;
+    const targetPathLast = targetPath[targetPath.length - 1];
+    const targetArray = targetPathLast.array;
+    const draggedIndex = draggedPathLast.index;
+    let targetIndex = targetPathLast.index;
 
-    // Verify target node still exists after removal
-    const targetStillExists = findNodeInHierarchy(
-      updatedHierarchy,
-      targetNodeId
-    );
-    if (!targetStillExists) {
-      console.error("Target node not found after removal");
-      handleDragEnd();
-      return;
-    }
-
-    // Verify the dragged node was actually removed
-    const draggedNodeStillExists = findNodeInHierarchy(
-      updatedHierarchy,
-      draggingNodeId
-    );
-    if (draggedNodeStillExists) {
-      console.error("Dragged node still exists after removal");
-      handleDragEnd();
-      return;
-    }
-
-    // Add node to new location based on drag position
-    let finalHierarchy: OrgChartNode[];
+    // Determine the position based on dragOverPosition
+    let insertPosition: "before" | "after" | "child";
     if (dragOverPosition === "center") {
-      // Add as child of target node
-      finalHierarchy = addNodeToParent(
-        updatedHierarchy,
-        targetNodeId,
-        nodeToMove
-      );
-    } else if (dragOverPosition === "left" || dragOverPosition === "right") {
-      // Add as sibling at same level (left = before, right = after)
-      finalHierarchy = addNodeAsSibling(
-        updatedHierarchy,
-        targetNodeId,
-        nodeToMove,
-        dragOverPosition === "left" ? "before" : "after"
-      );
+      insertPosition = "child";
+    } else if (dragOverPosition === "left" || dragOverPosition === "top") {
+      insertPosition = "before";
     } else {
-      // Top or bottom: add as sibling (top = before, bottom = after)
-      finalHierarchy = addNodeAsSibling(
-        updatedHierarchy,
-        targetNodeId,
-        nodeToMove,
-        dragOverPosition === "top" ? "before" : "after"
-      );
+      // right or bottom
+      insertPosition = "after";
     }
 
-    // Verify the node was added
-    const nodeWasAdded = findNodeInHierarchy(finalHierarchy, draggingNodeId);
-    if (!nodeWasAdded) {
-      console.error("Node was not added to new location");
-      handleDragEnd();
-      return;
+    // Check if moving within the same array
+    const sameArray = sourceArray === targetArray;
+
+    if (insertPosition === "child") {
+      // Add as child of target node
+      // Remove from source first
+      sourceArray.splice(draggedIndex, 1);
+
+      // Ensure target has children array
+      if (!targetArray[targetIndex].children) {
+        targetArray[targetIndex].children = [];
+      }
+
+      // Add to target's children
+      targetArray[targetIndex].children!.push(draggedItem);
+    } else {
+      // Add as sibling (before or after)
+      if (sameArray) {
+        // Same array - remove first, then adjust target index
+        sourceArray.splice(draggedIndex, 1);
+
+        // Adjust target index if we removed an item before it
+        if (draggedIndex < targetIndex) {
+          targetIndex -= 1;
+        }
+
+        // Adjust based on position
+        if (insertPosition === "after") {
+          targetIndex += 1;
+        }
+        // else insertPosition === "before", targetIndex is already correct
+
+        // Insert at target position
+        targetArray.splice(targetIndex, 0, draggedItem);
+      } else {
+        // Different arrays - remove from source first
+        sourceArray.splice(draggedIndex, 1);
+
+        // Adjust target index based on position
+        if (insertPosition === "after") {
+          targetIndex += 1;
+        }
+
+        // Insert at target position
+        targetArray.splice(targetIndex, 0, draggedItem);
+      }
     }
 
-    // Update state with new hierarchy - create a completely new object to ensure React detects the change
-    // This will trigger recalculation of positions via useMemo dependencies
+    // Create a completely new array structure to ensure React detects the change
+    // (exactly like Menu Manager does)
+    const updatedHierarchy = createNewArrayStructure(newHierarchy);
+
+    // Update state with new hierarchy
     setData({
       organizationName: data.organizationName,
       description: data.description,
-      hierarchy: finalHierarchy,
+      hierarchy: updatedHierarchy,
     });
 
     handleDragEnd();
