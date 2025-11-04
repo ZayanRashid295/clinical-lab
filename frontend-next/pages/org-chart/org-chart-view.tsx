@@ -291,6 +291,11 @@ function OrgChartView() {
   >([]);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
   const [isScrollEnabled, setIsScrollEnabled] = useState<boolean>(true);
+  const [editingNode, setEditingNode] = useState<{
+    nodeId: string;
+    field: "role" | "name";
+  } | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -751,6 +756,67 @@ function OrgChartView() {
     });
   };
 
+  // Function to start editing a node field
+  const handleStartEdit = (
+    nodeId: string,
+    field: "role" | "name",
+    currentValue: string
+  ) => {
+    setEditingNode({ nodeId, field });
+    setEditValue(currentValue);
+  };
+
+  // Function to save the edited value
+  const handleSaveEdit = () => {
+    if (!editingNode || !editValue.trim()) {
+      setEditingNode(null);
+      return;
+    }
+
+    const { nodeId, field } = editingNode;
+
+    // Deep clone the hierarchy
+    const newHierarchy = JSON.parse(
+      JSON.stringify(data.hierarchy)
+    ) as OrgChartNode[];
+
+    // Find and update the node
+    const updateNodeInHierarchy = (nodes: OrgChartNode[]): boolean => {
+      for (const node of nodes) {
+        if (node.id === nodeId) {
+          if (field === "role") {
+            node.role = editValue.trim();
+          } else {
+            node.name = editValue.trim();
+          }
+          return true;
+        }
+        if (node.children && updateNodeInHierarchy(node.children)) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    updateNodeInHierarchy(newHierarchy);
+
+    // Update state
+    setData((prevData) => ({
+      ...prevData,
+      hierarchy: newHierarchy,
+    }));
+
+    // Clear editing state
+    setEditingNode(null);
+    setEditValue("");
+  };
+
+  // Function to cancel editing
+  const handleCancelEdit = () => {
+    setEditingNode(null);
+    setEditValue("");
+  };
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       // Don't pan if dragging a node
@@ -1178,7 +1244,7 @@ function OrgChartView() {
                       )}
 
                     <div
-                      draggable
+                      draggable={editingNode?.nodeId !== node.id}
                       onDragStart={(e) => {
                         e.stopPropagation();
                         e.dataTransfer.effectAllowed = "move";
@@ -1207,7 +1273,12 @@ function OrgChartView() {
                         width: `${NODE_WIDTH}px`,
                         height: `${NODE_HEIGHT}px`,
                         opacity: isDragging ? 0.5 : 1,
-                        cursor: isDragging ? "grabbing" : "grab",
+                        cursor:
+                          editingNode?.nodeId === node.id
+                            ? "text"
+                            : isDragging
+                            ? "grabbing"
+                            : "grab",
                         zIndex: isDragging ? 1000 : "auto",
                       }}
                       className={`rounded-lg shadow-xl border-2 overflow-hidden transition-all relative ${
@@ -1229,14 +1300,66 @@ function OrgChartView() {
                       {/* Role header */}
                       <div
                         className={`bg-gradient-to-r ${nodeColor.header} text-white p-2 text-center font-bold text-sm`}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          handleStartEdit(node.id, "role", node.role);
+                        }}
                       >
-                        {node.role}
+                        {editingNode?.nodeId === node.id &&
+                        editingNode?.field === "role" ? (
+                          <input
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={handleSaveEdit}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSaveEdit();
+                              } else if (e.key === "Escape") {
+                                handleCancelEdit();
+                              }
+                              e.stopPropagation();
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            autoFocus
+                            className="w-full bg-white text-gray-900 px-1 py-0 text-center font-bold text-sm rounded border-2 border-blue-500 focus:outline-none"
+                          />
+                        ) : (
+                          node.role
+                        )}
                       </div>
                       {/* Name section */}
                       <div
                         className={`${nodeColor.body} p-3 text-center text-sm font-medium text-gray-800`}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          handleStartEdit(node.id, "name", node.name);
+                        }}
                       >
-                        {node.name}
+                        {editingNode?.nodeId === node.id &&
+                        editingNode?.field === "name" ? (
+                          <input
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={handleSaveEdit}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSaveEdit();
+                              } else if (e.key === "Escape") {
+                                handleCancelEdit();
+                              }
+                              e.stopPropagation();
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            autoFocus
+                            className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium text-sm rounded border-2 border-blue-500 focus:outline-none"
+                          />
+                        ) : (
+                          node.name
+                        )}
                       </div>
                     </div>
 
