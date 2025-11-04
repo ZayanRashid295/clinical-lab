@@ -3,7 +3,7 @@ import {
   OrgChartNode,
   OrgChartData,
 } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH, NODE_HEIGHT } from "../constants";
+import { NODE_WIDTH, NODE_WIDTH_HORIZONTAL, NODE_HEIGHT } from "../constants";
 import {
   findNodeInHierarchy,
   findNodePath,
@@ -27,7 +27,8 @@ export function useOrgChartDrag(
   data: OrgChartData,
   setData: React.Dispatch<React.SetStateAction<OrgChartData>>,
   zoom: number,
-  setIsScrollEnabled: (enabled: boolean) => void
+  setIsScrollEnabled: (enabled: boolean) => void,
+  isHorizontalLayout: boolean = false
 ) {
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
@@ -84,8 +85,11 @@ export function useOrgChartDrag(
       // Clone the element
       const dragImage = target.cloneNode(false) as HTMLElement;
 
+      // Use correct width based on layout mode
+      const nodeWidth = isHorizontalLayout ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
+
       // Set dimensions - scale the container size
-      dragImage.style.width = `${NODE_WIDTH * zoom}px`;
+      dragImage.style.width = `${nodeWidth * zoom}px`;
       dragImage.style.height = `${NODE_HEIGHT * zoom}px`;
       dragImage.style.position = "fixed";
       dragImage.style.left = "-9999px";
@@ -101,7 +105,7 @@ export function useOrgChartDrag(
       void dragImage.offsetHeight;
 
       // Set the drag image - offset needs to account for scale
-      const offsetX = (NODE_WIDTH * zoom) / 2;
+      const offsetX = (nodeWidth * zoom) / 2;
       const offsetY = (NODE_HEIGHT * zoom) / 2;
       e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 
@@ -125,7 +129,7 @@ export function useOrgChartDrag(
       // Prevent scrolling during drag
       setIsScrollEnabled(false);
     },
-    [data.hierarchy, zoom, setIsScrollEnabled]
+    [data.hierarchy, zoom, setIsScrollEnabled, isHorizontalLayout]
   );
 
   const handleDragEnd = useCallback(() => {

@@ -4,6 +4,7 @@ import {
 } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
 import {
   NODE_WIDTH,
+  NODE_WIDTH_HORIZONTAL,
   NODE_HEIGHT,
   NODE_HEIGHT_VERTICAL,
   NODE_HORIZONTAL_GAP,
@@ -253,7 +254,7 @@ function calculatePositionsHorizontal(
     if (children.length === 0) {
       // Leaf node - position at startY
       const y = startY;
-      const x = LEVEL_START_Y + level * (NODE_WIDTH + NODE_HORIZONTAL_GAP);
+      const x = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
       positions.set(nodeId, { x, y });
       return { y, height: NODE_HEIGHT };
     }
@@ -262,7 +263,7 @@ function calculatePositionsHorizontal(
     if (children.length === 1) {
       // Position the parent at startY
       const parentY = startY;
-      const parentX = LEVEL_START_Y + level * (NODE_WIDTH + NODE_HORIZONTAL_GAP);
+      const parentX = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
       positions.set(nodeId, { x: parentX, y: parentY });
 
       // Calculate child subtree height first (recursively, starting at 0)
@@ -333,7 +334,7 @@ function calculatePositionsHorizontal(
     const centerY = (actualMinY + actualMaxY) / 2;
     const y = centerY - NODE_HEIGHT / 2;
 
-    const x = LEVEL_START_Y + level * (NODE_WIDTH + NODE_HORIZONTAL_GAP);
+    const x = LEVEL_START_Y + level * (NODE_WIDTH_HORIZONTAL + NODE_HORIZONTAL_GAP);
     positions.set(nodeId, { x, y });
 
     // Return the actual height based on bounds
@@ -397,13 +398,14 @@ export function calculateCanvasDimensions(
   isHorizontal: boolean = false
 ): { canvasWidth: number; canvasHeight: number } {
   const nodeHeight = isHorizontal ? NODE_HEIGHT : NODE_HEIGHT_VERTICAL;
+  const nodeWidth = isHorizontal ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
   let maxY = -Infinity;
   positions.forEach((pos) => {
     minX = Math.min(minX, pos.x);
-    maxX = Math.max(maxX, pos.x + NODE_WIDTH);
+    maxX = Math.max(maxX, pos.x + nodeWidth);
     minY = Math.min(minY, pos.y);
     maxY = Math.max(maxY, pos.y + nodeHeight);
   });

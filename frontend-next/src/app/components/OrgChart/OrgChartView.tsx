@@ -47,7 +47,7 @@ function OrgChartView() {
   const transformWrapperRef = useRef<HTMLDivElement>(null);
 
   // Custom hooks
-  const dragState = useOrgChartDrag(data, setData, zoom, setIsScrollEnabled);
+  const dragState = useOrgChartDrag(data, setData, zoom, setIsScrollEnabled, isHorizontalLayout);
   const editState = useOrgChartEdit(data, setData);
   const jsonState = useOrgChartJson(data, setData);
 

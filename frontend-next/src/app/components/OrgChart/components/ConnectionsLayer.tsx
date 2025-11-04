@@ -1,6 +1,6 @@
 import React from "react";
 import { Connection } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
-import { NODE_WIDTH, NODE_HEIGHT, NODE_HEIGHT_VERTICAL } from "../constants";
+import { NODE_WIDTH, NODE_WIDTH_HORIZONTAL, NODE_HEIGHT, NODE_HEIGHT_VERTICAL } from "../constants";
 
 interface ConnectionsLayerProps {
   connections: Connection[];
@@ -18,6 +18,7 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
   isHorizontalLayout,
 }) => {
   const nodeHeight = isHorizontalLayout ? NODE_HEIGHT : NODE_HEIGHT_VERTICAL;
+  const nodeWidth = isHorizontalLayout ? NODE_WIDTH_HORIZONTAL : NODE_WIDTH;
   
   return (
     <svg
@@ -34,7 +35,7 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
         if (isHorizontalLayout) {
           // Horizontal layout: parent on left, children on right
           // Calculate connection points
-          const fromX = fromPos.x + NODE_WIDTH;
+          const fromX = fromPos.x + nodeWidth;
           const fromY = fromPos.y + nodeHeight / 2;
           const toX = toPos.x;
           const toY = toPos.y + nodeHeight / 2;
@@ -55,9 +56,9 @@ export const ConnectionsLayer: React.FC<ConnectionsLayerProps> = ({
         } else {
           // Vertical layout: parent on top, children below
           // Calculate connection points
-          const fromX = fromPos.x + NODE_WIDTH / 2;
+          const fromX = fromPos.x + nodeWidth / 2;
           const fromY = fromPos.y + nodeHeight;
-          const toX = toPos.x + NODE_WIDTH / 2;
+          const toX = toPos.x + nodeWidth / 2;
           const toY = toPos.y;
 
           // Create horizontal-vertical path (right-angle)
