@@ -2,7 +2,8 @@ import { OrgChartData } from "./org-chart-types/org-chart-model";
 
 export const initialOrgData: OrgChartData = {
   organizationName: "Corporate Organization",
-  description: "Organizational hierarchy with roles and reporting structure",
+  description:
+    "Complex organizational hierarchy with multiple departments and reporting structures",
   hierarchy: [
     {
       id: "ceo",
@@ -10,60 +11,89 @@ export const initialOrgData: OrgChartData = {
       name: "Sebastian Bennett",
       children: [
         {
-          id: "director1",
-          role: "DIRECTOR",
+          id: "cto",
+          role: "CTO",
           name: "Alfredo Torres",
           children: [
             {
-              id: "manager1",
-              role: "MANAGER",
+              id: "eng-manager1",
+              role: "ENG MANAGER",
               name: "Phyllis Schwaiger",
               children: [
                 {
-                  id: "worker1",
-                  role: "WORKER",
+                  id: "senior-dev1",
+                  role: "SENIOR DEV",
                   name: "Matt Zhang",
                   children: [
                     {
-                      id: "intern1",
-                      role: "INTERN",
+                      id: "dev1",
+                      role: "DEVELOPER",
                       name: "Murad Naser",
                     },
+                    {
+                      id: "dev2",
+                      role: "DEVELOPER",
+                      name: "Sarah Johnson",
+                    },
                   ],
+                },
+                {
+                  id: "senior-dev2",
+                  role: "SENIOR DEV",
+                  name: "Alex Chen",
+                  children: [
+                    {
+                      id: "dev3",
+                      role: "DEVELOPER",
+                      name: "Emily Davis",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              id: "eng-manager2",
+              role: "ENG MANAGER",
+              name: "Michael Brown",
+              children: [
+                {
+                  id: "senior-dev3",
+                  role: "SENIOR DEV",
+                  name: "Lisa Wang",
                 },
               ],
             },
           ],
         },
         {
-          id: "finance",
-          role: "FINANCE",
+          id: "cfo",
+          role: "CFO",
           name: "Donna Stroupe",
           children: [
             {
-              id: "manager2",
-              role: "MANAGER",
+              id: "finance-manager",
+              role: "FINANCE MANAGER",
               name: "Bailey Dupont",
               children: [
                 {
-                  id: "worker2",
-                  role: "WORKER",
+                  id: "accountant1",
+                  role: "ACCOUNTANT",
                   name: "Samira Hadid",
                   children: [
                     {
-                      id: "intern2",
+                      id: "intern1",
                       role: "INTERN",
                       name: "Howard Ong",
                     },
                   ],
                 },
                 {
-                  id: "worker3",
-                  role: "WORKER",
+                  id: "accountant2",
+                  role: "ACCOUNTANT",
                   name: "Richard Sanchez",
                   children: [
                     {
-                      id: "intern3",
+                      id: "intern2",
                       role: "INTERN",
                       name: "Chiaki Sato",
                     },
@@ -71,29 +101,97 @@ export const initialOrgData: OrgChartData = {
                 },
               ],
             },
+            {
+              id: "hr-manager",
+              role: "HR MANAGER",
+              name: "Jennifer Lee",
+              children: [
+                {
+                  id: "hr-specialist1",
+                  role: "HR SPECIALIST",
+                  name: "David Kim",
+                },
+                {
+                  id: "hr-specialist2",
+                  role: "HR SPECIALIST",
+                  name: "Maria Garcia",
+                },
+              ],
+            },
           ],
         },
         {
-          id: "marketing",
-          role: "MARKETING",
+          id: "cmo",
+          role: "CMO",
           name: "Juliana Silva",
           children: [
             {
-              id: "manager3",
-              role: "MANAGER",
+              id: "marketing-manager",
+              role: "MARKETING MANAGER",
               name: "Francois Mercer",
               children: [
                 {
-                  id: "worker4",
-                  role: "WORKER",
+                  id: "marketing-specialist1",
+                  role: "MARKETING SPECIALIST",
                   name: "Kyrie Petrakis",
                   children: [
                     {
-                      id: "intern4",
+                      id: "intern3",
                       role: "INTERN",
                       name: "Dani Martinez",
                     },
                   ],
+                },
+                {
+                  id: "marketing-specialist2",
+                  role: "MARKETING SPECIALIST",
+                  name: "Robert Taylor",
+                },
+              ],
+            },
+            {
+              id: "sales-manager",
+              role: "SALES MANAGER",
+              name: "Patricia Williams",
+              children: [
+                {
+                  id: "sales-rep1",
+                  role: "SALES REP",
+                  name: "James Anderson",
+                },
+                {
+                  id: "sales-rep2",
+                  role: "SALES REP",
+                  name: "Linda Thompson",
+                },
+                {
+                  id: "sales-rep3",
+                  role: "SALES REP",
+                  name: "Christopher Moore",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "coo",
+          role: "COO",
+          name: "Thomas White",
+          children: [
+            {
+              id: "ops-manager",
+              role: "OPS MANAGER",
+              name: "Nancy Harris",
+              children: [
+                {
+                  id: "ops-coordinator1",
+                  role: "OPS COORDINATOR",
+                  name: "Daniel Martinez",
+                },
+                {
+                  id: "ops-coordinator2",
+                  role: "OPS COORDINATOR",
+                  name: "Karen Clark",
                 },
               ],
             },

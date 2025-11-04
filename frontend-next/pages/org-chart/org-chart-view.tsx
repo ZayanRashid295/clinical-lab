@@ -106,10 +106,25 @@ function calculatePositions(
   const positions = new Map<string, { x: number; y: number }>();
   const hierarchy = buildHierarchyMap(flatNodes);
   const nodeMap = new Map(flatNodes.map((n) => [n.id, n]));
+  const allFlatNodes = flatNodes; // Store for recursive adjustment
 
   // Find root nodes (nodes without parentId)
   const rootNodes = flatNodes.filter((n) => !n.parentId);
   if (rootNodes.length === 0) return positions;
+
+  // Helper to recursively adjust all descendants
+  const adjustSubtree = (nodeId: string, offset: number) => {
+    const currentPos = positions.get(nodeId);
+    if (currentPos) {
+      positions.set(nodeId, { ...currentPos, x: currentPos.x + offset });
+    }
+    
+    // Recursively adjust all children
+    const children = hierarchy.get(nodeId) || [];
+    children.forEach(child => {
+      adjustSubtree(child.id, offset);
+    });
+  };
 
   // Recursive function to calculate positions
   const calculateNodePosition = (
@@ -130,7 +145,39 @@ function calculatePositions(
       return { x, width: NODE_WIDTH };
     }
 
-    // Calculate positions for all children
+    // If there's only one child, center it directly below the parent
+    if (children.length === 1) {
+      // Position the parent at startX
+      const parentX = startX;
+      const parentY = LEVEL_START_Y + level * (NODE_HEIGHT + NODE_VERTICAL_GAP);
+      positions.set(nodeId, { x: parentX, y: parentY });
+
+      // Calculate child subtree width first (recursively, starting at 0)
+      const childPos = calculateNodePosition(children[0].id, level + 1, 0);
+      
+      // Center the child directly below the parent
+      // Parent center is at: parentX + NODE_WIDTH / 2
+      // Child center should align with parent center
+      // So child left edge should be at: (parentX + NODE_WIDTH / 2) - NODE_WIDTH / 2 = parentX
+      // This means child.left = parent.left, which centers them
+      const parentCenterX = parentX + NODE_WIDTH / 2;
+      const centeredChildX = parentCenterX - NODE_WIDTH / 2;
+      
+      // Get the child's current position and adjust it
+      const childCurrentPos = positions.get(children[0].id);
+      if (childCurrentPos) {
+        const offset = centeredChildX - childCurrentPos.x;
+        // Adjust the child and all its descendants
+        adjustSubtree(children[0].id, offset);
+      }
+
+      return {
+        x: parentX,
+        width: Math.max(NODE_WIDTH, childPos.width),
+      };
+    }
+
+    // Multiple children - calculate positions for all children
     let currentX = startX;
     let totalChildrenWidth = 0;
     const childPositions: Array<{ x: number; width: number }> = [];
@@ -161,14 +208,14 @@ function calculatePositions(
     };
   };
 
-  // Calculate from all root nodes
+  // Calculate from all root nodes - start from 0
   let totalRootWidth = 0;
   rootNodes.forEach((rootNode) => {
     const rootPos = calculateNodePosition(rootNode.id, 0, totalRootWidth);
     totalRootWidth += rootPos.width + NODE_HORIZONTAL_GAP;
   });
 
-  // Center the entire tree
+  // Find the actual bounds of all nodes
   let minX = Infinity;
   let maxX = -Infinity;
   positions.forEach((pos) => {
@@ -176,9 +223,14 @@ function calculatePositions(
     maxX = Math.max(maxX, pos.x + NODE_WIDTH);
   });
 
-  const centerOffset = -(minX + maxX) / 2;
+  // Calculate offset to ensure all nodes are visible (pad left side)
+  // Add padding to ensure we can scroll left if needed
+  const leftPadding = CANVAS_PADDING;
+  const offset = leftPadding - minX;
+  
+  // Apply offset to all positions
   positions.forEach((pos, nodeId) => {
-    positions.set(nodeId, { ...pos, x: pos.x + centerOffset });
+    positions.set(nodeId, { ...pos, x: pos.x + offset });
   });
 
   return positions;
@@ -238,7 +290,7 @@ function OrgChartView() {
   );
 
   // Calculate canvas dimensions
-  const { canvasWidth, canvasHeight, centerX } = useMemo(() => {
+  const { canvasWidth, canvasHeight } = useMemo(() => {
     let minX = Infinity;
     let maxX = -Infinity;
     let maxY = 0;
@@ -247,13 +299,12 @@ function OrgChartView() {
       maxX = Math.max(maxX, pos.x + NODE_WIDTH);
       maxY = Math.max(maxY, pos.y + NODE_HEIGHT);
     });
-    const width = maxX - minX + CANVAS_PADDING * 2;
+    // Ensure minimum width and add padding on both sides
+    const width = Math.max(maxX - minX + CANVAS_PADDING * 2, 2000);
     const height = maxY + CANVAS_PADDING;
-    const center = (minX + maxX) / 2;
     return {
       canvasWidth: width,
       canvasHeight: height,
-      centerX: center,
     };
   }, [positions]);
 
@@ -302,6 +353,21 @@ function OrgChartView() {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isPanning, handleMouseMove, handleMouseUp]);
+
+  // Scroll to show content on initial load
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer && positions.size > 0) {
+      // Find the leftmost node position
+      let minX = Infinity;
+      positions.forEach((pos) => {
+        minX = Math.min(minX, pos.x);
+      });
+      // Scroll to show the leftmost content with some padding
+      scrollContainer.scrollLeft = Math.max(0, minX * zoom - 50);
+      scrollContainer.scrollTop = 0;
+    }
+  }, [positions, zoom]);
 
   const copyJSON = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -496,10 +562,10 @@ function OrgChartView() {
               className="relative"
               style={{
                 transform: `scale(${zoom})`,
-                transformOrigin: "center center",
+                transformOrigin: "top left",
                 width: `${canvasWidth}px`,
                 height: `${canvasHeight}px`,
-                margin: "0 auto",
+                minWidth: `${canvasWidth}px`,
               }}
             >
               {/* SVG connections overlay */}
@@ -529,10 +595,10 @@ function OrgChartView() {
                   const toPos = positions.get(conn.to);
                   if (!fromPos || !toPos) return null;
 
-                  const fromX = fromPos.x + NODE_WIDTH / 2 + CANVAS_PADDING - centerX;
-                  const fromY = fromPos.y + NODE_HEIGHT + CANVAS_PADDING;
-                  const toX = toPos.x + NODE_WIDTH / 2 + CANVAS_PADDING - centerX;
-                  const toY = toPos.y + CANVAS_PADDING;
+                  const fromX = fromPos.x + NODE_WIDTH / 2;
+                  const fromY = fromPos.y + NODE_HEIGHT;
+                  const toX = toPos.x + NODE_WIDTH / 2;
+                  const toY = toPos.y;
 
                   return (
                     <path
@@ -553,8 +619,8 @@ function OrgChartView() {
                 if (!pos) return null;
 
                 const nodeColor = getNodeColor(node.id);
-                const x = pos.x + CANVAS_PADDING - centerX;
-                const y = pos.y + CANVAS_PADDING;
+                const x = pos.x;
+                const y = pos.y;
 
                 return (
                   <div
