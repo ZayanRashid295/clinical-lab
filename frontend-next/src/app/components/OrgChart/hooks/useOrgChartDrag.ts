@@ -210,12 +210,39 @@ export function useOrgChartDrag(
       e.preventDefault();
       e.stopPropagation();
 
-      const insertPosition: "before" | "after" | "child" =
-        dropPosition === "center" || dropPosition === "bottom"
-          ? "child"
-          : dropPosition === "top" || dropPosition === "left"
-          ? "before"
-          : "after";
+      const insertPosition: "before" | "after" | "child" = (() => {
+        if (dropPosition === "center") {
+          return "child";
+        }
+
+        if (isHorizontalLayout) {
+          // Horizontal layout: parent on left, children on right
+          // Right = child (children go to the right)
+          // Left = before (sibling before, to the left)
+          // Top = before (sibling before, above)
+          // Bottom = before (sibling before, below/right)
+          if (dropPosition === "right") {
+            return "child";
+          } else if (dropPosition === "left" || dropPosition === "top" || dropPosition === "bottom") {
+            return "before";
+          } else {
+            return "after";
+          }
+        } else {
+          // Vertical layout: parent on top, children below
+          // Bottom = child (children go below)
+          // Top = before (sibling before, above)
+          // Left = before (sibling before, to the left)
+          // Right = before (sibling before, to the right)
+          if (dropPosition === "bottom") {
+            return "child";
+          } else if (dropPosition === "top" || dropPosition === "left" || dropPosition === "right") {
+            return "before";
+          } else {
+            return "after";
+          }
+        }
+      })();
 
       // Store IDs before clearing state
       const currentDraggingId = draggingNodeId;
@@ -354,7 +381,7 @@ export function useOrgChartDrag(
         hierarchy: updatedHierarchy,
       }));
     },
-    [draggingNodeId, data.hierarchy, handleDragEnd, setData]
+    [draggingNodeId, data.hierarchy, handleDragEnd, setData, isHorizontalLayout]
   );
 
   return {
