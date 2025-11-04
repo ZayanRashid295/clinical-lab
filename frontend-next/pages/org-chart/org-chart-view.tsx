@@ -395,6 +395,41 @@ function OrgChartView() {
     // Find node for debug display
     const sourceNode = findNodeInHierarchy(data.hierarchy, nodeId);
 
+    // Create a custom drag image that respects the zoom level
+    const target = e.currentTarget as HTMLElement;
+
+    // Clone the element and scale it according to zoom
+    const dragImage = target.cloneNode(true) as HTMLElement;
+
+    // Style the drag image
+    dragImage.style.position = "fixed";
+    dragImage.style.left = "-9999px";
+    dragImage.style.top = "-9999px";
+    dragImage.style.width = `${NODE_WIDTH * zoom}px`;
+    dragImage.style.height = `${NODE_HEIGHT * zoom}px`;
+    dragImage.style.transform = "none";
+    dragImage.style.opacity = "1";
+    dragImage.style.pointerEvents = "none";
+    dragImage.style.zIndex = "999999";
+
+    // Append to body temporarily
+    document.body.appendChild(dragImage);
+
+    // Force reflow to ensure element is rendered
+    void dragImage.offsetHeight;
+
+    // Set the drag image
+    const offsetX = (NODE_WIDTH * zoom) / 2;
+    const offsetY = (NODE_HEIGHT * zoom) / 2;
+    e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+
+    // Clean up after drag starts
+    setTimeout(() => {
+      if (document.body.contains(dragImage)) {
+        document.body.removeChild(dragImage);
+      }
+    }, 0);
+
     // Add debug log entry for drag start
     setDebugLog((prevLog) => [
       {
