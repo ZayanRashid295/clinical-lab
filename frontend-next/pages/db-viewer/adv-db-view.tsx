@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import {
   Plus,
   Trash2,
@@ -240,18 +246,18 @@ function AdvDbView() {
   };
 
   const toggleModuleTables = (moduleIndex: number) => {
-    const module = data.modules[moduleIndex];
-    if (!module) return;
+    const moduleData = data.modules[moduleIndex];
+    if (!moduleData) return;
 
     // Check if any table in module is hidden
-    const hasHidden = module.tables.some(
+    const hasHidden = moduleData.tables.some(
       (t) => tableVisibility.get(t.id) === false
     );
 
     // If any hidden, show all; otherwise hide all
     setTableVisibility((prev) => {
       const next = new Map(prev);
-      module.tables.forEach((t) => {
+      moduleData.tables.forEach((t) => {
         next.set(t.id, hasHidden);
       });
       return next;
@@ -755,7 +761,7 @@ function AdvDbView() {
   const [anchorPoints, setAnchorPoints] = useState<Record<AnchorKey, Point>>(
     {} as Record<AnchorKey, Point>
   );
-  const measureAnchors = () => {
+  const measureAnchors = useCallback(() => {
     const wrapper = transformWrapperRef.current;
     if (!wrapper) return;
     const wrapperRect = wrapper.getBoundingClientRect();
@@ -771,7 +777,7 @@ function AdvDbView() {
       next[key] = { x, y };
     });
     setAnchorPoints(next as Record<AnchorKey, Point>);
-  };
+  }, [zoom]);
 
   // Re-measure on zoom, drag, layout changes, scroll, resize
   useEffect(() => {
@@ -783,6 +789,7 @@ function AdvDbView() {
     currentTables,
     jsonPanelWidth,
     dynamicCanvasHeight,
+    measureAnchors,
   ]);
 
   useEffect(() => {
@@ -793,7 +800,7 @@ function AdvDbView() {
     };
     sc.addEventListener("scroll", onScroll);
     return () => sc.removeEventListener("scroll", onScroll);
-  }, [zoom]);
+  }, [zoom, measureAnchors]);
 
   useEffect(() => {
     const wrapper = transformWrapperRef.current;
@@ -805,7 +812,7 @@ function AdvDbView() {
       ro.disconnect();
       window.removeEventListener("resize", measureAnchors);
     };
-  }, [zoom]);
+  }, [zoom, measureAnchors]);
 
   return (
     <div className="w-full h-screen bg-gray-900 flex flex-col">

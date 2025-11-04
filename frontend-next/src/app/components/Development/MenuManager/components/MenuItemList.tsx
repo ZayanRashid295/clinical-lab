@@ -211,6 +211,7 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
                 isExpanded={false}
                 isEditing={false}
                 isDragging={false}
+                isSelected={false}
                 editData={editData}
                 draggedItemId={draggedItemId}
                 dragOverPosition={dragOverPosition}
@@ -219,10 +220,9 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onToggleExpand={() => {}}
+                onSelect={() => {}}
                 onEdit={() => {}}
                 onDelete={() => {}}
-                onMoveUp={() => {}}
-                onMoveDown={() => {}}
                 onPromote={() => {}}
                 onDemote={() => {}}
                 onEditChange={onEditChange}
@@ -332,6 +332,7 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
                 isExpanded={false}
                 isEditing={false}
                 isDragging={false}
+                isSelected={false}
                 editData={editData}
                 draggedItemId={draggedItemId}
                 dragOverPosition={dragOverPosition}
@@ -340,10 +341,9 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onToggleExpand={() => {}}
+                onSelect={() => {}}
                 onEdit={() => {}}
                 onDelete={() => {}}
-                onMoveUp={() => {}}
-                onMoveDown={() => {}}
                 onPromote={() => {}}
                 onDemote={() => {}}
                 onEditChange={onEditChange}
