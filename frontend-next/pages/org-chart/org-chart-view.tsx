@@ -498,14 +498,63 @@ function OrgChartView() {
   };
 
   const handleDrop = (e: React.DragEvent, targetNodeId: string) => {
-    if (!draggingNodeId || draggingNodeId === targetNodeId) return;
+    // Validate drop conditions
+    if (!draggingNodeId || draggingNodeId === targetNodeId) {
+      handleDragEnd();
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Determine position at drop time from mouse position (like Menu Manager)
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const width = rect.width;
+    const height = rect.height;
+
+    // Calculate which region the cursor is in at drop time
+    const edgeThreshold = 0.25;
+    let insertPosition: "before" | "after" | "child";
+
+    if (y < height * edgeThreshold) {
+      insertPosition = "before";
+    } else if (y > height * (1 - edgeThreshold)) {
+      insertPosition = "after";
+    } else if (x < width * edgeThreshold) {
+      insertPosition = "before";
+    } else if (x > width * (1 - edgeThreshold)) {
+      insertPosition = "after";
+    } else {
+      insertPosition = "child";
+    }
+
+    // Store IDs before clearing state
+    const currentDraggingId = draggingNodeId;
+    const currentTargetId = targetNodeId;
+
+    // Deep clone the entire structure (like Menu Manager)
+    const newHierarchy = JSON.parse(
+      JSON.stringify(data.hierarchy)
+    ) as OrgChartNode[];
+
+    // Find paths to both items
+    const draggedPath = findNodePath(newHierarchy, currentDraggingId);
+    const targetPath = findNodePath(newHierarchy, currentTargetId);
+
+    if (!draggedPath || !targetPath) {
+      console.error("Could not find dragged or target node");
+      handleDragEnd();
+      return;
+    }
 
     // Prevent dropping on descendants (can't make a node a child of its own descendant)
     const isDescendant = (
       ancestorId: string,
       descendantId: string
     ): boolean => {
-      const ancestor = findNodeInHierarchy(data.hierarchy, ancestorId);
+      const ancestor = findNodeInHierarchy(newHierarchy, ancestorId);
       if (!ancestor || !ancestor.children) return false;
       if (ancestor.children.some((child) => child.id === descendantId))
         return true;
@@ -514,27 +563,9 @@ function OrgChartView() {
       );
     };
 
-    if (isDescendant(draggingNodeId, targetNodeId)) {
+    if (isDescendant(currentDraggingId, currentTargetId)) {
       handleDragEnd();
       return; // Can't drop on descendant
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Deep clone the entire structure (like Menu Manager)
-    const newHierarchy = JSON.parse(
-      JSON.stringify(data.hierarchy)
-    ) as OrgChartNode[];
-
-    // Find paths to both items
-    const draggedPath = findNodePath(newHierarchy, draggingNodeId);
-    const targetPath = findNodePath(newHierarchy, targetNodeId);
-
-    if (!draggedPath || !targetPath) {
-      console.error("Could not find dragged or target node");
-      handleDragEnd();
-      return;
     }
 
     // Get the dragged item (deep clone)
@@ -549,17 +580,6 @@ function OrgChartView() {
     const targetArray = targetPathLast.array;
     const draggedIndex = draggedPathLast.index;
     let targetIndex = targetPathLast.index;
-
-    // Determine the position based on dragOverPosition
-    let insertPosition: "before" | "after" | "child";
-    if (dragOverPosition === "center") {
-      insertPosition = "child";
-    } else if (dragOverPosition === "left" || dragOverPosition === "top") {
-      insertPosition = "before";
-    } else {
-      // right or bottom
-      insertPosition = "after";
-    }
 
     // Check if moving within the same array
     const sameArray = sourceArray === targetArray;
@@ -613,14 +633,15 @@ function OrgChartView() {
     // (exactly like Menu Manager does)
     const updatedHierarchy = createNewArrayStructure(newHierarchy);
 
-    // Update state with new hierarchy
-    setData({
-      organizationName: data.organizationName,
-      description: data.description,
-      hierarchy: updatedHierarchy,
-    });
-
+    // Clear drag state first (before state update)
     handleDragEnd();
+
+    // Update state with new hierarchy using functional update to ensure we have latest state
+    setData((prevData) => ({
+      organizationName: prevData.organizationName,
+      description: prevData.description,
+      hierarchy: updatedHierarchy,
+    }));
   };
 
   const handleMouseMove = useCallback(
@@ -884,18 +905,6 @@ function OrgChartView() {
                 height={canvasHeight}
                 style={{ overflow: "visible" }}
               >
-                <defs>
-                  <marker
-                    id="arrowhead"
-                    markerWidth="10"
-                    markerHeight="10"
-                    refX="9"
-                    refY="5"
-                    orient="auto"
-                  >
-                    <polygon points="0,0 10,5 0,10" fill="#6b7280" />
-                  </marker>
-                </defs>
                 {connections.map((conn) => {
                   const fromPos = positions.get(conn.from);
                   const toPos = positions.get(conn.to);
@@ -919,7 +928,6 @@ function OrgChartView() {
                       fill="none"
                       stroke="#6b7280"
                       strokeWidth={2}
-                      markerEnd="url(#arrowhead)"
                     />
                   );
                 })}
@@ -1016,7 +1024,12 @@ function OrgChartView() {
                         handleDragEnd();
                       }}
                       onDragOver={(e) => handleDragOver(e, node.id)}
-                      onDrop={(e) => handleDrop(e, node.id)}
+                      onDrop={(e) => {
+                        // Only process drop if we have valid drag state
+                        if (draggingNodeId && draggingNodeId !== node.id) {
+                          handleDrop(e, node.id);
+                        }
+                      }}
                       onMouseDown={(e) => {
                         // Prevent canvas panning when clicking on node
                         e.stopPropagation();
