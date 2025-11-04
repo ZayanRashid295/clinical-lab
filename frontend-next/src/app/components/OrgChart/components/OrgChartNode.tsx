@@ -213,7 +213,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({
 
         {/* Name section */}
         <div
-          className={`${nodeColor.body} p-3 text-center text-sm font-medium text-gray-800`}
+          className={`${nodeColor.body} p-3 text-center text-[17.5px] font-medium text-gray-800 flex items-center justify-center`}
           onDoubleClick={(e) => {
             e.stopPropagation();
             onStartEdit(node.id, "name", node.name);
@@ -236,7 +236,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium text-sm rounded border-2 border-blue-500 focus:outline-none"
+              className="w-full bg-white text-gray-900 px-1 py-0 text-center font-medium text-[17.5px] rounded border-2 border-blue-500 focus:outline-none"
             />
           ) : (
             node.name
