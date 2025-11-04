@@ -565,7 +565,7 @@ function OrgChartView() {
     e.preventDefault();
     e.stopPropagation();
     const insertPosition: "before" | "after" | "child" =
-      dropPosition === "center"
+      dropPosition === "center" || dropPosition === "bottom"
         ? "child"
         : dropPosition === "top" || dropPosition === "left"
         ? "before"
