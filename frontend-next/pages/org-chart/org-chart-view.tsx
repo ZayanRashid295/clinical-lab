@@ -290,6 +290,7 @@ function OrgChartView() {
     }>
   >([]);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+  const [isScrollEnabled, setIsScrollEnabled] = useState<boolean>(true);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const transformWrapperRef = useRef<HTMLDivElement>(null);
@@ -341,24 +342,6 @@ function OrgChartView() {
     }
   };
 
-  // Function to find node in hierarchy and remove it
-  const removeNodeFromHierarchy = (
-    nodes: OrgChartNode[],
-    nodeId: string
-  ): OrgChartNode[] => {
-    return nodes
-      .filter((node) => node.id !== nodeId)
-      .map((node) => {
-        if (node.children && node.children.length > 0) {
-          return {
-            ...node,
-            children: removeNodeFromHierarchy(node.children, nodeId),
-          };
-        }
-        return node;
-      });
-  };
-
   // Function to find node in hierarchy
   const findNodeInHierarchy = (
     nodes: OrgChartNode[],
@@ -374,35 +357,35 @@ function OrgChartView() {
     return null;
   };
 
-  // Function to add node to a parent in hierarchy
-  const addNodeToParent = (
-    nodes: OrgChartNode[],
-    parentId: string | null,
-    node: OrgChartNode
-  ): OrgChartNode[] => {
-    if (parentId === null) {
-      // Add as root node
-      return [...nodes, { ...node, children: [] }];
-    }
+  // Calculate drop position from mouse coordinates
+  const calculateDropPosition = (
+    e: React.DragEvent
+  ): "top" | "bottom" | "left" | "right" | "center" => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const width = rect.width;
+    const height = rect.height;
 
-    return nodes.map((n) => {
-      if (n.id === parentId) {
-        return {
-          ...n,
-          children: [
-            ...(n.children || []),
-            { ...node, children: node.children || [] },
-          ],
-        };
-      }
-      if (n.children) {
-        return {
-          ...n,
-          children: addNodeToParent(n.children, parentId, node),
-        };
-      }
-      return n;
-    });
+    // Use a 25% threshold for edges to make center region larger
+    const edgeThreshold = 0.25;
+
+    // Check vertical position first (above/below)
+    if (y < height * edgeThreshold) {
+      return "top";
+    } else if (y > height * (1 - edgeThreshold)) {
+      return "bottom";
+    }
+    // Check horizontal position (left/right)
+    else if (x < width * edgeThreshold) {
+      return "left";
+    } else if (x > width * (1 - edgeThreshold)) {
+      return "right";
+    }
+    // Center region (as child)
+    else {
+      return "center";
+    }
   };
 
   const handleDragStart = (e: React.DragEvent, nodeId: string) => {
@@ -422,11 +405,8 @@ function OrgChartView() {
       ...prevLog.slice(0, 49), // Keep last 50 entries
     ]);
 
-    // Prevent scrolling during drag
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.style.overflow = "hidden";
-    }
+    // Prevent scrolling during drag using state
+    setIsScrollEnabled(false);
   };
 
   const handleDragEnd = () => {
@@ -434,11 +414,8 @@ function OrgChartView() {
     setDraggingNodeId(null);
     setDragOverNodeId(null);
 
-    // Re-enable scrolling after drag
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.style.overflow = "auto";
-    }
+    // Re-enable scrolling after drag using state
+    setIsScrollEnabled(true);
   };
 
   const handleDragOver = (e: React.DragEvent, nodeId: string) => {
@@ -447,38 +424,9 @@ function OrgChartView() {
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
-
-    // Calculate which region the cursor is in
-    // Use a 25% threshold for edges to make center region larger
-    const edgeThreshold = 0.25;
-    let position: "top" | "bottom" | "left" | "right" | "center";
-
-    // Check vertical position first (above/below)
-    if (y < height * edgeThreshold) {
-      position = "top";
-      setDragOverPosition("top");
-    } else if (y > height * (1 - edgeThreshold)) {
-      position = "bottom";
-      setDragOverPosition("bottom");
-    }
-    // Check horizontal position (left/right)
-    else if (x < width * edgeThreshold) {
-      position = "left";
-      setDragOverPosition("left");
-    } else if (x > width * (1 - edgeThreshold)) {
-      position = "right";
-      setDragOverPosition("right");
-    }
-    // Center region (as child)
-    else {
-      position = "center";
-      setDragOverPosition("center");
-    }
+    // Calculate drop position using shared function
+    const position = calculateDropPosition(e);
+    setDragOverPosition(position);
 
     // Only log snap if it's a different node or different position
     if (dragOverNodeId !== nodeId || dragOverPosition !== position) {
@@ -563,49 +511,18 @@ function OrgChartView() {
     e.preventDefault();
     e.stopPropagation();
 
-    // Determine position at drop time from mouse position (like Menu Manager)
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
-
-    // Calculate which region the cursor is in at drop time
-    // Use the same logic as handleDragOver to ensure consistency
-    const edgeThreshold = 0.25;
-    let dropPosition: "top" | "bottom" | "left" | "right" | "center";
-    let insertPosition: "before" | "after" | "child";
-
-    // Check vertical position first (above/below)
-    if (y < height * edgeThreshold) {
-      dropPosition = "top";
-      insertPosition = "before";
-    } else if (y > height * (1 - edgeThreshold)) {
-      dropPosition = "bottom";
-      insertPosition = "after";
-    }
-    // Check horizontal position (left/right)
-    else if (x < width * edgeThreshold) {
-      dropPosition = "left";
-      insertPosition = "before";
-    } else if (x > width * (1 - edgeThreshold)) {
-      dropPosition = "right";
-      insertPosition = "after";
-    }
-    // Center region (as child)
-    else {
-      dropPosition = "center";
-      insertPosition = "child";
-    }
+    // Calculate drop position using shared function
+    const dropPosition = calculateDropPosition(e);
+    const insertPosition: "before" | "after" | "child" =
+      dropPosition === "center"
+        ? "child"
+        : dropPosition === "top" || dropPosition === "left"
+        ? "before"
+        : "after";
 
     // Store IDs before clearing state
     const currentDraggingId = draggingNodeId;
     const currentTargetId = targetNodeId;
-
-    // Store before hierarchy for debug
-    const beforeHierarchy = JSON.parse(
-      JSON.stringify(data.hierarchy)
-    ) as OrgChartNode[];
 
     // Deep clone the entire structure (like Menu Manager)
     const newHierarchy = JSON.parse(
@@ -736,16 +653,11 @@ function OrgChartView() {
     // (exactly like Menu Manager does)
     const updatedHierarchy = createNewArrayStructure(newHierarchy);
 
-    // Capture after hierarchy for debug
-    const afterHierarchy = JSON.parse(
-      JSON.stringify(updatedHierarchy)
-    ) as OrgChartNode[];
+    // Find node names for debug display (from original hierarchy)
+    const sourceNode = findNodeInHierarchy(data.hierarchy, currentDraggingId);
+    const destNode = findNodeInHierarchy(data.hierarchy, currentTargetId);
 
-    // Find node names for debug display
-    const sourceNode = findNodeInHierarchy(beforeHierarchy, currentDraggingId);
-    const destNode = findNodeInHierarchy(beforeHierarchy, currentTargetId);
-
-    // Add debug log entry for release
+    // Add debug log entry for release (without heavy hierarchy snapshots to save memory)
     setDebugLog((prevLog) => [
       {
         timestamp: new Date().toLocaleTimeString(),
@@ -757,8 +669,6 @@ function OrgChartView() {
           ? `${destNode.name} (${currentTargetId})`
           : `${currentTargetId}`,
         position: dropPosition,
-        beforeHierarchy,
-        afterHierarchy,
       },
       ...prevLog.slice(0, 49), // Keep last 50 entries
     ]);
@@ -1000,8 +910,10 @@ function OrgChartView() {
           </button>
           <button
             onClick={() => {
-              setShowDebugPanel(!showDebugPanel);
-              if (showJsonPanel && showDebugPanel) {
+              const newShowDebugPanel = !showDebugPanel;
+              setShowDebugPanel(newShowDebugPanel);
+              // Close JSON panel when opening debug panel (mutual exclusivity)
+              if (newShowDebugPanel && showJsonPanel) {
                 setShowJsonPanel(false);
               }
             }}
@@ -1060,9 +972,12 @@ function OrgChartView() {
         >
           <div
             ref={scrollContainerRef}
-            className="flex-1 bg-gray-800 relative overflow-auto custom-scrollbar"
+            className="flex-1 bg-gray-800 relative custom-scrollbar"
             onMouseDown={handleCanvasMouseDown}
-            style={{ cursor: isPanning ? "grabbing" : "grab" }}
+            style={{
+              cursor: isPanning ? "grabbing" : "grab",
+              overflow: isScrollEnabled ? "auto" : "hidden",
+            }}
           >
             <div
               ref={transformWrapperRef}
