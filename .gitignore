@@ -27,3 +27,5 @@ Thumbs.db
 # Existing ignored paths
 ref/
 org-data/
+nextjs/.next/
+nextjs/node_modules/
