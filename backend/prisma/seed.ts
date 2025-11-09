@@ -1,8 +1,13 @@
+import { config } from "dotenv";
+import { resolve } from "path";
 import { PrismaClient } from "@prisma/client";
 // import { seedLearningCases } from "./seed-learning-cases";
 import { seedBase } from "./seed-base";
 import { seedUSMLE } from "./seed-usmle";
 import { seedPayments } from "./seed-payments";
+
+// Load .env file from the backend directory (parent of prisma folder)
+config({ path: resolve(process.cwd(), ".env") });
 
 async function main() {
   const prisma = new PrismaClient();

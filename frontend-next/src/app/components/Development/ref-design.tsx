@@ -360,6 +360,13 @@ const RefDesign = () => {
           path: "/robotic",
           roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
         },
+        {
+          id: "question-generator",
+          label: "menu.questionGenerator",
+          icon: "❓",
+          path: "/question-generator",
+          roles: ["ADMIN", "DRIVER", "PASSENGER", "FLEET_MANAGER"],
+        },
       ],
     },
   ];

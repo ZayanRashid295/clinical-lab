@@ -72,10 +72,10 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
       return null;
     };
 
-    const syncMenuWithPath = () => {
-      const path = window.location.pathname;
-      setCurrentPath(path);
-      const menuId = findMenuIdByPath(menuItems, path);
+    const syncMenuWithPath = (path?: string) => {
+      const currentPathValue = path || window.location.pathname;
+      setCurrentPath(currentPathValue);
+      const menuId = findMenuIdByPath(menuItems, currentPathValue);
 
       if (menuId && menuId !== activeMenu) {
         setActiveMenu(menuId);
@@ -87,7 +87,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         if (parentItem && !expandedMenus.includes(parentItem.id)) {
           setExpandedMenus((prev) => [...prev, parentItem.id]);
         }
-      } else if (!menuId && path === "/") {
+      } else if (!menuId && currentPathValue === "/") {
         // Default to dashboard for root path
         setActiveMenu("dashboard");
       }
@@ -96,17 +96,25 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     // Initial sync
     syncMenuWithPath();
 
+    // Listen for Next.js router route changes
+    const handleRouteChange = (url: string) => {
+      syncMenuWithPath(url);
+    };
+
     // Listen for browser back/forward navigation
     const handlePopState = () => {
       syncMenuWithPath();
     };
 
+    // Subscribe to Next.js router events
+    router.events.on("routeChangeComplete", handleRouteChange);
     window.addEventListener("popstate", handlePopState);
 
     return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [menuItems, activeMenu, expandedMenus]);
+  }, [menuItems, activeMenu, expandedMenus, router]);
 
   const handleMenuChange = (menuId: string) => {
     // Close mobile menu when item selected
@@ -132,11 +140,8 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
       setActiveMenu(menuId);
       setCurrentPath(menuPath);
 
-      // Update the URL without triggering navigation
-      window.history.pushState(null, "", menuPath);
-
-      // Trigger a custom event for any components that need to know about route changes
-      window.dispatchEvent(new PopStateEvent("popstate"));
+      // Use Next.js router for navigation to ensure proper route handling
+      router.push(menuPath, undefined, { shallow: false });
     } else {
       // Only set activeMenu directly if no path found (shouldn't happen normally)
       setActiveMenu(menuId);

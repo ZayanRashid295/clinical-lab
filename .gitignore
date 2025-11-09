@@ -1,3 +1,29 @@
-ref/
+# Dependency directories
+node_modules/
+.env
+.env.*
+.env.example
+dist/
+build/
 
+# Python (if backend uses Python)
+__pycache__/
+*.py[cod]
+venv/
+ENV/
+env/
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Existing ignored paths
+ref/
 org-data/

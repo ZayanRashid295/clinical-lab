@@ -62,6 +62,11 @@ import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
 // Import robotic components
 import RobotFace from "../components/robotic/RobotFace";
 
+// Import question generator components
+import QuestionGeneratorPage from "../components/question-generator/QuestionGeneratorPage";
+import QuestionGeneratorStudent from "../components/question-generator/QuestionGeneratorStudent";
+import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
+
 // Import development components
 import MenuManager from "../components/Development/MenuManager";
 import RefDesign from "../components/Development/ref-design";
@@ -195,6 +200,11 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Robotic routes
     "/robotic": () => <RobotFace />,
+
+    // Question generator routes
+    "/question-generator": () => <QuestionGeneratorPage />,
+    "/question-generator/student": () => <QuestionGeneratorStudent />,
+    "/question-generator/admin": () => <QuestionGeneratorAdmin />,
 
     // Development routes
     "/development/menu-manager": () => <MenuManager />,

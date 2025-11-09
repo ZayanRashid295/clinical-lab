@@ -1,134 +1,66 @@
-import * as React from "react";
-import { cn } from "@/shared/utils/cn";
+'use client'
 
-interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
-  type?: "single" | "multiple";
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
+import * as React from 'react'
+import * as AccordionPrimitive from '@radix-ui/react-accordion'
+import { ChevronDownIcon } from 'lucide-react'
+
+import { cn } from '@/shared/utils/cn'
+
+function Accordion({
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Root>) {
+  return <AccordionPrimitive.Root data-slot="accordion" {...props} />
 }
 
-const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-  ({ className, type = "single", value, onValueChange, children, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn("space-y-2", className)}
-        {...props}
-      >
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            const itemValue = (child as React.ReactElement<AccordionItemProps>).props.value;
-            const isOpen = type === "multiple"
-              ? Array.isArray(value) && value.includes(itemValue)
-              : value === itemValue;
-            
-            return React.cloneElement(child, {
-              isOpen,
-              onToggle: () => {
-                if (type === "multiple") {
-                  const currentValue = Array.isArray(value) ? value : [];
-                  const newValue = isOpen
-                    ? currentValue.filter((v) => v !== itemValue)
-                    : [...currentValue, itemValue];
-                  onValueChange?.(newValue);
-                } else {
-                  onValueChange?.(isOpen ? "" : itemValue);
-                }
-              },
-            } as any);
-          }
-          return child;
-        })}
-      </div>
-    );
-  }
-);
-Accordion.displayName = "Accordion";
-
-interface AccordionItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: string;
-  isOpen?: boolean;
-  onToggle?: () => void;
+function AccordionItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+  return (
+    <AccordionPrimitive.Item
+      data-slot="accordion-item"
+      className={cn('border-b last:border-b-0', className)}
+      {...props}
+    />
+  )
 }
 
-const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
-  ({ className, value, isOpen, onToggle, children, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn("border rounded-lg", className)}
-        {...props}
-      >
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              isOpen,
-              onToggle,
-            } as any);
-          }
-          return child;
-        })}
-      </div>
-    );
-  }
-);
-AccordionItem.displayName = "AccordionItem";
-
-interface AccordionTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  isOpen?: boolean;
-  onToggle?: () => void;
-}
-
-const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  ({ className, isOpen, onToggle, children, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        type="button"
-        onClick={onToggle}
+function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+  return (
+    <AccordionPrimitive.Header className="flex">
+      <AccordionPrimitive.Trigger
+        data-slot="accordion-trigger"
         className={cn(
-          "flex w-full items-center justify-between py-3 px-3 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-          className
+          'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
+          className,
         )}
         {...props}
       >
         {children}
-        <svg
-          className="h-4 w-4 shrink-0 transition-transform duration-200"
-          style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-        >
-          <path
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-    );
-  }
-);
-AccordionTrigger.displayName = "AccordionTrigger";
+        <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+}
 
-const AccordionContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { isOpen?: boolean }
->(({ className, isOpen, children, ...props }, ref) => {
-  if (!isOpen) return null;
-  
+function AccordionContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Content>) {
   return (
-    <div
-      ref={ref}
-      className={cn("overflow-hidden text-sm transition-all", className)}
+    <AccordionPrimitive.Content
+      data-slot="accordion-content"
+      className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
       {...props}
     >
-      {children}
-    </div>
-  );
-});
-AccordionContent.displayName = "AccordionContent";
+      <div className={cn('pt-0 pb-4', className)}>{children}</div>
+    </AccordionPrimitive.Content>
+  )
+}
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
-
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
