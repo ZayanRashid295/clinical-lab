@@ -8,14 +8,20 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from "@nestjs/swagger";
+import { Express } from "express";
 import { QuestionsService } from "./questions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CreateQuestionDto } from "./dto/create-question.dto";
@@ -298,5 +304,38 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async removeQuestionChoice(@Param("id") id: string) {
     return this.questionsService.removeQuestionChoice(id);
+  }
+
+  @Post("upload-image")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor("image"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        image: {
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: "Upload image for question content" })
+  @ApiResponse({
+    status: 201,
+    description: "Image uploaded successfully",
+    schema: {
+      type: "object",
+      properties: {
+        url: { type: "string" },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: "Invalid file" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.questionsService.uploadImage(file);
   }
 }

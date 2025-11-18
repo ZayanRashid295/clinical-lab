@@ -88,8 +88,35 @@ export interface CreateQuestionDto {
   difficulty?: "easy" | "medium" | "hard";
   points?: number;
   isActive?: boolean;
+  subject?: string;
+  system?: string;
+  chapterId?: string;
+  sectionId?: string;
+  tags?: string[];
+  explanationBlocks?: Array<{
+    type: "TEXT" | "TABLE" | "IMAGES";
+    order?: number;
+    data: any;
+  }>;
+  perAnswerExplanations?: Record<
+    string,
+    Array<{
+      type: "TEXT" | "TABLE" | "IMAGES";
+      order?: number;
+      data: any;
+    }>
+  >;
+  questionStemBlocks?: Array<{
+    type: "TEXT" | "IMAGES" | "TABLE";
+    order?: number;
+    data: any;
+  }>;
+  choices?: Array<{
+    text: string;
+    isCorrect: boolean;
+    order: number;
+  }>;
 }
-
 export interface UpdateQuestionDto {
   topicId?: string;
   productTagId?: string;

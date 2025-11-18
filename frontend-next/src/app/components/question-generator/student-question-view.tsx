@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/shared/ui/card"
 import QuestionPanel from "./question-panel"
 import ExplanationPanel from "./explanation-panel"
+import { QuestionsService } from "@/app/services/questions/questions.service"
 
 const DEMO_QUESTION = {
   id: "demo-1",
@@ -129,26 +130,309 @@ export default function StudentQuestionView() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [questions, setQuestions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const questionsService = new QuestionsService()
+
+  // Transform backend question to frontend format
+  const transformBackendToFrontend = (backendQuestion: any) => {
+    if (!backendQuestion) {
+      throw new Error("Backend question is null or undefined")
+    }
+
+    const choices = Array.isArray(backendQuestion.choices) ? backendQuestion.choices : []
+    
+    if (choices.length === 0) {
+      console.warn(`⚠️ Question ${backendQuestion.id} has no choices`)
+    }
+    
+    const options = choices.map((choice: any, index: number) => ({
+      label: String.fromCharCode(65 + index), // A, B, C, D, E
+      value: String.fromCharCode(65 + index),
+      text: choice.text || "",
+      correct: choice.isCorrect || false,
+    }))
+
+    // Transform explanation blocks
+    const explanationBlocks = Array.isArray(backendQuestion.explanationBlocks) 
+      ? backendQuestion.explanationBlocks 
+      : []
+    
+    const explanation = explanationBlocks.map((block: any) => {
+      if (!block) return null
+      
+      // Check for per-answer-explanation placeholder FIRST, before processing TEXT blocks
+      // This handles blocks saved as TEXT with placeholder marker
+      if (block.type === "PER_ANSWER_EXPLANATION" || (block.data && (block.data.placeholder === true || block.data.isPerAnswerExplanation === true))) {
+        // Handle PER-ANSWER-EXPLANATION placeholder blocks
+        return {
+          id: block.id || `per-answer-${Math.random()}`,
+          type: "per-answer-explanation",
+          data: { placeholder: true },
+        }
+      }
+      
+      if (block.type === "TEXT") {
+        // Handle TEXT blocks - preserve both HTML and markdown for backward compatibility
+        const blockData = block.data || {}
+        
+        return {
+          id: block.id || `text-${Math.random()}`,
+          type: "text",
+          data: {
+            // Preserve HTML if it exists
+            html: blockData.html || "",
+            // Preserve markdown as fallback (for old questions or conversion)
+            markdown: blockData.markdown || blockData.content || (typeof blockData === "string" ? blockData : ""),
+            // Keep other fields for backward compatibility
+            ...blockData,
+          },
+        }
+      } else if (block.type === "TABLE") {
+        // Handle TABLE blocks
+        return {
+          id: block.id || `table-${Math.random()}`,
+          type: "table",
+          data: block.data || {},
+        }
+      } else if (block.type === "IMAGES") {
+        // Handle IMAGES blocks
+        return {
+          id: block.id || `images-${Math.random()}`,
+          type: "images",
+          data: block.data || {},
+        }
+      } else {
+        // Default to text
+        return {
+          id: block.id || `block-${Math.random()}`,
+          type: "text",
+          data: block.data || {},
+        }
+      }
+    }).filter((block: any) => block !== null)
+
+    // Transform per-answer explanations - preserve block structure for rich content
+    const perAnswerExplanations: Record<string, string | any[]> = {}
+    if (backendQuestion.perAnswerExplanations && Array.isArray(backendQuestion.perAnswerExplanations)) {
+      for (const pae of backendQuestion.perAnswerExplanations) {
+        if (!pae || !pae.choiceLabel) continue
+        
+        const blocks = Array.isArray(pae.blocks) ? pae.blocks : []
+        
+        // Check if we have rich content blocks (TABLE, IMAGES) or just TEXT
+        const hasRichContent = blocks.some((b: any) => b && (b.type === "TABLE" || b.type === "IMAGES"))
+        
+        if (hasRichContent) {
+          // Transform to frontend block format
+          const transformedBlocks = blocks
+            .filter((b: any) => b != null)
+            .map((b: any) => {
+              if (b.type === "TEXT") {
+                // Preserve HTML from block data
+                const blockData = b.data || {}
+                return {
+                  id: b.id || `text-${Math.random()}`,
+                  type: "text",
+                  data: {
+                    html: blockData.html || "",
+                    ...blockData,
+                  },
+                }
+              } else if (b.type === "TABLE") {
+                return {
+                  id: b.id || `table-${Math.random()}`,
+                  type: "table",
+                  data: b.data || {},
+                }
+              } else if (b.type === "IMAGES") {
+                return {
+                  id: b.id || `images-${Math.random()}`,
+                  type: "images",
+                  data: b.data || {},
+                }
+              }
+              return null
+            })
+            .filter((b: any) => b !== null)
+          
+          if (transformedBlocks.length > 0) {
+            perAnswerExplanations[pae.choiceLabel] = transformedBlocks
+          }
+        } else {
+          // Simple text explanation - preserve as blocks with HTML
+          const transformedBlocks = blocks
+            .filter((b: any) => b != null && b.type === "TEXT")
+            .map((b: any) => {
+              const blockData = b.data || {}
+              return {
+                id: b.id || `text-${Math.random()}`,
+                type: "text",
+                data: {
+                  html: blockData.html || "",
+                  ...blockData,
+                },
+              }
+            })
+          
+          if (transformedBlocks.length > 0) {
+            perAnswerExplanations[pae.choiceLabel] = transformedBlocks
+          }
+        }
+      }
+    }
+
+    // Transform question stem blocks
+    const questionStemBlocks = Array.isArray(backendQuestion.questionStemBlocks) && backendQuestion.questionStemBlocks.length > 0
+      ? backendQuestion.questionStemBlocks.map((block: any) => ({
+          id: block.id || Date.now(),
+          type: block.type?.toLowerCase() || "text",
+          data: block.data || {},
+        }))
+      : []
+
+    return {
+      id: backendQuestion.id,
+      stem: backendQuestion.question || "",
+      questionStemBlocks,
+      subject: backendQuestion.subject || "",
+      system: backendQuestion.system || "",
+      topic: backendQuestion.topic,
+      options,
+      explanation,
+      perAnswerExplanations,
+      tags: Array.isArray(backendQuestion.tags) ? backendQuestion.tags : [],
+    }
+  }
 
   useEffect(() => {
-    const saved = localStorage.getItem("uworld_questions")
-    if (saved) {
-      try {
-        const parsedQuestions = JSON.parse(saved)
-        if (Array.isArray(parsedQuestions) && parsedQuestions.length > 0) {
-          setQuestions(parsedQuestions)
-        } else {
-          setQuestions([DEMO_QUESTION])
-        }
-      } catch (e) {
-        console.error("Failed to load questions:", e)
-        setQuestions([DEMO_QUESTION])
-      }
-    } else {
-      setQuestions([DEMO_QUESTION])
-    }
-    setLoading(false)
+    loadQuestions()
   }, [])
+
+  const loadQuestions = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      console.log("🔍 Starting to load questions from database...")
+      
+      // Check if auth token exists
+      const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null
+      if (!token) {
+        console.warn("⚠️ No auth token found. Questions endpoint requires authentication.")
+        setError("Authentication required. Please log in to view questions.")
+        setQuestions([DEMO_QUESTION])
+        setLoading(false)
+        return
+      }
+      
+      // Fetch questions with pagination (max 100 per request)
+      let allQuestions: any[] = []
+      let page = 1
+      const limit = 100
+      let hasMore = true
+      let totalPages = 1
+
+      while (hasMore && page <= 10) { // Limit to 10 pages max to prevent infinite loops
+        console.log(`📄 Fetching page ${page}...`)
+
+        const response = await questionsService.getQuestions({ 
+          status: "ACTIVE",
+          page,
+          limit,
+          sortBy: "createdAt",
+          sortOrder: "asc",
+        })
+        
+        console.log(`📦 Response received:`, {
+          isArray: Array.isArray(response),
+          hasData: !!(response as any)?.data,
+          pagination: (response as any)?.pagination,
+        })
+        
+        const questionsData = Array.isArray(response) 
+          ? response 
+          : (response as any)?.data || []
+        
+        console.log(`📊 Found ${questionsData.length} questions on page ${page}`)
+        
+        allQuestions = [...allQuestions, ...questionsData]
+        
+        // Check if there are more pages
+        if (Array.isArray(response)) {
+          hasMore = questionsData.length === limit
+        } else {
+          const pagination = (response as any)?.pagination
+          if (pagination) {
+            totalPages = pagination.totalPages
+            hasMore = page < pagination.totalPages
+          } else {
+            hasMore = questionsData.length === limit
+          }
+        }
+        
+        // If no questions on this page, stop
+        if (questionsData.length === 0) {
+          hasMore = false
+        }
+        
+        page++
+      }
+      
+      console.log(`✅ Loaded ${allQuestions.length} total questions from database`)
+      
+      if (allQuestions.length === 0) {
+        console.log("⚠️ No questions found in database, using demo question")
+        setError("No questions found in database. Using demo question.")
+        setQuestions([DEMO_QUESTION])
+        setLoading(false)
+        return
+      }
+      
+      const transformedQuestions = allQuestions.map((q, idx) => {
+        try {
+          return transformBackendToFrontend(q)
+        } catch (transformErr: any) {
+          console.error(`❌ Failed to transform question ${idx}:`, transformErr)
+          console.error("Question data:", q)
+          return null
+        }
+      }).filter((q) => q !== null)
+      
+      console.log(`✅ Transformed ${transformedQuestions.length} questions successfully`)
+      
+      if (transformedQuestions.length === 0) {
+        console.log("⚠️ All questions failed transformation, using demo question")
+        setError("Failed to process questions from database. Using demo question.")
+        setQuestions([DEMO_QUESTION])
+      } else {
+        console.log(`✅ Setting ${transformedQuestions.length} questions`)
+        setQuestions(transformedQuestions)
+      }
+    } catch (err: any) {
+      console.error("❌ Failed to load questions:", err)
+      console.error("Error details:", {
+        message: err.message,
+        stack: err.stack,
+        response: err.response,
+      })
+      
+      // Try to get more details from the error
+      let errorMessage = err.message || "Failed to load questions"
+      if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
+        errorMessage = "Authentication required. Please log in to view questions."
+      } else if (err.message?.includes("403") || err.message?.includes("Forbidden")) {
+        errorMessage = "You don't have permission to view questions."
+      } else if (err.message?.includes("Network") || err.message?.includes("fetch")) {
+        errorMessage = "Network error. Please check your connection."
+      }
+      
+      setError(errorMessage)
+      // Fallback to demo question on error
+      setQuestions([DEMO_QUESTION])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSelectAnswer = (option: string) => {
     if (!answered) {
@@ -173,11 +457,34 @@ export default function StudentQuestionView() {
     }
   }
 
-  if (loading || questions.length === 0) {
+  if (loading) {
     return (
       <div className="h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <Card className="p-8 sm:p-12 text-center w-full max-w-md bg-card/50 backdrop-blur-sm">
-          <p className="text-foreground/70">{loading ? "Loading questions..." : "Loading demo question..."}</p>
+          <p className="text-foreground/70">Loading questions from database...</p>
+          {error && (
+            <p className="text-destructive mt-2 text-sm">{error}</p>
+          )}
+        </Card>
+      </div>
+    )
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <Card className="p-8 sm:p-12 text-center w-full max-w-md bg-card/50 backdrop-blur-sm">
+          <p className="text-foreground/70 mb-4">
+            {error ? "Failed to load questions" : "No questions available"}
+          </p>
+          {error && (
+            <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm">{error}</p>
+            </div>
+          )}
+          <p className="text-muted-foreground mt-4 text-sm">
+            Using demo question as fallback
+          </p>
         </Card>
       </div>
     )
@@ -188,6 +495,7 @@ export default function StudentQuestionView() {
   const isCorrect = selectedAnswer === correctOption?.value
   const correctAnswerLabel = correctOption?.label
   const correctAnswerText = correctOption?.text
+
 
   return (
     <div className="h-full bg-background dark:bg-background flex flex-col">
@@ -291,6 +599,9 @@ export default function StudentQuestionView() {
                   correctAnswerLabel={correctAnswerLabel}
                   options={currentQuestion.options}
                   perAnswerExplanations={currentQuestion.perAnswerExplanations}
+                  subject={currentQuestion.subject}
+                  system={currentQuestion.system}
+                  topic={currentQuestion.topic}
                 />
               </div>
             ) : (

@@ -16,16 +16,17 @@ interface Question {
 interface QuestionListProps {
   questions: Question[]
   onEdit: (id: string) => void
+  onView?: (id: string) => void
   onDelete: (id: string) => void
 }
 
-export default function QuestionList({ questions, onEdit, onDelete }: QuestionListProps) {
+export default function QuestionList({ questions, onEdit, onView, onDelete }: QuestionListProps) {
   return (
     <div className="space-y-4">
       {questions.map((question) => (
         <Card key={question.id} className="p-6 hover:shadow-lg transition-shadow">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Question Content */}
+            {/* Question Stem Content */}
             <div className="lg:col-span-2">
               <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">{question.stem}</h3>
               <div className="space-y-1">
@@ -68,6 +69,15 @@ export default function QuestionList({ questions, onEdit, onDelete }: QuestionLi
 
             {/* Actions */}
             <div className="flex gap-2 lg:justify-end items-center">
+              {onView && (
+                <Button 
+                  onClick={() => onView(question.id)} 
+                  variant="outline" 
+                  className="flex-1 lg:flex-none bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
+                >
+                  View
+                </Button>
+              )}
               <Button onClick={() => onEdit(question.id)} variant="outline" className="flex-1 lg:flex-none">
                 Edit
               </Button>

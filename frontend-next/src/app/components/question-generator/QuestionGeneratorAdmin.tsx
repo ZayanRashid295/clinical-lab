@@ -15,9 +15,9 @@ export default function QuestionGeneratorAdmin() {
     router.push("/question-generator/student")
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="sticky top-0 z-40 bg-card/95 backdrop-blur border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="flex-shrink-0 z-40 bg-card/95 backdrop-blur border-b border-border">
+        <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4 w-full">
           <button
             onClick={handleBackClick}
             className="font-bold text-foreground hover:text-primary transition-colors text-sm sm:text-base"
@@ -38,8 +38,14 @@ export default function QuestionGeneratorAdmin() {
       </div>
 
       {/* Content */}
+      <div className="flex-1 min-h-0 overflow-hidden">
       <AdminDashboard />
+      </div>
     </div>
   )
 }
+
+
+
+
 

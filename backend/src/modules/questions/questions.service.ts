@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import * as fs from "fs";
+import * as path from "path";
+import { Express } from "express";
+import * as sharp from "sharp";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
@@ -40,7 +44,7 @@ export class QuestionsService {
         page = 1,
         limit = 10,
         sortBy = "createdAt",
-        sortOrder = "desc",
+        sortOrder = "asc",
       } = query;
 
       // Build where clause
@@ -104,7 +108,20 @@ export class QuestionsService {
               order: "asc",
             },
           },
+          questionStemBlocks: {
+            orderBy: { order: "asc" },
+          },
+          explanationBlocks: {
+            orderBy: { order: "asc" },
+          },
+          perAnswerExplanations: {
+            include: {
+              blocks: { orderBy: { order: "asc" } },
+            },
+          },
           productTag: true,
+          chapter: true,
+          section: true,
           topic: {
             include: {
               chapter: {
@@ -195,7 +212,7 @@ export class QuestionsService {
           },
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
         take: filters.limit,
         skip: filters.offset,
@@ -306,7 +323,7 @@ export class QuestionsService {
           productTag: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
         take: limit,
         skip: offset,
@@ -372,7 +389,7 @@ export class QuestionsService {
           },
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
         take: limit,
         skip: offset,
@@ -425,7 +442,20 @@ export class QuestionsService {
             order: "asc",
           },
         },
+        questionStemBlocks: {
+          orderBy: { order: "asc" },
+        },
+        explanationBlocks: {
+          orderBy: { order: "asc" },
+        },
+        perAnswerExplanations: {
+          include: {
+            blocks: { orderBy: { order: "asc" } },
+          },
+        },
         productTag: true,
+        chapter: true,
+        section: true,
         topic: {
           include: {
             chapter: {
@@ -455,11 +485,174 @@ export class QuestionsService {
   }
 
   async create(createQuestionDto: CreateQuestionDto) {
-    return this.prisma.question.create({
-      data: createQuestionDto,
+    try {
+    // Extract rich explanation parts not directly mappable to Question fields
+    const {
+      explanationBlocks,
+      perAnswerExplanations,
+      questionStemBlocks,
+      tags,
+      chapterId,
+      sectionId,
+      ...questionCore
+    } = createQuestionDto as any;
+
+    // If chapterId is provided, fetch chapter name for subject
+    if (chapterId && !questionCore.subject) {
+      const chapter = await this.prisma.chapter.findUnique({
+        where: { id: chapterId },
+        select: { name: true },
+      });
+      if (chapter) {
+        questionCore.subject = chapter.name;
+      }
+    }
+
+    // If sectionId is provided, fetch section name for system
+    if (sectionId && !questionCore.system) {
+      const section = await this.prisma.section.findUnique({
+        where: { id: sectionId },
+        select: { name: true },
+      });
+      if (section) {
+        questionCore.system = section.name;
+      }
+    }
+
+    // Prepare tags as JSON if provided
+    const tagsJson = Array.isArray(tags) ? (tags as string[]) : undefined;
+
+    // Build nested create for explanation blocks
+    const explanationBlocksCreate =
+      Array.isArray(explanationBlocks) && explanationBlocks.length > 0
+        ? {
+              create: explanationBlocks.map((b: any, idx: number) => {
+                // Ensure data is a valid JSON object
+                let blockData = b.data;
+                if (typeof blockData !== "object" || blockData === null) {
+                  blockData = {};
+                }
+                
+                // Ensure type is valid
+                const validTypes = ["TEXT", "TABLE", "IMAGES"];
+                const blockType = validTypes.includes(b.type?.toUpperCase()) 
+                  ? b.type.toUpperCase() 
+                  : "TEXT";
+
+                return {
+                  type: blockType,
+              order: typeof b.order === "number" ? b.order : idx,
+                  data: blockData,
+                };
+              }),
+          }
+        : undefined;
+
+    // Build nested create for per-answer explanations
+    const perAnswerCreate =
+      perAnswerExplanations && typeof perAnswerExplanations === "object"
+        ? {
+            create: Object.entries(perAnswerExplanations).map(
+                ([label, blocks]: [string, any[]]) => {
+                  if (!Array.isArray(blocks)) {
+                    return {
+                      choiceLabel: String(label),
+                      blocks: { create: [] },
+                    };
+                  }
+
+                  return {
+                choiceLabel: String(label),
+                blocks: {
+                      create: blocks.map((b: any, idx: number) => {
+                        // Ensure data is a valid JSON object
+                        let blockData = b.data;
+                        if (typeof blockData !== "object" || blockData === null) {
+                          blockData = {};
+                        }
+                        
+                        // Ensure type is valid
+                        const validTypes = ["TEXT", "TABLE", "IMAGES"];
+                        const blockType = validTypes.includes(b.type?.toUpperCase()) 
+                          ? b.type.toUpperCase() 
+                          : "TEXT";
+
+                        return {
+                          type: blockType,
+                        order: typeof b.order === "number" ? b.order : idx,
+                          data: blockData,
+                        };
+                      }),
+                },
+                  };
+                }
+            ),
+          }
+        : undefined;
+
+    // Build nested create for question stem blocks
+    const questionStemBlocksCreate =
+      Array.isArray(questionStemBlocks) && questionStemBlocks.length > 0
+        ? {
+            create: questionStemBlocks.map((b: any, idx: number) => {
+              // Ensure data is a valid JSON object
+              let blockData = b.data;
+              if (typeof blockData !== "object" || blockData === null) {
+                blockData = {};
+              }
+              
+              // Ensure type is valid
+              const validTypes = ["TEXT", "IMAGES", "TABLE"];
+              const blockType = validTypes.includes(b.type?.toUpperCase()) 
+                ? b.type.toUpperCase() 
+                : "TEXT";
+
+              return {
+                type: blockType,
+                order: typeof b.order === "number" ? b.order : idx,
+                data: blockData,
+              };
+            }),
+          }
+        : undefined;
+
+      return await this.prisma.question.create({
+      data: {
+        ...questionCore,
+        // Add chapterId and sectionId if provided
+        ...(chapterId ? { chapterId } : {}),
+        ...(sectionId ? { sectionId } : {}),
+        // Persist tags as Json if present
+        ...(tagsJson ? { tags: tagsJson as unknown as any } : {}),
+        // Nested relations
+        ...(questionStemBlocksCreate
+          ? { questionStemBlocks: questionStemBlocksCreate }
+          : {}),
+        ...(explanationBlocksCreate
+          ? { explanationBlocks: explanationBlocksCreate }
+          : {}),
+        ...(perAnswerCreate ? { perAnswerExplanations: perAnswerCreate } : {}),
+      },
       include: {
-        choices: true,
+        choices: {
+          orderBy: { order: "asc" },
+        },
+        questionStemBlocks: {
+          orderBy: { order: "asc" },
+        },
+        explanationBlocks: {
+          orderBy: { order: "asc" },
+        },
+        perAnswerExplanations: {
+          include: {
+            blocks: {
+              orderBy: { order: "asc" },
+            },
+          },
+        },
         productTag: true,
+        chapter: true,
+        section: true,
         topic: {
           include: {
             chapter: {
@@ -480,6 +673,21 @@ export class QuestionsService {
         },
       },
     });
+    } catch (error: any) {
+      console.error("Error creating question:", error);
+      console.error("Question DTO:", JSON.stringify(createQuestionDto, null, 2));
+      
+      // Provide more detailed error message
+      if (error.code === "P2002") {
+        throw new Error(`Unique constraint violation: ${error.meta?.target}`);
+      } else if (error.code === "P2003") {
+        throw new Error(`Foreign key constraint violation: ${error.meta?.field_name}`);
+      } else if (error.message) {
+        throw new Error(`Failed to create question: ${error.message}`);
+      } else {
+        throw new Error(`Failed to create question: ${JSON.stringify(error)}`);
+      }
+    }
   }
 
   async update(id: string, updateQuestionDto: UpdateQuestionDto) {
@@ -491,23 +699,156 @@ export class QuestionsService {
       throw new NotFoundException(`Question with ID ${id} not found`);
     }
 
-    return this.prisma.question.update({
-      where: { id },
-      data: updateQuestionDto,
-      include: {
-        choices: true,
-        productTag: true,
-        topic: {
-          include: {
-            chapter: {
-              include: {
-                section: {
-                  include: {
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
+    // For updates, replace explanation blocks if provided
+    const {
+      explanationBlocks,
+      perAnswerExplanations,
+      questionStemBlocks,
+      tags,
+      chapterId,
+      sectionId,
+      ...questionCore
+    } = updateQuestionDto as any;
+
+    // If chapterId is provided, fetch chapter name for subject
+    if (chapterId && !questionCore.subject) {
+      const chapter = await this.prisma.chapter.findUnique({
+        where: { id: chapterId },
+        select: { name: true },
+      });
+      if (chapter) {
+        questionCore.subject = chapter.name;
+      }
+    }
+
+    // If sectionId is provided, fetch section name for system
+    if (sectionId && !questionCore.system) {
+      const section = await this.prisma.section.findUnique({
+        where: { id: sectionId },
+        select: { name: true },
+      });
+      if (section) {
+        questionCore.system = section.name;
+      }
+    }
+
+    // Prepare core update data
+    const data: any = {
+      ...questionCore,
+    };
+    if (Array.isArray(tags)) {
+      data.tags = tags as unknown as any;
+    }
+    if (chapterId) {
+      data.chapterId = chapterId;
+    }
+    if (sectionId) {
+      data.sectionId = sectionId;
+    }
+
+    // Execute in a transaction to keep consistency
+    return this.prisma.$transaction(async (tx) => {
+      // Update core fields
+      const updated = await tx.question.update({
+        where: { id },
+        data,
+      });
+
+      // Replace main explanation blocks if provided
+      if (Array.isArray(explanationBlocks)) {
+        await tx.explanationBlock.deleteMany({
+          where: { questionId: id },
+        });
+        if (explanationBlocks.length > 0) {
+          await tx.explanationBlock.createMany({
+            data: explanationBlocks.map((b: any, idx: number) => ({
+              questionId: id,
+              type: b.type,
+              order: typeof b.order === "number" ? b.order : idx,
+              data: b.data,
+            })),
+          });
+        }
+      }
+
+      // Replace per-answer explanations if provided
+      if (perAnswerExplanations && typeof perAnswerExplanations === "object") {
+        // Delete existing per-answer explanations and their blocks
+        const existing = await tx.perAnswerExplanation.findMany({
+          where: { questionId: id },
+          select: { id: true },
+        });
+        if (existing.length > 0) {
+          const existingIds = existing.map((e) => e.id);
+          await tx.explanationBlock.deleteMany({
+            where: { perAnswerId: { in: existingIds } },
+          });
+          await tx.perAnswerExplanation.deleteMany({
+            where: { id: { in: existingIds } },
+          });
+        }
+        // Create new ones
+        for (const [label, blocks] of Object.entries(perAnswerExplanations)) {
+          const pae = await tx.perAnswerExplanation.create({
+            data: {
+              questionId: id,
+              choiceLabel: String(label),
+            },
+          });
+          if (Array.isArray(blocks) && blocks.length > 0) {
+            await tx.explanationBlock.createMany({
+              data: blocks.map((b: any, idx: number) => ({
+                perAnswerId: pae.id,
+                type: b.type,
+                order: typeof b.order === "number" ? b.order : idx,
+                data: b.data,
+              })),
+            });
+          }
+        }
+      }
+
+      // Replace question stem blocks if provided
+      if (Array.isArray(questionStemBlocks)) {
+        // Use the correct Prisma model name (camelCase of QuestionStemBlock)
+        const QuestionStemBlockModel = (tx as any).questionStemBlock;
+        if (QuestionStemBlockModel) {
+          await QuestionStemBlockModel.deleteMany({
+            where: { questionId: id },
+          });
+          if (questionStemBlocks.length > 0) {
+            await QuestionStemBlockModel.createMany({
+              data: questionStemBlocks.map((b: any, idx: number) => ({
+                questionId: id,
+                type: b.type,
+                order: typeof b.order === "number" ? b.order : idx,
+                data: b.data,
+              })),
+            });
+          }
+        }
+      }
+
+      // Return full object with includes
+      return tx.question.findUnique({
+        where: { id },
+        include: {
+          choices: { orderBy: { order: "asc" } },
+          questionStemBlocks: { orderBy: { order: "asc" } },
+          explanationBlocks: { orderBy: { order: "asc" } },
+          perAnswerExplanations: {
+            include: { blocks: { orderBy: { order: "asc" } } },
+          },
+          productTag: true,
+          chapter: true,
+          section: true,
+          topic: {
+            include: {
+              chapter: {
+                include: {
+                  section: {
+                    include: {
+                      product: { select: { id: true, name: true } },
                     },
                   },
                 },
@@ -515,7 +856,7 @@ export class QuestionsService {
             },
           },
         },
-      },
+      });
     });
   }
 
@@ -779,5 +1120,93 @@ export class QuestionsService {
 
   async removeQuestionChoice(id: string) {
     return this.removeChoice(id);
+  }
+
+  async uploadImage(file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException("No file uploaded");
+    }
+
+    // Validate file type
+    const allowedMimeTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException("Invalid file type. Only images are allowed.");
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      throw new BadRequestException("File size exceeds 5MB limit");
+    }
+
+    // Create uploads directory if it doesn't exist
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const fileExtension = path.extname(file.originalname);
+    const filename = `${timestamp}-${randomString}${fileExtension}`;
+    const filepath = path.join(uploadsDir, filename);
+
+    try {
+      // Process image with sharp to reduce size
+      const image = sharp(file.buffer);
+      const metadata = await image.metadata();
+      
+      // Resize image if it's too large (max width 1200px, maintain aspect ratio)
+      const maxWidth = 1200;
+      let processedImage = image;
+      
+      if (metadata.width && metadata.width > maxWidth) {
+        processedImage = image.resize(maxWidth, null, {
+          withoutEnlargement: true,
+          fit: 'inside',
+        });
+      }
+
+      // Determine output format and filename
+      let finalFilename = filename;
+      let finalFilepath = filepath;
+
+      // Compress and save based on image type
+      if (file.mimetype === 'image/png') {
+        await processedImage
+          .png({ quality: 80, compressionLevel: 9 })
+          .toFile(finalFilepath);
+      } else if (file.mimetype === 'image/gif') {
+        // GIFs are converted to PNG for better compression
+        finalFilename = filename.replace(/\.gif$/i, '.png');
+        finalFilepath = path.join(uploadsDir, finalFilename);
+        await processedImage
+          .png({ quality: 80, compressionLevel: 9 })
+          .toFile(finalFilepath);
+      } else if (file.mimetype === 'image/webp') {
+        await processedImage
+          .webp({ quality: 80 })
+          .toFile(finalFilepath);
+      } else {
+        // JPEG - use quality compression
+        await processedImage
+          .jpeg({ quality: 80, mozjpeg: true })
+          .toFile(finalFilepath);
+      }
+
+    // Return URL (adjust based on your server configuration)
+    const baseUrl = process.env.API_URL || "http://localhost:3000";
+      const url = `${baseUrl}/uploads/${finalFilename}`;
+
+    return { url };
+    } catch (error) {
+      console.error("Error processing image:", error);
+      // Fallback to saving original file if processing fails
+      fs.writeFileSync(filepath, file.buffer);
+      const baseUrl = process.env.API_URL || "http://localhost:3000";
+      const url = `${baseUrl}/uploads/${filename}`;
+      return { url };
+    }
   }
 }

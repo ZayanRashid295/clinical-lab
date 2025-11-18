@@ -33,7 +33,7 @@ const useQuestions = (
     page: 1,
     limit: 10,
     sortBy: "createdAt",
-    sortOrder: "desc",
+    sortOrder: "asc",
     ...initialFilters,
   });
 

@@ -67,5 +67,35 @@ export class QuestionsService extends BaseDataService<
   }> {
     return this.get(`${this.endpoint}/stats`);
   }
+
+  /**
+   * Upload an image for question content
+   */
+  async uploadImage(file: File): Promise<{ url: string }> {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const url = `${API_BASE_URL}${this.endpoint}/upload-image`;
+
+    const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {},
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to upload image: ${response.status}`);
+    }
+
+    return response.json();
+  }
 }
 

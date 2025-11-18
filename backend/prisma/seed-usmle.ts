@@ -1486,6 +1486,215 @@ export async function seedUSMLE(prisma: PrismaClient) {
     });
   }
 
+  // ========== SEED DUMMY QUESTIONS ==========
+  console.log("❓ Creating dummy questions...");
+  
+  // Get a topic to use for the dummy question (using first pathology topic)
+  const pathologyTopic = await prisma.topic.findFirst({
+    where: {
+      chapter: {
+        name: "Pathology",
+      },
+    },
+  });
+
+  if (pathologyTopic) {
+    // Get Pathology tag
+    const pathologyTag = tags["Pathology"];
+
+    // Create a dummy question with all fields
+    const dummyQuestion = await prisma.question.upsert({
+      where: {
+        id: "dummy-question-17-alpha-hydroxylase",
+      },
+      update: {},
+      create: {
+        id: "dummy-question-17-alpha-hydroxylase",
+        topicId: pathologyTopic.id,
+        productTagId: pathologyTag?.id,
+        question:
+          "A 13-year-old girl presents with lack of puberty, hypertension, hypokalemia, and low testosterone/estradiol. 46,XY karyotype. Which enzyme deficiency?",
+        subject: "Pathology",
+        system: "Endocrine",
+        tags: ["CAH", "Congenital Adrenal Hyperplasia", "Enzyme Deficiency"],
+        difficulty: "medium",
+        points: 1,
+        isActive: true,
+        explanationBlocks: {
+          create: [
+            {
+              type: "TEXT",
+              order: 0,
+              data: {
+                markdown:
+                  "### Overview\n\nThis patient is genetically male (46,XY) with features suggestive of **17α-hydroxylase deficiency**, a rare cause of congenital adrenal hyperplasia (CAH). This enzyme deficiency impairs both cortisol and androgen synthesis, leading to accumulation of precursor hormones and shunting toward the mineralocorticoid pathway.",
+              },
+            },
+            {
+              type: "TEXT",
+              order: 1,
+              data: {
+                markdown:
+                  "### Clinical Presentation\n\nThe classic triad of 17 alpha-hydroxylase deficiency includes:\n\n- **Hypertension** from excess mineralocorticoid (11-deoxycorticosterone)\n- **Hypokalemia** from aldosterone-like effects\n- **Sexual underdevelopment** from androgen deficiency",
+              },
+            },
+            {
+              type: "TABLE",
+              order: 2,
+              data: {
+                rows: 5,
+                cols: 4,
+                cells: {
+                  "0-0": "**Enzyme**",
+                  "0-1": "**Defect**",
+                  "0-2": "**Clinical Findings**",
+                  "0-3": "**Key Feature**",
+                  "1-0": "17α-hydroxylase",
+                  "1-1": "↓ Cortisol, ↓ Androgens",
+                  "1-2": "Hypertension, XX female with XY",
+                  "1-3": "46,XY phenotypic female",
+                  "2-0": "11β-hydroxylase",
+                  "2-1": "↓ Cortisol, ↑ Androgens",
+                  "2-2": "Hypertension, virilization",
+                  "2-3": "46,XY virilized female",
+                  "3-0": "5α-reductase",
+                  "3-1": "↓ DHT, normal testosterone",
+                  "3-2": "Ambiguous genitalia, gynecomastia",
+                  "3-3": "Post-pubertal virilization",
+                  "4-0": "17,20-lyase",
+                  "4-1": "↓ Androgens, normal cortisol",
+                  "4-2": "Sexual underdevelopment only",
+                  "4-3": "46,XY without hypertension",
+                },
+              },
+            },
+          ],
+        },
+        choices: {
+          create: [
+            {
+              text: "5 alpha-reductase (11%)",
+              isCorrect: false,
+              order: 0,
+            },
+            {
+              text: "17 alpha-hydroxylase (66%)",
+              isCorrect: true,
+              order: 1,
+            },
+            {
+              text: "11 beta-hydroxylase (8%)",
+              isCorrect: false,
+              order: 2,
+            },
+            {
+              text: "17,20-lyase (7%)",
+              isCorrect: false,
+              order: 3,
+            },
+            {
+              text: "3 beta-hydroxysteroid dehydrogenase (8%)",
+              isCorrect: false,
+              order: 4,
+            },
+          ],
+        },
+        perAnswerExplanations: {
+          create: [
+            {
+              choiceLabel: "A",
+              blocks: {
+                create: [
+                  {
+                    type: "TEXT",
+                    order: 0,
+                    data: {
+                      markdown:
+                        "5 alpha-reductase deficiency causes ambiguous genitalia and gynecomastia at puberty, but testosterone levels are normal or elevated and there is NO hypertension or hypokalemia. This patient has hypertension and low testosterone, which rules out this diagnosis.",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              choiceLabel: "B",
+              blocks: {
+                create: [
+                  {
+                    type: "TEXT",
+                    order: 0,
+                    data: {
+                      markdown:
+                        "17 alpha-hydroxylase deficiency is the correct answer. It causes deficiency in both cortisol and androgen synthesis, leading to hypertension (from mineralocorticoid shunting), hypokalemia, and sexual underdevelopment. The 46,XY karyotype with female phenotype is pathognomonic.",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              choiceLabel: "C",
+              blocks: {
+                create: [
+                  {
+                    type: "TEXT",
+                    order: 0,
+                    data: {
+                      markdown:
+                        "11 beta-hydroxylase deficiency causes hypertension and hypokalemia like this case, BUT it also causes virilization due to excess androgen production. This patient shows NO virilization and has FEMALE external genitalia, making this diagnosis incompatible.",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              choiceLabel: "D",
+              blocks: {
+                create: [
+                  {
+                    type: "TEXT",
+                    order: 0,
+                    data: {
+                      markdown:
+                        "17,20-lyase deficiency causes selective androgen deficiency and sexual underdevelopment, but it does NOT cause hypertension or hypokalemia. This patient has clear hypertension and electrolyte abnormalities, ruling out this diagnosis.",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              choiceLabel: "E",
+              blocks: {
+                create: [
+                  {
+                    type: "TEXT",
+                    order: 0,
+                    data: {
+                      markdown:
+                        "3 beta-hydroxysteroid dehydrogenase deficiency presents with salt-wasting crisis in severe cases, with a different biochemical pattern. Additionally, mild forms cause virilization, not the findings seen here.",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      include: {
+        choices: true,
+        explanationBlocks: true,
+        perAnswerExplanations: {
+          include: {
+            blocks: true,
+          },
+        },
+      },
+    });
+
+    console.log(`✅ Created dummy question: ${dummyQuestion.id}`);
+  } else {
+    console.log("⚠️  No pathology topic found, skipping dummy question creation");
+  }
+
   console.log("✅ USMLE database seeding completed successfully!");
   console.log("\n📊 Summary:");
   console.log(`- Product: USMLE Step 1`);
@@ -1502,4 +1711,5 @@ export async function seedUSMLE(prisma: PrismaClient) {
   console.log(
     `- Subscription Packages: 4 (Basic, Standard, Premium, Ultimate)`
   );
+  console.log(`- Dummy Questions: 1`);
 }

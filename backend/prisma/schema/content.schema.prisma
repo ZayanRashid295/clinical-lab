@@ -14,6 +14,7 @@ model Section {
   // Relations
   product  Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   chapters Chapter[]
+  questions Question[]
 
   @@unique([productId, name])
   @@map("sections")
@@ -32,6 +33,7 @@ model Chapter {
   // Relations
   section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   topics  Topic[]
+  questions Question[]
 
   @@unique([sectionId, name])
   @@map("chapters")
@@ -59,8 +61,14 @@ model Question {
   id          String   @id @default(cuid())
   topicId     String
   productTagId String?
-  question    String   // The question text
-  explanation String?  // Explanation for the correct answer
+  question    String   @db.Text // The question text/stem (supports long text)
+  explanation String?  @db.Text // Explanation for the correct answer (legacy - keep for backward compatibility)
+  // Added fields for question-generator
+  subject     String?  // Chapter name (for display)
+  system      String?  // Section name (for display)
+  chapterId   String?  // Reference to Chapter (for Subject dropdown)
+  sectionId   String?  // Reference to Section (for System dropdown)
+  tags        Json?
   difficulty  String   @default("medium") // easy, medium, hard
   points      Int      @default(1) // Points for correct answer
   isActive    Boolean  @default(true)
@@ -70,7 +78,12 @@ model Question {
   // Relations
   topic                Topic                 @relation(fields: [topicId], references: [id], onDelete: Cascade)
   productTag           ProductTag?           @relation(fields: [productTagId], references: [id])
+  chapter              Chapter?              @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  section              Section?             @relation(fields: [sectionId], references: [id], onDelete: SetNull)
   choices              QuestionChoice[]
+  questionStemBlocks   QuestionStemBlock[]  // Rich content blocks for question stem (text, images)
+  explanationBlocks    ExplanationBlock[]    @relation("QuestionExplanation")
+  perAnswerExplanations PerAnswerExplanation[]
   questionPaperQuestions QuestionPaperQuestion[]
 
   @@map("questions")
@@ -90,4 +103,71 @@ model QuestionChoice {
 
   @@unique([questionId, order])
   @@map("question_choices")
+}
+
+// Rich content blocks for explanations (supports text, tables, images)
+model ExplanationBlock {
+  id          String   @id @default(cuid())
+  questionId  String?
+  perAnswerId String?
+
+  type        ExplanationBlockType
+  order       Int      @default(0)
+  data        Json
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  question    Question?             @relation("QuestionExplanation", fields: [questionId], references: [id], onDelete: Cascade)
+  perAnswer   PerAnswerExplanation? @relation(fields: [perAnswerId], references: [id], onDelete: Cascade)
+
+  @@map("explanation_blocks")
+}
+
+enum ExplanationBlockType {
+  TEXT
+  TABLE
+  IMAGES
+}
+
+// Per-answer explanations (A, B, C, D, E)
+model PerAnswerExplanation {
+  id          String   @id @default(cuid())
+  questionId  String
+  choiceLabel String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  question    Question            @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  blocks      ExplanationBlock[]
+
+  @@unique([questionId, choiceLabel])
+  @@map("per_answer_explanations")
+}
+
+// Rich content blocks for question stem (supports text, images, and tables)
+model QuestionStemBlock {
+  id          String   @id @default(cuid())
+  questionId  String
+
+  type        QuestionStemBlockType
+  order       Int      @default(0)
+  data        Json
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  question    Question            @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("question_stem_blocks")
+}
+
+enum QuestionStemBlockType {
+  TEXT
+  IMAGES
+  TABLE
 }

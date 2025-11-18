@@ -3,16 +3,30 @@
 ## Overview
 This document proposes a database schema design for the question-generator module that supports rich content explanations including text (markdown), tables, and images.
 
+## Quick Summary
+
+### ✅ What Already Exists (No Changes Needed)
+- **Question** model with `question` field (stem)
+- **QuestionChoice** model with one-to-many relationship
+  - Already handles multiple options (A, B, C, D, E)
+  - Has `text`, `isCorrect`, `order` fields
+  - Perfect structure - no modifications needed
+
+### ❌ What Needs to Be Added
+1. **To Question model**: `subject`, `system`, `tags` fields
+2. **New tables**: `ExplanationBlock`, `PerAnswerExplanation` (for rich content)
+3. **Rich explanation support**: Replace simple string with structured blocks
+
 ## Current State Analysis
 
 ### Frontend Data Structure
 Based on the question-generator components, questions have:
-- **Stem**: Question text
-- **Options**: Array of {label, text, correct, value}
-- **Subject & System**: Metadata (e.g., "Pathology", "Endocrine")
-- **Tags**: Array of strings
-- **Explanation**: Array of content blocks with types: `text`, `table`, `images`
-- **Per-Answer Explanations**: Object with keys A-E, each containing content blocks
+- **Stem**: Question text (maps to `Question.question` field)
+- **Options**: Array of {label, text, correct, value} (maps to `QuestionChoice` relation - ✅ ALREADY EXISTS)
+- **Subject & System**: Metadata (e.g., "Pathology", "Endocrine") - ❌ MISSING
+- **Tags**: Array of strings - ❌ MISSING
+- **Explanation**: Array of content blocks with types: `text`, `table`, `images` - ❌ Currently just a String
+- **Per-Answer Explanations**: Object with keys A-E, each containing content blocks - ❌ MISSING
 
 ### Content Block Types
 1. **Text Block** (`type: "text"`)
@@ -27,13 +41,25 @@ Based on the question-generator components, questions have:
    - `data.count`: Number of images
    - `data.images`: Array of image URLs
 
-### Existing Database Schema
-The current `Question` model in `content.schema.prisma` is basic:
-- Only has `explanation` as a simple String
-- Doesn't support rich content blocks
-- Doesn't support per-answer explanations
-- Missing subject/system fields
-- Missing tags support
+### Existing Database Schema ✅
+The current schema already has:
+- **Question** model with `question` field (stem) ✅
+- **QuestionChoice** model with one-to-many relationship ✅
+  - `text`: Choice text
+  - `isCorrect`: Boolean flag
+  - `order`: For ordering (A=0, B=1, C=2, etc.)
+  - Proper relationship: `Question.choices -> QuestionChoice[]`
+
+### What's Missing ❌
+1. **Question** model missing:
+   - `subject` field (String?)
+   - `system` field (String?)
+   - `tags` field (Json? - array of strings)
+   - Rich explanation structure (currently just `explanation String?`)
+
+2. **No per-answer explanations** - completely missing
+
+3. **No rich content blocks** - explanation is just a plain string
 
 ## Proposed Database Schema
 
@@ -50,62 +76,71 @@ Store structured JSON with supporting tables for metadata and relationships.
 
 ## Recommended Schema Design (Option 3: Hybrid)
 
-### 1. Enhanced Question Model
+### 1. Enhanced Question Model (Add Missing Fields)
+
+**Keep existing structure, just ADD these fields:**
 
 ```prisma
 model Question {
   id          String   @id @default(cuid())
-  topicId     String?
+  topicId     String
   productTagId String?
   
-  // Question Content
-  stem        String   // Question text/stem
-  subject     String?  // e.g., "Pathology", "Biochemistry"
-  system      String?  // e.g., "Endocrine", "Cardiovascular"
-  difficulty  String   @default("medium") // easy, medium, hard
+  // Existing fields (KEEP AS-IS)
+  question    String   // Question text/stem (maps to frontend "stem")
+  explanation String?  // Keep for backward compatibility, but will be replaced by rich content
+  difficulty  String   @default("medium")
   points      Int      @default(1)
-  
-  // Metadata
-  tags        Json?    // Array of strings: ["CAH", "Enzyme deficiency"]
   isActive    Boolean  @default(true)
-  
-  // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relations
-  topic                Topic?                 @relation(fields: [topicId], references: [id], onDelete: SetNull)
-  productTag           ProductTag?            @relation(fields: [productTagId], references: [id], onDelete: SetNull)
-  choices              QuestionChoice[]
+  // NEW FIELDS TO ADD
+  subject     String?  // e.g., "Pathology", "Biochemistry"
+  system      String?  // e.g., "Endocrine", "Cardiovascular"
+  tags        Json?    // Array of strings: ["CAH", "Enzyme deficiency"]
+  
+  // Relations (existing - KEEP AS-IS)
+  topic                Topic                 @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  productTag           ProductTag?           @relation(fields: [productTagId], references: [id])
+  choices              QuestionChoice[]      // ✅ Already exists - one-to-many relationship
+  
+  // NEW RELATIONS TO ADD
   explanationBlocks    ExplanationBlock[]     @relation("QuestionExplanation")
   perAnswerExplanations PerAnswerExplanation[]
-  questionPaperQuestions QuestionPaperQuestion[]
+  questionPaperQuestions QuestionPaperQuestion[] // Already exists
   
   @@map("questions")
 }
 ```
 
-### 2. QuestionChoice Model (Enhanced)
+### 2. QuestionChoice Model (NO CHANGES NEEDED ✅)
+
+**This is already perfect - no changes required:**
 
 ```prisma
 model QuestionChoice {
   id         String   @id @default(cuid())
   questionId String
-  label      String   // A, B, C, D, E
-  text       String   // Choice text
-  isCorrect  Boolean  @default(false)
-  order      Int      @default(0) // For ordering (0=A, 1=B, etc.)
+  text       String   // Choice text ✅
+  isCorrect  Boolean  @default(false) ✅
+  order      Int      @default(0) // For ordering (0=A, 1=B, etc.) ✅
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   // Relations
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade) ✅
 
-  @@unique([questionId, order])
-  @@unique([questionId, label]) // Ensure unique labels per question
+  @@unique([questionId, order]) ✅
   @@map("question_choices")
 }
 ```
+
+**Note**: The frontend uses `label` (A, B, C, D, E) which can be derived from `order`:
+- order 0 = "A"
+- order 1 = "B"
+- order 2 = "C"
+- etc.
 
 ### 3. ExplanationBlock Model (Core Rich Content)
 
@@ -254,7 +289,9 @@ model QuestionImage {
 }
 ```
 
-### Example 5: Complete Question Structure
+### Example 5: Complete Question Structure (Mapping to DB)
+
+**Frontend Structure:**
 ```json
 {
   "id": "question_123",
@@ -262,28 +299,33 @@ model QuestionImage {
   "subject": "Pathology",
   "system": "Endocrine",
   "tags": ["CAH", "Enzyme deficiency", "Adrenal glands"],
-  "difficulty": "hard",
-  "points": 2,
-  "choices": [
-    { "label": "A", "text": "5 alpha-reductase", "isCorrect": false, "order": 0 },
-    { "label": "B", "text": "17 alpha-hydroxylase", "isCorrect": true, "order": 1 },
-    { "label": "C", "text": "11 beta-hydroxylase", "isCorrect": false, "order": 2 }
+  "options": [
+    { "label": "A", "text": "5 alpha-reductase", "correct": false, "value": "A" },
+    { "label": "B", "text": "17 alpha-hydroxylase", "correct": true, "value": "B" },
+    { "label": "C", "text": "11 beta-hydroxylase", "correct": false, "value": "C" }
   ],
-  "explanationBlocks": [
-    { "type": "TEXT", "order": 0, "data": { "markdown": "## Overview\n\n..." } },
-    { "type": "TABLE", "order": 1, "data": { "rows": 5, "cols": 4, "cells": {...} } },
-    { "type": "TEXT", "order": 2, "data": { "markdown": "## Why This Answer?\n\n..." } }
+  "explanation": [
+    { "type": "text", "order": 0, "data": { "markdown": "## Overview\n\n..." } },
+    { "type": "table", "order": 1, "data": { "rows": 5, "cols": 4, "cells": {...} } }
   ],
   "perAnswerExplanations": {
-    "A": [
-      { "type": "TEXT", "order": 0, "data": { "markdown": "5 alpha-reductase deficiency causes..." } }
-    ],
-    "B": [
-      { "type": "TEXT", "order": 0, "data": { "markdown": "17 alpha-hydroxylase deficiency is the correct answer..." } }
-    ]
+    "A": [{ "type": "text", "data": { "markdown": "5 alpha-reductase deficiency..." } }],
+    "B": [{ "type": "text", "data": { "markdown": "17 alpha-hydroxylase is correct..." } }]
   }
 }
 ```
+
+**Database Mapping:**
+- `stem` → `Question.question`
+- `subject` → `Question.subject` (NEW)
+- `system` → `Question.system` (NEW)
+- `tags` → `Question.tags` (NEW - JSON array)
+- `options` → `Question.choices` (QuestionChoice[]) - ✅ Already exists
+  - `label` derived from `order` (0=A, 1=B, 2=C)
+  - `text` → `QuestionChoice.text`
+  - `correct` → `QuestionChoice.isCorrect`
+- `explanation` → `Question.explanationBlocks` (ExplanationBlock[]) - NEW
+- `perAnswerExplanations` → `Question.perAnswerExplanations` (PerAnswerExplanation[]) - NEW
 
 ---
 
@@ -317,23 +359,31 @@ switch (item.type) {
 
 ## Migration Strategy
 
-### Step 1: Add New Fields to Question
-- Add `subject`, `system`, `tags` fields
-- Keep existing `explanation` field for backward compatibility
+### Step 1: Add New Fields to Question Model
+- Add `subject` (String?)
+- Add `system` (String?)
+- Add `tags` (Json?)
+- **Keep existing `explanation` field** for backward compatibility during migration
 
 ### Step 2: Create New Tables
-- Create `ExplanationBlock` table
-- Create `PerAnswerExplanation` table
-- Create `QuestionImage` table (optional)
+- Create `ExplanationBlock` table (for rich content blocks)
+- Create `PerAnswerExplanation` table (for per-answer explanations)
+- Create `QuestionImage` table (optional - for image management)
 
 ### Step 3: Migrate Existing Data
-- Convert existing `explanation` strings to `ExplanationBlock` records
+- Existing `QuestionChoice` records remain unchanged ✅
+- Convert existing `explanation` strings to `ExplanationBlock` records (type: TEXT)
 - Create migration script to parse and convert
 
 ### Step 4: Update Application Code
-- Update Prisma client
-- Update API endpoints
-- Update frontend to use new structure
+- Update Prisma client (generate new schema)
+- Update API endpoints (DTOs and services)
+- Update frontend to use new structure (minimal changes needed - just map fields)
+
+### Step 5: Backward Compatibility
+- Keep `explanation` field for a transition period
+- Support both old (string) and new (blocks) formats in API
+- Gradually migrate all questions to new format
 
 ---
 

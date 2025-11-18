@@ -6,6 +6,8 @@ import {
   IsInt,
   Min,
   IsIn,
+  IsArray,
+  IsObject,
 } from "class-validator";
 
 export class CreateQuestionDto {
@@ -74,4 +76,98 @@ export class CreateQuestionDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  // New optional metadata fields for question-generator
+  @ApiProperty({
+    description: "Subject for categorization (e.g., Pathology) - display name from Chapter",
+    required: false,
+    example: "Pathology",
+  })
+  @IsOptional()
+  @IsString()
+  subject?: string;
+
+  @ApiProperty({
+    description: "System for categorization (e.g., Endocrine) - display name from Section",
+    required: false,
+    example: "Endocrine",
+  })
+  @IsOptional()
+  @IsString()
+  system?: string;
+
+  @ApiProperty({
+    description: "Chapter ID for Subject dropdown",
+    required: false,
+    example: "cmguoh2dg000hlj45zxmb3rsl",
+  })
+  @IsOptional()
+  @IsString()
+  chapterId?: string;
+
+  @ApiProperty({
+    description: "Section ID for System dropdown",
+    required: false,
+    example: "cmguoh2dg000hlj45zxmb3rsm",
+  })
+  @IsOptional()
+  @IsString()
+  sectionId?: string;
+
+  @ApiProperty({
+    description: "Tags for the question",
+    required: false,
+    example: ["CAH", "Enzyme deficiency", "Adrenal glands"],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  tags?: string[];
+
+  // Rich explanation data (optional)
+  @ApiProperty({
+    description:
+      "Rich explanation blocks (text/table/images). Each item should include type, order, and data JSON.",
+    required: false,
+    type: Array,
+  })
+  @IsOptional()
+  @IsArray()
+  explanationBlocks?: Array<{
+    type: "TEXT" | "TABLE" | "IMAGES";
+    order?: number;
+    data: any;
+  }>;
+
+  @ApiProperty({
+    description:
+      "Per-answer explanations keyed by choice label (A-E). Each value is an array of blocks.",
+    required: false,
+    type: Object,
+  })
+  @IsOptional()
+  @IsObject()
+  perAnswerExplanations?: Record<
+    string,
+    Array<{
+      type: "TEXT" | "TABLE" | "IMAGES";
+      order?: number;
+      data: any;
+    }>
+  >;
+
+  // Rich question stem blocks (supports text, images, and tables)
+  @ApiProperty({
+    description:
+      "Rich question stem blocks (text/images/tables). Each item should include type, order, and data JSON.",
+    required: false,
+    type: Array,
+  })
+  @IsOptional()
+  @IsArray()
+  questionStemBlocks?: Array<{
+    type: "TEXT" | "IMAGES" | "TABLE";
+    order?: number;
+    data: any;
+  }>;
 }

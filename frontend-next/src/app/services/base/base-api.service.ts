@@ -52,6 +52,16 @@ export abstract class BaseApiService {
           `API request failed with status ${response.status}:`,
           errorData
         );
+        
+        // Handle 401 Unauthorized - clear invalid token
+        if (response.status === 401) {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userData");
+            console.log("🔒 Cleared invalid auth token due to 401 error");
+          }
+        }
+        
         throw new Error(
           errorData.message || `HTTP error! status: ${response.status}`
         );

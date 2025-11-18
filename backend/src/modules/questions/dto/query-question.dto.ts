@@ -116,11 +116,11 @@ export class QueryQuestionDto {
   @ApiProperty({
     description: "Sort order",
     enum: ["asc", "desc"],
-    example: "desc",
+    example: "asc",
     required: false,
   })
   @IsOptional()
   @IsEnum(["asc", "desc"])
-  sortOrder?: "asc" | "desc" = "desc";
+  sortOrder?: "asc" | "desc" = "asc";
 }
 

@@ -44,10 +44,6 @@ export default function MarkdownUploader({ onQuestionParsed }: MarkdownUploaderP
         tags: parsed.tags,
       }
 
-      console.log("[v0] Parsed question data:", questionData)
-      console.log("[v0] Explanation blocks:", parsed.mainExplanation)
-      console.log("[v0] Per-answer explanations:", parsed.perAnswerExplanations)
-
       onQuestionParsed(questionData)
       setSuccess(true)
 
@@ -61,7 +57,6 @@ export default function MarkdownUploader({ onQuestionParsed }: MarkdownUploaderP
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to parse markdown file"
       setError(errorMessage)
-      console.error("[v0] Markdown parsing error:", err)
     } finally {
       setIsLoading(false)
     }

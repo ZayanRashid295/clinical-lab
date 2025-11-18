@@ -182,7 +182,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
       i = j - 1
       // Convert the main explanation markdown to content blocks
       questionData.mainExplanation = convertMarkdownToExplanationBlocks(explanationText.trim())
-      console.log("[v0] Extracted main explanation blocks:", questionData.mainExplanation)
       i++
       continue
     }
@@ -218,7 +217,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
         }
         // Convert each per-answer explanation to content blocks
         questionData.perAnswerExplanations[answerLabel] = convertMarkdownToExplanationBlocks(explanationText.trim())
-        console.log(`[v0] Extracted explanation for ${answerLabel}:`, questionData.perAnswerExplanations[answerLabel])
       }
       i++
       continue
@@ -254,17 +252,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
       'Invalid markdown format: Missing correct answer indicator. Please include "Correct Answer: X" where X is A, B, C, D, or E.',
     )
   }
-
-  console.log("[v0] Full parsed question data:", {
-    stem: questionData.stem?.substring(0, 100) + "...",
-    options: questionData.options,
-    correctAnswer: questionData.correctAnswer,
-    subject: questionData.subject,
-    system: questionData.system,
-    mainExplanationLength: questionData.mainExplanation?.length,
-    perAnswerExplanationsKeys: Object.keys(questionData.perAnswerExplanations || {}),
-    tags: questionData.tags,
-  })
 
   return {
     stem: questionData.stem || "",
@@ -373,8 +360,8 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       continue
     }
 
-    // Handle headings
-    if (trimmed.startsWith("##")) {
+    // Handle headings (H1: #, H2: ##, H3: ###, etc.)
+    if (trimmed.match(/^#{1,6}\s+/)) {
       if (currentText.trim()) {
         blocks.push({
           id: blockIdCounter++,
@@ -412,8 +399,8 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       continue
     }
     // Handle HTML tables (if the line contains <table tag)
-    else if (trimmed.includes("<table") || trimmed.includes("<tr") || trimmed.includes("<td")) {
-      // HTML table found - store as markdown text block so react-markdown can render it
+    else if (trimmed.match(/<table[\s>]/i)) {
+      // HTML table found - create a table block with HTML
       if (currentText.trim()) {
         blocks.push({
           id: blockIdCounter++,
@@ -424,21 +411,22 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       }
       // Collect the entire HTML table (may span multiple lines)
       let htmlTable = trimmed
-      let tableClosed = trimmed.includes("</table>")
+      let tableClosed = trimmed.match(/<\/table>/i)
       i++
       
       while (i < lines.length && !tableClosed) {
         htmlTable += "\n" + lines[i]
-        if (lines[i].trim().includes("</table>")) {
+        if (lines[i].trim().match(/<\/table>/i)) {
           tableClosed = true
         }
         i++
       }
       
+      // Create a table block with HTML data
       blocks.push({
         id: blockIdCounter++,
-        type: "text",
-        data: { markdown: htmlTable },
+        type: "table",
+        data: { html: htmlTable },
       })
       continue
     }
