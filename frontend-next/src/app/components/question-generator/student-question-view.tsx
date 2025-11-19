@@ -281,13 +281,19 @@ export default function StudentQuestionView() {
       }
     }
 
-    // Transform question stem blocks
+    // Transform question stem blocks and sort by order to preserve markdown file structure
     const questionStemBlocks = Array.isArray(backendQuestion.questionStemBlocks) && backendQuestion.questionStemBlocks.length > 0
-      ? backendQuestion.questionStemBlocks.map((block: any) => ({
+      ? backendQuestion.questionStemBlocks
+          .map((block: any) => ({
           id: block.id || Date.now(),
           type: block.type?.toLowerCase() || "text",
           data: block.data || {},
+            order: typeof block.order === "number" ? block.order : 999,
         }))
+          .sort((a: any, b: any) => {
+            // Sort by order to maintain block sequence as in markdown file
+            return a.order - b.order
+          })
       : []
 
     return {

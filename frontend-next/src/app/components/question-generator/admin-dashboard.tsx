@@ -5,6 +5,7 @@ import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import QuestionList from "./question-list"
 import MarkdownUploader from "./markdown-uploader"
+import BulkMarkdownUploader from "./bulk-markdown-uploader"
 import AdminQuestionView from "./admin-question-view"
 import QuestionCreator from "./question-creator/QuestionCreator"
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
@@ -164,6 +165,7 @@ export default function AdminDashboard() {
   const [viewingId, setViewingId] = useState<string | null>(null)
   const [showNewQuestion, setShowNewQuestion] = useState(false)
   const [showMarkdownUploader, setShowMarkdownUploader] = useState(false)
+  const [showBulkUploader, setShowBulkUploader] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -922,6 +924,17 @@ export default function AdminDashboard() {
 
   const handleUploadMarkdown = () => {
     setShowMarkdownUploader(true)
+    setShowBulkUploader(false)
+    setShowNewQuestion(false)
+    setParsedMarkdownData(null)
+    setEditingId(null)
+    setViewingId(null)
+    setShowNewQuestionMenu(false)
+  }
+
+  const handleBulkUploadMarkdown = () => {
+    setShowBulkUploader(true)
+    setShowMarkdownUploader(false)
     setShowNewQuestion(false)
     setParsedMarkdownData(null)
     setEditingId(null)
@@ -931,12 +944,16 @@ export default function AdminDashboard() {
 
   const editingQuestion = editingId ? questions.find((q) => q.id === editingId) : null
   const viewingQuestion = viewingId ? questions.find((q) => q.id === viewingId) : null
-  const filteredQuestions = questions.filter(
-    (q) =>
-      q.stem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.system.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const filteredQuestions = questions.filter((q) => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return true // Show all questions if no search term
+    }
+    const searchLower = searchTerm.toLowerCase()
+    const stem = (q.stem || "").toLowerCase()
+    const subject = (q.subject || "").toLowerCase()
+    const system = (q.system || "").toLowerCase()
+    return stem.includes(searchLower) || subject.includes(searchLower) || system.includes(searchLower)
+  })
 
   if (loading) {
     return (
@@ -961,7 +978,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Search Bar and New Question Button - Only show when viewing list */}
-      {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && (
+      {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && !showBulkUploader && (
         <div className="space-y-3 mb-4">
           <div className="flex gap-3">
             <Card className="p-4 shadow-md flex-1">
@@ -990,6 +1007,12 @@ export default function AdminDashboard() {
                       📄 Upload Markdown Question
                     </button>
                     <button
+                      onClick={handleBulkUploadMarkdown}
+                      className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                    >
+                      📚 Bulk Upload Markdown Questions
+                    </button>
+                    <button
                       onClick={handleCreateManually}
                       className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                     >
@@ -1010,9 +1033,31 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* Bulk Markdown Uploader Section */}
+      {showBulkUploader && (
+        <div className="mb-4 overflow-y-auto max-h-[calc(100vh-200px)]">
+          <BulkMarkdownUploader
+            onQuestionsCreated={async (questionIds) => {
+              // Reload questions after bulk creation
+              await loadQuestions()
+              // Optionally show success message
+              alert(`Successfully created ${questionIds.length} question(s)!`)
+            }}
+            onQuestionEdit={(questionId) => {
+              setEditingId(questionId)
+              setShowBulkUploader(false)
+              setShowNewQuestion(false)
+            }}
+            onCancel={() => {
+              setShowBulkUploader(false)
+            }}
+          />
+        </div>
+      )}
+
       {/* Editor, View, or List */}
       {showNewQuestion || editingId ? (
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-h-0">
           <QuestionCreator
             initialData={
               editingId && editingQuestion
@@ -1032,6 +1077,7 @@ export default function AdminDashboard() {
             onCancel={() => {
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)
+              setShowBulkUploader(false)
               setEditingId(null)
               setViewingId(null)
               setParsedMarkdownData(null)
@@ -1049,11 +1095,11 @@ export default function AdminDashboard() {
             }}
             onCancel={() => {
               setViewingId(null)
-          }}
-        />
+            }}
+          />
         </div>
-      ) : !showMarkdownUploader ? (
-        <>
+      ) : !showMarkdownUploader && !showBulkUploader ? (
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {/* Questions List */}
           {filteredQuestions.length === 0 ? (
             <Card className="p-12">
@@ -1089,7 +1135,7 @@ export default function AdminDashboard() {
               />
             </>
           )}
-        </>
+        </div>
       ) : null}
       </div>
     </div>

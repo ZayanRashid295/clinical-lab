@@ -3,6 +3,7 @@
 import { ContentBlock } from "./rich-editor/types"
 import { Choice } from "./choice-system/types"
 import { QuestionCreatorData } from "./question-creator/types"
+import { convertMarkdownToExplanationBlocks } from "./markdown-parser-utils"
 
 /**
  * Convert old format blocks to new format ContentBlocks
@@ -79,13 +80,39 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
   }
   // PRIORITY 3: Fallback to string stem only if no blocks exist
   else if (typeof oldQuestion.stem === "string" && oldQuestion.stem.trim()) {
-    // Convert string stem to a text block
-    stemBlocks = [{
-      id: `stem-${Date.now()}`,
-      type: "text",
-      data: { markdown: oldQuestion.stem, html: "" },
-      order: 0,
-    }]
+    // Convert string stem to blocks using markdown parser (handles images, tables, etc.)
+    const parsedBlocks = convertMarkdownToExplanationBlocks(oldQuestion.stem)
+    // Convert parsed blocks to ContentBlock format
+    stemBlocks = parsedBlocks.map((block, idx) => {
+      const blockId = block.id || `stem-${Date.now()}-${idx}`
+      const blockOrder = typeof block.order === "number" ? block.order : idx
+      
+      // Handle image blocks - convert from "images" type with string URLs to "image" type with object URLs
+      if (block.type === "images" && block.data?.images) {
+        const imageUrls = Array.isArray(block.data.images) ? block.data.images : []
+        return {
+          id: blockId,
+          type: "image" as ContentBlock["type"],
+          data: {
+            images: imageUrls.map((url: string, imgIdx: number) => ({
+              url: typeof url === "string" ? url : (url as any)?.url || "",
+              alt: typeof url === "object" && (url as any)?.alt ? (url as any).alt : `Image ${imgIdx + 1}`,
+              id: typeof url === "object" && (url as any)?.id ? (url as any).id : `img-${Date.now()}-${imgIdx}`,
+            })),
+            count: imageUrls.length,
+          },
+          order: blockOrder,
+        } as ContentBlock
+      }
+      
+      // Handle other block types
+      return {
+        id: blockId,
+        type: (block.type === "images" ? "image" : block.type) as ContentBlock["type"],
+        data: block.data || {},
+        order: blockOrder,
+      } as ContentBlock
+    })
   }
 
   return {
@@ -234,6 +261,7 @@ function convertNewDataToOld(newType: ContentBlock["type"], newData: any): any {
       html: newData?.tableHtml || "",
       rows: newData?.rows || 3,
       cols: newData?.cols || 3,
+      cells: newData?.cells || {}, // Preserve cells object - this contains the actual table content!
     }
   }
 

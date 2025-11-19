@@ -41,7 +41,16 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
     return () => observer.disconnect()
   }, [])
 
-  const renderedContent = content.map((item) => {
+  // Sort content by order if order field exists to preserve markdown file structure
+  const sortedContent = Array.isArray(content)
+    ? [...content].sort((a, b) => {
+        const orderA = typeof (a as any).order === "number" ? (a as any).order : 999
+        const orderB = typeof (b as any).order === "number" ? (b as any).order : 999
+        return orderA - orderB
+      })
+    : content
+
+  const renderedContent = sortedContent.map((item) => {
       switch (item.type) {
         case "text":
           return renderMarkdown(item, isDark)
@@ -471,8 +480,10 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
   }
 
   // If HTML is available (from AdvancedTableEditor), render it directly with sanitization
-  if (item.data?.html) {
-    return <TableHtmlRenderer html={item.data.html} itemId={item.id} isDark={isDark} />
+  // Check both html and tableHtml (AdvancedTableEditor stores as tableHtml)
+  const tableHtml = item.data?.html || item.data?.tableHtml
+  if (tableHtml) {
+    return <TableHtmlRenderer html={tableHtml} itemId={item.id} isDark={isDark} />
   }
 
   if (item.data?.markdown) {
@@ -590,6 +601,7 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
   let rows = 0
   let cols = 0
   let tableData: string[][] = []
+  let cells: Record<string, string> = {}
 
   if (Array.isArray(item.data?.rows)) {
     // Format from markdown parser: rows is an array of arrays
@@ -600,9 +612,29 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
     // Format from rich content editor: rows and cols are numbers with cells object
     rows = item.data.rows || 0
     cols = item.data.cols || 0
+    cells = item.data.cells || {}
+    
+    // Debug: Log table data structure
+    if (process.env.NODE_ENV === "development") {
+      if (Object.keys(cells).length === 0) {
+        console.warn("[TableRenderer] Empty cells object for table:", {
+          rows,
+          cols,
+          data: item.data,
+          itemId: item.id,
+        })
+      } else {
+        console.log("[TableRenderer] Table data:", {
+          rows,
+          cols,
+          cellCount: Object.keys(cells).length,
+          sampleCells: Object.entries(cells).slice(0, 6),
+        })
+      }
+    }
   } else {
     // Invalid table data
-    console.warn("[v0] Invalid table data structure:", item.data)
+    console.warn("[TableRenderer] Invalid table data structure:", item.data)
     return null
   }
 
@@ -627,7 +659,8 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               if (tableData.length > 0 && Array.isArray(tableData[0])) {
                 cellContent = tableData[0][colIdx] || `Header ${colIdx + 1}`
               } else {
-                cellContent = item.data.cells?.[cellKey] || `Header ${colIdx + 1}`
+                // Use cells object directly
+                cellContent = cells[cellKey] || `Header ${colIdx + 1}`
               }
 
               return (
@@ -665,7 +698,8 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                     cellContent = tableData[actualRowIdx][colIdx] || `Cell ${actualRowIdx + 1}-${colIdx + 1}`
                 } else {
                     const cellKey = `${actualRowIdx}-${colIdx}`
-                    cellContent = item.data.cells?.[cellKey] || `Cell ${actualRowIdx + 1}-${colIdx + 1}`
+                    // Use cells object directly
+                    cellContent = cells[cellKey] || `Cell ${actualRowIdx + 1}-${colIdx + 1}`
                 }
 
                 return (

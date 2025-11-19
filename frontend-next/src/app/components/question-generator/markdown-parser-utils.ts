@@ -4,6 +4,7 @@ export interface ParsedQuestion {
   correctAnswer: string
   subject: string
   system: string
+  topic?: string
   mainExplanation: any[]
   perAnswerExplanations: Record<string, any[]>
   tags: string[]
@@ -59,13 +60,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
   }
 
+  // Track if we've seen per-answer explanations section
+  let seenPerAnswerSection = false
+  
   // Parse rest of the file
   while (i < lines.length) {
     const line = lines[i].trim()
 
     // Extract title (# Title) - fallback if YAML not present
     if (line.startsWith("# ") && !questionData.subject) {
-      const titleParts = line.slice(2).split(" - ")
+      const titleParts = line.slice(2).split(" — ")
       if (titleParts.length >= 2) {
         questionData.subject = titleParts[0].trim()
         questionData.system = titleParts[1].trim()
@@ -74,52 +78,78 @@ export function parseMarkdown(content: string): ParsedQuestion {
       continue
     }
 
+    // Extract topic (## Topic: ...)
+    if (line.match(/^##\s+Topic:\s*(.+)/i)) {
+      const topicMatch = line.match(/^##\s+Topic:\s*(.+)/i)
+      if (topicMatch) {
+        questionData.topic = topicMatch[1].trim()
+      }
+      i++
+      continue
+    }
+
     // Handle Clinical Case and Question sections (can be ## or ###)
     if (line.match(/^##+ (Clinical Case|Question|Stem)/)) {
-      let caseText = questionData.stem ? questionData.stem + " " : ""
+      let caseLines: string[] = []
+      if (questionData.stem) {
+        // If we already have stem content, split it and add to lines
+        caseLines = questionData.stem.split("\n").filter(l => l.trim())
+      }
       i++
       // Collect text until we hit options or another section
       while (
         i < lines.length &&
         !lines[i].trim().match(/^\*?\*?[A-E]\.\*?\*?\s+/) &&
-        !lines[i].match(/^##+ (Explanation|Choice-by-Choice|Additional|Raw|Example)/) &&
+        !lines[i].match(/^##+ (Explanation|Choice-by-Choice|Additional|Raw|Example|Question)/) &&
         !lines[i].trim().match(/^### (?:Explanation|Choice)\s+[A-E]/)
       ) {
-        const currentLine = lines[i].trim()
+        const currentLine = lines[i]
         // Skip empty lines and horizontal rules, but keep other content
-        if (currentLine && currentLine !== "---" && !currentLine.match(/^---+$/)) {
-          // If it's another section header at same level, stop
-          if (currentLine.match(/^##+ (Clinical Case|Question|Stem)/)) {
+        const trimmed = currentLine.trim()
+        if (trimmed && trimmed !== "---" && !trimmed.match(/^---+$/)) {
+          // If it's another section header (including Question), stop
+          if (trimmed.match(/^##+\s+(Clinical Case|Question|Stem|Explanation|Choice-by-Choice)/)) {
             break
           }
-          caseText += currentLine + " "
+          // Preserve the original line (with proper spacing) to maintain markdown structure
+          // This is important for images, tables, and formatting
+          caseLines.push(currentLine)
+        } else if (!trimmed) {
+          // Preserve empty lines to maintain paragraph separation
+          caseLines.push("")
         }
         i++
       }
-      questionData.stem = caseText.trim()
+      // Join with newlines to preserve markdown structure
+      questionData.stem = caseLines.join("\n")
       // Don't increment i here since we want to process the line we stopped at
       continue
     }
 
     // Fallback: if no stem found and we hit options, collect all text before options
     if (!questionData.stem && line.match(/^\*?\*?[A-E]\.\*?\*?\s+/) && i > 0) {
-      let stemText = ""
+      let stemLines: string[] = []
       for (let j = 0; j < i; j++) {
-        const prevLine = lines[j].trim()
+        const prevLine = lines[j]
+        const trimmed = prevLine.trim()
         if (
-          prevLine &&
-          !prevLine.startsWith("#") &&
-          !prevLine.startsWith("---") &&
-          !prevLine.includes("title:") &&
-          !prevLine.includes("tags:") &&
-          !prevLine.includes("difficulty:") &&
-          !prevLine.includes("correct_answer:") &&
-          prevLine !== ""
+          trimmed &&
+          !trimmed.startsWith("#") &&
+          !trimmed.startsWith("---") &&
+          !trimmed.includes("title:") &&
+          !trimmed.includes("tags:") &&
+          !trimmed.includes("difficulty:") &&
+          !trimmed.includes("correct_answer:") &&
+          trimmed !== ""
         ) {
-          stemText += prevLine + " "
+          // Preserve original line to maintain markdown structure
+          stemLines.push(prevLine)
+        } else if (!trimmed) {
+          // Preserve empty lines
+          stemLines.push("")
         }
       }
-      questionData.stem = stemText.trim()
+      questionData.stem = stemLines.join("\n")
     }
 
     // Extract options (A., B., C., D., E.)
@@ -166,14 +196,20 @@ export function parseMarkdown(content: string): ParsedQuestion {
       // Allow all other content including headings, tables, images, etc.
       // Start from the next line after "## Explanation"
       let j = i + 1
+      let choiceByChoiceIdx = -1 // Track where "## Choice-by-Choice Explanations" appears
       // Match both per-answer explanation formats as stopping points
-      const choiceByChoicePattern = /^##+ (Choice-by-Choice|Additional|Raw|Example)/
+      const choiceByChoicePattern = /^##+\s+(Choice-by-Choice|Additional|Raw|Example)/
       while (
         j < lines.length &&
         !lines[j].trim().match(/^### Explanation\s+[A-E](?:\s|$)/) &&
-        !lines[j].trim().match(/^### Choice\s+[A-E]\s+Explanation/) &&
-        !lines[j].trim().match(choiceByChoicePattern)
+        !lines[j].trim().match(/^### Choice\s+[A-E]\s+Explanation/)
       ) {
+        const currentLine = lines[j].trim()
+        // Check if this is the Choice-by-Choice section header
+        if (currentLine.match(choiceByChoicePattern)) {
+          choiceByChoiceIdx = j
+          break
+        }
         explanationText += lines[j] + "\n"
         j++
       }
@@ -181,7 +217,81 @@ export function parseMarkdown(content: string): ParsedQuestion {
       // continue from the next line (which might be a per-answer explanation)
       i = j - 1
       // Convert the main explanation markdown to content blocks
-      questionData.mainExplanation = convertMarkdownToExplanationBlocks(explanationText.trim())
+      let explanationBlocks = convertMarkdownToExplanationBlocks(explanationText.trim())
+      
+      // If we found "## Choice-by-Choice Explanations" in the explanation, insert a placeholder there
+      if (choiceByChoiceIdx >= 0) {
+        // Find the block that contains the Choice-by-Choice header
+        // We need to split the blocks at the point where Choice-by-Choice appears
+        const explanationTextBeforeChoice = explanationText.trim()
+        const choiceByChoiceLine = lines[choiceByChoiceIdx]
+        
+        // Find which block contains the Choice-by-Choice line
+        let splitPoint = -1
+        for (let blockIdx = 0; blockIdx < explanationBlocks.length; blockIdx++) {
+          const block = explanationBlocks[blockIdx]
+          if (block.type === "text" && block.data?.markdown) {
+            if (block.data.markdown.includes(choiceByChoiceLine.trim())) {
+              // Split this block at the Choice-by-Choice line
+              const markdown = block.data.markdown
+              const choiceIndex = markdown.indexOf(choiceByChoiceLine.trim())
+              if (choiceIndex >= 0) {
+                const beforeChoice = markdown.substring(0, choiceIndex).trim()
+                const afterChoice = markdown.substring(choiceIndex + choiceByChoiceLine.trim().length).trim()
+                
+                // Replace the block with content before Choice-by-Choice
+                if (beforeChoice) {
+                  explanationBlocks[blockIdx] = {
+                    ...block,
+                    data: { ...block.data, markdown: beforeChoice },
+                  }
+                } else {
+                  // Remove the block if it's empty
+                  explanationBlocks.splice(blockIdx, 1)
+                  blockIdx--
+                }
+                
+                // Insert placeholder after this block
+                splitPoint = blockIdx + 1
+                break
+              }
+            }
+          }
+        }
+        
+        // Insert per-answer explanation placeholder at the split point (or at the end if not found)
+        const placeholderBlock = {
+          id: Date.now(),
+          type: "per-answer-explanation",
+          order: splitPoint >= 0 ? splitPoint : explanationBlocks.length,
+          data: {
+            placeholder: true,
+            isPerAnswerExplanation: true,
+          },
+        }
+        
+        if (splitPoint >= 0) {
+          explanationBlocks.splice(splitPoint, 0, placeholderBlock)
+        } else {
+          explanationBlocks.push(placeholderBlock)
+        }
+        
+        // Re-number orders
+        explanationBlocks.forEach((block, idx) => {
+          block.order = idx
+        })
+      }
+      
+      questionData.mainExplanation = explanationBlocks
+      i++
+      continue
+    }
+
+    // Handle "## Choice-by-Choice Explanations" section header
+    if (line.match(/^##+\s+Choice-by-Choice\s+Explanations/i)) {
+      // Mark that we've seen the per-answer explanations section
+      seenPerAnswerSection = true
+      // Continue to next line to process per-answer explanations
       i++
       continue
     }
@@ -204,7 +314,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
           j < lines.length &&
           !lines[j].trim().match(/^### Explanation\s+[A-E](?:\s|$)/) &&
           !lines[j].trim().match(/^### Choice\s+[A-E]\s+Explanation/) &&
-          !lines[j].trim().match(/^##+ (Choice-by-Choice|Additional|Raw|Example)/)
+          !lines[j].trim().match(/^##+\s+Choice-by-Choice\s+Explanations/i)
         ) {
           explanationText += lines[j] + "\n"
           j++
@@ -220,6 +330,69 @@ export function parseMarkdown(content: string): ParsedQuestion {
       }
       i++
       continue
+    }
+
+    // After per-answer explanations, collect any remaining content (like "## Management Approach")
+    // and add it to the main explanation
+    // This should run after we've seen the per-answer section and processed all per-answer explanations
+    const hasPerAnswerSection = seenPerAnswerSection
+    const hasPerAnswerExplanations = questionData.perAnswerExplanations && Object.keys(questionData.perAnswerExplanations).length > 0
+    
+    if (hasPerAnswerSection && hasPerAnswerExplanations) {
+      // Check if this is additional content that should be added to main explanation
+      // (e.g., "## Management Approach", "## Additional Notes", etc.)
+      // Must be a section header (## or ###) that's not Explanation, Choice-by-Choice, Clinical Case, Question, Stem, or Topic
+      // And not a per-answer explanation header
+      const isSectionHeader = line.match(/^##+\s+/)
+      const isExcludedSection = line.match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)
+      const isPerAnswerHeader = line.match(/^###\s+(Explanation|Choice)\s+[A-E]/i)
+      const isAdditionalSection = isSectionHeader && !isExcludedSection && !isPerAnswerHeader
+      
+      if (isAdditionalSection) {
+        let additionalContent = ""
+        let j = i
+        // Collect all content until end of file, end marker, or another major section
+        while (
+          j < lines.length &&
+          !lines[j].trim().match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i) &&
+          !lines[j].trim().match(/^###\s+(Explanation|Choice)\s+[A-E]/i) &&
+          !lines[j].trim().match(/^\*End of test question/i)
+        ) {
+          additionalContent += lines[j] + "\n"
+          j++
+        }
+        // Append to main explanation
+        if (additionalContent.trim()) {
+          const existingExplanation = questionData.mainExplanation || []
+          const additionalBlocks = convertMarkdownToExplanationBlocks(additionalContent.trim())
+          
+          // Renumber orders to be sequential across all blocks
+          const maxOrder = existingExplanation.length > 0 
+            ? Math.max(...existingExplanation.map((b: any) => typeof b.order === "number" ? b.order : 0))
+            : -1
+          additionalBlocks.forEach((block: any, idx: number) => {
+            block.order = maxOrder + 1 + idx
+          })
+          
+          questionData.mainExplanation = [...existingExplanation, ...additionalBlocks]
+          
+          // Debug: Log when additional content is found
+          if (process.env.NODE_ENV === "development") {
+            console.log("[MarkdownParser] Inline: Found additional content after per-answer explanations:", {
+              section: line.trim(),
+              startLine: i,
+              endLine: j - 1,
+              blockCount: additionalBlocks.length,
+              firstBlockType: additionalBlocks[0]?.type,
+              maxOrder,
+              newOrders: additionalBlocks.map((b: any) => b.order),
+            })
+          }
+        }
+        // Skip to the end of the collected content (j-1 because j is the line after)
+        i = j - 1
+        continue
+      }
     }
 
     // Extract tags (from tags section)
@@ -259,6 +432,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     correctAnswer: questionData.correctAnswer || "",
     subject: questionData.subject || "General",
     system: questionData.system || "General",
+    topic: questionData.topic,
     mainExplanation: questionData.mainExplanation || [],
     perAnswerExplanations: questionData.perAnswerExplanations || {},
     tags: questionData.tags || [],
@@ -279,6 +453,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
   let currentText = ""
   let i = 0
   let blockIdCounter = Date.now()
+  let blockOrder = 0 // Track order to preserve markdown file structure
 
   // Image markdown pattern: ![alt](url) or just image URLs
   const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
@@ -296,6 +471,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
@@ -313,6 +489,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "images",
+          order: blockOrder++,
           data: {
             count: imageUrls.length,
             images: imageUrls,
@@ -342,6 +519,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
@@ -350,6 +528,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       blocks.push({
         id: blockIdCounter++,
         type: "images",
+        order: blockOrder++,
         data: {
           count: 1,
           images: [urlMatch[0]],
@@ -366,6 +545,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
@@ -381,6 +561,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
@@ -394,6 +575,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       blocks.push({
         id: blockIdCounter++,
         type: "text",
+        order: blockOrder++,
         data: { markdown: listItems.join("\n") },
       })
       continue
@@ -405,13 +587,14 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
       }
       // Collect the entire HTML table (may span multiple lines)
       let htmlTable = trimmed
-      let tableClosed = trimmed.match(/<\/table>/i)
+      let tableClosed = !!trimmed.match(/<\/table>/i)
       i++
       
       while (i < lines.length && !tableClosed) {
@@ -426,6 +609,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       blocks.push({
         id: blockIdCounter++,
         type: "table",
+        order: blockOrder++,
         data: { html: htmlTable },
       })
       continue
@@ -436,17 +620,24 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
       }
       const tableLines: string[][] = []
       while (i < lines.length && lines[i].trim().startsWith("|")) {
-        const cells = lines[i]
+        const line = lines[i]
+        const cells = line
           .split("|")
           .slice(1, -1)
           .map((cell) => cell.trim())
-        if (cells.length > 0 && !cells[0].match(/^-+$/)) {
+        // Skip separator rows (rows that are all dashes or empty)
+        const isSeparatorRow = cells.length > 0 && (
+          cells.every(cell => cell.match(/^-+$/) || cell === "") ||
+          cells[0].match(/^-+$/)
+        )
+        if (cells.length > 0 && !isSeparatorRow) {
           tableLines.push(cells)
         }
         i++
@@ -454,20 +645,37 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       if (tableLines.length > 0) {
         // Convert markdown table format to editor format
         const numRows = tableLines.length
-        const numCols = tableLines[0]?.length || 0
+        const numCols = Math.max(...tableLines.map(row => row.length), 0)
         const cells: Record<string, string> = {}
         
-        // Populate cells object
+        // Populate cells object - row 0 is header, rows 1+ are data
         tableLines.forEach((row, rowIdx) => {
           row.forEach((cell, colIdx) => {
             const cellKey = `${rowIdx}-${colIdx}`
-            cells[cellKey] = cell
+            // Preserve cell content, including empty cells - trim to remove extra whitespace
+            cells[cellKey] = (cell || "").trim()
           })
+          // Fill in missing columns with empty strings
+          for (let colIdx = row.length; colIdx < numCols; colIdx++) {
+            const cellKey = `${rowIdx}-${colIdx}`
+            cells[cellKey] = ""
+          }
         })
+        
+        // Debug: Log table parsing
+        if (process.env.NODE_ENV === "development") {
+          console.log("[TableParser] Parsed table:", {
+            rows: numRows,
+            cols: numCols,
+            cellCount: Object.keys(cells).length,
+            sampleCells: Object.entries(cells).slice(0, 6),
+          })
+        }
         
         blocks.push({
           id: blockIdCounter++,
           type: "table",
+          order: blockOrder++,
           data: {
             rows: numRows,
             cols: numCols,
@@ -490,6 +698,7 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         blocks.push({
           id: blockIdCounter++,
           type: "text",
+          order: blockOrder++,
           data: { markdown: currentText.trim() },
         })
         currentText = ""
@@ -504,9 +713,104 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
     blocks.push({
       id: blockIdCounter++,
       type: "text",
+      order: blockOrder++,
       data: { markdown: currentText.trim() },
     })
   }
 
-  return blocks
+  // Ensure blocks are sorted by order (should already be in order, but just in case)
+  return blocks.sort((a, b) => {
+    const orderA = typeof a.order === "number" ? a.order : 999
+    const orderB = typeof b.order === "number" ? b.order : 999
+    return orderA - orderB
+  })
+}
+
+/**
+ * Extract all image references from markdown content
+ * Returns an array of image paths found in the markdown
+ */
+export function extractImageReferences(markdownContent: string): string[] {
+  const imageReferences: string[] = []
+  
+  // Pattern for markdown images: ![alt](path)
+  const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
+  let match
+  
+  while ((match = imagePattern.exec(markdownContent)) !== null) {
+    const imagePath = match[2]
+    if (imagePath && !imagePath.startsWith('http://') && !imagePath.startsWith('https://')) {
+      // Only include local paths, not URLs
+      imageReferences.push(imagePath)
+    }
+  }
+  
+  // Also check for plain image URLs in content blocks (already processed)
+  // This is handled in convertMarkdownToExplanationBlocks
+  
+  return Array.from(new Set(imageReferences)) // Remove duplicates
+}
+
+/**
+ * Replace image paths in markdown content with new URLs
+ */
+export function replaceImagePaths(
+  markdownContent: string,
+  pathMapping: Record<string, string>
+): string {
+  let updatedContent = markdownContent
+  
+  // Replace image references: ![alt](oldPath) -> ![alt](newUrl)
+  const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
+  
+  updatedContent = updatedContent.replace(imagePattern, (match, alt, path) => {
+    // If this path has a mapping, replace it
+    if (pathMapping[path]) {
+      return `![${alt}](${pathMapping[path]})`
+    }
+    // Otherwise keep the original
+    return match
+  })
+  
+  return updatedContent
+}
+
+/**
+ * Replace image paths in content blocks (used in explanations)
+ */
+export function replaceImagePathsInBlocks(
+  blocks: any[],
+  pathMapping: Record<string, string>
+): any[] {
+  return blocks.map((block) => {
+    if (block.type === 'text' && block.data?.markdown) {
+      // Replace image paths in markdown text
+      return {
+        ...block,
+        data: {
+          ...block.data,
+          markdown: replaceImagePaths(block.data.markdown, pathMapping),
+        },
+      }
+    } else if (block.type === 'images' && block.data?.images) {
+      // Replace image URLs in image blocks
+      return {
+        ...block,
+        data: {
+          ...block.data,
+          images: block.data.images.map((imgUrl: string) => {
+            // Check if this URL matches any of our mapped paths
+            for (const [oldPath, newUrl] of Object.entries(pathMapping)) {
+              // Handle both relative paths and full URLs
+              if (imgUrl === oldPath || imgUrl.includes(oldPath)) {
+                return newUrl
+              }
+            }
+            return imgUrl
+          }),
+        },
+      }
+    }
+    return block
+  })
 }
