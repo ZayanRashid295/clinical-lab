@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -44,7 +45,13 @@ export class AssessmentsController {
     description: "Question papers retrieved successfully",
   })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async findAll(@Query() query: QueryQuestionPaperDto) {
+  async findAll(@Request() req, @Query() query: QueryQuestionPaperDto) {
+    const authenticatedUserId = req.user?.userId;
+    // Automatically filter by user's ID if not explicitly provided
+    // This ensures users only see their own tests
+    if (authenticatedUserId && !query.userId) {
+      query.userId = authenticatedUserId;
+    }
     return this.assessmentsService.findAll(query);
   }
 
@@ -116,6 +123,60 @@ export class AssessmentsController {
     return this.assessmentsService.getQuestionPaperQuestionStats();
   }
 
+  @Get("question-pool/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get user question pool statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "User question pool statistics retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiQuery({ name: "tagIds", required: false, type: String, description: "Comma-separated tag IDs" })
+  @ApiQuery({ name: "systemIds", required: false, type: String, description: "Comma-separated system (section) IDs" })
+  @ApiQuery({ name: "subjectIds", required: false, type: String, description: "Comma-separated subject (chapter) IDs" })
+  @ApiQuery({ name: "topicIds", required: false, type: String, description: "Comma-separated topic IDs" })
+  @ApiQuery({ name: "marked", required: false, type: Boolean, description: "Filter by marked status (true = only marked, false = only unmarked)" })
+  getUserQuestionPoolStats(
+    @Request() req,
+    @Query("tagIds") tagIds?: string,
+    @Query("systemIds") systemIds?: string,
+    @Query("subjectIds") subjectIds?: string,
+    @Query("topicIds") topicIds?: string,
+    @Query("marked") marked?: string
+  ) {
+    const filters: {
+      tagIds?: string[];
+      systemIds?: string[];
+      subjectIds?: string[];
+      topicIds?: string[];
+      marked?: boolean;
+    } = {};
+
+    if (tagIds) {
+      filters.tagIds = tagIds.split(",").filter((id) => id.trim());
+    }
+    if (systemIds) {
+      filters.systemIds = systemIds.split(",").filter((id) => id.trim());
+    }
+    if (subjectIds) {
+      filters.subjectIds = subjectIds.split(",").filter((id) => id.trim());
+    }
+    if (topicIds) {
+      filters.topicIds = topicIds.split(",").filter((id) => id.trim());
+    }
+    if (marked !== undefined) {
+      // Parse marked strictly from the query string: "true" -> true, "false" -> false, anything else -> undefined
+      if (marked === "true") {
+        filters.marked = true;
+      } else if (marked === "false") {
+        filters.marked = false;
+      }
+    }
+
+    return this.assessmentsService.getUserQuestionPoolStats(req.user.userId, filters);
+  }
+
   @Get("questions/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -164,45 +225,80 @@ export class AssessmentsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Create new question paper (Admin only)" })
+  @ApiOperation({ summary: "Create new question paper" })
   @ApiResponse({
     status: 201,
     description: "Question paper created successfully",
   })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async create(@Body() createQuestionPaperDto: CreateQuestionPaperDto) {
+  async create(
+    @Request() req,
+    @Body() createQuestionPaperDto: CreateQuestionPaperDto
+  ) {
+    // Ensure users can only create tests for themselves
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new Error("User not authenticated");
+    }
+    // Override userId with authenticated user's ID
+    createQuestionPaperDto.userId = authenticatedUserId;
     return this.assessmentsService.create(createQuestionPaperDto);
   }
 
   @Patch(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update question paper (Admin only)" })
+  @ApiOperation({ summary: "Update question paper" })
   @ApiResponse({
     status: 200,
     description: "Question paper updated successfully",
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Forbidden - can only update own tests" })
   async update(
+    @Request() req,
     @Param("id") id: string,
     @Body() updateQuestionPaperDto: UpdateQuestionPaperDto
   ) {
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new Error("User not authenticated");
+    }
+    // Verify the test belongs to the user
+    const questionPaper = await this.assessmentsService.getQuestionPaper(id);
+    if (questionPaper.userId !== authenticatedUserId) {
+      throw new Error("You can only update your own tests");
+    }
+    // Ensure userId cannot be changed
+    if (updateQuestionPaperDto.userId) {
+      updateQuestionPaperDto.userId = authenticatedUserId;
+    }
     return this.assessmentsService.update(id, updateQuestionPaperDto);
   }
 
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate question paper (Admin only)" })
+  @ApiOperation({ summary: "Deactivate question paper" })
   @ApiResponse({
     status: 200,
     description: "Question paper deactivated successfully",
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async remove(@Param("id") id: string) {
+  @ApiResponse({ status: 403, description: "Forbidden - can only delete own tests" })
+  async remove(@Request() req, @Param("id") id: string) {
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new Error("User not authenticated");
+    }
+    // Verify the test belongs to the user
+    const questionPaper = await this.assessmentsService.getQuestionPaper(id);
+    if (questionPaper.userId !== authenticatedUserId) {
+      throw new Error("You can only delete your own tests");
+    }
     return this.assessmentsService.remove(id);
   }
 

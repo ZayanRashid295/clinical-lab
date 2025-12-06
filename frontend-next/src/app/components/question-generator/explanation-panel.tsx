@@ -27,9 +27,9 @@ export default function ExplanationPanel({
 }: ExplanationPanelProps) {
   return (
     <div className="animate-fade-in flex flex-col h-full overflow-hidden">
-      <Card className="shadow-md overflow-hidden flex-1 flex flex-col bg-card/60 backdrop-blur-sm border border-border/40 rounded-xl hover:shadow-lg transition-all duration-300 min-h-0">
-        <div className="border-b border-border/40 px-6 py-4 bg-gradient-to-r from-primary/8 via-transparent to-transparent flex-shrink-0">
-          <h2 className="text-lg font-bold text-primary tracking-wide uppercase letter-spacing">Explanation</h2>
+      <Card className="shadow-md overflow-hidden flex-1 flex flex-col bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm border border-border/40 dark:border-gray-700 rounded-xl hover:shadow-lg transition-all duration-300 min-h-0">
+        <div className="border-b border-border/40 dark:border-gray-700/50 px-6 py-4 flex-shrink-0">
+          <h2 className="text-lg font-bold text-primary dark:text-blue-400 tracking-wide uppercase letter-spacing">Explanation</h2>
         </div>
 
         <div className="overflow-y-auto flex-1 min-h-0" style={{ maxHeight: '100%' }}>
@@ -43,31 +43,31 @@ export default function ExplanationPanel({
                 selectedAnswer={selectedAnswer}
               />
             ) : (
-              <div className="text-center py-12 text-foreground/60">
+              <div className="text-center py-12 text-foreground/60 dark:text-gray-400">
                 <p className="text-sm font-medium">No detailed explanation available for this question.</p>
               </div>
             )}
 
             {/* Subject, System, Topic at the end */}
             {(subject || system || topic) && (
-              <div className="border-t border-border/40 pt-6 mt-6">
+              <div className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {subject && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Subject</div>
-                      <div className="text-sm font-bold text-foreground">{subject}</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Subject</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{subject}</div>
                     </div>
                   )}
                   {system && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">System</div>
-                      <div className="text-sm font-bold text-foreground">{system}</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">System</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{system}</div>
                     </div>
                   )}
                   {topic && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Topic</div>
-                      <div className="text-sm font-bold text-foreground">
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Topic</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">
                         {typeof topic === "string" ? topic : topic?.name || ""}
                       </div>
                     </div>

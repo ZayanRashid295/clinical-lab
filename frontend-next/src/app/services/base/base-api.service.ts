@@ -103,10 +103,20 @@ export abstract class BaseApiService {
     params?: Record<string, any>
   ): Promise<any> {
     let url = endpoint;
+    let hasCacheBuster = false;
 
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
+        // Filter out internal cache-busting parameters that shouldn't be sent to backend
+        if (key === "_t") {
+          hasCacheBuster = true;
+          return;
+        }
+        // Filter out other internal parameters that start with underscore
+        if (key.startsWith("_")) {
+          return;
+        }
         if (value !== undefined && value !== null && value !== "") {
           searchParams.append(key, String(value));
         }
@@ -117,7 +127,13 @@ export abstract class BaseApiService {
       }
     }
 
-    return this.request(url, { method: "GET" });
+    // Use cache control headers for cache-busting instead of query parameters
+    const requestOptions: RequestInit = {
+      method: "GET",
+      cache: hasCacheBuster ? "no-store" : "default",
+    };
+
+    return this.request(url, requestOptions);
   }
 
   // Common POST method

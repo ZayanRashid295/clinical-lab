@@ -72,5 +72,75 @@ export class QuestionPapersService extends BaseDataService<
   }> {
     return this.get(`${this.endpoint}/stats`);
   }
+
+  /**
+   * Get user question pool statistics (unused, incorrect, marked, omitted, correct)
+   */
+  async getUserQuestionPoolStats(filters?: {
+    tagIds?: string[];
+    systemIds?: string[];
+    subjectIds?: string[];
+    topicIds?: string[];
+    marked?: boolean;
+  }): Promise<{
+    unused: number;
+    incorrect: number;
+    marked: number;
+    omitted: number;
+    correct: number;
+    total: number;
+  }> {
+    const queryParams: Record<string, string> = {};
+    
+    if (filters?.tagIds && filters.tagIds.length > 0) {
+      queryParams.tagIds = filters.tagIds.join(",");
+    }
+    if (filters?.systemIds && filters.systemIds.length > 0) {
+      queryParams.systemIds = filters.systemIds.join(",");
+    }
+    if (filters?.subjectIds && filters.subjectIds.length > 0) {
+      queryParams.subjectIds = filters.subjectIds.join(",");
+    }
+    if (filters?.topicIds && filters.topicIds.length > 0) {
+      queryParams.topicIds = filters.topicIds.join(",");
+    }
+    if (filters?.marked !== undefined) {
+      queryParams.marked = filters.marked.toString();
+    }
+
+    return this.get(`${this.endpoint}/question-pool/stats`, queryParams);
+  }
+
+  /**
+   * Get assessment results for a question paper
+   */
+  async getAssessmentResults(id: string): Promise<{
+    questionPaper: {
+      id: string;
+      name: string;
+      type: string;
+      timeLimit?: number;
+    };
+    results: {
+      totalQuestions: number;
+      answeredQuestions: number;
+      unansweredQuestions: number;
+      correctAnswers: number;
+      incorrectAnswers: number;
+      score: number;
+      percentage: number;
+    };
+    questions: Array<{
+      id: string;
+      order: number;
+      question: any;
+      userAnswer?: string;
+      isCorrect?: boolean;
+      timeSpent?: number;
+      markedForReview: boolean;
+    }>;
+  }> {
+    return this.get(`${this.endpoint}/${id}/results`);
+  }
 }
 

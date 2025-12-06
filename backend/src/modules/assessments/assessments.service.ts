@@ -454,6 +454,7 @@ export class AssessmentsService {
             userAnswer: answer.userAnswer,
             isCorrect: isCorrect,
             timeSpent: answer.timeSpent,
+            markedForReview: answer.markedForReview ?? false,
           },
         });
       }
@@ -942,9 +943,23 @@ export class AssessmentsService {
       );
     }
 
-    return this.prisma.questionPaperQuestion.update({
+    console.log(`🔧 Backend: Updating question paper question ${questionPaperQuestionId}`);
+    console.log(`📥 Received update data:`, updateQuestionPaperQuestionDto);
+    console.log(`📊 Current markedForReview value:`, questionPaperQuestion.markedForReview);
+
+    // Ensure markedForReview is explicitly updated when provided (including false)
+    // This ensures that unmarking a question (setting to false) properly updates the database
+    const updateData: any = { ...updateQuestionPaperQuestionDto };
+    if (updateQuestionPaperQuestionDto.markedForReview !== undefined) {
+      updateData.markedForReview = updateQuestionPaperQuestionDto.markedForReview;
+      console.log(`✅ Setting markedForReview to: ${updateData.markedForReview} (type: ${typeof updateData.markedForReview})`);
+    } else {
+      console.log(`⚠️ markedForReview is undefined, not updating`);
+    }
+
+    const updated = await this.prisma.questionPaperQuestion.update({
       where: { id: questionPaperQuestionId },
-      data: updateQuestionPaperQuestionDto,
+      data: updateData,
       include: {
         question: {
           include: {
@@ -954,6 +969,11 @@ export class AssessmentsService {
         },
       },
     });
+
+    console.log(`✅ Backend: Updated question paper question ${questionPaperQuestionId}`);
+    console.log(`📊 New markedForReview value:`, updated.markedForReview);
+
+    return updated;
   }
 
   async removeQuestionPaperQuestion(id: string) {
@@ -975,5 +995,247 @@ export class AssessmentsService {
     return this.prisma.questionPaperQuestion.delete({
       where: { id: questionPaperQuestionId },
     });
+  }
+
+  async getUserQuestionPoolStats(
+    userId: string,
+    filters?: {
+      tagIds?: string[];
+      systemIds?: string[];
+      subjectIds?: string[];
+      topicIds?: string[];
+      marked?: boolean;
+    }
+  ) {
+    // Build where clause for filtering questions
+    const questionWhere: any = {
+      isActive: true,
+    };
+
+    // Filter by topics (if provided)
+    if (filters?.topicIds && filters.topicIds.length > 0) {
+      questionWhere.topicId = { in: filters.topicIds };
+    }
+
+    // Filter by sections/systems (if provided)
+    if (filters?.systemIds && filters.systemIds.length > 0) {
+      questionWhere.sectionId = { in: filters.systemIds };
+    }
+
+    // Filter by chapters/subjects (if provided)
+    if (filters?.subjectIds && filters.subjectIds.length > 0) {
+      questionWhere.chapterId = { in: filters.subjectIds };
+    }
+
+    // Fetch full question data for tag filtering
+    const allFilteredQuestions = await this.prisma.question.findMany({
+      where: questionWhere,
+      select: {
+        id: true,
+        productTagId: true,
+        tags: true,
+      },
+    });
+
+    // Apply tag filtering if needed
+    let filteredQuestionIds: string[];
+    if (filters?.tagIds && filters.tagIds.length > 0) {
+      filteredQuestionIds = allFilteredQuestions
+        .filter((question) => {
+          // Check direct productTagId
+          if (question.productTagId && filters.tagIds!.includes(question.productTagId)) {
+            return true;
+          }
+
+          // Check tags JSON field for productTagIds
+          if (question.tags && Array.isArray(question.tags)) {
+            for (const tag of question.tags) {
+              if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+                try {
+                  const tagIdsJson = tag.replace("__productTagIds:", "");
+                  const questionTagIds = JSON.parse(tagIdsJson);
+                  if (Array.isArray(questionTagIds)) {
+                    // Check if any of the question's tags match any selected tag
+                    if (questionTagIds.some((qTagId) => filters.tagIds!.includes(qTagId))) {
+                      return true;
+                    }
+                  }
+                } catch (e) {
+                  // Ignore parse errors
+                }
+              }
+            }
+          }
+
+          return false;
+        })
+        .map((q) => q.id);
+    } else {
+      filteredQuestionIds = allFilteredQuestions.map((q) => q.id);
+    }
+
+    const totalQuestionsCount = filteredQuestionIds.length;
+
+    // Get all question papers for this user
+    const userQuestionPapers = await this.prisma.questionPaper.findMany({
+      where: { userId },
+      select: { id: true },
+    });
+
+    const questionPaperIds = userQuestionPapers.map((qp) => qp.id);
+
+    if (questionPaperIds.length === 0) {
+      // User has no question papers, so all filtered questions are unused
+      // If marked filter is enabled and true, unused should be 0 (unused questions can't be marked)
+      const unusedCount = filters?.marked === true ? 0 : totalQuestionsCount;
+      return {
+        unused: unusedCount,
+        incorrect: 0,
+        marked: 0,
+        omitted: 0,
+        correct: 0,
+        total: totalQuestionsCount,
+      };
+    }
+
+    // Get all question paper questions for this user (across all tests)
+    // We need to check all questions first, then filter to only those in filteredQuestionIds
+    // Include updatedAt to get the latest status for each question
+    const allUserAnswers = await this.prisma.questionPaperQuestion.findMany({
+      where: {
+        questionPaperId: { in: questionPaperIds },
+      },
+      select: {
+        questionId: true,
+        userAnswer: true,
+        isCorrect: true,
+        markedForReview: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        updatedAt: 'desc', // Get most recent first
+      },
+    });
+
+    // Track question status across all attempts for ALL questions
+    // For marked status, use the LATEST value (most recent updatedAt)
+    // For other statuses, use "ever" logic (once true, always true)
+    const questionStatus = new Map<
+      string,
+      {
+        everCorrect: boolean;
+        everIncorrect: boolean;
+        everOmitted: boolean;
+        isMarked: boolean; // Changed from everMarked to isMarked - uses latest value
+        latestUpdatedAt: Date; // Track the most recent update time
+      }
+    >();
+
+    for (const answer of allUserAnswers) {
+      const existing = questionStatus.get(answer.questionId);
+      
+      if (!existing) {
+        // First time seeing this question - since we ordered by updatedAt desc,
+        // this is the most recent record for this question
+        questionStatus.set(answer.questionId, {
+          everCorrect: answer.isCorrect === true,
+          everIncorrect: answer.isCorrect === false,
+          everOmitted: answer.userAnswer === null,
+          isMarked: answer.markedForReview === true, // Use latest value (first record = most recent)
+          latestUpdatedAt: answer.updatedAt,
+        });
+      } else {
+        // We've seen this question before - update "ever" flags but keep the latest marked status
+        // Since records are ordered by updatedAt desc, the first record we processed is the most recent
+        questionStatus.set(answer.questionId, {
+        everCorrect: existing.everCorrect || (answer.isCorrect === true),
+        everIncorrect: existing.everIncorrect || (answer.isCorrect === false),
+          everOmitted: existing.everOmitted || (answer.userAnswer === null),
+          isMarked: existing.isMarked, // Keep the first (most recent) value we saw
+          latestUpdatedAt: existing.latestUpdatedAt, // Keep the first (most recent) timestamp
+        });
+      }
+    }
+
+    // Filter to only questions that match the current filter criteria
+    const filteredQuestionStatus = new Map<string, typeof questionStatus extends Map<string, infer V> ? V : never>();
+    for (const questionId of filteredQuestionIds) {
+      const status = questionStatus.get(questionId);
+      if (status) {
+        filteredQuestionStatus.set(questionId, status);
+      }
+    }
+
+    // Get all encountered question IDs (from filtered questions only)
+    const encounteredQuestionIds = new Set(filteredQuestionStatus.keys());
+
+    // Calculate unused: questions never encountered (within filtered set)
+    const unused = totalQuestionsCount - encounteredQuestionIds.size;
+
+    // Calculate statistics (only for filtered questions)
+    // Note: A question can be in multiple categories (e.g., marked AND correct)
+    // If marked filter is enabled, apply AND logic: only count questions that are in the pool AND marked
+    let correct = 0;
+    let incorrect = 0;
+    let omitted = 0;
+    let marked = 0;
+
+    for (const [questionId, status] of filteredQuestionStatus.entries()) {
+      // If marked filter is enabled, only count questions that are marked
+      // Use isMarked (latest value) instead of everMarked
+      const matchesMarkedFilter = filters?.marked === undefined || (filters.marked === true && status.isMarked) || (filters.marked === false && !status.isMarked);
+      
+      if (!matchesMarkedFilter) {
+        continue; // Skip this question if it doesn't match the marked filter
+      }
+
+      // Count correct: questions that have ever been answered correctly
+      // (can also be marked or have been incorrect in other attempts)
+      if (status.everCorrect) {
+        correct++;
+      }
+      
+      // Count incorrect: questions answered incorrectly but never correctly
+      // (can also be marked)
+      if (status.everIncorrect && !status.everCorrect) {
+        incorrect++;
+      }
+      
+      // Count omitted: questions that were omitted but never answered
+      // (can also be marked)
+      if (status.everOmitted && !status.everCorrect && !status.everIncorrect) {
+        omitted++;
+      }
+
+      // Count marked: questions that are CURRENTLY marked (using latest markedForReview value)
+      // (can also be correct, incorrect, or omitted)
+      if (status.isMarked) {
+        marked++;
+      }
+    }
+
+    // If marked filter is enabled, also filter unused count
+    let unusedCount = unused;
+    if (filters?.marked === true) {
+      // For unused questions, we need to check if they would be marked
+      // Since unused questions haven't been encountered, they can't be marked
+      // So if marked filter is true, unused should be 0
+      unusedCount = 0;
+    } else if (filters?.marked === false) {
+      // If marked filter is false, unused count remains the same (unused questions are not marked)
+      // No change needed
+    }
+
+    // Calculate total based on filtered counts (reflecting marked filter if applied)
+    const totalCount = unusedCount + incorrect + omitted + correct;
+
+    return {
+      unused: unusedCount,
+      incorrect,
+      marked,
+      omitted,
+      correct,
+      total: totalCount,
+    };
   }
 }

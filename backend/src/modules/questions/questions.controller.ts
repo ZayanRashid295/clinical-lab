@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
   UseInterceptors,
   UploadedFile,
 } from "@nestjs/common";
@@ -30,6 +31,7 @@ import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
 import { UpdateQuestionChoiceDto } from "./dto/update-question-choice.dto";
 import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
+import { FilteredQuestionsDto } from "./dto/filtered-questions.dto";
 
 @ApiTags("questions")
 @Controller("questions")
@@ -202,6 +204,60 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async findOneQuestionChoice(@Param("id") id: string) {
     return this.questionsService.findOneQuestionChoice(id);
+  }
+
+  // Specific routes must come before :id route to avoid route conflicts
+  @Get("test-creation-data")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get hierarchical data for test creation (tags, systems, subjects, topics with question counts)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Test creation data retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiQuery({ name: "pool", required: false, enum: ["unused", "marked", "incorrect", "correct", "omitted"], description: "Question pool to filter counts by" })
+  @ApiQuery({ name: "marked", required: false, type: Boolean, description: "Filter by marked status (true = only marked, false = only unmarked)" })
+  async getTestCreationData(@Request() req, @Query("pool") pool?: string, @Query("marked") marked?: string) {
+    // Parse marked strictly from the query string: "true" -> true, "false" -> false, anything else/undefined -> undefined
+    let markedBool: boolean | undefined = undefined;
+    if (marked === "true") {
+      markedBool = true;
+    } else if (marked === "false") {
+      markedBool = false;
+    }
+    console.log(`🔍 Controller - Received: pool=${pool}, marked=${marked} (parsed: ${markedBool})`);
+    return this.questionsService.getTestCreationData({
+      pool: pool as "unused" | "marked" | "incorrect" | "correct" | "omitted" | undefined,
+      marked: markedBool,
+      userId: req.user?.userId,
+    });
+  }
+
+  @Get("filtered")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get filtered questions for test taking based on tags, systems, subjects, topics, and question pool",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Filtered questions retrieved successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async getFilteredQuestions(@Request() req, @Query() query: FilteredQuestionsDto) {
+    return this.questionsService.getFilteredQuestions({
+      tagIds: query.tagIds,
+      systemIds: query.systemIds,
+      subjectIds: query.subjectIds,
+      topicIds: query.topicIds,
+      pool: query.pool,
+      marked: query.marked,
+      limit: query.limit,
+      userId: req.user?.userId,
+    });
   }
 
   @Get(":id")

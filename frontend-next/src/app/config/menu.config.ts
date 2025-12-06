@@ -154,21 +154,21 @@ export const MENU_CONFIG = {
       label: "menu.testCreation",
       icon: "✏️",
       path: "/test-creation",
-      roles: ["ADMIN", "FACULTY"],
+      roles: ["ADMIN", "FACULTY", "STUDENT", "PASSENGER", "DRIVER", "FLEET_MANAGER"],
       submenu: [
         {
           id: "study-create-test",
           label: "menu.studyCreateTest",
           icon: "📝",
           path: "/test-creation/study-create",
-          roles: ["ADMIN", "FACULTY"],
+          roles: ["ADMIN", "FACULTY", "STUDENT", "PASSENGER", "DRIVER", "FLEET_MANAGER"],
         },
         {
           id: "previous-tests",
           label: "menu.previousTests",
           icon: "📊",
           path: "/previous-tests",
-          roles: ["ADMIN", "STUDENT", "FACULTY"],
+          roles: ["ADMIN", "STUDENT", "FACULTY", "PASSENGER", "DRIVER", "FLEET_MANAGER"],
         },
         {
           id: "test-templates",

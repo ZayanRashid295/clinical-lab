@@ -12,18 +12,20 @@ import { SubjectSelector } from "./SubjectSelector";
 import { SystemSelector } from "./SystemSelector";
 
 export default function StudyCreateTest() {
-  const [mode, setMode] = useState<"tutor" | "timed">("tutor");
+  const [isTutor, setIsTutor] = useState(true);
   const [isTimed, setIsTimed] = useState(false);
   const [selectedPool, setSelectedPool] = useState("unused");
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedSystems, setSelectedSystems] = useState<string[]>([]);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState("");
 
-  const handleSubjectToggle = (subjectId: string) => {
-    setSelectedSubjects((prev) =>
-      prev.includes(subjectId)
-        ? prev.filter((id) => id !== subjectId)
-        : [...prev, subjectId]
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
     );
   };
 
@@ -35,10 +37,26 @@ export default function StudyCreateTest() {
     );
   };
 
+  const handleSubjectToggle = (subjectId: string) => {
+    setSelectedSubjects((prev) =>
+      prev.includes(subjectId)
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId]
+    );
+  };
+
+  const handleTopicToggle = (topicId: string) => {
+    setSelectedTopics((prev) =>
+      prev.includes(topicId)
+        ? prev.filter((id) => id !== topicId)
+        : [...prev, topicId]
+    );
+  };
+
   const handleGenerateTest = () => {
     // Validation
-    if (selectedSubjects.length === 0) {
-      alert("Please select at least one subject.");
+    if (selectedTags.length === 0) {
+      alert("Please select at least one tag.");
       return;
     }
     if (selectedSystems.length === 0) {
@@ -50,18 +68,33 @@ export default function StudyCreateTest() {
       return;
     }
 
-    // TODO: Implement API call to create test
-    console.log("Creating test with:", {
-      mode,
-      isTimed,
-      questionPool: selectedPool,
-      subjects: selectedSubjects,
-      systems: selectedSystems,
-      questionCount: parseInt(questionCount),
-      duration: isTimed ? parseInt(questionCount) * 1.5 : undefined,
-    });
-    
-    alert(`Test configuration created! (This is a demo - backend integration pending)`);
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (selectedTags.length > 0) {
+      params.set("tagIds", selectedTags.join(","));
+    }
+    if (selectedSystems.length > 0) {
+      params.set("systemIds", selectedSystems.join(","));
+    }
+    if (selectedSubjects.length > 0) {
+      params.set("subjectIds", selectedSubjects.join(","));
+    }
+    if (selectedTopics.length > 0) {
+      params.set("topicIds", selectedTopics.join(","));
+    }
+    params.set("limit", questionCount);
+    // Determine mode: if tutor is enabled, use "tutor", otherwise use "timed" if timed is enabled
+    const mode = isTutor ? "tutor" : (isTimed ? "timed" : "tutor");
+    params.set("mode", mode);
+    if (isTimed) {
+      params.set("timed", "true");
+    }
+    if (isTutor) {
+      params.set("tutor", "true");
+    }
+
+    // Navigate to student mode with filters
+    window.location.href = `/question-generator/student?${params.toString()}`;
   };
 
   return (
@@ -82,25 +115,38 @@ export default function StudyCreateTest() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <TestModeSelector
-            mode={mode}
+            isTutor={isTutor}
             isTimed={isTimed}
-            onModeChange={setMode}
+            onTutorChange={setIsTutor}
             onTimedChange={setIsTimed}
           />
           <QuestionPoolSelector
             selectedPool={selectedPool}
             onPoolChange={setSelectedPool}
+            filters={{
+              tagIds: selectedTags.length > 0 ? selectedTags : undefined,
+              systemIds: selectedSystems.length > 0 ? selectedSystems : undefined,
+              subjectIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
+              topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+            }}
           />
         </div>
 
         <div className="space-y-6">
           <SubjectSelector
-            selectedSubjects={selectedSubjects}
-            onSubjectToggle={handleSubjectToggle}
+            selectedSubjects={selectedTags}
+            onSubjectToggle={handleTagToggle}
+            selectedPool={selectedPool}
           />
           <SystemSelector
             selectedSystems={selectedSystems}
             onSystemToggle={handleSystemToggle}
+            selectedTags={selectedTags}
+            selectedPool={selectedPool}
+            selectedSubjects={selectedSubjects}
+            selectedTopics={selectedTopics}
+            onSubjectToggle={handleSubjectToggle}
+            onTopicToggle={handleTopicToggle}
           />
         </div>
       </div>

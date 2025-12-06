@@ -20,6 +20,10 @@ interface RichMarkdownEditorProps {
   onChange?: (html: string) => void
   className?: string
   showEditorContent?: boolean // If false, only show toolbar
+  onAddBlock?: (type: 'text' | 'table' | 'image' | 'internal-link' | 'external-link' | 'per-answer-explanation') => void
+  disabled?: boolean
+  perAnswerExplanationCount?: number
+  isMainExplanation?: boolean
 }
 
 export default function RichMarkdownEditor({
@@ -27,6 +31,10 @@ export default function RichMarkdownEditor({
   onChange,
   className,
   showEditorContent = true,
+  onAddBlock,
+  disabled = false,
+  perAnswerExplanationCount = 0,
+  isMainExplanation = false,
 }: RichMarkdownEditorProps) {
   const [isReady, setIsReady] = useState(false)
   const lastContentRef = useRef<string | undefined>(undefined)
@@ -293,32 +301,78 @@ export default function RichMarkdownEditor({
             />
           </div>
 
-          <div className="flex items-center gap-1 border-l border-border pl-2">
-            <ToolbarButton
-              tooltip="Insert link"
-              onClick={() => {
-                const url = window.prompt("Enter URL:")
-                if (url) {
-                  runEditorCommand(() => editor.chain().focus().setLink({ href: url }).run())
-                }
-              }}
-              icon="🔗"
-            />
-            <ToolbarButton
-              tooltip="Insert image"
-              onClick={() => {
-                const url = window.prompt("Enter image URL:")
-                if (url) {
-                  runEditorCommand(() => editor.chain().focus().setImage({ src: url }).run())
-                }
-              }}
-              icon="🖼️"
-            />
-          </div>
+          {/* Block Addition Buttons - Integrated into toolbar */}
+          {onAddBlock && (
+            <div className="flex items-center gap-1 border-l border-border pl-2">
+              <Button
+                onClick={() => onAddBlock('text')}
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+              >
+                <span className="mr-1">📝</span>
+                <span>+ Text</span>
+              </Button>
+              <Button
+                onClick={() => onAddBlock('table')}
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+              >
+                <span className="mr-1">📊</span>
+                <span>+ Table</span>
+              </Button>
+              <Button
+                onClick={() => onAddBlock('image')}
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+              >
+                <span className="mr-1">🖼️</span>
+                <span>+ Image</span>
+              </Button>
+              <Button
+                onClick={() => onAddBlock('internal-link')}
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+              >
+                <span className="mr-1">🔗</span>
+                <span>+ Internal Link</span>
+              </Button>
+              <Button
+                onClick={() => onAddBlock('external-link')}
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+              >
+                <span className="mr-1">🌐</span>
+                <span>+ External Link</span>
+              </Button>
+              {isMainExplanation && perAnswerExplanationCount === 0 && (
+                <Button
+                  onClick={() => onAddBlock('per-answer-explanation')}
+                  disabled={disabled}
+                  variant="outline"
+                  size="sm"
+                  className="bg-card hover:bg-muted/50 border-border/50 text-foreground h-8 px-2"
+                >
+                  <span className="mr-1">💬</span>
+                  <span>+ Per-Answer Explanation</span>
+                </Button>
+              )}
+            </div>
+          )}
+
         </TooltipProvider>
       </div>
     )
-  }, [editor, runEditorCommand])
+  }, [editor, runEditorCommand, onAddBlock, disabled, perAnswerExplanationCount, isMainExplanation])
 
   if (!editor) {
     return (

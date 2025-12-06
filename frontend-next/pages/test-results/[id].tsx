@@ -6,6 +6,7 @@ import TestResultsPage from "../../src/app/components/test-results/TestResultsPa
 
 export default function TestResults() {
   const router = useRouter();
+  const { id } = router.query;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

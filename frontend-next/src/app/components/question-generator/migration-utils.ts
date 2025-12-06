@@ -14,9 +14,22 @@ export function convertOldBlocksToNew(oldBlocks: any[]): ContentBlock[] {
   return oldBlocks
     .filter((block) => block != null)
     .map((block, index) => {
+      // Check if this is a per-answer-explanation placeholder first
+      // This handles both PER_ANSWER_EXPLANATION type and TEXT blocks with markers
+      const isPerAnswerExplanation = 
+        block.type === "PER_ANSWER_EXPLANATION" || 
+        block.type === "per-answer-explanation" ||
+        (block.data && (
+          block.data.placeholder === true || 
+          block.data.isPerAnswerExplanation === true ||
+          block.data.allChoices === true
+        ))
+      
       // Preserve the original type for proper conversion
       const originalType = block.type || "TEXT"
-      const convertedType = convertOldTypeToNew(originalType)
+      const convertedType = isPerAnswerExplanation 
+        ? "per-answer-explanation" 
+        : convertOldTypeToNew(originalType)
       const convertedData = convertOldDataToNew(originalType, block.data)
       
       const newBlock: ContentBlock = {
@@ -115,6 +128,26 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
     })
   }
 
+  // Extract questionId from tags if stored there
+  let questionId: string | undefined = oldQuestion.questionId || oldQuestion.metadata?.questionId
+  const tags = Array.isArray(oldQuestion.tags) ? oldQuestion.tags : []
+  const filteredTags: string[] = []
+  
+  for (const tag of tags) {
+    if (typeof tag === "string" && tag.startsWith("__questionId:")) {
+      questionId = tag.replace("__questionId:", "")
+      if (process.env.NODE_ENV === "development") {
+        console.log("[convertOldQuestionToNew] Extracted questionId from tags:", questionId)
+      }
+    } else {
+      filteredTags.push(String(tag))
+    }
+  }
+  
+  if (process.env.NODE_ENV === "development" && questionId) {
+    console.log("[convertOldQuestionToNew] Final questionId for metadata:", questionId)
+  }
+
   return {
     stem: stemBlocks,
     choices: convertOldOptionsToChoices(oldQuestion.options || []),
@@ -128,7 +161,13 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
       sectionId: oldQuestion.sectionId,
       chapterId: oldQuestion.chapterId,
       topicId: oldQuestion.topicId,
-      tags: Array.isArray(oldQuestion.tags) ? oldQuestion.tags : [],
+      productTagId: oldQuestion.productTagId,
+      // Convert single productTagId to array for backward compatibility
+      productTagIds: oldQuestion.productTagId 
+        ? [oldQuestion.productTagId] 
+        : oldQuestion.productTagIds || undefined,
+      tags: filteredTags, // Return tags without the questionId marker
+      questionId: questionId, // Preserve questionId from tags or existing metadata
     },
   }
 }
@@ -149,7 +188,12 @@ export function convertNewQuestionToOld(newData: QuestionCreatorData): any {
     sectionId: newData.metadata.sectionId,
     chapterId: newData.metadata.chapterId,
     topicId: newData.metadata.topicId,
+    productTagId: newData.metadata.productTagId || (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0 ? newData.metadata.productTagIds[0] : undefined),
+    productTagIds: newData.metadata.productTagIds,
     tags: newData.metadata.tags || [],
+    metadata: {
+      questionId: newData.metadata.questionId,
+    },
   }
 }
 
@@ -239,9 +283,24 @@ function convertOldDataToNew(oldType: string, oldData: any): any {
 
   if (normalizedType === "per-answer-explanation" || normalizedType === "PER_ANSWER_EXPLANATION") {
     // Handle per-answer-explanation placeholder
+    // Preserve allChoices flag if it exists
     return {
       placeholder: true,
       isPerAnswerExplanation: true,
+      allChoices: oldData?.allChoices === true || true, // Default to true for all choices block
+    }
+  }
+  
+  // Also check if it's a TEXT block with per-answer-explanation markers
+  // (This case is now handled in convertOldBlocksToNew before calling convertOldDataToNew)
+  if (normalizedType === "text" || normalizedType === "TEXT") {
+    if (oldData?.placeholder === true || oldData?.isPerAnswerExplanation === true || oldData?.allChoices === true) {
+      // This is a per-answer-explanation placeholder saved as TEXT
+      return {
+        placeholder: true,
+        isPerAnswerExplanation: true,
+        allChoices: oldData?.allChoices === true || true,
+      }
     }
   }
 
@@ -291,6 +350,7 @@ function convertNewDataToOld(newType: ContentBlock["type"], newData: any): any {
     return {
       placeholder: true,
       isPerAnswerExplanation: true,
+      allChoices: newData?.allChoices === true || true, // Preserve allChoices flag
     }
   }
 

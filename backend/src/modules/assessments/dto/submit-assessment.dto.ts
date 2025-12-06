@@ -24,6 +24,15 @@ export class QuestionAnswerDto {
   })
   @IsOptional()
   timeSpent?: number;
+
+  @ApiProperty({
+    description: "Whether question is marked for review",
+    example: false,
+    required: false,
+    default: false,
+  })
+  @IsOptional()
+  markedForReview?: boolean;
 }
 
 export class SubmitAssessmentDto {

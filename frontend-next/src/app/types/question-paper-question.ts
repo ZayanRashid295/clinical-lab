@@ -7,6 +7,7 @@ export interface QuestionPaperQuestion {
   userAnswer?: string;
   isCorrect?: boolean;
   timeSpent?: number;
+  markedForReview?: boolean;
   order: number;
   createdAt: string;
   updatedAt: string;
@@ -68,12 +69,15 @@ export interface CreateQuestionPaperQuestionDto {
   questionPaperId: string;
   questionId: string;
   order?: number;
+  markedForReview?: boolean;
 }
 
 export interface UpdateQuestionPaperQuestionDto {
   userAnswer?: string;
+  isCorrect?: boolean;
   timeSpent?: number;
   order?: number;
+  markedForReview?: boolean;
 }
 
 // Filter interfaces

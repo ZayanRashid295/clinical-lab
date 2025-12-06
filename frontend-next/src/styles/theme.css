@@ -30,11 +30,25 @@
   /* Elevation system for hover/active effects */
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
+
+  /* Light mode semantic colors */
+  --card-bg: white;
+  --background-bg: #f9fafb;
+  --foreground-color: #111827;
+  --muted-bg: #f3f4f6;
+  --muted-foreground-color: #6b7280;
+  --border-color: #e5e7eb;
 }
 
 /* Dark mode - colors will be dynamically set by ThemeService */
 .dark {
   /* Dark mode colors are now set dynamically by ThemeService.applyTheme() */
+  --card-bg: #1f2937;
+  --background-bg: #111827;
+  --foreground-color: #f3f4f6;
+  --muted-bg: #1f2937;
+  --muted-foreground-color: #9ca3af;
+  --border-color: #374151;
 }
 
 /* Apply base font size to html element */

@@ -27,6 +27,7 @@ model QuestionPaperQuestion {
   userAnswer     String?  // User's selected answer
   isCorrect      Boolean? // Whether user answered correctly
   timeSpent      Int?     // Time spent on this question in seconds
+  markedForReview Boolean @default(false) // Whether question is marked for review
   order          Int      @default(0) // Order of question in the paper
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

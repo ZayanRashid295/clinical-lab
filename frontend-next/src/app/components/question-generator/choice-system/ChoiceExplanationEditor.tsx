@@ -4,14 +4,15 @@ import { useState, useEffect } from "react"
 import { Card } from "@/shared/ui/card"
 import { Badge } from "@/shared/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs"
-import RichEditorContent from "../rich-editor/RichEditorContent"
+import RichTextEditor from "../unified-editor/RichTextEditor"
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "./types"
+import { blocksToHTMLAsync, htmlToBlocks } from "../unified-editor/content-utils"
 
 interface ChoiceExplanationEditorProps {
   choices: Choice[]
   explanations: Record<string, ContentBlock[]>
-  onChange: (explanations: Record<string, ContentBlock[]>) => void
+  onChange: (explanations: Record<string, ContentBlock[]) => void
   disabled?: boolean
 }
 
@@ -22,6 +23,8 @@ export default function ChoiceExplanationEditor({
   disabled = false,
 }: ChoiceExplanationEditorProps) {
   const [activeTab, setActiveTab] = useState<string>(choices[0]?.label || "")
+  const [htmlContents, setHtmlContents] = useState<Record<string, string>>({})
+  const [isConverting, setIsConverting] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     if (choices.length > 0 && !activeTab) {
@@ -29,10 +32,45 @@ export default function ChoiceExplanationEditor({
     }
   }, [choices, activeTab])
 
-  const handleExplanationChange = (label: string, blocks: ContentBlock[]) => {
+  // Convert blocks to HTML when explanations change
+  useEffect(() => {
+    const convertAll = async () => {
+      const newHtmlContents: Record<string, string> = {}
+      const newIsConverting: Record<string, boolean> = {}
+      
+      for (const choice of choices) {
+        const blocks = explanations[choice.label] || []
+        if (blocks.length > 0) {
+          newIsConverting[choice.label] = true
+          try {
+            const html = await blocksToHTMLAsync(blocks)
+            newHtmlContents[choice.label] = html || "<p></p>"
+          } catch (error) {
+            console.error(`Error converting blocks to HTML for ${choice.label}:`, error)
+            newHtmlContents[choice.label] = "<p></p>"
+          } finally {
+            newIsConverting[choice.label] = false
+          }
+        } else {
+          newHtmlContents[choice.label] = "<p></p>"
+        }
+      }
+      
+      setHtmlContents(newHtmlContents)
+      setIsConverting(newIsConverting)
+    }
+
+    convertAll()
+  }, [explanations, choices])
+
+  const handleExplanationChange = async (label: string, html: string) => {
+    // Convert HTML back to blocks
+    const existingBlocks = explanations[label] || []
+    const newBlocks = htmlToBlocks(html, existingBlocks)
+    
     const updated = { ...explanations }
-    if (blocks && blocks.length > 0) {
-      updated[label] = blocks
+    if (newBlocks && newBlocks.length > 0 && (newBlocks[0].data?.html || "").trim() !== "<p></p>") {
+      updated[label] = newBlocks
     } else {
       delete updated[label]
     }
@@ -87,12 +125,19 @@ export default function ChoiceExplanationEditor({
               </div>
 
               <div className="border border-border rounded-lg p-3 bg-card">
-                <RichEditorContent
-                  blocks={explanations[choice.label] || []}
-                  onChange={(blocks) => handleExplanationChange(choice.label, blocks)}
+                {isConverting[choice.label] ? (
+                  <div className="min-h-[80px] flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">Loading...</p>
+                  </div>
+                ) : (
+                  <RichTextEditor
+                    content={htmlContents[choice.label] || "<p></p>"}
+                    onChange={(html) => handleExplanationChange(choice.label, html)}
                   placeholder={`Add explanation for choice ${choice.label}...`}
-                  disabled={disabled}
+                    editable={!disabled}
+                    className="min-h-[80px]"
                 />
+                )}
               </div>
             </div>
           </TabsContent>

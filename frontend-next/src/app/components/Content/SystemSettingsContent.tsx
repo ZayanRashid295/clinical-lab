@@ -166,7 +166,7 @@ export default function SystemSettingsContent() {
     <div className="space-y-8">
       {/* Theme Mode */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Theme Mode</h3>
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Theme Mode</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
@@ -184,21 +184,21 @@ export default function SystemSettingsContent() {
               key={option.value}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                 config.theme === option.value
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                  : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
               onClick={() => setTheme(option.value as "light" | "dark")}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900">{option.label}</h4>
-                  <p className="text-sm text-gray-500">{option.description}</p>
+                  <h4 className="font-medium text-foreground dark:text-foreground">{option.label}</h4>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">{option.description}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
                     config.theme === option.value
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-300"
+                      ? "border-primary dark:border-primary bg-primary dark:bg-primary"
+                      : "border-muted-foreground dark:border-muted-foreground"
                   }`}
                 />
               </div>
@@ -209,7 +209,7 @@ export default function SystemSettingsContent() {
 
       {/* Color Scheme */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
           Color Scheme
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -218,18 +218,18 @@ export default function SystemSettingsContent() {
               key={key}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                 config.colorScheme === key
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                  : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
               onClick={() => setColorScheme(key as any)}
             >
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-gray-900">{scheme.name}</h4>
+                <h4 className="font-medium text-foreground dark:text-foreground">{scheme.name}</h4>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
                     config.colorScheme === key
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-300"
+                      ? "border-primary dark:border-primary bg-primary dark:bg-primary"
+                      : "border-muted-foreground dark:border-muted-foreground"
                   }`}
                 />
               </div>
@@ -254,7 +254,7 @@ export default function SystemSettingsContent() {
 
       {/* Font Size */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Font Size</h3>
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Font Size</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { value: "small", label: "Small", description: "Compact text" },
@@ -265,8 +265,8 @@ export default function SystemSettingsContent() {
               key={option.value}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                 config.fontSize === option.value
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                  : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
               onClick={() =>
                 setFontSize(option.value as "small" | "medium" | "large")
@@ -274,14 +274,14 @@ export default function SystemSettingsContent() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900">{option.label}</h4>
-                  <p className="text-sm text-gray-500">{option.description}</p>
+                  <h4 className="font-medium text-foreground dark:text-foreground">{option.label}</h4>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">{option.description}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
                     config.fontSize === option.value
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-300"
+                      ? "border-primary dark:border-primary bg-primary dark:bg-primary"
+                      : "border-muted-foreground dark:border-muted-foreground"
                   }`}
                 />
               </div>
@@ -292,7 +292,7 @@ export default function SystemSettingsContent() {
 
       {/* Border Radius */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
           Border Radius
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -310,8 +310,8 @@ export default function SystemSettingsContent() {
               key={option.value}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                 config.borderRadius === option.value
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                  : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
               onClick={() =>
                 setBorderRadius(
@@ -321,14 +321,14 @@ export default function SystemSettingsContent() {
             >
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h4 className="font-medium text-gray-900">{option.label}</h4>
-                  <p className="text-sm text-gray-500">{option.description}</p>
+                  <h4 className="font-medium text-foreground dark:text-foreground">{option.label}</h4>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">{option.description}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
                     config.borderRadius === option.value
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-300"
+                      ? "border-primary dark:border-primary bg-primary dark:bg-primary"
+                      : "border-muted-foreground dark:border-muted-foreground"
                   }`}
                 />
               </div>

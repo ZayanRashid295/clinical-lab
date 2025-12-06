@@ -38,13 +38,13 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
   const correctAnswerLabel = correctOption?.label
 
   return (
-    <div className="h-full bg-background flex flex-col w-full">
+    <div className="h-full bg-background dark:bg-gray-900 flex flex-col w-full">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 bg-card/20 backdrop-blur-sm w-full">
+      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 dark:border-gray-700 bg-card/20 dark:bg-gray-800/20 backdrop-blur-sm w-full">
         <div className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <h2 className="text-lg font-bold text-foreground">Question Preview</h2>
+              <h2 className="text-lg font-bold text-foreground dark:text-gray-100">Question Preview</h2>
               {question.subject || question.system ? (
                 <div className="flex flex-wrap gap-2">
                   {question.subject && (
@@ -67,7 +67,7 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
                 </Button>
               )}
               {onEdit && (
-                <Button onClick={onEdit} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button onClick={onEdit} size="sm" className="bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700">
                   Edit Question
                 </Button>
               )}
@@ -111,9 +111,9 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
                       <p className={`font-bold text-base ${isCorrect ? "text-success" : "text-destructive"}`}>
                         {isCorrect ? "Correct!" : "Incorrect"}
                       </p>
-                      <p className="text-foreground/70 text-sm">
+                      <p className="text-foreground/70 dark:text-gray-300 text-sm">
                         Correct Answer:{" "}
-                        <span className="font-semibold text-foreground">
+                        <span className="font-semibold text-foreground dark:text-gray-100">
                           {correctAnswerLabel}. {correctOption?.text}
                         </span>
                       </p>
@@ -159,10 +159,10 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center px-4">
-                <Card className="p-8 sm:p-12 text-center w-full bg-gradient-to-br from-primary/8 to-secondary/8 backdrop-blur-sm border border-border/40 animate-fade-in shadow-sm hover:shadow-md transition-shadow">
+                <Card className="p-8 sm:p-12 text-center w-full bg-gradient-to-br from-primary/8 to-secondary/8 dark:from-primary/10 dark:to-secondary/10 backdrop-blur-sm border border-border/40 dark:border-gray-700 animate-fade-in shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center animate-pulse border border-primary/30">
-                      <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/30 dark:to-secondary/30 flex items-center justify-center animate-pulse border border-primary/30 dark:border-primary/50">
+                      <svg className="w-7 h-7 text-primary dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -171,7 +171,7 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
                         />
                       </svg>
                     </div>
-                    <p className="text-sm text-foreground/70 font-semibold tracking-wide">
+                    <p className="text-sm text-foreground/70 dark:text-gray-300 font-semibold tracking-wide">
                       Select an answer to view the detailed explanation
                     </p>
                   </div>

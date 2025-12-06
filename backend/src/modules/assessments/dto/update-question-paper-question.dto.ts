@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsInt, Min } from "class-validator";
+import { IsString, IsOptional, IsInt, Min, IsBoolean } from "class-validator";
 
 export class UpdateQuestionPaperQuestionDto {
   @ApiProperty({
@@ -10,6 +10,15 @@ export class UpdateQuestionPaperQuestionDto {
   @IsOptional()
   @IsString()
   userAnswer?: string;
+
+  @ApiProperty({
+    description: "Whether the answer is correct",
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isCorrect?: boolean;
 
   @ApiProperty({
     description: "Time spent on this question in seconds",
@@ -30,4 +39,13 @@ export class UpdateQuestionPaperQuestionDto {
   @IsInt()
   @Min(0)
   order?: number;
+
+  @ApiProperty({
+    description: "Whether question is marked for review",
+    example: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  markedForReview?: boolean;
 }

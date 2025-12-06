@@ -83,7 +83,7 @@ function renderInternalLink(item: ContentItem) {
   const href = `/${targetType === 'question' ? 'question-generator' : 'content'}/${targetType}/${targetId}`
   
   return (
-    <div key={item.id} className="my-4 p-4 border border-primary/30 rounded-lg bg-primary/5">
+    <div key={item.id} className="my-4 p-4 border border-primary/30 dark:border-primary/40 rounded-lg bg-primary/5 dark:bg-primary/10">
       <a
         href={href}
         className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-semibold transition-colors"
@@ -93,7 +93,7 @@ function renderInternalLink(item: ContentItem) {
         <ExternalLink className="w-4 h-4" />
       </a>
       {description && (
-        <p className="text-sm text-muted-foreground mt-2">{description}</p>
+        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">{description}</p>
       )}
     </div>
   )
@@ -107,7 +107,7 @@ function renderExternalLink(item: ContentItem) {
   }
 
   return (
-    <div key={item.id} className="my-4 p-4 border border-blue-500/30 rounded-lg bg-blue-500/5">
+    <div key={item.id} className="my-4 p-4 border border-blue-500/30 dark:border-blue-500/40 rounded-lg bg-blue-500/5 dark:bg-blue-500/10">
       <a
         href={url}
         target={openInNewTab !== false ? "_blank" : undefined}
@@ -119,7 +119,7 @@ function renderExternalLink(item: ContentItem) {
         <ExternalLink className="w-4 h-4" />
       </a>
       {description && (
-        <p className="text-sm text-muted-foreground mt-2">{description}</p>
+        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">{description}</p>
       )}
     </div>
   )
@@ -147,7 +147,7 @@ function fixListItemFormatting(html: string): string {
 }
 
 // Component to render HTML with sanitization
-function HtmlRenderer({ html, itemId }: { html: string; itemId: number }) {
+function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string }) {
   const [sanitizedHtml, setSanitizedHtml] = useState<string>(html)
 
   useEffect(() => {
@@ -155,52 +155,46 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number }) {
     const sanitizeHtml = async () => {
       // First, fix list item formatting
       const fixedHtml = fixListItemFormatting(html)
-      const sanitizeSchema: any = {
-        ...defaultSchema,
+      
+      // Don't remove empty table rows - this might interfere with merged cells
+      // The empty rows removal was causing issues with colspan/rowspan
+      const cleanedHtml = fixedHtml
+      
+      // Debug: Log the HTML before sanitization to check for colspan/rowspan
+      if (process.env.NODE_ENV === "development") {
+        const hasColspan = cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')
+        const hasRowspan = cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')
+        if (hasColspan || hasRowspan) {
+          console.log("[HtmlRenderer] HTML contains merged cells:", {
+            hasColspan,
+            hasRowspan,
+            sample: cleanedHtml.substring(0, 500)
+          })
+        }
+      }
+      
+      // Use a very permissive schema that preserves all table attributes
+      // The HTML comes from Tiptap which is trusted, we just need basic XSS protection
+      const permissiveSchema: any = {
         tagNames: [
-          ...((defaultSchema?.tagNames as string[]) || []),
-          "table",
-          "thead",
-          "tbody",
-          "tr",
-          "th",
-          "td",
-          "img",
-          "figure",
-          "figcaption",
-          "span",
-          "strong",
-          "em",
-          "u",
-          "s",
-          "strike",
-          "code",
-          "pre",
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-          "ul",
-          "ol",
-          "li",
-          "a",
-          "blockquote",
-          "hr",
-          "p",
-          "div",
+          "table", "thead", "tbody", "tfoot", "tr", "th", "td",
+          "p", "div", "span", "strong", "em", "u", "s", "strike", "code", "pre", "mark",
+          "ul", "ol", "li", "br", "hr",
+          "h1", "h2", "h3", "h4", "h5", "h6",
+          "a", "img", "blockquote", "figure", "figcaption",
         ],
         attributes: {
-          ...((defaultSchema?.attributes as Record<string, any>) || {}),
-          table: ["className", "style"],
+          table: ["className", "style", "border", "cellpadding", "cellspacing"],
           thead: ["className", "style"],
           tbody: ["className", "style"],
+          tfoot: ["className", "style"],
           tr: ["className", "style"],
-          th: ["className", "style", "colspan", "rowspan"],
-          td: ["className", "style", "colspan", "rowspan"],
-          img: ["src", "alt", "title", "className", "style", "width", "height"],
-          span: ["className", "style", "data-color"], // Allow color styles on spans
+          // Explicitly allow both lowercase and camelCase for colspan/rowspan
+          th: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color", "align", "valign"],
+          td: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color", "align", "valign"],
+          p: ["className", "style"],
+          div: ["className", "style"],
+          span: ["className", "style", "data-color"],
           strong: ["className", "style"],
           em: ["className", "style"],
           u: ["className", "style"],
@@ -208,35 +202,57 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number }) {
           strike: ["className", "style"],
           code: ["className", "style"],
           pre: ["className", "style"],
-          p: ["className", "style"],
-          div: ["className", "style"],
+          mark: ["className", "style", "data-color"],
+          ul: ["className", "style"],
+          ol: ["className", "style"],
+          li: ["className", "style"],
+          br: ["className", "style"],
+          hr: ["className", "style"],
           h1: ["className", "style"],
           h2: ["className", "style"],
           h3: ["className", "style"],
           h4: ["className", "style"],
           h5: ["className", "style"],
           h6: ["className", "style"],
-          ul: ["className", "style"],
-          ol: ["className", "style"],
-          li: ["className", "style"],
           a: ["href", "target", "rel", "className", "style"],
+          img: ["src", "alt", "title", "className", "style", "width", "height"],
+          figure: ["className", "style"],
+          figcaption: ["className", "style"],
           blockquote: ["className", "style"],
-          hr: ["className", "style"],
-          "*": ["className", "style"], // Allow style attribute on all elements
+          "*": ["className", "style"],
         },
+        strip: [],
       }
 
       try {
+        // Only sanitize for security, don't modify the HTML structure or styles
         const file = await unified()
           .use(rehypeParse, { fragment: true })
-          .use(rehypeSanitize, sanitizeSchema)
+          .use(rehypeSanitize, permissiveSchema)
           .use(rehypeStringify, { allowDangerousHtml: true })
-          .process(fixedHtml)
+          .process(cleanedHtml)
+        
         // Fix list items again after sanitization (in case sanitization re-added <p> tags)
-        const finalHtml = fixListItemFormatting(String(file))
+        let finalHtml = fixListItemFormatting(String(file))
+        
+        // Debug: Log the HTML after sanitization to check if colspan/rowspan are preserved
+        if (process.env.NODE_ENV === "development") {
+          const hasColspanAfter = finalHtml.includes('colspan') || finalHtml.includes('colSpan')
+          const hasRowspanAfter = finalHtml.includes('rowspan') || finalHtml.includes('rowSpan')
+          if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
+            console.warn("[HtmlRenderer] colspan was removed during sanitization!")
+            console.log("Before:", cleanedHtml.substring(0, 1000))
+            console.log("After:", finalHtml.substring(0, 1000))
+          }
+          if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
+            console.warn("[HtmlRenderer] rowspan was removed during sanitization!")
+          }
+        }
+        
         setSanitizedHtml(finalHtml)
       } catch (error) {
         console.error("Error sanitizing HTML:", error)
+        // If sanitization fails, use original HTML (it's from Tiptap which is trusted)
         // Fallback to original HTML with list formatting fixed
         setSanitizedHtml(fixListItemFormatting(html))
       }
@@ -245,11 +261,204 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number }) {
   }, [html])
 
   return (
-    <div 
-      key={itemId}
-      className="prose prose-sm dark:prose-invert max-w-none [&_p]:text-foreground/90 [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-foreground [&_h1]:mt-8 [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-4 [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-1 [&_ul]:mb-4 [&_ul]:text-foreground/90 [&_ul]:ml-6 [&_ul]:pl-0 [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:space-y-1 [&_ol]:mb-4 [&_ol]:text-foreground/90 [&_ol]:ml-6 [&_ol]:pl-0 [&_li]:text-foreground/90 [&_li]:ml-0 [&_li]:pl-0 [&_li]:whitespace-pre-wrap [&_span]:whitespace-pre-wrap [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline [&_code]:bg-muted [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap"
-      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-    />
+    <div key={itemId}>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .html-content-${itemId} table,
+          .html-content-${itemId} table * {
+            box-sizing: border-box !important;
+          }
+          .html-content-${itemId} table {
+            border: 3px solid #6b7280 !important;
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            width: 100% !important;
+            min-width: 100% !important;
+            display: table !important;
+            margin: 16px 0 !important;
+            background-color: #ffffff !important;
+          }
+          .dark .html-content-${itemId} table {
+            border-color: #9ca3af !important;
+            background-color: #1f2937 !important;
+          }
+          .html-content-${itemId} table tr,
+          .html-content-${itemId} table thead tr,
+          .html-content-${itemId} table tbody tr {
+            border: 2px solid #6b7280 !important;
+            border-top: 2px solid #6b7280 !important;
+            border-bottom: 2px solid #6b7280 !important;
+            display: table-row !important;
+          }
+          .dark .html-content-${itemId} table tr,
+          .dark .html-content-${itemId} table thead tr,
+          .dark .html-content-${itemId} table tbody tr {
+            border-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table thead tr {
+            border-bottom: 3px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table thead tr {
+            border-bottom-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table tbody tr {
+            border-bottom: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table tbody tr {
+            border-bottom-color: #9ca3af !important;
+          }
+          /* Use the same table styles as edit mode (ProseMirror) */
+          .html-content-${itemId} table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            border: 3px solid #6b7280 !important;
+            margin: 16px 0;
+            background-color: #ffffff !important;
+            display: table !important;
+          }
+          .dark .html-content-${itemId} table {
+            border-color: #9ca3af !important;
+            background-color: #1f2937 !important;
+          }
+          .html-content-${itemId} table tr {
+            border: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table tr {
+            border-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table th,
+          .html-content-${itemId} table td {
+            border: 2px solid #6b7280 !important;
+            border-top: 2px solid #6b7280 !important;
+            border-left: 2px solid #6b7280 !important;
+            border-right: 2px solid #6b7280 !important;
+            border-bottom: 2px solid #6b7280 !important;
+            padding: 8px 12px !important;
+            vertical-align: top;
+            min-width: 100px !important;
+            min-height: 40px !important;
+            position: relative;
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            display: table-cell !important;
+          }
+          .dark .html-content-${itemId} table th,
+          .dark .html-content-${itemId} table td {
+            border-color: #9ca3af !important;
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+          }
+          .html-content-${itemId} table th {
+            border-bottom: 3px solid #6b7280 !important;
+            background-color: #f3f4f6 !important;
+            font-weight: 600;
+            color: #111827 !important;
+          }
+          .dark .html-content-${itemId} table th {
+            border-color: #9ca3af !important;
+            border-bottom: 3px solid #9ca3af !important;
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+          }
+          .html-content-${itemId} table th p,
+          .html-content-${itemId} table td p {
+            margin: 0;
+            min-height: 1.5em;
+          }
+          /* Handle merged cells - same as edit mode */
+          .html-content-${itemId} table th[colspan] + th,
+          .html-content-${itemId} table td[colspan] + td,
+          .html-content-${itemId} table th[colspan] + td,
+          .html-content-${itemId} table td[colspan] + th {
+            border-left: none !important;
+          }
+          .html-content-${itemId} table th[colspan],
+          .html-content-${itemId} table td[colspan] {
+            border-right: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table th[colspan],
+          .dark .html-content-${itemId} table td[colspan] {
+            border-right-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table th[rowspan],
+          .html-content-${itemId} table td[rowspan] {
+            border-bottom: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table th[rowspan],
+          .dark .html-content-${itemId} table td[rowspan] {
+            border-bottom-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table th:first-child,
+          .html-content-${itemId} table td:first-child {
+            border-left: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table th:first-child,
+          .dark .html-content-${itemId} table td:first-child {
+            border-left-color: #9ca3af !important;
+          }
+          .html-content-${itemId} table th:last-child,
+          .html-content-${itemId} table td:last-child {
+            border-right: 2px solid #6b7280 !important;
+          }
+          .dark .html-content-${itemId} table th:last-child,
+          .dark .html-content-${itemId} table td:last-child {
+            border-right-color: #9ca3af !important;
+          }
+          /* Preserve text colors and highlights from inline styles */
+          .html-content-${itemId} span[style*="color"],
+          .html-content-${itemId} p[style*="color"],
+          .html-content-${itemId} div[style*="color"],
+          .html-content-${itemId} td[style*="color"],
+          .html-content-${itemId} th[style*="color"],
+          .html-content-${itemId} mark[style*="color"] {
+            /* Inline styles have higher specificity - colors are preserved */
+          }
+          .html-content-${itemId} mark:not([style*="background-color"]) {
+            /* Default highlight color only if no inline style */
+            background-color: #FFFF00;
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+          .html-content-${itemId} mark[style*="background-color"] {
+            /* Preserve custom highlight colors from inline styles */
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+          .html-content-${itemId} span[style*="background-color"] {
+            /* Preserve highlight colors on spans */
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+        `
+      }} />
+      <div 
+        className={`html-content-${itemId} prose prose-sm dark:prose-invert max-w-none 
+          [&_p]:text-foreground/90 dark:[&_p]:text-gray-200 [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap 
+          [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-8 [&_h1]:mb-4 
+          [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-6 [&_h2]:mb-3 
+          [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-4 [&_h3]:mb-2 
+          [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
+          [&_h5]:text-sm [&_h5]:font-semibold [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
+          [&_h6]:text-xs [&_h6]:font-semibold [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
+          [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-1 [&_ul]:mb-4 [&_ul]:text-foreground/90 dark:[&_ul]:text-gray-200 [&_ul]:ml-6 [&_ul]:pl-0 
+          [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:space-y-1 [&_ol]:mb-4 [&_ol]:text-foreground/90 dark:[&_ol]:text-gray-200 [&_ol]:ml-6 [&_ol]:pl-0 
+          [&_li]:text-foreground/90 dark:[&_li]:text-gray-200 [&_li]:ml-0 [&_li]:pl-0 [&_li]:whitespace-pre-wrap 
+          [&_span]:whitespace-pre-wrap [&_span]:text-foreground/90 dark:[&_span]:text-gray-200 
+          [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
+          [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap 
+          [&_pre]:bg-muted dark:[&_pre]:bg-gray-800 [&_pre]:text-foreground dark:[&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto 
+          [&_blockquote]:border-l-4 [&_blockquote]:border-border dark:[&_blockquote]:border-gray-600 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-foreground/80 dark:[&_blockquote]:text-gray-300 
+          [&_strong]:text-foreground dark:[&_strong]:text-gray-100 [&_strong]:font-semibold 
+          [&_em]:text-foreground/90 dark:[&_em]:text-gray-200 [&_em]:italic 
+          [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto`}
+        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+      />
+    </div>
   )
 }
 
@@ -317,21 +526,76 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
     return null
   }
   
-  // Use HTML, with fallback to markdown conversion if HTML is missing
+  // Use HTML, with fallback to markdown conversion if HTML is missing or empty
   const html = item.data?.html
   const markdown = item.data?.markdown || ""
 
   // Check if HTML is valid and not empty
   if (html && typeof html === "string") {
     const trimmedHtml = html.trim()
-    // Only skip if it's truly empty (empty string or just whitespace in tags)
-    if (trimmedHtml && trimmedHtml !== "<p></p>" && trimmedHtml !== "<p><br></p>" && trimmedHtml !== "<p> </p>") {
+    // Only use HTML if it's truly not empty (not just empty tags or whitespace)
+    const isEmptyHtml = !trimmedHtml || 
+      trimmedHtml === "<p></p>" || 
+      trimmedHtml === "<p><br></p>" || 
+      trimmedHtml === "<p> </p>" ||
+      trimmedHtml === "<p><br/></p>" ||
+      trimmedHtml === "<div></div>" ||
+      trimmedHtml === "<div><br></div>"
+    
+    // Check if HTML contains raw markdown syntax (like **bold**, *italic*, etc.)
+    // This happens when markdown was saved as HTML without conversion
+    // Extract inner text and check for markdown patterns
+    const htmlInnerText = trimmedHtml.replace(/<[^>]+>/g, '').trim()
+    // More comprehensive markdown detection: bold, italic, links, lists, etc.
+    const markdownPatterns = [
+      /\*\*[^*]+\*\*/,           // **bold**
+      /\*[^*]+\*/,                // *italic* (not inside **)
+      /__[^_]+__/,                // __bold__
+      /_[^_]+_/,                   // _italic_
+      /\[.+\]\(.+\)/,             // [link](url)
+      /^[-*+]\s/m,                 // List items
+      /^\d+\.\s/m,                 // Numbered lists
+      /^#{1,6}\s/m,                // Headers
+      /`[^`]+`/,                   // Inline code
+      /```[\s\S]*?```/,           // Code blocks
+    ]
+    const containsMarkdownSyntax = markdownPatterns.some(pattern => 
+      pattern.test(htmlInnerText) || pattern.test(trimmedHtml)
+    )
+    
+    // If HTML is not empty and doesn't contain markdown syntax, use it
+    // Also check if HTML contains colors/highlights - if so, always use HtmlRenderer
+    const hasFormatting = !isEmptyHtml && (html.includes("<span") || html.includes("<mark") || html.includes("style="))
+    
+    if (!isEmptyHtml && (!containsMarkdownSyntax || hasFormatting)) {
       return <HtmlRenderer html={html} itemId={item.id} />
+    }
+    
+    // If HTML contains markdown syntax, extract it and convert
+    if (!isEmptyHtml && containsMarkdownSyntax) {
+      // Prefer the markdown field if it exists, otherwise extract from HTML
+      let markdownToConvert = markdown
+      
+      if (!markdownToConvert || !markdownToConvert.trim()) {
+        // Extract text content from HTML, preserving line breaks and markdown
+        // Remove HTML tags but preserve the text content
+        markdownToConvert = trimmedHtml
+          .replace(/<p[^>]*>/gi, '\n') // Convert <p> to newline
+          .replace(/<\/p>/gi, '\n') // Convert </p> to newline
+          .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newline
+          .replace(/<[^>]+>/g, '') // Remove all other HTML tags
+          .replace(/\n\n+/g, '\n\n') // Normalize multiple newlines
+          .trim()
+      }
+      
+      if (markdownToConvert && markdownToConvert.trim()) {
+        return <MarkdownToHtmlRenderer markdown={markdownToConvert} itemId={item.id} />
+      }
     }
   }
 
-  // Fallback: If HTML is missing but markdown exists, convert it
-  if (markdown && markdown.trim()) {
+  // Fallback: If HTML is missing or empty but markdown exists, convert it
+  if (markdown && typeof markdown === "string" && markdown.trim()) {
     return <MarkdownToHtmlRenderer markdown={markdown} itemId={item.id} />
   }
 
@@ -370,15 +634,17 @@ function removeEmptyTableRows(html: string): string {
   return html.replace(/<tr[^>]*>[\s\n]*(?:<t[dh][^>]*>[\s\n]*<\/t[dh]>[\s\n]*)+<\/tr>/gi, '')
 }
 
-// Component to render HTML tables with proper sanitization
+// Component to render HTML tables - render exactly as in edit mode
 function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: number; isDark: boolean }) {
   const [sanitizedHtml, setSanitizedHtml] = useState<string>(html)
 
   useEffect(() => {
     const sanitizeTableHtml = async () => {
-      // Remove empty rows first
-      const cleanedHtml = removeEmptyTableRows(html)
+      // Don't remove empty rows - this might interfere with merged cells
+      // The empty rows removal was causing issues with colspan/rowspan
+      const cleanedHtml = html
       
+      // Create sanitize schema that explicitly preserves colspan and rowspan
       const sanitizeSchema: any = {
         ...defaultSchema,
         tagNames: [
@@ -396,18 +662,25 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
           "s",
           "strike",
           "code",
+          "mark",
           "a",
           "p",
           "div",
+          "br",
+          "ul",
+          "ol",
+          "li",
         ],
         attributes: {
+          // Start with default attributes but override for table cells to ensure colspan/rowspan are preserved
           ...((defaultSchema?.attributes as Record<string, any>) || {}),
           table: ["className", "style"],
           thead: ["className", "style"],
           tbody: ["className", "style"],
           tr: ["className", "style"],
-          th: ["className", "style", "colspan", "rowspan"],
-          td: ["className", "style", "colspan", "rowspan"],
+          // Explicitly set th and td attributes - don't merge, replace to ensure colspan/rowspan are included
+          th: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color"],
+          td: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color"],
           span: ["className", "style", "data-color"],
           strong: ["className", "style"],
           em: ["className", "style"],
@@ -415,22 +688,109 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
           s: ["className", "style"],
           strike: ["className", "style"],
           code: ["className", "style"],
+          mark: ["className", "style", "data-color"],
           a: ["href", "target", "rel", "className", "style"],
           p: ["className", "style"],
           div: ["className", "style"],
+          ul: ["className", "style"],
+          ol: ["className", "style"],
+          li: ["className", "style"],
           "*": ["className", "style"],
         },
+        // Allow all text content inside table cells
+        strip: [],
       }
 
       try {
+        // Debug: Log the HTML before sanitization to check for colspan/rowspan
+        if (process.env.NODE_ENV === "development") {
+          const hasColspan = cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')
+          const hasRowspan = cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')
+          if (hasColspan || hasRowspan) {
+            console.log("[TableHtmlRenderer] HTML contains merged cells:", {
+              hasColspan,
+              hasRowspan,
+              sample: cleanedHtml.substring(0, 500)
+            })
+          }
+        }
+        
+        // Use a very permissive schema that preserves all table attributes
+        // The HTML comes from Tiptap which is trusted, we just need basic XSS protection
+        const permissiveSchema: any = {
+          tagNames: [
+            "table", "thead", "tbody", "tfoot", "tr", "th", "td",
+            "p", "div", "span", "strong", "em", "u", "s", "strike", "code", "pre", "mark",
+            "ul", "ol", "li", "br", "hr",
+            "h1", "h2", "h3", "h4", "h5", "h6",
+            "a", "img", "blockquote",
+          ],
+          attributes: {
+            table: ["className", "style", "border", "cellpadding", "cellspacing"],
+            thead: ["className", "style"],
+            tbody: ["className", "style"],
+            tfoot: ["className", "style"],
+            tr: ["className", "style"],
+            // Explicitly allow both lowercase and camelCase for colspan/rowspan
+            th: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color", "align", "valign"],
+            td: ["className", "style", "colspan", "rowspan", "colSpan", "rowSpan", "data-text-align", "data-background-color", "data-border-color", "align", "valign"],
+            p: ["className", "style"],
+            div: ["className", "style"],
+            span: ["className", "style", "data-color"],
+            strong: ["className", "style"],
+            em: ["className", "style"],
+            u: ["className", "style"],
+            s: ["className", "style"],
+            strike: ["className", "style"],
+            code: ["className", "style"],
+            pre: ["className", "style"],
+            mark: ["className", "style", "data-color"],
+            ul: ["className", "style"],
+            ol: ["className", "style"],
+            li: ["className", "style"],
+            br: ["className", "style"],
+            hr: ["className", "style"],
+            h1: ["className", "style"],
+            h2: ["className", "style"],
+            h3: ["className", "style"],
+            h4: ["className", "style"],
+            h5: ["className", "style"],
+            h6: ["className", "style"],
+            a: ["href", "target", "rel", "className", "style"],
+            img: ["src", "alt", "title", "className", "style", "width", "height"],
+            blockquote: ["className", "style"],
+            "*": ["className", "style"],
+          },
+          strip: [],
+        }
+        
+        // Only sanitize for security, don't modify the HTML structure or styles
         const file = await unified()
           .use(rehypeParse, { fragment: true })
-          .use(rehypeSanitize, sanitizeSchema)
+          .use(rehypeSanitize, permissiveSchema)
           .use(rehypeStringify, { allowDangerousHtml: true })
           .process(cleanedHtml)
-        setSanitizedHtml(String(file))
+        
+        const sanitized = String(file)
+        
+        // Debug: Log the HTML after sanitization to check if colspan/rowspan are preserved
+        if (process.env.NODE_ENV === "development") {
+          const hasColspanAfter = sanitized.includes('colspan') || sanitized.includes('colSpan')
+          const hasRowspanAfter = sanitized.includes('rowspan') || sanitized.includes('rowSpan')
+          if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
+            console.warn("[TableHtmlRenderer] colspan was removed during sanitization!")
+            console.log("Before:", cleanedHtml.substring(0, 1000))
+            console.log("After:", sanitized.substring(0, 1000))
+          }
+          if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
+            console.warn("[TableHtmlRenderer] rowspan was removed during sanitization!")
+          }
+        }
+        
+        setSanitizedHtml(sanitized)
       } catch (error) {
         console.error("Error sanitizing table HTML:", error)
+        // If sanitization fails, use original HTML (it's from Tiptap which is trusted)
         setSanitizedHtml(cleanedHtml)
       }
     }
@@ -439,11 +799,123 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
 
   return (
     <div key={itemId} className="overflow-x-auto my-4">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          /* Use the same styles as edit mode (ProseMirror) */
+          .table-view-${itemId} table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            border: 3px solid #6b7280 !important;
+            margin: 16px 0;
+            background-color: #ffffff !important;
+            display: table !important;
+          }
+          .dark .table-view-${itemId} table {
+            border-color: #9ca3af !important;
+            background-color: #1f2937 !important;
+          }
+          .table-view-${itemId} table tr {
+            border: 2px solid #6b7280 !important;
+          }
+          .dark .table-view-${itemId} table tr {
+            border-color: #9ca3af !important;
+          }
+          .table-view-${itemId} table th,
+          .table-view-${itemId} table td {
+            border: 2px solid #6b7280 !important;
+            border-top: 2px solid #6b7280 !important;
+            border-left: 2px solid #6b7280 !important;
+            border-right: 2px solid #6b7280 !important;
+            border-bottom: 2px solid #6b7280 !important;
+            padding: 8px 12px !important;
+            vertical-align: top;
+            min-width: 100px !important;
+            min-height: 40px !important;
+            position: relative;
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            display: table-cell !important;
+          }
+          .dark .table-view-${itemId} table th,
+          .dark .table-view-${itemId} table td {
+            border-color: #9ca3af !important;
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+          }
+          .table-view-${itemId} table th {
+            border-bottom: 3px solid #6b7280 !important;
+            background-color: #f3f4f6 !important;
+            font-weight: 600;
+            color: #111827 !important;
+          }
+          .dark .table-view-${itemId} table th {
+            border-color: #9ca3af !important;
+            border-bottom: 3px solid #9ca3af !important;
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+          }
+          .table-view-${itemId} table th p,
+          .table-view-${itemId} table td p {
+            margin: 0;
+            min-height: 1.5em;
+          }
+          /* Handle merged cells - same as edit mode */
+          .table-view-${itemId} table th[colspan] + th,
+          .table-view-${itemId} table td[colspan] + td,
+          .table-view-${itemId} table th[colspan] + td,
+          .table-view-${itemId} table td[colspan] + th {
+            border-left: none !important;
+          }
+          .table-view-${itemId} table th[colspan],
+          .table-view-${itemId} table td[colspan] {
+            border-right: 2px solid #6b7280 !important;
+          }
+          .dark .table-view-${itemId} table th[colspan],
+          .dark .table-view-${itemId} table td[colspan] {
+            border-right-color: #9ca3af !important;
+          }
+          .table-view-${itemId} table th[rowspan],
+          .table-view-${itemId} table td[rowspan] {
+            border-bottom: 2px solid #6b7280 !important;
+          }
+          .dark .table-view-${itemId} table th[rowspan],
+          .dark .table-view-${itemId} table td[rowspan] {
+            border-bottom-color: #9ca3af !important;
+          }
+          /* Preserve text colors and highlights from inline styles */
+          .table-view-${itemId} span[style*="color"],
+          .table-view-${itemId} p[style*="color"],
+          .table-view-${itemId} div[style*="color"],
+          .table-view-${itemId} td[style*="color"],
+          .table-view-${itemId} th[style*="color"],
+          .table-view-${itemId} mark[style*="color"] {
+            /* Inline styles have higher specificity - colors are preserved */
+          }
+          .table-view-${itemId} mark:not([style*="background-color"]) {
+            /* Default highlight color only if no inline style */
+            background-color: #FFFF00;
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+          .table-view-${itemId} mark[style*="background-color"] {
+            /* Preserve custom highlight colors from inline styles */
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+          .table-view-${itemId} span[style*="background-color"] {
+            /* Preserve highlight colors on spans */
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: inherit;
+          }
+        `
+      }} />
       <div
-        className="[&_table]:min-w-full [&_table]:border-collapse [&_table]:border-2 [&_th]:p-3 [&_th]:text-sm [&_th]:font-bold [&_th]:text-foreground [&_th]:text-left [&_th]:border [&_th]:border-b-2 [&_th]:bg-muted [&_td]:p-3 [&_td]:text-sm [&_td]:bg-card [&_td]:text-foreground/90 [&_td]:border [&_tr]:hover:bg-muted/30 [&_tr]:transition-colors [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline"
-        style={{
-          // Apply dark mode styles if needed
-        }}
+        className={`table-view-${itemId}`}
         dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
       />
     </div>
@@ -491,7 +963,86 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
     // For markdown, we'll rely on the tr component filter instead
     return (
       <div key={item.id} className="overflow-x-auto my-4">
-        <ReactMarkdown
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .markdown-table-${item.id} table,
+            .markdown-table-${item.id} table * {
+              box-sizing: border-box !important;
+            }
+            .markdown-table-${item.id} table {
+              border: 3px solid #6b7280 !important;
+              border-collapse: collapse !important;
+              border-spacing: 0 !important;
+              width: 100% !important;
+              min-width: 100% !important;
+              display: table !important;
+              margin: 16px 0 !important;
+              background-color: #ffffff !important;
+            }
+            .dark .markdown-table-${item.id} table {
+              border-color: #9ca3af !important;
+              background-color: #1f2937 !important;
+            }
+            .markdown-table-${item.id} table tr,
+            .markdown-table-${item.id} table thead tr,
+            .markdown-table-${item.id} table tbody tr {
+              border: 2px solid #6b7280 !important;
+              border-top: 2px solid #6b7280 !important;
+              border-bottom: 2px solid #6b7280 !important;
+              display: table-row !important;
+            }
+            .dark .markdown-table-${item.id} table tr,
+            .dark .markdown-table-${item.id} table thead tr,
+            .dark .markdown-table-${item.id} table tbody tr {
+              border-color: #9ca3af !important;
+            }
+            .markdown-table-${item.id} table thead tr {
+              border-bottom: 3px solid #6b7280 !important;
+            }
+            .dark .markdown-table-${item.id} table thead tr {
+              border-bottom-color: #9ca3af !important;
+            }
+            .markdown-table-${item.id} table tbody tr {
+              border-bottom: 2px solid #6b7280 !important;
+            }
+            .dark .markdown-table-${item.id} table tbody tr {
+              border-bottom-color: #9ca3af !important;
+            }
+            .markdown-table-${item.id} table th,
+            .markdown-table-${item.id} table td {
+              border: 2px solid #6b7280 !important;
+              border-top: 2px solid #6b7280 !important;
+              border-left: 2px solid #6b7280 !important;
+              border-right: 2px solid #6b7280 !important;
+              border-bottom: 2px solid #6b7280 !important;
+              padding: 8px 12px !important;
+              display: table-cell !important;
+              vertical-align: top !important;
+              background-color: #ffffff !important;
+              color: #111827 !important;
+            }
+            .dark .markdown-table-${item.id} table th,
+            .dark .markdown-table-${item.id} table td {
+              border-color: #9ca3af !important;
+              background-color: #1f2937 !important;
+              color: #f3f4f6 !important;
+            }
+            .markdown-table-${item.id} table th {
+              border-bottom: 3px solid #6b7280 !important;
+              background-color: #f3f4f6 !important;
+              font-weight: 600 !important;
+              color: #111827 !important;
+            }
+            .dark .markdown-table-${item.id} table th {
+              border-color: #9ca3af !important;
+              border-bottom: 3px solid #9ca3af !important;
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+            }
+          `
+        }} />
+        <div className={`markdown-table-${item.id}`}>
+          <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
           components={{
@@ -499,7 +1050,9 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               <table
                 className="explanation-table min-w-full border-collapse"
                 style={{
-                  border: isDark ? "2px solid #374151" : "2px solid #e5e7eb",
+                  borderCollapse: "collapse",
+                  borderSpacing: "0",
+                  display: "table",
                 }}
                 {...props}
               />
@@ -515,14 +1068,14 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               const isTitleRow = colspan > 1 && colspan !== 1
               return (
                 <th
-                  className="p-3 text-sm font-bold text-foreground text-left"
+                  className="p-3 text-sm font-bold text-foreground dark:text-gray-100 text-left"
                   style={{
-                    border: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
-                    borderBottom: isDark ? "2px solid #374151" : "2px solid #e5e7eb",
-                    backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                    backgroundColor: isDark ? "#374151" : "#f3f4f6",
                     padding: "8px 12px",
                     textAlign: isTitleRow ? "center" : "left",
                     fontSize: isTitleRow ? "1.1em" : undefined,
+                    display: "table-cell",
+                    color: isDark ? "#f9fafb" : "#111827",
                   }}
                   colSpan={colspan}
                   {...props}
@@ -537,10 +1090,12 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                 1
               return (
                 <td
-                  className="p-3 text-sm bg-card text-foreground/90 [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline [&_a:hover]:text-blue-800 [&_a:hover]:dark:text-blue-300"
+                  className="p-3 text-sm bg-card dark:bg-gray-800 text-foreground/90 dark:text-gray-200 [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline [&_a:hover]:text-blue-800 [&_a:hover]:dark:text-blue-300"
                   style={{
-                    border: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
+                    backgroundColor: isDark ? "#1f2937" : "#ffffff",
                     padding: "8px 12px",
+                    display: "table-cell",
+                    color: isDark ? "#f3f4f6" : "#111827",
                   }}
                   colSpan={colspan}
                   {...props}
@@ -579,9 +1134,9 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               
               return (
                 <tr
-                  className="hover:bg-muted/30 transition-colors"
+                  className="hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors"
                   style={{
-                    borderBottom: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
+                    display: "table-row",
                   }}
                   {...props}
                 >
@@ -589,10 +1144,17 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                 </tr>
               )
             },
+            thead: ({ node, ...props }: any) => (
+              <thead style={{ display: "table-header-group" }} {...props} />
+            ),
+            tbody: ({ node, ...props }: any) => (
+              <tbody style={{ display: "table-row-group" }} {...props} />
+            ),
           }}
         >
           {item.data.html || ""}
         </ReactMarkdown>
+        </div>
       </div>
     )
   }
@@ -645,13 +1207,15 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
   return (
     <div key={item.id} className="overflow-x-auto my-4">
       <table 
-        className="explanation-table min-w-full border-collapse"
+        className="explanation-table min-w-full border-collapse border-[3px] border-[#6b7280] dark:border-[#9ca3af] bg-white dark:bg-[#1f2937]"
         style={{
-          border: isDark ? "2px solid #374151" : "2px solid #e5e7eb",
+          borderCollapse: "collapse",
+          borderSpacing: "0",
+          display: "table",
         }}
       >
         <thead>
-          <tr>
+          <tr style={{ display: "table-row" }}>
             {Array.from({ length: cols }).map((_, colIdx) => {
               const cellKey = `0-${colIdx}`
               let cellContent = ""
@@ -666,12 +1230,12 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               return (
                 <th
                   key={`header-${colIdx}`}
-                  className="p-3 text-sm font-bold text-foreground text-left"
+                  className="p-3 text-sm font-bold text-foreground dark:text-gray-100 text-left border-2 dark:border-[#9ca3af] border-[#6b7280] border-b-[3px]"
                   style={{
-                    border: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
-                    borderBottom: isDark ? "2px solid #374151" : "2px solid #e5e7eb",
-                    backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                    backgroundColor: isDark ? "#374151" : "#f3f4f6",
                     padding: "8px 12px",
+                    display: "table-cell",
+                    color: isDark ? "#f9fafb" : "#111827",
                   }}
                 >
                   {cellContent}
@@ -686,9 +1250,9 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
             return (
               <tr 
                 key={rowIdx} 
-                className="hover:bg-muted/30 transition-colors"
+                className="hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors border-2 dark:border-[#9ca3af] border-[#6b7280]"
                 style={{
-                  borderBottom: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
+                  display: "table-row",
                 }}
               >
               {Array.from({ length: cols }).map((_, colIdx) => {
@@ -705,10 +1269,11 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                 return (
                   <td
                       key={`${actualRowIdx}-${colIdx}`}
-                      className="p-3 text-sm bg-card text-foreground/90 transition-colors"
+                      className="p-3 text-sm bg-white dark:bg-[#1f2937] text-foreground/90 dark:text-gray-200 transition-colors border-2 dark:border-[#9ca3af] border-[#6b7280]"
                       style={{
-                        border: isDark ? "1px solid #374151" : "1px solid #e5e7eb",
                         padding: "8px 12px",
+                        display: "table-cell",
+                        color: isDark ? "#f3f4f6" : "#111827",
                       }}
                     >
                       {cellContent}
@@ -739,38 +1304,57 @@ function renderPerAnswerExplanations(
 
   if (!hasPerAnswerExplanations) {
     return (
-      <div key={item.id} className="border border-border/40 rounded-lg p-4 bg-muted/20">
-        <p className="text-sm text-muted-foreground italic text-center">
+      <div key={item.id} className="border border-border/40 dark:border-gray-700 rounded-lg p-4 bg-muted/20 dark:bg-gray-800/30">
+        <p className="text-sm text-muted-foreground dark:text-gray-400 italic text-center">
           Per-answer explanations will appear here. Configure them in the Per-Answer Explanations section.
         </p>
       </div>
     )
   }
 
+  // Sort options: correct choice first, then incorrect ones in original order
+  const correctOption = options.find(opt => opt.correct)
+  const incorrectOptions = options.filter(opt => !opt.correct)
+  const sortedOptions = correctOption 
+    ? [correctOption, ...incorrectOptions]
+    : options
+
   return (
-    <div key={item.id} className="border-t border-border/40 pt-6 mt-6">
-      <h3 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wide">Answer Breakdown</h3>
+    <div key={item.id} className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
+      <h3 className="text-sm font-bold text-foreground dark:text-gray-100 mb-4 uppercase tracking-wide">Answer Breakdown</h3>
       <div className="space-y-6">
-        {options.map((option) => {
+        {sortedOptions.map((option) => {
           const isCorrect = option.correct
           const isSelected = selectedAnswer === option.label
           const explanation = perAnswerExplanations[option.label]
           const isContentBlocks = Array.isArray(explanation)
           const hasContent = isContentBlocks 
-            ? explanation.length > 0 
+            ? explanation.length > 0 && explanation.some((block: any) => {
+                // Check if block has actual content
+                if (!block || !block.data) return false
+                const html = block.data?.html || ""
+                const markdown = block.data?.markdown || ""
+                const trimmedHtml = html.trim()
+                const isEmptyHtml = !trimmedHtml || 
+                  trimmedHtml === "<p></p>" || 
+                  trimmedHtml === "<p><br></p>" || 
+                  trimmedHtml === "<p> </p>" ||
+                  trimmedHtml === "<p><br/></p>" ||
+                  trimmedHtml === "<div></div>" ||
+                  trimmedHtml === "<div><br></div>"
+                return !isEmptyHtml || (markdown && markdown.trim())
+              })
             : !!explanation?.trim()
-
-          if (!hasContent) return null
 
           return (
             <div
               key={option.label}
-              className="border-b border-border/40 pb-6 last:border-b-0 last:pb-0"
+              className="border-b border-border/40 dark:border-gray-700/50 pb-6 last:border-b-0 last:pb-0"
             >
               {/* Header */}
               <div className="mb-3">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="font-bold text-foreground">Option {option.label}:</span>
+                  <span className="font-bold text-foreground dark:text-gray-100">Option {option.label}:</span>
                   <span className={`text-sm font-semibold ${
                     isCorrect ? "text-green-600" : "text-red-600"
                   }`}>
@@ -787,48 +1371,87 @@ function renderPerAnswerExplanations(
 
               {/* Explanation Content */}
               <div className="space-y-2">
-                {isContentBlocks ? (
-                  <div className="text-foreground/90">
-                    <RichContentRenderer content={explanation} />
-                  </div>
-                ) : (
-                  <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        p: ({ node, ...props }) => (
-                          <p className="text-foreground/90 leading-relaxed mb-3 whitespace-pre-wrap" {...props} />
-                        ),
-                        strong: ({ node, ...props }) => (
-                          <strong className="font-semibold text-foreground" {...props} />
-                        ),
-                        em: ({ node, ...props }) => (
-                          <em className="italic text-foreground/90" {...props} />
-                        ),
-                        a: ({ node, ...props }: any) => (
-                          <a
-                            className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            {...props}
+                {hasContent ? (
+                  <>
+                    {isContentBlocks ? (
+                      // For blocks, check if they contain HTML with colors/highlights
+                      // If so, extract HTML and render directly to preserve formatting
+                      (() => {
+                        // Check if any block has HTML with colors/highlights
+                        const hasHtmlWithFormatting = explanation.some((block: any) => {
+                          const html = block?.data?.html || ""
+                          return html && (html.includes("<span") || html.includes("<mark") || html.includes("style="))
+                        })
+                        
+                        if (hasHtmlWithFormatting) {
+                          // Extract HTML from all blocks and render directly
+                          const combinedHtml = explanation
+                            .map((block: any) => block?.data?.html || "")
+                            .filter((html: string) => html && html.trim())
+                            .join("")
+                          
+                          if (combinedHtml) {
+                            return <HtmlRenderer html={combinedHtml} itemId={`per-answer-${option.label}`} />
+                          }
+                        }
+                        
+                        // Otherwise, use RichContentRenderer (which will handle markdown conversion)
+                        return (
+                          <div className="text-foreground/90">
+                            <RichContentRenderer content={explanation} />
+                          </div>
+                        )
+                      })()
+                    ) : (
+                      // Check if explanation contains HTML (like colors, highlights)
+                      // If it does, render as HTML instead of markdown to preserve formatting
+                      (typeof explanation === "string" && (explanation.includes("<span") || explanation.includes("<mark") || explanation.includes("style="))) ? (
+                        <HtmlRenderer html={explanation} itemId={`per-answer-${option.label}`} />
+                      ) : (
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({ node, ...props }) => (
+                                <p className="text-foreground/90 leading-relaxed mb-3 whitespace-pre-wrap" {...props} />
+                              ),
+                              strong: ({ node, ...props }) => (
+                                <strong className="font-semibold text-foreground" {...props} />
+                              ),
+                              em: ({ node, ...props }) => (
+                                <em className="italic text-foreground/90" {...props} />
+                              ),
+                              a: ({ node, ...props }: any) => (
+                                <a
+                                  className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  {...props}
+                                >
+                                  {props.children}
+                                  <ExternalLink className="w-3 h-3 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                                </a>
+                              ),
+                              ul: ({ node, ...props }) => (
+                                <ul className="list-disc list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
+                              ),
+                              ol: ({ node, ...props }) => (
+                                <ol className="list-decimal list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
+                              ),
+                              li: ({ node, ...props }) => (
+                                <li className="text-foreground/90" {...props} />
+                              ),
+                            }}
                           >
-                            {props.children}
-                            <ExternalLink className="w-3 h-3 flex-shrink-0 text-blue-600 dark:text-blue-400" />
-                          </a>
-                        ),
-                        ul: ({ node, ...props }) => (
-                          <ul className="list-disc list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
-                        ),
-                        ol: ({ node, ...props }) => (
-                          <ol className="list-decimal list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
-                        ),
-                        li: ({ node, ...props }) => (
-                          <li className="text-foreground/90" {...props} />
-                        ),
-                      }}
-                    >
-                      {explanation}
-                    </ReactMarkdown>
+                            {explanation}
+                          </ReactMarkdown>
+                        </div>
+                      )
+                    )}
+                  </>
+                ) : (
+                  <div className="text-sm text-muted-foreground italic py-2">
+                    No explanation for this choice
                   </div>
                 )}
               </div>
@@ -872,7 +1495,7 @@ function renderImages(item: ContentItem) {
         {Array.from({ length: imageCount }).map((_, idx) => {
           const imageUrl = images[idx]
           return (
-            <div key={idx} className="max-w-[450px] aspect-square rounded-lg overflow-hidden border border-border bg-muted mx-auto">
+            <div key={idx} className="max-w-[450px] aspect-square rounded-lg overflow-hidden border border-border dark:border-gray-700 bg-muted dark:bg-gray-800 mx-auto">
               {imageUrl ? (
                 <img
                   src={imageUrl || "/placeholder.svg"}
@@ -886,7 +1509,7 @@ function renderImages(item: ContentItem) {
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm bg-muted/50">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground dark:text-gray-400 text-sm bg-muted/50 dark:bg-gray-800/50">
                   {`Image ${idx + 1}`}
                 </div>
               )}

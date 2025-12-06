@@ -14,6 +14,11 @@ import BaseTableCell from "@tiptap/extension-table-cell"
 import TextAlign from "@tiptap/extension-text-align"
 import Underline from "@tiptap/extension-underline"
 import Strike from "@tiptap/extension-strike"
+import { TextStyle } from "@tiptap/extension-text-style"
+import Color from "@tiptap/extension-color"
+import Highlight from "@tiptap/extension-highlight"
+import { FontSize } from "./unified-editor/FontSizeExtension"
+import { FontFamily } from "./unified-editor/FontFamilyExtension"
 
 import { unified } from "unified"
 import remarkParse from "remark-parse"
@@ -99,6 +104,8 @@ interface AdvancedTableEditorProps {
   initialFormat?: "html" | "markdown"
   onChange?: (payload: { html: string; markdown: string }) => void
   className?: string
+  showToolbar?: boolean
+  editorRef?: (editor: any) => void
 }
 
 export default function AdvancedTableEditor({
@@ -106,6 +113,8 @@ export default function AdvancedTableEditor({
   initialFormat = "html",
   onChange,
   className,
+  showToolbar = false,
+  editorRef,
 }: AdvancedTableEditorProps) {
   const [mode, setMode] = useState<TableEditorMode>("visual")
   const [markdownDraft, setMarkdownDraft] = useState("")
@@ -147,6 +156,13 @@ export default function AdvancedTableEditor({
       TableHeader,
       CustomTableCell,
       TextAlign.configure({ types: ["heading", "paragraph", "tableHeader", "tableCell"] }),
+      TextStyle,
+      Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
+      FontSize,
+      FontFamily,
     ],
     content: "",
     autofocus: false,
@@ -161,6 +177,13 @@ export default function AdvancedTableEditor({
     },
     immediatelyRender: false,
   })
+
+  // Expose editor via ref if provided
+  useEffect(() => {
+    if (editorRef && editor) {
+      editorRef(editor)
+    }
+  }, [editor, editorRef])
 
   const createDefaultTable = useCallback(() => {
     if (!editor) return
@@ -552,7 +575,7 @@ export default function AdvancedTableEditor({
 
       {mode === "visual" ? (
         <div className="space-y-3">
-          {renderToolbar()}
+          {showToolbar && renderToolbar()}
           <div className="border border-border rounded-md overflow-hidden">
             <EditorContent editor={editor} className="prose prose-sm dark:prose-invert max-w-none" />
           </div>

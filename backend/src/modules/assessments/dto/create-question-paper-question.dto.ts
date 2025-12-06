@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsInt, Min } from "class-validator";
+import { IsString, IsOptional, IsInt, Min, IsBoolean } from "class-validator";
 
 export class CreateQuestionPaperQuestionDto {
   @ApiProperty({
@@ -26,4 +26,14 @@ export class CreateQuestionPaperQuestionDto {
   @IsInt()
   @Min(0)
   order?: number;
+
+  @ApiProperty({
+    description: "Whether question is marked for review",
+    example: false,
+    default: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  markedForReview?: boolean;
 }

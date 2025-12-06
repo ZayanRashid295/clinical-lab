@@ -30,6 +30,8 @@ interface Question {
   questionStemBlocks?: any[] // Rich content blocks for question stem
   chapterId?: string // Chapter ID for Subject dropdown
   sectionId?: string // Section ID for System dropdown
+  productTagId?: string // Single tag ID for backward compatibility
+  productTagIds?: string[] // Multiple tag IDs
   topic?: any // Topic object or string
 }
 
@@ -203,42 +205,63 @@ export default function AdminDashboard() {
 
     // Transform explanation blocks from backend format to frontend format
     const explanationBlocks = backendQuestion.explanationBlocks || []
-    const transformedExplanation = Array.isArray(explanationBlocks) ? explanationBlocks.map((block: any) => {
+    const transformedExplanation = Array.isArray(explanationBlocks) ? explanationBlocks.map((block: any, index: number) => {
       if (!block) return null
       
       // Check for per-answer-explanation placeholder
-      if (block.data && (block.data.placeholder === true || block.data.isPerAnswerExplanation === true)) {
+      // Check for placeholder, isPerAnswerExplanation, or allChoices flags
+      if (block.data && (
+        block.data.placeholder === true || 
+        block.data.isPerAnswerExplanation === true ||
+        block.data.allChoices === true
+      )) {
         return {
-          id: block.id || Date.now(),
+          // Don't include id - backend doesn't accept it during creation
           type: "per-answer-explanation",
-          data: { placeholder: true },
+          order: typeof block.order === "number" ? block.order : index,
+          data: { 
+            placeholder: true,
+            isPerAnswerExplanation: true,
+            allChoices: true, // Mark as containing all choices
+          },
         }
       }
       
       // Transform block types to lowercase and ensure proper structure
       if (block.type === "TEXT") {
         return {
-          id: block.id || Date.now(),
+          // Don't include id - backend doesn't accept it during creation
           type: "text",
+          order: typeof block.order === "number" ? block.order : index,
           data: block.data || {},
         }
       } else if (block.type === "TABLE") {
         return {
-          id: block.id || Date.now(),
+          // Don't include id - backend doesn't accept it during creation
           type: "table",
+          order: typeof block.order === "number" ? block.order : index,
           data: block.data || {},
         }
       } else if (block.type === "IMAGES") {
         return {
-          id: block.id || Date.now(),
+          // Don't include id - backend doesn't accept it during creation
           type: "images",
+          order: typeof block.order === "number" ? block.order : index,
           data: block.data || {},
         }
       } else {
         // Already in frontend format or unknown type
-        return block
+        return {
+          ...block,
+          order: typeof block.order === "number" ? block.order : index,
+        }
       }
-    }).filter((b: any) => b !== null) : []
+    }).filter((b: any) => b !== null).sort((a: any, b: any) => {
+      // Sort by order to maintain block sequence
+      const orderA = typeof a.order === "number" ? a.order : 999
+      const orderB = typeof b.order === "number" ? b.order : 999
+      return orderA - orderB
+    }) : []
 
     // Transform question stem blocks from backend format to frontend format
     const questionStemBlocks = Array.isArray(backendQuestion.questionStemBlocks) && backendQuestion.questionStemBlocks.length > 0
@@ -299,7 +322,7 @@ export default function AdminDashboard() {
             }
             
             return {
-              id: block.id || `stem-block-${Date.now()}-${index}`,
+              // Don't include id - backend doesn't accept it during creation
               type: blockType,
               data: blockData,
               order: typeof block.order === "number" ? block.order : index, // Preserve order
@@ -340,25 +363,48 @@ export default function AdminDashboard() {
             .map((b: any) => {
               if (b.type === "TEXT") {
                 const blockData = b.data || {}
+                // Ensure html field exists - use markdown or content as fallback
+                let html = blockData.html || ""
+                if (!html && blockData.markdown) {
+                  // If markdown looks like HTML, use it directly
+                  if (blockData.markdown.trim().startsWith("<")) {
+                    html = blockData.markdown
+                  } else {
+                    // Otherwise, wrap in paragraph
+                    html = `<p>${blockData.markdown}</p>`
+                  }
+                } else if (!html && blockData.content) {
+                  const content = blockData.content
+                  if (typeof content === "string") {
+                    if (content.trim().startsWith("<")) {
+                      html = content
+                    } else {
+                      html = `<p>${content}</p>`
+                    }
+                  }
+                }
+                
                 return {
                   id: b.id || `text-${Date.now()}-${Math.random()}`,
                   type: "text",
+                  order: typeof b.order === "number" ? b.order : 0,
                   data: {
-                    html: blockData.html || "",
+                    html: html || "<p></p>", // Always ensure html field exists
                     markdown: blockData.markdown || blockData.content || (typeof blockData === "string" ? blockData : ""),
-                    ...blockData,
                   },
                 }
               } else if (b.type === "TABLE") {
                 return {
                   id: b.id || `table-${Date.now()}-${Math.random()}`,
                   type: "table",
+                  order: typeof b.order === "number" ? b.order : 0,
                   data: b.data || {},
                 }
               } else if (b.type === "IMAGES") {
                 return {
                   id: b.id || `images-${Date.now()}-${Math.random()}`,
                   type: "images",
+                  order: typeof b.order === "number" ? b.order : 0,
                   data: b.data || {},
                 }
               }
@@ -391,11 +437,25 @@ export default function AdminDashboard() {
           
           if (textBlocks.length > 0) {
             // Convert text strings to text blocks
-            transformedPerAnswerExplanations[pae.choiceLabel] = textBlocks.map((text: string, idx: number) => ({
-              id: `text-${Date.now()}-${idx}-${Math.random()}`,
-              type: "text",
-              data: { markdown: text },
-            }))
+            // Ensure html field is set - if text looks like HTML, use it; otherwise wrap in paragraph
+            transformedPerAnswerExplanations[pae.choiceLabel] = textBlocks.map((text: string, idx: number) => {
+              let html = ""
+              if (text.trim().startsWith("<")) {
+                html = text // Already HTML
+              } else {
+                html = `<p>${text}</p>` // Wrap markdown/text in paragraph
+              }
+              
+              return {
+                id: `text-${Date.now()}-${idx}-${Math.random()}`,
+                type: "text",
+                order: idx,
+                data: { 
+                  html: html,
+                  markdown: text,
+                },
+              }
+            })
           }
         }
       }
@@ -412,8 +472,33 @@ export default function AdminDashboard() {
       })
     }
 
+    // Extract questionId and productTagIds from tags if stored there
+    let storedQuestionId: string | null = null
+    let storedProductTagIds: string[] | undefined = undefined
+    const tags = Array.isArray(backendQuestion.tags) ? backendQuestion.tags : []
+    const filteredTags: string[] = []
+    
+    for (const tag of tags) {
+      if (typeof tag === "string" && tag.startsWith("__questionId:")) {
+        storedQuestionId = tag.replace("__questionId:", "")
+      } else if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+        try {
+          const tagIdsJson = tag.replace("__productTagIds:", "")
+          storedProductTagIds = JSON.parse(tagIdsJson)
+        } catch (e) {
+          console.warn("Failed to parse productTagIds from tags:", e)
+        }
+      } else {
+        filteredTags.push(String(tag))
+      }
+    }
+    
+    // Use stored productTagIds or fallback to single productTagId
+    const productTagIds = storedProductTagIds || (backendQuestion.productTagId ? [backendQuestion.productTagId] : undefined)
+    
     return {
       id: backendQuestion.id,
+      questionId: storedQuestionId || backendQuestion.metadata?.questionId || backendQuestion.questionId || null,
       stem: backendQuestion.question || "",
       questionStemBlocks,
       options,
@@ -422,9 +507,11 @@ export default function AdminDashboard() {
       system: backendQuestion.system || "",
       chapterId: backendQuestion.chapterId || "",
       sectionId: backendQuestion.sectionId || "",
+      productTagId: backendQuestion.productTagId || "",
+      productTagIds: productTagIds,
       explanation: transformedExplanation,
       perAnswerExplanations: transformedPerAnswerExplanations,
-      tags: Array.isArray(backendQuestion.tags) ? backendQuestion.tags : [],
+      tags: filteredTags, // Return tags without the questionId and productTagIds markers
       createdAt: backendQuestion.createdAt,
       topicId: backendQuestion.topicId,
       topic: backendQuestion.topic,
@@ -445,12 +532,16 @@ export default function AdminDashboard() {
           .filter((block: any) => block != null)
           .map((block: any, idx: number) => {
           // Handle per-answer-explanation placeholder blocks
-            if (block.type === "per-answer-explanation" || (block.data && block.data.placeholder === true)) {
+            if (block.type === "per-answer-explanation" || (block.data && (block.data.placeholder === true || block.data.allChoices === true))) {
               // Save as TEXT block with special marker
               return {
                 type: "TEXT" as const,
                 order: typeof block.order === "number" ? block.order : idx,
-                data: { placeholder: true, isPerAnswerExplanation: true },
+                data: { 
+                  placeholder: true, 
+                  isPerAnswerExplanation: true,
+                  allChoices: block.data?.allChoices === true || true, // Preserve allChoices flag
+                },
               }
             }
             
@@ -497,21 +588,44 @@ export default function AdminDashboard() {
             // Ensure type is valid enum value
             const validTypes = ["TEXT", "TABLE", "IMAGES"] as const
             let blockType: "TEXT" | "TABLE" | "IMAGES" = "TEXT"
-          if (block.type) {
+            if (block.type) {
               const upperType = String(block.type).toUpperCase()
               // Map "image" to "IMAGES" for consistency
               if (upperType === "IMAGE") {
                 blockType = "IMAGES"
               } else if (validTypes.includes(upperType as any)) {
                 blockType = upperType as "TEXT" | "TABLE" | "IMAGES"
+              }
             }
-          }
+            
+            // Handle table blocks - ensure tableHtml is present
+            if (blockType === "TABLE") {
+              if (!blockData.tableHtml && blockData.html) {
+                blockData.tableHtml = blockData.html
+              }
+              if (!blockData.tableHtml) {
+                // Create empty table HTML if missing
+                blockData.tableHtml = "<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>"
+              }
+              // Ensure table structure fields
+              if (!blockData.rows) blockData.rows = 3
+              if (!blockData.cols) blockData.cols = 3
+              if (!blockData.cells) blockData.cells = {}
+            }
+            
+            // Clean up data - remove any undefined or null values that might cause issues
+            const cleanedData: any = {}
+            for (const [key, value] of Object.entries(blockData)) {
+              if (value !== undefined && value !== null) {
+                cleanedData[key] = value
+              }
+            }
             
             return {
               type: blockType,
               order: typeof block.order === "number" ? block.order : idx,
-              data: blockData,
-              id: block.id || `explanation-block-${Date.now()}-${idx}`, // Preserve block ID
+              data: cleanedData,
+              // Don't include id - backend doesn't accept it during creation
             }
           })
       : undefined
@@ -576,7 +690,7 @@ export default function AdminDashboard() {
                 type: blockType,
                 order: typeof b.order === "number" ? b.order : idx,
                 data: blockData,
-                id: b.id || `per-answer-block-${Date.now()}-${idx}`, // Preserve block ID
+                // Don't include id - backend doesn't accept it during creation
           }
         })
         }
@@ -598,7 +712,8 @@ export default function AdminDashboard() {
                 }
                 
                 // Handle image blocks - ensure images array is properly formatted
-                if (block.type === "IMAGES" || block.type === "image" || block.type === "images") {
+                const blockTypeUpper = String(block.type || "").toUpperCase()
+                if (blockTypeUpper === "IMAGES" || blockTypeUpper === "IMAGE") {
                   // Convert image objects to URL strings if needed
                   if (Array.isArray(blockData.images)) {
                     blockData.images = blockData.images.map((img: any) => {
@@ -609,18 +724,45 @@ export default function AdminDashboard() {
                     }).filter((url: string) => url && url.trim())
                   }
                   // Ensure count matches actual images
-                  if (blockData.count && Array.isArray(blockData.images)) {
-                    blockData.count = Math.max(blockData.count, blockData.images.length)
+                  if (Array.isArray(blockData.images)) {
+                    blockData.count = blockData.images.length
+                  } else {
+                    blockData.count = 0
                   }
+                }
+                
+                // Ensure text blocks have at least empty html/markdown
+                if (blockTypeUpper === "TEXT") {
+                  if (!blockData.html && !blockData.markdown) {
+                    blockData.html = ""
+                    blockData.markdown = ""
+                  }
+                }
+                
+                // Ensure table blocks have proper structure
+                if (blockTypeUpper === "TABLE") {
+                  // Use html if tableHtml is missing
+                  if (!blockData.tableHtml && blockData.html) {
+                    blockData.tableHtml = blockData.html
+                    delete blockData.html
+                  }
+                  // Ensure tableHtml exists (even if empty)
+                  if (!blockData.tableHtml) {
+                    blockData.tableHtml = "<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>"
+                  }
+                  // Ensure table structure fields
+                  if (!blockData.rows) blockData.rows = 3
+                  if (!blockData.cols) blockData.cols = 3
+                  if (!blockData.cells) blockData.cells = {}
                 }
               } catch (e) {
                 console.warn("Failed to clone block.data for question stem:", e)
                 blockData = {}
               }
             } else if (block.content) {
-              blockData = { markdown: String(block.content) }
+              blockData = { markdown: String(block.content), html: "" }
             } else if (block.markdown) {
-              blockData = { markdown: String(block.markdown) }
+              blockData = { markdown: String(block.markdown), html: "" }
             } else {
               blockData = {}
             }
@@ -637,11 +779,11 @@ export default function AdminDashboard() {
               }
             }
             
+            // Remove id from block - backend doesn't expect it in create
             return {
               type: blockType,
               order: typeof block.order === "number" ? block.order : idx,
               data: blockData,
-              id: block.id || `stem-block-${Date.now()}-${idx}`, // Preserve block ID
             }
           })
       : undefined
@@ -684,30 +826,85 @@ export default function AdminDashboard() {
       payload.system = String(frontendQuestion.system).trim()
     }
     
+    // Handle tags - store questionId in tags as a special entry
+    const tagsArray: string[] = []
     if (Array.isArray(frontendQuestion.tags) && frontendQuestion.tags.length > 0) {
-      payload.tags = frontendQuestion.tags
-        .filter((tag: any) => tag && String(tag).trim())
-        .map((tag: any) => String(tag).trim())
+      tagsArray.push(...frontendQuestion.tags
+        .filter((tag: any) => tag && String(tag).trim() && !String(tag).startsWith("__questionId:"))
+        .map((tag: any) => String(tag).trim()))
+    }
+    
+    // Store questionId in tags if it exists in metadata (from convertNewQuestionToOld)
+    const questionId = frontendQuestion.metadata?.questionId || frontendQuestion.questionId
+    if (questionId && String(questionId).trim()) {
+      tagsArray.push(`__questionId:${String(questionId).trim()}`)
+    }
+    
+    if (tagsArray.length > 0) {
+      payload.tags = tagsArray
     }
     
     // Only include explanationBlocks if they exist and are valid
     if (explanationBlocks && explanationBlocks.length > 0) {
-      payload.explanationBlocks = explanationBlocks
+      // Remove id fields from all blocks - backend doesn't accept them
+      payload.explanationBlocks = explanationBlocks.map((block: any) => {
+        const { id, ...blockWithoutId } = block
+        // Clean up data - remove undefined/null values and ensure proper structure
+        if (blockWithoutId.data) {
+          const cleanedData: any = {}
+          for (const [key, value] of Object.entries(blockWithoutId.data)) {
+            if (value !== undefined && value !== null) {
+              cleanedData[key] = value
+            }
+          }
+          // Ensure table blocks have tableHtml
+          if (blockWithoutId.type === "TABLE" && !cleanedData.tableHtml && cleanedData.html) {
+            cleanedData.tableHtml = cleanedData.html
+            delete cleanedData.html
+          }
+          if (blockWithoutId.type === "TABLE" && !cleanedData.tableHtml) {
+            cleanedData.tableHtml = "<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>"
+          }
+          blockWithoutId.data = cleanedData
+        }
+        return blockWithoutId
+      })
     }
     
     // Only include perAnswerExplanations if they exist and are valid
     if (Object.keys(perAnswerExplanations).length > 0) {
-      payload.perAnswerExplanations = perAnswerExplanations
+      // Remove id fields from all blocks - backend doesn't accept them
+      const cleanedPerAnswerExplanations: Record<string, any[]> = {}
+      for (const [label, blocks] of Object.entries(perAnswerExplanations)) {
+        cleanedPerAnswerExplanations[label] = blocks.map((block: any) => {
+          const { id, ...blockWithoutId } = block
+          // Clean up data - remove undefined/null values
+          if (blockWithoutId.data) {
+            const cleanedData: any = {}
+            for (const [key, value] of Object.entries(blockWithoutId.data)) {
+              if (value !== undefined && value !== null) {
+                cleanedData[key] = value
+              }
+            }
+            blockWithoutId.data = cleanedData
+          }
+          return blockWithoutId
+        })
+      }
+      payload.perAnswerExplanations = cleanedPerAnswerExplanations
     }
 
     // Only include questionStemBlocks if they exist and are valid
     if (questionStemBlocks && questionStemBlocks.length > 0) {
-      // Ensure all blocks have proper order and are sorted
+      // Ensure all blocks have proper order and are sorted, and remove id fields
       const sortedStemBlocks = questionStemBlocks
-        .map((block: any, idx: number) => ({
-          ...block,
-          order: typeof block.order === "number" ? block.order : idx,
-        }))
+        .map((block: any, idx: number) => {
+          const { id, ...blockWithoutId } = block
+          return {
+            ...blockWithoutId,
+            order: typeof block.order === "number" ? block.order : idx,
+          }
+        })
         .sort((a: any, b: any) => {
           const orderA = typeof a.order === "number" ? a.order : 999
           const orderB = typeof b.order === "number" ? b.order : 999
@@ -730,6 +927,28 @@ export default function AdminDashboard() {
     if (frontendQuestion.sectionId && String(frontendQuestion.sectionId).trim()) {
       payload.sectionId = String(frontendQuestion.sectionId).trim()
     }
+    
+    // Add productTagId if provided (use first from array for backward compatibility)
+    const productTagIds = frontendQuestion.productTagIds || (frontendQuestion.productTagId ? [frontendQuestion.productTagId] : [])
+    if (productTagIds.length > 0) {
+      // Store first tag in productTagId for backward compatibility
+      payload.productTagId = String(productTagIds[0]).trim()
+      
+      // Store all tag IDs in tags JSON field
+      if (!payload.tags) {
+        payload.tags = []
+      }
+      // Add productTagIds to tags JSON as a special entry
+      const tagsArray = Array.isArray(payload.tags) ? [...payload.tags] : []
+      // Store productTagIds in tags JSON
+      tagsArray.push(`__productTagIds:${JSON.stringify(productTagIds)}`)
+      payload.tags = tagsArray
+    } else if (frontendQuestion.productTagId && String(frontendQuestion.productTagId).trim()) {
+      payload.productTagId = String(frontendQuestion.productTagId).trim()
+    }
+
+    // Note: questionId is generated on the frontend based on system, subject, and topic
+    // It's not stored in the backend, but can be regenerated when needed
 
     // Store choices separately (not part of DTO)
     return {
@@ -805,6 +1024,13 @@ export default function AdminDashboard() {
 
       // Convert new format to old format for backend compatibility
       const oldFormatData = convertNewQuestionToOld(questionData)
+      
+      // Debug: Log the conversion
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Save] QuestionCreatorData:", questionData)
+        console.log("[Save] Old format data:", oldFormatData)
+      }
+      
       const backendData = transformFrontendToBackend(oldFormatData, questionData.metadata.topicId)
       
       // Extract choices separately (they're not part of the DTO)
@@ -826,9 +1052,34 @@ export default function AdminDashboard() {
         throw new Error("Topic ID is required")
       }
 
+      // Final cleanup - remove any id fields and undefined/null values recursively
+      const cleanPayload = (obj: any): any => {
+        if (Array.isArray(obj)) {
+          return obj.map(cleanPayload).filter((item) => item !== undefined && item !== null)
+        } else if (obj && typeof obj === "object") {
+          const cleaned: any = {}
+          for (const [key, value] of Object.entries(obj)) {
+            if (key === "id") continue // Skip id fields
+            if (value !== undefined && value !== null) {
+              cleaned[key] = cleanPayload(value)
+            }
+          }
+          return cleaned
+        }
+        return obj
+      }
+      
+      const finalPayload = cleanPayload(questionPayload)
+      
+      // Debug: Log the final payload
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Save] Final cleaned payload:", JSON.stringify(finalPayload, null, 2))
+        console.log("[Save] Choices:", choices)
+      }
+
       if (editingId) {
         // Update existing question
-        await questionsService.updateQuestion(editingId, questionPayload)
+        await questionsService.updateQuestion(editingId, finalPayload)
         // Reload questions to get updated data
         await loadQuestions()
         // If viewing the edited question, refresh the view
@@ -836,9 +1087,34 @@ export default function AdminDashboard() {
           setViewingId(null)
           setTimeout(() => setViewingId(editingId), 100)
         }
+        // Notify other tabs/components that questions were updated
+        // Use a unique timestamp to ensure the event is detected
+        if (typeof window !== "undefined") {
+          const timestamp = Date.now().toString()
+          localStorage.setItem("questionsUpdated", timestamp)
+          // Dispatch event multiple times to ensure it's caught
+          window.dispatchEvent(new Event("questionUpdated"))
+          // Also dispatch a custom event with more details
+          window.dispatchEvent(new CustomEvent("questionsUpdated", { detail: { timestamp, questionId: editingId } }))
+          console.log("✅ Question updated notification sent:", timestamp)
+        }
       } else {
         // Create new question
-        const createdQuestion = await questionsService.createQuestion(questionPayload)
+        let createdQuestion
+        try {
+          createdQuestion = await questionsService.createQuestion(finalPayload)
+        } catch (createError: any) {
+          console.error("[Save] Error creating question:", createError)
+          console.error("[Save] Error response:", createError.response?.data)
+          console.error("[Save] Error status:", createError.response?.status)
+          console.error("[Save] Payload that failed:", JSON.stringify(finalPayload, null, 2))
+          const errorMessage = createError.response?.data?.message || createError.response?.data?.error || createError.message || "Internal server error"
+          throw new Error(`Failed to save question: ${errorMessage}`)
+        }
+        
+        if (!createdQuestion) {
+          throw new Error("Failed to create question: No response from server")
+        }
         
         // Get the question ID (handle both response formats)
         const questionId = typeof createdQuestion === "object" && "id" in createdQuestion 
@@ -870,6 +1146,17 @@ export default function AdminDashboard() {
 
         // Reload questions to get new question with all data
         await loadQuestions()
+        // Notify other tabs/components that questions were updated
+        // Use a unique timestamp to ensure the event is detected
+        if (typeof window !== "undefined") {
+          const timestamp = Date.now().toString()
+          localStorage.setItem("questionsUpdated", timestamp)
+          // Dispatch event multiple times to ensure it's caught
+          window.dispatchEvent(new Event("questionUpdated"))
+          // Also dispatch a custom event with more details
+          window.dispatchEvent(new CustomEvent("questionsUpdated", { detail: { timestamp, questionId } }))
+          console.log("✅ Question created notification sent:", timestamp)
+        }
       }
       
       setShowNewQuestion(false)
@@ -958,9 +1245,9 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Card className="p-12">
+        <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
           <div className="text-center">
-            <p className="text-muted-foreground">Loading questions from database...</p>
+            <p className="text-muted-foreground dark:text-gray-400">Loading questions from database...</p>
           </div>
         </Card>
       </div>
@@ -968,12 +1255,12 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-background dark:bg-gray-900">
       <div className="px-4 py-8 flex-1 flex flex-col min-h-0 w-full">
       {/* Error Display */}
       {error && (
-        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <p className="text-destructive">{error}</p>
+        <div className="mb-4 p-4 bg-destructive/10 dark:bg-destructive/20 border border-destructive/20 dark:border-destructive/30 rounded-lg">
+          <p className="text-destructive dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -981,13 +1268,13 @@ export default function AdminDashboard() {
       {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && !showBulkUploader && (
         <div className="space-y-3 mb-4">
           <div className="flex gap-3">
-            <Card className="p-4 shadow-md flex-1">
+            <Card className="p-4 shadow-md flex-1 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
               <input
                 type="text"
                 placeholder="Search questions by stem, subject, or system..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full px-4 py-2 rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 placeholder-muted-foreground dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary/30"
               />
             </Card>
             <div className="relative" ref={menuRef}>
@@ -998,23 +1285,23 @@ export default function AdminDashboard() {
                 + New Question
               </Button>
               {showNewQuestionMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-lg z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
                   <div className="py-1">
                     <button
                       onClick={handleUploadMarkdown}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
                     >
                       📄 Upload Markdown Question
                     </button>
                     <button
                       onClick={handleBulkUploadMarkdown}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
                     >
                       📚 Bulk Upload Markdown Questions
                     </button>
                     <button
                       onClick={handleCreateManually}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
                     >
                       ✏️ Create Question Manually
                     </button>
@@ -1075,6 +1362,8 @@ export default function AdminDashboard() {
             }
             onSave={handleSaveQuestion}
             onCancel={() => {
+              console.log('[AdminDashboard] QuestionCreator onCancel called - this should NOT happen on editor clicks!')
+              console.trace('Cancel call stack:')
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)
               setShowBulkUploader(false)
@@ -1095,19 +1384,19 @@ export default function AdminDashboard() {
             }}
             onCancel={() => {
               setViewingId(null)
-            }}
-          />
+          }}
+        />
         </div>
       ) : !showMarkdownUploader && !showBulkUploader ? (
         <div className="flex-1 min-h-0 overflow-y-auto">
           {/* Questions List */}
           {filteredQuestions.length === 0 ? (
-            <Card className="p-12">
+            <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground dark:text-gray-400 mb-4">
                   {questions.length === 0 ? "No questions created yet" : "No questions match your search"}
                 </p>
-                <Button onClick={handleCreateManually} variant="outline">
+                <Button onClick={handleCreateManually} variant="outline" className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700">
                   {questions.length === 0 ? "Create First Question" : "New Question"}
                 </Button>
               </div>
@@ -1115,7 +1404,7 @@ export default function AdminDashboard() {
           ) : (
             <>
               <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground dark:text-gray-400">
                   Showing {filteredQuestions.length} of {questions.length} questions
                 </p>
               </div>

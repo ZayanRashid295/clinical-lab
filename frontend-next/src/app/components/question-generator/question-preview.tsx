@@ -32,8 +32,15 @@ export default function QuestionPreview({ question, onExit }: QuestionPreviewPro
       <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 bg-card/20 backdrop-blur-sm w-full">
         <div className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="text-sm text-foreground/60 bg-primary/10 px-3 py-1.5 rounded-lg w-fit border border-primary/20 font-semibold tracking-wide uppercase">
-              Preview Mode
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="text-sm text-foreground/60 bg-primary/10 px-3 py-1.5 rounded-lg w-fit border border-primary/20 font-semibold tracking-wide uppercase">
+                Preview Mode
+              </div>
+              {currentQuestion.questionId && (
+                <span className="text-sm font-mono font-bold text-foreground bg-card px-3 py-1.5 rounded border border-border">
+                  {currentQuestion.questionId}
+                </span>
+              )}
             </div>
             {currentQuestion.subject || currentQuestion.system ? (
               <div className="flex flex-wrap gap-2">

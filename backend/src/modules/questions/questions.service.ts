@@ -1209,4 +1209,651 @@ export class QuestionsService {
       return { url };
     }
   }
+
+  /**
+   * Get hierarchical data for test creation
+   * Returns tags with question counts, and systems with subjects and topics with counts
+   */
+  async getTestCreationData(options?: {
+    pool?: "unused" | "marked" | "incorrect" | "correct" | "omitted";
+    marked?: boolean;
+    userId?: string;
+  }) {
+    try {
+      const { pool, marked, userId } = options || {};
+      console.log(`🔍 Service - Processing: pool=${pool}, marked=${marked}, userId=${userId}`);
+
+      // Get all active product tags
+      const productTags = await this.prisma.productTag.findMany({
+        where: { isActive: true },
+        orderBy: { name: "asc" },
+      });
+
+      // Get all active sections with their chapters and topics
+      const sections = await this.prisma.section.findMany({
+        where: { isActive: true },
+        include: {
+          chapters: {
+            where: { isActive: true },
+            include: {
+              topics: {
+                where: { isActive: true },
+                orderBy: { order: "asc" },
+              },
+            },
+            orderBy: { order: "asc" },
+          },
+        },
+        orderBy: { order: "asc" },
+      });
+
+      // Get all active questions to calculate counts
+      const allQuestions = await this.prisma.question.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          productTagId: true,
+          sectionId: true,
+          chapterId: true,
+          topicId: true,
+          tags: true,
+        },
+      });
+
+      // If pool is specified, filter questions based on user's question pool status
+      let filteredQuestionIds: Set<string> | null = null;
+      if (pool && userId) {
+        // Early return: unused questions can't be marked, so if pool is "unused" and marked is true, return empty set
+        if (pool === "unused" && marked === true) {
+          filteredQuestionIds = new Set<string>();
+          console.log(`🔍 Early return: pool=unused, marked=true, filteredQuestionIds size=${filteredQuestionIds.size}`);
+        } else {
+        // Get user's question paper questions to determine pool status
+        const userQuestionPapers = await this.prisma.questionPaper.findMany({
+          where: { userId },
+          select: { id: true },
+        });
+
+        const questionPaperIds = userQuestionPapers.map((qp) => qp.id);
+
+        if (questionPaperIds.length > 0) {
+          // Get all question paper questions for this user
+          // Include updatedAt to get the latest status for each question
+          const allUserAnswers = await this.prisma.questionPaperQuestion.findMany({
+            where: {
+              questionPaperId: { in: questionPaperIds },
+            },
+            select: {
+              questionId: true,
+              userAnswer: true,
+              isCorrect: true,
+              markedForReview: true,
+              updatedAt: true,
+            },
+            orderBy: {
+              updatedAt: 'desc', // Get most recent first
+            },
+          });
+
+          // Track question status across all attempts
+          // For marked status, use the LATEST value (most recent updatedAt)
+          // For other statuses, use "ever" logic (once true, always true)
+          const questionStatus = new Map<
+            string,
+            {
+              everCorrect: boolean;
+              everIncorrect: boolean;
+              everOmitted: boolean;
+              isMarked: boolean; // Changed from everMarked to isMarked - uses latest value
+              everEncountered: boolean;
+              latestUpdatedAt: Date; // Track the most recent update time
+            }
+          >();
+
+          for (const answer of allUserAnswers) {
+            const existing = questionStatus.get(answer.questionId);
+            
+            if (!existing) {
+              // First time seeing this question - since we ordered by updatedAt desc,
+              // this is the most recent record for this question
+            questionStatus.set(answer.questionId, {
+              everEncountered: true,
+              isMarked: answer.markedForReview === true, // Use latest value (first record = most recent)
+              everOmitted: answer.userAnswer === null,
+              everCorrect: answer.isCorrect === true,
+              everIncorrect: answer.isCorrect === false,
+              latestUpdatedAt: answer.updatedAt,
+            });
+            } else {
+              // We've seen this question before - update "ever" flags but keep the latest marked status
+              // Since records are ordered by updatedAt desc, the first record we processed is the most recent
+              questionStatus.set(answer.questionId, {
+              everEncountered: true,
+              isMarked: existing.isMarked, // Keep the first (most recent) value we saw
+              everOmitted: existing.everOmitted || (answer.userAnswer === null),
+              everCorrect: existing.everCorrect || (answer.isCorrect === true),
+              everIncorrect: existing.everIncorrect || (answer.isCorrect === false),
+              latestUpdatedAt: existing.latestUpdatedAt, // Keep the first (most recent) timestamp
+            });
+            }
+          }
+
+          // Filter questions based on pool
+          const allQuestionIds = new Set(allQuestions.map((q) => q.id));
+          const encounteredQuestionIds = new Set(questionStatus.keys());
+
+          filteredQuestionIds = new Set<string>();
+          let poolMatchCount = 0;
+          let markedMatchCount = 0;
+          let bothMatchCount = 0;
+          for (const question of allQuestions) {
+            const status = questionStatus.get(question.id) || {
+              everCorrect: false,
+              everIncorrect: false,
+              everOmitted: false,
+              isMarked: false, // Changed from everMarked to isMarked
+              everEncountered: false,
+              latestUpdatedAt: new Date(0), // Default to epoch if never encountered
+            };
+
+            let matchesPool = false;
+            switch (pool) {
+              case "unused":
+                // Unused questions are those never encountered
+                // If marked filter is true, unused questions can't be marked, so skip them
+                if (marked === true) {
+                  matchesPool = false; // Unused questions can't be marked
+                } else {
+                matchesPool = !encounteredQuestionIds.has(question.id);
+                }
+                break;
+              case "marked":
+                // Use isMarked (latest value) instead of everMarked
+                matchesPool = status.isMarked;
+                break;
+              case "correct":
+                matchesPool = status.everCorrect;
+                break;
+              case "incorrect":
+                matchesPool = status.everIncorrect && !status.everCorrect;
+                break;
+              case "omitted":
+                matchesPool = status.everOmitted && !status.everCorrect && !status.everIncorrect;
+                break;
+            }
+            if (matchesPool) poolMatchCount++;
+
+            // Apply marked filter if specified (AND logic with pool)
+            // Note: For "unused" pool with marked=true, we already handled it above
+            // Use isMarked (latest value) instead of everMarked
+            let matchesMarked = true;
+            if (marked !== undefined) {
+              // Skip marked filter for "unused" pool when marked=true (already handled in matchesPool)
+              if (!(pool === "unused" && marked === true)) {
+                if (marked) {
+                  matchesMarked = status.isMarked; // Use latest value
+                } else {
+                  matchesMarked = !status.isMarked; // Use latest value
+                }
+              }
+            }
+            if (matchesMarked) markedMatchCount++;
+
+            // Question must match both pool and marked criteria
+            if (matchesPool && matchesMarked) {
+              filteredQuestionIds.add(question.id);
+              bothMatchCount++;
+            }
+          }
+          console.log(`🔍 Filtering results: pool=${pool}, marked=${marked}, poolMatch=${poolMatchCount}, markedMatch=${markedMatchCount}, bothMatch=${bothMatchCount}, finalCount=${filteredQuestionIds.size}`);
+        } else if (pool === "unused") {
+          // User has no tests, so all questions are unused
+            // But if marked filter is enabled and true, unused questions can't be marked, so return empty
+            if (marked === true) {
+              filteredQuestionIds = new Set<string>();
+            } else {
+          filteredQuestionIds = new Set(allQuestions.map((q) => q.id));
+            }
+        } else {
+          // User has no tests but wants marked/correct/incorrect/omitted - no questions match
+          filteredQuestionIds = new Set<string>();
+          }
+        }
+      }
+
+      // Helper function to check if a question matches a tag
+      const questionMatchesTag = (question: any, tagId: string): boolean => {
+        // Check direct productTagId
+        if (question.productTagId === tagId) {
+          return true;
+        }
+        // Check tags JSON field for productTagIds
+        if (question.tags && Array.isArray(question.tags)) {
+          for (const tag of question.tags) {
+            if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+              try {
+                const tagIdsJson = tag.replace("__productTagIds:", "");
+                const tagIds = JSON.parse(tagIdsJson);
+                if (Array.isArray(tagIds) && tagIds.includes(tagId)) {
+                  return true;
+                }
+              } catch (e) {
+                // Ignore parse errors
+              }
+            }
+          }
+        }
+        return false;
+      };
+
+      // Calculate question counts for each tag
+      console.log(`🔍 Before tag counts: filteredQuestionIds is ${filteredQuestionIds === null ? 'null' : filteredQuestionIds instanceof Set ? `Set with size ${filteredQuestionIds.size}` : 'unknown'}`);
+      const tagsWithCounts = productTags.map((tag) => {
+        let questionsToCount = allQuestions.filter((q) => questionMatchesTag(q, tag.id));
+        if (filteredQuestionIds !== null) {
+          questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
+        }
+        const count = questionsToCount.length;
+        if (tag.name === "Anatomy" || tag.name === "Behavioral science") {
+          console.log(`🔍 Tag ${tag.name}: filteredQuestionIds=${filteredQuestionIds === null ? 'null' : `Set(size=${filteredQuestionIds.size})`}, beforeFilter=${allQuestions.filter((q) => questionMatchesTag(q, tag.id)).length}, afterFilter=${count}`);
+        }
+        return {
+          id: tag.id,
+          name: tag.name,
+          description: tag.description,
+          color: tag.color,
+          count,
+        };
+      });
+
+      // Build hierarchical structure for systems
+      const systemsWithData = sections.map((section) => {
+        const subjectsWithData = section.chapters.map((chapter) => {
+          const topicsWithData = chapter.topics.map((topic) => {
+            // Count questions for this topic across all tags
+            const topicCountsByTag: Record<string, number> = {};
+            
+            productTags.forEach((tag) => {
+              let questionsToCount = allQuestions.filter((q) => {
+                return (
+                  q.topicId === topic.id &&
+                  questionMatchesTag(q, tag.id)
+                );
+              });
+              if (filteredQuestionIds !== null) {
+                questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
+              }
+              const count = questionsToCount.length;
+              if (count > 0) {
+                topicCountsByTag[tag.id] = count;
+              }
+            });
+
+            // Total count for this topic (across all tags)
+            let topicQuestions = allQuestions.filter((q) => q.topicId === topic.id);
+            if (filteredQuestionIds !== null) {
+              topicQuestions = topicQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+            }
+            const totalCount = topicQuestions.length;
+
+            return {
+              id: topic.id,
+              name: topic.name,
+              description: topic.description,
+              order: topic.order,
+              count: totalCount,
+              countsByTag: topicCountsByTag,
+            };
+          });
+
+          // Count questions for this chapter (subject) across all tags
+          const chapterCountsByTag: Record<string, number> = {};
+          productTags.forEach((tag) => {
+            let questionsToCount = allQuestions.filter((q) => {
+              return (
+                q.chapterId === chapter.id &&
+                questionMatchesTag(q, tag.id)
+              );
+            });
+            if (filteredQuestionIds !== null) {
+              questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
+            }
+            const count = questionsToCount.length;
+            if (count > 0) {
+              chapterCountsByTag[tag.id] = count;
+            }
+          });
+
+          // Total count for this chapter
+          let chapterQuestions = allQuestions.filter((q) => q.chapterId === chapter.id);
+          if (filteredQuestionIds !== null) {
+            chapterQuestions = chapterQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+          }
+          const totalChapterCount = chapterQuestions.length;
+
+          return {
+            id: chapter.id,
+            name: chapter.name,
+            description: chapter.description,
+            order: chapter.order,
+            count: totalChapterCount,
+            countsByTag: chapterCountsByTag,
+            topics: topicsWithData,
+          };
+        });
+
+        // Count questions for this section (system) across all tags
+        const sectionCountsByTag: Record<string, number> = {};
+        productTags.forEach((tag) => {
+          let questionsToCount = allQuestions.filter((q) => {
+            return (
+              q.sectionId === section.id &&
+              questionMatchesTag(q, tag.id)
+            );
+          });
+          if (filteredQuestionIds !== null) {
+            questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
+          }
+          const count = questionsToCount.length;
+          if (count > 0) {
+            sectionCountsByTag[tag.id] = count;
+          }
+        });
+
+        // Total count for this section
+        let sectionQuestions = allQuestions.filter((q) => q.sectionId === section.id);
+        if (filteredQuestionIds !== null) {
+          sectionQuestions = sectionQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+        }
+        const totalSectionCount = sectionQuestions.length;
+
+        return {
+          id: section.id,
+          name: section.name,
+          description: section.description,
+          order: section.order,
+          count: totalSectionCount,
+          countsByTag: sectionCountsByTag,
+          subjects: subjectsWithData,
+        };
+      });
+
+      return {
+        tags: tagsWithCounts,
+        systems: systemsWithData,
+      };
+    } catch (error) {
+      console.error("Error fetching test creation data:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get filtered questions for test taking based on tags, systems, subjects, and topics
+   */
+  async getFilteredQuestions(filters: {
+    tagIds?: string[];
+    systemIds?: string[];
+    subjectIds?: string[];
+    topicIds?: string[];
+    pool?: "unused" | "incorrect" | "correct" | "omitted";
+    marked?: boolean;
+    limit?: number;
+    userId?: string;
+  }) {
+    try {
+      const { tagIds = [], systemIds = [], subjectIds = [], topicIds = [], pool, marked, limit = 100, userId } = filters;
+
+      // Build where clause
+      const where: any = {
+        isActive: true,
+      };
+
+      // Filter by topics (if provided)
+      if (topicIds.length > 0) {
+        where.topicId = { in: topicIds };
+      }
+
+      // Filter by sections/systems (if provided)
+      if (systemIds.length > 0) {
+        where.sectionId = { in: systemIds };
+      }
+
+      // Filter by chapters/subjects (if provided)
+      if (subjectIds.length > 0) {
+        where.chapterId = { in: subjectIds };
+      }
+
+      // Get all questions first to filter by tags (since tags can be in JSON field)
+      // For pool filtering, we need to fetch more questions to ensure we have enough after filtering
+      // If pool is specified, fetch a larger batch to account for questions that will be filtered out
+      const fetchLimit = pool ? Math.max(limit * 20, 500) : limit * 2; // Fetch more if pool filtering is active
+      let questions = await this.prisma.question.findMany({
+        where,
+        include: {
+          choices: {
+            orderBy: { order: "asc" },
+          },
+          questionStemBlocks: {
+            orderBy: { order: "asc" },
+          },
+          explanationBlocks: {
+            orderBy: { order: "asc" },
+          },
+          perAnswerExplanations: {
+            include: {
+              blocks: { orderBy: { order: "asc" } },
+            },
+          },
+          productTag: true,
+          chapter: true,
+          section: true,
+          topic: {
+            include: {
+              chapter: {
+                include: {
+                  section: {
+                    include: {
+                      product: {
+                        select: {
+                          id: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        take: fetchLimit,
+      });
+
+      // Filter by tags if provided
+      if (tagIds.length > 0) {
+        questions = questions.filter((question) => {
+          // Check direct productTagId
+          if (question.productTagId && tagIds.includes(question.productTagId)) {
+            return true;
+          }
+          
+          // Check tags JSON field for productTagIds
+          if (question.tags && Array.isArray(question.tags)) {
+            for (const tag of question.tags) {
+              if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+                try {
+                  const tagIdsJson = tag.replace("__productTagIds:", "");
+                  const questionTagIds = JSON.parse(tagIdsJson);
+                  if (Array.isArray(questionTagIds)) {
+                    // Check if any of the question's tags match any selected tag
+                    if (questionTagIds.some((qTagId) => tagIds.includes(qTagId))) {
+                      return true;
+                    }
+                  }
+                } catch (e) {
+                  // Ignore parse errors
+                }
+              }
+            }
+          }
+          
+          return false;
+        });
+      }
+
+      // Filter by question pool if provided
+      if (pool && userId) {
+        // Get user's question paper questions to determine pool status
+        const userQuestionPapers = await this.prisma.questionPaper.findMany({
+          where: { userId },
+          select: { id: true },
+        });
+
+        const questionPaperIds = userQuestionPapers.map((qp) => qp.id);
+
+        if (questionPaperIds.length > 0) {
+          // Get all question paper questions for this user
+          // Include updatedAt to get the latest status for each question
+          const allUserAnswers = await this.prisma.questionPaperQuestion.findMany({
+            where: {
+              questionPaperId: { in: questionPaperIds },
+            },
+            select: {
+              questionId: true,
+              userAnswer: true,
+              isCorrect: true,
+              markedForReview: true,
+              updatedAt: true,
+            },
+            orderBy: {
+              updatedAt: 'desc', // Get most recent first
+            },
+          });
+
+          // Track question status across all attempts
+          // For marked status, use the LATEST value (most recent updatedAt)
+          // For other statuses, use "ever" logic (once true, always true)
+          const questionStatus = new Map<
+            string,
+            {
+              everCorrect: boolean;
+              everIncorrect: boolean;
+              everOmitted: boolean;
+              isMarked: boolean; // Changed from everMarked to isMarked - uses latest value
+              everEncountered: boolean;
+              latestUpdatedAt: Date; // Track the most recent update time
+            }
+          >();
+
+          for (const answer of allUserAnswers) {
+            const existing = questionStatus.get(answer.questionId);
+            
+            if (!existing) {
+              // First time seeing this question - since we ordered by updatedAt desc,
+              // this is the most recent record for this question
+            questionStatus.set(answer.questionId, {
+              everEncountered: true,
+              isMarked: answer.markedForReview === true, // Use latest value (first record = most recent)
+              everOmitted: answer.userAnswer === null,
+              everCorrect: answer.isCorrect === true,
+              everIncorrect: answer.isCorrect === false,
+              latestUpdatedAt: answer.updatedAt,
+            });
+            } else {
+              // We've seen this question before - update "ever" flags but keep the latest marked status
+              // Since records are ordered by updatedAt desc, the first record we processed is the most recent
+              questionStatus.set(answer.questionId, {
+              everEncountered: true,
+              isMarked: existing.isMarked, // Keep the first (most recent) value we saw
+              everOmitted: existing.everOmitted || (answer.userAnswer === null),
+              everCorrect: existing.everCorrect || (answer.isCorrect === true),
+              everIncorrect: existing.everIncorrect || (answer.isCorrect === false),
+              latestUpdatedAt: existing.latestUpdatedAt, // Keep the first (most recent) timestamp
+            });
+            }
+          }
+
+          // Filter questions based on pool
+          const questionIds = new Set(questions.map((q) => q.id));
+          const encounteredQuestionIds = new Set(questionStatus.keys());
+
+          questions = questions.filter((question) => {
+            const status = questionStatus.get(question.id) || {
+              everCorrect: false,
+              everIncorrect: false,
+              everOmitted: false,
+              isMarked: false, // Changed from everMarked to isMarked
+              everEncountered: false,
+              latestUpdatedAt: new Date(0), // Default to epoch if never encountered
+            };
+
+            // First filter by pool type
+            let matchesPool = true;
+            if (pool) {
+            switch (pool) {
+              case "unused":
+                // Questions never encountered in any test
+                  matchesPool = !encounteredQuestionIds.has(question.id);
+                  break;
+              case "correct":
+                // Questions that have ever been answered correctly (even if also marked/incorrect)
+                  matchesPool = status.everCorrect;
+                  break;
+              case "incorrect":
+                // Questions that have ever been answered incorrectly (even if also marked)
+                // But not if they were ever answered correctly
+                  matchesPool = status.everIncorrect && !status.everCorrect;
+                  break;
+              case "omitted":
+                // Questions that have been omitted (not answered) in at least one test
+                // But not if they were ever answered
+                  matchesPool = status.everOmitted && !status.everCorrect && !status.everIncorrect;
+                  break;
+              default:
+                  matchesPool = true;
+            }
+            }
+
+            // Then apply marked filter if specified
+            // Use isMarked (latest value) instead of everMarked
+            let matchesMarked = true;
+            if (marked !== undefined) {
+              if (marked) {
+                // Only include marked questions (using latest value)
+                matchesMarked = status.isMarked;
+              } else {
+                // Exclude marked questions (using latest value)
+                matchesMarked = !status.isMarked;
+              }
+            }
+
+            // Question must match both pool and marked criteria
+            return matchesPool && matchesMarked;
+          });
+        } else if (pool === "unused") {
+          // User has no tests, so all questions are unused
+          // But if marked filter is enabled and true, unused questions can't be marked, so return empty
+          if (marked === true) {
+            questions = [];
+          }
+          // If marked is false or undefined, all questions are unused and not marked (or we don't care about marked), so no filtering needed
+        } else {
+          // User has no tests but wants marked/correct/incorrect/omitted - return empty
+          questions = [];
+        }
+      }
+
+      // Limit to requested amount
+      questions = questions.slice(0, limit);
+
+      return questions;
+    } catch (error) {
+      console.error("Error fetching filtered questions:", error);
+      throw error;
+    }
+  }
 }

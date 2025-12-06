@@ -10,6 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/shared/ui/radio-group";
 import { Label } from "@/shared/ui/label";
 import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, Bookmark } from "lucide-react";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
+import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
+import { QuestionsService } from "@/app/services/questions/questions.service";
 
 interface Test {
   id: string;
@@ -52,6 +55,10 @@ export default function TestSessionPage() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [startTime] = useState(Date.now());
   const [error, setError] = useState<string | null>(null);
+  
+  const questionPapersService = new QuestionPapersService();
+  const questionPaperQuestionsService = new QuestionPaperQuestionsService();
+  const questionsService = new QuestionsService();
 
   useEffect(() => {
     if (!id || typeof id !== "string") return;
@@ -59,49 +66,106 @@ export default function TestSessionPage() {
     const fetchTest = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/tests/${id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch test");
-        }
-        const testData = await response.json();
-        setTest(testData);
+        setError(null);
+        
+        // Fetch question paper using the service
+        const questionPaper = await questionPapersService.getQuestionPaper(id);
+        
+        // Fetch question paper questions
+        const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
+          questionPaperId: id,
+          limit: 100,
+        });
+        
+        // Handle paginated response
+        const questionPaperQuestions = Array.isArray(questionsResponse)
+          ? questionsResponse
+          : (questionsResponse as any)?.data || [];
 
-        // Load saved answers and marked questions from test
-        if (testData.answers) {
-          const answers: Record<number, string> = {};
-          Object.keys(testData.answers).forEach((qId, idx) => {
-            const questionIndex = testData.questions.indexOf(qId);
-            if (questionIndex !== -1) {
-              answers[questionIndex] = testData.answers[qId];
-            }
-          });
-          setSelectedAnswers(answers);
-        }
-        if (testData.markedQuestions) {
-          const marked = new Set<number>();
-          testData.markedQuestions.forEach((qId: string) => {
-            const questionIndex = testData.questions.indexOf(qId);
-            if (questionIndex !== -1) {
-              marked.add(questionIndex);
-            }
-          });
-          setMarkedQuestions(marked);
-        }
+        // Transform question paper to test format
+        const testData: Test = {
+          id: questionPaper.id,
+          name: questionPaper.name,
+          mode: questionPaper.timeLimit ? "timed" : "tutor",
+          isTimed: !!questionPaper.timeLimit,
+          questionPool: questionPaper.type === "practice" ? "USMLE Step 1" : "Custom",
+          subjects: [],
+          systems: [],
+          questionCount: questionPaperQuestions.length,
+          duration: questionPaper.timeLimit,
+          questions: [],
+          answers: {},
+          markedQuestions: [],
+          status: "in-progress",
+          createdAt: questionPaper.createdAt,
+        };
 
-        // Fetch questions by their IDs
-        if (testData.questions && testData.questions.length > 0) {
-          const questionPromises = testData.questions.map(async (questionId: string) => {
-            const qResponse = await fetch(`/api/questions/${questionId}`);
-            if (!qResponse.ok) {
-              throw new Error(`Failed to fetch question ${questionId}`);
+        // Extract questions and restore answers/marked status
+        if (questionPaperQuestions.length > 0) {
+          const questionIds: string[] = [];
+          const answers: Record<string, string> = {};
+          const markedQuestions: string[] = [];
+
+          // Sort by order to maintain question sequence
+          const sortedQuestions = [...questionPaperQuestions].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+          sortedQuestions.forEach((qpq: any) => {
+            questionIds.push(qpq.questionId);
+            if (qpq.userAnswer) {
+              answers[qpq.questionId] = qpq.userAnswer;
             }
-            return qResponse.json();
+            if (qpq.markedForReview) {
+              markedQuestions.push(qpq.questionId);
+            }
           });
+
+          testData.questions = questionIds;
+          testData.answers = answers;
+          testData.markedQuestions = markedQuestions;
+
+          // Fetch full question details using the service
+          const questionPromises = questionIds.map(async (questionId: string) => {
+            try {
+              const question = await questionsService.getQuestion(questionId);
+              // Transform backend question to frontend format
+              return {
+                id: question.id,
+                text: question.stem || question.text,
+                options: (question.choices || []).map((c: any) => c.text),
+                correctAnswer: (question.choices || []).find((c: any) => c.isCorrect)?.text || "",
+                explanation: question.explanation || "",
+                subject: question.topic?.chapter?.name || "",
+                system: question.topic?.chapter?.section?.name || "",
+                difficulty: "Medium" as const,
+                imageUrl: question.imageUrl,
+              };
+            } catch (err) {
+              console.error(`Failed to fetch question ${questionId}:`, err);
+              throw err;
+            }
+          });
+          
           const fetchedQuestions = await Promise.all(questionPromises);
           setQuestions(fetchedQuestions);
-        } else {
-          setQuestions([]);
+
+          // Restore answers and marked questions by index
+          const restoredAnswers: Record<number, string> = {};
+          const restoredMarked = new Set<number>();
+
+          sortedQuestions.forEach((qpq: any, index: number) => {
+            if (qpq.userAnswer) {
+              restoredAnswers[index] = qpq.userAnswer;
+            }
+            if (qpq.markedForReview) {
+              restoredMarked.add(index);
+            }
+          });
+
+          setSelectedAnswers(restoredAnswers);
+          setMarkedQuestions(restoredMarked);
         }
+
+        setTest(testData);
       } catch (err: any) {
         setError(err?.message || "Failed to load test");
       } finally {

@@ -152,7 +152,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
       questionData.stem = stemLines.join("\n")
     }
 
-    // Extract options (A., B., C., D., E.)
+    // Extract options (A., B., C., D., E.) and inline per-answer explanations
     if (line.match(/^\*?\*?[A-E]\.\*?\*?\s+/)) {
       const optionMatch = line.match(/^\*?\*?([A-E])\.\*?\*?\s+(.+)/)
       if (optionMatch) {
@@ -166,8 +166,61 @@ export function parseMarkdown(content: string): ParsedQuestion {
           text,
           correct: label === questionData.correctAnswer,
         })
+        
+        // Check for inline per-answer explanation right after this option
+        // Look for "### Choice [A-E] Explanation" on the next non-empty line
+        let j = i + 1
+        // Skip empty lines
+        while (j < lines.length && !lines[j].trim()) {
+          j++
+        }
+        
+        // Check if the next non-empty line is a per-answer explanation for this choice
+        if (j < lines.length) {
+          const nextLine = lines[j].trim()
+          const perAnswerMatch1 = nextLine.match(/^###\s+Choice\s+([A-E])\s+Explanation/)
+          const perAnswerMatch2 = nextLine.match(/^###\s+Explanation\s+([A-E])(?:\s|$)/)
+          const perAnswerMatch = perAnswerMatch1 || perAnswerMatch2
+          
+          if (perAnswerMatch && perAnswerMatch[1] === label) {
+            // Found inline per-answer explanation for this choice
+            let explanationText = ""
+            // Start from the line after the explanation header
+            let k = j + 1
+            // Collect content until we hit the next option, next per-answer explanation, or a major section
+            while (
+              k < lines.length &&
+              !lines[k].trim().match(/^\*?\*?[A-E]\.\*?\*?\s+/) && // Next option
+              !lines[k].trim().match(/^###\s+(Explanation|Choice)\s+[A-E]/) && // Next per-answer explanation
+              !lines[k].trim().match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i) && // Major section
+              !lines[k].trim().match(/^Correct Answer:/i) && // Correct answer line
+              !lines[k].trim().match(/^\*End of test question/i) // End marker
+            ) {
+              explanationText += lines[k] + "\n"
+              k++
+            }
+            
+            if (explanationText.trim()) {
+              if (!questionData.perAnswerExplanations) {
+                questionData.perAnswerExplanations = {}
+              }
+              // Convert explanation to content blocks
+              questionData.perAnswerExplanations[label] = convertMarkdownToExplanationBlocks(explanationText.trim())
+              
+              // Skip the lines we just processed
+              i = k - 1
+            } else {
+              i = j
+            }
+          } else {
+            i++
+          }
+        } else {
+          i++
+        }
+      } else {
+        i++
       }
-      i++
       continue
     }
 
@@ -288,34 +341,57 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
 
     // Handle "## Choice-by-Choice Explanations" section header
+    // This is now only a placeholder marker in the main explanation
+    // Per-answer explanations are now inline with choices, so we just skip this line
     if (line.match(/^##+\s+Choice-by-Choice\s+Explanations/i)) {
-      // Mark that we've seen the per-answer explanations section
+      // Mark that we've seen the per-answer explanations section (for placeholder insertion)
       seenPerAnswerSection = true
-      // Continue to next line to process per-answer explanations
+      // Skip this line - it's just a placeholder marker
       i++
       continue
     }
 
-    // Match both "### Explanation A" and "### Choice A Explanation" formats
-    // Also handle "### Choice A Explanation — description" format (match anything after Explanation)
+    // Skip per-answer explanations in the old location (after "## Choice-by-Choice Explanations")
+    // They should now be inline with choices, so we ignore them here
+    // Only process if they haven't been processed inline with choices
     const perAnswerMatch1 = line.match(/^### Explanation\s+([A-E])(?:\s|$)/)
     const perAnswerMatch2 = line.match(/^### Choice\s+([A-E])\s+Explanation/)
     const perAnswerMatch = perAnswerMatch1 || perAnswerMatch2
     if (perAnswerMatch) {
       const answerLabel = perAnswerMatch[1]
-      if (answerLabel) {
+      // Only process if this explanation hasn't already been captured inline with the choice
+      // If it's already in perAnswerExplanations, skip it (it was processed inline)
+      if (answerLabel && !questionData.perAnswerExplanations?.[answerLabel]) {
         let explanationText = ""
-        // Continue until we hit the next per-answer explanation or end of file
+        // Continue until we hit the next per-answer explanation, a new major section (##), or end of file
         // Allow all other content including headings, tables, images, etc.
         // Start from the next line after the explanation header
         let j = i + 1
         // Match both formats for stopping condition (more flexible - allows text after "Explanation")
-        while (
-          j < lines.length &&
-          !lines[j].trim().match(/^### Explanation\s+[A-E](?:\s|$)/) &&
-          !lines[j].trim().match(/^### Choice\s+[A-E]\s+Explanation/) &&
-          !lines[j].trim().match(/^##+\s+Choice-by-Choice\s+Explanations/i)
-        ) {
+        // Stop at: next per-answer explanation, new major section (##), or end of file
+        while (j < lines.length) {
+          const currentLine = lines[j].trim()
+          
+          // Stop at next per-answer explanation
+          if (currentLine.match(/^### Explanation\s+[A-E](?:\s|$)/) ||
+              currentLine.match(/^### Choice\s+[A-E]\s+Explanation/)) {
+            break
+          }
+          
+          // Stop at "## Choice-by-Choice Explanations" header
+          if (currentLine.match(/^##+\s+Choice-by-Choice\s+Explanations/i)) {
+            break
+          }
+          
+          // Stop at any new major section (##) - this includes "## Management Approach" and similar
+          // Only stop at ## (not ###), as ### can be part of the explanation content
+          if (currentLine.match(/^##\s+/) && !currentLine.match(/^###\s+/)) {
+            // But don't stop at excluded sections that we've already processed
+            if (!currentLine.match(/^##\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)) {
+              break
+            }
+          }
+          
           explanationText += lines[j] + "\n"
           j++
         }
@@ -327,8 +403,10 @@ export function parseMarkdown(content: string): ParsedQuestion {
         }
         // Convert each per-answer explanation to content blocks
         questionData.perAnswerExplanations[answerLabel] = convertMarkdownToExplanationBlocks(explanationText.trim())
+      } else {
+        // Skip this line if explanation was already processed inline
+        i++
       }
-      i++
       continue
     }
 
@@ -361,32 +439,74 @@ export function parseMarkdown(content: string): ParsedQuestion {
           additionalContent += lines[j] + "\n"
           j++
         }
-        // Append to main explanation
+        // Insert additional content AFTER the per-answer-explanation placeholder
         if (additionalContent.trim()) {
           const existingExplanation = questionData.mainExplanation || []
           const additionalBlocks = convertMarkdownToExplanationBlocks(additionalContent.trim())
           
-          // Renumber orders to be sequential across all blocks
-          const maxOrder = existingExplanation.length > 0 
-            ? Math.max(...existingExplanation.map((b: any) => typeof b.order === "number" ? b.order : 0))
-            : -1
-          additionalBlocks.forEach((block: any, idx: number) => {
-            block.order = maxOrder + 1 + idx
-          })
+          // Find the placeholder block index
+          const placeholderIndex = existingExplanation.findIndex(
+            (block: any) => block.type === "per-answer-explanation" && block.data?.placeholder === true
+          )
           
-          questionData.mainExplanation = [...existingExplanation, ...additionalBlocks]
-          
-          // Debug: Log when additional content is found
-          if (process.env.NODE_ENV === "development") {
-            console.log("[MarkdownParser] Inline: Found additional content after per-answer explanations:", {
-              section: line.trim(),
-              startLine: i,
-              endLine: j - 1,
-              blockCount: additionalBlocks.length,
-              firstBlockType: additionalBlocks[0]?.type,
-              maxOrder,
-              newOrders: additionalBlocks.map((b: any) => b.order),
+          if (placeholderIndex >= 0) {
+            // Insert additional blocks right after the placeholder
+            const insertIndex = placeholderIndex + 1
+            
+            // Calculate order for new blocks (should be after placeholder)
+            const placeholderOrder = existingExplanation[placeholderIndex].order || 0
+            additionalBlocks.forEach((block: any, idx: number) => {
+              block.order = placeholderOrder + 1 + idx
             })
+            
+            // Insert blocks after placeholder
+            existingExplanation.splice(insertIndex, 0, ...additionalBlocks)
+            
+            // Renumber all blocks after the inserted blocks to maintain sequential order
+            const startRenumberFrom = insertIndex + additionalBlocks.length
+            for (let k = startRenumberFrom; k < existingExplanation.length; k++) {
+              existingExplanation[k].order = placeholderOrder + additionalBlocks.length + (k - startRenumberFrom) + 1
+            }
+            
+            questionData.mainExplanation = existingExplanation
+            
+            // Debug: Log when additional content is found
+            if (process.env.NODE_ENV === "development") {
+              console.log("[MarkdownParser] Inline: Found additional content after per-answer explanations:", {
+                section: line.trim(),
+                startLine: i,
+                endLine: j - 1,
+                blockCount: additionalBlocks.length,
+                firstBlockType: additionalBlocks[0]?.type,
+                placeholderIndex,
+                insertIndex,
+                placeholderOrder,
+                newOrders: additionalBlocks.map((b: any) => b.order),
+              })
+            }
+          } else {
+            // Fallback: if no placeholder found, append to end (shouldn't happen normally)
+            const maxOrder = existingExplanation.length > 0 
+              ? Math.max(...existingExplanation.map((b: any) => typeof b.order === "number" ? b.order : 0))
+              : -1
+            additionalBlocks.forEach((block: any, idx: number) => {
+              block.order = maxOrder + 1 + idx
+            })
+            
+            questionData.mainExplanation = [...existingExplanation, ...additionalBlocks]
+            
+            // Debug: Log when additional content is found (fallback case)
+            if (process.env.NODE_ENV === "development") {
+              console.log("[MarkdownParser] Inline: Found additional content but no placeholder found (fallback):", {
+                section: line.trim(),
+                startLine: i,
+                endLine: j - 1,
+                blockCount: additionalBlocks.length,
+                firstBlockType: additionalBlocks[0]?.type,
+                maxOrder,
+                newOrders: additionalBlocks.map((b: any) => b.order),
+              })
+            }
           }
         }
         // Skip to the end of the collected content (j-1 because j is the line after)
