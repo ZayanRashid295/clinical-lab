@@ -1042,7 +1042,7 @@ export default function StudentQuestionView() {
                             [question.id]: existingQPQ.id,
                           }))
                           // Check if it was marked
-                          const isMarked = existingQPQ.markedForReview === true || existingQPQ.markedForReview === "true" || existingQPQ.markedForReview === 1
+                          const isMarked = existingQPQ.markedForReview === true || (typeof existingQPQ.markedForReview === "string" && existingQPQ.markedForReview === "true") || (typeof existingQPQ.markedForReview === "number" && existingQPQ.markedForReview === 1)
                           if (isMarked) {
                             setMarkedQuestions((prev) => {
                               const updated = new Set(prev)
@@ -1268,8 +1268,12 @@ export default function StudentQuestionView() {
       console.error("Failed to save marked status to database:", error)
       // On error, revert the local state change to match what's in the database
       try {
+        const params = getSearchParams()
+        const questionPaperIdForRevert = params.get("questionPaperId")
+        if (!questionPaperIdForRevert) return
+        
         const current = await questionPaperQuestionsService.getQuestionPaperQuestions({
-          questionPaperId,
+          questionPaperId: questionPaperIdForRevert,
           questionId,
         })
         const currentArray = Array.isArray(current) ? current : (current as any)?.data || []
@@ -1351,8 +1355,11 @@ export default function StudentQuestionView() {
         }
 
         // If there are more than 100 questions, fetch all pages
-        if (existingQuestionPaperQuestions.length === 100) {
-          let allQuestions = [...existingQuestionPaperQuestions]
+        const existingArray = Array.isArray(existingQuestionPaperQuestions) 
+          ? existingQuestionPaperQuestions 
+          : (existingQuestionPaperQuestions as any)?.data || []
+        if (existingArray.length === 100) {
+          let allQuestions = [...existingArray]
           let page = 2
           while (true) {
             const nextPage = await questionPaperQuestionsService.getQuestionPaperQuestions({

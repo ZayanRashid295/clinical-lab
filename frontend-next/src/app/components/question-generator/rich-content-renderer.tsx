@@ -613,7 +613,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
 }
 
 // Component to convert markdown to HTML and render it
-function MarkdownToHtmlRenderer({ markdown, itemId }: { markdown: string; itemId: number }) {
+function MarkdownToHtmlRenderer({ markdown, itemId }: { markdown: string; itemId: number | string }) {
   const [html, setHtml] = useState<string>("")
 
   useEffect(() => {
@@ -635,7 +635,7 @@ function removeEmptyTableRows(html: string): string {
 }
 
 // Component to render HTML tables - render exactly as in edit mode
-function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: number; isDark: boolean }) {
+function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: number | string; isDark: boolean }) {
   const [sanitizedHtml, setSanitizedHtml] = useState<string>(html)
 
   useEffect(() => {

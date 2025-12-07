@@ -222,6 +222,7 @@ function convertNewTypeToOld(newType: ContentBlock["type"]): string {
     text: "TEXT",
     table: "TABLE",
     image: "IMAGES",
+    images: "IMAGES",
     "internal-link": "TEXT", // Internal links stored as TEXT in old format
     "external-link": "TEXT", // External links stored as TEXT in old format
     "per-answer-explanation": "PER_ANSWER_EXPLANATION", // Per-answer explanation placeholder

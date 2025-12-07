@@ -25,42 +25,11 @@ import PerAnswerExplanationEditor from "./PerAnswerExplanationEditor"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { Editor } from "@tiptap/react"
 import { RotateCcw, Eye, EyeOff } from "lucide-react"
+import { QuestionCreatorData } from "../question-creator/types"
 
 interface QuestionEditorProps {
-  initialData?: {
-    stem?: ContentBlock[]
-    choices?: Choice[]
-    perAnswerExplanations?: Record<string, ContentBlock[]>
-    mainExplanation?: ContentBlock[]
-    metadata?: {
-      subject?: string
-      system?: string
-      sectionId?: string
-      chapterId?: string
-      topicId?: string
-      productTagId?: string
-      productTagIds?: string[]
-      tags?: string[]
-      questionId?: string
-    }
-  }
-  onSave: (data: {
-    stem: ContentBlock[]
-    choices: Choice[]
-    perAnswerExplanations: Record<string, ContentBlock[]>
-    mainExplanation: ContentBlock[]
-    metadata: {
-      subject?: string
-      system?: string
-      sectionId?: string
-      chapterId?: string
-      topicId?: string
-      productTagId?: string
-      productTagIds?: string[]
-      tags?: string[]
-      questionId?: string
-    }
-  }) => void
+  initialData?: Partial<QuestionCreatorData>
+  onSave: (data: QuestionCreatorData) => void
   onCancel: () => void
 }
 
@@ -410,8 +379,16 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
     // Fallback to activeSection-based detection
     if (activeSection === "stem" && stemEditorRef.current) {
       return stemEditorRef.current
-    } else if (activeSection === "explanation" && explanationEditorRef.current) {
-      return explanationEditorRef.current
+    } else if (activeSection === "explanation") {
+      // If there's a main explanation editor, use it
+      if (explanationEditorRef.current) {
+        return explanationEditorRef.current
+      }
+      // Otherwise, return the first text block editor if available
+      const firstTextBlockEditor = Object.values(textBlockEditorRefs.current).find(editor => editor !== null)
+      if (firstTextBlockEditor) {
+        return firstTextBlockEditor
+      }
     } else if (activeSection?.startsWith("per-answer-")) {
       // Try activePerAnswerLabel first
       if (activePerAnswerLabel && perAnswerEditorRefs.current[activePerAnswerLabel]) {
@@ -919,7 +896,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                     })}
                     {choices.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground dark:text-gray-400 text-sm">
-                        No choices added. Click "Add Choice" to add options.
+                        No choices added. Click &quot;Add Choice&quot; to add options.
                       </div>
                     )}
                   </div>
@@ -931,14 +908,34 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
           {/* Right column - Explanation */}
           <div className="lg:col-span-3 flex flex-col overflow-hidden min-h-0">
             <div className="overflow-y-auto flex-1 pr-2">
-              <Card className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl h-full flex flex-col">
+              <Card 
+                className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl h-full flex flex-col"
+                onClick={(e) => {
+                  // Activate explanation section when clicking anywhere in the card
+                  // Check if the click is not on an interactive element
+                  const target = e.target as HTMLElement
+                  if (!target.closest('button') && !target.closest('input') && !target.closest('[contenteditable]')) {
+                    setActiveSection("explanation")
+                    // If there are blocks, focus the first one
+                    if (mainExplanationBlocks.length > 0) {
+                      const firstBlock = mainExplanationBlocks[0]
+                      const firstBlockEditor = textBlockEditorRefs.current[firstBlock.id]
+                      if (firstBlockEditor) {
+                        setTimeout(() => {
+                          firstBlockEditor.chain().focus().run()
+                        }, 50)
+                      }
+                    }
+                  }
+                }}
+              >
                 <div className="flex-shrink-0 mb-4">
                   <h3 className="text-xs font-bold text-primary/70 dark:text-blue-400 uppercase tracking-widest">
                     Explanation
                   </h3>
                 </div>
                 
-                <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="flex-1 min-h-0 overflow-y-auto explanation-container">
                   <div className="space-y-6">
                     <ExplanationBlockEditor
                       blocks={mainExplanationBlocks}

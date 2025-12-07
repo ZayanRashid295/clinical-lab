@@ -91,7 +91,7 @@ export default function PerAnswerExplanationEditor({
                   const normalizedEditor = normalizeHtml(editorHtml)
                   // Double-check the editor hasn't changed since we scheduled this update
                   if (normalizedEditor !== normalizedNew) {
-                    editorInstanceRef.current.commands.setContent(newHtml, false)
+                    editorInstanceRef.current.commands.setContent(newHtml, { emitUpdate: false })
                   }
                 }
               })

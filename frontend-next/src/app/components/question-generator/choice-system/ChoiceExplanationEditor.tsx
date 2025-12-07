@@ -12,7 +12,7 @@ import { blocksToHTMLAsync, htmlToBlocks } from "../unified-editor/content-utils
 interface ChoiceExplanationEditorProps {
   choices: Choice[]
   explanations: Record<string, ContentBlock[]>
-  onChange: (explanations: Record<string, ContentBlock[]) => void
+  onChange: (explanations: Record<string, ContentBlock[]>) => void
   disabled?: boolean
 }
 

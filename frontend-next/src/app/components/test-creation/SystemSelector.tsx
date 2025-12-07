@@ -473,7 +473,7 @@ export function SystemSelector({
                         >
                           {subject.name}
                         </span>
-                        <span className="text-[11px] text-muted-foreground dark:text-gray-400">{subjectCount} Q's</span>
+                        <span className="text-[11px] text-muted-foreground dark:text-gray-400">{subjectCount} Q&apos;s</span>
                       </div>
                       <button
                         onClick={(e) => {

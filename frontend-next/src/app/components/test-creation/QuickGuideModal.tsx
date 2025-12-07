@@ -86,7 +86,7 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
               </div>
               <p className="text-sm text-muted-foreground dark:text-gray-400 leading-relaxed">
                 Enable <span className="font-medium text-foreground dark:text-gray-100">Include marked questions</span> to filter your test
-                to only show questions you've previously marked for review. This is perfect for revisiting challenging
+                to only show questions you&apos;ve previously marked for review. This is perfect for revisiting challenging
                 topics you want to focus on.
               </p>
               <div className="bg-muted/50 dark:bg-gray-700/30 rounded-lg p-3 mt-2 flex items-start gap-2">
@@ -158,8 +158,8 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
               <div className="bg-muted/50 dark:bg-gray-700/30 rounded-lg p-3 mt-2 flex items-start gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground dark:text-gray-400">
-                  <span className="font-medium text-foreground dark:text-gray-100">Pro tip:</span> Use "Select All" to quickly include all
-                  items, then deselect the ones you don't need.
+                  <span className="font-medium text-foreground dark:text-gray-100">Pro tip:</span> Use &quot;Select All&quot; to quickly include all
+                  items, then deselect the ones you don&apos;t need.
                 </p>
               </div>
             </div>
@@ -201,8 +201,8 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
                 <h3 className="font-semibold text-foreground dark:text-gray-100">Generate Your Test</h3>
               </div>
               <p className="text-sm text-muted-foreground dark:text-gray-400 leading-relaxed">
-                Once you've configured all settings, click the{" "}
-                <span className="font-medium text-foreground dark:text-gray-100">"Generate Test"</span> button to create your personalized
+                Once you&apos;ve configured all settings, click the{" "}
+                <span className="font-medium text-foreground dark:text-gray-100">&quot;Generate Test&quot;</span> button to create your personalized
                 practice exam. Your test will be ready in seconds!
               </p>
             </div>
@@ -218,13 +218,15 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
             </span>
           </div>
           <Button onClick={() => onOpenChange(false)} className="h-9 px-4 font-medium">
-            Got it, let's start!
+            Got it, let&apos;s start!
           </Button>
         </div>
       </DialogContent>
     </Dialog>
   )
 }
+
+
 
 
 

@@ -234,7 +234,7 @@ export default function RichTextEditor({
       isUpdatingRef.current = true
       // Set content - TipTap will parse the HTML and preserve all inline styles
       // The false parameter means "don't emit update events" to prevent loops
-      editor.commands.setContent(content || "<p></p>", false)
+      editor.commands.setContent(content || "<p></p>", { emitUpdate: false })
       
       // Debug: Log when content with formatting is loaded
       if (process.env.NODE_ENV === "development" && content && (content.includes('style=') || content.includes('font-size') || content.includes('font-family'))) {
@@ -459,7 +459,7 @@ export default function RichTextEditor({
       }} />
       <div
         className={cn(
-          "border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 border-border dark:border-gray-700 bg-card dark:bg-gray-800",
+          "border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100",
           !editable && "bg-muted/50 dark:bg-gray-800/50"
         )}
         onClick={(e) => {
@@ -477,7 +477,6 @@ export default function RichTextEditor({
             editorRef(editor)
           }
         }}
-        className="bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
       >
         <EditorContent 
           editor={editor} 

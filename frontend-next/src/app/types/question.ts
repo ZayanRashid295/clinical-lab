@@ -66,6 +66,7 @@ export interface QuestionQueryParams {
   productTagId?: string;
   dateFrom?: string;
   dateTo?: string;
+  _t?: string | number; // Cache buster parameter
 }
 
 export interface QuestionChoiceQueryParams {

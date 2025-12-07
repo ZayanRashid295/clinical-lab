@@ -17,6 +17,7 @@ import { authService } from "@/shared/services/auth.service"
 
 interface Question {
   id: string
+  questionId?: string | null // Optional question ID stored in metadata/tags
   stem: string
   options: Array<{ label: string; text: string; correct: boolean; value?: string }>
   choices?: QuestionChoice[] // Backend uses 'choices'

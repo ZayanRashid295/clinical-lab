@@ -156,7 +156,16 @@ export default function ExplanationBlockEditor({
   )
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="space-y-4"
+      onClick={(e) => {
+        // If clicking on the container (not on a block or interactive element), activate explanation section
+        const target = e.target as HTMLElement
+        if (target === e.currentTarget || (!target.closest('[contenteditable]') && !target.closest('button') && !target.closest('input'))) {
+          onSectionChange("explanation")
+        }
+      }}
+    >
       {blocks.map((block, index) => {
         const isPerAnswerPlaceholder = block.type === "per-answer-explanation"
         const isAllChoicesBlock = isPerAnswerPlaceholder && block.data?.allChoices === true
@@ -361,7 +370,12 @@ export default function ExplanationBlockEditor({
       })}
 
       {blocks.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground dark:text-gray-400 text-sm border border-dashed rounded-lg border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+        <div 
+          className="text-center py-8 text-muted-foreground dark:text-gray-400 text-sm border border-dashed rounded-lg border-border dark:border-gray-700 bg-card dark:bg-gray-800 cursor-pointer hover:bg-muted/50 dark:hover:bg-gray-700/50 transition-colors"
+          onClick={() => {
+            onSectionChange("explanation")
+          }}
+        >
           No explanation content. Use the toolbar above to add text blocks or per-answer explanations.
         </div>
       )}

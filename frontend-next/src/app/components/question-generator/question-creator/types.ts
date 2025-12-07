@@ -10,6 +10,9 @@ export interface QuestionMetadata {
   sectionId?: string
   chapterId?: string
   topicId?: string
+  productTagId?: string // Single tag ID for backward compatibility
+  productTagIds?: string[] // Multiple tag IDs
+  questionId?: string | null // Optional question ID stored in metadata/tags
   tags?: string[]
 }
 

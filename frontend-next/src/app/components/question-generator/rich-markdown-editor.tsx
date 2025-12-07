@@ -120,7 +120,7 @@ export default function RichMarkdownEditor({
           console.log('Setting content with headings in TipTap:', normalizedInitial)
         }
         
-        editor.commands.setContent(normalizedInitial || "<p></p>", false)
+        editor.commands.setContent(normalizedInitial || "<p></p>", { emitUpdate: false })
         lastContentRef.current = normalizedInitial
         
         // Verify headings were parsed correctly
@@ -140,7 +140,7 @@ export default function RichMarkdownEditor({
         // Fallback: try with just the text content
         try {
           const textContent = normalizedInitial.replace(/<[^>]*>/g, '')
-          editor.commands.setContent(`<p>${textContent}</p>`, false)
+          editor.commands.setContent(`<p>${textContent}</p>`, { emitUpdate: false })
           lastContentRef.current = normalizedInitial
         } catch (fallbackError) {
           console.error("Error in fallback content setting:", fallbackError)
