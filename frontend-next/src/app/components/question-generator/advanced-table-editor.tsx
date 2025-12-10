@@ -1,4 +1,4 @@
-"use client"
+  "use client"
 
 import type { ReactNode } from "react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -122,6 +122,10 @@ export default function AdvancedTableEditor({
   const [importHtmlText, setImportHtmlText] = useState("")
   const [initialized, setInitialized] = useState(false)
   const initialContentRef = useRef<string | undefined>(undefined)
+  const hasUserEditedRef = useRef(false) // Track if user has manually edited the table
+  const hasLoadedInitialContentRef = useRef(false) // Track if we've loaded initial content once
+  const onChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null) // For debouncing onChange
+  const isTypingRef = useRef(false) // Track if user is actively typing
 
   const colorPalette = useMemo(
     () => ["", "#f97316", "#facc15", "#34d399", "#38bdf8", "#a855f7", "#ef4444", "#94a3b8"],
@@ -168,11 +172,23 @@ export default function AdvancedTableEditor({
     autofocus: false,
     onUpdate: async ({ editor }) => {
       if (mode === "visual") {
+        // Mark that user has edited the content
+        hasUserEditedRef.current = true
+        isTypingRef.current = true
+        
+        // Debounce onChange to prevent excessive re-renders and cursor loss
+        if (onChangeTimeoutRef.current) {
+          clearTimeout(onChangeTimeoutRef.current)
+        }
+        
+        onChangeTimeoutRef.current = setTimeout(async () => {
         let html = editor.getHTML()
         // Remove empty rows from HTML before saving
         html = html.replace(/<tr[^>]*>[\s\n]*(?:<t[dh][^>]*>[\s\n]*<\/t[dh]>[\s\n]*)+<\/tr>/gi, '')
         const markdown = await htmlToMarkdown(html)
         onChange?.({ html, markdown })
+          isTypingRef.current = false
+        }, 300) // 300ms debounce
       }
     },
     immediatelyRender: false,
@@ -209,8 +225,40 @@ export default function AdvancedTableEditor({
     }, 150)
   }, [editor, onChange])
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (onChangeTimeoutRef.current) {
+        clearTimeout(onChangeTimeoutRef.current)
+      }
+    }
+  }, [])
+
   const loadInitialContent = useCallback(async () => {
     if (!editor) return
+
+    // CRITICAL: Don't reload if user is actively typing
+    if (isTypingRef.current) {
+      return
+    }
+
+    // CRITICAL: Only load initial content once on first mount
+    // After that, don't reload even if initialContent prop changes
+    // This prevents clearing user's manual edits
+    if (hasLoadedInitialContentRef.current) {
+      return
+    }
+
+    // CRITICAL: Don't reload if user has manually edited the content
+    // This prevents clearing user's manual edits when component re-renders
+    if (hasUserEditedRef.current && initialized) {
+      return
+    }
+
+    // If initialContent hasn't changed, don't reload
+    if (initialContentRef.current === initialContent && initialized) {
+      return
+    }
 
     // If no initial content, create default table
     if (!initialContent || initialContent.trim() === "") {
@@ -221,8 +269,29 @@ export default function AdvancedTableEditor({
     }
 
     let desiredHtml = initialContent || ""
+    
+    // If loading from markdown, preserve it in markdownDraft
     if (initialContent && initialFormat === "markdown") {
+      // Preserve the original markdown for markdown mode
+      setMarkdownDraft(initialContent)
       desiredHtml = await markdownToHTML(initialContent)
+    } else if (initialFormat === "html" && initialContent) {
+      // If loading from HTML, try to generate markdown for markdown mode
+      // This ensures markdown mode has content when switching
+      try {
+        const generatedMarkdown = await htmlToMarkdown(initialContent)
+        if (generatedMarkdown && generatedMarkdown.trim() && generatedMarkdown.includes("|")) {
+          setMarkdownDraft(generatedMarkdown)
+        } else {
+          // Fallback: extract table from HTML
+          const extractedMarkdown = extractTableFromHTML(initialContent)
+          if (extractedMarkdown) {
+            setMarkdownDraft(extractedMarkdown)
+          }
+        }
+      } catch (error) {
+        console.error("Error generating markdown from HTML:", error)
+      }
     }
 
     // Remove empty rows from HTML before loading
@@ -242,13 +311,17 @@ export default function AdvancedTableEditor({
     if (initialized) {
       const current = editor.getHTML().trim()
       if (desiredHtml.trim() && current === desiredHtml.trim()) {
+        initialContentRef.current = initialContent
         return
       }
     }
 
-    editor.commands.setContent(desiredHtml || "", { emitUpdate: true })
+    // Only set content if we haven't initialized yet, or if initialContent actually changed
+    editor.commands.setContent(desiredHtml || "", { emitUpdate: false }) // Don't emit update to prevent loops
     initialContentRef.current = initialContent
     setInitialized(true)
+    hasLoadedInitialContentRef.current = true // Mark that we've loaded initial content
+    hasUserEditedRef.current = false // Reset edit flag when loading new content
   }, [editor, initialContent, initialFormat, initialized, createDefaultTable])
 
   useEffect(() => {
@@ -260,17 +333,39 @@ export default function AdvancedTableEditor({
       if (!editor || nextMode === mode) return
 
       if (nextMode === "markdown") {
+        // Save current visual mode content before switching
         const html = editor.getHTML()
-        const markdown = await htmlToMarkdown(html)
-        setMarkdownDraft(markdown)
+        // Try to convert HTML to markdown
+        let markdown = await htmlToMarkdown(html)
+        
+        // If conversion resulted in empty or invalid markdown, try to extract table structure from HTML
+        if (!markdown || !markdown.trim() || !markdown.includes("|")) {
+          // Fallback: manually extract table from HTML
+          markdown = extractTableFromHTML(html)
+        }
+        
+        // Save the current state before switching
+        if (html && html.includes("<table")) {
+          onChange?.({ html, markdown: markdown || "" })
+        }
+        
+        setMarkdownDraft(markdown || "")
       } else {
+        // Save markdown changes before switching to visual
         const html = await markdownToHTML(markdownDraft)
         editor.commands.setContent(html, { emitUpdate: false })
+        // Mark as edited when user switches back from markdown mode
+        hasUserEditedRef.current = true
+        
+        // Save the converted content
+        if (html && html.includes("<table")) {
+          onChange?.({ html, markdown: markdownDraft })
+        }
       }
 
       setMode(nextMode)
     },
-    [editor, markdownDraft, mode],
+    [editor, markdownDraft, mode, onChange],
   )
 
   const applyMarkdownDraft = useCallback(async () => {
@@ -279,7 +374,13 @@ export default function AdvancedTableEditor({
     editor.commands.setContent(html, { emitUpdate: false })
     setMode("visual")
     setInitialized(true)
-  }, [editor, markdownDraft])
+    hasUserEditedRef.current = true // Mark as edited when applying markdown
+    
+    // Save the applied content
+    if (html && html.includes("<table")) {
+      onChange?.({ html, markdown: markdownDraft })
+    }
+  }, [editor, markdownDraft, onChange])
 
   const runEditorCommand = useCallback(
     (run: () => boolean) => {
@@ -299,12 +400,32 @@ export default function AdvancedTableEditor({
     setMode("visual")
   }, [editor, importMarkdownText])
 
-  const importHtml = useCallback(() => {
+  const importHtml = useCallback(async () => {
     if (!editor || !importHtmlText.trim()) return
     editor.commands.setContent(importHtmlText, { emitUpdate: false })
+    // Generate markdown from imported HTML
+    try {
+      const markdown = await htmlToMarkdown(importHtmlText)
+      if (markdown && markdown.includes("|")) {
+        setMarkdownDraft(markdown)
+      } else {
+        const extracted = extractTableFromHTML(importHtmlText)
+        if (extracted) {
+          setMarkdownDraft(extracted)
+        }
+      }
+    } catch (error) {
+      console.error("Error generating markdown from imported HTML:", error)
+    }
     setImportHtmlText("")
     setMode("visual")
-  }, [editor, importHtmlText])
+    hasUserEditedRef.current = true
+    // Save the imported content
+    if (importHtmlText.includes("<table")) {
+      const markdown = await htmlToMarkdown(importHtmlText).catch(() => extractTableFromHTML(importHtmlText) || "")
+      onChange?.({ html: importHtmlText, markdown })
+    }
+  }, [editor, importHtmlText, onChange])
 
   const renderToolbar = useCallback(() => {
     if (!editor) return null
@@ -897,7 +1018,87 @@ async function markdownToHTML(markdown: string): Promise<string> {
   return String(file)
 }
 
+// Extract table structure directly from HTML as fallback
+function extractTableFromHTML(html: string): string {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, "text/html")
+    const table = doc.querySelector("table")
+    
+    if (!table) {
+      return ""
+    }
+    
+    const rows: string[][] = []
+    const thead = table.querySelector("thead")
+    const tbody = table.querySelector("tbody") || table
+    
+    // Process header row
+    if (thead) {
+      const headerRow = thead.querySelector("tr")
+      if (headerRow) {
+        const cells = Array.from(headerRow.querySelectorAll("th, td")).map(cell => {
+          let text = cell.innerHTML || cell.textContent || ""
+          // Convert HTML formatting back to markdown
+          text = text.replace(/<strong>(.*?)<\/strong>/gi, "**$1**")
+          text = text.replace(/<em>(.*?)<\/em>/gi, "*$1*")
+          text = text.replace(/<[^>]+>/g, "") // Remove remaining HTML tags
+          // Decode HTML entities
+          text = text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+          text = text.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+          // Escape pipe characters
+          return text.replace(/\|/g, "\\|").trim()
+        })
+        if (cells.length > 0) {
+          rows.push(cells)
+        }
+      }
+    }
+    
+    // Process body rows
+    const bodyRows = tbody.querySelectorAll("tr")
+    bodyRows.forEach((row) => {
+      const cells = Array.from(row.querySelectorAll("td, th")).map(cell => {
+        let text = cell.innerHTML || cell.textContent || ""
+        // Convert HTML formatting back to markdown
+        text = text.replace(/<strong>(.*?)<\/strong>/gi, "**$1**")
+        text = text.replace(/<em>(.*?)<\/em>/gi, "*$1*")
+        text = text.replace(/<[^>]+>/g, "") // Remove remaining HTML tags
+        // Decode HTML entities
+        text = text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+        text = text.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+        // Escape pipe characters
+        return text.replace(/\|/g, "\\|").trim()
+      })
+      if (cells.length > 0) {
+        rows.push(cells)
+      }
+    })
+    
+    if (rows.length === 0) {
+      return ""
+    }
+    
+    // Generate markdown table
+    const markdownLines: string[] = []
+    rows.forEach((row, index) => {
+      markdownLines.push("| " + row.join(" | ") + " |")
+      // Add separator after header row
+      if (index === 0 && rows.length > 1) {
+        const separator = "| " + row.map(() => "---").join(" | ") + " |"
+        markdownLines.push(separator)
+      }
+    })
+    
+    return markdownLines.join("\n")
+  } catch (error) {
+    console.error("Error extracting table from HTML:", error)
+    return ""
+  }
+}
+
 async function htmlToMarkdown(html: string): Promise<string> {
+  try {
   const file = await unified()
     .use(rehypeParse, { fragment: true })
     .use(rehypeRemark)
@@ -905,6 +1106,18 @@ async function htmlToMarkdown(html: string): Promise<string> {
     .use(remarkStringify)
     .process(html)
 
-  return String(file)
+    const result = String(file)
+    
+    // If the result doesn't contain a table, try manual extraction
+    if ((!result || !result.trim() || !result.includes("|")) && html.includes("<table")) {
+      return extractTableFromHTML(html)
+    }
+    
+    return result
+  } catch (error) {
+    console.error("Error converting HTML to markdown:", error)
+    // Fallback to manual extraction
+    return extractTableFromHTML(html)
+  }
 }
 

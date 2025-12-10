@@ -39,6 +39,8 @@ export default function RichTextEditor({
   editorRef,
 }: RichTextEditorProps) {
   const isUpdatingRef = useRef(false)
+  const isTypingRef = useRef(false)
+  const onChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -90,7 +92,6 @@ export default function RichTextEditor({
           style: "border: 2px solid #000000; width: 100%;",
         },
       }),
-      TableHeader,
       TableRow,
       TableCell.extend({
         content: 'paragraph+',
@@ -144,6 +145,7 @@ export default function RichTextEditor({
           return ['td', HTMLAttributes, 0]
         },
       }),
+      // Use extended TableHeader instead of base one to avoid duplicate extension warning
       TableHeader.extend({
         content: 'paragraph+',
         addAttributes() {
@@ -202,8 +204,18 @@ export default function RichTextEditor({
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       if (isUpdatingRef.current) return
+      isTypingRef.current = true
+      
+      // Debounce onChange to prevent excessive re-renders and cursor loss
+      if (onChangeTimeoutRef.current) {
+        clearTimeout(onChangeTimeoutRef.current)
+      }
+      
+      onChangeTimeoutRef.current = setTimeout(() => {
       const html = editor.getHTML()
       onChange(html)
+        isTypingRef.current = false
+      }, 300) // 300ms debounce
     },
     editorProps: {
       attributes: {
@@ -228,8 +240,20 @@ export default function RichTextEditor({
     }
   }, [editor, editorRef])
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (onChangeTimeoutRef.current) {
+        clearTimeout(onChangeTimeoutRef.current)
+      }
+    }
+  }, [])
+
   // Update editor content when prop changes
   useEffect(() => {
+    // Don't update if user is actively typing
+    if (isTypingRef.current) return
+    
     if (editor && content !== editor.getHTML()) {
       isUpdatingRef.current = true
       // Set content - TipTap will parse the HTML and preserve all inline styles
@@ -480,7 +504,17 @@ export default function RichTextEditor({
       >
         <EditorContent 
           editor={editor} 
-          className="prose prose-sm dark:prose-invert max-w-none [&_p]:text-foreground dark:[&_p]:text-gray-100 [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_ul]:text-foreground dark:[&_ul]:text-gray-100 [&_ol]:text-foreground dark:[&_ol]:text-gray-100 [&_li]:text-foreground dark:[&_li]:text-gray-100"
+          className="prose prose-sm dark:prose-invert max-w-none 
+            [&_p]:text-foreground dark:[&_p]:text-gray-100 
+            [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-6 [&_h1]:mb-4
+            [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-5 [&_h2]:mb-3
+            [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2
+            [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:text-lg [&_h4]:font-bold [&_h4]:mt-3 [&_h4]:mb-2
+            [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:text-base [&_h5]:font-bold [&_h5]:mt-2 [&_h5]:mb-1
+            [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:text-sm [&_h6]:font-bold [&_h6]:mt-2 [&_h6]:mb-1
+            [&_ul]:text-foreground dark:[&_ul]:text-gray-100 
+            [&_ol]:text-foreground dark:[&_ol]:text-gray-100 
+            [&_li]:text-foreground dark:[&_li]:text-gray-100"
         />
       </div>
     </>

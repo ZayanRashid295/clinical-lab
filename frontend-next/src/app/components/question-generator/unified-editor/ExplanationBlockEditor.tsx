@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState, useEffect } from "react"
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "../choice-system/types"
 import RichTextEditor from "./RichTextEditor"
@@ -12,6 +12,358 @@ import { Label } from "@/shared/ui/label"
 import { ChevronUp, ChevronDown, X, MessageSquare } from "lucide-react"
 import { blocksToHTML, htmlToBlocks } from "./content-utils"
 import { Editor } from "@tiptap/react"
+import { unified } from "unified"
+import remarkParse from "remark-parse"
+import remarkGfm from "remark-gfm"
+import remarkRehype from "remark-rehype"
+import rehypeStringify from "rehype-stringify"
+import { memo, useMemo } from "react"
+
+// Helper to convert markdown table to HTML (moved outside to prevent recreation)
+async function convertMarkdownTableToHTML(markdown: string): Promise<string> {
+  try {
+    if (!markdown || !markdown.trim()) {
+      return ""
+    }
+    
+    const file = await unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkRehype, { allowDangerousHtml: true })
+      .use(rehypeStringify, { allowDangerousHtml: true })
+      .process(markdown)
+    
+    let html = String(file)
+    html = html.replace(/^<html[^>]*>/, '').replace(/<\/html>$/, '')
+    html = html.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '')
+    html = html.trim()
+    
+    if (html.includes("<table")) {
+      const tableMatch = html.match(/<table[\s\S]*?<\/table>/i)
+      if (tableMatch) {
+        return tableMatch[0]
+      }
+    }
+    
+    return html
+  } catch (error) {
+    console.error("Error converting markdown table to HTML:", error)
+    return ""
+  }
+}
+
+// Stable component for table editing - memoized to prevent unnecessary re-renders
+const TableBlockEditor = memo(({
+  blockId,
+  blockHtml,
+  detectedTable,
+  onTableChange,
+  editorRef,
+}: {
+  blockId: string
+  blockHtml: string
+  detectedTable: { isTable: boolean; tableMarkdown?: string }
+  onTableChange: (payload: { html: string; markdown: string }) => void
+  editorRef: (editor: Editor | null) => void
+}) => {
+  const [tableHtml, setTableHtml] = useState<string>(() => {
+    // Initialize with existing HTML if available
+    if (blockHtml && blockHtml.includes("<table")) {
+      return blockHtml
+    }
+    return ""
+  })
+  const [isConverting, setIsConverting] = useState(false)
+  const hasConvertedRef = useRef(false)
+  
+  // Use stable initial content - only update if blockHtml actually changed significantly
+  // MUST be called before any early returns to follow rules of hooks
+  const stableInitialContent = useMemo(() => {
+    // Prefer local state (tableHtml) which is only updated when we convert or user edits
+    // Only fall back to blockHtml if tableHtml is empty
+    if (tableHtml && tableHtml.includes("<table")) {
+      return tableHtml
+    }
+    if (blockHtml && blockHtml.includes("<table")) {
+      return blockHtml
+    }
+    return ""
+  }, [tableHtml, blockHtml]) // Include blockHtml in deps for initial load
+  
+  // Stable onChange handler - memoized to prevent re-renders
+  // MUST be called before any early returns to follow rules of hooks
+  const handleChange = useCallback((payload: { html: string; markdown: string }) => {
+    setTableHtml(payload.html) // Update local state
+    onTableChange(payload)
+  }, [onTableChange])
+  
+  useEffect(() => {
+    // Only convert once
+    if (hasConvertedRef.current) return
+    
+    // If we have HTML table already, use it
+    if (blockHtml && blockHtml.includes("<table")) {
+      setTableHtml(blockHtml)
+      hasConvertedRef.current = true
+      return
+    }
+    
+    // If we detected a markdown table, convert it (only once)
+    if (detectedTable.isTable && detectedTable.tableMarkdown && !hasConvertedRef.current) {
+      hasConvertedRef.current = true
+      setIsConverting(true)
+      convertMarkdownTableToHTML(detectedTable.tableMarkdown).then((html) => {
+        if (html && html.includes("<table")) {
+          setTableHtml(html)
+          // Save the converted HTML immediately
+          onTableChange({
+            html: html,
+            markdown: detectedTable.tableMarkdown || "",
+          })
+        }
+        setIsConverting(false)
+      }).catch((error) => {
+        console.error("Failed to convert markdown table:", error)
+        setIsConverting(false)
+      })
+    }
+  }, [blockHtml, detectedTable, onTableChange]) // Include dependencies
+  
+  // Early returns AFTER all hooks
+  if (isConverting) {
+    return (
+      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[200px] flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Converting markdown table...</p>
+      </div>
+    )
+  }
+  
+  if (!stableInitialContent || !stableInitialContent.includes("<table")) {
+    return (
+      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[200px]">
+        <p className="text-sm text-muted-foreground">No table content</p>
+      </div>
+    )
+  }
+  
+  return (
+    <AdvancedTableEditor
+      key={blockId} // Use blockId as key to prevent re-creation
+      initialContent={stableInitialContent}
+      initialFormat="html"
+      onChange={handleChange}
+      className="min-h-[200px]"
+      showToolbar={false}
+      editorRef={editorRef}
+    />
+  )
+})
+
+TableBlockEditor.displayName = "TableBlockEditor"
+
+// Helper to convert markdown to HTML for text blocks
+async function convertMarkdownToHTML(markdown: string): Promise<string> {
+  try {
+    if (!markdown || !markdown.trim()) {
+      return "<p></p>"
+    }
+    
+    // If markdown already looks like HTML, return it
+    if (markdown.trim().startsWith("<")) {
+      return markdown.trim()
+    }
+    
+    const file = await unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkRehype, { allowDangerousHtml: true })
+      .use(rehypeStringify, { allowDangerousHtml: true })
+      .process(markdown)
+    
+    let html = String(file)
+    html = html.replace(/^<html[^>]*>/, '').replace(/<\/html>$/, '')
+    html = html.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '')
+    html = html.trim()
+    
+    // Ensure we have valid HTML
+    if (!html || html === "") {
+      html = `<p>${markdown.replace(/\n/g, '<br>')}</p>`
+    }
+    
+    return html
+  } catch (error) {
+    console.error("Error converting markdown to HTML:", error)
+    // Fallback: convert markdown to HTML manually
+    let fallback = markdown
+    
+    // Convert headings first (before other conversions)
+    // Process from most specific (H6) to least specific (H1) to avoid conflicts
+    // H6: ###### Heading (6 hashes)
+    fallback = fallback.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>')
+    // H5: ##### Heading (5 hashes)
+    fallback = fallback.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>')
+    // H4: #### Heading (4 hashes)
+    fallback = fallback.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
+    // H3: ### Heading (3 hashes)
+    fallback = fallback.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+    // H2: ## Heading (2 hashes)
+    fallback = fallback.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+    // H1: # Heading (1 hash - must be last to avoid matching others)
+    fallback = fallback.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
+    
+    // Convert bold and italic
+    fallback = fallback.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    fallback = fallback.replace(/\*(.*?)\*/g, '<em>$1</em>')
+    
+    // Convert line breaks - preserve paragraph structure
+    // Split by double newlines to create paragraphs
+    const paragraphs = fallback.split(/\n\n+/)
+    const htmlParagraphs = paragraphs.map(p => {
+      const trimmed = p.trim()
+      if (!trimmed) return ''
+      // If it's already a heading, return as-is
+      if (trimmed.match(/^<h[1-6]>/)) {
+        return trimmed
+      }
+      // Otherwise, wrap in paragraph and convert single newlines to <br>
+      return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`
+    }).filter(p => p).join('')
+    
+    return htmlParagraphs || '<p></p>'
+  }
+}
+
+// Component to handle markdown-to-HTML conversion for text blocks
+const TextBlockEditor = memo(({
+  blockId,
+  blockHtml,
+  blockMarkdown,
+  onChange,
+  editorRef,
+  placeholder,
+  className,
+}: {
+  blockId: string
+  blockHtml: string
+  blockMarkdown: string
+  onChange: (html: string) => void
+  editorRef: (editor: Editor | null) => void
+  placeholder?: string
+  className?: string
+}) => {
+  const [isConverting, setIsConverting] = useState(false)
+  const [convertedHtml, setConvertedHtml] = useState<string>("")
+  const hasConvertedRef = useRef<string>("") // Track which markdown we've converted
+  
+  // Determine if we need to convert markdown
+  const needsConversion = useMemo(() => {
+    // Check if blockHtml is actually HTML (starts with <) or just empty/placeholder
+    const hasValidHtml = blockHtml && 
+      blockHtml.trim() && 
+      blockHtml !== "<p></p>" && 
+      blockHtml !== "<p><br></p>" &&
+      blockHtml.trim().startsWith("<") // Must be actual HTML, not markdown
+    
+    // If we have valid HTML, no conversion needed
+    if (hasValidHtml) {
+      return false
+    }
+    
+    // If we have markdown but no valid HTML, we need to convert
+    if (blockMarkdown && blockMarkdown.trim()) {
+      return true
+    }
+    return false
+  }, [blockHtml, blockMarkdown])
+  
+  // Convert markdown to HTML when needed
+  useEffect(() => {
+    // Reset conversion flag if markdown changed
+    if (hasConvertedRef.current !== blockMarkdown) {
+      hasConvertedRef.current = ""
+    }
+    
+    if (!needsConversion || !blockMarkdown || !blockMarkdown.trim()) {
+      return
+    }
+    
+    // Skip if we've already converted this exact markdown
+    if (hasConvertedRef.current === blockMarkdown) {
+      return
+    }
+    
+    // Convert markdown to HTML
+    hasConvertedRef.current = blockMarkdown
+    setIsConverting(true)
+    
+    if (process.env.NODE_ENV === "development") {
+      console.log("[TextBlockEditor] Converting markdown to HTML:", {
+        blockId,
+        markdownLength: blockMarkdown.length,
+        markdownPreview: blockMarkdown.substring(0, 100),
+      })
+    }
+    
+    convertMarkdownToHTML(blockMarkdown).then((html) => {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[TextBlockEditor] Conversion successful:", {
+          blockId,
+          htmlLength: html.length,
+          htmlPreview: html.substring(0, 200),
+        })
+      }
+      setConvertedHtml(html)
+      // Save the converted HTML immediately
+      onChange(html)
+      setIsConverting(false)
+    }).catch((error) => {
+      console.error("[TextBlockEditor] Failed to convert markdown to HTML:", error)
+      setIsConverting(false)
+      hasConvertedRef.current = "" // Allow retry
+    })
+  }, [needsConversion, blockMarkdown, blockId, onChange])
+  
+  // Use converted HTML if available, otherwise use blockHtml
+  const contentToRender = useMemo(() => {
+    // If we have converted HTML, use it
+    if (convertedHtml && convertedHtml.trim() && convertedHtml !== "<p></p>") {
+      return convertedHtml
+    }
+    
+    // Only use blockHtml if it's actual HTML (starts with <)
+    if (blockHtml && blockHtml.trim() && blockHtml !== "<p></p>" && blockHtml.trim().startsWith("<")) {
+      return blockHtml
+    }
+    
+    // If we're converting, show empty until conversion completes
+    if (isConverting) {
+      return "<p></p>"
+    }
+    
+    return "<p></p>"
+  }, [convertedHtml, blockHtml, isConverting])
+  
+  // Show loading state while converting
+  if (isConverting) {
+    return (
+      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[100px] flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Converting markdown...</p>
+      </div>
+    )
+  }
+  
+  return (
+    <RichTextEditor
+      content={contentToRender}
+      onChange={onChange}
+      editorRef={editorRef}
+      placeholder={placeholder}
+      className={className}
+    />
+  )
+})
+
+TextBlockEditor.displayName = "TextBlockEditor"
 
 interface ExplanationBlockEditorProps {
   blocks: ContentBlock[]
@@ -47,6 +399,183 @@ export default function ExplanationBlockEditor({
   editorRefs,
 }: ExplanationBlockEditorProps) {
   const textBlockEditorRefs = editorRefs.textBlocks
+  
+  // Track which blocks have been converted to prevent re-conversion
+  const convertedBlocksRef = useRef<Set<string>>(new Set())
+  
+  // Helper function to detect markdown tables (copied from rich-content-editor.tsx)
+  const detectMarkdownTable = useCallback((markdown: string): { isTable: boolean; tableMarkdown?: string } => {
+    if (!markdown || typeof markdown !== "string") {
+      return { isTable: false }
+    }
+
+    let normalizedMarkdown = markdown.trim()
+    
+    if (normalizedMarkdown.includes("<")) {
+      normalizedMarkdown = normalizedMarkdown
+        .replace(/<p[^>]*>/gi, '\n')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<div[^>]*>/gi, '\n')
+        .replace(/<\/div>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .trim()
+    }
+
+    // Check for table row patterns
+    const tableRowPattern = /\|\s*[^|]+\s*\|\s*[^|]+\s*\|/g
+    const allTableMatches = [...normalizedMarkdown.matchAll(tableRowPattern)]
+    
+    // Single-line table detection
+    if (allTableMatches.length >= 3 && normalizedMarkdown.split("\n").filter(l => l.trim()).length <= 3) {
+      let tableText = normalizedMarkdown.trim()
+      const separatorPattern = /\|\s*[-:]+\s*\|/
+      const hasSeparator = separatorPattern.test(tableText)
+      
+      if (hasSeparator) {
+        const parts = tableText.split(separatorPattern)
+        if (parts.length >= 2) {
+          const header = parts[0].trim()
+          const dataRows = parts.slice(1).join("").trim()
+          
+          let headerRow = header
+          if (!headerRow.startsWith("|")) headerRow = "| " + headerRow
+          if (!headerRow.endsWith("|")) headerRow = headerRow + " |"
+          
+          const sepCols = (headerRow.match(/\|/g) || []).length - 1
+          const separator = "| " + Array(sepCols).fill("---").join(" | ") + " |"
+          
+          const dataParts = dataRows.split(/\s*\|\s*\|\s*/).filter(p => p.trim() && p.includes("|"))
+          const dataRowsFormatted = dataParts.map(row => {
+            row = row.trim()
+            if (!row.startsWith("|")) row = "| " + row
+            if (!row.endsWith("|")) row = row + " |"
+            return row
+          })
+          
+          const tableMarkdown = [headerRow, separator, ...dataRowsFormatted].join("\n")
+          
+          console.log("[ExplanationBlockEditor] Detected single-line table:", {
+            original: normalizedMarkdown.substring(0, 300),
+            tableMarkdownPreview: tableMarkdown.substring(0, 300),
+          })
+          
+          return { isTable: true, tableMarkdown }
+        }
+      } else {
+        const splitByBoundary = tableText.split(/\s*\|\s*\|\s*/).filter(p => p.trim() && p.includes("|"))
+        if (splitByBoundary.length >= 2) {
+          const rows = splitByBoundary.map((row, idx) => {
+            row = row.trim()
+            if (!row.startsWith("|")) row = "| " + row
+            if (!row.endsWith("|")) row = row + " |"
+            return row
+          })
+          
+          const colCount = (rows[0].match(/\|/g) || []).length - 1
+          const separator = "| " + Array(colCount).fill("---").join(" | ") + " |"
+          const tableMarkdown = [rows[0], separator, ...rows.slice(1)].join("\n")
+          
+          console.log("[ExplanationBlockEditor] Detected single-line table without separator:", {
+            original: normalizedMarkdown.substring(0, 300),
+            tableMarkdownPreview: tableMarkdown.substring(0, 300),
+          })
+          
+          return { isTable: true, tableMarkdown }
+        }
+      }
+    }
+
+    // Multi-line table detection
+    const lines = normalizedMarkdown.split("\n")
+    const tableLines: string[] = []
+    let inTable = false
+    let tableStartIndex = -1
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      const trimmed = line.trim()
+      
+      if (trimmed.startsWith("|") && trimmed.includes("|", 1)) {
+        if (!inTable) {
+          inTable = true
+          tableStartIndex = i
+        }
+        tableLines.push(line)
+      } else if (trimmed.match(/^\|[\s\-\|:]+\|$/)) {
+        if (inTable) {
+          tableLines.push(line)
+        }
+      } else if (trimmed.match(/^\|[\s\-:]+\|$/)) {
+        if (inTable) {
+          tableLines.push(line)
+        }
+      } else {
+        if (inTable) {
+          break
+        }
+      }
+    }
+
+    if (tableLines.length >= 2) {
+      const nonTableLines = lines.filter((line, idx) => {
+        const trimmed = line.trim()
+        return idx < tableStartIndex || idx >= tableStartIndex + tableLines.length
+      }).filter(line => line.trim() !== "").length
+
+      const isPrimaryTable = tableStartIndex === 0 || 
+                             (tableLines.length >= 2 && nonTableLines <= 3) ||
+                             (tableLines.length >= 3)
+      
+      if (isPrimaryTable) {
+        const tableMarkdown = tableLines.join("\n")
+        
+        console.log("[ExplanationBlockEditor] Detected multi-line table:", {
+          tableLinesCount: tableLines.length,
+          tableMarkdownPreview: tableMarkdown.substring(0, 300),
+        })
+        
+        return { isTable: true, tableMarkdown }
+      }
+    }
+
+    return { isTable: false }
+  }, [])
+  
+  // Helper to convert markdown table to HTML
+  const markdownTableToHTML = useCallback(async (markdown: string): Promise<string> => {
+    try {
+      if (!markdown || !markdown.trim()) {
+        return ""
+      }
+      
+      const file = await unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeStringify, { allowDangerousHtml: true })
+        .process(markdown)
+      
+      let html = String(file)
+      html = html.replace(/^<html[^>]*>/, '').replace(/<\/html>$/, '')
+      html = html.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '')
+      html = html.trim()
+      
+      if (html.includes("<table")) {
+        const tableMatch = html.match(/<table[\s\S]*?<\/table>/i)
+        if (tableMatch) {
+          return tableMatch[0]
+        }
+      }
+      
+      return html
+    } catch (error) {
+      console.error("Error converting markdown table to HTML:", error)
+      return ""
+    }
+  }, [])
+  
   const handleBlockChange = useCallback(
     (index: number, html: string) => {
       const newBlocks = [...blocks]
@@ -54,18 +583,25 @@ export default function ExplanationBlockEditor({
       if (newBlocks[index].type === "text") {
         // Preserve all HTML formatting (bold, italic, font-size, font-family, colors, etc.)
         // TipTap generates HTML with inline styles that must be preserved
+        // CRITICAL: Always save HTML so preview/view mode can render it
         newBlocks[index] = {
           ...newBlocks[index],
           data: {
             ...newBlocks[index].data,
-            html: html, // Preserve the full HTML with all inline styles
+            html: html, // Always save HTML - this is what preview/view mode uses
+            // Keep existing markdown for backward compatibility, but HTML takes priority
             markdown: newBlocks[index].data.markdown || "",
           },
         }
         
-        // Debug: Log when formatting is detected
-        if (process.env.NODE_ENV === "development" && (html.includes('style=') || html.includes('font-size') || html.includes('font-family'))) {
-          console.log("handleBlockChange: Preserving HTML with formatting:", html.substring(0, 300))
+        // Debug: Log when content is updated
+        if (process.env.NODE_ENV === "development") {
+          console.log("[handleBlockChange] Updating text block:", {
+            blockId: newBlocks[index].id,
+            htmlLength: html.length,
+            hasMarkdown: !!newBlocks[index].data.markdown,
+            htmlPreview: html.substring(0, 200),
+          })
         }
         
         onChange(newBlocks)
@@ -150,7 +686,22 @@ export default function ExplanationBlockEditor({
       // Preserve existing block IDs when converting HTML back to blocks
       const existingBlocks = perAnswerExplanations[choiceLabel] || []
       const newBlocks = htmlToBlocks(html, existingBlocks)
-      onPerAnswerExplanationChange(choiceLabel, newBlocks)
+      // Ensure HTML is saved in each block's data
+      const blocksWithHtml = newBlocks.map((block) => {
+        if (block.type === "text") {
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              html: html, // Save the HTML content
+              // Preserve markdown if it exists, otherwise extract from HTML
+              markdown: block.data?.markdown || "",
+            },
+          }
+        }
+        return block
+      })
+      onPerAnswerExplanationChange(choiceLabel, blocksWithHtml)
     },
     [onPerAnswerExplanationChange, perAnswerExplanations]
   )
@@ -256,6 +807,9 @@ export default function ExplanationBlockEditor({
                       <PerAnswerExplanationEditor
                         blocks={perAnswerBlocks}
                         onChange={(html) => handlePerAnswerBlockChange(choice.label, html)}
+                        onBlocksChange={(updatedBlocks) => {
+                          onPerAnswerExplanationChange(choice.label, updatedBlocks)
+                        }}
                         editorRef={(editor) => {
                           editorRefs.perAnswer.current[choice.label] = editor
                           if (editor) {
@@ -277,10 +831,51 @@ export default function ExplanationBlockEditor({
         }
 
         // Regular text block or table block
-        const blockHtml = block.data?.html || block.data?.tableHtml || block.data?.markdown || (block.type === "table" ? "" : "<p></p>")
+        // Only use actual HTML, not markdown (markdown should be converted separately)
+        const blockHtml = block.data?.html || block.data?.tableHtml || (block.type === "table" ? "" : "<p></p>")
+        const blockMarkdown = block.data?.markdown || ""
         const blockActiveSection = `explanation-block-${block.id}`
         const isTextBlockActive = activeSection === blockActiveSection
+        
+        // Check if this is a table block OR if text block contains a markdown table
         const isTableBlock = block.type === "table"
+        const hasTableInHtml = blockHtml && typeof blockHtml === "string" && blockHtml.includes("<table")
+        
+        // Check if text block contains markdown table
+        let detectedTable: { isTable: boolean; tableMarkdown?: string } = { isTable: false }
+        let shouldRenderAsTable = isTableBlock || hasTableInHtml
+        
+        if (!shouldRenderAsTable && block.type === "text") {
+          // Extract markdown from HTML if needed
+          let contentToCheck = blockMarkdown
+          if (!contentToCheck || contentToCheck.trim().length < 10) {
+            contentToCheck = blockHtml
+              .replace(/<p[^>]*>/gi, '\n')
+              .replace(/<\/p>/gi, '\n')
+              .replace(/<br\s*\/?>/gi, '\n')
+              .replace(/<div[^>]*>/gi, '\n')
+              .replace(/<\/div>/gi, '\n')
+              .replace(/&nbsp;/gi, ' ')
+              .replace(/<[^>]+>/g, '')
+              .replace(/\n\n+/g, '\n')
+              .trim()
+          }
+          
+          detectedTable = detectMarkdownTable(contentToCheck)
+          shouldRenderAsTable = detectedTable.isTable
+          
+          console.log("[ExplanationBlockEditor] Text block analysis:", {
+            blockId: block.id,
+            blockType: block.type,
+            hasMarkdown: !!blockMarkdown,
+            hasHtml: !!blockHtml,
+            htmlContainsTable: hasTableInHtml,
+            contentToCheckLength: contentToCheck.length,
+            detectedTable,
+            shouldRenderAsTable,
+            contentPreview: contentToCheck.substring(0, 300),
+          })
+        }
         
         return (
           <Card
@@ -291,7 +886,7 @@ export default function ExplanationBlockEditor({
           >
             <div className="flex items-center justify-between">
               <Label className="text-xs text-muted-foreground dark:text-gray-300">
-                {block.type === "text" ? "Text Block" : block.type === "table" ? "Table Block" : "Content Block"}
+                {block.type === "table" ? "Table Block" : block.type === "text" ? "Text Block" : "Content Block"}
               </Label>
               <div className="flex items-center gap-1">
                 <Button
@@ -330,17 +925,34 @@ export default function ExplanationBlockEditor({
                 onSectionChange(blockActiveSection)
               }}
             >
-              {isTableBlock ? (
-                <AdvancedTableEditor
-                  initialContent={blockHtml}
-                  initialFormat="html"
-                  onChange={(payload) => handleTableBlockChange(index, payload)}
-                  className="min-h-[200px]"
-                  showToolbar={false}
+              {shouldRenderAsTable ? (
+                <TableBlockEditor
+                  key={`table-${block.id}`}
+                  blockId={block.id}
+                  blockHtml={blockHtml}
+                  detectedTable={detectedTable}
+                  onTableChange={(payload) => {
+                    if (block.type === "table") {
+                      handleTableBlockChange(index, payload)
+                    } else {
+                      // Keep as text block, just update the HTML/markdown with table content
+                      const newBlocks = [...blocks]
+                      newBlocks[index] = {
+                        ...newBlocks[index],
+                        type: "text", // Keep as text block
+                        data: {
+                          ...newBlocks[index].data,
+                          html: payload.html, // Update HTML with table
+                          markdown: payload.markdown || detectedTable.tableMarkdown || blockMarkdown,
+                          tableHtml: payload.html, // Also store as tableHtml for compatibility
+                        },
+                      }
+                      onChange(newBlocks)
+                    }
+                  }}
                   editorRef={(editor) => {
                     textBlockEditorRefs.current[block.id] = editor
                     if (editor) {
-                      // Set up focus handler
                       editor.on("focus", () => {
                         onSectionChange(blockActiveSection)
                       })
@@ -348,8 +960,10 @@ export default function ExplanationBlockEditor({
                   }}
                 />
               ) : (
-              <RichTextEditor
-                content={blockHtml}
+              <TextBlockEditor
+                blockId={block.id}
+                blockHtml={blockHtml}
+                blockMarkdown={blockMarkdown}
                 onChange={(html) => handleBlockChange(index, html)}
                 editorRef={(editor) => {
                   textBlockEditorRefs.current[block.id] = editor

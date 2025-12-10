@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import QuestionList from "./question-list"
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
   const [parsedMarkdownData, setParsedMarkdownData] = useState<any>(null)
   const [showNewQuestionMenu, setShowNewQuestionMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  const questionsService = new QuestionsService()
+  const questionsService = useMemo(() => new QuestionsService(), [])
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -230,11 +230,18 @@ export default function AdminDashboard() {
       
       // Transform block types to lowercase and ensure proper structure
       if (block.type === "TEXT") {
+        const blockData = block.data || {}
+        // Ensure HTML and markdown are preserved
+        // If we have markdown but no HTML, the editor will convert it
         return {
-          // Don't include id - backend doesn't accept it during creation
+          id: block.id || `text-${Date.now()}-${index}`, // Preserve ID if available
           type: "text",
           order: typeof block.order === "number" ? block.order : index,
-          data: block.data || {},
+          data: {
+            html: blockData.html || "", // Preserve HTML if available
+            markdown: blockData.markdown || blockData.content || "", // Preserve markdown
+            ...blockData, // Preserve other fields
+          },
         }
       } else if (block.type === "TABLE") {
         return {
@@ -287,6 +294,32 @@ export default function AdminDashboard() {
               blockData = { ...block.data }
             } else if (block.data) {
               blockData = { content: block.data }
+            }
+            
+            // Handle table blocks - ensure html is preserved from tableHtml
+            if (blockType === "table") {
+              // If we have tableHtml from backend, also set it as html for frontend
+              if (blockData.tableHtml && !blockData.html) {
+                blockData.html = blockData.tableHtml
+              }
+            }
+            
+            // Handle text blocks - check if markdown contains a table and convert it
+            if (blockType === "text" && blockData.markdown) {
+              // Check if markdown contains a table
+              const markdownText = typeof blockData.markdown === "string" ? blockData.markdown : ""
+              if (markdownText.includes("|") && markdownText.match(/^\|.+\|/m)) {
+                // Markdown table detected - ensure we have HTML version
+                // If HTML is missing or contains raw markdown, we'll convert it in the editor
+                if (!blockData.html || (blockData.html.includes("|") && !blockData.html.includes("<table"))) {
+                  // HTML is missing or contains raw markdown - will be converted in editor
+                  // Keep markdown for now, editor will handle conversion
+                }
+              }
+              // Also preserve tableHtml for backward compatibility
+              if (blockData.html && !blockData.tableHtml) {
+                blockData.tableHtml = blockData.html
+              }
             }
             
             // Handle image blocks - ensure images array is properly formatted
@@ -364,58 +397,47 @@ export default function AdminDashboard() {
             .map((b: any) => {
               if (b.type === "TEXT") {
                 const blockData = b.data || {}
-                // Ensure html field exists - use markdown or content as fallback
-                let html = blockData.html || ""
-                if (!html && blockData.markdown) {
-                  // If markdown looks like HTML, use it directly
-                  if (blockData.markdown.trim().startsWith("<")) {
-                    html = blockData.markdown
-                  } else {
-                    // Otherwise, wrap in paragraph
-                    html = `<p>${blockData.markdown}</p>`
-                  }
-                } else if (!html && blockData.content) {
-                  const content = blockData.content
-                  if (typeof content === "string") {
-                    if (content.trim().startsWith("<")) {
-                      html = content
-                    } else {
-                      html = `<p>${content}</p>`
-                    }
-                  }
-                }
-                
+                // Ensure HTML and markdown are preserved
+                // If we have markdown but no HTML, the editor will convert it
                 return {
-                  id: b.id || `text-${Date.now()}-${Math.random()}`,
+                  id: b.id || `text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   type: "text",
                   order: typeof b.order === "number" ? b.order : 0,
                   data: {
-                    html: html || "<p></p>", // Always ensure html field exists
-                    markdown: blockData.markdown || blockData.content || (typeof blockData === "string" ? blockData : ""),
+                    html: blockData.html || "", // Preserve HTML if available
+                    markdown: blockData.markdown || blockData.content || "", // Preserve markdown
+                    ...blockData, // Preserve other fields
                   },
                 }
               } else if (b.type === "TABLE") {
+                const tableBlockData = b.data || {}
                 return {
-                  id: b.id || `table-${Date.now()}-${Math.random()}`,
+                  id: b.id || `table-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   type: "table",
                   order: typeof b.order === "number" ? b.order : 0,
-                  data: b.data || {},
+                  data: {
+                    html: tableBlockData.html || tableBlockData.tableHtml || "",
+                    tableHtml: tableBlockData.tableHtml || tableBlockData.html || "",
+                    markdown: tableBlockData.markdown || "",
+                    ...tableBlockData,
+                  },
                 }
               } else if (b.type === "IMAGES") {
                 return {
-                  id: b.id || `images-${Date.now()}-${Math.random()}`,
+                  id: b.id || `images-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   type: "images",
                   order: typeof b.order === "number" ? b.order : 0,
-                  data: b.data || {},
+                  data: blockData,
                 }
               }
-              return null
+              // Default fallback
+              return {
+                id: b.id || `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                type: "text",
+                order: typeof b.order === "number" ? b.order : 0,
+                data: blockData,
+              }
             })
-            .filter((b: any) => b !== null)
-          
-          if (transformedBlocks.length > 0) {
-            transformedPerAnswerExplanations[pae.choiceLabel] = transformedBlocks
-          }
         } else {
           // Simple text explanation - convert to text blocks for consistency
           const textBlocks = blocks
@@ -438,22 +460,20 @@ export default function AdminDashboard() {
           
           if (textBlocks.length > 0) {
             // Convert text strings to text blocks
-            // Ensure html field is set - if text looks like HTML, use it; otherwise wrap in paragraph
+            // Don't wrap markdown in HTML - let the editor convert it properly
+            // If text is already HTML, use it; otherwise leave html empty so markdown conversion happens
             transformedPerAnswerExplanations[pae.choiceLabel] = textBlocks.map((text: string, idx: number) => {
-              let html = ""
-              if (text.trim().startsWith("<")) {
-                html = text // Already HTML
-              } else {
-                html = `<p>${text}</p>` // Wrap markdown/text in paragraph
-              }
+              // Check if text is already HTML
+              const isHtml = text.trim().startsWith("<") && text.trim().includes(">")
               
               return {
                 id: `text-${Date.now()}-${idx}-${Math.random()}`,
                 type: "text",
                 order: idx,
                 data: { 
-                  html: html,
-                  markdown: text,
+                  // Only set html if it's already HTML, otherwise leave empty for markdown conversion
+                  html: isHtml ? text : "",
+                  markdown: text, // Always preserve markdown
                 },
               }
             })
@@ -859,12 +879,17 @@ export default function AdminDashboard() {
             }
           }
           // Ensure table blocks have tableHtml
-          if (blockWithoutId.type === "TABLE" && !cleanedData.tableHtml && cleanedData.html) {
-            cleanedData.tableHtml = cleanedData.html
-            delete cleanedData.html
-          }
-          if (blockWithoutId.type === "TABLE" && !cleanedData.tableHtml) {
-            cleanedData.tableHtml = "<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>"
+          if (blockWithoutId.type === "TABLE") {
+            // If we have html, use it as tableHtml (but keep html too for frontend)
+            if (cleanedData.html && !cleanedData.tableHtml) {
+              cleanedData.tableHtml = cleanedData.html
+            }
+            // Preserve cells data even if we have HTML - cells are useful for editing
+            // Only create empty table HTML if we have absolutely nothing
+            if (!cleanedData.tableHtml && !cleanedData.html && (!cleanedData.cells || Object.keys(cleanedData.cells || {}).length === 0)) {
+              cleanedData.tableHtml = "<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>"
+            }
+            // Keep both html and tableHtml for compatibility - don't delete html
           }
           blockWithoutId.data = cleanedData
         }
@@ -958,32 +983,59 @@ export default function AdminDashboard() {
     } as any
   }
 
-  useEffect(() => {
-    // Check authentication before loading questions
-    if (authService.isAuthenticated()) {
-      loadQuestions()
-    } else {
-      setLoading(false)
-      setError("Please log in to access the admin dashboard.")
-      // Show demo question as fallback
-      setQuestions([DEMO_QUESTION])
-    }
-  }, [])
-
-  const loadQuestions = async () => {
+  const loadQuestions = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await questionsService.getQuestions({ 
-        status: "ACTIVE",
-        limit: 100 // Changed from 1000 to 100
-      })
       
-      const questionsData = Array.isArray(response) 
-        ? response 
-        : (response as any)?.data || []
+      // Load all questions using pagination (like student mode)
+      console.log("🔍 Starting to load all questions from database...")
       
-      const transformedQuestions = questionsData.map(transformBackendToFrontend)
+      const cacheBuster = Date.now()
+      let page = 1
+      const limit = 100
+      let hasMore = true
+      let allQuestions: any[] = []
+
+      while (hasMore && page <= 50) { // Increased max pages to 50 (5000 questions max)
+        console.log(`📄 Fetching page ${page}...`)
+
+        const response = await questionsService.getQuestions({ 
+          status: "ACTIVE",
+          page,
+          limit,
+          sortBy: "createdAt",
+          sortOrder: "desc", // Show newest first in admin
+          _t: cacheBuster,
+        })
+        
+        const questionsData = Array.isArray(response) 
+          ? response 
+          : (response as any)?.data || []
+        
+        allQuestions = [...allQuestions, ...questionsData]
+        
+        if (Array.isArray(response)) {
+          hasMore = questionsData.length === limit
+        } else {
+          const pagination = (response as any)?.pagination
+          if (pagination) {
+            hasMore = page < pagination.totalPages
+          } else {
+            hasMore = questionsData.length === limit
+          }
+        }
+        
+        if (questionsData.length === 0) {
+          hasMore = false
+        }
+        
+        page++
+      }
+      
+      console.log(`✅ Loaded ${allQuestions.length} total questions from database`)
+      
+      const transformedQuestions = allQuestions.map(transformBackendToFrontend)
       
       if (transformedQuestions.length === 0) {
         // If no questions in DB, show demo question as fallback
@@ -1012,7 +1064,51 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [questionsService])
+
+  useEffect(() => {
+    // Check authentication before loading questions
+    if (authService.isAuthenticated()) {
+      loadQuestions()
+    } else {
+      setLoading(false)
+      setError("Please log in to access the admin dashboard.")
+      // Show demo question as fallback
+      setQuestions([DEMO_QUESTION])
+    }
+  }, [loadQuestions])
+
+  // Listen for question updates from other tabs/components
+  useEffect(() => {
+    const handleQuestionUpdate = () => {
+      console.log("🔄 Question update detected, refreshing list...")
+      if (authService.isAuthenticated()) {
+        loadQuestions()
+      }
+    }
+
+    // Listen for both event types
+    window.addEventListener("questionUpdated", handleQuestionUpdate)
+    window.addEventListener("questionsUpdated", handleQuestionUpdate)
+
+    // Also listen for storage changes (cross-tab updates)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "questionsUpdated") {
+        console.log("🔄 Question update detected from another tab, refreshing list...")
+        if (authService.isAuthenticated()) {
+          loadQuestions()
+        }
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+
+    return () => {
+      window.removeEventListener("questionUpdated", handleQuestionUpdate)
+      window.removeEventListener("questionsUpdated", handleQuestionUpdate)
+      window.removeEventListener("storage", handleStorageChange)
+    }
+  }, [loadQuestions])
 
   const handleSaveQuestion = async (questionData: QuestionCreatorData) => {
     try {

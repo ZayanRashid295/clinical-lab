@@ -1196,15 +1196,16 @@ export class QuestionsService {
       }
 
     // Return URL (adjust based on your server configuration)
-    const baseUrl = process.env.API_URL || "http://localhost:3000";
-      const url = `${baseUrl}/uploads/${finalFilename}`;
+    // Use API_URL if set, otherwise construct from request origin or use default
+    const baseUrl = process.env.API_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+    const url = `${baseUrl}/uploads/${finalFilename}`;
 
     return { url };
     } catch (error) {
       console.error("Error processing image:", error);
       // Fallback to saving original file if processing fails
       fs.writeFileSync(filepath, file.buffer);
-      const baseUrl = process.env.API_URL || "http://localhost:3000";
+      const baseUrl = process.env.API_URL || process.env.FRONTEND_URL || "http://localhost:3000";
       const url = `${baseUrl}/uploads/${filename}`;
       return { url };
     }

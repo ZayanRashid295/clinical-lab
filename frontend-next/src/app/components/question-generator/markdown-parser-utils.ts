@@ -386,8 +386,12 @@ export function parseMarkdown(content: string): ParsedQuestion {
           // Stop at any new major section (##) - this includes "## Management Approach" and similar
           // Only stop at ## (not ###), as ### can be part of the explanation content
           if (currentLine.match(/^##\s+/) && !currentLine.match(/^###\s+/)) {
-            // But don't stop at excluded sections that we've already processed
-            if (!currentLine.match(/^##\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)) {
+            // Always stop at "## Explanation" - that's the main explanation section, not part of per-answer explanation
+            if (currentLine.match(/^##\s+Explanation/i)) {
+              break
+            }
+            // Stop at other major sections, but don't stop at excluded sections that might appear within per-answer explanations
+            if (!currentLine.match(/^##\s+(Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)) {
               break
             }
           }
@@ -734,75 +738,53 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       })
       continue
     }
-    // Handle markdown tables
-    else if (trimmed.startsWith("|")) {
-      if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
-      const tableLines: string[][] = []
-      while (i < lines.length && lines[i].trim().startsWith("|")) {
-        const line = lines[i]
-        const cells = line
-          .split("|")
-          .slice(1, -1)
-          .map((cell) => cell.trim())
-        // Skip separator rows (rows that are all dashes or empty)
-        const isSeparatorRow = cells.length > 0 && (
-          cells.every(cell => cell.match(/^-+$/) || cell === "") ||
-          cells[0].match(/^-+$/)
-        )
-        if (cells.length > 0 && !isSeparatorRow) {
-          tableLines.push(cells)
-        }
+    // Handle markdown tables - keep them as part of text blocks instead of separate table blocks
+    else if (trimmed.startsWith("|") || trimmed.match(/^\|[\s\-\|:]+\|$/)) {
+      // Collect all table lines and add them to current text block
+      // This includes table rows (| col1 | col2 |) and separator rows (| --- | --- |)
+      const tableLines: string[] = []
+      let inTable = true
+      
+      while (i < lines.length && inTable) {
+        const currentLine = lines[i]
+        const currentTrimmed = currentLine.trim()
+        
+        // Check if it's a table row (starts and ends with |)
+        if (currentTrimmed.startsWith("|") && currentTrimmed.endsWith("|")) {
+          tableLines.push(currentLine)
+          i++
+        } 
+        // Check if it's a separator row (| --- | --- | or |--------|-------------|)
+        else if (currentTrimmed.match(/^\|[\s\-\|:]+\|$/)) {
+          tableLines.push(currentLine)
         i++
       }
-      if (tableLines.length > 0) {
-        // Convert markdown table format to editor format
-        const numRows = tableLines.length
-        const numCols = Math.max(...tableLines.map(row => row.length), 0)
-        const cells: Record<string, string> = {}
-        
-        // Populate cells object - row 0 is header, rows 1+ are data
-        tableLines.forEach((row, rowIdx) => {
-          row.forEach((cell, colIdx) => {
-            const cellKey = `${rowIdx}-${colIdx}`
-            // Preserve cell content, including empty cells - trim to remove extra whitespace
-            cells[cellKey] = (cell || "").trim()
-          })
-          // Fill in missing columns with empty strings
-          for (let colIdx = row.length; colIdx < numCols; colIdx++) {
-            const cellKey = `${rowIdx}-${colIdx}`
-            cells[cellKey] = ""
+        // Empty line might be part of table (some markdown allows blank lines in tables)
+        else if (currentTrimmed === "" && tableLines.length > 0) {
+          // If we have table lines and encounter empty line, check next line
+          // If next line is also a table line, include the empty line
+          if (i + 1 < lines.length) {
+            const nextTrimmed = lines[i + 1].trim()
+            if (nextTrimmed.startsWith("|") || nextTrimmed.match(/^\|[\s\-\|:]+\|$/)) {
+              tableLines.push(currentLine)
+              i++
+            } else {
+              inTable = false
+            }
+          } else {
+            inTable = false
           }
-        })
-        
-        // Debug: Log table parsing
-        if (process.env.NODE_ENV === "development") {
-          console.log("[TableParser] Parsed table:", {
-            rows: numRows,
-            cols: numCols,
-            cellCount: Object.keys(cells).length,
-            sampleCells: Object.entries(cells).slice(0, 6),
-          })
+        } else {
+          // Not a table line, stop collecting
+          inTable = false
         }
-        
-        blocks.push({
-          id: blockIdCounter++,
-          type: "table",
-          order: blockOrder++,
-          data: {
-            rows: numRows,
-            cols: numCols,
-            cells: cells,
-          },
-        })
       }
+      
+      // Add table lines to current text block (with newlines)
+      if (tableLines.length > 0) {
+        currentText += (currentText ? "\n" : "") + tableLines.join("\n")
+      }
+      // Don't increment i here since the while loop already did
       continue
     } else if (trimmed) {
       // Skip separator lines (---, --, etc.)

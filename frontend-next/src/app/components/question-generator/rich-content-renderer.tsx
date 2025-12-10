@@ -503,17 +503,73 @@ async function markdownToHTML(markdown: string): Promise<string> {
     // H1: # Heading
     fallback = fallback.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
     
-    // Convert bold and italic
-    fallback = fallback.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    fallback = fallback.replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Convert lists - handle text before lists properly
+    // First, split by double newlines to get paragraphs/sections
+    const sections = fallback.split(/\n\n+/)
+    const processedSections: string[] = []
     
-    // Convert line breaks
-    fallback = fallback.replace(/\n\n/g, '</p><p>')
-    fallback = fallback.replace(/\n/g, '<br>')
+    for (const section of sections) {
+      const lines = section.split('\n')
+      const processedLines: string[] = []
+      let inList = false
+      let currentParagraph: string[] = []
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
+        // Check if line starts with list marker (-, *, +)
+        const listMatch = line.match(/^([-*+])\s+(.+)$/)
+        
+        if (listMatch) {
+          // If we have accumulated paragraph text, output it first
+          if (currentParagraph.length > 0) {
+            processedLines.push(`<p>${currentParagraph.join(' ')}</p>`)
+            currentParagraph = []
+          }
+          
+          if (!inList) {
+            processedLines.push('<ul>')
+            inList = true
+          }
+          processedLines.push(`<li>${listMatch[2]}</li>`)
+        } else {
+          if (inList) {
+            processedLines.push('</ul>')
+            inList = false
+          }
+          if (line) {
+            currentParagraph.push(line)
+          }
+        }
+      }
+      
+      // Close list if still open
+      if (inList) {
+        processedLines.push('</ul>')
+      }
+      
+      // Output any remaining paragraph text
+      if (currentParagraph.length > 0) {
+        processedLines.push(`<p>${currentParagraph.join(' ')}</p>`)
+      }
+      
+      if (processedLines.length > 0) {
+        processedSections.push(processedLines.join('\n'))
+      }
+    }
     
-    // Wrap in paragraph if it doesn't start with a heading or paragraph tag
-    if (!fallback.trim().match(/^<(h[1-6]|p)/)) {
-      fallback = `<p>${fallback}</p>`
+    fallback = processedSections.join('\n')
+    
+    // Convert bold and italic (after lists, but process inside list items too)
+    // First convert **bold** (double asterisks) - must be done before single *
+    fallback = fallback.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+    // Then convert *italic* (single asterisks, but not inside **)
+    // Match *text* where text doesn't contain asterisks or newlines
+    fallback = fallback.replace(/(^|[^*])\*([^*\n]+?)\*([^*]|$)/g, '$1<em>$2</em>$3')
+    
+    // The list structure is already in place, no need to split again
+    // Just ensure we have valid HTML
+    if (!fallback || fallback.trim() === "") {
+      fallback = `<p>${markdown.replace(/\n/g, '<br>')}</p>`
     }
     
     return fallback
@@ -533,6 +589,12 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
   // Check if HTML is valid and not empty
   if (html && typeof html === "string") {
     const trimmedHtml = html.trim()
+    
+    // PRIORITY 1: If HTML contains a table, use it directly (don't convert)
+    if (trimmedHtml.includes("<table")) {
+      return <HtmlRenderer html={html} itemId={item.id} />
+    }
+    
     // Only use HTML if it's truly not empty (not just empty tags or whitespace)
     const isEmptyHtml = !trimmedHtml || 
       trimmedHtml === "<p></p>" || 
@@ -546,7 +608,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
     // This happens when markdown was saved as HTML without conversion
     // Extract inner text and check for markdown patterns
     const htmlInnerText = trimmedHtml.replace(/<[^>]+>/g, '').trim()
-    // More comprehensive markdown detection: bold, italic, links, lists, etc.
+    // More comprehensive markdown detection: bold, italic, links, lists, tables, etc.
     const markdownPatterns = [
       /\*\*[^*]+\*\*/,           // **bold**
       /\*[^*]+\*/,                // *italic* (not inside **)
@@ -558,6 +620,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
       /^#{1,6}\s/m,                // Headers
       /`[^`]+`/,                   // Inline code
       /```[\s\S]*?```/,           // Code blocks
+      /^\|.+\|/m,                  // Markdown tables (lines starting with |)
     ]
     const containsMarkdownSyntax = markdownPatterns.some(pattern => 
       pattern.test(htmlInnerText) || pattern.test(trimmedHtml)

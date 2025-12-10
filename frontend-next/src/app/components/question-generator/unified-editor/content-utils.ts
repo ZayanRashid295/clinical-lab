@@ -128,6 +128,7 @@ export async function blocksToHTMLAsync(blocks: ContentBlock[]): Promise<string>
     .map(async (block) => {
       // Get HTML from block data - prioritize html over markdown
       let html = block.data?.html || ""
+      const markdown = block.data?.markdown || ""
       
       // Check if HTML is empty or just empty tags
       const isEmptyHtml = !html || 
@@ -139,9 +140,22 @@ export async function blocksToHTMLAsync(blocks: ContentBlock[]): Promise<string>
         html.trim() === "<div></div>" ||
         html.trim() === "<div><br></div>"
       
-      // If HTML is empty but we have markdown, convert markdown to HTML
-      if (isEmptyHtml && block.data?.markdown) {
-        const markdown = block.data.markdown
+      // Check if HTML contains raw markdown syntax (like **bold**, *italic*, lists, etc.)
+      // This happens when markdown was saved as HTML without conversion
+      const htmlInnerText = html.replace(/<[^>]+>/g, '').trim()
+      const markdownPatterns = [
+        /\*\*[^*]+\*\*/,           // **bold**
+        /\*[^*\n]+\*/,              // *italic*
+        /^[-*+]\s/m,                // List items
+        /^\d+\.\s/m,                // Numbered lists
+        /^#{1,6}\s/m,               // Headers
+      ]
+      const containsMarkdownSyntax = !isEmptyHtml && markdownPatterns.some(pattern => 
+        pattern.test(htmlInnerText) || pattern.test(html)
+      )
+      
+      // If HTML is empty or contains markdown syntax, convert markdown to HTML
+      if ((isEmptyHtml || containsMarkdownSyntax) && markdown) {
         // If markdown looks like HTML (starts with <), use it directly
         if (markdown.trim().startsWith("<")) {
           html = markdown
@@ -149,17 +163,17 @@ export async function blocksToHTMLAsync(blocks: ContentBlock[]): Promise<string>
           // Convert markdown to HTML properly
           html = await markdownToHTML(markdown)
         }
-      }
-      
-      // If still no content, check for content field (legacy)
-      if (!html && block.data?.content) {
-        const content = block.data.content
-        if (typeof content === "string") {
-          if (content.trim().startsWith("<")) {
-            html = content
-          } else {
-            // Convert content as markdown if it's not HTML
-            html = await markdownToHTML(content)
+      } else if (isEmptyHtml && !markdown) {
+        // If HTML is empty and no markdown, check for content field (legacy)
+        if (block.data?.content) {
+          const content = block.data.content
+          if (typeof content === "string") {
+            if (content.trim().startsWith("<")) {
+              html = content
+            } else {
+              // Convert content as markdown if it's not HTML
+              html = await markdownToHTML(content)
+            }
           }
         }
       }

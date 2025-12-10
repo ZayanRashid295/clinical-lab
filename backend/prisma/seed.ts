@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { seedBase } from "./seed-base";
 import { seedUSMLE } from "./seed-usmle";
 import { seedPayments } from "./seed-payments";
+import { seedQuestions } from "./seed-questions";
 
 // Load .env file from the backend directory (parent of prisma folder)
 config({ path: resolve(process.cwd(), ".env") });
@@ -22,6 +23,9 @@ async function main() {
     // Seed other data
     // await seedLearningCases(prisma);
     await seedUSMLE(prisma);
+
+    // Seed questions (requires topics to exist)
+    await seedQuestions(prisma);
 
     console.log("\n🎉 All seeding completed successfully!");
   } catch (error) {
