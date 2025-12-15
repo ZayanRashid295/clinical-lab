@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { UIConfig, UIConfigService } from "../../app/config/ui.config";
+import { ThemeService } from "../../app/config/theme.service";
 
 interface UIConfigContextType {
   config: UIConfig;
@@ -17,6 +18,16 @@ interface UIConfigContextType {
       | "indigo"
       | "pink"
       | "teal"
+      | "cyan"
+      | "emerald"
+      | "violet"
+      | "rose"
+      | "amber"
+      | "lime"
+      | "slate"
+      | "zinc"
+      | "sky"
+      | "fuchsia"
   ) => void;
   setFontSize: (fontSize: "small" | "medium" | "large") => void;
   setBorderRadius: (
@@ -25,7 +36,7 @@ interface UIConfigContextType {
   resetConfig: () => void;
 }
 
-const UIConfigContext = createContext<UIConfigContextType | undefined>(
+export const UIConfigContext = createContext<UIConfigContextType | undefined>(
   undefined
 );
 
@@ -39,11 +50,19 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
   const [config, setConfig] = React.useState<UIConfig>(() =>
     UIConfigService.getInstance().getConfig()
   );
+  const themeService = React.useRef(ThemeService.getInstance());
 
   React.useEffect(() => {
     const unsubscribe = UIConfigService.getInstance().subscribe(setConfig);
     return unsubscribe;
   }, []);
+
+  // CRITICAL: Apply theme whenever config changes to keep all pages in sync
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      themeService.current.applyTheme(config);
+    }
+  }, [config]);
 
   const updateConfig = React.useCallback((updates: Partial<UIConfig>) => {
     UIConfigService.getInstance().updateConfig(updates);

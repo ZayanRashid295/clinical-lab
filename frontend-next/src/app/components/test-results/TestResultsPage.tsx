@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
-import { Progress } from "@/shared/ui/progress";
 import {
   Table,
   TableBody,
@@ -21,10 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { CheckCircle, XCircle, Circle, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Circle, ChevronLeft, TrendingUp, Activity } from "lucide-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
-import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 
 interface QuestionPaperQuestion {
   id: string;
@@ -49,15 +47,15 @@ interface QuestionPaperQuestion {
       };
     };
     productTag?: {
-  id: string;
-  name: string;
+      id: string;
+      name: string;
     };
   };
 }
 
 interface AssessmentResults {
   questionPaper: {
-  id: string;
+    id: string;
     name: string;
     type: string;
     timeLimit?: number;
@@ -81,7 +79,6 @@ export default function TestResultsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFilter, setShowFilter] = useState("All");
-  const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
 
   const questionPapersService = new QuestionPapersService();
 
@@ -108,12 +105,13 @@ export default function TestResultsPage() {
     return (
       <div className="w-full min-h-screen bg-background dark:bg-gray-900">
         <div className="w-full px-6 lg:px-8 xl:px-12 py-8 space-y-8">
-          <Skeleton className="h-8 w-64 bg-muted dark:bg-gray-800" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Skeleton className="h-48 bg-muted dark:bg-gray-800" />
-            <Skeleton className="h-48 bg-muted dark:bg-gray-800" />
+          <Skeleton className="h-8 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton className="h-40" />
+            <Skeleton className="h-40" />
+            <Skeleton className="h-40" />
           </div>
-          <Skeleton className="h-96 bg-muted dark:bg-gray-800" />
+          <Skeleton className="h-96" />
         </div>
       </div>
     );
@@ -123,14 +121,9 @@ export default function TestResultsPage() {
     return (
       <div className="w-full min-h-screen bg-background dark:bg-gray-900">
         <div className="w-full px-6 lg:px-8 xl:px-12 py-8">
-          <h1 className="text-2xl font-bold text-foreground dark:text-white">
-            Test Results Not Found
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-white">Test Results Not Found</h1>
           <p className="text-muted-foreground dark:text-gray-400 mt-2">{error}</p>
-          <Button
-            onClick={() => router.push("/previous-tests")}
-            className="mt-4"
-          >
+          <Button onClick={() => router.push("/previous-tests")} className="mt-4">
             Back to Previous Tests
           </Button>
         </div>
@@ -142,11 +135,8 @@ export default function TestResultsPage() {
   const score = stats.percentage;
   const correctCount = stats.correctAnswers;
   const totalCount = stats.totalQuestions;
-
-  // Determine mode and pool
-  const hasTimeSpent = questions.some((q) => q.timeSpent && q.timeSpent > 0);
-  const mode = hasTimeSpent ? "Timed" : "Untutored";
-  const pool = questionPaper.type === "practice" ? "USMLE Step 1" : "Custom";
+  const incorrectCount = stats.incorrectAnswers;
+  const unansweredCount = stats.unansweredQuestions;
 
   // Filter questions based on showFilter
   const filteredQuestions = questions.filter((q) => {
@@ -170,179 +160,194 @@ export default function TestResultsPage() {
   };
 
   const formatTimeSpent = (seconds?: number) => {
-    if (!seconds) return "0 sec";
-    if (seconds < 60) return `${seconds} sec`;
+    if (!seconds) return "0s";
+    if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return secs > 0 ? `${minutes} min ${secs} sec` : `${minutes} min`;
-  };
-
-  const handleQuestionClick = (questionPaperQuestionId: string) => {
-    setSelectedQuestion(questionPaperQuestionId);
-    // For now, just log - can be enhanced to show question details in a modal
-    console.log("View question:", questionPaperQuestionId);
-    // TODO: Open question detail modal or navigate to question view
+    return secs > 0 ? `${minutes}m ${secs}s` : `${minutes}m`;
   };
 
   return (
     <div className="w-full min-h-screen bg-background dark:bg-gray-900">
-      <div className="w-full px-6 lg:px-8 xl:px-12 py-8 space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border dark:border-gray-800 pb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground dark:text-white">
-              Test Results
-            </h1>
-            <p className="text-muted-foreground dark:text-gray-400 mt-2 text-lg">
-              {questionPaper.name}
-            </p>
-          </div>
-            <Button
-              variant="outline"
-              className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-800"
-              onClick={() => router.push("/previous-tests")}
-            >
-            Back to Previous Tests
+      <div className="border-b border-border dark:border-gray-700 bg-card/50 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="w-full px-6 lg:px-8 xl:px-12 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => router.push("/previous-tests")} className="gap-2">
+                <ChevronLeft className="h-4 w-4" />
+                Previous Tests
+              </Button>
+              <div className="h-4 w-px bg-border dark:bg-gray-700" />
+              <div>
+                <h1 className="text-lg font-semibold text-balance text-foreground dark:text-white">{questionPaper.name}</h1>
+                <p className="text-xs text-muted-foreground dark:text-gray-400">Test Results Overview</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push(`/test-analysis/${id}`)}>
+              View Analytics
             </Button>
+          </div>
         </div>
+      </div>
 
-        {/* Score and Settings Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Your Score Card */}
-          <Card className="bg-card dark:bg-gray-800 border-border dark:border-gray-700 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-foreground dark:text-white">
-                Your Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                {score}%
+      <div className="w-full px-6 lg:px-8 xl:px-12 py-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">Overall Score</p>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-4xl font-semibold tracking-tight text-foreground dark:text-white">{score}</span>
+                    <span className="text-lg text-muted-foreground dark:text-gray-400">%</span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <div className="h-1.5 rounded-full bg-muted dark:bg-gray-700 w-32">
+                      <div
+                        className="h-1.5 rounded-full bg-primary dark:bg-primary"
+                        style={{ width: `${score}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <Progress value={score} className="h-3" />
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Avg: 64%
-              </div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {correctCount} of {totalCount} correct
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Test Settings Card */}
-          <Card className="bg-card dark:bg-gray-800 border-border dark:border-gray-700 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-foreground dark:text-white">
-                Test Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Mode</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant={mode === "Timed" ? "default" : "outline"}
-                    size="sm"
-                    disabled
-                    className="border-border dark:border-gray-700 text-foreground dark:text-gray-100"
-                  >
-                    Timed
-                  </Button>
-                  <Button
-                    variant={mode === "Untutored" ? "default" : "outline"}
-                    size="sm"
-                    disabled
-                    className="border-border dark:border-gray-700 text-foreground dark:text-gray-100"
-                  >
-                    Untutored
-                  </Button>
+                <div className="rounded-lg bg-primary/10 dark:bg-primary/20 p-2">
+                  <TrendingUp className="h-4 w-4 text-primary dark:text-primary" />
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Question Pool
+              <p className="text-xs text-muted-foreground dark:text-gray-400 mt-3">
+                {correctCount} / {totalCount} correct
               </p>
-                <Button variant="outline" size="sm" disabled className="border-border dark:border-gray-700 text-foreground dark:text-gray-100">
-                  {pool}
-                </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">Questions Answered</p>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-4xl font-semibold tracking-tight text-foreground dark:text-white">{stats.answeredQuestions}</span>
+                  </div>
+                  <div className="mt-2 flex gap-3 text-xs">
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-green-600 dark:bg-green-400" />
+                      <span className="text-muted-foreground dark:text-gray-400">{correctCount} correct</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-destructive dark:bg-destructive" />
+                      <span className="text-muted-foreground dark:text-gray-400">{incorrectCount} wrong</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-lg bg-green-600/10 dark:bg-green-400/20 p-2">
+                  <Activity className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
               </div>
+              <p className="text-xs text-muted-foreground dark:text-gray-400 mt-3">{totalCount} total questions</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">Performance</p>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-4xl font-semibold tracking-tight text-foreground dark:text-white">{score}</span>
+                    <span className="text-lg text-muted-foreground dark:text-gray-400">%</span>
+                  </div>
+                  <div className="mt-3">
+                    <Badge variant={score >= 70 ? "default" : "secondary"} className="text-xs">
+                      {score >= 70 ? "Strong Performance" : "Needs Review"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground dark:text-gray-400 mt-3">Test completion rate</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Questions Table */}
-        <Card className="bg-card dark:bg-gray-800 border-border dark:border-gray-700 shadow-sm">
-          <CardHeader className="pb-4 px-6 pt-6">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-semibold text-foreground dark:text-white">
-                Questions
-            </CardTitle>
-              <Select value={showFilter} onValueChange={setShowFilter}>
-                <SelectTrigger className="w-[180px] bg-card dark:bg-gray-800 border-border dark:border-gray-700 text-foreground dark:text-gray-100">
-                  <SelectValue placeholder="Show: All" />
-                </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-gray-800 border-border dark:border-gray-700">
-                  <SelectItem value="All" className="text-foreground dark:text-gray-100">Show: All</SelectItem>
-                  <SelectItem value="Correct" className="text-foreground dark:text-gray-100">Show: Correct</SelectItem>
-                  <SelectItem value="Incorrect" className="text-foreground dark:text-gray-100">Show: Incorrect</SelectItem>
-                  <SelectItem value="Omitted" className="text-foreground dark:text-gray-100">Show: Omitted</SelectItem>
-                  <SelectItem value="Marked" className="text-foreground dark:text-gray-100">Show: Marked</SelectItem>
-                </SelectContent>
-              </Select>
+        <Card className="border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+          <CardHeader className="border-b border-border dark:border-gray-700 bg-card dark:bg-gray-800">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-base font-semibold text-foreground dark:text-white">Question History</CardTitle>
+                <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
+                  {filteredQuestions.length} {filteredQuestions.length === 1 ? "question" : "questions"}
+                </p>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Select value={showFilter} onValueChange={setShowFilter}>
+                  <SelectTrigger className="w-[140px] h-9 bg-muted/50 dark:bg-gray-700/50 border-border dark:border-gray-700">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+                    <SelectItem value="All" className="text-foreground dark:text-white">All</SelectItem>
+                    <SelectItem value="Correct" className="text-foreground dark:text-white">Correct</SelectItem>
+                    <SelectItem value="Incorrect" className="text-foreground dark:text-white">Incorrect</SelectItem>
+                    <SelectItem value="Omitted" className="text-foreground dark:text-white">Omitted</SelectItem>
+                    <SelectItem value="Marked" className="text-foreground dark:text-white">Marked</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-gray-800/50 border-b dark:border-gray-700">
-                    <TableHead className="font-semibold w-16 px-6">Status</TableHead>
-                    <TableHead className="font-semibold px-6">ID</TableHead>
-                    <TableHead className="font-semibold px-6">SUBJECTS</TableHead>
-                    <TableHead className="font-semibold px-6">SYSTEMS</TableHead>
-                    <TableHead className="font-semibold px-6">CATEGORIES</TableHead>
-                    <TableHead className="font-semibold px-6">TOPICS</TableHead>
-                    <TableHead className="font-semibold px-6">% CORRECT OTHERS</TableHead>
-                    <TableHead className="font-semibold px-6">TIME SPENT</TableHead>
-                    <TableHead className="font-semibold w-16 px-6"></TableHead>
+                  <TableRow className="border-border dark:border-gray-700 hover:bg-transparent dark:hover:bg-transparent">
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Status</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">ID</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Subject</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">System</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Category</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Topic</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Time</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredQuestions.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground dark:text-gray-400">
-                        No questions found
+                      <TableCell colSpan={7} className="h-32 text-center text-sm text-muted-foreground dark:text-gray-400">
+                        No questions match your filters
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredQuestions.map((q, index) => {
                       const question = q.question;
-                      const subject = question?.topic?.chapter?.name || "N/A";
-                      const system = question?.topic?.chapter?.section?.name || "N/A";
-                      const category = question?.productTag?.name || "N/A";
-                      const topic = question?.topic?.name || "N/A";
+                      const subject = question?.topic?.chapter?.name || "—";
+                      const system = question?.topic?.chapter?.section?.name || "—";
+                      const category = question?.productTag?.name || "—";
+                      const topic = question?.topic?.name || "—";
                       const questionId = `${index + 1}-${question?.id?.slice(-4) || "XXXX"}`;
 
                       return (
                         <TableRow
                           key={q.id}
-                          className="bg-card dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer border-border dark:border-gray-700"
-                          onClick={() => handleQuestionClick(q.id)}
+                          className="border-border dark:border-gray-700 hover:bg-muted/50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                          onClick={() => {
+                            // TODO: Navigate to question detail view
+                            console.log("View question:", q.id);
+                          }}
                         >
-                          <TableCell className="px-6">{getStatusIcon(q)}</TableCell>
-                          <TableCell className="font-mono text-sm px-6">{questionId}</TableCell>
-                          <TableCell className="px-6">{subject}</TableCell>
-                          <TableCell className="px-6">{system}</TableCell>
-                          <TableCell className="px-6">{category}</TableCell>
-                          <TableCell className="px-6">{topic}</TableCell>
-                          <TableCell className="text-muted-foreground dark:text-gray-400 px-6">66%</TableCell>
-                          <TableCell className="text-muted-foreground dark:text-gray-400 px-6">
-                            {formatTimeSpent(q.timeSpent)}
+                          <TableCell className="px-4 py-3 text-foreground dark:text-white">{getStatusIcon(q)}</TableCell>
+                          <TableCell className="px-4 py-3 font-mono text-sm text-foreground dark:text-white">{questionId}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{subject}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{system}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{category}</TableCell>
+                          <TableCell className="px-4 py-3">
+                            {topic !== "—" ? (
+                              <Badge variant="outline" className="text-xs font-normal text-foreground dark:text-white border-border dark:border-gray-600">
+                                {topic}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground dark:text-gray-400">—</span>
+                            )}
                           </TableCell>
-                          <TableCell className="px-6">
-                            <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                          <TableCell className="px-4 py-3 text-xs text-muted-foreground dark:text-gray-400 font-mono">
+                            {formatTimeSpent(q.timeSpent)}
                           </TableCell>
                         </TableRow>
                       );

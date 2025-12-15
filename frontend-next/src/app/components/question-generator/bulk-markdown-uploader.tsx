@@ -988,12 +988,30 @@ export default function BulkMarkdownUploader({
     }
   }
 
+  const [isDark, setIsDark] = useState(false)
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains("dark"))
+    }
+    checkDarkMode()
+    const observer = new MutationObserver(checkDarkMode)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <Card className="p-6 shadow-lg border-2 border-dashed border-primary/30">
+    <div 
+      className={`p-6 shadow-lg border-2 border-dashed border-primary/30 border border-border dark:border-gray-700 rounded-xl ${isDark ? '!bg-gray-800' : ''}`}
+      style={isDark ? { backgroundColor: '#1f2937' } : {}}
+    >
       <div className="space-y-4 min-h-0">
         <div>
-          <h3 className="text-lg font-bold text-foreground mb-2">Bulk Upload Markdown Questions</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-lg font-bold text-foreground dark:text-gray-100 mb-2">Bulk Upload Markdown Questions</h3>
+          <p className="text-sm text-muted-foreground dark:text-gray-300">
             Upload multiple .md files or a directory containing .md files and images
           </p>
         </div>
@@ -1023,7 +1041,7 @@ export default function BulkMarkdownUploader({
           <>
             {uploadMode === "files" ? (
               <div
-                className="relative border-2 border-dashed border-border rounded-lg p-8 hover:bg-muted/30 transition-colors cursor-pointer"
+                className="relative border-2 border-dashed border-border dark:border-gray-600 rounded-lg p-8 hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors cursor-pointer dark:bg-gray-800/50"
                 onClick={() => !isProcessing && fileInputRef.current?.click()}
               >
                 <input
@@ -1038,16 +1056,16 @@ export default function BulkMarkdownUploader({
 
                 <div className="text-center">
                   <div className="mb-3 text-4xl">📄</div>
-                  <p className="font-semibold text-foreground mb-1">Drop multiple markdown files here</p>
-                  <p className="text-sm text-muted-foreground">or click to browse</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="font-semibold text-foreground dark:text-gray-100 mb-1">Drop multiple markdown files here</p>
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">or click to browse</p>
+                  <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">
                     Supported: .md files and image files (.jpg, .png, .gif, .webp, .svg)
                   </p>
                 </div>
               </div>
             ) : (
               <div
-                className="relative border-2 border-dashed border-border rounded-lg p-8 hover:bg-muted/30 transition-colors cursor-pointer"
+                className="relative border-2 border-dashed border-border dark:border-gray-600 rounded-lg p-8 hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors cursor-pointer dark:bg-gray-800/50"
                 onClick={() => !isProcessing && directoryInputRef.current?.click()}
               >
                 <input
@@ -1062,9 +1080,9 @@ export default function BulkMarkdownUploader({
 
                 <div className="text-center">
                   <div className="mb-3 text-4xl">📁</div>
-                  <p className="font-semibold text-foreground mb-1">Drop a directory here</p>
-                  <p className="text-sm text-muted-foreground">or click to browse</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="font-semibold text-foreground dark:text-gray-100 mb-1">Drop a directory here</p>
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">or click to browse</p>
+                  <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">
                     Directory should contain .md files and an images/ folder with referenced images
                   </p>
                 </div>
@@ -1075,10 +1093,10 @@ export default function BulkMarkdownUploader({
 
         {/* Show upload area button when summary exists */}
         {summary && !isProcessing && (
-          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 dark:bg-gray-700/30 border border-border dark:border-gray-600">
             <div>
-              <p className="text-sm font-medium text-foreground">Want to upload more files?</p>
-              <p className="text-xs text-muted-foreground">Click the button below to add more questions</p>
+              <p className="text-sm font-medium text-foreground dark:text-gray-100">Want to upload more files?</p>
+              <p className="text-xs text-muted-foreground dark:text-gray-300">Click the button below to add more questions</p>
             </div>
             <Button
               onClick={() => {
@@ -1102,8 +1120,8 @@ export default function BulkMarkdownUploader({
 
         {/* Processing Status */}
         {isProcessing && (
-          <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
-            <div className="flex items-center gap-2 text-blue-600">
+          <div className="p-4 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 dark:border-blue-500/40">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm font-medium">Processing files...</span>
             </div>
@@ -1114,24 +1132,24 @@ export default function BulkMarkdownUploader({
         {/* Summary Report */}
         {summary && !isProcessing && (
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-card border border-border">
-              <h4 className="font-semibold text-foreground mb-3">Processing Summary</h4>
+            <div className="p-4 rounded-lg dark:bg-gray-800 border border-border dark:border-gray-700" style={{ backgroundColor: isDark ? '#1f2937' : 'var(--card-bg, #ffffff)' }}>
+              <h4 className="font-semibold text-foreground dark:text-gray-100 mb-3">Processing Summary</h4>
               <div className="grid grid-cols-4 gap-4 mb-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">{summary.total}</div>
-                  <div className="text-xs text-muted-foreground">Total</div>
+                  <div className="text-2xl font-bold text-foreground dark:text-gray-100">{summary.total}</div>
+                  <div className="text-xs text-muted-foreground dark:text-gray-300">Total</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{summary.successful}</div>
-                  <div className="text-xs text-muted-foreground">Successful</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.successful}</div>
+                  <div className="text-xs text-muted-foreground dark:text-gray-300">Successful</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">{summary.failed}</div>
-                  <div className="text-xs text-muted-foreground">Failed</div>
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.failed}</div>
+                  <div className="text-xs text-muted-foreground dark:text-gray-300">Failed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{summary.skipped}</div>
-                  <div className="text-xs text-muted-foreground">Skipped</div>
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{summary.skipped}</div>
+                  <div className="text-xs text-muted-foreground dark:text-gray-300">Skipped</div>
                 </div>
               </div>
 
@@ -1148,20 +1166,20 @@ export default function BulkMarkdownUploader({
                   return (
                     <div
                       key={idx}
-                      className="border border-border rounded-lg p-3 bg-card"
+                      className="border border-border dark:border-gray-600 rounded-lg p-3 bg-card dark:bg-gray-700/50"
                     >
                       {/* Question Header */}
                       <div className="flex items-start gap-2">
                         {result.status === "success" ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                         ) : result.status === "error" ? (
-                          <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                         ) : (
-                          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                          <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <div className="font-medium text-foreground">{result.fileName}</div>
+                            <div className="font-medium text-foreground dark:text-gray-100">{result.fileName}</div>
                             {result.status === "success" && (
                               <Button
                                 size="sm"
@@ -1186,7 +1204,7 @@ export default function BulkMarkdownUploader({
                           
                           {result.questionId && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-muted-foreground">Question ID: {result.questionId}</span>
+                              <span className="text-xs text-muted-foreground dark:text-gray-300">Question ID: {result.questionId}</span>
                               {onQuestionEdit && (
                                 <Button
                                   size="sm"
@@ -1202,10 +1220,10 @@ export default function BulkMarkdownUploader({
                           )}
                           
                           {result.error && (
-                            <div className="text-xs text-red-600 mt-1">{result.error}</div>
+                            <div className="text-xs text-red-600 dark:text-red-400 mt-1">{result.error}</div>
                           )}
                           {result.warnings && result.warnings.length > 0 && (
-                            <div className="text-xs text-yellow-600 mt-1">
+                            <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
                               {result.warnings.join("; ")}
                             </div>
                           )}
@@ -1214,15 +1232,15 @@ export default function BulkMarkdownUploader({
 
                       {/* Question Content (Expandable) */}
                       {result.status === "success" && result.questionData && isExpanded && (
-                        <div className="mt-4 space-y-4 pt-4 border-t border-border">
+                        <div className="mt-4 space-y-4 pt-4 border-t border-border dark:border-gray-600">
                           {/* System, Subject, Topic Selection */}
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* System (Section) */}
                             <div>
-                              <label className="block text-sm font-medium text-foreground mb-2">
-                                System (Section) <span className="text-red-500">*</span>
+                              <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
+                                System (Section) <span className="text-red-500 dark:text-red-400">*</span>
                                 {result.questionData.system && (
-                                  <span className="text-xs text-muted-foreground ml-2">
+                                  <span className="text-xs text-muted-foreground dark:text-gray-300 ml-2">
                                     (Parsed: {result.questionData.system})
                                   </span>
                                 )}
@@ -1232,7 +1250,7 @@ export default function BulkMarkdownUploader({
                                 onChange={(e) => {
                                   updateQuestionMetadata(result.fileName, { sectionId: e.target.value })
                                 }}
-                                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                 disabled={isCreating || loadingSections}
                               >
                                 <option value="">Select System...</option>
@@ -1246,10 +1264,10 @@ export default function BulkMarkdownUploader({
 
                             {/* Subject (Chapter) */}
                             <div>
-                              <label className="block text-sm font-medium text-foreground mb-2">
-                                Subject (Chapter) <span className="text-red-500">*</span>
+                              <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
+                                Subject (Chapter) <span className="text-red-500 dark:text-red-400">*</span>
                                 {result.questionData.subject && (
-                                  <span className="text-xs text-muted-foreground ml-2">
+                                  <span className="text-xs text-muted-foreground dark:text-gray-300 ml-2">
                                     (Parsed: {result.questionData.subject})
                                   </span>
                                 )}
@@ -1259,7 +1277,7 @@ export default function BulkMarkdownUploader({
                                 onChange={(e) => {
                                   updateQuestionMetadata(result.fileName, { chapterId: e.target.value })
                                 }}
-                                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                 disabled={isCreating || isLoadingChapters || !metadata.sectionId}
                               >
                                 <option value="">Select Subject...</option>
@@ -1273,15 +1291,15 @@ export default function BulkMarkdownUploader({
 
                             {/* Topic */}
                             <div>
-                              <label className="block text-sm font-medium text-foreground mb-2">
-                                Topic <span className="text-red-500">*</span>
+                              <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
+                                Topic <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
                               <select
                                 value={metadata.topicId}
                                 onChange={(e) => {
                                   updateQuestionMetadata(result.fileName, { topicId: e.target.value })
                                 }}
-                                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                 disabled={isCreating || isLoadingTopics || !metadata.chapterId}
                               >
                                 <option value="">Select Topic...</option>
@@ -1299,19 +1317,19 @@ export default function BulkMarkdownUploader({
                             {/* Subject & System */}
                             {(result.questionData.subject || result.questionData.system) && (
                               <div className="text-sm">
-                                <span className="font-medium text-foreground">Subject:</span>{" "}
-                                <span className="text-muted-foreground">{result.questionData.subject || "N/A"}</span>
+                                <span className="font-medium text-foreground dark:text-gray-100">Subject:</span>{" "}
+                                <span className="text-muted-foreground dark:text-gray-300">{result.questionData.subject || "N/A"}</span>
                                 {" | "}
-                                <span className="font-medium text-foreground">System:</span>{" "}
-                                <span className="text-muted-foreground">{result.questionData.system || "N/A"}</span>
+                                <span className="font-medium text-foreground dark:text-gray-100">System:</span>{" "}
+                                <span className="text-muted-foreground dark:text-gray-300">{result.questionData.system || "N/A"}</span>
                               </div>
                             )}
 
                             {/* Tags */}
                             {result.questionData.tags && result.questionData.tags.length > 0 && (
                               <div className="text-sm">
-                                <span className="font-medium text-foreground">Tags:</span>{" "}
-                                <span className="text-muted-foreground">
+                                <span className="font-medium text-foreground dark:text-gray-100">Tags:</span>{" "}
+                                <span className="text-muted-foreground dark:text-gray-300">
                                   {result.questionData.tags.join(", ")}
                                 </span>
                               </div>
@@ -1319,8 +1337,8 @@ export default function BulkMarkdownUploader({
 
                             {/* Question Stem Preview */}
                             <div>
-                              <div className="text-sm font-medium text-foreground mb-2">Question Stem:</div>
-                              <div className="p-3 rounded bg-muted/50 text-sm text-foreground/80 max-h-32 overflow-y-auto">
+                              <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">Question Stem:</div>
+                              <div className="p-3 rounded bg-muted/50 dark:bg-gray-700/50 text-sm text-foreground/80 dark:text-gray-200 max-h-32 overflow-y-auto border border-border dark:border-gray-600">
                                 {result.questionData.stem ? (
                                   <div className="whitespace-pre-wrap">
                                     {result.questionData.stem.length > 200
@@ -1328,7 +1346,7 @@ export default function BulkMarkdownUploader({
                                       : result.questionData.stem}
                                   </div>
                                 ) : (
-                                  <span className="text-muted-foreground">No stem content</span>
+                                  <span className="text-muted-foreground dark:text-gray-400">No stem content</span>
                                 )}
                               </div>
                             </div>
@@ -1336,21 +1354,21 @@ export default function BulkMarkdownUploader({
                             {/* Options Preview */}
                             {result.questionData.options && result.questionData.options.length > 0 && (
                               <div>
-                                <div className="text-sm font-medium text-foreground mb-2">Options:</div>
+                                <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">Options:</div>
                                 <div className="space-y-1">
                                   {result.questionData.options.map((opt: any, optIdx: number) => (
                                     <div
                                       key={optIdx}
                                       className={`p-2 rounded text-sm ${
                                         opt.correct
-                                          ? "bg-green-500/10 border border-green-500/30"
-                                          : "bg-muted/50"
+                                          ? "bg-green-500/10 dark:bg-green-500/20 border border-green-500/30 dark:border-green-500/40"
+                                          : "bg-muted/50 dark:bg-gray-700/50"
                                       }`}
                                     >
-                                      <span className="font-medium">
+                                      <span className="font-medium dark:text-gray-100">
                                         {opt.label}. {opt.correct && "✅ "}
                                       </span>
-                                      <span className={opt.correct ? "text-green-600" : "text-foreground/80"}>
+                                      <span className={opt.correct ? "text-green-600 dark:text-green-400" : "text-foreground/80 dark:text-gray-200"}>
                                         {opt.text}
                                       </span>
                                     </div>
@@ -1362,11 +1380,11 @@ export default function BulkMarkdownUploader({
                             {/* Explanation Preview */}
                             {result.questionData.explanation && result.questionData.explanation.length > 0 && (
                               <div>
-                                <div className="text-sm font-medium text-foreground mb-2">
+                                <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                   Main Explanation ({result.questionData.explanation.length} block
                                   {result.questionData.explanation.length > 1 ? "s" : ""}):
                                 </div>
-                                <div className="p-2 rounded bg-muted/30 text-xs text-muted-foreground">
+                                <div className="p-2 rounded bg-muted/30 dark:bg-gray-700/30 text-xs text-muted-foreground dark:text-gray-300">
                                   Explanation content parsed successfully
                                 </div>
                               </div>
@@ -1376,10 +1394,10 @@ export default function BulkMarkdownUploader({
                             {result.questionData.perAnswerExplanations &&
                               Object.keys(result.questionData.perAnswerExplanations).length > 0 && (
                                 <div>
-                                  <div className="text-sm font-medium text-foreground mb-2">
+                                  <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                     Per-Answer Explanations:
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
+                                  <div className="text-xs text-muted-foreground dark:text-gray-300">
                                     {Object.keys(result.questionData.perAnswerExplanations).length} explanation
                                     {Object.keys(result.questionData.perAnswerExplanations).length > 1 ? "s" : ""}{" "}
                                     available
@@ -1399,8 +1417,8 @@ export default function BulkMarkdownUploader({
 
         {/* Creating Status */}
         {isCreating && (
-          <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
-            <div className="flex items-center gap-2 text-blue-600">
+          <div className="p-4 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 dark:border-blue-500/40">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm font-medium">Creating questions...</span>
             </div>
@@ -1409,12 +1427,12 @@ export default function BulkMarkdownUploader({
 
         {/* Warnings */}
         {warnings.length > 0 && (
-          <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+          <div className="p-3 rounded-lg bg-yellow-500/10 dark:bg-yellow-500/20 border border-yellow-500/30 dark:border-yellow-500/40">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-yellow-600 mb-1">Warnings</div>
-                <ul className="text-xs text-yellow-700 dark:text-yellow-500 space-y-1 max-h-32 overflow-y-auto">
+                <div className="text-sm font-medium text-yellow-600 dark:text-yellow-400 mb-1">Warnings</div>
+                <ul className="text-xs text-yellow-700 dark:text-yellow-300 space-y-1 max-h-32 overflow-y-auto">
                   {warnings.map((warning, idx) => (
                     <li key={idx}>• {warning}</li>
                   ))}
@@ -1426,12 +1444,12 @@ export default function BulkMarkdownUploader({
 
         {/* Errors */}
         {errors.length > 0 && (
-          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+          <div className="p-3 rounded-lg bg-destructive/10 dark:bg-destructive/20 border border-destructive/30 dark:border-destructive/40">
             <div className="flex items-start gap-2">
-              <XCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+              <XCircle className="w-4 h-4 text-destructive dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-destructive mb-1">Errors</div>
-                <ul className="text-xs text-destructive space-y-1">
+                <div className="text-sm font-medium text-destructive dark:text-red-400 mb-1">Errors</div>
+                <ul className="text-xs text-destructive dark:text-red-300 space-y-1">
                   {errors.map((error, idx) => (
                     <li key={idx}>• {error}</li>
                   ))}
@@ -1473,7 +1491,7 @@ export default function BulkMarkdownUploader({
           </div>
         )}
       </div>
-    </Card>
+    </div>
   )
 }
 

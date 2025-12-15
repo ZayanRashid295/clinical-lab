@@ -152,6 +152,8 @@ export default function StudentQuestionView() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set())
   const [questionPaperQuestionIds, setQuestionPaperQuestionIds] = useState<Record<string, string>>({})
+  const [questionStartTimes, setQuestionStartTimes] = useState<Record<string, number>>({})
+  const [questionTimeSpent, setQuestionTimeSpent] = useState<Record<string, number>>({})
   const questionsService = new QuestionsService()
   const questionPapersService = new QuestionPapersService()
   const questionPaperQuestionsService = new QuestionPaperQuestionsService()
@@ -455,7 +457,7 @@ export default function StudentQuestionView() {
     }
   }
 
-  // Restore selected answer when question changes
+  // Restore selected answer when question changes and track time
   useEffect(() => {
     if (questions.length > 0 && currentQuestionIndex < questions.length) {
       const currentQuestion = questions[currentQuestionIndex]
@@ -463,9 +465,38 @@ export default function StudentQuestionView() {
         const savedAnswer = answers[currentQuestion.id]
         setSelectedAnswer(savedAnswer || null)
         setAnswered(!!savedAnswer)
+        
+        // Track start time for current question
+        const now = Date.now()
+        setQuestionStartTimes((prev) => {
+          // If this question hasn't been viewed before, record the start time
+          if (!prev[currentQuestion.id]) {
+            return { ...prev, [currentQuestion.id]: now }
+          }
+          return prev
+        })
       }
     }
   }, [currentQuestionIndex, questions, answers])
+
+  // Track time spent when leaving a question
+  const recordTimeSpent = (questionId: string) => {
+    const startTime = questionStartTimes[questionId]
+    if (startTime) {
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000) // Convert to seconds
+      setQuestionTimeSpent((prev) => {
+        // Accumulate time if question was visited multiple times
+        const existingTime = prev[questionId] || 0
+        return { ...prev, [questionId]: existingTime + timeSpent }
+      })
+      // Reset start time for this question
+      setQuestionStartTimes((prev) => {
+        const updated = { ...prev }
+        delete updated[questionId]
+        return updated
+      })
+    }
+  }
 
   useEffect(() => {
     loadQuestions()
@@ -1298,6 +1329,12 @@ export default function StudentQuestionView() {
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
+      // Record time spent on current question before moving
+      const currentQuestion = questions[currentQuestionIndex]
+      if (currentQuestion) {
+        recordTimeSpent(currentQuestion.id)
+      }
+      
       const nextIndex = currentQuestionIndex + 1
       setCurrentQuestionIndex(nextIndex)
       const nextQuestion = questions[nextIndex]
@@ -1309,6 +1346,12 @@ export default function StudentQuestionView() {
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
+      // Record time spent on current question before moving
+      const currentQuestion = questions[currentQuestionIndex]
+      if (currentQuestion) {
+        recordTimeSpent(currentQuestion.id)
+      }
+      
       const prevIndex = currentQuestionIndex - 1
       setCurrentQuestionIndex(prevIndex)
       const prevQuestion = questions[prevIndex]
@@ -1321,6 +1364,12 @@ export default function StudentQuestionView() {
   const handleEndTest = async () => {
     setIsEndingTest(true)
     try {
+      // Record time spent on current question before ending test
+      const currentQuestion = questions[currentQuestionIndex]
+      if (currentQuestion) {
+        recordTimeSpent(currentQuestion.id)
+      }
+      
       const user = authService.getCurrentUser()
       if (!user || !user.id) {
         throw new Error("User not authenticated")
@@ -1394,10 +1443,13 @@ export default function StudentQuestionView() {
 
               // Explicitly set markedForReview to true or false (not undefined)
               const isMarked = markedQuestions.has(question.id)
+              // Get time spent for this question
+              const timeSpent = questionTimeSpent[question.id] || 0
+              
               await questionPaperQuestionsService.updateQuestionPaperQuestion(existingQPQ.id, {
                 userAnswer: userAnswer || undefined,
                 isCorrect: isCorrect ?? undefined,
-                timeSpent: 0,
+                timeSpent: timeSpent,
                 order: index,
                 markedForReview: isMarked, // Explicitly true or false
               })
@@ -1419,10 +1471,13 @@ export default function StudentQuestionView() {
 
               // Explicitly set markedForReview to true or false (not undefined)
               const isMarked = markedQuestions.has(question.id)
+              // Get time spent for this question
+              const timeSpent = questionTimeSpent[question.id] || 0
+              
               await questionPaperQuestionsService.updateQuestionPaperQuestion(id, {
                 userAnswer: userAnswer || undefined,
                 isCorrect: isCorrect ?? undefined,
-                timeSpent: 0,
+                timeSpent: timeSpent,
                 markedForReview: isMarked, // Explicitly true or false
               })
               console.log(`💾 End test: Created and updated question ${question.id} - markedForReview=${isMarked}`)
@@ -1512,10 +1567,13 @@ export default function StudentQuestionView() {
               const correctOption = question.options.find((o: any) => o.correct)
               const isCorrect = userAnswer === correctOption?.value ? true : userAnswer ? false : null
 
+              // Get time spent for this question
+              const timeSpent = questionTimeSpent[question.id] || 0
+              
               await questionPaperQuestionsService.updateQuestionPaperQuestion(id, {
                 userAnswer: userAnswer || undefined,
                 isCorrect: isCorrect ?? undefined,
-                timeSpent: 0,
+                timeSpent: timeSpent,
                 markedForReview: markedQuestions.has(question.id),
               })
             })

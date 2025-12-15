@@ -37,6 +37,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.17",
     "@prisma/client": "^5.22.0",
+    "@stripe/stripe-js": "^8.5.3",
     "@types/multer": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
@@ -49,6 +50,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "sharp": "^0.34.5",
+    "stripe": "^20.0.0",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
