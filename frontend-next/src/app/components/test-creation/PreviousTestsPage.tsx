@@ -52,7 +52,6 @@ export default function PreviousTestsPage() {
         // Fetch all question papers for the user
         const questionPapersResponse = await questionPapersService.getQuestionPapers({
           userId: user.id,
-          limit: 100, // Maximum allowed by backend
         });
 
         // Handle both array and paginated response formats
@@ -64,7 +63,7 @@ export default function PreviousTestsPage() {
 
         // For each question paper, calculate score and get metadata
         const testsData = await Promise.all(
-          questionPapers.map(async (paper) => {
+          (questionPapers as any[]).map(async (paper: any) => {
             // Get questions for this paper (with pagination if needed)
             // We need to fetch questions to calculate score and extract subjects/systems
             let allQuestions: any[] = [];
@@ -77,7 +76,6 @@ export default function PreviousTestsPage() {
               while (hasMore) {
                 const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
                   questionPaperId: paper.id,
-                  limit: 100, // Maximum allowed by backend
                   page,
                 });
 

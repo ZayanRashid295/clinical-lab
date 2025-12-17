@@ -9,8 +9,8 @@ interface ExplanationPanelProps {
   correctAnswerLabel?: string
   options?: Array<{ label: string; text: string; correct: boolean }>
   perAnswerExplanations?: Record<string, string | any[]>
-  subject?: string
-  system?: string
+  chapter?: string
+  subjectTag?: string
   topic?: string | { name?: string }
 }
 
@@ -21,8 +21,8 @@ export default function ExplanationPanel({
   correctAnswerLabel = "C",
   options = [],
   perAnswerExplanations = {},
-  subject,
-  system,
+  chapter,
+  subjectTag,
   topic,
 }: ExplanationPanelProps) {
   return (
@@ -48,20 +48,20 @@ export default function ExplanationPanel({
               </div>
             )}
 
-            {/* Subject, System, Topic at the end */}
-            {(subject || system || topic) && (
+            {/* Metadata (Subjects/Chapters/Topic) */}
+            {(subjectTag || chapter || topic) && (
               <div className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {subject && (
+                  {subjectTag && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Subject</div>
-                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{subject}</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Subjects</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{subjectTag}</div>
                     </div>
                   )}
-                  {system && (
+                  {chapter && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">System</div>
-                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{system}</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Chapters</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{chapter}</div>
                     </div>
                   )}
                   {topic && (

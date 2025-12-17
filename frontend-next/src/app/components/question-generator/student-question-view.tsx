@@ -537,7 +537,6 @@ export default function StudentQuestionView() {
         // Fetch question paper questions
         const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
           questionPaperId: questionPaperIdParam,
-          limit: 100,
         })
         
         // Handle paginated response
@@ -552,7 +551,6 @@ export default function StudentQuestionView() {
           while (page <= pagination.totalPages) {
             const nextPage = await questionPaperQuestionsService.getQuestionPaperQuestions({
               questionPaperId: questionPaperIdParam,
-              limit: 100,
               page,
             })
             const nextPageData = Array.isArray(nextPage) ? nextPage : (nextPage as any)?.data || []
@@ -756,7 +754,6 @@ export default function StudentQuestionView() {
             while (hasMore) {
               const qpqResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
                 questionPaperId: existingQuestionPaperIdForCheck,
-                limit: 100,
                 page,
               })
               
@@ -819,7 +816,6 @@ export default function StudentQuestionView() {
                 try {
                   const userQuestionPapers = await questionPapersService.getQuestionPapers({
                     userId: user.id,
-                    limit: 100, // Maximum allowed by backend
                     page,
                   })
                   
@@ -862,7 +858,6 @@ export default function StudentQuestionView() {
                     while (qpqHasMore) {
                       const qpqResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
                         questionPaperId,
-                        limit: 100,
                         page: qpqPage,
                       })
                       
@@ -954,7 +949,6 @@ export default function StudentQuestionView() {
                     try {
                       const userQuestionPapers = await questionPapersService.getQuestionPapers({
                         userId: user.id,
-                        limit: 100,
                         page,
                       })
                       
@@ -994,7 +988,6 @@ export default function StudentQuestionView() {
                       while (qpqHasMore) {
                         const qpqResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
                           questionPaperId: qpId,
-                          limit: 100,
                           page: qpqPage,
                         })
                         
@@ -1395,7 +1388,6 @@ export default function StudentQuestionView() {
         // Fetch existing question paper questions to get their IDs
         let existingQuestionPaperQuestions = await questionPaperQuestionsService.getQuestionPaperQuestions({
           questionPaperId: existingQuestionPaperId,
-          limit: 100,
         })
 
         // Handle pagination if needed
@@ -1403,31 +1395,34 @@ export default function StudentQuestionView() {
           existingQuestionPaperQuestions = (existingQuestionPaperQuestions as any)?.data || []
         }
 
-        // If there are more than 100 questions, fetch all pages
+        // Fetch all pages if paginated
         const existingArray = Array.isArray(existingQuestionPaperQuestions) 
           ? existingQuestionPaperQuestions 
           : (existingQuestionPaperQuestions as any)?.data || []
-        if (existingArray.length === 100) {
+        const pagination = !Array.isArray(existingQuestionPaperQuestions) && (existingQuestionPaperQuestions as any)?.pagination
+        if (pagination && pagination.totalPages > 1) {
           let allQuestions = [...existingArray]
           let page = 2
-          while (true) {
+          while (page <= pagination.totalPages) {
             const nextPage = await questionPaperQuestionsService.getQuestionPaperQuestions({
               questionPaperId: existingQuestionPaperId,
-              limit: 100,
               page,
             })
             const nextPageArray = Array.isArray(nextPage) ? nextPage : (nextPage as any)?.data || []
             if (nextPageArray.length === 0) break
             allQuestions = [...allQuestions, ...nextPageArray]
-            if (nextPageArray.length < 100) break
             page++
           }
           existingQuestionPaperQuestions = allQuestions
         }
 
         // Create a map of questionId -> QuestionPaperQuestion for quick lookup
+        const existingQPQArray = Array.isArray(existingQuestionPaperQuestions)
+          ? existingQuestionPaperQuestions
+          : (existingQuestionPaperQuestions as any)?.data || []
+
         const existingQPQMap = new Map(
-          existingQuestionPaperQuestions.map((qpq: any) => [qpq.questionId, qpq])
+          (existingQPQArray as any[]).map((qpq: any) => [qpq.questionId, qpq])
         )
 
         // Update or create question paper questions
@@ -1584,7 +1579,6 @@ export default function StudentQuestionView() {
         try {
           const reloadedResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
             questionPaperId,
-            limit: 1000,
           })
           const reloadedQuestions = Array.isArray(reloadedResponse)
             ? reloadedResponse

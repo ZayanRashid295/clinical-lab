@@ -395,8 +395,9 @@ export default function AdminDashboard() {
           const transformedBlocks = blocks
             .filter((b: any) => b != null)
             .map((b: any) => {
-              if (b.type === "TEXT") {
                 const blockData = b.data || {}
+
+              if (b.type === "TEXT") {
                 // Ensure HTML and markdown are preserved
                 // If we have markdown but no HTML, the editor will convert it
                 return {

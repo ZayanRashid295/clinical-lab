@@ -55,7 +55,7 @@ export default function TopicFormModal({
       // Load chapters
       setLoadingChapters(true);
       chaptersService
-        .getChapters({ limit: 100, status: "ACTIVE" })
+        .getChapters({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setChapters(response);

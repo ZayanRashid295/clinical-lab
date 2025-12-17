@@ -131,16 +131,38 @@ function fixListItemFormatting(html: string): string {
   // This regex pattern matches <p> tags inside <li> and removes them while preserving content
   let result = html
   
-  // Match <li> tags that contain <p> tags (with possible whitespace)
-  // Pattern: <li>...<p>content</p>...</li>
-  result = result.replace(/<li([^>]*)>\s*<p([^>]*)>([\s\S]*?)<\/p>\s*<\/li>/gi, (match, liAttrs, pAttrs, content) => {
-    // Preserve any attributes on the <li> tag
-    return `<li${liAttrs || ''}>${content.trim()}</li>`
+  // First, handle cases with multiple <p> tags in a single <li>
+  result = result.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi, (match, liAttrs, content) => {
+    // Remove all <p> tags and their closing tags, preserving content
+    let cleaned = content
+      .replace(/<p[^>]*>/gi, '') // Remove opening <p> tags
+      .replace(/<\/p>/gi, '') // Remove closing </p> tags
+      .replace(/\n\s*\n\s*/g, ' ') // Replace multiple newlines with single space
+      .replace(/^\s+|\s+$/g, '') // Trim leading/trailing whitespace
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+    
+    return `<li${liAttrs || ''}>${cleaned}</li>`
   })
   
   // Also handle cases where there might be text before or after the <p> tag
   result = result.replace(/<li([^>]*)>([^<]*)<p([^>]*)>([\s\S]*?)<\/p>([^<]*)<\/li>/gi, (match, liAttrs, before, pAttrs, content, after) => {
-    return `<li${liAttrs || ''}>${(before || '').trim()}${content.trim()}${(after || '').trim()}</li>`
+    const cleanedBefore = (before || '').trim().replace(/\s+/g, ' ')
+    const cleanedContent = content.replace(/^\s+|\s+$/g, '').replace(/\n\s*/g, ' ').replace(/\s+/g, ' ')
+    const cleanedAfter = (after || '').trim().replace(/\s+/g, ' ')
+    return `<li${liAttrs || ''}>${cleanedBefore}${cleanedContent}${cleanedAfter}</li>`
+  })
+  
+  // Handle cases where <li> contains only whitespace and a <p> tag (common in markdown conversion)
+  result = result.replace(/<li([^>]*)>\s*\n\s*<p([^>]*)>([\s\S]*?)<\/p>\s*\n\s*<\/li>/gi, (match, liAttrs, pAttrs, content) => {
+    const cleanedContent = content.replace(/^\s+|\s+$/g, '').replace(/\n\s*/g, ' ').replace(/\s+/g, ' ')
+    return `<li${liAttrs || ''}>${cleanedContent}</li>`
+  })
+  
+  // Final pass: remove any remaining block-level elements that might cause line breaks
+  // But preserve nested lists (ul, ol) and other important elements
+  result = result.replace(/<li([^>]*)>\s*<div[^>]*>([\s\S]*?)<\/div>\s*<\/li>/gi, (match, liAttrs, content) => {
+    const cleanedContent = content.replace(/^\s+|\s+$/g, '').replace(/\n\s*/g, ' ').replace(/\s+/g, ' ')
+    return `<li${liAttrs || ''}>${cleanedContent}</li>`
   })
   
   return result
@@ -159,6 +181,16 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
       // Don't remove empty table rows - this might interfere with merged cells
       // The empty rows removal was causing issues with colspan/rowspan
       const cleanedHtml = fixedHtml
+
+      // IMPORTANT: Tables created inside TipTap text blocks rely heavily on inline styles
+      // (especially text colors). rehype-sanitize can strip or rewrite these styles,
+      // which breaks preview parity with edit mode. Since this HTML is authored via
+      // our editor, we treat it as trusted and skip sanitization for table-containing
+      // fragments to preserve styling exactly.
+      if (cleanedHtml.includes("<table")) {
+        setSanitizedHtml(cleanedHtml)
+        return
+      }
       
       // Debug: Log the HTML before sanitization to check for colspan/rowspan
       if (process.env.NODE_ENV === "development") {
@@ -233,7 +265,19 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
           .process(cleanedHtml)
         
         // Fix list items again after sanitization (in case sanitization re-added <p> tags)
+        // Run multiple times to catch nested cases
         let finalHtml = fixListItemFormatting(String(file))
+        finalHtml = fixListItemFormatting(finalHtml) // Run again to catch any remaining cases
+
+        // If sanitization stripped inline text colors (common issue), prefer the trusted TipTap HTML.
+        // Highlighter (background-color) already works, but text color must be preserved too.
+        const sourceHasInlineColor =
+          /style\s*=\s*["'][^"']*color\s*:/i.test(cleanedHtml) || /color\s*:\s*#/i.test(cleanedHtml)
+        const sanitizedHasInlineColor =
+          /style\s*=\s*["'][^"']*color\s*:/i.test(finalHtml) || /color\s*:\s*#/i.test(finalHtml)
+        if (sourceHasInlineColor && !sanitizedHasInlineColor) {
+          finalHtml = cleanedHtml
+        }
         
         // Debug: Log the HTML after sanitization to check if colspan/rowspan are preserved
         if (process.env.NODE_ENV === "development") {
@@ -264,6 +308,32 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
     <div key={itemId}>
       <style dangerouslySetInnerHTML={{
         __html: `
+          /* TextStyle helpers (font family / size) - keep renderer output consistent with the editor */
+          .html-content-${itemId} .tiptap-ff-arial { font-family: Arial, sans-serif; }
+          .html-content-${itemId} .tiptap-ff-times-new-roman { font-family: "Times New Roman", Times, serif; }
+          .html-content-${itemId} .tiptap-ff-courier-new { font-family: "Courier New", Courier, monospace; }
+          .html-content-${itemId} .tiptap-ff-georgia { font-family: Georgia, serif; }
+          .html-content-${itemId} .tiptap-ff-verdana { font-family: Verdana, Geneva, sans-serif; }
+          .html-content-${itemId} .tiptap-ff-helvetica { font-family: Helvetica, Arial, sans-serif; }
+          .html-content-${itemId} .tiptap-ff-comic-sans-ms { font-family: "Comic Sans MS", "Comic Sans", cursive; }
+          .html-content-${itemId} .tiptap-ff-trebuchet-ms { font-family: "Trebuchet MS", Helvetica, sans-serif; }
+
+          .html-content-${itemId} .tiptap-fs-8 { font-size: 8px; }
+          .html-content-${itemId} .tiptap-fs-9 { font-size: 9px; }
+          .html-content-${itemId} .tiptap-fs-10 { font-size: 10px; }
+          .html-content-${itemId} .tiptap-fs-11 { font-size: 11px; }
+          .html-content-${itemId} .tiptap-fs-12 { font-size: 12px; }
+          .html-content-${itemId} .tiptap-fs-14 { font-size: 14px; }
+          .html-content-${itemId} .tiptap-fs-16 { font-size: 16px; }
+          .html-content-${itemId} .tiptap-fs-18 { font-size: 18px; }
+          .html-content-${itemId} .tiptap-fs-20 { font-size: 20px; }
+          .html-content-${itemId} .tiptap-fs-24 { font-size: 24px; }
+          .html-content-${itemId} .tiptap-fs-28 { font-size: 28px; }
+          .html-content-${itemId} .tiptap-fs-32 { font-size: 32px; }
+          .html-content-${itemId} .tiptap-fs-36 { font-size: 36px; }
+          .html-content-${itemId} .tiptap-fs-48 { font-size: 48px; }
+          .html-content-${itemId} .tiptap-fs-72 { font-size: 72px; }
+
           .html-content-${itemId} table,
           .html-content-${itemId} table * {
             box-sizing: border-box !important;
@@ -341,26 +411,25 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
             min-height: 40px !important;
             position: relative;
             background-color: #ffffff !important;
-            color: #111827 !important;
+            /* Never override text color: users may set per-cell or inline text colors */
+            font-family: inherit;
             display: table-cell !important;
           }
           .dark .html-content-${itemId} table th,
           .dark .html-content-${itemId} table td {
             border-color: #9ca3af !important;
             background-color: #1f2937 !important;
-            color: #f3f4f6 !important;
+            font-family: inherit;
           }
           .html-content-${itemId} table th {
             border-bottom: 3px solid #6b7280 !important;
             background-color: #f3f4f6 !important;
             font-weight: 600;
-            color: #111827 !important;
           }
           .dark .html-content-${itemId} table th {
             border-color: #9ca3af !important;
             border-bottom: 3px solid #9ca3af !important;
             background-color: #374151 !important;
-            color: #f9fafb !important;
           }
           .html-content-${itemId} table th p,
           .html-content-${itemId} table td p {
@@ -434,27 +503,190 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
             border-radius: 2px;
             color: inherit;
           }
+
+          /* List styling - fix spacing for nested lists */
+          .html-content-${itemId} ul,
+          .html-content-${itemId} ol {
+            list-style-position: outside;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+          }
+          /* Top-level lists get more bottom margin */
+          .html-content-${itemId} > ul,
+          .html-content-${itemId} > ol {
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+          }
+          /* Nested lists - absolutely no spacing - most specific selectors first */
+          .html-content-${itemId} li > ul,
+          .html-content-${itemId} li > ol {
+            margin-top: 0.125rem !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 1.5rem;
+          }
+          /* All nested lists - no spacing */
+          .html-content-${itemId} li ul,
+          .html-content-${itemId} li ol,
+          .html-content-${itemId} ul ul,
+          .html-content-${itemId} ul ol,
+          .html-content-${itemId} ol ul,
+          .html-content-${itemId} ol ol,
+          .html-content-${itemId} li li ul,
+          .html-content-${itemId} li li ol {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 1.5rem;
+          }
+          /* List items - minimal spacing, ensure proper display */
+          .html-content-${itemId} li {
+            display: list-item !important;
+            margin-top: 0.125rem;
+            margin-bottom: 0.125rem;
+            padding-left: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 1.5;
+            list-style-position: outside;
+            vertical-align: baseline;
+          }
+          /* Ensure list item content starts immediately after the marker */
+          .html-content-${itemId} ol li,
+          .html-content-${itemId} ul li {
+            display: list-item !important;
+            list-style-position: outside;
+          }
+          /* Ensure all content inside list items flows inline (no line breaks) */
+          .html-content-${itemId} li > p {
+            display: inline !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: inherit !important;
+          }
+          .html-content-${itemId} li > p:first-child {
+            display: inline !important;
+          }
+          .html-content-${itemId} li > p:only-child {
+            display: inline !important;
+          }
+          /* Remove block display from any first child in list items (except nested lists) */
+          .html-content-${itemId} li > *:first-child:not(ul):not(ol) {
+            display: inline !important;
+          }
+          /* Ensure all inline elements stay inline */
+          .html-content-${itemId} li > strong,
+          .html-content-${itemId} li > em,
+          .html-content-${itemId} li > span,
+          .html-content-${itemId} li > code,
+          .html-content-${itemId} li > a {
+            display: inline !important;
+          }
+          /* Remove any margins/padding that could cause line breaks */
+          .html-content-${itemId} li > *:not(ul):not(ol) {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+          }
+          .html-content-${itemId} li > p + * {
+            margin-top: 0 !important;
+          }
+          /* Force inline display for any divs inside list items */
+          .html-content-${itemId} li > div {
+            display: inline !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          /* Remove any line-height that might cause spacing */
+          .html-content-${itemId} li > p,
+          .html-content-${itemId} li > div {
+            line-height: inherit !important;
+          }
+          /* Remove bottom margin from list items that directly contain nested lists */
+          .html-content-${itemId} li > ul,
+          .html-content-${itemId} li > ol {
+            margin-top: 0.125rem !important;
+            margin-bottom: 0 !important;
+          }
+          /* When nested list is last child, remove parent li bottom margin */
+          .html-content-${itemId} li > ul:last-child,
+          .html-content-${itemId} li > ol:last-child {
+            margin-bottom: 0 !important;
+          }
+          .html-content-${itemId} li:last-child > ul:last-child,
+          .html-content-${itemId} li:last-child > ol:last-child {
+            margin-bottom: 0 !important;
+          }
+          /* Remove spacing from nested list items */
+          .html-content-${itemId} li li {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          /* Remove extra spacing from paragraphs before/after nested lists */
+          .html-content-${itemId} li p {
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+          }
+          .html-content-${itemId} li p:first-child {
+            margin-top: 0;
+          }
+          .html-content-${itemId} li p:last-child {
+            margin-bottom: 0;
+          }
+          /* Remove all spacing around nested lists - comprehensive override */
+          .html-content-${itemId} * ul ul,
+          .html-content-${itemId} * ul ol,
+          .html-content-${itemId} * ol ul,
+          .html-content-${itemId} * ol ol {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+          }
+          /* Remove spacing from list items that contain nested lists as last child */
+          .html-content-${itemId} li:last-child {
+            margin-bottom: 0.125rem;
+          }
+          /* When nested list is the only or last content in li, remove li bottom margin */
+          .html-content-${itemId} li > ul:only-child,
+          .html-content-${itemId} li > ol:only-child {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          /* Remove spacing between text and nested list in same list item */
+          .html-content-${itemId} li > * + ul,
+          .html-content-${itemId} li > * + ol {
+            margin-top: 0.125rem !important;
+          }
+          .html-content-${itemId} li > ul + *,
+          .html-content-${itemId} li > ol + * {
+            margin-top: 0.125rem !important;
+          }
         `
       }} />
       <div 
-        className={`html-content-${itemId} prose prose-sm dark:prose-invert max-w-none 
-          [&_p]:text-foreground/90 dark:[&_p]:text-gray-200 [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap 
+        className={`html-content-${itemId} max-w-none text-foreground/90 dark:text-gray-200
+          [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap 
           [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-8 [&_h1]:mb-4 
           [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-6 [&_h2]:mb-3 
           [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-4 [&_h3]:mb-2 
           [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
           [&_h5]:text-sm [&_h5]:font-semibold [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
           [&_h6]:text-xs [&_h6]:font-semibold [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
-          [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-1 [&_ul]:mb-4 [&_ul]:text-foreground/90 dark:[&_ul]:text-gray-200 [&_ul]:ml-6 [&_ul]:pl-0 
-          [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:space-y-1 [&_ol]:mb-4 [&_ol]:text-foreground/90 dark:[&_ol]:text-gray-200 [&_ol]:ml-6 [&_ol]:pl-0 
-          [&_li]:text-foreground/90 dark:[&_li]:text-gray-200 [&_li]:ml-0 [&_li]:pl-0 [&_li]:whitespace-pre-wrap 
-          [&_span]:whitespace-pre-wrap [&_span]:text-foreground/90 dark:[&_span]:text-gray-200 
+          [&_ul]:list-disc [&_ul]:list-outside [&_ul]:ml-6 [&_ul]:pl-0 
+          [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:ml-6 [&_ol]:pl-0 
+          [&_li]:ml-0 [&_li]:pl-0 [&_li]:whitespace-pre-wrap 
+          [&_span]:whitespace-pre-wrap
           [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
           [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap 
           [&_pre]:bg-muted dark:[&_pre]:bg-gray-800 [&_pre]:text-foreground dark:[&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto 
           [&_blockquote]:border-l-4 [&_blockquote]:border-border dark:[&_blockquote]:border-gray-600 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-foreground/80 dark:[&_blockquote]:text-gray-300 
-          [&_strong]:text-foreground dark:[&_strong]:text-gray-100 [&_strong]:font-semibold 
-          [&_em]:text-foreground/90 dark:[&_em]:text-gray-200 [&_em]:italic 
+          [&_strong]:font-semibold 
+          [&_em]:italic 
           [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto`}
         dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
       />
@@ -864,6 +1096,32 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
     <div key={itemId} className="overflow-x-auto my-4">
       <style dangerouslySetInnerHTML={{
         __html: `
+          /* TextStyle helpers (font family / size) - keep renderer output consistent with the editor */
+          .table-view-${itemId} .tiptap-ff-arial { font-family: Arial, sans-serif; }
+          .table-view-${itemId} .tiptap-ff-times-new-roman { font-family: "Times New Roman", Times, serif; }
+          .table-view-${itemId} .tiptap-ff-courier-new { font-family: "Courier New", Courier, monospace; }
+          .table-view-${itemId} .tiptap-ff-georgia { font-family: Georgia, serif; }
+          .table-view-${itemId} .tiptap-ff-verdana { font-family: Verdana, Geneva, sans-serif; }
+          .table-view-${itemId} .tiptap-ff-helvetica { font-family: Helvetica, Arial, sans-serif; }
+          .table-view-${itemId} .tiptap-ff-comic-sans-ms { font-family: "Comic Sans MS", "Comic Sans", cursive; }
+          .table-view-${itemId} .tiptap-ff-trebuchet-ms { font-family: "Trebuchet MS", Helvetica, sans-serif; }
+
+          .table-view-${itemId} .tiptap-fs-8 { font-size: 8px; }
+          .table-view-${itemId} .tiptap-fs-9 { font-size: 9px; }
+          .table-view-${itemId} .tiptap-fs-10 { font-size: 10px; }
+          .table-view-${itemId} .tiptap-fs-11 { font-size: 11px; }
+          .table-view-${itemId} .tiptap-fs-12 { font-size: 12px; }
+          .table-view-${itemId} .tiptap-fs-14 { font-size: 14px; }
+          .table-view-${itemId} .tiptap-fs-16 { font-size: 16px; }
+          .table-view-${itemId} .tiptap-fs-18 { font-size: 18px; }
+          .table-view-${itemId} .tiptap-fs-20 { font-size: 20px; }
+          .table-view-${itemId} .tiptap-fs-24 { font-size: 24px; }
+          .table-view-${itemId} .tiptap-fs-28 { font-size: 28px; }
+          .table-view-${itemId} .tiptap-fs-32 { font-size: 32px; }
+          .table-view-${itemId} .tiptap-fs-36 { font-size: 36px; }
+          .table-view-${itemId} .tiptap-fs-48 { font-size: 48px; }
+          .table-view-${itemId} .tiptap-fs-72 { font-size: 72px; }
+
           /* Use the same styles as edit mode (ProseMirror) */
           .table-view-${itemId} table {
             table-layout: fixed;
@@ -898,26 +1156,28 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
             min-height: 40px !important;
             position: relative;
             background-color: #ffffff !important;
-            color: #111827 !important;
+            color: inherit !important;
+            font-family: inherit !important;
             display: table-cell !important;
           }
           .dark .table-view-${itemId} table th,
           .dark .table-view-${itemId} table td {
             border-color: #9ca3af !important;
             background-color: #1f2937 !important;
-            color: #f3f4f6 !important;
+            color: inherit !important;
+            font-family: inherit !important;
           }
           .table-view-${itemId} table th {
             border-bottom: 3px solid #6b7280 !important;
             background-color: #f3f4f6 !important;
             font-weight: 600;
-            color: #111827 !important;
+            color: inherit !important;
           }
           .dark .table-view-${itemId} table th {
             border-color: #9ca3af !important;
             border-bottom: 3px solid #9ca3af !important;
             background-color: #374151 !important;
-            color: #f9fafb !important;
+            color: inherit !important;
           }
           .table-view-${itemId} table th p,
           .table-view-${itemId} table td p {
@@ -1082,25 +1342,27 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
               display: table-cell !important;
               vertical-align: top !important;
               background-color: #ffffff !important;
-              color: #111827 !important;
+              color: inherit !important;
+              font-family: inherit !important;
             }
             .dark .markdown-table-${item.id} table th,
             .dark .markdown-table-${item.id} table td {
               border-color: #9ca3af !important;
               background-color: #1f2937 !important;
-              color: #f3f4f6 !important;
+              color: inherit !important;
+              font-family: inherit !important;
             }
             .markdown-table-${item.id} table th {
               border-bottom: 3px solid #6b7280 !important;
               background-color: #f3f4f6 !important;
               font-weight: 600 !important;
-              color: #111827 !important;
+              color: inherit !important;
             }
             .dark .markdown-table-${item.id} table th {
               border-color: #9ca3af !important;
               border-bottom: 3px solid #9ca3af !important;
               background-color: #374151 !important;
-              color: #f9fafb !important;
+              color: inherit !important;
             }
           `
         }} />
@@ -1138,7 +1400,7 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                     textAlign: isTitleRow ? "center" : "left",
                     fontSize: isTitleRow ? "1.1em" : undefined,
                     display: "table-cell",
-                    color: isDark ? "#f9fafb" : "#111827",
+                    color: "inherit",
                   }}
                   colSpan={colspan}
                   {...props}
@@ -1158,7 +1420,7 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
                     backgroundColor: isDark ? "#1f2937" : "#ffffff",
                     padding: "8px 12px",
                     display: "table-cell",
-                    color: isDark ? "#f3f4f6" : "#111827",
+                    color: "inherit",
                   }}
                   colSpan={colspan}
                   {...props}
@@ -1419,17 +1681,17 @@ function renderPerAnswerExplanations(
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="font-bold text-foreground dark:text-gray-100">Option {option.label}:</span>
                   <span className={`text-sm font-semibold ${
-                    isCorrect ? "text-green-600" : "text-red-600"
+                    isCorrect ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                   }`}>
                     {isCorrect ? "Correct" : "Incorrect"}
                   </span>
                   {isSelected && (
-                    <span className="text-xs font-semibold px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20">
+                    <span className="text-xs font-semibold px-2 py-1 rounded bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border border-primary/20 dark:border-primary/30">
                       You selected
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-foreground/70 mt-1">{option.text}</p>
+                <p className="text-sm text-foreground/70 dark:text-gray-300 mt-1">{option.text}</p>
               </div>
 
               {/* Explanation Content */}

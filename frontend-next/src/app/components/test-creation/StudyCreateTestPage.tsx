@@ -199,7 +199,6 @@ export default function StudyCreateTestPage() {
           topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
-          limit: 999, // Max limit allowed by backend (1000 is exclusive)
         });
         // If we got exactly 999, there might be more, so show "999+"
         // Otherwise show the actual count
@@ -364,7 +363,6 @@ export default function StudyCreateTestPage() {
           topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
-          limit: 999,
         });
         const count = questions.length === 999 ? 999 : questions.length;
         setAvailableQuestionsCount(count);

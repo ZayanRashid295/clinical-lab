@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import { LandingNav } from "./LandingNav";
 import { HeroCarousel } from "./HeroCarousel";
@@ -13,6 +14,8 @@ import MenuLayoutSettings from "@/shared/components/Settings/MenuLayoutSettings"
 import { Button } from "@/shared/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/shared/utils/cn";
+import { SubscriptionPackagesService } from "@/app/services/subscriptions/subscription-packages.service";
+import { SubscriptionPackage } from "@/app/types/subscription";
 import {
   Brain,
   Users,
@@ -115,94 +118,191 @@ function FeaturesGrid() {
   );
 }
 
-function PricingGrid({ onLoginClick }: { onLoginClick: () => void }) {
+function PricingGrid({
+  onLoginClick,
+  onPackageSelect,
+}: {
+  onLoginClick: () => void;
+  onPackageSelect: (packageId: string) => void;
+}) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const packagesService = new SubscriptionPackagesService();
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        setLoading(true);
+        const response = await packagesService.getPackages({ status: "ACTIVE" });
+        const packagesList = Array.isArray(response) ? response : response.data || [];
+        // Sort by price ascending
+        const sortedPackages = packagesList.sort((a, b) => {
+          const priceA = parseFloat(a.price?.toString() || "0");
+          const priceB = parseFloat(b.price?.toString() || "0");
+          return priceA - priceB;
+        });
+        setPackages(sortedPackages);
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+        setPackages([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <p className="text-gray-600">Loading pricing plans...</p>
+      </div>
+    );
+  }
+
+  if (packages.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <p className="text-gray-600">No pricing plans available at the moment.</p>
+      </div>
+    );
+  }
+
+  // Map packages to pricing cards
+  // First package: Student (basic)
+  // Second package: Student Pro (if exists)
+  // Third: Institution or custom (if exists)
+  const studentPackage = packages[0] || null;
+  const studentProPackage = packages[1] || null;
+  const institutionPackage = packages[2] || null;
 
   return (
     <div
       ref={ref}
       className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
     >
-      <div
-        className={cn(
-          "opacity-0 transition-all duration-700 ease-out",
-          isVisible && "opacity-100 translate-y-0",
-          !isVisible && "translate-y-12"
-        )}
-      >
-        <PricingCard
-          name="Student"
-          price="$19"
-          period="month"
-          description="For individual medical students"
-          features={[
-            "Unlimited case access (20+ cases)",
-            "Shadow & Clinical Interview modes",
-            "AI-powered feedback & scoring",
-            "Leaderboard & achievements",
-            "Progress tracking dashboard",
-            "Community support",
-          ]}
-          cta="Start Free Trial"
-          onSelect={onLoginClick}
-        />
-      </div>
+      {studentPackage && (
+        <div
+          className={cn(
+            "opacity-0 transition-all duration-700 ease-out",
+            isVisible && "opacity-100 translate-y-0",
+            !isVisible && "translate-y-12"
+          )}
+        >
+          <PricingCard
+            name={studentPackage.name || "Student"}
+            price={`$${parseFloat(studentPackage.price?.toString() || "0").toFixed(2)}`}
+            period="month"
+            description={studentPackage.description || "For individual medical students"}
+            features={
+              studentPackage.subscriptionFeatures?.map(
+                (f) => f.packageFeature?.name || ""
+              ).filter(Boolean) || [
+                "Unlimited case access (20+ cases)",
+                "Shadow & Clinical Interview modes",
+                "AI-powered feedback & scoring",
+              ]
+            }
+            cta="Start Free Trial"
+            packageId={studentPackage.id}
+            onSelect={() => onPackageSelect(studentPackage.id)}
+          />
+        </div>
+      )}
 
-      <div
-        className={cn(
-          "opacity-0 transition-all duration-700 ease-out delay-100",
-          isVisible && "opacity-100 translate-y-0",
-          !isVisible && "translate-y-12"
-        )}
-      >
-        <PricingCard
-          name="Student Pro"
-          price="$39"
-          period="month"
-          description="Advanced features for serious learners"
-          features={[
-            "Everything in Student plan",
-            "50+ premium cases",
-            "Specialty-focused tracks",
-            "Advanced analytics & insights",
-            "SOAP note AI grading",
-            "Priority support",
-            "Downloadable certificates",
-          ]}
-          popular={true}
-          cta="Start Free Trial"
-          onSelect={onLoginClick}
-        />
-      </div>
+      {studentProPackage && (
+        <div
+          className={cn(
+            "opacity-0 transition-all duration-700 ease-out delay-100",
+            isVisible && "opacity-100 translate-y-0",
+            !isVisible && "translate-y-12"
+          )}
+        >
+          <PricingCard
+            name={studentProPackage.name || "Student Pro"}
+            price={`$${parseFloat(studentProPackage.price?.toString() || "0").toFixed(2)}`}
+            period="month"
+            description={studentProPackage.description || "Advanced features for serious learners"}
+            features={
+              studentProPackage.subscriptionFeatures?.map(
+                (f) => f.packageFeature?.name || ""
+              ).filter(Boolean) || [
+                "Everything in Student plan",
+                "50+ premium cases",
+                "Specialty-focused tracks",
+              ]
+            }
+            popular={true}
+            cta="Start Free Trial"
+            packageId={studentProPackage.id}
+            onSelect={() => onPackageSelect(studentProPackage.id)}
+          />
+        </div>
+      )}
 
-      <div
-        className={cn(
-          "opacity-0 transition-all duration-700 ease-out delay-200",
-          isVisible && "opacity-100 translate-y-0",
-          !isVisible && "translate-y-12"
-        )}
-      >
-        <PricingCard
-          name="Institution"
-          price="Custom"
-          period="year"
-          description="For medical schools & hospitals"
-          features={[
-            "Everything in Pro plan",
-            "Unlimited student accounts",
-            "Faculty dashboard & analytics",
-            "Cohort management tools",
-            "Custom case authoring",
-            "OSCE-style assessments",
-            "White-label options",
-            "Dedicated account manager",
-            "SSO integration",
-            "Custom curriculum alignment",
-          ]}
-          cta="Contact Sales"
-          onSelect={onLoginClick}
-        />
-      </div>
+      {institutionPackage ? (
+        <div
+          className={cn(
+            "opacity-0 transition-all duration-700 ease-out delay-200",
+            isVisible && "opacity-100 translate-y-0",
+            !isVisible && "translate-y-12"
+          )}
+        >
+          <PricingCard
+            name={institutionPackage.name || "Institution"}
+            price={
+              parseFloat(institutionPackage.price?.toString() || "0") === 0
+                ? "Custom"
+                : `$${parseFloat(institutionPackage.price?.toString() || "0").toFixed(2)}`
+            }
+            period="year"
+            description={institutionPackage.description || "For medical schools & hospitals"}
+            features={
+              institutionPackage.subscriptionFeatures?.map(
+                (f) => f.packageFeature?.name || ""
+              ).filter(Boolean) || [
+                "Everything in Pro plan",
+                "Unlimited student accounts",
+                "Faculty dashboard & analytics",
+              ]
+            }
+            cta="Contact Sales"
+            packageId={institutionPackage.id}
+            onSelect={() => onPackageSelect(institutionPackage.id)}
+          />
+        </div>
+      ) : (
+        <div
+          className={cn(
+            "opacity-0 transition-all duration-700 ease-out delay-200",
+            isVisible && "opacity-100 translate-y-0",
+            !isVisible && "translate-y-12"
+          )}
+        >
+          <PricingCard
+            name="Institution"
+            price="Custom"
+            period="year"
+            description="For medical schools & hospitals"
+            features={[
+              "Everything in Pro plan",
+              "Unlimited student accounts",
+              "Faculty dashboard & analytics",
+              "Cohort management tools",
+              "Custom case authoring",
+              "OSCE-style assessments",
+              "White-label options",
+              "Dedicated account manager",
+              "SSO integration",
+              "Custom curriculum alignment",
+            ]}
+            cta="Contact Sales"
+            onSelect={onLoginClick}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -357,6 +457,7 @@ function HowItWorksSection2() {
 }
 
 export function LandingPage() {
+  const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -478,7 +579,10 @@ export function LandingPage() {
               </p>
             </div>
 
-            <PricingGrid onLoginClick={handleOpenLoginModal} />
+            <PricingGrid
+              onLoginClick={handleOpenLoginModal}
+              onPackageSelect={(packageId) => router.push(`/checkout-basic?packageId=${packageId}`)}
+            />
 
             <div className="text-center mt-12">
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">

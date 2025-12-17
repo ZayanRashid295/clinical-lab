@@ -12,16 +12,14 @@ export interface PaymentQueryParams extends QueryParams {
 }
 
 // Create payment data transfer object
+// Aligns with backend CreatePaymentDto (userId + optional subscriptionPackageId, amount/currency/method optional)
 export interface CreatePaymentDto {
   userId: string;
-  rideId?: string;
-  amount: number;
-  currency: string;
-  method: PaymentMethodType;
+  subscriptionPackageId?: string;
+  amount?: number;
+  currency?: string;
+  method?: PaymentMethodType;
   description?: string;
-  metadata?: {
-    [key: string]: any;
-  };
 }
 
 // Update payment data transfer object

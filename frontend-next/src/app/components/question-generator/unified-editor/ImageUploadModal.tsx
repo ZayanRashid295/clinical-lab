@@ -70,28 +70,34 @@ export default function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUpl
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-background dark:bg-gray-900 border-border dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle>Upload Image</DialogTitle>
+          <DialogTitle className="text-foreground dark:text-gray-100">Upload Image</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="picture">Image File</Label>
-            <Input id="picture" type="file" accept="image/*" onChange={handleFileChange} />
+            <Label htmlFor="picture" className="text-foreground dark:text-gray-100">Image File</Label>
+            <Input 
+              id="picture" 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileChange}
+              className="text-foreground dark:text-gray-100 bg-background dark:bg-gray-800 border-border dark:border-gray-600 file:text-foreground dark:file:text-gray-100"
+            />
           </div>
           {previewUrl && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Preview:</h4>
-              <img src={previewUrl} alt="Image Preview" className="max-w-full h-auto rounded-md border" />
+              <h4 className="text-sm font-medium mb-2 text-foreground dark:text-gray-100">Preview:</h4>
+              <img src={previewUrl} alt="Image Preview" className="max-w-full h-auto rounded-md border border-border dark:border-gray-600" />
             </div>
           )}
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-red-500 dark:text-red-400">{error}</p>}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={uploading}>
+          <Button variant="outline" onClick={handleClose} disabled={uploading} className="border-border dark:border-gray-600 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-800">
             Cancel
           </Button>
-          <Button onClick={handleUploadClick} disabled={!selectedFile || uploading}>
+          <Button onClick={handleUploadClick} disabled={!selectedFile || uploading} className="bg-primary dark:bg-primary text-primary-foreground dark:text-primary-foreground hover:bg-primary/90 dark:hover:bg-primary/90">
             {uploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -74,7 +74,6 @@ export default function TestSessionPage() {
         // Fetch question paper questions
         const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
           questionPaperId: id,
-          limit: 100,
         });
         
         // Handle paginated response

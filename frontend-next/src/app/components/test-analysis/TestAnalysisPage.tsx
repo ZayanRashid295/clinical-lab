@@ -128,7 +128,6 @@ export default function TestAnalysisPage() {
         while (hasMore) {
           const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
             questionPaperId: id,
-            limit: 100,
             page,
           });
 

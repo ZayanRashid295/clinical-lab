@@ -1,5 +1,17 @@
 import { Extension } from "@tiptap/core"
 
+function normalizeFontSize(fontSize: string | number) {
+  const value = String(fontSize).replace("px", "").trim()
+  return value.match(/^\d+$/) ? value : ""
+}
+
+function parseFontSizeFromClassName(element: HTMLElement) {
+  // We store font size as class `tiptap-fs-12` etc.
+  const className = element.getAttribute("class") || ""
+  const match = className.match(/\btiptap-fs-(\d+)\b/)
+  return match?.[1] || null
+}
+
 export const FontSize = Extension.create({
   name: "fontSize",
 
@@ -11,16 +23,20 @@ export const FontSize = Extension.create({
           fontSize: {
             default: null,
             parseHTML: (element) => {
-              const fontSize = element.style.fontSize
+              // Prefer our class-based representation, fallback to legacy inline styles.
+              const fromClass = parseFontSizeFromClassName(element as HTMLElement)
+              if (fromClass) return fromClass
+              const fontSize = (element as HTMLElement).style.fontSize
               return fontSize ? fontSize.replace("px", "") : null
             },
             renderHTML: (attributes) => {
               if (!attributes.fontSize) {
                 return {}
               }
-              return {
-                style: `font-size: ${attributes.fontSize}px`,
-              }
+              // Use a class instead of inline style to avoid clobbering other `style`
+              // attributes like `color` and `font-family` on the same `textStyle` mark.
+              const size = normalizeFontSize(attributes.fontSize)
+              return size ? { class: `tiptap-fs-${size}` } : {}
             },
           },
         },

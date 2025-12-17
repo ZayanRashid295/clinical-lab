@@ -57,7 +57,7 @@ export default function QuestionPaperFormModal({
       // Load users
       setLoadingUsers(true);
       usersService
-        .getUsers({ limit: 100, status: "ACTIVE" })
+        .getUsers({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setUsers(response);

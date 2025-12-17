@@ -64,7 +64,7 @@ export default function QuestionFormModal({
       // Load topics
       setLoadingTopics(true);
       topicsService
-        .getTopics({ limit: 100, status: "ACTIVE" })
+        .getTopics({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setTopics(response);
@@ -82,7 +82,7 @@ export default function QuestionFormModal({
       // Load tags
       setLoadingTags(true);
       tagsService
-        .getTags({ limit: 100, status: "ACTIVE" })
+        .getTags({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setTags(response);

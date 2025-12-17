@@ -346,6 +346,7 @@ export default function UnifiedToolbar({
       
       // Force update to ensure the Select shows the new value
       // The editor update event should trigger a re-render
+      return true
     })
   }
 
@@ -353,11 +354,21 @@ export default function UnifiedToolbar({
     executeCommand(() => {
       // Set the font family directly
       editor.chain().focus().setFontFamily(family).run()
+      return true
     })
   }
 
   const setTextColor = (color: string) => {
-    executeCommand(() => editor.chain().focus().setColor(color).run())
+    executeCommand(() => {
+      const chain = editor.chain().focus()
+      // When inside a table, also set cell attribute so plain cell text (e.g. first column)
+      // reliably renders with the chosen color in preview/HTML output.
+      if (isInTable) {
+        // Apply to both cell and header, whichever is active
+        try { chain.setCellAttribute("textColor", color) } catch {}
+      }
+      return chain.setColor(color).run()
+    })
     setTextColorOpen(false)
   }
 
@@ -381,6 +392,7 @@ export default function UnifiedToolbar({
           editor.chain().focus().toggleHighlight({ color }).run()
         }
       }
+      return true
     })
     setHighlightColorOpen(false)
   }
@@ -582,6 +594,7 @@ export default function UnifiedToolbar({
               onClick={() => {
                 executeCommand(() => {
                   editor.chain().focus().unsetHighlight().run()
+                  return true
                 })
                 setHighlightColorOpen(false)
               }}
@@ -680,7 +693,53 @@ export default function UnifiedToolbar({
         type="button"
         variant="ghost"
         size="sm"
-        onClick={() => executeCommand(() => editor.chain().focus().toggleBulletList().run())}
+        onClick={() => {
+          executeCommand(() => {
+            try {
+              const isInListItem = editor.isActive("listItem")
+              const isInBulletList = editor.isActive("bulletList")
+              const isInOrderedList = editor.isActive("orderedList")
+              
+              // If we're in a list item
+              if (isInListItem) {
+                // If already in a bullet list, just indent (create nested bullet list)
+                if (isInBulletList && editor.can().sinkListItem("listItem")) {
+                  editor.chain().focus().sinkListItem("listItem").run()
+                }
+                // If in an ordered list, create nested bullet list without converting parent
+                else if (isInOrderedList && editor.can().sinkListItem("listItem")) {
+                  // Strategy: Sink the list item first to create a nested structure
+                  // Then wrap the nested content in a bullet list
+                  // This ensures the parent ordered list remains unchanged
+                  
+                  // Step 1: Sink to create nested list structure
+                  editor.chain().focus().sinkListItem("listItem").run()
+                  
+                  // Step 2: After sinking, we're now in a nested list item
+                  // Check if we can toggle bullet list (should only affect nested level)
+                  // Use a small delay to ensure the sink operation completes
+                  requestAnimationFrame(() => {
+                    // Now toggle bullet list - this should only affect the nested list
+                    // because after sinking, the selection is in a nested list item
+                    if (editor.isActive("listItem")) {
+                      editor.chain().focus().toggleBulletList().run()
+                    }
+                  })
+                }
+                // If not in any list yet, just toggle
+                else {
+                  editor.chain().focus().toggleBulletList().run()
+                }
+              } else {
+                // Not in a list item, normal toggle
+                editor.chain().focus().toggleBulletList().run()
+              }
+            } catch (error) {
+              // Fallback to normal toggle
+              editor.chain().focus().toggleBulletList().run()
+            }
+          })
+        }}
         className={cn((() => {
           try {
             return editor.isActive("bulletList")
@@ -688,7 +747,7 @@ export default function UnifiedToolbar({
             return false
           }
         })() && "bg-muted dark:bg-gray-700")}
-        title="Bullet List"
+        title="Bullet List (In list item: creates nested bullet list without converting parent)"
       >
         <List className="h-4 w-4" />
       </Button>
@@ -696,7 +755,52 @@ export default function UnifiedToolbar({
         type="button"
         variant="ghost"
         size="sm"
-        onClick={() => executeCommand(() => editor.chain().focus().toggleOrderedList().run())}
+        onClick={() => {
+          executeCommand(() => {
+            try {
+              const isInListItem = editor.isActive("listItem")
+              const isInBulletList = editor.isActive("bulletList")
+              const isInOrderedList = editor.isActive("orderedList")
+              
+              // If we're in a list item
+              if (isInListItem) {
+                // If already in an ordered list, just indent (create nested ordered list)
+                if (isInOrderedList && editor.can().sinkListItem("listItem")) {
+                  editor.chain().focus().sinkListItem("listItem").run()
+                }
+                // If in a bullet list, create nested ordered list without converting parent
+                else if (isInBulletList && editor.can().sinkListItem("listItem")) {
+                  // Strategy: Sink the list item first to create a nested structure
+                  // Then wrap the nested content in an ordered list
+                  // This ensures the parent bullet list remains unchanged
+                  
+                  // Step 1: Sink to create nested list structure
+                  editor.chain().focus().sinkListItem("listItem").run()
+                  
+                  // Step 2: After sinking, we're now in a nested list item
+                  // Toggle ordered list - this should only affect the nested level
+                  requestAnimationFrame(() => {
+                    // Now toggle ordered list - this should only affect the nested list
+                    // because after sinking, the selection is in a nested list item
+                    if (editor.isActive("listItem")) {
+                      editor.chain().focus().toggleOrderedList().run()
+                    }
+                  })
+                }
+                // If not in any list yet, just toggle
+                else {
+                  editor.chain().focus().toggleOrderedList().run()
+                }
+              } else {
+                // Not in a list item, normal toggle
+                editor.chain().focus().toggleOrderedList().run()
+              }
+            } catch (error) {
+              // Fallback to normal toggle
+              editor.chain().focus().toggleOrderedList().run()
+            }
+          })
+        }}
         className={cn((() => {
           try {
             return editor.isActive("orderedList")
@@ -704,10 +808,47 @@ export default function UnifiedToolbar({
             return false
           }
         })() && "bg-muted dark:bg-gray-700")}
-        title="Numbered List"
+        title="Numbered List (In list item: creates nested numbered list without converting parent)"
       >
         <ListOrdered className="h-4 w-4" />
       </Button>
+      
+      {/* List Indent/Outdent - Show when in a list */}
+      {(() => {
+        try {
+          const isInList = editor.isActive("bulletList") || editor.isActive("orderedList")
+          if (!isInList) return null
+          
+          return (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => executeCommand(() => editor.chain().focus().sinkListItem("listItem").run())}
+                title="Indent List Item (Create Nested List) - Keyboard: Tab"
+                disabled={!editor.can().sinkListItem("listItem")}
+                className="opacity-60 hover:opacity-100"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => executeCommand(() => editor.chain().focus().liftListItem("listItem").run())}
+                title="Outdent List Item (Move to Parent List) - Keyboard: Shift+Tab"
+                disabled={!editor.can().liftListItem("listItem")}
+                className="opacity-60 hover:opacity-100"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </>
+          )
+        } catch {
+          return null
+        }
+      })()}
 
       <div className="w-px h-6 bg-border dark:bg-gray-700 mx-1" />
 

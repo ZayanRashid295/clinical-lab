@@ -55,7 +55,7 @@ export default function ProductFormModal({
       // Load available tags
       setLoadingTags(true);
       tagsService
-        .getTags({ limit: 100, status: "ACTIVE" })
+        .getTags({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setAvailableTags(response);

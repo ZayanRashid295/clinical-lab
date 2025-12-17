@@ -64,7 +64,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     if (isOpen) {
       setLoadingSections(true)
       sectionsService
-        .getSections({ limit: 100, status: "ACTIVE" })
+        .getSections({ status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setSections(data)
@@ -78,7 +78,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     if (isOpen && sectionId) {
       setLoadingChapters(true)
       chaptersService
-        .getChapters({ sectionId, limit: 100, status: "ACTIVE" })
+        .getChapters({ sectionId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setChapters(data)
@@ -95,7 +95,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     if (isOpen && chapterId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId, limit: 100, status: "ACTIVE" })
+        .getTopics({ chapterId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)

@@ -31,6 +31,14 @@ export class PaymentsService extends BaseApiService {
   }
 
   /**
+   * Manually sync payment status from Stripe
+   * Useful when webhook is missed or in development
+   */
+  async syncPayment(id: string): Promise<Payment> {
+    return this.post(`${this.endpoint}/${id}/sync`, {});
+  }
+
+  /**
    * Create a new payment
    */
   async createPayment(paymentData: CreatePaymentDto): Promise<CreateResponse> {

@@ -55,7 +55,7 @@ export default function QuestionChoiceFormModal({
       // Load questions
       setLoadingQuestions(true);
       questionsService
-        .getQuestions({ limit: 100, status: "ACTIVE" })
+        .getQuestions({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setQuestions(response);

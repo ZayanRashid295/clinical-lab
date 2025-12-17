@@ -637,6 +637,53 @@ export class SubscriptionsService {
     });
   }
 
+  /**
+   * Clean up duplicate active subscriptions for a user
+   * Keeps only the most recent active subscription, cancels all others
+   */
+  async cleanupDuplicateActiveSubscriptions(userId: string) {
+    const activeSubscriptions = await this.prisma.subscription.findMany({
+      where: {
+        userId,
+        status: "ACTIVE" as any,
+      },
+      orderBy: {
+        createdAt: "desc", // Most recent first
+      },
+    });
+
+    if (activeSubscriptions.length <= 1) {
+      return {
+        kept: activeSubscriptions.length,
+        cancelled: 0,
+        message: "No duplicate subscriptions found",
+      };
+    }
+
+    // Keep the most recent one, cancel all others
+    const toCancel = activeSubscriptions.slice(1); // All except the first (most recent)
+    const cancelledIds = toCancel.map((s) => s.id);
+
+    await this.prisma.subscription.updateMany({
+      where: {
+        id: {
+          in: cancelledIds,
+        },
+      },
+      data: {
+        status: "CANCELLED",
+      },
+    });
+
+    return {
+      kept: 1,
+      cancelled: toCancel.length,
+      keptSubscriptionId: activeSubscriptions[0].id,
+      cancelledSubscriptionIds: cancelledIds,
+      message: `Kept most recent subscription, cancelled ${toCancel.length} duplicate(s)`,
+    };
+  }
+
   async getStats() {
     const total = await this.prisma.subscription.count();
     const active = await this.prisma.subscription.count({

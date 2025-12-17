@@ -215,11 +215,11 @@ export default function PerAnswerExplanationEditor({
                 trimmedHtml !== "<div></div>" &&
                 trimmedHtml !== "<div><br></div>" &&
                 trimmedHtml.startsWith("<")
-              const hasMarkdown = block.data?.markdown && block.data.markdown.trim()
+              const hasMarkdown = !!(block.data?.markdown && block.data.markdown.trim())
               
               // If block has markdown but no HTML, convert it
               if (!hasHtml && hasMarkdown) {
-                if (process.env.NODE_ENV === "development") {
+                if (process.env.NODE_ENV === "development" && block.data?.markdown) {
                   console.log("[PerAnswerExplanationEditor] Converting block markdown:", {
                     blockId: block.id,
                     markdownLength: block.data.markdown.length,
@@ -227,7 +227,7 @@ export default function PerAnswerExplanationEditor({
                   })
                 }
                 
-                const convertedHtml = await convertMarkdownToHTML(block.data.markdown)
+                const convertedHtml = await convertMarkdownToHTML(block.data!.markdown!)
                 
                 if (process.env.NODE_ENV === "development") {
                   console.log("[PerAnswerExplanationEditor] Converted HTML:", {

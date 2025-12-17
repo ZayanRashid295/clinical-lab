@@ -52,7 +52,7 @@ export default function RichTextEditor({
             class: "bg-muted p-4 rounded-lg font-mono text-sm",
           },
         },
-        horizontalRule: true,
+        horizontalRule: {},
         strike: false,
         underline: false,
         link: false,
@@ -110,6 +110,19 @@ export default function RichTextEditor({
                 }
               },
             },
+            textColor: {
+              default: null,
+              parseHTML: (element: HTMLElement) => element.style.color || element.getAttribute("data-text-color"),
+              renderHTML: (attributes: Record<string, any>) => {
+                if (!attributes.textColor) {
+                  return {}
+                }
+                return {
+                  "data-text-color": attributes.textColor,
+                  style: `color: ${attributes.textColor}`,
+                }
+              },
+            },
             backgroundColor: {
               default: null,
               parseHTML: (element: HTMLElement) => element.style.backgroundColor || element.getAttribute("data-background-color"),
@@ -141,8 +154,8 @@ export default function RichTextEditor({
         parseHTML() {
           return [{ tag: 'td' }]
         },
-        renderHTML({ HTMLAttributes }) {
-          return ['td', HTMLAttributes, 0]
+        renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
+          return ["td", HTMLAttributes, 0]
         },
       }),
       // Use extended TableHeader instead of base one to avoid duplicate extension warning
@@ -160,6 +173,19 @@ export default function RichTextEditor({
                 return {
                   "data-text-align": attributes.textAlign,
                   style: styles.join("; "),
+                }
+              },
+            },
+            textColor: {
+              default: null,
+              parseHTML: (element: HTMLElement) => element.style.color || element.getAttribute("data-text-color"),
+              renderHTML: (attributes: Record<string, any>) => {
+                if (!attributes.textColor) {
+                  return {}
+                }
+                return {
+                  "data-text-color": attributes.textColor,
+                  style: `color: ${attributes.textColor}`,
                 }
               },
             },
@@ -194,8 +220,8 @@ export default function RichTextEditor({
         parseHTML() {
           return [{ tag: 'th' }]
         },
-        renderHTML({ HTMLAttributes }) {
-          return ['th', HTMLAttributes, 0]
+        renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
+          return ["th", HTMLAttributes, 0]
         },
       }),
     ],
@@ -284,6 +310,32 @@ export default function RichTextEditor({
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
+          /* TextStyle helpers (font family / size) */
+          .ProseMirror .tiptap-ff-arial { font-family: Arial, sans-serif; }
+          .ProseMirror .tiptap-ff-times-new-roman { font-family: "Times New Roman", Times, serif; }
+          .ProseMirror .tiptap-ff-courier-new { font-family: "Courier New", Courier, monospace; }
+          .ProseMirror .tiptap-ff-georgia { font-family: Georgia, serif; }
+          .ProseMirror .tiptap-ff-verdana { font-family: Verdana, Geneva, sans-serif; }
+          .ProseMirror .tiptap-ff-helvetica { font-family: Helvetica, Arial, sans-serif; }
+          .ProseMirror .tiptap-ff-comic-sans-ms { font-family: "Comic Sans MS", "Comic Sans", cursive; }
+          .ProseMirror .tiptap-ff-trebuchet-ms { font-family: "Trebuchet MS", Helvetica, sans-serif; }
+
+          .ProseMirror .tiptap-fs-8 { font-size: 8px; }
+          .ProseMirror .tiptap-fs-9 { font-size: 9px; }
+          .ProseMirror .tiptap-fs-10 { font-size: 10px; }
+          .ProseMirror .tiptap-fs-11 { font-size: 11px; }
+          .ProseMirror .tiptap-fs-12 { font-size: 12px; }
+          .ProseMirror .tiptap-fs-14 { font-size: 14px; }
+          .ProseMirror .tiptap-fs-16 { font-size: 16px; }
+          .ProseMirror .tiptap-fs-18 { font-size: 18px; }
+          .ProseMirror .tiptap-fs-20 { font-size: 20px; }
+          .ProseMirror .tiptap-fs-24 { font-size: 24px; }
+          .ProseMirror .tiptap-fs-28 { font-size: 28px; }
+          .ProseMirror .tiptap-fs-32 { font-size: 32px; }
+          .ProseMirror .tiptap-fs-36 { font-size: 36px; }
+          .ProseMirror .tiptap-fs-48 { font-size: 48px; }
+          .ProseMirror .tiptap-fs-72 { font-size: 72px; }
+
           /* Paragraph hover */
           .ProseMirror p:hover {
             background-color: hsl(var(--muted) / 0.3);
@@ -301,6 +353,39 @@ export default function RichTextEditor({
             background-color: hsl(var(--muted) / 0.3);
             border-radius: 4px;
             transition: background-color 0.2s ease;
+          }
+
+          /* List styles - ensure bullets and numbers are visible */
+          .ProseMirror ul {
+            list-style-type: disc !important;
+            list-style-position: outside !important;
+            padding-left: 1.5rem !important;
+            margin: 0.5rem 0 !important;
+          }
+          .ProseMirror ol {
+            list-style-type: decimal !important;
+            list-style-position: outside !important;
+            padding-left: 1.5rem !important;
+            margin: 0.5rem 0 !important;
+          }
+          .ProseMirror li {
+            display: list-item !important;
+            margin: 0.25rem 0 !important;
+            padding-left: 0.25rem !important;
+          }
+          .ProseMirror ul ul {
+            list-style-type: circle !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .ProseMirror ul ul ul {
+            list-style-type: square !important;
+          }
+          .ProseMirror ol ol {
+            list-style-type: lower-alpha !important;
+          }
+          .ProseMirror ol ol ol {
+            list-style-type: lower-roman !important;
           }
 
           /* List hover */
@@ -512,9 +597,9 @@ export default function RichTextEditor({
             [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:text-lg [&_h4]:font-bold [&_h4]:mt-3 [&_h4]:mb-2
             [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:text-base [&_h5]:font-bold [&_h5]:mt-2 [&_h5]:mb-1
             [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:text-sm [&_h6]:font-bold [&_h6]:mt-2 [&_h6]:mb-1
-            [&_ul]:text-foreground dark:[&_ul]:text-gray-100 
-            [&_ol]:text-foreground dark:[&_ol]:text-gray-100 
-            [&_li]:text-foreground dark:[&_li]:text-gray-100"
+            [&_ul]:text-foreground dark:[&_ul]:text-gray-100 [&_ul]:list-disc [&_ul]:list-outside [&_ul]:ml-6 [&_ul]:pl-0
+            [&_ol]:text-foreground dark:[&_ol]:text-gray-100 [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:ml-6 [&_ol]:pl-0
+            [&_li]:text-foreground dark:[&_li]:text-gray-100 [&_li]:ml-0 [&_li]:pl-0"
         />
       </div>
     </>

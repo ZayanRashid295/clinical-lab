@@ -14,6 +14,7 @@ interface PricingCardProps {
   features: string[];
   popular?: boolean;
   cta: string;
+  packageId?: string;
   onSelect: () => void;
 }
 

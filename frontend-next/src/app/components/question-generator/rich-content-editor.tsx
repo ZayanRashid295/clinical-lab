@@ -81,7 +81,7 @@ function detectMarkdownTable(markdown: string): { isTable: boolean; tableMarkdow
   // Handle single-line tables (all rows concatenated, e.g., "| col1 | col2 | | col3 | col4 |")
   // Check if markdown contains multiple table row patterns
   const tableRowPattern = /\|\s*[^|]+\s*\|\s*[^|]+\s*\|/g
-  const allTableMatches = [...normalizedMarkdown.matchAll(tableRowPattern)]
+  const allTableMatches = normalizedMarkdown.match(tableRowPattern) || []
   
   // If we have 3+ table row patterns and it's mostly on one line, it's likely a concatenated table
   if (allTableMatches.length >= 3 && normalizedMarkdown.split("\n").filter(l => l.trim()).length <= 3) {
@@ -453,6 +453,11 @@ export default function RichContentEditor({ item, onUpdate }: RichContentEditorP
     }
 
     // Otherwise, render as regular text editor
+    const initialContent =
+      (item.data && (item.data as any).html) ||
+      (item.data && (item.data as any).markdown) ||
+      contentToCheck
+
     return (
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">Rich Text Content</label>

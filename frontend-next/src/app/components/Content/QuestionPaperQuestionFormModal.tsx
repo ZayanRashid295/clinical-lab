@@ -57,7 +57,7 @@ export default function QuestionPaperQuestionFormModal({
       // Load question papers
       setLoadingQuestionPapers(true);
       questionPapersService
-        .getQuestionPapers({ limit: 100, status: "ACTIVE" })
+        .getQuestionPapers({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setQuestionPapers(response);

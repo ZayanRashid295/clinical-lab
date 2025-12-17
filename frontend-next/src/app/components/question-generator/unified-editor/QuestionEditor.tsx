@@ -20,7 +20,7 @@ import { TopicsService } from "@/app/services/content/topics.service"
 import { ProductTagsService } from "@/app/services/products/product-tags.service"
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "../choice-system/types"
-import { blocksToHTML, htmlToBlocks } from "./content-utils"
+import { blocksToHTML, blocksToHTMLAsync, htmlToBlocks } from "./content-utils"
 import PerAnswerExplanationEditor from "./PerAnswerExplanationEditor"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { Editor } from "@tiptap/react"
@@ -92,7 +92,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   useEffect(() => {
     setLoadingSections(true)
     sectionsService
-      .getSections({ limit: 100, status: "ACTIVE" })
+      .getSections({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         setSections(data)
@@ -105,7 +105,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   useEffect(() => {
     setLoadingTags(true)
     productTagsService
-      .getTags({ limit: 100, status: "ACTIVE" })
+      .getTags({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         setProductTags(data)
@@ -138,29 +138,26 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
     }
   }, [showTagsDropdown])
 
-  // Load chapters when section changes
+  // Load chapters on mount (no longer dependent on System selection)
   useEffect(() => {
-    if (metadata.sectionId) {
-      setLoadingChapters(true)
-      chaptersService
-        .getChapters({ sectionId: metadata.sectionId, limit: 100, status: "ACTIVE" })
-        .then((response) => {
-          const data = Array.isArray(response) ? response : (response as any)?.data || []
-          setChapters(data)
-        })
-        .catch(() => setChapters([]))
-        .finally(() => setLoadingChapters(false))
-    } else {
-      setChapters([])
-    }
-  }, [metadata.sectionId])
+    setLoadingChapters(true)
+    chaptersService
+      .getChapters({ status: "ACTIVE" })
+      .then((response) => {
+        const data = Array.isArray(response) ? response : (response as any)?.data || []
+        setChapters(data)
+      })
+      .catch(() => setChapters([]))
+      .finally(() => setLoadingChapters(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Load topics when chapter changes
   useEffect(() => {
     if (metadata.chapterId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId: metadata.chapterId, limit: 100, status: "ACTIVE" })
+        .getTopics({ chapterId: metadata.chapterId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)
@@ -213,19 +210,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   }, [metadata.topicId])
 
   // Handle metadata changes
-  const handleSectionChange = (sectionId: string) => {
-    setMetadata((prev) => ({
-      ...prev,
-      sectionId: sectionId || undefined,
-      chapterId: undefined,
-      topicId: undefined,
-    }))
-  }
-
   const handleChapterChange = (chapterId: string) => {
+    const selectedChapter = chapters.find((c: any) => c.id === chapterId)
+    const derivedSectionId = selectedChapter?.sectionId || selectedChapter?.section?.id
     setMetadata((prev) => ({
       ...prev,
       chapterId: chapterId || undefined,
+      // Auto-map System from selected Chapter (frontend-only)
+      sectionId: derivedSectionId || prev.sectionId,
       topicId: undefined,
     }))
   }
@@ -237,30 +229,19 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
     }))
   }
 
-  const handleTagToggle = (productTagId: string) => {
-    setMetadata((prev) => {
-      const currentTagIds = prev.productTagIds || []
-      const isSelected = currentTagIds.includes(productTagId)
-      
-      const newTagIds = isSelected
-        ? currentTagIds.filter((id) => id !== productTagId)
-        : [...currentTagIds, productTagId]
-      
-      return {
-        ...prev,
-        productTagIds: newTagIds.length > 0 ? newTagIds : undefined,
-        // Keep productTagId for backward compatibility (use first selected tag)
-        productTagId: newTagIds.length > 0 ? newTagIds[0] : undefined,
-      }
-    })
+  const handleTagSelect = (productTagId: string) => {
+    setMetadata((prev) => ({
+      ...prev,
+      // Single-select only
+      productTagId: productTagId || undefined,
+      productTagIds: productTagId ? [productTagId] : undefined,
+    }))
   }
   
-  const getSelectedTagNames = () => {
-    const selectedIds = metadata.productTagIds || []
-    return productTags
-      .filter((tag) => selectedIds.includes(tag.id))
-      .map((tag) => tag.name)
-      .join(", ")
+  const getSelectedTagName = () => {
+    const selectedId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    const selected = productTags.find((t) => t.id === selectedId)
+    return selected?.name || ""
   }
 
   // Generate question ID based on system, subject, and topic
@@ -339,6 +320,109 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
       setQuestionId(generateQuestionId())
     }
   }, [generateQuestionId, isQuestionIdManuallyEdited, initialData?.metadata?.questionId])
+
+  // Convert markdown blocks to HTML when stemBlocks are first loaded
+  // This ensures that markdown content (from bulk upload) is properly rendered in edit mode
+  const [hasConvertedStemBlocks, setHasConvertedStemBlocks] = useState(false)
+  useEffect(() => {
+    const convertStemBlocks = async () => {
+      if (stemBlocks.length === 0 || hasConvertedStemBlocks) return
+      
+      // Check if any blocks have markdown that needs conversion
+      const needsConversion = stemBlocks.some(block => {
+        if (block.type === "text") {
+          const html = block.data?.html || ""
+          const markdown = block.data?.markdown || ""
+          const isEmptyHtml = !html || 
+            html.trim() === "" || 
+            html.trim() === "<p></p>" || 
+            html.trim() === "<p><br></p>" ||
+            html.trim() === "<p> </p>" ||
+            html.trim() === "<p><br/></p>" ||
+            html.trim() === "<div></div>" ||
+            html.trim() === "<div><br></div>"
+          
+          // Check if HTML contains raw markdown syntax
+          const htmlInnerText = html.replace(/<[^>]+>/g, '').trim()
+          const markdownPatterns = [
+            /\*\*[^*]+\*\*/,
+            /\*[^*\n]+\*/,
+            /^[-*+]\s/m,
+            /^\d+\.\s/m,
+            /^#{1,6}\s/m,
+          ]
+          const containsMarkdownSyntax = !isEmptyHtml && markdownPatterns.some(pattern => 
+            pattern.test(htmlInnerText) || pattern.test(html)
+          )
+          
+          return (isEmptyHtml || containsMarkdownSyntax) && markdown && markdown.trim()
+        }
+        return false
+      })
+      
+      if (!needsConversion) {
+        setHasConvertedStemBlocks(true)
+        return
+      }
+      
+      // Convert markdown to HTML for all blocks that need it
+      const updatedBlocks = await Promise.all(stemBlocks.map(async (block) => {
+        if (block.type === "text") {
+          const html = block.data?.html || ""
+          const markdown = block.data?.markdown || ""
+          
+          const isEmptyHtml = !html || 
+            html.trim() === "" || 
+            html.trim() === "<p></p>" || 
+            html.trim() === "<p><br></p>" ||
+            html.trim() === "<p> </p>" ||
+            html.trim() === "<p><br/></p>" ||
+            html.trim() === "<div></div>" ||
+            html.trim() === "<div><br></div>"
+          
+          const htmlInnerText = html.replace(/<[^>]+>/g, '').trim()
+          const markdownPatterns = [
+            /\*\*[^*]+\*\*/,
+            /\*[^*\n]+\*/,
+            /^[-*+]\s/m,
+            /^\d+\.\s/m,
+            /^#{1,6}\s/m,
+          ]
+          const containsMarkdownSyntax = !isEmptyHtml && markdownPatterns.some(pattern => 
+            pattern.test(htmlInnerText) || pattern.test(html)
+          )
+          
+          if ((isEmptyHtml || containsMarkdownSyntax) && markdown && markdown.trim()) {
+            // Convert markdown to HTML using async conversion for proper rendering
+            const convertedHtml = await blocksToHTMLAsync([block])
+            return {
+              ...block,
+              data: {
+                ...block.data,
+                html: convertedHtml !== "<p></p>" ? convertedHtml : html,
+              },
+            }
+          }
+        }
+        return block
+      }))
+      
+      // Only update if blocks actually changed
+      const hasChanges = updatedBlocks.some((block, index) => {
+        const original = stemBlocks[index]
+        return block.type === "text" && original.type === "text" && 
+               block.data?.html !== original.data?.html
+      })
+      
+      if (hasChanges) {
+        setStemBlocks(updatedBlocks)
+      }
+      setHasConvertedStemBlocks(true)
+    }
+    
+    convertStemBlocks()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData?.stem]) // Only run when initialData.stem changes (when question is loaded)
 
   // Get the active editor based on activeSection
   // This function should NOT call setState to avoid infinite loops
@@ -586,6 +670,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
 
   // If in preview mode, show student view
   if (isPreviewMode) {
+    const selectedSubjectTagName = getSelectedTagName()
     return (
       <div className="flex flex-col h-full">
         {/* Header with back button */}
@@ -640,8 +725,8 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                   text: choice.text,
                   correct: choice.correct,
                 }))}
-                subject={chapterName || metadata.subject}
-                system={sectionName || metadata.system}
+                subjectTag={selectedSubjectTagName || ""}
+                chapter={chapterName || metadata.subject}
                 topic={topicName || (metadata.topicId ? { name: topicName } : undefined)}
                 correctAnswerLabel={choices.find((c) => c.correct)?.label || "C"}
               />
@@ -753,9 +838,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                   >
                     <RichTextEditor
                       content={blocksToHTML(stemBlocks)}
-                      onChange={(html) => {
+                      onChange={async (html) => {
                         // Preserve existing block IDs when converting HTML back to blocks
-                        setStemBlocks(htmlToBlocks(html, stemBlocks))
+                        const newBlocks = htmlToBlocks(html, stemBlocks)
+                        setStemBlocks(newBlocks)
                       }}
                       editorRef={(editor) => {
                         stemEditorRef.current = editor
@@ -973,124 +1059,48 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                       }}
                     />
 
-                    {/* System, Subject, Topic, Tags at the end - Editable */}
+                    {/* Metadata (Subjects/Chapters/Topic) */}
                     <div className="border-t border-border/40 dark:border-gray-700 pt-6 mt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Subjects (Product Tag) */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            System
+                            Subjects
                           </div>
                           <select
-                            value={metadata.sectionId || ""}
-                            onChange={(e) => handleSectionChange(e.target.value)}
+                            value={metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""}
+                            onChange={(e) => handleTagSelect(e.target.value)}
                             className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            disabled={loadingSections}
+                            disabled={loadingTags}
                           >
-                            <option value="">Select System...</option>
-                            {sections.map((section) => (
-                              <option key={section.id} value={section.id}>
-                                {section.name}
+                            <option value="">Select Subject...</option>
+                            {productTags.map((tag) => (
+                              <option key={tag.id} value={tag.id}>
+                                {tag.name}
                               </option>
                             ))}
                           </select>
                         </div>
-                        <div className="relative tags-dropdown-container">
-                          <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Tags
-                          </div>
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={() => setShowTagsDropdown(!showTagsDropdown)}
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-left flex items-center justify-between hover:bg-muted dark:hover:bg-gray-700"
-                              disabled={loadingTags}
-                            >
-                              <span className="truncate">
-                                {metadata.productTagIds && metadata.productTagIds.length > 0
-                                  ? getSelectedTagNames() || "Select Tags..."
-                                  : "Select Tags..."}
-                              </span>
-                              <span className="ml-2 text-muted-foreground dark:text-gray-400">
-                                {showTagsDropdown ? "▲" : "▼"}
-                              </span>
-                            </button>
-                            {showTagsDropdown && (
-                              <div className="absolute z-50 w-full mt-1 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                {loadingTags ? (
-                                  <div className="px-3 py-2 text-sm text-muted-foreground dark:text-gray-400">
-                                    Loading tags...
-                                  </div>
-                                ) : productTags.length === 0 ? (
-                                  <div className="px-3 py-2 text-sm text-muted-foreground dark:text-gray-400">
-                                    No tags available
-                                  </div>
-                                ) : (
-                                  <div className="py-1">
-                                    {productTags.map((tag) => {
-                                      const isSelected = metadata.productTagIds?.includes(tag.id) || false
-                                      return (
-                                        <label
-                                          key={tag.id}
-                                          className="flex items-center px-3 py-2 hover:bg-muted/50 dark:hover:bg-gray-700 cursor-pointer"
-                                        >
-                                          <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => handleTagToggle(tag.id)}
-                                            className="mr-2 h-4 w-4 rounded border-border dark:border-gray-600 text-primary focus:ring-primary"
-                                          />
-                                          <span className="text-sm text-foreground dark:text-gray-100">{tag.name}</span>
-                                        </label>
-                                      )
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          {metadata.productTagIds && metadata.productTagIds.length > 0 && (
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {productTags
-                                .filter((tag) => metadata.productTagIds?.includes(tag.id))
-                                .map((tag) => (
-                                  <span
-                                    key={tag.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary/10 text-primary"
-                                  >
-                                    {tag.name}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleTagToggle(tag.id)}
-                                      className="ml-1 hover:text-primary/80 dark:hover:text-blue-400 text-foreground dark:text-gray-200"
-                                    >
-                                      ×
-                                    </button>
-                                  </span>
-                                ))}
-                            </div>
-                          )}
-                        </div>
+                        {/* Chapters */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Subject
+                            Chapters
                           </div>
                           <select
                             value={metadata.chapterId || ""}
                             onChange={(e) => handleChapterChange(e.target.value)}
                             className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            disabled={loadingChapters || !metadata.sectionId}
+                            disabled={loadingChapters}
                           >
-                            <option value="">Select Subject...</option>
+                            <option value="">Select Chapter...</option>
                             {chapters.map((chapter) => (
                               <option key={chapter.id} value={chapter.id}>
                                 {chapter.name}
                               </option>
                             ))}
                           </select>
-                          {!metadata.sectionId && (
-                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select System first</p>
-                          )}
                         </div>
+                        {/* Topic */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
                             Topic
@@ -1109,7 +1119,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                             ))}
                           </select>
                           {!metadata.chapterId && (
-                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select Subject first</p>
+                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select Chapter first</p>
                           )}
                         </div>
                       </div>

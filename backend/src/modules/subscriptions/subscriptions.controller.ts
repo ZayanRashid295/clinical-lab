@@ -221,6 +221,19 @@ export class SubscriptionsController {
     return this.subscriptionsService.cancelSubscription(id);
   }
 
+  @Post("cleanup-duplicates/:userId")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Clean up duplicate active subscriptions for a user" })
+  @ApiResponse({
+    status: 200,
+    description: "Duplicate subscriptions cleaned up successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async cleanupDuplicateActiveSubscriptions(@Param("userId") userId: string) {
+    return this.subscriptionsService.cleanupDuplicateActiveSubscriptions(userId);
+  }
+
   // ========== PACKAGE FEATURES ==========
   @Get("features")
   @UseGuards(JwtAuthGuard)

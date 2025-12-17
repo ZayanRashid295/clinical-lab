@@ -402,6 +402,73 @@ export default function ExplanationBlockEditor({
   
   // Track which blocks have been converted to prevent re-conversion
   const convertedBlocksRef = useRef<Set<string>>(new Set())
+  const lastBlocksRef = useRef<string>("")
+  
+  // Convert markdown blocks to HTML when blocks change (but only if blocks actually changed)
+  useEffect(() => {
+    // Create a signature of the blocks to detect actual changes
+    const blocksSignature = JSON.stringify(blocks.map(b => ({
+      id: b.id,
+      hasMarkdown: !!(b.data?.markdown && b.data.markdown.trim()),
+      hasHtml: !!(b.data?.html && b.data.html.trim() && b.data.html !== "<p></p>")
+    })))
+    
+    // Skip if blocks haven't actually changed
+    if (lastBlocksRef.current === blocksSignature) return
+    lastBlocksRef.current = blocksSignature
+    
+    const convertBlocks = async () => {
+      const blocksToConvert = blocks.filter((block) => {
+        if (block.type !== "text") return false
+        const hasMarkdown = !!(block.data?.markdown && block.data.markdown.trim())
+        const hasHtml = !!(block.data?.html && 
+          block.data.html.trim() && 
+          block.data.html !== "<p></p>" && 
+          block.data.html !== "<p><br></p>" &&
+          block.data.html.trim().startsWith("<"))
+        const blockKey = `${block.id}-${block.data?.markdown?.substring(0, 50)}`
+        const alreadyConverted = convertedBlocksRef.current.has(blockKey)
+        
+        // Convert if we have markdown but no valid HTML, and haven't converted this block yet
+        return hasMarkdown && !hasHtml && !alreadyConverted
+      })
+      
+      if (blocksToConvert.length === 0) return
+      
+      // Convert all blocks that need conversion
+      const convertedBlocks = await Promise.all(
+        blocksToConvert.map(async (block) => {
+          const blockKey = `${block.id}-${block.data?.markdown?.substring(0, 50)}`
+          convertedBlocksRef.current.add(blockKey)
+          
+          const html = await convertMarkdownToHTML(block.data!.markdown!)
+          
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              html: html,
+              markdown: block.data!.markdown, // Preserve markdown
+            },
+          }
+        })
+      )
+      
+      // Update blocks if any were converted
+      if (convertedBlocks.length > 0) {
+        const updatedBlocks = blocks.map((block) => {
+          const converted = convertedBlocks.find((cb) => cb.id === block.id)
+          return converted || block
+        })
+        // Use a timeout to avoid infinite loops
+        setTimeout(() => {
+          onChange(updatedBlocks)
+        }, 0)
+      }
+    }
+    
+    convertBlocks()
+  }, [blocks]) // Only depend on blocks, not onChange
   
   // Helper function to detect markdown tables (copied from rich-content-editor.tsx)
   const detectMarkdownTable = useCallback((markdown: string): { isTable: boolean; tableMarkdown?: string } => {
@@ -425,7 +492,7 @@ export default function ExplanationBlockEditor({
 
     // Check for table row patterns
     const tableRowPattern = /\|\s*[^|]+\s*\|\s*[^|]+\s*\|/g
-    const allTableMatches = [...normalizedMarkdown.matchAll(tableRowPattern)]
+    const allTableMatches = normalizedMarkdown.match(tableRowPattern) || []
     
     // Single-line table detection
     if (allTableMatches.length >= 3 && normalizedMarkdown.split("\n").filter(l => l.trim()).length <= 3) {

@@ -54,7 +54,7 @@ export default function ProductSubtypeFormModal({
       // Load products
       setLoadingProducts(true);
       productsService
-        .getProducts({ limit: 100, status: "ACTIVE" })
+        .getProducts({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setProducts(response);

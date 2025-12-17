@@ -70,5 +70,20 @@ export class SubscriptionsService extends BaseDataService<
   }> {
     return this.get(`${this.endpoint}/stats`);
   }
+
+  /**
+   * Get user's subscriptions
+   */
+  async getUserSubscriptions(
+    userId: string,
+    status?: string
+  ): Promise<Subscription[]> {
+    const params: any = {};
+    if (status) {
+      params.status = status;
+    }
+    const response = await this.get(`${this.endpoint}/user/${userId}`, params);
+    return Array.isArray(response) ? response : [];
+  }
 }
 

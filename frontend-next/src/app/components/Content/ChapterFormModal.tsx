@@ -56,7 +56,7 @@ export default function ChapterFormModal({
       // Load sections
       setLoadingSections(true);
       sectionsService
-        .getSections({ limit: 100, status: "ACTIVE" })
+        .getSections({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setSections(response);

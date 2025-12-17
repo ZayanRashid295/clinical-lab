@@ -3,18 +3,50 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../src/shared";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
+import { SubscriptionAcknowledgmentModal } from "../src/app/components/SubscriptionAcknowledgmentModal";
+import { SubscriptionsService } from "../src/app/services/subscriptions/subscriptions.service";
 
 export default function Dashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [showAcknowledgmentModal, setShowAcknowledgmentModal] = useState(false);
+  const subscriptionsService = new SubscriptionsService();
 
   useEffect(() => {
-    // Check authentication status
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
+    const checkSubscription = async () => {
+      // Check authentication status
+      if (!authService.isAuthenticated()) {
+        router.replace("/login");
+        return;
+      }
+
+      try {
+        // Get user profile
+        const profile = await authService.getProfile();
+        if (!profile?.id) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Check for active subscription
+        const activeSubscriptions = await subscriptionsService.getUserSubscriptions(
+          profile.id,
+          "ACTIVE"
+        );
+
+        // Show modal if no active subscription
+        if (!activeSubscriptions || activeSubscriptions.length === 0) {
+          setShowAcknowledgmentModal(true);
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        // On error, don't show modal (fail silently)
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSubscription();
   }, [router]);
 
   if (isLoading) {
@@ -28,6 +60,16 @@ export default function Dashboard() {
     );
   }
 
+  const handleSubscribe = () => {
+    setShowAcknowledgmentModal(false);
+    router.push("/landing-page#pricing");
+  };
+
+  const handleAccessAccount = () => {
+    setShowAcknowledgmentModal(false);
+    // Dashboard is already shown, just close modal
+  };
+
   return (
     <>
       <Head>
@@ -37,6 +79,13 @@ export default function Dashboard() {
           content="Main dashboard with key metrics and insights"
         />
       </Head>
+
+      <SubscriptionAcknowledgmentModal
+        isOpen={showAcknowledgmentModal}
+        onClose={() => setShowAcknowledgmentModal(false)}
+        onSubscribe={handleSubscribe}
+        onAccessAccount={handleAccessAccount}
+      />
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}

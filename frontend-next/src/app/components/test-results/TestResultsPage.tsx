@@ -89,7 +89,8 @@ export default function TestResultsPage() {
       try {
         setIsLoading(true);
         const data = await questionPapersService.getAssessmentResults(id);
-        setResults(data);
+        // Backend returns a compatible shape but TS types differ slightly, so cast for now
+        setResults(data as any);
       } catch (err: any) {
         console.error("Failed to fetch results:", err);
         setError(err?.message || "Failed to load test results");

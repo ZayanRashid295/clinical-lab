@@ -55,7 +55,7 @@ export default function SectionFormModal({
       // Load products
       setLoadingProducts(true);
       productsService
-        .getProducts({ limit: 100, status: "ACTIVE" })
+        .getProducts({ status: "ACTIVE" })
         .then((response) => {
           if (Array.isArray(response)) {
             setProducts(response);

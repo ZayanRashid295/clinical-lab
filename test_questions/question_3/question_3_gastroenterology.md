@@ -1,6 +1,6 @@
 ---
 title: "Gastrointestinal & Nutrition — Organ Systems"
-tags: [Gastroenterology, Surgery, Clinical Case]
+tags: [Psychology]
 difficulty: medium
 correct_answer: D
 ---
@@ -93,6 +93,9 @@ This patient has **acute cholecystitis**, an inflammation of the gallbladder typ
 ---
 
 ## Choice-by-Choice Explanations
+
+![Blood smear showing hemosiderin inclusions](Screenshot From 2025-11-18 20-13-51.png)
+
 
 ## Management Approach
 1. **Immediate:**

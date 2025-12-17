@@ -8,6 +8,9 @@ import {
   Patch,
   Delete,
   Query,
+  HttpCode,
+  Req,
+  RawBodyRequest,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -15,24 +18,28 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from "@nestjs/swagger";
+import { Request } from "express";
 import { PaymentsService } from "./payments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CreatePaymentDto } from "./dto/create-payment.dto";
 
 @ApiTags("payments")
 @Controller("payments")
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Process payment" })
   @ApiResponse({ status: 201, description: "Payment processed successfully" })
-  create(@Body() createPaymentDto: any) {
+  create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentsService.create(createPaymentDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get all payments with pagination" })
   @ApiResponse({ status: 200, description: "Payments retrieved successfully" })
   findAll(
@@ -67,6 +74,8 @@ export class PaymentsController {
 
   // Payment Methods endpoints (must be before @Get(':id') to avoid route conflicts)
   @Get("methods")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get payment methods" })
   @ApiResponse({
     status: 200,
@@ -88,6 +97,8 @@ export class PaymentsController {
   }
 
   @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get payment by ID" })
   @ApiResponse({ status: 200, description: "Payment retrieved successfully" })
   @ApiResponse({ status: 404, description: "Payment not found" })
@@ -95,7 +106,21 @@ export class PaymentsController {
     return this.paymentsService.findOne(id);
   }
 
+  @Post(":id/sync")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Manually sync payment status from Stripe" })
+  @ApiResponse({
+    status: 200,
+    description: "Payment synced successfully",
+  })
+  async syncPayment(@Param("id") id: string) {
+    return this.paymentsService.syncPaymentFromStripe(id);
+  }
+
   @Post("methods")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Create payment method" })
   @ApiResponse({
     status: 201,
@@ -106,6 +131,8 @@ export class PaymentsController {
   }
 
   @Patch("methods/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Update payment method" })
   @ApiResponse({
     status: 200,
@@ -120,6 +147,8 @@ export class PaymentsController {
   }
 
   @Delete("methods/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Delete payment method" })
   @ApiResponse({
     status: 200,
@@ -128,5 +157,32 @@ export class PaymentsController {
   @ApiResponse({ status: 404, description: "Payment method not found" })
   deletePaymentMethod(@Param("id") id: string) {
     return this.paymentsService.deletePaymentMethod(id);
+  }
+
+  // Stripe webhook endpoint
+  // NOTE: This endpoint should NOT use JwtAuthGuard - Stripe sends webhooks without auth
+  // Security is handled via signature verification instead
+  @Post("webhook/stripe")
+  @HttpCode(200)
+  @ApiOperation({ summary: "Stripe webhook endpoint" })
+  @ApiResponse({ status: 200, description: "Webhook received" })
+  @ApiResponse({ status: 401, description: "Invalid webhook signature" })
+  async handleStripeWebhook(
+    @Req() req: Request,
+    @Body() body: any
+  ) {
+    const signature = req.headers["stripe-signature"] as string | undefined;
+    
+    // Try to get raw body if available (requires app configuration for raw body parsing)
+    // For production: configure Express to provide raw body for this route
+    // For dev/testing: we'll accept parsed body and verify if signature is provided
+    const rawBody = (req as any).rawBody;
+    const payload = rawBody || (body ? JSON.stringify(body) : null);
+
+    if (!payload) {
+      throw new Error("Missing webhook payload");
+    }
+
+    return this.paymentsService.handleStripeWebhook(payload, signature);
   }
 }

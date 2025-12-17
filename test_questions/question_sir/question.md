@@ -1,67 +1,73 @@
 ---
-title: "Anatomy — Musculoskeletal System"
-tags: [Anatomy, Upper Limb, Rotator Cuff]
+title: "Physics — Fundamental Constants"
+tags: [Physics, Waves, Electromagnetism, Constants]
 difficulty: easy
 correct_answer: B
 ---
 
-# Anatomy — Musculoskeletal System  
-## Topic: Supraspinatus & Initiation of Arm Abduction (0–15°)
+# Physics — Fundamental Constants  
+## Topic: Speed of Light in Vacuum
 
 ---
 
 ## Question
-Which of the following muscles is responsible for initiating abduction of the arm at the shoulder joint (0–15 degrees)?
+What is the speed of light in vacuum?
 
-*A.* Deltoid  
-*B.* Supraspinatus  
-*C.* Infraspinatus  
-*D.* Teres major  
-*E.* Subscapularis  
+*A.* \(3.0 \times 10^6 \, \text{m/s}\)  
+*B.* \(3.0 \times 10^8 \, \text{m/s}\)  
+*C.* \(3.0 \times 10^{10} \, \text{m/s}\)  
+*D.* \(1.5 \times 10^8 \, \text{m/s}\)  
+*E.* \(9.8 \, \text{m/s}^2\)
 
 ---
 
-### Choice A Explanation — Deltoid  
+### Choice A Explanation — \(3.0 \times 10^6 \, \text{m/s}\)
 *Why it's wrong:*  
-The deltoid abducts the arm *from 15–90 degrees*, not the initial phase. It cannot initiate abduction because the humeral head must first be stabilized by the supraspinatus.
+This value is **100 times smaller** than the actual speed of light and is closer to spacecraft velocities.
 
 ---
 
-### Choice B Explanation — Supraspinatus ✅  
+### Choice B Explanation — \(3.0 \times 10^8 \, \text{m/s}\) ✅
 *Why it's correct:*  
-- Initiates *0–15 degrees* of arm abduction  
-- Stabilizes the humeral head in the glenoid fossa  
-- First component of the abduction arc before the deltoid takes over  
-- Innervated by the suprascapular nerve  
+- Exact and accepted value of the speed of light in vacuum  
+- Represented by the constant **\(c\)**  
+- Fundamental constant of nature  
+- Central to relativity and electromagnetism
 
 ---
 
-### Choice C Explanation — Infraspinatus  
+### Choice C Explanation — \(3.0 \times 10^{10} \, \text{m/s}\)
 *Why it's wrong:*  
-Primarily responsible for *external rotation* of the humerus. It does not contribute to abduction initiation.
+This value is two orders of magnitude larger than the true value.
 
 ---
 
-### Choice D Explanation — Teres Major  
+### Choice D Explanation — \(1.5 \times 10^8 \, \text{m/s}\)
 *Why it's wrong:*  
-Acts in *adduction, **internal rotation, and **extension* of the arm. Its actions oppose abduction, making it an incorrect choice.
+Approximately the speed of light in water or glass, not in vacuum.
 
 ---
 
-### Choice E Explanation — Subscapularis  
+### Choice E Explanation — \(9.8 \, \text{m/s}^2\)
 *Why it's wrong:*  
-A strong *internal rotator* and adductor of the humerus. It does not participate in initiating abduction.
+This is acceleration due to gravity, not a speed.
 
 ---
 
-*Correct Answer:* B
+**Correct Answer:** B
 
 ---
 
 ## Explanation
 
 ### Overview
-The *supraspinatus* is the key muscle that *initiates arm abduction from 0–15 degrees* at the shoulder joint. After this initial range, the *deltoid* becomes the primary abductor. The supraspinatus also plays an essential role in *stabilizing the humeral head*, making early abduction smooth and biomechanically possible.
+The **speed of light in vacuum**, denoted by **\(c\)**, is:
+
+\[
+c = 3.0 \times 10^8 \, \text{m/s}
+\]
+
+It is the maximum speed at which energy, matter, and information can travel.
 
 ---
 
@@ -69,29 +75,40 @@ The *supraspinatus* is the key muscle that *initiates arm abduction from 0–15 
 
 | Concept | Explanation |
 |--------|-------------|
-| *Muscle responsible for 0–15° abduction* | Supraspinatus |
-| *Innervation* | Suprascapular nerve |
-| *Why supraspinatus is required* | Stabilizes humeral head and initiates lifting |
-| *Deltoid involvement* | Takes over abduction after ~15° |
-| *Clinical relevance* | Tears cause difficulty initiating abduction |
+| Symbol | \(c\) |
+| Value | \(3.0 \times 10^8 \, \text{m/s}\) |
+| Medium | Vacuum |
+| SI unit | m/s |
+| Importance | Fundamental speed limit of the universe |
 
 ---
 
-### Differential Diagnoses for Difficulty Initiating Abduction
+### Common Misconceptions
 
-| Condition | Reason |
-|----------|--------|
-| Supraspinatus tear | Weakness or inability to start abduction |
-| Suprascapular nerve injury | Denervation → loss of initiation |
-| Subacromial impingement | Pain inhibits early abduction |
-| Adhesive capsulitis | Global restriction including 0–15° |
-| Calcific tendinitis | Painful limitation of initial abduction |
+| Misconception | Clarification |
+|---------------|---------------|
+| Light speed varies in vacuum | It is constant |
+| Objects can exceed \(c\) | Impossible for matter |
+| Same speed in all media | Slower in materials |
+| Depends on source motion | Independent of source |
+
+---
+
+### Applications & Real-World Relevance
+
+| Application | Role |
+|------------|------|
+| Relativity | Space–time relationship |
+| GPS | Precise timing corrections |
+| Astronomy | Distance measurement |
+| Fiber optics | Signal transmission |
+| EM theory | Wave propagation |
 
 ---
 
-### Keywords for Quick Identification  
-- *Initiates abduction*  
-- *0–15 degrees*  
-- *Rotator cuff*
+### Keywords for Quick Identification
+- Speed of light  
+- \(c\)  
+- Fundamental constant  
+- Vacuum
 
----

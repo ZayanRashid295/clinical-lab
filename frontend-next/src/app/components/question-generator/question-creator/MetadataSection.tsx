@@ -34,7 +34,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
   useEffect(() => {
     setLoadingSections(true)
     sectionsService
-      .getSections({ limit: 100, status: "ACTIVE" })
+      .getSections({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         setSections(data)
@@ -47,7 +47,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
     if (sectionId) {
       setLoadingChapters(true)
       chaptersService
-        .getChapters({ sectionId, limit: 100, status: "ACTIVE" })
+        .getChapters({ sectionId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setChapters(data)
@@ -64,7 +64,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
     if (chapterId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId, limit: 100, status: "ACTIVE" })
+        .getTopics({ chapterId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)

@@ -583,6 +583,39 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
   const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
   const urlPattern = /(https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg))/i
 
+  // Helper function to check if a line is a list item (ordered or unordered, including nested)
+  const isListItem = (line: string): boolean => {
+    const trimmed = line.trim()
+    // Check for unordered list markers: -, *, +
+    if (/^[-*+]\s/.test(trimmed)) return true
+    // Check for ordered list markers: 1., 2., etc. (with optional indentation)
+    if (/^\d+\.\s/.test(trimmed)) return true
+    // Check for nested list items (indented with spaces or tabs)
+    const indentMatch = line.match(/^(\s*)/)
+    if (indentMatch) {
+      const indent = indentMatch[1]
+      // If line has indentation and matches list pattern, it's a nested list item
+      if (indent.length > 0) {
+        const afterIndent = trimmed
+        if (/^[-*+]\s/.test(afterIndent) || /^\d+\.\s/.test(afterIndent)) return true
+      }
+    }
+    return false
+  }
+
+  // Helper function to check if we're still in the same list context
+  // (handles empty lines between list items)
+  const isInListContext = (lines: string[], currentIndex: number): boolean => {
+    // Look ahead to find the next non-empty line
+    for (let j = currentIndex; j < lines.length; j++) {
+      const nextLine = lines[j].trim()
+      if (nextLine === "") continue // Skip empty lines
+      // If next non-empty line is a list item, we're still in list context
+      return isListItem(lines[j])
+    }
+    return false
+  }
+
   while (i < lines.length) {
     const line = lines[i]
     const trimmed = line.trim()
@@ -679,9 +712,11 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       i++
       continue
     }
-    // Handle bullet lists
-    else if (trimmed.startsWith("-")) {
-      if (currentText.trim()) {
+    
+    // Handle lists (ordered and unordered) - keep them together in a single block
+    if (isListItem(line)) {
+      // Flush any non-list text before starting a list
+      if (currentText.trim() && !isListItem(lines[Math.max(0, i - 1)])) {
         blocks.push({
           id: blockIdCounter++,
           type: "text",
@@ -690,18 +725,51 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         })
         currentText = ""
       }
-      // Collect list items and add as markdown
+      
+      // Collect all list items, including empty lines between them
       const listItems: string[] = []
-      while (i < lines.length && lines[i].trim().startsWith("-")) {
-        listItems.push(lines[i].trim())
-        i++
+      let inList = true
+      
+      while (i < lines.length && inList) {
+        const currentLine = lines[i]
+        const currentTrimmed = currentLine.trim()
+        
+        if (currentTrimmed === "") {
+          // Empty line - check if we're still in list context
+          if (isInListContext(lines, i + 1)) {
+            // Next non-empty line is still a list item, keep the empty line
+            listItems.push("")
+            i++
+            continue
+          } else {
+            // Next non-empty line is not a list item, end the list
+            inList = false
+            break
+          }
+        } else if (isListItem(currentLine)) {
+          // It's a list item, add it
+          listItems.push(currentLine)
+          i++
+        } else {
+          // Not a list item, end the list
+          inList = false
+          break
+        }
       }
-      blocks.push({
-        id: blockIdCounter++,
-        type: "text",
-        order: blockOrder++,
-        data: { markdown: listItems.join("\n") },
-      })
+      
+      // Add the complete list as a single text block
+      if (listItems.length > 0) {
+        // Remove trailing empty lines
+        while (listItems.length > 0 && listItems[listItems.length - 1] === "") {
+          listItems.pop()
+        }
+        blocks.push({
+          id: blockIdCounter++,
+          type: "text",
+          order: blockOrder++,
+          data: { markdown: listItems.join("\n") },
+        })
+      }
       continue
     }
     // Handle HTML tables (if the line contains <table tag)
@@ -795,15 +863,34 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       // Regular text line - add to current text block
       currentText += (currentText ? "\n" : "") + trimmed
     } else {
-      // Empty line - flush current text if we have any
+      // Empty line - check if we should flush or continue
+      // If current text ends with a list item and next non-empty line is also a list item,
+      // keep the empty line and continue (don't flush)
       if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
+        const currentTextLines = currentText.trim().split("\n")
+        const lastLine = currentTextLines[currentTextLines.length - 1]
+        
+        // Check if the last line in current text is a list item
+        const lastLineIsListItem = isListItem(lastLine)
+        
+        // Check if next non-empty line is a list item
+        const nextIsListItem = isInListContext(lines, i + 1)
+        
+        if (lastLineIsListItem && nextIsListItem) {
+          // We're in the middle of a list, keep the empty line and continue
+          currentText += "\n"
+          i++
+          continue
+        } else {
+          // Not in a list context, flush the current text
+          blocks.push({
+            id: blockIdCounter++,
+            type: "text",
+            order: blockOrder++,
+            data: { markdown: currentText.trim() },
+          })
+          currentText = ""
+        }
       }
     }
 

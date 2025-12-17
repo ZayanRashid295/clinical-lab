@@ -55,62 +55,123 @@ export function blocksToHTML(blocks: ContentBlock[]): string {
     return "<p></p>"
   }
 
-  // Filter to only text blocks and extract their HTML
-  const textBlocks = blocks
-    .filter((block) => block.type === "text")
-    .map((block) => {
+  // Sort blocks by order and convert each to HTML.
+  // IMPORTANT: edit-mode RichTextEditor only accepts HTML, so we must include images/tables too
+  // (bulk-uploaded questions often contain these blocks).
+  const sorted = [...blocks].sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+  const htmlParts: string[] = []
+
+  for (const block of sorted) {
+    if (!block) continue
+
+    if (block.type === "text") {
       // Get HTML from block data - prioritize html over markdown
       let html = block.data?.html || ""
-      
-      // Check if HTML is empty or just empty tags
-      const isEmptyHtml = !html || 
-        html.trim() === "" || 
-        html.trim() === "<p></p>" || 
-        html.trim() === "<p><br></p>" || 
+      const markdown = block.data?.markdown || ""
+
+      const isEmptyHtml = !html ||
+        html.trim() === "" ||
+        html.trim() === "<p></p>" ||
+        html.trim() === "<p><br></p>" ||
         html.trim() === "<p> </p>" ||
         html.trim() === "<p><br/></p>" ||
         html.trim() === "<div></div>" ||
         html.trim() === "<div><br></div>"
-      
-      // If HTML is empty but we have markdown, use markdown as fallback
-      // For synchronous conversion, we'll wrap markdown in paragraph tags
-      // For proper markdown rendering, use blocksToHTMLAsync
-      if (isEmptyHtml && block.data?.markdown) {
-        const markdown = block.data.markdown
+
+      // Check if HTML contains raw markdown syntax (like **bold**, *italic*, lists, etc.)
+      const htmlInnerText = html.replace(/<[^>]+>/g, '').trim()
+      const markdownPatterns = [
+        /\*\*[^*]+\*\*/,           // **bold**
+        /\*[^*\n]+\*/,              // *italic*
+        /^[-*+]\s/m,                // List items
+        /^\d+\.\s/m,                // Numbered lists
+        /^#{1,6}\s/m,               // Headers
+      ]
+      const containsMarkdownSyntax = !isEmptyHtml && markdownPatterns.some(pattern => 
+        pattern.test(htmlInnerText) || pattern.test(html)
+      )
+
+      // If HTML is empty or contains markdown syntax, try to convert markdown to HTML
+      if ((isEmptyHtml || containsMarkdownSyntax) && markdown && markdown.trim()) {
+        // Basic synchronous markdown conversion for common patterns
+        let converted = markdown
+        // Convert **bold** to <strong>
+        converted = converted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        // Convert *italic* to <em> (but not **bold** which we already converted)
+        converted = converted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+        // Convert headers
+        converted = converted.replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        converted = converted.replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        converted = converted.replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        // Convert line breaks
+        converted = converted.replace(/\n\n/g, '</p><p>')
+        converted = converted.replace(/\n/g, '<br>')
+        // Convert lists (basic)
+        converted = converted.replace(/^[-*+]\s+(.*)$/gim, '<li>$1</li>')
+        converted = converted.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+        // Convert numbered lists
+        converted = converted.replace(/^\d+\.\s+(.*)$/gim, '<li>$1</li>')
+        converted = converted.replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+        
         // If markdown looks like HTML (starts with <), use it directly
         if (markdown.trim().startsWith("<")) {
           html = markdown
         } else {
-          // For sync version, just wrap in paragraph - proper conversion requires async
-          // This is a fallback - blocksToHTMLAsync should be used for proper markdown rendering
+          // Wrap in paragraph if not already wrapped
+          if (!converted.trim().startsWith("<")) {
+            html = `<p>${converted}</p>`
+          } else {
+            html = converted
+          }
+        }
+      } else if (isEmptyHtml && block.data?.markdown) {
+        const markdown = block.data.markdown
+        if (markdown.trim().startsWith("<")) {
+          html = markdown
+        } else {
           html = `<p>${markdown}</p>`
         }
       }
-      
-      // If still no content, check for content field (legacy)
+
       if (!html && block.data?.content) {
         const content = block.data.content
         if (typeof content === "string") {
-          if (content.trim().startsWith("<")) {
-            html = content
-          } else {
-            html = `<p>${content}</p>`
-          }
+          html = content.trim().startsWith("<") ? content : `<p>${content}</p>`
         }
       }
-      
-      return html.trim()
-    })
-    .filter((html) => html.length > 0)
+
+      if (html && html.trim()) htmlParts.push(html.trim())
+      continue
+    }
+
+    if (block.type === "table") {
+      const tableHtml = block.data?.tableHtml || block.data?.html || ""
+      if (tableHtml && typeof tableHtml === "string" && tableHtml.trim()) {
+        htmlParts.push(tableHtml.trim())
+      }
+      continue
+    }
+
+    if (block.type === "image" || block.type === "images") {
+      const imagesRaw = block.data?.images
+      const urls: string[] = Array.isArray(imagesRaw)
+        ? imagesRaw.map((img: any) => (typeof img === "string" ? img : img?.url)).filter(Boolean)
+        : []
+      for (const url of urls) {
+        htmlParts.push(`<img src="${String(url)}" alt="Image" />`)
+      }
+      continue
+    }
+  }
 
   // If no text blocks found, return empty paragraph
-  if (textBlocks.length === 0) {
+  if (htmlParts.length === 0) {
     return "<p></p>"
   }
 
   // Join all HTML blocks together
   // TipTap can handle multiple block elements, so we can concatenate them
-  return textBlocks.join("")
+  return htmlParts.join("")
 }
 
 /**
@@ -122,10 +183,13 @@ export async function blocksToHTMLAsync(blocks: ContentBlock[]): Promise<string>
     return "<p></p>"
   }
 
-  // Filter to only text blocks and convert them
-  const textBlockPromises = blocks
-    .filter((block) => block.type === "text")
-    .map(async (block) => {
+  const sorted = [...blocks].sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+  const htmlParts: string[] = []
+
+  for (const block of sorted) {
+    if (!block) continue
+
+    if (block.type === "text") {
       // Get HTML from block data - prioritize html over markdown
       let html = block.data?.html || ""
       const markdown = block.data?.markdown || ""
@@ -178,20 +242,32 @@ export async function blocksToHTMLAsync(blocks: ContentBlock[]): Promise<string>
         }
       }
       
-      return html.trim()
-    })
+      if (html && html.trim()) htmlParts.push(html.trim())
+      continue
+    }
 
-  // Wait for all conversions to complete
-  const textBlocks = await Promise.all(textBlockPromises)
-  const filteredBlocks = textBlocks.filter((html) => html.length > 0)
+    if (block.type === "table") {
+      const tableHtml = block.data?.tableHtml || block.data?.html || ""
+      if (tableHtml && typeof tableHtml === "string" && tableHtml.trim()) {
+        htmlParts.push(tableHtml.trim())
+      }
+      continue
+    }
 
-  // If no text blocks found, return empty paragraph
-  if (filteredBlocks.length === 0) {
-    return "<p></p>"
+    if (block.type === "image" || block.type === "images") {
+      const imagesRaw = block.data?.images
+      const urls: string[] = Array.isArray(imagesRaw)
+        ? imagesRaw.map((img: any) => (typeof img === "string" ? img : img?.url)).filter(Boolean)
+        : []
+      for (const url of urls) {
+        htmlParts.push(`<img src="${String(url)}" alt="Image" />`)
+      }
+      continue
+    }
   }
 
-  // Join all HTML blocks together
-  return filteredBlocks.join("")
+  if (htmlParts.length === 0) return "<p></p>"
+  return htmlParts.join("")
 }
 
 /**
