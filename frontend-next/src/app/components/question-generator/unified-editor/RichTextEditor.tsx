@@ -275,6 +275,177 @@ export default function RichTextEditor({
     }
   }, [])
 
+  // Helper function to normalize list HTML and remove excessive spacing
+  const normalizeListHTML = (html: string): string => {
+    if (!html || !html.includes('<li')) return html
+    
+    let normalized = html
+    
+    // IMPORTANT: Preserve all classes (especially tiptap-fs-* and tiptap-ff-* for font size/family)
+    // Only remove <p> tags inside <li> elements, but preserve all attributes including classes
+    // Remove <p> tags inside <li> elements (TipTap doesn't use them, they cause spacing issues)
+    // But preserve nested <ul>/<ol> structures inside <li>
+    const processListItem = (content: string): string => {
+      // First, check if this content contains nested lists - if so, preserve them
+      const hasNestedList = /<[uo]l[\s>]/.test(content)
+      
+      if (hasNestedList) {
+        // For items with nested lists, be more careful
+        // Remove <p> tags but preserve the nested list structure and font size classes
+        // Extract classes from <p> tags before removing them
+        const pTagMatches = Array.from(content.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi))
+        let preservedClasses: string[] = []
+        
+        for (const pMatch of pTagMatches) {
+          const pAttrs = pMatch[1] || ""
+          const classMatch = pAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
+          if (classMatch?.[1]) {
+            const classes = classMatch[1].split(/\s+/)
+            const fontClasses = classes.filter(c => c.startsWith('tiptap-fs-') || c.startsWith('tiptap-ff-'))
+            preservedClasses.push(...fontClasses)
+          }
+        }
+        
+        let cleaned = content
+          // Remove <p> tags that wrap everything (but not nested lists)
+          .replace(/^<p[^>]*>([\s\S]*?)<\/p>$/gi, '$1')
+          // Remove <p> tags that are direct children (but preserve nested lists)
+          .replace(/<p[^>]*>([^<]*(?:<[uo]l[\s\S]*?<\/[uo]l>)?[^<]*)<\/p>/gi, '$1')
+          // Remove standalone <p> tags (not containing lists)
+          .replace(/<p[^>]*>([^<]*)<\/p>/gi, '$1')
+          // Remove <div> tags
+          .replace(/<div[^>]*>/gi, '')
+          .replace(/<\/div>/gi, '')
+          // Normalize whitespace but preserve list structure
+          .replace(/\n\s*\n\s*/g, ' ')
+          .replace(/^\s+|\s+$/g, '')
+          .replace(/\s+(?=<)/g, '') // Remove spaces before tags
+          .replace(/>\s+/g, '> ') // Normalize spaces after tags
+        
+        // If we have preserved classes and content doesn't already have them, wrap in span
+        if (preservedClasses.length > 0) {
+          const uniqueClasses = [...new Set(preservedClasses)].join(' ')
+          if (!cleaned.includes(`class="${uniqueClasses}"`) && !cleaned.includes(`class='${uniqueClasses}'`) && !cleaned.includes(uniqueClasses.split(' ')[0])) {
+            // Wrap only the non-list content in span, preserving nested lists
+            if (cleaned.match(/^[^<]*<[uo]l/)) {
+              // Content starts with text before list - wrap the text part
+              cleaned = cleaned.replace(/^([^<]*)(<[uo]l[\s\S]*)$/, `<span class="${uniqueClasses}">$1</span>$2`)
+            } else if (cleaned.match(/<\/[uo]l>[^<]*$/)) {
+              // Content ends with text after list - wrap the text part
+              cleaned = cleaned.replace(/^([\s\S]*<\/[uo]l>)([^<]*)$/, `$1<span class="${uniqueClasses}">$2</span>`)
+            } else {
+              // No lists, wrap everything
+              cleaned = `<span class="${uniqueClasses}">${cleaned}</span>`
+            }
+          }
+        }
+        
+        return cleaned
+      } else {
+        // For items without nested lists, remove <p> and <div> tags but preserve their classes on content
+        // Extract classes from <p> tags before removing them
+        const pTagMatches = Array.from(content.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi))
+        let preservedClasses: string[] = []
+        
+        for (const pMatch of pTagMatches) {
+          const pAttrs = pMatch[1] || ""
+          const classMatch = pAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
+          if (classMatch?.[1]) {
+            const classes = classMatch[1].split(/\s+/)
+            const fontClasses = classes.filter(c => c.startsWith('tiptap-fs-') || c.startsWith('tiptap-ff-'))
+            preservedClasses.push(...fontClasses)
+          }
+        }
+        
+        let cleaned = content
+          .replace(/<p[^>]*>/gi, '')
+          .replace(/<\/p>/gi, '')
+          .replace(/<div[^>]*>/gi, '')
+          .replace(/<\/div>/gi, '')
+          .replace(/\n\s*\n\s*/g, ' ')
+          .replace(/^\s+|\s+$/g, '')
+          .replace(/\s+/g, ' ')
+        
+        // If we have preserved classes and content doesn't already have them, wrap in span
+        if (preservedClasses.length > 0) {
+          const uniqueClasses = [...new Set(preservedClasses)].join(' ')
+          if (!cleaned.includes(`class="${uniqueClasses}"`) && !cleaned.includes(`class='${uniqueClasses}'`) && !cleaned.includes(uniqueClasses.split(' ')[0])) {
+            cleaned = `<span class="${uniqueClasses}">${cleaned}</span>`
+          }
+        }
+        
+        return cleaned
+      }
+    }
+    
+    // Process list items, handling nested lists carefully
+    // IMPORTANT: When removing <p> tags, preserve their classes by wrapping content in <span>
+    // Also check for existing <span> tags with font size classes and preserve them
+    // Use a recursive approach to handle deeply nested lists
+    let changed = true
+    let iterations = 0
+    while (changed && iterations < 10) {
+      const before = normalized
+      normalized = normalized.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi, (match, liAttrs, content) => {
+        // Before processing, extract classes from <p> tags that will be removed
+        const pTagMatches = Array.from(content.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi))
+        let preservedClasses: string[] = []
+        
+        for (const pMatch of pTagMatches) {
+          const pAttrs = pMatch[1] || ""
+          const classMatch = pAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
+          if (classMatch?.[1]) {
+            // Extract font size and font family classes
+            const classes = classMatch[1].split(/\s+/)
+            const fontClasses = classes.filter(c => c.startsWith('tiptap-fs-') || c.startsWith('tiptap-ff-'))
+            preservedClasses.push(...fontClasses)
+          }
+        }
+        
+        // Also check for existing <span> tags with font size classes in the content
+        const spanTagMatches = Array.from(content.matchAll(/<span([^>]*)>([\s\S]*?)<\/span>/gi))
+        for (const spanMatch of spanTagMatches) {
+          const spanAttrs = spanMatch[1] || ""
+          const classMatch = spanAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
+          if (classMatch?.[1]) {
+            const classes = classMatch[1].split(/\s+/)
+            const fontClasses = classes.filter(c => c.startsWith('tiptap-fs-') || c.startsWith('tiptap-ff-'))
+            preservedClasses.push(...fontClasses)
+          }
+        }
+        
+        const cleaned = processListItem(content)
+        
+        // If we have preserved classes and content doesn't already have them, wrap in span
+        if (preservedClasses.length > 0) {
+          const uniqueClasses = [...new Set(preservedClasses)].join(' ')
+          // Check if cleaned content already has these classes (might be in existing spans)
+          const hasClasses = cleaned.includes(`class="${uniqueClasses}"`) || 
+                            cleaned.includes(`class='${uniqueClasses}'`) ||
+                            uniqueClasses.split(' ').some(cls => cleaned.includes(cls))
+          
+          if (!hasClasses) {
+            // Wrap content in span with preserved classes
+            return `<li${liAttrs || ''}><span class="${uniqueClasses}">${cleaned}</span></li>`
+          }
+        }
+        
+        return `<li${liAttrs || ''}>${cleaned}</li>`
+      })
+      changed = normalized !== before
+      iterations++
+    }
+    
+    // Remove excessive whitespace between list items
+    normalized = normalized.replace(/(<\/li>)\s+(<li)/gi, '$1$2')
+    
+    // Remove empty paragraphs before/after lists
+    normalized = normalized.replace(/<p[^>]*>\s*<\/p>\s*(<[uo]l)/gi, '$1')
+    normalized = normalized.replace(/(<\/[uo]l>)\s*<p[^>]*>\s*<\/p>/gi, '$1')
+    
+    return normalized
+  }
+
   // Update editor content when prop changes
   useEffect(() => {
     // Don't update if user is actively typing
@@ -282,9 +453,533 @@ export default function RichTextEditor({
     
     if (editor && content !== editor.getHTML()) {
       isUpdatingRef.current = true
-      // Set content - TipTap will parse the HTML and preserve all inline styles
-      // The false parameter means "don't emit update events" to prevent loops
-      editor.commands.setContent(content || "<p></p>", { emitUpdate: false })
+      
+      // Normalize list HTML to fix spacing issues, but preserve font size classes
+      const normalizedContent = normalizeListHTML(content || "<p></p>")
+      
+      // Set content - TipTap will parse the HTML
+      editor.commands.setContent(normalizedContent, { emitUpdate: false })
+      
+      // CRITICAL FIX: After setContent, FORCE apply font size marks
+      // This is especially important when font size is the ONLY mark (no bold/italic)
+      // TipTap might not create textStyle mark in this case, so we force it
+      
+      // Use setTimeout to ensure TipTap has finished parsing
+      setTimeout(() => {
+        const htmlHasFontSize = normalizedContent.includes('tiptap-fs-')
+        if (!htmlHasFontSize) {
+          isUpdatingRef.current = false
+          return
+        }
+        
+        // Parse HTML to find all font size classes
+        // IMPORTANT: Also check within table cells (td, th) for font size classes
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(normalizedContent, 'text/html')
+        const htmlElements = doc.querySelectorAll('[class*="tiptap-fs-"]')
+        
+        // Also check for font size classes within table cells
+        const tableCells = doc.querySelectorAll('td[class*="tiptap-fs-"], th[class*="tiptap-fs-"], td [class*="tiptap-fs-"], th [class*="tiptap-fs-"]')
+        
+        if (htmlElements.length === 0 && tableCells.length === 0) {
+          isUpdatingRef.current = false
+          return
+        }
+        
+        const { state } = editor
+        const { tr } = state
+        let hasChanges = false
+        
+        // Build a map of text content to font sizes
+        const textToFontSize = new Map<string, string>()
+        
+        // Process regular elements
+        for (const htmlEl of Array.from(htmlElements)) {
+          const el = htmlEl as HTMLElement
+          const className = el.getAttribute("class") || ""
+          const match = className.match(/\btiptap-fs-(\d+)\b/)
+          
+          if (!match?.[1]) continue
+          
+          const fontSize = match[1]
+          const text = el.textContent?.trim() || ""
+          
+          if (text) {
+            // Store the longest text match (most specific)
+            const existing = textToFontSize.get(text)
+            if (!existing || text.length > existing.length) {
+              textToFontSize.set(text, fontSize)
+            }
+          }
+        }
+        
+        // Process table cells - check both the cell itself and its children
+        for (const cellEl of Array.from(tableCells)) {
+          const el = cellEl as HTMLElement
+          
+          // Check if the cell itself has the class
+          const cellClassName = el.getAttribute("class") || ""
+          let match = cellClassName.match(/\btiptap-fs-(\d+)\b/)
+          let fontSize: string | null = null
+          
+          if (match?.[1]) {
+            fontSize = match[1]
+          } else {
+            // Check children for font size classes
+            const childWithFontSize = el.querySelector('[class*="tiptap-fs-"]') as HTMLElement
+            if (childWithFontSize) {
+              const childClassName = childWithFontSize.getAttribute("class") || ""
+              match = childClassName.match(/\btiptap-fs-(\d+)\b/)
+              if (match?.[1]) {
+                fontSize = match[1]
+              }
+            }
+          }
+          
+          if (fontSize) {
+            const text = el.textContent?.trim() || ""
+            if (text) {
+              const existing = textToFontSize.get(text)
+              if (!existing || text.length > existing.length) {
+                textToFontSize.set(text, fontSize)
+              }
+            }
+          }
+        }
+        
+        // Apply marks to ALL text nodes that match (including those in table cells)
+        // The descendants method will traverse all nodes including table cells
+        // Use the same aggressive approach for both regular text and table cell content
+        state.doc.descendants((node, pos) => {
+          if (!node.isText) return true
+          
+          const nodeText = node.text.trim()
+          if (!nodeText) return true
+          
+          // Check if this text node matches any of our stored text patterns
+          for (const [searchText, fontSize] of textToFontSize.entries()) {
+            // Match if texts overlap significantly
+            if (nodeText.includes(searchText) || searchText.includes(nodeText) || 
+                nodeText.substring(0, Math.min(20, nodeText.length)) === searchText.substring(0, Math.min(20, searchText.length))) {
+              
+              // Check if mark already exists
+              const hasMark = node.marks.some(
+                m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+              )
+              
+              if (!hasMark) {
+                // FORCE apply font size mark - this works even when it's the only mark
+                // This works for both regular text and table cell content
+                // Use nodesBetween to ensure we apply to all text nodes in the range
+                state.doc.nodesBetween(pos, pos + node.nodeSize, (textNode, textPos) => {
+                  if (textNode.isText) {
+                    const textHasMark = textNode.marks.some(
+                      m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                    )
+                    if (!textHasMark) {
+                      tr.addMark(textPos, textPos + textNode.nodeSize, state.schema.marks.textStyle.create({ fontSize }))
+                      hasChanges = true
+                    }
+                  }
+                  return true
+                })
+                break // Found match, move to next node
+              }
+            }
+          }
+          
+          return true
+        })
+        
+        // Apply transaction if we made changes
+        if (hasChanges) {
+          editor.view.dispatch(tr)
+        }
+        
+        isUpdatingRef.current = false
+      }, 100) // Small delay to ensure TipTap has finished
+      
+      // SECOND PASS: After DOM is fully rendered, check DOM elements
+      // This catches cases where HTML was parsed but marks weren't applied
+      // IMPORTANT: This pass specifically handles table cells which might need special treatment
+      setTimeout(() => {
+        const editorDOM = editor.view.dom
+        const elementsWithFontSize = editorDOM.querySelectorAll('[class*="tiptap-fs-"]')
+        
+        // Also check for font size classes within table cells in the DOM
+        const tableCellsWithFontSize = editorDOM.querySelectorAll('td[class*="tiptap-fs-"], th[class*="tiptap-fs-"], td [class*="tiptap-fs-"], th [class*="tiptap-fs-"]')
+        
+        // Also check the HTML content directly to find font size classes
+        // This catches cases where TipTap might not have rendered the classes yet
+        const htmlContent = normalizedContent || content || ""
+        const hasFontSizeInContent = htmlContent.includes('tiptap-fs-')
+        
+        if (elementsWithFontSize.length > 0 || tableCellsWithFontSize.length > 0 || hasFontSizeInContent) {
+          const { state, view } = editor
+          const { tr } = state
+          let hasChanges = false
+          
+          // Process each element with font size class (including table cells)
+          const allElementsToProcess = [
+            ...Array.from(elementsWithFontSize),
+            ...Array.from(tableCellsWithFontSize)
+          ]
+          
+          for (const el of allElementsToProcess) {
+            const htmlEl = el as HTMLElement
+            
+            // Check if this is a table cell (td or th)
+            const isTableCell = htmlEl.tagName === 'TD' || htmlEl.tagName === 'TH'
+            
+            // Get font size - check the element itself first, then children
+            let fontSize: string | null = null
+            let className = htmlEl.getAttribute("class") || ""
+            let match = className.match(/\btiptap-fs-(\d+)\b/)
+            
+            if (match?.[1]) {
+              fontSize = match[1]
+            } else {
+              // Check children for font size classes (works for both regular elements and table cells)
+              const childWithFontSize = htmlEl.querySelector('[class*="tiptap-fs-"]') as HTMLElement
+              if (childWithFontSize) {
+                className = childWithFontSize.getAttribute("class") || ""
+                match = className.match(/\btiptap-fs-(\d+)\b/)
+                if (match?.[1]) {
+                  fontSize = match[1]
+                }
+              }
+            }
+            
+            if (!fontSize) continue
+            
+            const text = htmlEl.textContent || ""
+            
+            if (!text.trim()) continue
+            
+            // SPECIAL HANDLING FOR TABLE CELLS: Use TreeWalker to find ALL text nodes
+            // This is especially important when font size is the ONLY mark
+            // Apply the same aggressive approach as regular text
+            if (isTableCell) {
+              try {
+                // Use TreeWalker to find all text nodes in the table cell
+                const walker = document.createTreeWalker(
+                  htmlEl,
+                  NodeFilter.SHOW_TEXT,
+                  null
+                )
+                
+                let textNode: Node | null
+                while ((textNode = walker.nextNode())) {
+                  if (textNode.textContent && textNode.textContent.trim()) {
+                    try {
+                      // Get the position of the text node in the document
+                      const startPos = view.posAtDOM(textNode, 0)
+                      const endPos = view.posAtDOM(textNode, textNode.textContent.length)
+                      
+                      if (startPos !== null && endPos !== null && endPos > startPos) {
+                        // Use nodesBetween to check ALL text nodes in this range
+                        // This ensures we apply marks even when font size is the only mark
+                        state.doc.nodesBetween(startPos, endPos, (node, pos) => {
+                          if (node.isText) {
+                            // Check if this text node already has the font size mark
+                            const hasMark = node.marks.some(
+                              m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                            )
+                            
+                            if (!hasMark) {
+                              // Apply the font size mark to this specific text node
+                              // This works even when font size is the ONLY mark
+                              tr.addMark(pos, pos + node.nodeSize, state.schema.marks.textStyle.create({ fontSize }))
+                              hasChanges = true
+                            }
+                          }
+                          return true
+                        })
+                      }
+                    } catch (e) {
+                      // If DOM mapping fails, continue to next text node
+                      console.warn("Error getting posAtDOM for table cell text node:", e)
+                    }
+                  }
+                }
+                continue // Skip the regular processing for table cells
+              } catch (e) {
+                // If TreeWalker fails, fall through to regular processing
+                console.warn("Error using TreeWalker for table cell:", e)
+              }
+            }
+            
+            // Regular processing for non-table-cell elements
+            // Find position in document using TipTap's DOM mapping
+            try {
+              // Find first text node in the element
+              let firstTextNode: Node | null = null
+              let lastTextNode: Node | null = null
+              
+              const walker = document.createTreeWalker(
+                htmlEl,
+                NodeFilter.SHOW_TEXT,
+                null
+              )
+              
+              let node = walker.nextNode()
+              if (node) {
+                firstTextNode = node
+                lastTextNode = node
+                while ((node = walker.nextNode())) {
+                  lastTextNode = node
+                }
+              }
+              
+              if (firstTextNode && lastTextNode) {
+                // Get positions from text nodes
+                const startPos = view.posAtDOM(firstTextNode, 0)
+                const endPos = view.posAtDOM(lastTextNode, lastTextNode.textContent?.length || 0)
+                
+                if (startPos !== null && endPos !== null && endPos > startPos) {
+                  // Check ALL text nodes in this range to see if they have the mark
+                  let needsMark = false
+                  state.doc.nodesBetween(startPos, endPos, (node, pos) => {
+                    if (node.isText) {
+                      const hasMark = node.marks.some(
+                        m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                      )
+                      if (!hasMark) {
+                        needsMark = true
+                      }
+                    }
+                  })
+                  
+                  if (needsMark) {
+                    // Apply font size mark to the entire range
+                    tr.addMark(startPos, endPos, state.schema.marks.textStyle.create({ fontSize }))
+                    hasChanges = true
+                  }
+                }
+              } else {
+                // No text nodes found, try direct element mapping
+                const startPos = view.posAtDOM(htmlEl, 0)
+                if (startPos !== null) {
+                  // Find the end by getting the next sibling or parent end
+                  let endPos = startPos + text.length
+                  const $start = state.doc.resolve(startPos)
+                  const node = $start.nodeAfter || $start.parent
+                  if (node) {
+                    endPos = startPos + node.nodeSize
+                  }
+                  
+                  if (endPos > startPos) {
+                    // Check if mark exists in this range
+                    let needsMark = false
+                    state.doc.nodesBetween(startPos, endPos, (node) => {
+                      if (node.isText) {
+                        const hasMark = node.marks.some(
+                          m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                        )
+                        if (!hasMark) {
+                          needsMark = true
+                        }
+                      }
+                    })
+                    
+                    if (needsMark) {
+                      tr.addMark(startPos, endPos, state.schema.marks.textStyle.create({ fontSize }))
+                      hasChanges = true
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              // If DOM mapping fails, use text search as fallback
+              const searchText = text.trim().substring(0, Math.min(50, text.length))
+              if (searchText) {
+                let found = false
+                state.doc.descendants((node, pos) => {
+                  if (found) return false
+                  if (!node.isText) return true
+                  if (node.text.includes(searchText)) {
+                    // Check if this specific text node has the mark
+                    const hasMark = node.marks.some(
+                      m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                    )
+                    if (!hasMark) {
+                      // Apply mark to this text node
+                      tr.addMark(pos, pos + node.nodeSize, state.schema.marks.textStyle.create({ fontSize }))
+                      hasChanges = true
+                      found = true
+                    }
+                    return false // Stop searching
+                  }
+                  return true
+                })
+              }
+            }
+          }
+          
+          // Apply transaction if we made changes
+          if (hasChanges) {
+            editor.view.dispatch(tr)
+          }
+        }
+        
+        // THIRD PASS: Aggressively handle table cells from HTML content
+        // This ensures table cell font sizes persist even when font size is the only mark
+        // Match by text content to find corresponding cells in editor DOM
+        if (hasFontSizeInContent) {
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(htmlContent, 'text/html')
+          const tableCellsInHTML = doc.querySelectorAll('td[class*="tiptap-fs-"], th[class*="tiptap-fs-"], td [class*="tiptap-fs-"], th [class*="tiptap-fs-"]')
+          
+          if (tableCellsInHTML.length > 0) {
+            const { state, view } = editor
+            const { tr } = state
+            let hasChanges = false
+            
+            // Get all table cells from the editor DOM
+            const editorDOM = editor.view.dom
+            const editorTableCells = editorDOM.querySelectorAll('td, th')
+            
+            // Match HTML table cells with editor DOM table cells by text content
+            for (const htmlCell of Array.from(tableCellsInHTML)) {
+              const htmlCellEl = htmlCell as HTMLElement
+              
+              // Get font size from HTML cell
+              let fontSize: string | null = null
+              const cellClassName = htmlCellEl.getAttribute("class") || ""
+              let match = cellClassName.match(/\btiptap-fs-(\d+)\b/)
+              
+              if (match?.[1]) {
+                fontSize = match[1]
+              } else {
+                const childWithFontSize = htmlCellEl.querySelector('[class*="tiptap-fs-"]') as HTMLElement
+                if (childWithFontSize) {
+                  const childClassName = childWithFontSize.getAttribute("class") || ""
+                  match = childClassName.match(/\btiptap-fs-(\d+)\b/)
+                  if (match?.[1]) {
+                    fontSize = match[1]
+                  }
+                }
+              }
+              
+              if (!fontSize) continue
+              
+              const htmlCellText = htmlCellEl.textContent?.trim() || ""
+              if (!htmlCellText) continue
+              
+              // Find matching editor cell by text content
+              for (const editorCell of Array.from(editorTableCells)) {
+                const editorCellEl = editorCell as HTMLElement
+                const editorCellText = editorCellEl.textContent?.trim() || ""
+                
+                // Match if texts are similar (allowing for whitespace differences)
+                if (htmlCellText === editorCellText || 
+                    htmlCellText.substring(0, Math.min(30, htmlCellText.length)) === editorCellText.substring(0, Math.min(30, editorCellText.length))) {
+                  
+                  // Use TreeWalker to find all text nodes in the editor table cell
+                  const walker = document.createTreeWalker(
+                    editorCellEl,
+                    NodeFilter.SHOW_TEXT,
+                    null
+                  )
+                  
+                  let textNode: Node | null
+                  while ((textNode = walker.nextNode())) {
+                    if (textNode.textContent && textNode.textContent.trim()) {
+                      try {
+                        const startPos = view.posAtDOM(textNode, 0)
+                        const endPos = view.posAtDOM(textNode, textNode.textContent.length)
+                        
+                        if (startPos !== null && endPos !== null && endPos > startPos) {
+                          // Use nodesBetween to apply marks to ALL text nodes in this range
+                          // This is the same aggressive approach that works for regular text
+                          state.doc.nodesBetween(startPos, endPos, (node, pos) => {
+                            if (node.isText) {
+                              const hasMark = node.marks.some(
+                                m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                              )
+                              if (!hasMark) {
+                                // Apply mark to each text node individually
+                                // This works even when font size is the ONLY mark
+                                tr.addMark(pos, pos + node.nodeSize, state.schema.marks.textStyle.create({ fontSize }))
+                                hasChanges = true
+                              }
+                            }
+                            return true
+                          })
+                        }
+                      } catch (e) {
+                        // Continue to next text node
+                      }
+                    }
+                  }
+                  
+                  break // Found match, move to next HTML cell
+                }
+              }
+            }
+            
+            if (hasChanges) {
+              editor.view.dispatch(tr)
+            }
+          }
+        }
+        
+        // FOURTH PASS: If HTML has font size classes but DOM doesn't show them,
+        // parse the HTML directly and apply marks
+        if (hasFontSizeInContent && elementsWithFontSize.length === 0) {
+          // Parse HTML to find font size classes and apply them
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(htmlContent, 'text/html')
+          const htmlElementsWithFontSize = doc.querySelectorAll('[class*="tiptap-fs-"]')
+          
+          if (htmlElementsWithFontSize.length > 0) {
+            const { state, view } = editor
+            const { tr } = state
+            let hasChanges = false
+            
+            // For each element in the parsed HTML, find corresponding text in editor
+            for (const htmlEl of Array.from(htmlElementsWithFontSize)) {
+              const el = htmlEl as HTMLElement
+              const className = el.getAttribute("class") || ""
+              const match = className.match(/\btiptap-fs-(\d+)\b/)
+              
+              if (!match?.[1]) continue
+              
+              const fontSize = match[1]
+              const text = el.textContent || ""
+              
+              if (!text.trim()) continue
+              
+              // Search for this text in the editor document
+              const searchText = text.trim().substring(0, Math.min(100, text.length))
+              if (searchText) {
+                state.doc.descendants((node, pos) => {
+                  if (!node.isText) return true
+                  if (node.text.includes(searchText)) {
+                    // Check if this text node has the font size mark
+                    const hasMark = node.marks.some(
+                      m => m.type.name === 'textStyle' && m.attrs.fontSize === fontSize
+                    )
+                    if (!hasMark) {
+                      // Apply font size mark
+                      tr.addMark(pos, pos + node.nodeSize, state.schema.marks.textStyle.create({ fontSize }))
+                      hasChanges = true
+                    }
+                    return false // Stop after first match
+                  }
+                  return true
+                })
+              }
+            }
+            
+            if (hasChanges) {
+              editor.view.dispatch(tr)
+            }
+          }
+        }
+        
+        isUpdatingRef.current = false
+      }, 200) // Give TipTap time to finish parsing
       
       // Debug: Log when content with formatting is loaded
       if (process.env.NODE_ENV === "development" && content && (content.includes('style=') || content.includes('font-size') || content.includes('font-family'))) {
@@ -370,22 +1065,57 @@ export default function RichTextEditor({
           }
           .ProseMirror li {
             display: list-item !important;
-            margin: 0.25rem 0 !important;
-            padding-left: 0.25rem !important;
+            margin-top: 0.125rem !important;
+            margin-bottom: 0.125rem !important;
+            padding-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
           }
-          .ProseMirror ul ul {
+          /* Remove block display from <p> and <div> inside <li> */
+          .ProseMirror li > p,
+          .ProseMirror li > div {
+            display: inline !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: inherit !important;
+          }
+          /* Nested lists - all levels */
+          .ProseMirror ul ul,
+          .ProseMirror ol ol,
+          .ProseMirror li ul,
+          .ProseMirror li ol,
+          .ProseMirror ul ol,
+          .ProseMirror ol ul {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 1.5rem !important;
+          }
+          /* Second level nested lists */
+          .ProseMirror ul ul,
+          .ProseMirror ol ol {
             list-style-type: circle !important;
-            margin-top: 0.25rem !important;
-            margin-bottom: 0.25rem !important;
-          }
-          .ProseMirror ul ul ul {
-            list-style-type: square !important;
           }
           .ProseMirror ol ol {
             list-style-type: lower-alpha !important;
           }
+          /* Third level nested lists */
+          .ProseMirror ul ul ul {
+            list-style-type: square !important;
+          }
           .ProseMirror ol ol ol {
             list-style-type: lower-roman !important;
+          }
+          /* Fourth level and beyond */
+          .ProseMirror ul ul ul ul,
+          .ProseMirror ol ol ol ol,
+          .ProseMirror li ul ul,
+          .ProseMirror li ol ol {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
           }
 
           /* List hover */

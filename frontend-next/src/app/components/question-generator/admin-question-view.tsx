@@ -45,20 +45,6 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-foreground dark:text-gray-100">Question Preview</h2>
-              {question.subject || question.system ? (
-                <div className="flex flex-wrap gap-2">
-                  {question.subject && (
-                    <span className="px-3 py-1 bg-primary/12 text-primary rounded-lg text-xs font-semibold border border-primary/25">
-                      {question.subject}
-                    </span>
-                  )}
-                  {question.system && (
-                    <span className="px-3 py-1 bg-secondary/12 text-secondary rounded-lg text-xs font-semibold border border-secondary/25">
-                      {question.system}
-                    </span>
-                  )}
-                </div>
-              ) : null}
             </div>
             <div className="flex gap-2">
               {onCancel && (
@@ -152,8 +138,8 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
                   correctAnswerLabel={correctAnswerLabel}
                   options={question.options}
                   perAnswerExplanations={question.perAnswerExplanations}
-                  subject={question.subject}
-                  system={question.system}
+                  chapter={question.subject}
+                  subjectTag={question.tags && question.tags.length > 0 ? question.tags[0] : undefined}
                   topic={question.topic}
                 />
               </div>

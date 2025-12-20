@@ -604,96 +604,91 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
   }
 
   // Helper function to check if we're still in the same list context
-  // (handles empty lines between list items)
+  // (handles empty lines between list items and images within lists)
   const isInListContext = (lines: string[], currentIndex: number): boolean => {
     // Look ahead to find the next non-empty line
     for (let j = currentIndex; j < lines.length; j++) {
       const nextLine = lines[j].trim()
       if (nextLine === "") continue // Skip empty lines
+      
       // If next non-empty line is a list item, we're still in list context
-      return isListItem(lines[j])
+      if (isListItem(lines[j])) return true
+      
+      // If next non-empty line is an image, we're still in list context
+      // (images can be part of lists)
+      const imageMatches = Array.from(nextLine.matchAll(imagePattern))
+      const urlMatch = nextLine.match(urlPattern)
+      if (imageMatches.length > 0 || (urlMatch && nextLine === urlMatch[0])) {
+        // It's an image - check if there's a list item after it
+        // Continue looking for a list item after the image
+        for (let k = j + 1; k < lines.length; k++) {
+          const afterImageLine = lines[k].trim()
+          if (afterImageLine === "") continue
+          if (isListItem(lines[k])) return true
+          // If we hit something that's not a list item or image, we're not in list context
+          break
+        }
+        return true // Image is part of list context
+      }
+      
+      // Not a list item and not an image, we're not in list context
+      return false
     }
     return false
+  }
+
+  // Helper function to check if text contains list items
+  const textContainsListItems = (text: string): boolean => {
+    if (!text) return false
+    const textLines = text.split("\n")
+    return textLines.some(line => isListItem(line))
   }
 
   while (i < lines.length) {
     const line = lines[i]
     const trimmed = line.trim()
 
-    // Handle images (markdown format: ![alt](url))
+    // Check if current line is an image
     const imageMatches = Array.from(trimmed.matchAll(imagePattern))
-    if (imageMatches.length > 0) {
-      // Flush any current text
-      if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
+    const urlMatch = trimmed.match(urlPattern)
+    const isImageLine = imageMatches.length > 0 || (urlMatch && trimmed === urlMatch[0])
 
-      // Extract image URLs from matches
-      const imageUrls: string[] = []
-      for (const match of imageMatches) {
-        if (match[2]) {
-          imageUrls.push(match[2])
+    // Handle images (markdown format: ![alt](url))
+    // If we're in a list context (currentText contains list items), include image in the list block
+    // Also check if next line is a list item - if so, we're in the middle of a list
+    if (isImageLine) {
+      // Check if we're currently collecting a list
+      if (textContainsListItems(currentText)) {
+        // We're in a list - add image to current list block
+        currentText += "\n" + line
+        i++
+        continue
+      } else {
+        // Check if the next non-empty line is a list item - if so, we're in the middle of a list
+        // This handles the case where list items 1-2 were already flushed, but item 3 is coming
+        const nextIsListItem = isInListContext(lines, i + 1)
+        if (nextIsListItem) {
+          // Next line is a list item - this image is part of a list
+          // Check if previous block ended with a list item (we need to check the last block)
+          // For now, add it to currentText and the next list item will handle continuation
+          if (currentText) {
+            currentText += "\n" + line
+          } else {
+            currentText = line
+          }
+          i++
+          continue
+        } else {
+          // Not in a list - add to current text block
+          if (currentText) {
+            currentText += "\n" + line
+          } else {
+            currentText = line
+          }
+          i++
+          continue
         }
       }
-
-      if (imageUrls.length > 0) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "images",
-          order: blockOrder++,
-          data: {
-            count: imageUrls.length,
-            images: imageUrls,
-          },
-        })
-      }
-
-      // Check if there's remaining text on the line after the image
-      let remainingText = trimmed
-      for (const match of imageMatches) {
-        remainingText = remainingText.replace(match[0], "")
-      }
-      remainingText = remainingText.trim()
-      if (remainingText) {
-        currentText = remainingText
-      }
-
-      i++
-      continue
-    }
-
-    // Handle plain image URLs (if line is just an image URL)
-    const urlMatch = trimmed.match(urlPattern)
-    if (urlMatch && trimmed === urlMatch[0]) {
-      // Flush any current text
-      if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
-
-      blocks.push({
-        id: blockIdCounter++,
-        type: "images",
-        order: blockOrder++,
-        data: {
-          count: 1,
-          images: [urlMatch[0]],
-        },
-      })
-
-      i++
-      continue
     }
 
     // Handle headings (H1: #, H2: ##, H3: ###, etc.)
@@ -714,9 +709,56 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
     }
     
     // Handle lists (ordered and unordered) - keep them together in a single block
+    // This includes images within the list to preserve numbering
     if (isListItem(line)) {
-      // Flush any non-list text before starting a list
-      if (currentText.trim() && !isListItem(lines[Math.max(0, i - 1)])) {
+      // Check if we're already collecting a list in currentText
+      if (textContainsListItems(currentText)) {
+        // We're continuing an existing list - add this item to currentText and continue collecting
+        currentText += "\n" + line
+        i++
+        
+        // Continue collecting more list items, images, etc.
+        let continueCollecting = true
+        while (i < lines.length && continueCollecting) {
+          const nextLine = lines[i]
+          const nextTrimmed = nextLine.trim()
+          
+          if (nextTrimmed === "") {
+            // Empty line - check if we're still in list context
+            if (isInListContext(lines, i + 1)) {
+              currentText += "\n"
+              i++
+              continue
+            } else {
+              continueCollecting = false
+              break
+            }
+          } else if (isListItem(nextLine)) {
+            // It's a list item, add it
+            currentText += "\n" + nextLine
+            i++
+          } else {
+            // Check if it's an image line
+            const imageMatches = Array.from(nextTrimmed.matchAll(imagePattern))
+            const urlMatch = nextTrimmed.match(urlPattern)
+            
+            if (imageMatches.length > 0 || (urlMatch && nextTrimmed === urlMatch[0])) {
+              // It's an image - include it in the list block
+              currentText += "\n" + nextLine
+              i++
+              continue
+            } else {
+              // Not a list item and not an image, end the list
+              continueCollecting = false
+              break
+            }
+          }
+        }
+        continue
+      }
+      
+      // Starting a new list - flush any non-list text before starting
+      if (currentText.trim() && !textContainsListItems(currentText)) {
         blocks.push({
           id: blockIdCounter++,
           type: "text",
@@ -726,8 +768,10 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         currentText = ""
       }
       
-      // Collect all list items, including empty lines between them
-      const listItems: string[] = []
+      // Collect all list items, including empty lines and images between them
+      // Start with the current line (which is a list item)
+      const listItems: string[] = [line]
+      i++ // Move past the first list item - we've already processed it
       let inList = true
       
       while (i < lines.length && inList) {
@@ -737,12 +781,12 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         if (currentTrimmed === "") {
           // Empty line - check if we're still in list context
           if (isInListContext(lines, i + 1)) {
-            // Next non-empty line is still a list item, keep the empty line
+            // Next non-empty line is still a list item or image, keep the empty line
             listItems.push("")
             i++
             continue
           } else {
-            // Next non-empty line is not a list item, end the list
+            // Next non-empty line is not a list item or image, end the list
             inList = false
             break
           }
@@ -751,13 +795,27 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
           listItems.push(currentLine)
           i++
         } else {
-          // Not a list item, end the list
-          inList = false
-          break
+          // Check if it's an image line - if so, include it in the list block
+          const imageMatches = Array.from(currentTrimmed.matchAll(imagePattern))
+          const urlMatch = currentTrimmed.match(urlPattern)
+          
+          if (imageMatches.length > 0 || (urlMatch && currentTrimmed === urlMatch[0])) {
+            // It's an image - include it in the list block to preserve numbering
+            listItems.push(currentLine)
+            i++
+            // Continue collecting - next line might be another list item
+            continue
+          } else {
+            // Not a list item and not an image
+            // Check if we should still continue (e.g., if next line is a list item after some non-list content)
+            // For now, end the list - we can't include non-list, non-image content
+            inList = false
+            break
+          }
         }
       }
       
-      // Add the complete list as a single text block
+      // Add the complete list (including images) as a single text block
       if (listItems.length > 0) {
         // Remove trailing empty lines
         while (listItems.length > 0 && listItems[listItems.length - 1] === "") {

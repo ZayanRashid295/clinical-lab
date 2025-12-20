@@ -66,6 +66,8 @@ What is the most appropriate next step in management?
 
 ## Explanation
 
+![Blood smear showing hemosiderin inclusions](Screenshot From 2025-11-18 20-13-51.png)
+
 ### Overview
 This patient has **acute cholecystitis**, an inflammation of the gallbladder typically caused by obstruction of the cystic duct by gallstones. The clinical triad of right upper quadrant pain, fever, and leukocytosis, combined with ultrasound findings (gallstones, wall thickening, pericholecystic fluid), confirms the diagnosis. **Cholecystectomy** is the definitive treatment.
 
@@ -77,6 +79,8 @@ This patient has **acute cholecystitis**, an inflammation of the gallbladder typ
 - **Fever and leukocytosis:** Indicate inflammation/infection
 - **Radiating pain to right shoulder:** Referred pain via phrenic nerve (C3-C5 dermatomes)
 - **Ultrasound findings:** Gallstones, wall thickening (>4mm), and pericholecystic fluid are diagnostic
+
+![Blood smear showing hemosiderin inclusions](Screenshot From 2025-11-18 20-13-51.png)
 
 ---
 
@@ -96,7 +100,6 @@ This patient has **acute cholecystitis**, an inflammation of the gallbladder typ
 
 ![Blood smear showing hemosiderin inclusions](Screenshot From 2025-11-18 20-13-51.png)
 
-
 ## Management Approach
 1. **Immediate:**
    - NPO (nothing by mouth)
@@ -107,6 +110,8 @@ This patient has **acute cholecystitis**, an inflammation of the gallbladder typ
 2. **Definitive treatment:**
    - **Laparoscopic cholecystectomy** within 72 hours of symptom onset
    - Alternative: Open cholecystectomy if laparoscopic is not feasible
+
+![Blood smear showing hemosiderin inclusions](Screenshot From 2025-11-18 20-13-51.png)
 
 3. **Postoperative:**
    - Monitor for complications (bile leak, infection)

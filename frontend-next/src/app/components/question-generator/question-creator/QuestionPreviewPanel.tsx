@@ -64,25 +64,13 @@ export default function QuestionPreviewPanel({ data }: QuestionPreviewPanelProps
 
   return (
     <div className="h-full bg-background flex flex-col w-full">
-      {/* Subject/System Tags and Question ID - Optional header info */}
-      {(question.subject || question.system || data.metadata?.questionId) && (
+      {/* Question ID only - metadata moved to ExplanationPanel */}
+      {data.metadata?.questionId && (
         <div className="flex-shrink-0 px-6 py-2 border-b border-border/40 bg-card/10">
           <div className="flex flex-wrap gap-2 items-center">
-            {data.metadata?.questionId && (
-              <span className="text-sm font-mono font-bold text-foreground bg-card px-3 py-1.5 rounded border border-border">
-                {data.metadata.questionId}
-              </span>
-            )}
-            {question.subject && (
-              <span className="px-3 py-1 bg-primary/12 text-primary rounded-lg text-xs font-semibold border border-primary/25">
-                {question.subject}
-              </span>
-            )}
-            {question.system && (
-              <span className="px-3 py-1 bg-secondary/12 text-secondary rounded-lg text-xs font-semibold border border-secondary/25">
-                {question.system}
-              </span>
-            )}
+            <span className="text-sm font-mono font-bold text-foreground bg-card px-3 py-1.5 rounded border border-border">
+              {data.metadata.questionId}
+            </span>
           </div>
         </div>
       )}
@@ -163,8 +151,8 @@ export default function QuestionPreviewPanel({ data }: QuestionPreviewPanelProps
                   correctAnswerLabel={correctAnswerLabel}
                   options={options}
                   perAnswerExplanations={question.perAnswerExplanations}
-                  subject={question.subject}
-                  system={question.system}
+                  chapter={question.subject}
+                  subjectTag={data.metadata?.productTagId ? undefined : undefined}
                   topic={question.topic}
                 />
               </div>

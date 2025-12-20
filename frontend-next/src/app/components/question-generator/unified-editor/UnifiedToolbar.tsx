@@ -245,6 +245,7 @@ export default function UnifiedToolbar({
 
   const getCurrentFontSize = () => {
     try {
+      // First, try to get from textStyle mark
       const attrs = editor.getAttributes("textStyle")
       const fontSize = attrs?.fontSize
       
@@ -259,6 +260,53 @@ export default function UnifiedToolbar({
         if (exists) {
           return sizeValue
         }
+      }
+      
+      // FALLBACK: If textStyle doesn't have fontSize, check the DOM directly
+      // This handles cases where font size is the only mark and TipTap didn't create textStyle
+      try {
+        const selection = editor.state.selection
+        const { $from } = selection
+        
+        // Get the node at the cursor
+        const node = $from.node()
+        if (node && node.marks) {
+          // Check all marks for font size
+          for (const mark of node.marks) {
+            if (mark.type.name === 'textStyle' && mark.attrs.fontSize) {
+              const sizeValue = String(mark.attrs.fontSize).replace("px", "").trim()
+              const exists = FONT_SIZES.some(size => size.value === sizeValue)
+              if (exists) {
+                return sizeValue
+              }
+            }
+          }
+        }
+        
+        // Also check the DOM element at cursor position
+        const domAtPos = editor.view.domAtPos($from.pos)
+        if (domAtPos && domAtPos.node) {
+          let current: Node | null = domAtPos.node
+          let depth = 0
+          while (current && depth < 5) {
+            if (current.nodeType === Node.ELEMENT_NODE) {
+              const el = current as HTMLElement
+              const className = el.getAttribute("class") || ""
+              const match = className.match(/\btiptap-fs-(\d+)\b/)
+              if (match?.[1]) {
+                const sizeValue = match[1]
+                const exists = FONT_SIZES.some(size => size.value === sizeValue)
+                if (exists) {
+                  return sizeValue
+                }
+              }
+            }
+            current = current.parentNode
+            depth++
+          }
+        }
+      } catch (e) {
+        // Ignore DOM errors
       }
     } catch (error) {
       // Ignore

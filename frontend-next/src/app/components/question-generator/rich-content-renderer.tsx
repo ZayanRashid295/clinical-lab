@@ -175,8 +175,10 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
   useEffect(() => {
     // Sanitize HTML using unified pipeline
     const sanitizeHtml = async () => {
-      // First, fix list item formatting
-      const fixedHtml = fixListItemFormatting(html)
+      // First, merge any split ordered lists caused by images
+      let processedHtml = mergeSplitOrderedLists(html)
+      // Then, fix list item formatting
+      const fixedHtml = fixListItemFormatting(processedHtml)
       
       // Don't remove empty table rows - this might interfere with merged cells
       // The empty rows removal was causing issues with colspan/rowspan
@@ -236,7 +238,7 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
           pre: ["className", "style"],
           mark: ["className", "style", "data-color"],
           ul: ["className", "style"],
-          ol: ["className", "style"],
+          ol: ["className", "style", "start"],
           li: ["className", "style"],
           br: ["className", "style"],
           hr: ["className", "style"],
@@ -504,30 +506,66 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
             color: inherit;
           }
 
-          /* List styling - fix spacing for nested lists */
+          /* ============================================
+             LIST STYLING - PREVIEW MODE ONLY
+             Complete rewrite for perfect nested list spacing
+             Maximum specificity to override all other styles
+             ============================================ */
+          
+          /* RESET ALL LIST STYLES FIRST - Maximum specificity */
           .html-content-${itemId} ul,
-          .html-content-${itemId} ol {
-            list-style-position: outside;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-            padding-left: 1.5rem;
+          .html-content-${itemId} ol,
+          .html-content-${itemId} li,
+          .html-content-${itemId} ul ul,
+          .html-content-${itemId} ul ol,
+          .html-content-${itemId} ol ul,
+          .html-content-${itemId} ol ol,
+          .html-content-${itemId} li ul,
+          .html-content-${itemId} li ol,
+          .html-content-${itemId} li li,
+          .html-content-${itemId} li li ul,
+          .html-content-${itemId} li li ol {
+            box-sizing: border-box !important;
           }
-          /* Top-level lists get more bottom margin */
+          
+          /* TOP-LEVEL LISTS - Proper spacing */
           .html-content-${itemId} > ul,
           .html-content-${itemId} > ol {
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
-          }
-          /* Nested lists - absolutely no spacing - most specific selectors first */
-          .html-content-${itemId} li > ul,
-          .html-content-${itemId} li > ol {
-            margin-top: 0.125rem !important;
-            margin-bottom: 0 !important;
+            list-style-position: outside !important;
+            list-style-type: disc !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 1rem !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 1.5rem !important;
+            padding-right: 0 !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
-            padding-left: 1.5rem;
           }
-          /* All nested lists - no spacing */
+          .html-content-${itemId} > ol {
+            list-style-type: decimal !important;
+          }
+          
+          /* ALL LISTS - Base properties */
+          .html-content-${itemId} ul {
+            list-style-type: disc !important;
+            list-style-position: outside !important;
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+          }
+          .html-content-${itemId} ol {
+            list-style-type: decimal !important;
+            list-style-position: outside !important;
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+          }
+          
+          /* Ensure start attribute is respected - don't reset counters */
+          .html-content-${itemId} ol[start] {
+            counter-reset: none !important;
+          }
+          
+          /* NESTED LISTS - ZERO vertical spacing (this is the key fix) */
           .html-content-${itemId} li ul,
           .html-content-${itemId} li ol,
           .html-content-${itemId} ul ul,
@@ -535,136 +573,115 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
           .html-content-${itemId} ol ul,
           .html-content-${itemId} ol ol,
           .html-content-${itemId} li li ul,
-          .html-content-${itemId} li li ol {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            padding-left: 1.5rem;
-          }
-          /* List items - minimal spacing, ensure proper display */
-          .html-content-${itemId} li {
-            display: list-item !important;
-            margin-top: 0.125rem;
-            margin-bottom: 0.125rem;
-            padding-left: 0;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            line-height: 1.5;
-            list-style-position: outside;
-            vertical-align: baseline;
-          }
-          /* Ensure list item content starts immediately after the marker */
-          .html-content-${itemId} ol li,
-          .html-content-${itemId} ul li {
-            display: list-item !important;
-            list-style-position: outside;
-          }
-          /* Ensure all content inside list items flows inline (no line breaks) */
-          .html-content-${itemId} li > p {
-            display: inline !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            line-height: inherit !important;
-          }
-          .html-content-${itemId} li > p:first-child {
-            display: inline !important;
-          }
-          .html-content-${itemId} li > p:only-child {
-            display: inline !important;
-          }
-          /* Remove block display from any first child in list items (except nested lists) */
-          .html-content-${itemId} li > *:first-child:not(ul):not(ol) {
-            display: inline !important;
-          }
-          /* Ensure all inline elements stay inline */
-          .html-content-${itemId} li > strong,
-          .html-content-${itemId} li > em,
-          .html-content-${itemId} li > span,
-          .html-content-${itemId} li > code,
-          .html-content-${itemId} li > a {
-            display: inline !important;
-          }
-          /* Remove any margins/padding that could cause line breaks */
-          .html-content-${itemId} li > *:not(ul):not(ol) {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-          }
-          .html-content-${itemId} li > p + * {
-            margin-top: 0 !important;
-          }
-          /* Force inline display for any divs inside list items */
-          .html-content-${itemId} li > div {
-            display: inline !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          /* Remove any line-height that might cause spacing */
-          .html-content-${itemId} li > p,
-          .html-content-${itemId} li > div {
-            line-height: inherit !important;
-          }
-          /* Remove bottom margin from list items that directly contain nested lists */
+          .html-content-${itemId} li li ol,
           .html-content-${itemId} li > ul,
           .html-content-${itemId} li > ol {
-            margin-top: 0.125rem !important;
-            margin-bottom: 0 !important;
-          }
-          /* When nested list is last child, remove parent li bottom margin */
-          .html-content-${itemId} li > ul:last-child,
-          .html-content-${itemId} li > ol:last-child {
-            margin-bottom: 0 !important;
-          }
-          .html-content-${itemId} li:last-child > ul:last-child,
-          .html-content-${itemId} li:last-child > ol:last-child {
-            margin-bottom: 0 !important;
-          }
-          /* Remove spacing from nested list items */
-          .html-content-${itemId} li li {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
-          }
-          /* Remove extra spacing from paragraphs before/after nested lists */
-          .html-content-${itemId} li p {
-            margin-top: 0.25rem;
-            margin-bottom: 0.25rem;
-          }
-          .html-content-${itemId} li p:first-child {
-            margin-top: 0;
-          }
-          .html-content-${itemId} li p:last-child {
-            margin-bottom: 0;
-          }
-          /* Remove all spacing around nested lists - comprehensive override */
-          .html-content-${itemId} * ul ul,
-          .html-content-${itemId} * ul ol,
-          .html-content-${itemId} * ol ul,
-          .html-content-${itemId} * ol ol {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
+            margin-left: 0 !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
+            padding-left: 1.5rem !important;
           }
-          /* Remove spacing from list items that contain nested lists as last child */
-          .html-content-${itemId} li:last-child {
-            margin-bottom: 0.125rem;
-          }
-          /* When nested list is the only or last content in li, remove li bottom margin */
-          .html-content-${itemId} li > ul:only-child,
-          .html-content-${itemId} li > ol:only-child {
+          
+          /* Deeper nesting - also zero spacing */
+          .html-content-${itemId} ul ul ul,
+          .html-content-${itemId} ol ol ol,
+          .html-content-${itemId} li ul ul,
+          .html-content-${itemId} li ol ol,
+          .html-content-${itemId} ul ul ul ul,
+          .html-content-${itemId} ol ol ol ol,
+          .html-content-${itemId} li li ul ul,
+          .html-content-${itemId} li li ol ol {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 1.5rem !important;
           }
-          /* Remove spacing between text and nested list in same list item */
-          .html-content-${itemId} li > * + ul,
-          .html-content-${itemId} li > * + ol {
-            margin-top: 0.125rem !important;
+          
+          /* LIST ITEMS - Consistent spacing at all levels */
+          .html-content-${itemId} li {
+            display: list-item !important;
+            list-style-position: outside !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 1.5 !important;
           }
-          .html-content-${itemId} li > ul + *,
-          .html-content-${itemId} li > ol + * {
-            margin-top: 0.125rem !important;
+          
+          /* Nested list items - same spacing */
+          .html-content-${itemId} li li {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0 !important;
+          }
+          
+          /* Deeper nested list items */
+          .html-content-${itemId} li li li {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+          }
+          
+          /* Content inside list items - inline to prevent breaks */
+          .html-content-${itemId} li > p,
+          .html-content-${itemId} li > div,
+          .html-content-${itemId} li p,
+          .html-content-${itemId} li div {
+            display: inline !important;
+            margin: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            line-height: inherit !important;
+          }
+          
+          /* All non-list children - inline */
+          .html-content-${itemId} li > *:not(ul):not(ol),
+          .html-content-${itemId} li *:not(ul):not(ol):not(li) {
+            display: inline !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0 !important;
+          }
+          
+          /* Nested lists - block level, zero vertical spacing */
+          .html-content-${itemId} li > ul,
+          .html-content-${itemId} li > ol {
+            display: block !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+          }
+          
+          /* Spacing between text and nested list */
+          .html-content-${itemId} li > *:not(ul):not(ol) + ul,
+          .html-content-${itemId} li > *:not(ul):not(ol) + ol {
+            margin-top: 0.5rem !important;
+          }
+          
+          /* Spacing after nested list */
+          .html-content-${itemId} li > ul + *:not(ul):not(ol),
+          .html-content-${itemId} li > ol + *:not(ul):not(ol) {
+            margin-top: 0.5rem !important;
           }
         `
       }} />
@@ -677,9 +694,6 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
           [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
           [&_h5]:text-sm [&_h5]:font-semibold [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
           [&_h6]:text-xs [&_h6]:font-semibold [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
-          [&_ul]:list-disc [&_ul]:list-outside [&_ul]:ml-6 [&_ul]:pl-0 
-          [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:ml-6 [&_ol]:pl-0 
-          [&_li]:ml-0 [&_li]:pl-0 [&_li]:whitespace-pre-wrap 
           [&_span]:whitespace-pre-wrap
           [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
           [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap 
@@ -695,6 +709,102 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
 }
 
 // Helper function to convert markdown to HTML
+// Helper function to merge split ordered lists that are separated by images
+// This fixes the issue where markdown parser splits lists when images appear between items
+// Images are kept OUTSIDE the list (not as list items) but numbering continues
+function mergeSplitOrderedLists(html: string): string {
+  let result = html
+  let changed = true
+  let iterations = 0
+  const maxIterations = 10 // Prevent infinite loops
+  
+  // Keep processing until no more changes (to handle multiple splits)
+  while (changed && iterations < maxIterations) {
+    iterations++
+    changed = false
+    const beforeResult = result
+    
+    // Pattern to match: </ol> followed by content (images, etc.), then <ol>
+    // This pattern matches when we have a closing </ol>, then image/content, then opening <ol>
+    // We'll verify it's a top-level list by checking depth
+    const pattern = /(<ol[^>]*>)([\s\S]*?)(<\/ol>)\s*((?:<img[^>]*>|<p[^>]*>[\s\S]*?<\/p>|<div[^>]*>[\s\S]*?<\/div>|<figure[^>]*>[\s\S]*?<\/figure>)\s*)(<ol[^>]*>)/gi
+    
+    result = result.replace(pattern, (match, openTag1, listContent1, closeTag1, imageContent, openTag2) => {
+      // Count only top-level list items (not nested ones)
+      // We need to track depth for both <ol>/</ol> and <ul>/</ul> tags
+      let itemCount = 0
+      let depth = 0
+      let i = 0
+      
+      while (i < listContent1.length) {
+        const remaining = listContent1.substring(i)
+        
+        // Check for opening list tags (<ol> or <ul>)
+        if (remaining.match(/^<(ol|ul)[^>]*>/i)) {
+          depth++
+          const listMatch = remaining.match(/^<(ol|ul)[^>]*>/i)!
+          i += listMatch[0].length
+          continue
+        }
+        // Check for closing list tags (</ol> or </ul>)
+        else if (remaining.match(/^<\/(ol|ul)>/i)) {
+          depth--
+          const closeMatch = remaining.match(/^<\/(ol|ul)>/i)!
+          i += closeMatch[0].length
+          continue
+        }
+        // Count <li> tags only when at depth 0 (top-level)
+        else if (remaining.match(/^<li[^>]*>/i) && depth === 0) {
+          itemCount++
+          const liMatch = remaining.match(/^<li[^>]*>/i)!
+          i += liMatch[0].length
+          continue
+        }
+        
+        i++
+      }
+      
+      // If depth tracking resulted in 0 items, something went wrong
+      // This shouldn't happen, but as a safety check, verify the list has content
+      if (itemCount === 0 && listContent1.trim().length > 0) {
+        // Last resort: count all <li> tags (this might include nested, but better than 0)
+        const listItemMatches = listContent1.match(/<li[^>]*>/gi)
+        itemCount = listItemMatches ? listItemMatches.length : 0
+      }
+      
+      // Clean up image content - remove wrapping <p> or <div> tags
+      let cleanImageContent = imageContent.trim()
+      cleanImageContent = cleanImageContent.replace(/<p[^>]*>(<img[^>]*>)<\/p>/gi, '$1')
+      cleanImageContent = cleanImageContent.replace(/<div[^>]*>(<img[^>]*>)<\/div>/gi, '$1')
+      
+      // Calculate the correct start value
+      const startValue = itemCount + 1
+      
+      // Add start attribute to the second <ol> to continue numbering
+      // Remove existing start attribute if present, then add new one
+      let newOpenTag2 = openTag2.replace(/\s+start\s*=\s*["']?\d+["']?/gi, '')
+      
+      // Ensure start attribute is properly added with correct syntax
+      if (newOpenTag2.endsWith('>')) {
+        newOpenTag2 = newOpenTag2.slice(0, -1) + ` start="${startValue}">`
+      } else {
+        newOpenTag2 = newOpenTag2 + ` start="${startValue}">`
+      }
+      
+      changed = true
+      
+      // Return: first list + image content (outside list) + second list with start attribute
+      return `${openTag1}${listContent1}${closeTag1}\n${cleanImageContent}\n${newOpenTag2}`
+    })
+    
+    if (result === beforeResult) {
+      changed = false
+    }
+  }
+  
+  return result
+}
+
 async function markdownToHTML(markdown: string): Promise<string> {
   try {
     if (!markdown || !markdown.trim()) {
@@ -714,6 +824,9 @@ async function markdownToHTML(markdown: string): Promise<string> {
     html = html.replace(/^<html[^>]*>/, '').replace(/<\/html>$/, '')
     html = html.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '')
     html = html.trim()
+    
+    // Fix split ordered lists caused by images between list items
+    html = mergeSplitOrderedLists(html)
     
     // Ensure we have valid HTML
     if (!html || html === "") {
@@ -988,7 +1101,7 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
           p: ["className", "style"],
           div: ["className", "style"],
           ul: ["className", "style"],
-          ol: ["className", "style"],
+          ol: ["className", "style", "start"],
           li: ["className", "style"],
           "*": ["className", "style"],
         },
@@ -1721,8 +1834,44 @@ function renderPerAnswerExplanations(
                         }
                         
                         // Otherwise, use RichContentRenderer (which will handle markdown conversion)
+                        // But ensure it has proper CSS for lists
                         return (
-                          <div className="text-foreground/90">
+                          <div className="text-foreground/90 per-answer-explanation-content">
+                            <style dangerouslySetInnerHTML={{
+                              __html: `
+                                /* Ensure lists in per-answer explanation content blocks show bullets/numbers */
+                                .per-answer-explanation-content ul {
+                                  list-style-type: disc !important;
+                                  list-style-position: outside !important;
+                                  padding-left: 1.5rem !important;
+                                  margin-left: 0 !important;
+                                  margin-top: 0.5rem !important;
+                                  margin-bottom: 1rem !important;
+                                }
+                                .per-answer-explanation-content ol {
+                                  list-style-type: decimal !important;
+                                  list-style-position: outside !important;
+                                  padding-left: 1.5rem !important;
+                                  margin-left: 0 !important;
+                                  margin-top: 0.5rem !important;
+                                  margin-bottom: 1rem !important;
+                                }
+                                .per-answer-explanation-content li {
+                                  display: list-item !important;
+                                  list-style-position: outside !important;
+                                  margin-left: 0 !important;
+                                  padding-left: 0 !important;
+                                  margin-top: 0.5rem !important;
+                                  margin-bottom: 0.5rem !important;
+                                }
+                                .per-answer-explanation-content li > p,
+                                .per-answer-explanation-content li > div {
+                                  display: inline !important;
+                                  margin: 0 !important;
+                                  padding: 0 !important;
+                                }
+                              `
+                            }} />
                             <RichContentRenderer content={explanation} />
                           </div>
                         )
@@ -1733,7 +1882,34 @@ function renderPerAnswerExplanations(
                       (typeof explanation === "string" && (explanation.includes("<span") || explanation.includes("<mark") || explanation.includes("style="))) ? (
                         <HtmlRenderer html={explanation} itemId={`per-answer-${option.label}`} />
                       ) : (
-                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90">
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90" style={{ 
+                          // Override prose list styles to ensure bullets/numbers are visible
+                          '--tw-prose-bullets': 'disc',
+                          '--tw-prose-counters': 'decimal',
+                        } as React.CSSProperties}>
+                          <style dangerouslySetInnerHTML={{
+                            __html: `
+                              /* Ensure lists in per-answer explanations show bullets/numbers */
+                              .prose ul {
+                                list-style-type: disc !important;
+                                list-style-position: outside !important;
+                                padding-left: 1.5rem !important;
+                                margin-left: 0 !important;
+                              }
+                              .prose ol {
+                                list-style-type: decimal !important;
+                                list-style-position: outside !important;
+                                padding-left: 1.5rem !important;
+                                margin-left: 0 !important;
+                              }
+                              .prose li {
+                                display: list-item !important;
+                                list-style-position: outside !important;
+                                margin-left: 0 !important;
+                                padding-left: 0 !important;
+                              }
+                            `
+                          }} />
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
@@ -1758,13 +1934,13 @@ function renderPerAnswerExplanations(
                                 </a>
                               ),
                               ul: ({ node, ...props }) => (
-                                <ul className="list-disc list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
+                                <ul className="list-disc list-outside space-y-1 mb-4 text-foreground/90 ml-6 pl-0" style={{ listStyleType: "disc", listStylePosition: "outside", paddingLeft: "1.5rem" }} {...props} />
                               ),
                               ol: ({ node, ...props }) => (
-                                <ol className="list-decimal list-inside space-y-1 mb-4 text-foreground/90 ml-4" {...props} />
+                                <ol className="list-decimal list-outside space-y-1 mb-4 text-foreground/90 ml-6 pl-0" style={{ listStyleType: "decimal", listStylePosition: "outside", paddingLeft: "1.5rem" }} {...props} />
                               ),
                               li: ({ node, ...props }) => (
-                                <li className="text-foreground/90" {...props} />
+                                <li className="text-foreground/90" style={{ display: "list-item", listStylePosition: "outside", paddingLeft: "0" }} {...props} />
                               ),
                             }}
                           >

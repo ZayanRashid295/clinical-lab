@@ -61,6 +61,164 @@ export default function PerAnswerExplanationEditor({
 
       blocksRef.current = blocks
       
+      // Helper function to normalize list HTML and remove excessive spacing
+      const normalizeListHTML = (html: string): string => {
+        if (!html || !html.includes('<li')) return html
+        
+        let normalized = html
+        
+        // Remove <p> tags inside <li> elements (TipTap doesn't use them, they cause spacing issues)
+        // But preserve nested <ul>/<ol> structures inside <li>
+        const processListItem = (content: string): string => {
+          // First, check if this content contains nested lists - if so, preserve them
+          const hasNestedList = /<[uo]l[\s>]/.test(content)
+          
+          if (hasNestedList) {
+            // For items with nested lists, be more careful
+            // Remove <p> tags but preserve the nested list structure
+            let cleaned = content
+              // Remove <p> tags that wrap everything (but not nested lists)
+              .replace(/^<p[^>]*>([\s\S]*?)<\/p>$/gi, '$1')
+              // Remove <p> tags that are direct children (but preserve nested lists)
+              .replace(/<p[^>]*>([^<]*(?:<[uo]l[\s\S]*?<\/[uo]l>)?[^<]*)<\/p>/gi, '$1')
+              // Remove standalone <p> tags (not containing lists)
+              .replace(/<p[^>]*>([^<]*)<\/p>/gi, '$1')
+              // Remove <div> tags
+              .replace(/<div[^>]*>/gi, '')
+              .replace(/<\/div>/gi, '')
+          // Normalize whitespace but preserve list structure
+          .replace(/\n\s*\n\s*/g, ' ')
+          .replace(/^\s+|\s+$/g, '')
+          .replace(/\s+(?=<)/g, '') // Remove spaces before tags
+          .replace(/>\s+/g, '> ') // Normalize spaces after tags
+            return cleaned
+          } else {
+            // For items without nested lists, remove all <p> and <div> tags
+            let cleaned = content
+              .replace(/<p[^>]*>/gi, '')
+              .replace(/<\/p>/gi, '')
+              .replace(/<div[^>]*>/gi, '')
+              .replace(/<\/div>/gi, '')
+              .replace(/\n\s*\n\s*/g, ' ')
+              .replace(/^\s+|\s+$/g, '')
+              .replace(/\s+/g, ' ')
+            return cleaned
+          }
+        }
+        
+        // Process list items, handling nested lists carefully
+        // Use a recursive approach to handle deeply nested lists
+        let changed = true
+        let iterations = 0
+        while (changed && iterations < 10) {
+          const before = normalized
+          normalized = normalized.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi, (match, liAttrs, content) => {
+            const cleaned = processListItem(content)
+            return `<li${liAttrs || ''}>${cleaned}</li>`
+          })
+          changed = normalized !== before
+          iterations++
+        }
+        
+        // Remove excessive whitespace between list items
+        normalized = normalized.replace(/(<\/li>)\s+(<li)/gi, '$1$2')
+        
+        // Remove empty paragraphs before/after lists
+        normalized = normalized.replace(/<p[^>]*>\s*<\/p>\s*(<[uo]l)/gi, '$1')
+        normalized = normalized.replace(/(<\/[uo]l>)\s*<p[^>]*>\s*<\/p>/gi, '$1')
+        
+        return normalized
+      }
+      
+      // Helper function to merge split ordered lists that are separated by images
+      // Images are kept OUTSIDE the list (not as list items) but numbering continues using start attribute
+      const mergeSplitOrderedLists = (html: string): string => {
+        let result = html
+        let changed = true
+        let iterations = 0
+        const maxIterations = 10 // Prevent infinite loops
+        
+        // Keep processing until no more changes (to handle multiple splits)
+        while (changed && iterations < maxIterations) {
+          iterations++
+          changed = false
+          const beforeResult = result
+          
+          // Pattern to match: </ol> followed by content (images, etc.), then <ol>
+          const pattern = /(<ol[^>]*>)([\s\S]*?)(<\/ol>)\s*((?:<img[^>]*>|<p[^>]*>[\s\S]*?<\/p>|<div[^>]*>[\s\S]*?<\/div>|<figure[^>]*>[\s\S]*?<\/figure>)\s*)(<ol[^>]*>)/gi
+          
+          result = result.replace(pattern, (match, openTag1, listContent1, closeTag1, imageContent, openTag2) => {
+            // Count only top-level list items (not nested ones)
+            // We need to track depth for both <ol>/</ol> and <ul>/</ul> tags
+            let itemCount = 0
+            let depth = 0
+            let i = 0
+            
+            while (i < listContent1.length) {
+              const remaining = listContent1.substring(i)
+              
+              // Check for opening list tags (<ol> or <ul>)
+              if (remaining.match(/^<(ol|ul)[^>]*>/i)) {
+                depth++
+                const listMatch = remaining.match(/^<(ol|ul)[^>]*>/i)!
+                i += listMatch[0].length
+                continue
+              }
+              // Check for closing list tags (</ol> or </ul>)
+              else if (remaining.match(/^<\/(ol|ul)>/i)) {
+                depth--
+                const closeMatch = remaining.match(/^<\/(ol|ul)>/i)!
+                i += closeMatch[0].length
+                continue
+              }
+              // Count <li> tags only when at depth 0 (top-level)
+              else if (remaining.match(/^<li[^>]*>/i) && depth === 0) {
+                itemCount++
+                const liMatch = remaining.match(/^<li[^>]*>/i)!
+                i += liMatch[0].length
+                continue
+              }
+              
+              i++
+            }
+            
+            // If depth tracking resulted in 0 items, something went wrong
+            // This shouldn't happen, but as a safety check, verify the list has content
+            if (itemCount === 0 && listContent1.trim().length > 0) {
+              // Last resort: count all <li> tags (this might include nested, but better than 0)
+              const listItemMatches = listContent1.match(/<li[^>]*>/gi)
+              itemCount = listItemMatches ? listItemMatches.length : 0
+            }
+            
+            // Clean up image content - remove wrapping <p> or <div> tags
+            let cleanImageContent = imageContent.trim()
+            cleanImageContent = cleanImageContent.replace(/<p[^>]*>(<img[^>]*>)<\/p>/gi, '$1')
+            cleanImageContent = cleanImageContent.replace(/<div[^>]*>(<img[^>]*>)<\/div>/gi, '$1')
+            
+            // Add start attribute to the second <ol> to continue numbering
+            let newOpenTag2 = openTag2.replace(/\s+start\s*=\s*["']?\d+["']?/gi, '')
+            
+            // Ensure start attribute is properly added
+            if (newOpenTag2.endsWith('>')) {
+              newOpenTag2 = newOpenTag2.slice(0, -1) + ` start="${itemCount + 1}">`
+            } else {
+              newOpenTag2 = newOpenTag2 + ` start="${itemCount + 1}">`
+            }
+            
+            changed = true
+            
+            // Return: first list + image content (outside list) + second list with start attribute
+            return `${openTag1}${listContent1}${closeTag1}\n${cleanImageContent}\n${newOpenTag2}`
+          })
+          
+          if (result === beforeResult) {
+            changed = false
+          }
+        }
+        
+        return result
+      }
+
       // Helper function to convert markdown to HTML
       const convertMarkdownToHTML = async (markdown: string): Promise<string> => {
         try {
@@ -68,9 +226,9 @@ export default function PerAnswerExplanationEditor({
             return "<p></p>"
           }
           
-          // If markdown already looks like HTML, return it
+          // If markdown already looks like HTML, normalize it and return
           if (markdown.trim().startsWith("<")) {
-            return markdown.trim()
+            return normalizeListHTML(markdown.trim())
           }
           
           // Use unified to convert markdown to HTML
@@ -86,10 +244,16 @@ export default function PerAnswerExplanationEditor({
           html = html.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '')
           html = html.trim()
           
+          // Fix split ordered lists caused by images between list items
+          html = mergeSplitOrderedLists(html)
+          
           // Ensure we have valid HTML
           if (!html || html === "") {
             html = `<p>${markdown.replace(/\n/g, '<br>')}</p>`
           }
+          
+          // Normalize list HTML to remove excessive spacing from markdown conversion
+          html = normalizeListHTML(html)
           
           return html
         } catch (error) {
@@ -228,6 +392,7 @@ export default function PerAnswerExplanationEditor({
                 }
                 
                 const convertedHtml = await convertMarkdownToHTML(block.data!.markdown!)
+                // HTML is already normalized in convertMarkdownToHTML
                 
                 if (process.env.NODE_ENV === "development") {
                   console.log("[PerAnswerExplanationEditor] Converted HTML:", {
@@ -258,7 +423,7 @@ export default function PerAnswerExplanationEditor({
           
           // Now get the HTML for display
           const html = await blocksToHTMLAsync(updatedBlocks)
-          const newHtml = html || "<p></p>"
+          const newHtml = normalizeListHTML(html || "<p></p>")
           setHtmlContent(newHtml)
           setIsConverting(false)
           
@@ -278,7 +443,7 @@ export default function PerAnswerExplanationEditor({
       setIsConverting(true)
       try {
         const html = await blocksToHTMLAsync(blocks)
-        const newHtml = html || "<p></p>"
+        const newHtml = normalizeListHTML(html || "<p></p>")
         
         // Normalize HTML for comparison (remove extra whitespace)
         const normalizeHtml = (h: string) => h.replace(/\s+/g, ' ').trim()

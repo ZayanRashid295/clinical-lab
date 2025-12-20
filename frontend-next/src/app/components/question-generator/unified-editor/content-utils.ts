@@ -68,16 +68,16 @@ export function blocksToHTML(blocks: ContentBlock[]): string {
       // Get HTML from block data - prioritize html over markdown
       let html = block.data?.html || ""
       const markdown = block.data?.markdown || ""
-
-      const isEmptyHtml = !html ||
-        html.trim() === "" ||
-        html.trim() === "<p></p>" ||
-        html.trim() === "<p><br></p>" ||
+      
+      const isEmptyHtml = !html || 
+        html.trim() === "" || 
+        html.trim() === "<p></p>" || 
+        html.trim() === "<p><br></p>" || 
         html.trim() === "<p> </p>" ||
         html.trim() === "<p><br/></p>" ||
         html.trim() === "<div></div>" ||
         html.trim() === "<div><br></div>"
-
+      
       // Check if HTML contains raw markdown syntax (like **bold**, *italic*, lists, etc.)
       const htmlInnerText = html.replace(/<[^>]+>/g, '').trim()
       const markdownPatterns = [
@@ -132,13 +132,13 @@ export function blocksToHTML(blocks: ContentBlock[]): string {
           html = `<p>${markdown}</p>`
         }
       }
-
+      
       if (!html && block.data?.content) {
         const content = block.data.content
         if (typeof content === "string") {
           html = content.trim().startsWith("<") ? content : `<p>${content}</p>`
+          }
         }
-      }
 
       if (html && html.trim()) htmlParts.push(html.trim())
       continue

@@ -42,20 +42,6 @@ export default function QuestionPreview({ question, onExit }: QuestionPreviewPro
                 </span>
               )}
             </div>
-            {currentQuestion.subject || currentQuestion.system ? (
-              <div className="flex flex-wrap gap-2">
-                {currentQuestion.subject && (
-                  <span className="px-3 py-1 bg-primary/12 text-primary rounded-lg text-xs font-semibold border border-primary/25">
-                    {currentQuestion.subject}
-                  </span>
-                )}
-                {currentQuestion.system && (
-                  <span className="px-3 py-1 bg-secondary/12 text-secondary rounded-lg text-xs font-semibold border border-secondary/25">
-                    {currentQuestion.system}
-                  </span>
-                )}
-              </div>
-            ) : null}
             <div className="flex gap-2">
               <button
                 onClick={onExit}

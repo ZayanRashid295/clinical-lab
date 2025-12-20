@@ -49,7 +49,8 @@ export default function ExplanationPanel({
             )}
 
             {/* Metadata (Subjects/Chapters/Topic) */}
-            {(subjectTag || chapter || topic) && (
+            {/* Show metadata section if any value exists (including empty strings for loading states) */}
+            {(subjectTag || chapter || (topic && (typeof topic === "string" ? topic : topic?.name))) && (
               <div className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {subjectTag && (
@@ -64,7 +65,7 @@ export default function ExplanationPanel({
                       <div className="text-sm font-bold text-foreground dark:text-gray-100">{chapter}</div>
                     </div>
                   )}
-                  {topic && (
+                  {topic && (typeof topic === "string" ? topic : topic?.name) && (
                     <div>
                       <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-1">Topic</div>
                       <div className="text-sm font-bold text-foreground dark:text-gray-100">

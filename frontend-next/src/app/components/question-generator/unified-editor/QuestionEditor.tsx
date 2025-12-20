@@ -72,10 +72,11 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   const topicsService = new TopicsService()
   const productTagsService = new ProductTagsService()
 
-  // State for metadata names
+  // State for metadata names - initialize from initialData if available
   const [sectionName, setSectionName] = useState<string>("")
-  const [chapterName, setChapterName] = useState<string>("")
+  const [chapterName, setChapterName] = useState<string>(initialData?.metadata?.subject || "")
   const [topicName, setTopicName] = useState<string>("")
+  const [subjectTagName, setSubjectTagName] = useState<string>("")
 
   // State for editable metadata dropdowns
   const [sections, setSections] = useState<any[]>([])
@@ -87,6 +88,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   const [loadingChapters, setLoadingChapters] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState(false)
   const [loadingTags, setLoadingTags] = useState(false)
+  
+  // Track if metadata names have been fetched
+  const [metadataNamesFetched, setMetadataNamesFetched] = useState(false)
 
   // Load sections on mount
   useEffect(() => {
@@ -169,45 +173,101 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
     }
   }, [metadata.chapterId])
 
-  // Fetch metadata names when IDs change
-  useEffect(() => {
-    if (metadata.sectionId) {
-      sectionsService
-        .getSection(metadata.sectionId)
-        .then((section) => {
-          setSectionName(section?.name || metadata.system || "")
-        })
-        .catch(() => setSectionName(metadata.system || ""))
-    } else {
-      setSectionName(metadata.system || "")
-    }
-  }, [metadata.sectionId, metadata.system])
+  // Comprehensive metadata name fetching function
+  const fetchMetadataNames = useCallback(async (metadataToUse: any) => {
+    if (!metadataToUse) return
 
-  useEffect(() => {
-    if (metadata.chapterId) {
-      chaptersService
-        .getChapter(metadata.chapterId)
-        .then((chapter) => {
-          setChapterName(chapter?.name || metadata.subject || "")
-        })
-        .catch(() => setChapterName(metadata.subject || ""))
-    } else {
-      setChapterName(metadata.subject || "")
-    }
-  }, [metadata.chapterId, metadata.subject])
+    const promises: Promise<any>[] = []
 
-  useEffect(() => {
-    if (metadata.topicId) {
-      topicsService
-        .getTopic(metadata.topicId)
-        .then((topic) => {
-          setTopicName(topic?.name || "")
-        })
-        .catch(() => setTopicName(""))
-    } else {
-      setTopicName("")
+    // Fetch section name
+    if (metadataToUse.sectionId) {
+      promises.push(
+        sectionsService.getSection(metadataToUse.sectionId)
+          .then((section) => {
+            setSectionName(section?.name || metadataToUse.system || "")
+          })
+          .catch(() => setSectionName(metadataToUse.system || ""))
+      )
+    } else if (metadataToUse.system) {
+      setSectionName(metadataToUse.system)
     }
-  }, [metadata.topicId])
+
+    // Fetch chapter name
+    if (metadataToUse.chapterId) {
+      promises.push(
+        chaptersService.getChapter(metadataToUse.chapterId)
+          .then((chapter) => {
+            setChapterName(chapter?.name || metadataToUse.subject || "")
+          })
+          .catch(() => setChapterName(metadataToUse.subject || ""))
+      )
+    } else if (metadataToUse.subject) {
+      setChapterName(metadataToUse.subject)
+    }
+
+    // Fetch topic name
+    if (metadataToUse.topicId) {
+      promises.push(
+        topicsService.getTopic(metadataToUse.topicId)
+          .then((topic) => {
+            setTopicName(topic?.name || "")
+          })
+          .catch(() => setTopicName(""))
+      )
+    }
+
+    // Fetch tag name
+    const selectedTagId = metadataToUse.productTagId || (metadataToUse.productTagIds && metadataToUse.productTagIds[0])
+    if (selectedTagId) {
+      // Use a ref or closure to access current productTags
+      // Check if tag is already in productTags array (will be checked after productTags loads)
+      // For now, fetch it directly
+      promises.push(
+        productTagsService.getTag(selectedTagId)
+          .then((tag) => {
+            if (tag) {
+              setProductTags((prev) => {
+                const existing = prev.find((t) => t.id === tag.id)
+                if (existing) {
+                  setSubjectTagName(existing.name || "")
+                  return prev
+                }
+                setSubjectTagName(tag.name || "")
+                return [...prev, tag]
+              })
+            }
+          })
+          .catch(() => {
+            // If fetch fails, check if tag is in already loaded productTags
+            const existingTag = productTags.find((t) => t.id === selectedTagId)
+            if (existingTag) {
+              setSubjectTagName(existingTag.name || "")
+            }
+          })
+      )
+    }
+
+    await Promise.all(promises)
+    setMetadataNamesFetched(true)
+  }, [])
+
+  // Fetch metadata names on mount if initialData exists
+  useEffect(() => {
+    if (initialData?.metadata && !metadataNamesFetched) {
+      fetchMetadataNames(initialData.metadata)
+    }
+  }, [initialData?.metadata, metadataNamesFetched, fetchMetadataNames])
+
+  // Fetch metadata names when metadata state changes or when entering preview mode
+  useEffect(() => {
+    const hasMetadata = metadata.chapterId || metadata.topicId || metadata.productTagId || metadata.productTagIds || metadata.subject || metadata.system || metadata.sectionId
+    if (hasMetadata) {
+      // Always fetch when entering preview mode, or if not fetched yet
+      if (isPreviewMode || !metadataNamesFetched) {
+        fetchMetadataNames(metadata)
+      }
+    }
+  }, [metadata.chapterId, metadata.topicId, metadata.productTagId, metadata.productTagIds, metadata.subject, metadata.system, metadata.sectionId, metadataNamesFetched, isPreviewMode, fetchMetadataNames, metadata])
 
   // Handle metadata changes
   const handleChapterChange = (chapterId: string) => {
@@ -239,10 +299,16 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   }
   
   const getSelectedTagName = () => {
+    // First check if we have it in state
+    if (subjectTagName) return subjectTagName
+    
+    // Then check productTags array
     const selectedId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    if (!selectedId) return ""
     const selected = productTags.find((t) => t.id === selectedId)
     return selected?.name || ""
   }
+
 
   // Generate question ID based on system, subject, and topic
   const generateQuestionId = useCallback(() => {
@@ -670,7 +736,19 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
 
   // If in preview mode, show student view
   if (isPreviewMode) {
+    // Get metadata names with proper fallbacks - ensure we always have the latest values
     const selectedSubjectTagName = getSelectedTagName()
+    // Use chapterName if available, otherwise fall back to metadata.subject
+    // If we have chapterId but no name yet, show "Loading..." so the section appears
+    const displayChapterName = chapterName || metadata.subject || (metadata.chapterId ? "Loading..." : "")
+    // Use topicName if available, otherwise create object with placeholder if topicId exists
+    const displayTopic = topicName 
+      ? { name: topicName } 
+      : (metadata.topicId ? { name: "Loading..." } : undefined)
+    
+    // Ensure subjectTag shows "Loading..." if we have an ID but no name yet
+    const displaySubjectTag = selectedSubjectTagName || (metadata.productTagId || metadata.productTagIds?.[0] ? "Loading..." : undefined)
+
     return (
       <div className="flex flex-col h-full">
         {/* Header with back button */}
@@ -725,9 +803,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                   text: choice.text,
                   correct: choice.correct,
                 }))}
-                subjectTag={selectedSubjectTagName || ""}
-                chapter={chapterName || metadata.subject}
-                topic={topicName || (metadata.topicId ? { name: topicName } : undefined)}
+                subjectTag={displaySubjectTag}
+                chapter={displayChapterName || undefined}
+                topic={displayTopic}
                 correctAnswerLabel={choices.find((c) => c.correct)?.label || "C"}
               />
             </div>
