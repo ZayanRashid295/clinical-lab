@@ -144,9 +144,9 @@ export function parseMarkdown(content: string): ParsedQuestion {
             }
             // Otherwise skip this line entirely (don't add it to caseLines)
           } else {
-            // Preserve the original line (with proper spacing) to maintain markdown structure
-            // This is important for images, tables, and formatting
-            caseLines.push(currentLine)
+          // Preserve the original line (with proper spacing) to maintain markdown structure
+          // This is important for images, tables, and formatting
+          caseLines.push(currentLine)
           }
         } else if (!trimmed) {
           // Preserve empty lines to maintain paragraph separation

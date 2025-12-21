@@ -959,9 +959,9 @@ export default function BulkMarkdownUploader({
           if (Array.isArray(convertedBack.explanation) && convertedBack.explanation.length > 0) {
             questionPayload.explanationBlocks = convertedBack.explanation.map((block: any, idx: number) => {
               return {
-                type: block.type || "TEXT",
-                order: typeof block.order === "number" ? block.order : idx,
-                data: block.data || {},
+              type: block.type || "TEXT",
+              order: typeof block.order === "number" ? block.order : idx,
+              data: block.data || {},
               }
             })
           }

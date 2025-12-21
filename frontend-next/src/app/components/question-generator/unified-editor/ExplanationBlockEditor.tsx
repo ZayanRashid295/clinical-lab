@@ -98,18 +98,21 @@ const TableBlockEditor = memo(({
   }, [onTableChange])
   
   useEffect(() => {
-    // Only convert once
-    if (hasConvertedRef.current) return
-    
-    // If we have HTML table already, use it
+    // If we have HTML table already, use it (even if we've converted before, update if blockHtml changed)
     if (blockHtml && blockHtml.includes("<table")) {
-      setTableHtml(blockHtml)
-      hasConvertedRef.current = true
+      // Only update if the HTML actually changed
+      if (tableHtml !== blockHtml) {
+        setTableHtml(blockHtml)
+        hasConvertedRef.current = true
+      }
       return
     }
     
+    // Only convert markdown table once
+    if (hasConvertedRef.current) return
+    
     // If we detected a markdown table, convert it (only once)
-    if (detectedTable.isTable && detectedTable.tableMarkdown && !hasConvertedRef.current) {
+    if (detectedTable.isTable && detectedTable.tableMarkdown) {
       hasConvertedRef.current = true
       setIsConverting(true)
       convertMarkdownTableToHTML(detectedTable.tableMarkdown).then((html) => {
@@ -125,9 +128,10 @@ const TableBlockEditor = memo(({
       }).catch((error) => {
         console.error("Failed to convert markdown table:", error)
         setIsConverting(false)
+        hasConvertedRef.current = false // Allow retry
       })
     }
-  }, [blockHtml, detectedTable, onTableChange]) // Include dependencies
+  }, [blockHtml, detectedTable, onTableChange, tableHtml]) // Include tableHtml to detect changes
   
   // Early returns AFTER all hooks
   if (isConverting) {
@@ -561,22 +565,63 @@ export default function ExplanationBlockEditor({
     const blocksSignature = JSON.stringify(blocks.map(b => ({
       id: b.id,
       hasMarkdown: !!(b.data?.markdown && b.data.markdown.trim()),
-      hasHtml: !!(b.data?.html && b.data.html.trim() && b.data.html !== "<p></p>")
+      hasHtml: !!(b.data?.html && b.data.html.trim() && b.data.html !== "<p></p>"),
+      hasTableHtml: !!(b.data?.tableHtml && b.data.tableHtml.includes("<table"))
     })))
     
     // Skip if blocks haven't actually changed
     if (lastBlocksRef.current === blocksSignature) return
     lastBlocksRef.current = blocksSignature
     
+    // First, ensure blocks with HTML tables also have tableHtml set
+    const blocksWithTableHtml = blocks.map((block) => {
+      if (block.type === "text") {
+        const html = block.data?.html || ""
+        const hasTableHtml = block.data?.tableHtml || ""
+        
+        // If HTML contains a table but tableHtml is not set, set it
+        if (html && html.includes("<table") && !hasTableHtml) {
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              tableHtml: html,
+            },
+          }
+        }
+      }
+      return block
+    })
+    
+    // Update blocks if any needed tableHtml set
+    const needsTableHtmlUpdate = blocksWithTableHtml.some((block, index) => {
+      return block.data?.tableHtml !== blocks[index].data?.tableHtml
+    })
+    
+    if (needsTableHtmlUpdate) {
+      onChange(blocksWithTableHtml)
+      return // Let the next effect handle conversion
+    }
+    
     const convertBlocks = async () => {
       const blocksToConvert = blocks.filter((block) => {
         if (block.type !== "text") return false
         const hasMarkdown = !!(block.data?.markdown && block.data.markdown.trim())
-        const hasHtml = !!(block.data?.html && 
-          block.data.html.trim() && 
-          block.data.html !== "<p></p>" && 
-          block.data.html !== "<p><br></p>" &&
-          block.data.html.trim().startsWith("<"))
+        
+        // Check for valid HTML - including table HTML
+        const html = block.data?.html || ""
+        const tableHtml = block.data?.tableHtml || ""
+        const hasValidHtml = !!(html && 
+          html.trim() && 
+          html !== "<p></p>" && 
+          html !== "<p><br></p>" &&
+          (html.trim().startsWith("<") || html.includes("<table")))
+        const hasValidTableHtml = !!(tableHtml && 
+          tableHtml.trim() && 
+          tableHtml.includes("<table"))
+        
+        const hasHtml = hasValidHtml || hasValidTableHtml
+        
         const blockKey = `${block.id}-${block.data?.markdown?.substring(0, 50)}`
         const alreadyConverted = convertedBlocksRef.current.has(blockKey)
         
@@ -592,15 +637,64 @@ export default function ExplanationBlockEditor({
           const blockKey = `${block.id}-${block.data?.markdown?.substring(0, 50)}`
           convertedBlocksRef.current.add(blockKey)
           
-          const html = await convertMarkdownToHTML(block.data!.markdown!)
+          const markdown = block.data!.markdown!
+          
+          // Check if markdown contains a table
+          const tableDetection = detectMarkdownTable(markdown)
+          
+          let html: string
+          let isTable = false
+          let tableHtml: string | undefined = undefined
+          
+          // First, try regular markdown conversion (this will convert tables to HTML if present)
+          html = await convertMarkdownToHTML(markdown)
+          
+          // Check if the converted HTML contains a table
+          if (html && html.includes("<table")) {
+            isTable = true
+            // Extract the table HTML from the converted HTML
+            const tableMatch = html.match(/<table[\s\S]*?<\/table>/i)
+            if (tableMatch) {
+              tableHtml = tableMatch[0]
+            }
+          } else if (tableDetection.isTable && tableDetection.tableMarkdown) {
+            // If regular conversion didn't produce a table but we detected one, try table-specific conversion
+            const convertedTableHtml = await markdownTableToHTML(tableDetection.tableMarkdown)
+            if (convertedTableHtml && convertedTableHtml.includes("<table")) {
+              isTable = true
+              tableHtml = convertedTableHtml
+              // Replace the table in the markdown with the converted table HTML
+              // This preserves other content while ensuring the table is properly converted
+              const tableMarkdownRegex = new RegExp(
+                tableDetection.tableMarkdown.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                's'
+              )
+              // If markdown contains only the table, use just the table HTML
+              if (markdown.trim() === tableDetection.tableMarkdown.trim()) {
+                html = convertedTableHtml
+              } else {
+                // Otherwise, keep the full HTML but extract table separately
+                html = html || await convertMarkdownToHTML(markdown)
+              }
+            }
+          }
+          
+          // Build data object
+          const blockData: any = {
+            ...block.data,
+            html: html,
+            markdown: block.data!.markdown, // Preserve markdown
+          }
+          
+          // If it's a table, also save as tableHtml for proper rendering
+          if (isTable) {
+            // Use extracted tableHtml if available, otherwise use the full html if it contains a table
+            blockData.tableHtml = tableHtml || (html.includes("<table") ? html : undefined)
+          }
           
           return {
             ...block,
-            data: {
-              ...block.data,
-              html: html,
-              markdown: block.data!.markdown, // Preserve markdown
-            },
+            data: blockData,
           }
         })
       )
@@ -727,18 +821,23 @@ export default function ExplanationBlockEditor({
     }
 
     if (tableLines.length >= 2) {
-      const nonTableLines = lines.filter((line, idx) => {
-        const trimmed = line.trim()
-        return idx < tableStartIndex || idx >= tableStartIndex + tableLines.length
-      }).filter(line => line.trim() !== "").length
-
-      const isPrimaryTable = tableStartIndex === 0 || 
-                             (tableLines.length >= 2 && nonTableLines <= 3) ||
-                             (tableLines.length >= 3)
+      // More lenient detection: if we have a valid table structure (header + separator + at least one row),
+      // consider it a table even if there's other content
+      const hasSeparator = tableLines.some(line => line.trim().match(/^\|[\s\-\|:]+\|$/))
+      const hasHeader = tableLines.length > 0 && tableLines[0].trim().startsWith("|")
+      const hasDataRows = tableLines.length > (hasSeparator ? 2 : 1)
       
-      if (isPrimaryTable) {
+      // If we have a proper table structure (header, separator, data rows), it's a table
+      // This allows tables to be detected even when mixed with other content
+      if (hasHeader && hasDataRows && (hasSeparator || tableLines.length >= 2)) {
         const tableMarkdown = tableLines.join("\n")
         
+        return { isTable: true, tableMarkdown }
+      }
+      
+      // Fallback: if we have 3+ table lines, it's likely a table
+      if (tableLines.length >= 3) {
+        const tableMarkdown = tableLines.join("\n")
         return { isTable: true, tableMarkdown }
       }
     }
@@ -1043,10 +1142,34 @@ export default function ExplanationBlockEditor({
         // Check if this is a table block OR if text block contains a markdown table
         const isTableBlock = block.type === "table"
         const hasTableInHtml = blockHtml && typeof blockHtml === "string" && blockHtml.includes("<table")
+        const hasTableHtml = block.data?.tableHtml && block.data.tableHtml.includes("<table")
+        
+        // Extract table HTML from blockHtml if it contains a table mixed with other content
+        let extractedTableHtml: string | undefined = undefined
+        if (hasTableInHtml && blockHtml.includes("<table")) {
+          const tableMatch = blockHtml.match(/<table[\s\S]*?<\/table>/i)
+          if (tableMatch) {
+            extractedTableHtml = tableMatch[0]
+          }
+        }
         
         // Check if text block contains markdown table
         let detectedTable: { isTable: boolean; tableMarkdown?: string } = { isTable: false }
-        let shouldRenderAsTable = isTableBlock || hasTableInHtml
+        let shouldRenderAsTable = isTableBlock || hasTableInHtml || hasTableHtml
+        
+        // Check if block contains content other than just the table
+        let hasContentOutsideTable = false
+        if (blockHtml && hasTableInHtml && extractedTableHtml) {
+          // Remove the table from HTML to check if there's other content
+          const contentWithoutTable = blockHtml.replace(/<table[\s\S]*?<\/table>/gi, '').trim()
+          // Remove empty paragraphs and whitespace
+          const cleanedContent = contentWithoutTable
+            .replace(/<p[^>]*>\s*<\/p>/gi, '')
+            .replace(/<div[^>]*>\s*<\/div>/gi, '')
+            .replace(/&nbsp;/g, ' ')
+            .trim()
+          hasContentOutsideTable = cleanedContent.length > 0
+        }
         
         if (!shouldRenderAsTable && block.type === "text") {
           // Extract markdown from HTML if needed
@@ -1067,6 +1190,15 @@ export default function ExplanationBlockEditor({
           detectedTable = detectMarkdownTable(contentToCheck)
           shouldRenderAsTable = detectedTable.isTable
           
+          // If markdown has a table, check if there's content outside the table
+          if (detectedTable.isTable && detectedTable.tableMarkdown && blockMarkdown) {
+            const markdownWithoutTable = blockMarkdown.replace(
+              new RegExp(detectedTable.tableMarkdown.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 's'),
+              ''
+            ).trim()
+            hasContentOutsideTable = markdownWithoutTable.length > 0
+          }
+          
           console.log("[ExplanationBlockEditor] Text block analysis:", {
             blockId: block.id,
             blockType: block.type,
@@ -1076,6 +1208,7 @@ export default function ExplanationBlockEditor({
             contentToCheckLength: contentToCheck.length,
             detectedTable,
             shouldRenderAsTable,
+            hasContentOutsideTable,
             contentPreview: contentToCheck.substring(0, 300),
           })
         }
@@ -1128,17 +1261,18 @@ export default function ExplanationBlockEditor({
                 onSectionChange(blockActiveSection)
               }}
             >
-              {shouldRenderAsTable ? (
+              {shouldRenderAsTable && !hasContentOutsideTable ? (
+                // Block contains ONLY a table - use table editor
                 <TableBlockEditor
                   key={`table-${block.id}`}
                   blockId={block.id}
-                  blockHtml={blockHtml}
+                  blockHtml={extractedTableHtml || block.data?.tableHtml || blockHtml}
                   detectedTable={detectedTable}
                   onTableChange={(payload) => {
                     if (block.type === "table") {
                       handleTableBlockChange(index, payload)
                     } else {
-                      // Keep as text block, just update the HTML/markdown with table content
+                      // Keep as text block, update HTML with table content
                       const newBlocks = [...blocks]
                       newBlocks[index] = {
                         ...newBlocks[index],
@@ -1161,6 +1295,38 @@ export default function ExplanationBlockEditor({
                       })
                     }
                   }}
+                />
+              ) : shouldRenderAsTable && hasContentOutsideTable ? (
+                // Block contains text AND table - use RichTextEditor to show full content
+                <RichTextEditor
+                  key={`rich-text-${block.id}`}
+                  content={blockHtml || blockMarkdown || ""}
+                  onChange={(html) => {
+                    const newBlocks = [...blocks]
+                    newBlocks[index] = {
+                      ...newBlocks[index],
+                      data: {
+                        ...newBlocks[index].data,
+                        html: html,
+                        markdown: blockMarkdown, // Preserve markdown
+                        // Extract and save table HTML if present
+                        ...(html.includes("<table") ? {
+                          tableHtml: html.match(/<table[\s\S]*?<\/table>/i)?.[0] || html
+                        } : {}),
+                      },
+                    }
+                    onChange(newBlocks)
+                  }}
+                  editorRef={(editor) => {
+                    textBlockEditorRefs.current[block.id] = editor
+                    if (editor) {
+                      editor.on("focus", () => {
+                        onSectionChange(blockActiveSection)
+                      })
+                    }
+                  }}
+                  placeholder="Enter explanation content with tables..."
+                  className="min-h-[200px]"
                 />
               ) : (
               <TextBlockEditor
