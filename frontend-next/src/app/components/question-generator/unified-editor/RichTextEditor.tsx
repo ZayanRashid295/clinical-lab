@@ -388,11 +388,11 @@ export default function RichTextEditor({
       const before = normalized
       normalized = normalized.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi, (match, liAttrs, content) => {
         // Before processing, extract classes from <p> tags that will be removed
-        const pTagMatches = Array.from(content.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi))
+        const pTagMatches = Array.from(content.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi)) as RegExpMatchArray[]
         let preservedClasses: string[] = []
         
         for (const pMatch of pTagMatches) {
-          const pAttrs = pMatch[1] || ""
+          const pAttrs = (pMatch[1] as string) || ""
           const classMatch = pAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
           if (classMatch?.[1]) {
             // Extract font size and font family classes
@@ -403,9 +403,9 @@ export default function RichTextEditor({
         }
         
         // Also check for existing <span> tags with font size classes in the content
-        const spanTagMatches = Array.from(content.matchAll(/<span([^>]*)>([\s\S]*?)<\/span>/gi))
+        const spanTagMatches = Array.from(content.matchAll(/<span([^>]*)>([\s\S]*?)<\/span>/gi)) as RegExpMatchArray[]
         for (const spanMatch of spanTagMatches) {
-          const spanAttrs = spanMatch[1] || ""
+          const spanAttrs = (spanMatch[1] as string) || ""
           const classMatch = spanAttrs.match(/class\s*=\s*["']([^"']+)["']/i)
           if (classMatch?.[1]) {
             const classes = classMatch[1].split(/\s+/)
@@ -551,7 +551,7 @@ export default function RichTextEditor({
         // The descendants method will traverse all nodes including table cells
         // Use the same aggressive approach for both regular text and table cell content
         state.doc.descendants((node, pos) => {
-          if (!node.isText) return true
+          if (!node.isText || !node.text) return true
           
           const nodeText = node.text.trim()
           if (!nodeText) return true
@@ -796,7 +796,7 @@ export default function RichTextEditor({
                 let found = false
                 state.doc.descendants((node, pos) => {
                   if (found) return false
-                  if (!node.isText) return true
+                  if (!node.isText || !node.text) return true
                   if (node.text.includes(searchText)) {
                     // Check if this specific text node has the mark
                     const hasMark = node.marks.some(
@@ -954,7 +954,7 @@ export default function RichTextEditor({
               const searchText = text.trim().substring(0, Math.min(100, text.length))
               if (searchText) {
                 state.doc.descendants((node, pos) => {
-                  if (!node.isText) return true
+                  if (!node.isText || !node.text) return true
                   if (node.text.includes(searchText)) {
                     // Check if this text node has the font size mark
                     const hasMark = node.marks.some(

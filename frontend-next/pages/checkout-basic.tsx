@@ -14,6 +14,8 @@ import { Alert, AlertDescription } from "@/shared/ui/alert";
 import { paymentsService } from "@/app/services/payments/payments.service";
 import { authService } from "@/shared/services/auth.service";
 import { SubscriptionsService } from "@/app/services/subscriptions/subscriptions.service";
+import { ExistingSubscriptionModal } from "@/app/components/ExistingSubscriptionModal";
+import { Subscription } from "@/app/types/subscription";
 
 // IMPORTANT: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in frontend-next/.env.local
 const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;

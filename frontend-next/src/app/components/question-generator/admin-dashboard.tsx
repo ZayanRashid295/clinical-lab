@@ -391,7 +391,7 @@ export default function AdminDashboard() {
           const transformedBlocks = blocks
             .filter((b: any) => b != null)
             .map((b: any) => {
-                const blockData = b.data || {}
+              const blockData = b.data || {}
 
               if (b.type === "TEXT") {
                 // Ensure HTML and markdown are preserved
@@ -420,11 +420,12 @@ export default function AdminDashboard() {
                   },
                 }
               } else if (b.type === "IMAGES") {
+                const imageBlockData = b.data || {}
                 return {
                   id: b.id || `images-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   type: "images",
                   order: typeof b.order === "number" ? b.order : 0,
-                  data: blockData,
+                  data: imageBlockData,
                 }
               }
               // Default fallback

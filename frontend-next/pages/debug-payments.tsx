@@ -1,6 +1,6 @@
 import React from "react";
-import PaymentMethodsDebug from "../src/app/components/Debug/PaymentMethodsDebug";
-import PaymentMethodsContent from "../src/app/components/Content/PaymentMethodsContent";
+import PaymentMethodsDebug from "@/app/components/Debug/PaymentMethodsDebug";
+import PaymentMethodsContent from "@/app/components/Content/PaymentMethodsContent";
 
 /**
  * Debug page for testing payment methods

@@ -110,8 +110,6 @@ export default function QuestionPreview({ question, onExit }: QuestionPreviewPro
                   correctAnswerLabel={correctAnswerLabel}
                   options={currentQuestion.options}
                   perAnswerExplanations={currentQuestion.perAnswerExplanations}
-                  subject={currentQuestion.subject}
-                  system={currentQuestion.system}
                   topic={currentQuestion.topic}
                 />
               </div>
