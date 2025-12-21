@@ -115,10 +115,6 @@ export default function RichMarkdownEditor({
       try {
         // TipTap's setContent accepts HTML string and will parse it
         // It handles <strong>, <em>, <p>, <h1>, <h2>, <h3>, etc. automatically
-        // Debug: log if content contains headings
-        if (process.env.NODE_ENV === 'development' && normalizedInitial && (normalizedInitial.includes('<h1>') || normalizedInitial.includes('<h2>') || normalizedInitial.includes('<h3>'))) {
-          console.log('Setting content with headings in TipTap:', normalizedInitial)
-        }
         
         editor.commands.setContent(normalizedInitial || "<p></p>", { emitUpdate: false })
         lastContentRef.current = normalizedInitial

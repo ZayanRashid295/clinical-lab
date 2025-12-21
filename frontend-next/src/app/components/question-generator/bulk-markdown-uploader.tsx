@@ -469,6 +469,7 @@ export default function BulkMarkdownUploader({
         explanation: updatedMainExplanation,
         perAnswerExplanations: updatedPerAnswerExplanations,
         tags: parsed.tags,
+        questionId: parsed.questionId,
       }
       
       console.log(`[ProcessFile] Final questionData for ${fileName}:`, {
@@ -860,6 +861,7 @@ export default function BulkMarkdownUploader({
             perAnswerExplanations: result.questionData.perAnswerExplanations, // This is already blocks
             tags: result.questionData.tags || [],
             topicId: questionTopicId,
+            questionId: result.questionData.questionId, // Pass through parsed questionId if it exists
           }
 
           // Convert to new format - this will convert string stem to blocks
@@ -918,9 +920,28 @@ export default function BulkMarkdownUploader({
 
           if (convertedBack.subject) questionPayload.subject = convertedBack.subject
           if (convertedBack.system) questionPayload.system = convertedBack.system
-          if (convertedBack.tags && convertedBack.tags.length > 0) {
-            questionPayload.tags = convertedBack.tags
+          
+          // Handle tags - store questionId in tags if it exists
+          const tagsArray: string[] = []
+          if (convertedBack.tags && Array.isArray(convertedBack.tags)) {
+            // Filter out any existing questionId markers and add regular tags
+            for (const tag of convertedBack.tags) {
+              if (tag && String(tag).trim() && !String(tag).startsWith("__questionId:")) {
+                tagsArray.push(String(tag).trim())
+              }
+            }
           }
+          
+          // Store questionId in tags if it exists in metadata (from parsed markdown)
+          const parsedQuestionId = convertedBack.metadata?.questionId || result.questionData.questionId
+          if (parsedQuestionId && String(parsedQuestionId).trim()) {
+            tagsArray.push(`__questionId:${String(parsedQuestionId).trim()}`)
+          }
+          
+          if (tagsArray.length > 0) {
+            questionPayload.tags = tagsArray
+          }
+          
           if (questionProductTagId) {
             questionPayload.productTagId = questionProductTagId
           }
@@ -937,19 +958,10 @@ export default function BulkMarkdownUploader({
           // Add explanation blocks if available
           if (Array.isArray(convertedBack.explanation) && convertedBack.explanation.length > 0) {
             questionPayload.explanationBlocks = convertedBack.explanation.map((block: any, idx: number) => {
-              // Debug: Log table blocks to verify cells are preserved
-              if (block.type === "TABLE" && block.data?.cells) {
-                console.log("[BulkUpload] Saving table block with cells:", {
-                  rows: block.data.rows,
-                  cols: block.data.cols,
-                  cellCount: Object.keys(block.data.cells || {}).length,
-                  sampleCells: Object.entries(block.data.cells || {}).slice(0, 3),
-                })
-              }
               return {
-              type: block.type || "TEXT",
-              order: typeof block.order === "number" ? block.order : idx,
-              data: block.data || {},
+                type: block.type || "TEXT",
+                order: typeof block.order === "number" ? block.order : idx,
+                data: block.data || {},
               }
             })
           }

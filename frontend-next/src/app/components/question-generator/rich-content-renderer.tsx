@@ -194,18 +194,6 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
         return
       }
       
-      // Debug: Log the HTML before sanitization to check for colspan/rowspan
-      if (process.env.NODE_ENV === "development") {
-        const hasColspan = cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')
-        const hasRowspan = cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')
-        if (hasColspan || hasRowspan) {
-          console.log("[HtmlRenderer] HTML contains merged cells:", {
-            hasColspan,
-            hasRowspan,
-            sample: cleanedHtml.substring(0, 500)
-          })
-        }
-      }
       
       // Use a very permissive schema that preserves all table attributes
       // The HTML comes from Tiptap which is trusted, we just need basic XSS protection
@@ -286,9 +274,7 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
           const hasColspanAfter = finalHtml.includes('colspan') || finalHtml.includes('colSpan')
           const hasRowspanAfter = finalHtml.includes('rowspan') || finalHtml.includes('rowSpan')
           if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
-            console.warn("[HtmlRenderer] colspan was removed during sanitization!")
-            console.log("Before:", cleanedHtml.substring(0, 1000))
-            console.log("After:", finalHtml.substring(0, 1000))
+            // Colspan was removed during sanitization
           }
           if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
             console.warn("[HtmlRenderer] rowspan was removed during sanitization!")
@@ -1186,9 +1172,7 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
           const hasColspanAfter = sanitized.includes('colspan') || sanitized.includes('colSpan')
           const hasRowspanAfter = sanitized.includes('rowspan') || sanitized.includes('rowSpan')
           if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
-            console.warn("[TableHtmlRenderer] colspan was removed during sanitization!")
-            console.log("Before:", cleanedHtml.substring(0, 1000))
-            console.log("After:", sanitized.substring(0, 1000))
+            // Colspan was removed during sanitization
           }
           if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
             console.warn("[TableHtmlRenderer] rowspan was removed during sanitization!")
@@ -1624,12 +1608,7 @@ function renderTable(item: ContentItem, isDark: boolean = false) {
           itemId: item.id,
         })
       } else {
-        console.log("[TableRenderer] Table data:", {
-          rows,
-          cols,
-          cellCount: Object.keys(cells).length,
-          sampleCells: Object.entries(cells).slice(0, 6),
-        })
+        // Table data structure
       }
     }
   } else {

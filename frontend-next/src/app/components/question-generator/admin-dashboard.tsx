@@ -370,10 +370,6 @@ export default function AdminDashboard() {
           })
       : []
     
-    // Debug: Log loaded blocks to verify all are being loaded
-    if (process.env.NODE_ENV === "development" && questionStemBlocks.length > 0) {
-      console.log("Loaded question stem blocks:", questionStemBlocks.length, "blocks", questionStemBlocks.map((b: any) => ({ type: b.type, order: b.order, id: b.id })))
-    }
 
     // Transform per-answer explanations from backend format to frontend format
     // Backend format: Array of { choiceLabel: "A", blocks: [...] }
@@ -940,10 +936,6 @@ export default function AdminDashboard() {
       
       payload.questionStemBlocks = sortedStemBlocks
       
-      // Debug: Log block count to verify all blocks are being saved
-      if (process.env.NODE_ENV === "development") {
-        console.log("Saving question stem blocks:", sortedStemBlocks.length, "blocks", sortedStemBlocks.map((b: any) => ({ type: b.type, order: b.order })))
-      }
     }
 
     // Add chapterId and sectionId if provided
@@ -990,8 +982,6 @@ export default function AdminDashboard() {
       setError(null)
       
       // Load all questions using pagination (like student mode)
-      console.log("🔍 Starting to load all questions from database...")
-      
       const cacheBuster = Date.now()
       let page = 1
       const limit = 100
@@ -999,7 +989,6 @@ export default function AdminDashboard() {
       let allQuestions: any[] = []
 
       while (hasMore && page <= 50) { // Increased max pages to 50 (5000 questions max)
-        console.log(`📄 Fetching page ${page}...`)
 
         const response = await questionsService.getQuestions({ 
           status: "ACTIVE",
@@ -1033,8 +1022,6 @@ export default function AdminDashboard() {
         
         page++
       }
-      
-      console.log(`✅ Loaded ${allQuestions.length} total questions from database`)
       
       const transformedQuestions = allQuestions.map(transformBackendToFrontend)
       
@@ -1082,7 +1069,6 @@ export default function AdminDashboard() {
   // Listen for question updates from other tabs/components
   useEffect(() => {
     const handleQuestionUpdate = () => {
-      console.log("🔄 Question update detected, refreshing list...")
       if (authService.isAuthenticated()) {
         loadQuestions()
       }
@@ -1095,7 +1081,6 @@ export default function AdminDashboard() {
     // Also listen for storage changes (cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "questionsUpdated") {
-        console.log("🔄 Question update detected from another tab, refreshing list...")
         if (authService.isAuthenticated()) {
           loadQuestions()
         }
@@ -1122,12 +1107,6 @@ export default function AdminDashboard() {
 
       // Convert new format to old format for backend compatibility
       const oldFormatData = convertNewQuestionToOld(questionData)
-      
-      // Debug: Log the conversion
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Save] QuestionCreatorData:", questionData)
-        console.log("[Save] Old format data:", oldFormatData)
-      }
       
       const backendData = transformFrontendToBackend(oldFormatData, questionData.metadata.topicId)
       
@@ -1169,12 +1148,6 @@ export default function AdminDashboard() {
       
       const finalPayload = cleanPayload(questionPayload)
       
-      // Debug: Log the final payload
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Save] Final cleaned payload:", JSON.stringify(finalPayload, null, 2))
-        console.log("[Save] Choices:", choices)
-      }
-
       if (editingId) {
         // Update existing question
         await questionsService.updateQuestion(editingId, finalPayload)
@@ -1194,7 +1167,6 @@ export default function AdminDashboard() {
           window.dispatchEvent(new Event("questionUpdated"))
           // Also dispatch a custom event with more details
           window.dispatchEvent(new CustomEvent("questionsUpdated", { detail: { timestamp, questionId: editingId } }))
-          console.log("✅ Question updated notification sent:", timestamp)
         }
       } else {
         // Create new question
@@ -1253,7 +1225,6 @@ export default function AdminDashboard() {
           window.dispatchEvent(new Event("questionUpdated"))
           // Also dispatch a custom event with more details
           window.dispatchEvent(new CustomEvent("questionsUpdated", { detail: { timestamp, questionId } }))
-          console.log("✅ Question created notification sent:", timestamp)
         }
       }
       
@@ -1448,10 +1419,6 @@ export default function AdminDashboard() {
               editingId && editingQuestion
                 ? (() => {
                     const converted = convertOldQuestionToNew(editingQuestion)
-                    // Debug: Log what's being passed to QuestionCreator
-                    if (process.env.NODE_ENV === "development") {
-                      console.log("Passing to QuestionCreator - stem blocks:", converted.stem?.length || 0, "blocks", converted.stem?.map((b: any) => ({ type: b.type, order: b.order })))
-                    }
                     return converted
                   })()
                 : parsedMarkdownData
@@ -1460,8 +1427,6 @@ export default function AdminDashboard() {
             }
             onSave={handleSaveQuestion}
             onCancel={() => {
-              console.log('[AdminDashboard] QuestionCreator onCancel called - this should NOT happen on editor clicks!')
-              console.trace('Cancel call stack:')
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)
               setShowBulkUploader(false)

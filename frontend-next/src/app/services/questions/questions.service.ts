@@ -144,7 +144,6 @@ export class QuestionsService extends BaseDataService<
     if (params?.marked !== undefined) {
       queryParams.marked = params.marked.toString();
     }
-    console.log(`📊 QuestionsService.getTestCreationData - queryParams:`, queryParams);
     return this.get(`${this.endpoint}/test-creation-data`, queryParams);
   }
 

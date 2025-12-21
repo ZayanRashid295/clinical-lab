@@ -358,9 +358,6 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
     if (initialData?.metadata?.questionId) {
       // If there's a stored questionId, use it and mark as manually edited
       // This preserves manually edited questionIds when returning to edit mode
-      if (process.env.NODE_ENV === "development") {
-        console.log("[QuestionEditor] Loading stored questionId:", initialData.metadata.questionId)
-      }
       setQuestionId(initialData.metadata.questionId)
       setIsQuestionIdManuallyEdited(true)
     } else {

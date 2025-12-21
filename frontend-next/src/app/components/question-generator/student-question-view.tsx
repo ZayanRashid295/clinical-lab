@@ -1422,8 +1422,19 @@ export default function StudentQuestionView() {
           : (existingQuestionPaperQuestions as any)?.data || []
 
         const existingQPQMap = new Map(
-          (existingQPQArray as any[]).map((qpq: any) => [qpq.questionId, qpq])
+          (existingQPQArray as any[])
+            .filter((qpq: any) => qpq && (qpq.questionId || qpq.question?.id))
+            .map((qpq: any) => [qpq.questionId || qpq.question?.id, qpq])
         )
+
+        console.log(`🗺️ Built existingQPQMap with ${existingQPQMap.size} entries`)
+        console.log(`📝 Questions to process: ${questions.length}`)
+        const questionIdsInMap = Array.from(existingQPQMap.keys())
+        const questionIdsToProcess = questions.map(q => q.id)
+        const missingFromMap = questionIdsToProcess.filter(id => !questionIdsInMap.includes(id))
+        if (missingFromMap.length > 0) {
+          console.warn(`⚠️ Questions not found in map: ${missingFromMap.join(', ')}`)
+        }
 
         // Update or create question paper questions
         const questionUpdates = await Promise.all(
@@ -1452,6 +1463,43 @@ export default function StudentQuestionView() {
               return { id: existingQPQ.id, question, success: true }
             } else {
               // Create new question paper question if it doesn't exist
+              // First, double-check if it exists (in case it was added between map creation and now)
+              try {
+                const doubleCheck = await questionPaperQuestionsService.getQuestionPaperQuestions({
+                  questionPaperId,
+                  questionId: question.id,
+                  limit: 1,
+                })
+                const doubleCheckArray = Array.isArray(doubleCheck) ? doubleCheck : (doubleCheck as any)?.data || []
+                const existingQPQFromCheck = doubleCheckArray.find((qpq: any) => 
+                  (qpq.questionId === question.id || qpq.question?.id === question.id) &&
+                  qpq.questionPaperId === questionPaperId
+                ) || doubleCheckArray[0]
+                
+                if (existingQPQFromCheck && existingQPQFromCheck.id) {
+                  // It actually exists, update it instead
+                  console.log(`🔄 Found existing question ${question.id} on double-check, updating instead of creating`)
+                  const userAnswer = answers[question.id] || null
+                  const correctOption = question.options.find((o: any) => o.correct)
+                  const isCorrect = userAnswer === correctOption?.value ? true : userAnswer ? false : null
+                  const isMarked = markedQuestions.has(question.id)
+                  const timeSpent = questionTimeSpent[question.id] || 0
+                  
+                  await questionPaperQuestionsService.updateQuestionPaperQuestion(existingQPQFromCheck.id, {
+                    userAnswer: userAnswer || undefined,
+                    isCorrect: isCorrect ?? undefined,
+                    timeSpent: timeSpent,
+                    order: index,
+                    markedForReview: isMarked,
+                  })
+                  console.log(`💾 End test: Updated question ${question.id} (found on double-check) - markedForReview=${isMarked}`)
+                  return { id: existingQPQFromCheck.id, question, success: true }
+                }
+              } catch (checkError) {
+                // If check fails, proceed with creation attempt
+                console.warn(`⚠️ Double-check failed for question ${question.id}, proceeding with create:`, checkError)
+              }
+              
               try {
                 const created = await questionPaperQuestionsService.createQuestionPaperQuestion({
                   questionPaperId,
@@ -1478,6 +1526,47 @@ export default function StudentQuestionView() {
               console.log(`💾 End test: Created and updated question ${question.id} - markedForReview=${isMarked}`)
                 return { id, question, success: true }
               } catch (error: any) {
+                // If question already exists, try to fetch it and update it instead
+                if (error.message?.includes("already in the question paper") || error.message?.includes("already exists")) {
+                  console.warn(`⚠️ Question ${question.id} already exists in paper, fetching existing record`)
+                  try {
+                    // Try to find existing question paper question
+                    const existing = await questionPaperQuestionsService.getQuestionPaperQuestions({
+                      questionPaperId,
+                      questionId: question.id,
+                      limit: 100, // Ensure we get the result even if paginated
+                    })
+                    const existingArray = Array.isArray(existing) ? existing : (existing as any)?.data || []
+                    console.log(`🔍 Fetched ${existingArray.length} existing records for question ${question.id}`)
+                    const existingQPQ = existingArray.find((qpq: any) => 
+                      (qpq.questionId === question.id || qpq.question?.id === question.id) &&
+                      qpq.questionPaperId === questionPaperId
+                    ) || existingArray[0]
+                    
+                    if (existingQPQ && existingQPQ.id) {
+                      // Update the existing question paper question
+                      const userAnswer = answers[question.id] || null
+                      const correctOption = question.options.find((o: any) => o.correct)
+                      const isCorrect = userAnswer === correctOption?.value ? true : userAnswer ? false : null
+                      const isMarked = markedQuestions.has(question.id)
+                      const timeSpent = questionTimeSpent[question.id] || 0
+                      
+                      await questionPaperQuestionsService.updateQuestionPaperQuestion(existingQPQ.id, {
+                        userAnswer: userAnswer || undefined,
+                        isCorrect: isCorrect ?? undefined,
+                        timeSpent: timeSpent,
+                        order: index,
+                        markedForReview: isMarked,
+                      })
+                      console.log(`✅ End test: Fetched and updated existing question ${question.id} - markedForReview=${isMarked}`)
+                      return { id: existingQPQ.id, question, success: true }
+                    } else {
+                      console.error(`❌ Could not find existing question paper question for ${question.id} in fetched results`)
+                    }
+                  } catch (fetchError: any) {
+                    console.error(`❌ Failed to fetch existing question ${question.id}:`, fetchError?.message || fetchError)
+                  }
+                }
                 console.error(`Failed to create question paper question for ${question.id}:`, error)
                 return { id: null, question, success: false }
               }

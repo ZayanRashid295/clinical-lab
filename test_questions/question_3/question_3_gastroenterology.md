@@ -1,6 +1,6 @@
 ---
 title: "Gastrointestinal & Nutrition — Organ Systems"
-tags: [Psychology]
+tags: [Phchology]
 difficulty: medium
 correct_answer: D
 ---

@@ -8,6 +8,7 @@ export interface ParsedQuestion {
   mainExplanation: any[]
   perAnswerExplanations: Record<string, any[]>
   tags: string[]
+  questionId?: string
 }
 
 export function parseMarkdown(content: string): ParsedQuestion {
@@ -17,6 +18,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     perAnswerExplanations: {},
     tags: [],
     mainExplanation: [],
+    questionId: undefined,
   }
 
   let i = 0
@@ -57,6 +59,12 @@ export function parseMarkdown(content: string): ParsedQuestion {
           questionData.correctAnswer = answerMatch[1]
         }
       }
+      if (yamlLine.includes("question_id:")) {
+        const questionIdMatch = yamlLine.match(/question_id:\s*(.+)/)
+        if (questionIdMatch) {
+          questionData.questionId = questionIdMatch[1].trim()
+        }
+      }
     }
   }
 
@@ -88,6 +96,17 @@ export function parseMarkdown(content: string): ParsedQuestion {
       continue
     }
 
+    // Extract question ID from patterns like "Question (ID: 714025):" or "**Question (ID: 714025):**"
+    // This should be checked before the Question/Stem section handler
+    const questionIdMatch = line.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?/i)
+    if (questionIdMatch && questionIdMatch[1]) {
+      questionData.questionId = questionIdMatch[1].trim()
+      // Remove the question ID line from the stem if it's on its own line
+      // We'll handle this by not including it in the stem collection
+      i++
+      continue
+    }
+
     // Handle Clinical Case and Question sections (can be ## or ###)
     if (line.match(/^##+ (Clinical Case|Question|Stem)/)) {
       let caseLines: string[] = []
@@ -111,9 +130,24 @@ export function parseMarkdown(content: string): ParsedQuestion {
           if (trimmed.match(/^##+\s+(Clinical Case|Question|Stem|Explanation|Choice-by-Choice)/)) {
             break
           }
-          // Preserve the original line (with proper spacing) to maintain markdown structure
-          // This is important for images, tables, and formatting
-          caseLines.push(currentLine)
+          
+          // Check if this line contains a question ID pattern
+          const questionIdMatch = trimmed.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?/i)
+          if (questionIdMatch && questionIdMatch[1] && !questionData.questionId) {
+            // Extract question ID if not already found
+            questionData.questionId = questionIdMatch[1].trim()
+            // Remove the question ID from the line if it's the only content
+            const lineWithoutId = trimmed.replace(/(?:\*\*)?Question\s*\(ID:\s*[^)]+\)(?:\*\*)?:?\s*/i, "").trim()
+            if (lineWithoutId) {
+              // If there's remaining content after removing the ID, keep it
+              caseLines.push(lineWithoutId)
+            }
+            // Otherwise skip this line entirely (don't add it to caseLines)
+          } else {
+            // Preserve the original line (with proper spacing) to maintain markdown structure
+            // This is important for images, tables, and formatting
+            caseLines.push(currentLine)
+          }
         } else if (!trimmed) {
           // Preserve empty lines to maintain paragraph separation
           caseLines.push("")
@@ -132,6 +166,22 @@ export function parseMarkdown(content: string): ParsedQuestion {
       for (let j = 0; j < i; j++) {
         const prevLine = lines[j]
         const trimmed = prevLine.trim()
+        
+        // Check if this line contains a question ID pattern
+        const questionIdMatch = trimmed.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?/i)
+        if (questionIdMatch && questionIdMatch[1] && !questionData.questionId) {
+          // Extract question ID if not already found
+          questionData.questionId = questionIdMatch[1].trim()
+          // Remove the question ID from the line if it's the only content
+          const lineWithoutId = trimmed.replace(/(?:\*\*)?Question\s*\(ID:\s*[^)]+\)(?:\*\*)?:?\s*/i, "").trim()
+          if (lineWithoutId) {
+            // If there's remaining content after removing the ID, keep it
+            stemLines.push(lineWithoutId)
+          }
+          // Otherwise skip this line entirely
+          continue
+        }
+        
         if (
           trimmed &&
           !trimmed.startsWith("#") &&
@@ -473,21 +523,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
             }
             
             questionData.mainExplanation = existingExplanation
-            
-            // Debug: Log when additional content is found
-            if (process.env.NODE_ENV === "development") {
-              console.log("[MarkdownParser] Inline: Found additional content after per-answer explanations:", {
-                section: line.trim(),
-                startLine: i,
-                endLine: j - 1,
-                blockCount: additionalBlocks.length,
-                firstBlockType: additionalBlocks[0]?.type,
-                placeholderIndex,
-                insertIndex,
-                placeholderOrder,
-                newOrders: additionalBlocks.map((b: any) => b.order),
-              })
-            }
           } else {
             // Fallback: if no placeholder found, append to end (shouldn't happen normally)
             const maxOrder = existingExplanation.length > 0 
@@ -550,8 +585,24 @@ export function parseMarkdown(content: string): ParsedQuestion {
     )
   }
 
+  // Final cleanup: Remove any remaining question ID patterns from stem text
+  // and extract question ID if it wasn't found earlier
+  let finalStem = questionData.stem || ""
+  if (finalStem && !questionData.questionId) {
+    // Try to extract question ID from stem text if not already found
+    const questionIdMatch = finalStem.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?\s*/i)
+    if (questionIdMatch && questionIdMatch[1]) {
+      questionData.questionId = questionIdMatch[1].trim()
+      // Remove the question ID pattern from stem
+      finalStem = finalStem.replace(/(?:\*\*)?Question\s*\(ID:\s*[^)]+\)(?:\*\*)?:?\s*/gi, "").trim()
+    }
+  } else if (finalStem && questionData.questionId) {
+    // Remove question ID pattern from stem if it exists (cleanup)
+    finalStem = finalStem.replace(/(?:\*\*)?Question\s*\(ID:\s*[^)]+\)(?:\*\*)?:?\s*/gi, "").trim()
+  }
+
   return {
-    stem: questionData.stem || "",
+    stem: finalStem,
     options: questionData.options || [],
     correctAnswer: questionData.correctAnswer || "",
     subject: questionData.subject || "General",
@@ -560,6 +611,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     mainExplanation: questionData.mainExplanation || [],
     perAnswerExplanations: questionData.perAnswerExplanations || {},
     tags: questionData.tags || [],
+    questionId: questionData.questionId,
   } as ParsedQuestion
 }
 
@@ -661,8 +713,8 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
       if (textContainsListItems(currentText)) {
         // We're in a list - add image to current list block
         currentText += "\n" + line
-        i++
-        continue
+      i++
+      continue
       } else {
         // Check if the next non-empty line is a list item - if so, we're in the middle of a list
         // This handles the case where list items 1-2 were already flushed, but item 3 is coming
@@ -820,13 +872,13 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
         // Remove trailing empty lines
         while (listItems.length > 0 && listItems[listItems.length - 1] === "") {
           listItems.pop()
-        }
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: listItems.join("\n") },
-        })
+      }
+      blocks.push({
+        id: blockIdCounter++,
+        type: "text",
+        order: blockOrder++,
+        data: { markdown: listItems.join("\n") },
+      })
       }
       continue
     }
@@ -941,13 +993,13 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
           continue
         } else {
           // Not in a list context, flush the current text
-          blocks.push({
-            id: blockIdCounter++,
-            type: "text",
-            order: blockOrder++,
-            data: { markdown: currentText.trim() },
-          })
-          currentText = ""
+        blocks.push({
+          id: blockIdCounter++,
+          type: "text",
+          order: blockOrder++,
+          data: { markdown: currentText.trim() },
+        })
+        currentText = ""
         }
       }
     }

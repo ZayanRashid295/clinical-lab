@@ -29,21 +29,10 @@ export abstract class BaseApiService {
           ...config.headers,
           Authorization: `Bearer ${token}`,
         };
-        console.log(
-          `🔑 Adding auth token to request: Bearer ${token.substring(0, 10)}...`
-        );
-      } else {
-        console.log("⚠️ No auth token found in localStorage");
       }
     }
 
     try {
-      console.log(`Making API request to: ${url}`);
-      console.log(`Request config:`, {
-        method: config.method,
-        headers: config.headers,
-        body: config.body ? "Present" : "None",
-      });
       const response = await fetch(url, config);
 
       if (!response.ok) {
@@ -71,7 +60,7 @@ export abstract class BaseApiService {
 
       // Handle empty responses
       if (!text.trim()) {
-        console.warn(`Empty response from ${url}`);
+        // Empty response received
         return null;
       }
 

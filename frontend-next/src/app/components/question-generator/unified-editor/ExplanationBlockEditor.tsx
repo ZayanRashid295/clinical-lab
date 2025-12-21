@@ -461,22 +461,7 @@ const TextBlockEditor = memo(({
     hasConvertedRef.current = blockMarkdown
     setIsConverting(true)
     
-    if (process.env.NODE_ENV === "development") {
-      console.log("[TextBlockEditor] Converting markdown to HTML:", {
-        blockId,
-        markdownLength: blockMarkdown.length,
-        markdownPreview: blockMarkdown.substring(0, 100),
-      })
-    }
-    
     convertMarkdownToHTML(blockMarkdown).then((html) => {
-      if (process.env.NODE_ENV === "development") {
-        console.log("[TextBlockEditor] Conversion successful:", {
-          blockId,
-          htmlLength: html.length,
-          htmlPreview: html.substring(0, 200),
-        })
-      }
       setConvertedHtml(html)
       // Save the converted HTML immediately
       onChange(html)
@@ -689,11 +674,6 @@ export default function ExplanationBlockEditor({
           
           const tableMarkdown = [headerRow, separator, ...dataRowsFormatted].join("\n")
           
-          console.log("[ExplanationBlockEditor] Detected single-line table:", {
-            original: normalizedMarkdown.substring(0, 300),
-            tableMarkdownPreview: tableMarkdown.substring(0, 300),
-          })
-          
           return { isTable: true, tableMarkdown }
         }
       } else {
@@ -709,11 +689,6 @@ export default function ExplanationBlockEditor({
           const colCount = (rows[0].match(/\|/g) || []).length - 1
           const separator = "| " + Array(colCount).fill("---").join(" | ") + " |"
           const tableMarkdown = [rows[0], separator, ...rows.slice(1)].join("\n")
-          
-          console.log("[ExplanationBlockEditor] Detected single-line table without separator:", {
-            original: normalizedMarkdown.substring(0, 300),
-            tableMarkdownPreview: tableMarkdown.substring(0, 300),
-          })
           
           return { isTable: true, tableMarkdown }
         }
@@ -763,11 +738,6 @@ export default function ExplanationBlockEditor({
       
       if (isPrimaryTable) {
         const tableMarkdown = tableLines.join("\n")
-        
-        console.log("[ExplanationBlockEditor] Detected multi-line table:", {
-          tableLinesCount: tableLines.length,
-          tableMarkdownPreview: tableMarkdown.substring(0, 300),
-        })
         
         return { isTable: true, tableMarkdown }
       }

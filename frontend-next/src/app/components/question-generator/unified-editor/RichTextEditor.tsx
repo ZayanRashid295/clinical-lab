@@ -981,11 +981,6 @@ export default function RichTextEditor({
         isUpdatingRef.current = false
       }, 200) // Give TipTap time to finish parsing
       
-      // Debug: Log when content with formatting is loaded
-      if (process.env.NODE_ENV === "development" && content && (content.includes('style=') || content.includes('font-size') || content.includes('font-family'))) {
-        console.log("RichTextEditor: Loading content with formatting:", content.substring(0, 300))
-        console.log("RichTextEditor: Editor HTML after setContent:", editor.getHTML().substring(0, 300))
-      }
       
       setTimeout(() => {
         isUpdatingRef.current = false

@@ -35,9 +35,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Check if user is already authenticated
     const isAuth = authService.isAuthenticated();
-    console.log("Login page - isAuthenticated:", isAuth);
     if (isAuth) {
-      console.log("User is authenticated, redirecting to dashboard");
       router.push("/dashboard");
     }
   }, [router]);
@@ -100,21 +98,11 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError("");
 
-    console.log("🔐 Next.js login form submitted");
-    console.log("📧 Email:", email);
-    console.log("🔑 Password:", password ? "***" : "empty");
-
     try {
       await authService.login(email, password);
-      console.log("✅ Next.js login successful, navigating to dashboard");
       router.push("/dashboard");
     } catch (err) {
       console.error("❌ Next.js login failed:", err);
-      console.log("🔍 Error details:", {
-        message: err instanceof Error ? err.message : String(err),
-        type: typeof err,
-        constructor: err?.constructor?.name,
-      });
 
       const errorMessage =
         err instanceof Error ? err.message : t("common.loginFailed");

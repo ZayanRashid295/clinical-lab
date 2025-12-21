@@ -245,7 +245,6 @@ function detectMarkdownTable(markdown: string): { isTable: boolean; tableMarkdow
     }
   }
 
-  // If no table detected, log for debugging
   if (normalizedMarkdown.includes("|") && normalizedMarkdown.split("|").length >= 4) {
     console.log("[detectMarkdownTable] Markdown contains | but not detected as table:", {
       markdownPreview: normalizedMarkdown.substring(0, 300),
@@ -425,7 +424,6 @@ export default function RichContentEditor({ item, onUpdate }: RichContentEditorP
     // Check if content contains a markdown table
     const tableDetection = hasPipeChars ? detectMarkdownTable(contentToCheck) : { isTable: false }
     
-    // Debug logging - ALWAYS log to help debug
     console.log("[RichContentEditor] Text block analysis:", {
       hasMarkdown: !!markdown,
       hasHtml: !!html,

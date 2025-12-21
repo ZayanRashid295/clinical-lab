@@ -330,7 +330,7 @@ export default function TestResultsPage() {
                           className="border-border dark:border-gray-700 hover:bg-muted/50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
                           onClick={() => {
                             // TODO: Navigate to question detail view
-                            console.log("View question:", q.id);
+                            // View question
                           }}
                         >
                           <TableCell className="px-4 py-3 text-foreground dark:text-white">{getStatusIcon(q)}</TableCell>

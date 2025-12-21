@@ -68,9 +68,9 @@ export default function QuestionPreviewPanel({ data }: QuestionPreviewPanelProps
       {data.metadata?.questionId && (
         <div className="flex-shrink-0 px-6 py-2 border-b border-border/40 bg-card/10">
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-mono font-bold text-foreground bg-card px-3 py-1.5 rounded border border-border">
-              {data.metadata.questionId}
-            </span>
+              <span className="text-sm font-mono font-bold text-foreground bg-card px-3 py-1.5 rounded border border-border">
+                {data.metadata.questionId}
+              </span>
           </div>
         </div>
       )}

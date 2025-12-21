@@ -82,10 +82,6 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
   if (Array.isArray(oldQuestion.questionStemBlocks) && oldQuestion.questionStemBlocks.length > 0) {
     stemBlocks = convertOldBlocksToNew(oldQuestion.questionStemBlocks)
     
-    // Debug: Log block conversion
-    if (process.env.NODE_ENV === "development") {
-      console.log("convertOldQuestionToNew: Using questionStemBlocks:", stemBlocks.length, "blocks", stemBlocks.map(b => ({ type: b.type, order: b.order })))
-    }
   } 
   // PRIORITY 2: Use stem array if it exists
   else if (Array.isArray(oldQuestion.stem) && oldQuestion.stem.length > 0) {

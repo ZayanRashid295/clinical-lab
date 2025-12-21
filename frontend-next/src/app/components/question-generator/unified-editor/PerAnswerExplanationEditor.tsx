@@ -362,9 +362,6 @@ export default function PerAnswerExplanationEditor({
         hasConvertedRef.current = true
         setIsConverting(true)
         try {
-          if (process.env.NODE_ENV === "development") {
-            console.log("[PerAnswerExplanationEditor] Converting markdown to HTML for blocks:", blocks.length)
-          }
           
           // Convert each block's markdown to HTML and update blocks
           const updatedBlocks = await Promise.all(blocks.map(async (block) => {
@@ -383,24 +380,8 @@ export default function PerAnswerExplanationEditor({
               
               // If block has markdown but no HTML, convert it
               if (!hasHtml && hasMarkdown) {
-                if (process.env.NODE_ENV === "development" && block.data?.markdown) {
-                  console.log("[PerAnswerExplanationEditor] Converting block markdown:", {
-                    blockId: block.id,
-                    markdownLength: block.data.markdown.length,
-                    markdownPreview: block.data.markdown.substring(0, 100),
-                  })
-                }
-                
                 const convertedHtml = await convertMarkdownToHTML(block.data!.markdown!)
                 // HTML is already normalized in convertMarkdownToHTML
-                
-                if (process.env.NODE_ENV === "development") {
-                  console.log("[PerAnswerExplanationEditor] Converted HTML:", {
-                    blockId: block.id,
-                    htmlLength: convertedHtml.length,
-                    htmlPreview: convertedHtml.substring(0, 200),
-                  })
-                }
                 
                 return {
                   ...block,
@@ -416,9 +397,6 @@ export default function PerAnswerExplanationEditor({
           }))
           
           // Update blocks with converted HTML
-          if (process.env.NODE_ENV === "development") {
-            console.log("[PerAnswerExplanationEditor] Calling onBlocksChange with updated blocks")
-          }
           onBlocksChange(updatedBlocks)
           
           // Now get the HTML for display

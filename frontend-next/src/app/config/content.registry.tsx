@@ -57,10 +57,10 @@ import NewQuestionBuilder from "../components/test-creation/NewQuestionBuilder";
 import TestSessionPage from "../components/test-session/TestSessionPage";
 
 // Import zoom simulation components
-import ZoomSimulation from "../components/zoom-simulation/zoom-simulation";
+// import ZoomSimulation from "../components/zoom-simulation/zoom-simulation"; // Component not found
 
 // Import robotic components
-import RobotFace from "../components/robotic/RobotFace";
+// import RobotFace from "../components/robotic/RobotFace"; // Component not found
 
 // Import question generator components
 import QuestionGeneratorPage from "../components/question-generator/QuestionGeneratorPage";
@@ -68,10 +68,10 @@ import QuestionGeneratorStudent from "../components/question-generator/QuestionG
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
 
 // Import development components
-import MenuManager from "../components/Development/MenuManager";
-import RefDesign from "../components/Development/ref-design";
-import AdvDbView from "../components/Development/AdvDbView";
-import OrgChart from "../components/Development/OrgChart";
+// import MenuManager from "../components/Development/MenuManager"; // Component not found - exists as page
+// import RefDesign from "../components/Development/ref-design"; // Component not found - exists as page
+// import AdvDbView from "../components/Development/AdvDbView"; // Component not found
+import OrgChartView from "../components/OrgChart/OrgChartView";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -196,10 +196,34 @@ export const transportationContentRegistry: ContentRegistry = {
     ),
 
     // Zoom simulation routes
-    "/zoom": () => <ZoomSimulation />,
+    "/zoom": () => (
+      <UnderConstruction
+        menuTitle="Zoom Simulation"
+        menuIcon="📹"
+        description="Interactive zoom simulation feature for enhanced learning experience."
+        estimatedCompletion="TBD"
+        features={[
+          "Zoom interface simulation",
+          "Interactive controls",
+          "Real-time collaboration features",
+        ]}
+      />
+    ),
 
     // Robotic routes
-    "/robotic": () => <RobotFace />,
+    "/robotic": () => (
+      <UnderConstruction
+        menuTitle="Robot Face"
+        menuIcon="🤖"
+        description="Interactive robotic face interface for enhanced user interaction."
+        estimatedCompletion="TBD"
+        features={[
+          "Animated robot face",
+          "Interactive expressions",
+          "Voice and gesture recognition",
+        ]}
+      />
+    ),
 
     // Question generator routes
     "/question-generator": () => <QuestionGeneratorPage />,
@@ -207,10 +231,46 @@ export const transportationContentRegistry: ContentRegistry = {
     "/question-generator/admin": () => <QuestionGeneratorAdmin />,
 
     // Development routes
-    "/development/menu-manager": () => <MenuManager />,
-    "/development/ref-design": () => <RefDesign />,
-    "/development/adv-db-view": () => <AdvDbView />,
-    "/development/org-chart": () => <OrgChart />,
+    "/development/menu-manager": () => (
+      <UnderConstruction
+        menuTitle="Menu Manager"
+        menuIcon="📋"
+        description="Development tool for managing application menus and navigation."
+        estimatedCompletion="TBD"
+        features={[
+          "Menu configuration",
+          "Navigation management",
+          "Route organization",
+        ]}
+      />
+    ),
+    "/development/ref-design": () => (
+      <UnderConstruction
+        menuTitle="Reference Design"
+        menuIcon="🎨"
+        description="Reference design system and component library."
+        estimatedCompletion="TBD"
+        features={[
+          "Design system components",
+          "UI patterns",
+          "Style guidelines",
+        ]}
+      />
+    ),
+    "/development/adv-db-view": () => (
+      <UnderConstruction
+        menuTitle="Advanced Database View"
+        menuIcon="🗄️"
+        description="Advanced database viewer and management tool."
+        estimatedCompletion="TBD"
+        features={[
+          "Database visualization",
+          "Query builder",
+          "Data management",
+        ]}
+      />
+    ),
+    "/development/org-chart": () => <OrgChartView />,
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,

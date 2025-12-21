@@ -42,6 +42,7 @@ export default function MarkdownUploader({ onQuestionParsed }: MarkdownUploaderP
         explanation: parsed.mainExplanation, // Now contains content blocks instead of plain text
         perAnswerExplanations: parsed.perAnswerExplanations, // Now contains content blocks for each option
         tags: parsed.tags,
+        questionId: parsed.questionId, // Include parsed questionId if it exists
       }
 
       onQuestionParsed(questionData)

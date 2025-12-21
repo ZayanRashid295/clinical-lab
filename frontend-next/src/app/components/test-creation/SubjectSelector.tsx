@@ -37,9 +37,7 @@ export function SubjectSelector({ selectedSubjects, onSubjectToggle, selectedPoo
         const pool = selectedPool ? selectedPool as "unused" | "incorrect" | "correct" | "omitted" : undefined;
         // Explicitly pass marked parameter: true when enabled, undefined when disabled (to show all)
         const markedParam = isMarked ? true : undefined;
-        console.log(`📊 SubjectSelector - Fetching with pool=${pool}, marked=${markedParam}, isMarked=${isMarked}`);
         const data = await questionsService.getTestCreationData({ pool, marked: markedParam });
-        console.log(`📊 SubjectSelector - Received tags:`, data.tags.map(t => ({ name: t.name, count: t.count })));
 
         // Use backend data directly - backend handles all filtering logic including marked filter
         // for all question modes (unused, incorrect, correct, omitted)

@@ -32,18 +32,6 @@ export default function PaymentMethodsContent() {
   const activeMethods = paymentMethods.filter((pm) => pm.isActive);
   const inactiveMethods = paymentMethods.filter((pm) => !pm.isActive);
 
-  // Debug: Log data source and payment methods
-  useEffect(() => {
-    console.log("🔍 Payment Methods Debug Info:");
-    console.log(
-      "- Data source:",
-      isMockDataEnabled() ? "MOCK DATA" : "BACKEND API"
-    );
-    console.log("- Payment methods count:", paymentMethods.length);
-    console.log("- Payment methods:", paymentMethods);
-    console.log("- Loading:", loading);
-    console.log("- Error:", error);
-  }, [paymentMethods, loading, error]);
 
   const handleAddMethod = () => {
     setShowAddMethod(true);
@@ -51,13 +39,11 @@ export default function PaymentMethodsContent() {
 
   const handleViewMethod = (method: PaymentMethod) => {
     setSelectedMethod(method);
-    console.log("View method:", method);
   };
 
   const handleDeleteMethod = async (method: PaymentMethod) => {
     try {
       await deletePaymentMethod(method.id);
-      console.log("Payment method deleted successfully");
     } catch (error) {
       console.error("Failed to delete payment method:", error);
     }
