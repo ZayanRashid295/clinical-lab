@@ -263,11 +263,11 @@ export default function AdminPage() {
         return;
       }
 
-      // Check if user has ADMIN role
+      // Check if user has ADMIN or SUPERADMIN role
       const user = authService.getCurrentUser();
       const userRoles = user?.roles || [];
       
-      if (!userRoles.includes("ADMIN")) {
+      if (!userRoles.includes("ADMIN") && !userRoles.includes("SUPERADMIN")) {
         // Redirect non-admin users to dashboard
         router.replace("/dashboard");
         return;

@@ -27,7 +27,8 @@
     "migrate:indexes": "tsx scripts/add-access-control-indexes.ts",
     "migrate:roles": "tsx scripts/assign-lms-roles.ts",
     "migrate:all": "npm run migrate:indexes && npm run migrate:roles",
-    "create:admin": "tsx scripts/create-admin-user.ts"
+    "create:admin": "tsx scripts/create-admin-user.ts",
+    "create:superadmin": "tsx scripts/create-superadmin-user.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

@@ -34,6 +34,11 @@ export class RolesGuard implements CanActivate {
       typeof role === 'string' ? role : role.name || role.role?.name
     );
 
+    // SUPERADMIN has access to everything
+    if (userRoleNames.includes('SUPERADMIN')) {
+      return true;
+    }
+
     const hasRole = requiredRoles.some((role) => userRoleNames.includes(role));
 
     if (!hasRole) {
@@ -45,6 +50,7 @@ export class RolesGuard implements CanActivate {
     return true;
   }
 }
+
 
 
 
