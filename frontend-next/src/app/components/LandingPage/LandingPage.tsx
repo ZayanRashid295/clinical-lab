@@ -16,6 +16,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/shared/utils/cn";
 import { SubscriptionPackagesService } from "@/app/services/subscriptions/subscription-packages.service";
 import { SubscriptionPackage } from "@/app/types/subscription";
+import { authService } from "@/shared";
 import {
   Brain,
   Users,
@@ -121,9 +122,11 @@ function FeaturesGrid() {
 function PricingGrid({
   onLoginClick,
   onPackageSelect,
+  isAuthenticated,
 }: {
   onLoginClick: () => void;
   onPackageSelect: (packageId: string) => void;
+  isAuthenticated: boolean;
 }) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
@@ -134,17 +137,28 @@ function PricingGrid({
     const fetchPackages = async () => {
       try {
         setLoading(true);
+        if (process.env.NODE_ENV === "development") {
+          console.log("Fetching subscription packages...");
+        }
         const response = await packagesService.getPackages({ status: "ACTIVE" });
-        const packagesList = Array.isArray(response) ? response : response.data || [];
+        
+        // Handle both array and paginated response formats
+        const packagesList = Array.isArray(response) 
+          ? response 
+          : (response?.data || []);
+        
         // Sort by price ascending
         const sortedPackages = packagesList.sort((a, b) => {
           const priceA = parseFloat(a.price?.toString() || "0");
           const priceB = parseFloat(b.price?.toString() || "0");
           return priceA - priceB;
         });
+        
         setPackages(sortedPackages);
       } catch (error) {
-        console.error("Error fetching packages:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching packages:", error);
+        }
         setPackages([]);
       } finally {
         setLoading(false);
@@ -164,8 +178,13 @@ function PricingGrid({
 
   if (packages.length === 0) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <p className="text-gray-600">No pricing plans available at the moment.</p>
+      <div className="flex flex-col justify-center items-center py-20 space-y-4">
+        <p className="text-gray-600 dark:text-gray-400 text-lg">
+          No pricing plans available at the moment.
+        </p>
+        <p className="text-gray-500 dark:text-gray-500 text-sm">
+          Please check back later or contact support for more information.
+        </p>
       </div>
     );
   }
@@ -178,19 +197,24 @@ function PricingGrid({
   const studentProPackage = packages[1] || null;
   const institutionPackage = packages[2] || null;
 
+  // Debug: Log packages to console (development only)
+  if (process.env.NODE_ENV === "development") {
+    console.log("Rendering packages:", {
+      total: packages.length,
+      studentPackage: studentPackage?.name,
+      studentProPackage: studentProPackage?.name,
+      institutionPackage: institutionPackage?.name,
+      isVisible,
+    });
+  }
+
   return (
     <div
       ref={ref}
-      className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
+      className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-4 items-stretch"
     >
       {studentPackage && (
-        <div
-          className={cn(
-            "opacity-0 transition-all duration-700 ease-out",
-            isVisible && "opacity-100 translate-y-0",
-            !isVisible && "translate-y-12"
-          )}
-        >
+        <div className="transition-all duration-700 ease-out">
           <PricingCard
             name={studentPackage.name || "Student"}
             price={`$${parseFloat(studentPackage.price?.toString() || "0").toFixed(2)}`}
@@ -213,13 +237,7 @@ function PricingGrid({
       )}
 
       {studentProPackage && (
-        <div
-          className={cn(
-            "opacity-0 transition-all duration-700 ease-out delay-100",
-            isVisible && "opacity-100 translate-y-0",
-            !isVisible && "translate-y-12"
-          )}
-        >
+        <div className="transition-all duration-700 ease-out delay-100">
           <PricingCard
             name={studentProPackage.name || "Student Pro"}
             price={`$${parseFloat(studentProPackage.price?.toString() || "0").toFixed(2)}`}
@@ -243,13 +261,7 @@ function PricingGrid({
       )}
 
       {institutionPackage ? (
-        <div
-          className={cn(
-            "opacity-0 transition-all duration-700 ease-out delay-200",
-            isVisible && "opacity-100 translate-y-0",
-            !isVisible && "translate-y-12"
-          )}
-        >
+        <div className="transition-all duration-700 ease-out delay-200">
           <PricingCard
             name={institutionPackage.name || "Institution"}
             price={
@@ -274,13 +286,7 @@ function PricingGrid({
           />
         </div>
       ) : (
-        <div
-          className={cn(
-            "opacity-0 transition-all duration-700 ease-out delay-200",
-            isVisible && "opacity-100 translate-y-0",
-            !isVisible && "translate-y-12"
-          )}
-        >
+        <div className="transition-all duration-700 ease-out delay-200">
           <PricingCard
             name="Institution"
             price="Custom"
@@ -461,13 +467,61 @@ export function LandingPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pendingPackageId, setPendingPackageId] = useState<string | null>(null);
 
-  const handleOpenLoginModal = () => {
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+    };
+    checkAuth();
+    
+    // Check every 2 seconds to reduce load (less frequent than LandingNav)
+    const interval = setInterval(checkAuth, 2000);
+    
+    // Also listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'authToken' || e.key === 'userData') {
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const handleOpenLoginModal = (packageId?: string) => {
+    if (packageId) {
+      setPendingPackageId(packageId);
+    }
     setIsLoginModalOpen(true);
   };
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
+    // Note: Redirect is handled in LoginModal after successful login
+    // This just closes the modal
+  };
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    } else {
+      handleOpenLoginModal();
+    }
+  };
+
+  const handlePackageSelect = (packageId: string) => {
+    if (isAuthenticated) {
+      router.push(`/checkout-basic?packageId=${packageId}`);
+    } else {
+      handleOpenLoginModal(packageId);
+    }
   };
 
   const handleOpenVideoModal = () => {
@@ -523,13 +577,17 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <LandingNav onLoginClick={handleOpenLoginModal} />
+      <LandingNav 
+        onLoginClick={handleOpenLoginModal}
+        key={isLoginModalOpen ? "open" : "closed"} // Force re-render when modal state changes
+      />
 
       <main className="flex-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <HeroCarousel
           slides={heroSlides}
-          onLoginClick={handleOpenLoginModal}
+          onLoginClick={handleGetStarted}
           onDemoClick={handleOpenVideoModal}
+          isAuthenticated={isAuthenticated}
         />
 
         <section id="features" className="py-20 px-6 bg-white dark:bg-gray-900">
@@ -570,36 +628,36 @@ export function LandingPage() {
         <section id="pricing" className="py-20 px-6 bg-white dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
                 Choose Your Plan
               </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Flexible pricing for students and institutions. All plans
-                include 14-day free trial.
+              <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Flexible pricing for students and institutions. All plans include 14-day free trial.
               </p>
             </div>
 
             <PricingGrid
               onLoginClick={handleOpenLoginModal}
-              onPackageSelect={(packageId) => router.push(`/checkout-basic?packageId=${packageId}`)}
+              onPackageSelect={handlePackageSelect}
+              isAuthenticated={isAuthenticated}
             />
 
             <div className="text-center mt-12">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
                 All plans include 14-day free trial. No credit card required.
               </p>
-              <div className="flex flex-wrap gap-6 justify-center text-sm">
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Cancel anytime
+              <div className="flex flex-wrap gap-4 md:gap-6 justify-center text-sm md:text-base">
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
+                  <span>Cancel anytime</span>
                 </span>
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Education discounts available
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
+                  <span>Education discounts available</span>
                 </span>
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Group pricing for cohorts
+                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
+                  <span>Group pricing for cohorts</span>
                 </span>
               </div>
             </div>
@@ -613,7 +671,11 @@ export function LandingPage() {
         </div>
       </footer>
 
-      <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={handleCloseLoginModal}
+        pendingPackageId={pendingPackageId}
+      />
       <VideoModal
         isOpen={isVideoModalOpen}
         onClose={handleCloseVideoModal}

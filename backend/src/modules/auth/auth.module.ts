@@ -8,10 +8,17 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { TokenBlacklistService } from "./token-blacklist.service";
 import { JwtAuthWithBlacklistGuard } from "./guards/jwt-auth-with-blacklist.guard";
+import { RolesGuard } from "./guards/roles.guard";
+import { PermissionsGuard } from "./guards/permissions.guard";
+import { SubscriptionGuard } from "./guards/subscription.guard";
+import { FeatureGuard } from "./guards/feature.guard";
+import { CombinedAccessGuard } from "./guards/combined-access.guard";
+import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 
 @Module({
   imports: [
     PassportModule,
+    SubscriptionsModule, // Import to use SubscriptionsService in guards
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>("JWT_SECRET"),
@@ -29,7 +36,19 @@ import { JwtAuthWithBlacklistGuard } from "./guards/jwt-auth-with-blacklist.guar
     LocalStrategy,
     TokenBlacklistService,
     JwtAuthWithBlacklistGuard,
+    RolesGuard,
+    PermissionsGuard,
+    SubscriptionGuard,
+    FeatureGuard,
+    CombinedAccessGuard,
   ],
-  exports: [AuthService],
+  exports: [
+    AuthService,
+    RolesGuard,
+    PermissionsGuard,
+    SubscriptionGuard,
+    FeatureGuard,
+    CombinedAccessGuard,
+  ],
 })
 export class AuthModule {}

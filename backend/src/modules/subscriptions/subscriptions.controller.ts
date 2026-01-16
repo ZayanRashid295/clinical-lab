@@ -35,13 +35,10 @@ export class SubscriptionsController {
 
   // ========== SUBSCRIPTION PACKAGES ==========
   @Get("packages")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({
-    summary: "Get all subscription packages with filtering, pagination, and sorting",
+    summary: "Get all subscription packages with filtering, pagination, and sorting (Public endpoint)",
   })
   @ApiResponse({ status: 200, description: "Packages retrieved successfully" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
   async findAllPackages(@Query() query: QuerySubscriptionPackageDto) {
     return this.subscriptionsService.findAllPackages(query);
   }
@@ -60,7 +57,7 @@ export class SubscriptionsController {
   }
 
   @Get("packages/:id")
-  @ApiOperation({ summary: "Get package by ID" })
+  @ApiOperation({ summary: "Get package by ID (Public endpoint)" })
   @ApiResponse({ status: 200, description: "Package retrieved successfully" })
   @ApiResponse({ status: 404, description: "Package not found" })
   async getPackage(@Param("id") id: string) {
@@ -68,7 +65,7 @@ export class SubscriptionsController {
   }
 
   @Get("packages/:id/features")
-  @ApiOperation({ summary: "Get features for a package" })
+  @ApiOperation({ summary: "Get features for a package (Public endpoint)" })
   @ApiResponse({ status: 200, description: "Features retrieved successfully" })
   @ApiResponse({ status: 404, description: "Package not found" })
   async getPackageFeatures(@Param("id") id: string) {
@@ -232,6 +229,19 @@ export class SubscriptionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async cleanupDuplicateActiveSubscriptions(@Param("userId") userId: string) {
     return this.subscriptionsService.cleanupDuplicateActiveSubscriptions(userId);
+  }
+
+  @Post("cleanup-duplicates/all")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Clean up duplicate active subscriptions for all users (Admin only)" })
+  @ApiResponse({
+    status: 200,
+    description: "All duplicate subscriptions cleaned up successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async cleanupAllDuplicateActiveSubscriptions() {
+    return this.subscriptionsService.cleanupAllDuplicateActiveSubscriptions();
   }
 
   // ========== PACKAGE FEATURES ==========

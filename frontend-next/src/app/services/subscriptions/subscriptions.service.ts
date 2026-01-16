@@ -85,5 +85,19 @@ export class SubscriptionsService extends BaseDataService<
     const response = await this.get(`${this.endpoint}/user/${userId}`, params);
     return Array.isArray(response) ? response : [];
   }
+
+  /**
+   * Clean up duplicate active subscriptions for a user
+   * Keeps only the most recent active subscription, cancels all others
+   */
+  async cleanupDuplicateActiveSubscriptions(userId: string): Promise<{
+    kept: number;
+    cancelled: number;
+    keptSubscriptionId?: string;
+    cancelledSubscriptionIds?: string[];
+    message: string;
+  }> {
+    return this.post(`${this.endpoint}/cleanup-duplicates/${userId}`, {});
+  }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/shared/ui/alert";
 import { paymentsService } from "@/app/services/payments/payments.service";
 import { authService } from "@/shared/services/auth.service";
 import { SubscriptionsService } from "@/app/services/subscriptions/subscriptions.service";
+import { SubscriptionPackagesService } from "@/app/services/subscriptions/subscription-packages.service";
 import { ExistingSubscriptionModal } from "@/app/components/ExistingSubscriptionModal";
 import { Subscription } from "@/app/types/subscription";
 
@@ -79,10 +80,40 @@ function CheckoutForm({
     );
 
     if (error) {
+      // Only log errors in development
+      if (process.env.NODE_ENV === "development") {
+        console.error("Stripe payment error:", error);
+      }
+      
+      // Provide user-friendly error messages for common Stripe errors
+      let userFriendlyError = error.message || "Payment failed";
+      
+      if (error.message?.includes("test mode") && error.message?.includes("non-test card")) {
+        userFriendlyError = "This is a test environment. Please use a Stripe test card:\n\n" +
+          "Test Card: 4242 4242 4242 4242\n" +
+          "Expiry: Any future date (e.g., 12/25)\n" +
+          "CVC: Any 3 digits (e.g., 123)\n" +
+          "ZIP: Any 5 digits (e.g., 12345)\n\n" +
+          "For more test cards, visit: https://stripe.com/docs/testing";
+      } else if (error.message?.includes("card was declined")) {
+        userFriendlyError = "Your card was declined. " + 
+          (error.message.includes("test mode") 
+            ? "Please use a Stripe test card (4242 4242 4242 4242) for testing."
+            : "Please check your card details or try a different payment method.");
+      } else if (error.message?.includes("insufficient funds")) {
+        userFriendlyError = "Insufficient funds. Please use a different card or contact your bank.";
+      } else if (error.message?.includes("expired card")) {
+        userFriendlyError = "Your card has expired. Please use a different card.";
+      } else if (error.message?.includes("incorrect cvc") || error.message?.includes("incorrect_cvc")) {
+        userFriendlyError = "Incorrect CVC code. Please check and try again.";
+      } else if (error.message?.includes("incorrect number") || error.message?.includes("invalid_number")) {
+        userFriendlyError = "Invalid card number. Please check and try again.";
+      }
+      
       setState({
         ...state,
         loading: false,
-        error: error.message || "Payment failed",
+        error: userFriendlyError,
         success: false,
       });
       return;
@@ -132,7 +163,10 @@ function CheckoutForm({
                   return;
                 }
               } catch (syncError) {
-                console.error("Sync error:", syncError);
+                // Only log errors in development
+                if (process.env.NODE_ENV === "development") {
+                  console.error("Sync error:", syncError);
+                }
                 // Continue polling
               }
             }
@@ -210,16 +244,47 @@ function CheckoutForm({
 
       {state.error && (
         <Alert variant="destructive">
-          <AlertDescription>{state.error}</AlertDescription>
+          <AlertDescription>
+            <div className="font-semibold mb-2">❌ {state.error.split('\n')[0]}</div>
+            {state.error.includes('\n') && (
+              <div className="text-sm mt-2 whitespace-pre-line">
+                {state.error.split('\n').slice(1).join('\n')}
+              </div>
+            )}
+            {state.error.includes("test mode") && (
+              <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+                <div className="text-sm font-semibold mb-2">Test Card Information:</div>
+                <div className="text-xs space-y-1">
+                  <div><strong>Card:</strong> 4242 4242 4242 4242</div>
+                  <div><strong>Expiry:</strong> Any future date (e.g., 12/25)</div>
+                  <div><strong>CVC:</strong> Any 3 digits (e.g., 123)</div>
+                  <div><strong>ZIP:</strong> Any 5 digits (e.g., 12345)</div>
+                </div>
+                <a 
+                  href="https://stripe.com/docs/testing" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 underline mt-2 inline-block"
+                >
+                  View all test cards →
+                </a>
+              </div>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 
       {state.success && (
-        <Alert variant="default" className="bg-green-50 border-green-200">
-          <AlertDescription className="text-green-800">
-            <div className="font-semibold mb-2">✅ Payment Successful!</div>
-            <div className="text-sm">
-              Your subscription has been activated. You can now access all features.
+        <Alert variant="default" className="bg-green-50 border-green-300 border-2">
+          <AlertDescription className="text-green-900">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="font-bold text-lg">Payment Successful!</div>
+            </div>
+            <div className="text-sm font-medium">
+              Your subscription has been activated successfully. You can now access all premium features.
             </div>
           </AlertDescription>
         </Alert>
@@ -266,31 +331,72 @@ export default function BasicCheckoutPage() {
   const [existingSubscription, setExistingSubscription] = useState<Subscription | null>(null);
   const [showExistingSubscriptionModal, setShowExistingSubscriptionModal] = useState(false);
   const [shouldProceedWithPayment, setShouldProceedWithPayment] = useState(false);
+  const [packageInfo, setPackageInfo] = useState<any>(null);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (hasInitialized.current && state.clientSecret) {
+      return;
+    }
+
+    // Only initialize if router is ready and we don't have a client secret yet
+    if (!router.isReady || state.clientSecret || hasInitialized.current) {
+      return;
+    }
+
     const initPayment = async () => {
+      // Double-check to prevent race conditions
+      if (hasInitialized.current) {
+        return;
+      }
+      
+      // Mark as initialized immediately to prevent concurrent calls
+      hasInitialized.current = true;
+
       try {
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
+        // Check if user is authenticated first
+        if (!authService.isAuthenticated()) {
+          // Reset initialization flag and redirect
+          hasInitialized.current = false;
+          router.push("/landing-page");
+          return;
+        }
+
         // Ensure user is logged in and get profile
-        const profile = await authService.getProfile();
-        const userId = profile?.id;
+        let profile;
+        let userId;
+        try {
+          profile = await authService.getProfile();
+          userId = profile?.id;
+        } catch (authError) {
+          // Only log errors in development
+          if (process.env.NODE_ENV === "development") {
+            console.error("Authentication error:", authError);
+          }
+          // Clear invalid auth data and redirect immediately
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userData");
+          }
+          hasInitialized.current = false;
+          router.push("/landing-page");
+          return;
+        }
 
         if (!userId) {
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error: "You must be logged in to purchase a subscription.",
-          }));
-          // Redirect to login / landing
-          router.push("/");
+          // Reset initialization flag and redirect
+          hasInitialized.current = false;
+          router.push("/landing-page");
           return;
         }
 
         // Get packageId from query params or use default
         const packageId = (router.query.packageId as string) || DEFAULT_PACKAGE_ID;
 
-        // Check for existing ACTIVE subscription
+        // Check for existing ACTIVE subscription (only on first load, not when user explicitly wants to proceed)
         if (!shouldProceedWithPayment) {
           try {
             const userSubscriptions = await subscriptionsService.getUserSubscriptions(userId, "ACTIVE");
@@ -298,69 +404,115 @@ export default function BasicCheckoutPage() {
               setExistingSubscription(userSubscriptions[0]);
               setShowExistingSubscriptionModal(true);
               setState((prev) => ({ ...prev, loading: false }));
+              // Reset hasInitialized to allow re-initialization when user proceeds
+              hasInitialized.current = false;
               return;
             }
+            // No existing subscription found, continue to payment creation below
           } catch (subError) {
-            console.error("Error checking existing subscriptions:", subError);
+            // Only log errors in development
+            if (process.env.NODE_ENV === "development") {
+              console.error("Error checking existing subscriptions:", subError);
+            }
             // Continue with payment creation if check fails
+          }
+        }
+        
+        // Proceed with payment creation (either no existing subscription or user explicitly wants to proceed)
+        // hasInitialized is already set at the start of initPayment
+
+        // Fetch package information first to display details
+        try {
+          const packagesService = new SubscriptionPackagesService();
+          const pkg = await packagesService.getPackage(packageId);
+          setPackageInfo(pkg);
+        } catch (pkgError) {
+          // Continue without package info
+          if (process.env.NODE_ENV === "development") {
+            console.warn("Could not fetch package info:", pkgError);
           }
         }
 
         // Create payment on backend for selected subscription package
-        const payment = await paymentsService.createPayment({
+        const paymentResponse = await paymentsService.createPayment({
           userId,
           subscriptionPackageId: packageId,
           description: "Subscription purchase",
         });
 
-        // paymentsService.createPayment currently returns CreateResponse (generic),
-        // so we safely read the fields we expect from backend.
-        const clientSecret =
-          (payment as any).clientSecret || (payment as any).client_secret;
+        // Backend returns: { paymentId, clientSecret, amount, currency }
+        // But frontend service might wrap it, so check both structures
+        const payment = paymentResponse as any;
+        const clientSecret = payment?.clientSecret || payment?.client_secret || payment?.data?.clientSecret;
+        const paymentId = payment?.paymentId || payment?.id || payment?.data?.paymentId;
+        const amount = payment?.amount || payment?.data?.amount;
+        const currency = payment?.currency || payment?.data?.currency;
 
-        if (!clientSecret) {
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error:
-              "Unable to start payment: missing client secret from backend.",
-          }));
+        if (!clientSecret || !paymentId) {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Missing payment data in response:", { clientSecret, paymentId, paymentResponse });
+          }
+          // Reset and redirect - don't show error modal
+          hasInitialized.current = false;
+          router.push("/landing-page");
           return;
         }
+
+        // Use package info if available, otherwise use payment response
+        const finalAmount = amount || (packageInfo?.price ? Number(packageInfo.price) : null);
+        const finalCurrency = currency || (packageInfo?.currency || "USD");
 
         setState((prev) => ({
           ...prev,
           clientSecret,
-          paymentId: (payment as any).paymentId || null,
-          amount: (payment as any).amount || null,
-          currency: (payment as any).currency || null,
+          paymentId,
+          amount: finalAmount,
+          currency: finalCurrency,
           loading: false,
         }));
       } catch (err) {
-        setState((prev) => ({
-          ...prev,
-          loading: false,
-          error:
-            err instanceof Error
-              ? err.message
-              : "Failed to initialize checkout.",
-        }));
+        // Reset initialization flag on error so user can retry
+        hasInitialized.current = false;
+        
+        // Only log errors in development
+        if (process.env.NODE_ENV === "development") {
+          console.error("Checkout initialization error:", err);
+        }
+        
+        const errorMessage = err instanceof Error ? err.message : String(err) || "Failed to initialize checkout.";
+        
+        // Handle specific error cases with automatic redirects
+        if (errorMessage.includes("401") || errorMessage.includes("Unauthorized")) {
+          // Clear invalid auth data and redirect
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userData");
+          }
+          router.push("/landing-page");
+          return;
+        }
+        
+        // For all other errors, redirect to landing page immediately
+        // No error modal will be shown
+        router.push("/landing-page");
       }
     };
 
+    // Call initPayment
     initPayment();
-  }, [router, shouldProceedWithPayment]);
+  }, [router.isReady, router.query.packageId, shouldProceedWithPayment]);
 
   const handleCancelAndCreate = () => {
     setShowExistingSubscriptionModal(false);
+    hasInitialized.current = false; // Reset initialization flag
     setShouldProceedWithPayment(true);
-    // Re-initialize payment
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    // Re-initialize payment by resetting state and letting useEffect handle it
+    setState((prev) => ({ ...prev, loading: true, error: null, clientSecret: null, paymentId: null }));
   };
 
   const handleContinueWithExisting = () => {
     setShowExistingSubscriptionModal(false);
-    router.push("/dashboard");
+    router.push("/landing-page");
   };
 
   if (!stripePromise) {
@@ -407,15 +559,7 @@ export default function BasicCheckoutPage() {
     );
   }
 
-  if (!state.clientSecret) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">
-          Could not start checkout. {state.error || ""}
-        </p>
-      </div>
-    );
-  }
+  // No error modal - errors redirect immediately, so this check is not needed
 
   return (
     <>
@@ -427,22 +571,56 @@ export default function BasicCheckoutPage() {
         existingSubscription={existingSubscription}
       />
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">
         <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 space-y-4">
+        {state.success && (
+          <Alert variant="default" className="bg-green-50 border-green-400 border-2 mb-4">
+            <AlertDescription className="text-green-900">
+              <div className="flex items-center gap-3">
+                <svg className="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <div className="font-bold text-lg mb-1">🎉 Subscription Activated Successfully!</div>
+                  <div className="text-sm font-medium">
+                    Your payment was successful and your subscription is now active. Enjoy full access to all premium features!
+                  </div>
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Basic Qbank Subscription
+          {state.success ? "Subscription Complete" : (packageInfo?.name || "Subscription") + " Checkout"}
         </h1>
-        <p className="text-gray-600 mb-4">
-          You are purchasing <strong>30 days</strong> of access to the Qbank
-          (Basic package).
-        </p>
+        {packageInfo?.description && (
+          <p className="text-gray-600 mb-2">
+            {packageInfo.description}
+          </p>
+        )}
+        {packageInfo?.validityDays && (
+          <p className="text-gray-600 mb-4">
+            <strong>{packageInfo.validityDays} days</strong> of access
+          </p>
+        )}
         {state.amount && state.currency && (
           <p className="text-lg font-semibold mb-4">
-            Amount: {state.amount} {state.currency}
+            Amount: <strong>${Number(state.amount).toFixed(2)}</strong> {state.currency}
           </p>
         )}
 
-        {!state.success && (
+        {/* Test Mode Notice */}
+        {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.includes("pk_test_") && (
+          <Alert variant="default" className="bg-blue-50 border-blue-200 mb-4">
+            <AlertDescription className="text-blue-800 text-sm">
+              <div className="font-semibold mb-1">🧪 Test Mode</div>
+              <div>Use Stripe test card: <code className="bg-blue-100 px-1 rounded">4242 4242 4242 4242</code></div>
+              <div className="text-xs mt-1">Expiry: Any future date | CVC: Any 3 digits | ZIP: Any 5 digits</div>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!state.success && state.clientSecret && state.clientSecret.length > 0 && (
           <Elements
             stripe={stripePromise}
             options={{ clientSecret: state.clientSecret }}
@@ -451,21 +629,35 @@ export default function BasicCheckoutPage() {
           </Elements>
         )}
 
+        {!state.success && (!state.clientSecret || state.clientSecret.length === 0) && !state.loading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Preparing checkout form...</p>
+          </div>
+        )}
+
         {state.success && (
           <div className="space-y-3 mt-4">
             <Button
               className="w-full"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/dashboard?subscriptionSuccess=true")}
             >
               Go to Dashboard
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => router.push("/landing-page")}
+            >
+              Back to Home
             </Button>
             {state.subscriptionId && (
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => router.push("/dashboard?tab=subscription")}
+                onClick={() => router.push("/admin/subscriptions")}
               >
-                View My Subscription
+                See My Subscription
               </Button>
             )}
           </div>
@@ -475,9 +667,9 @@ export default function BasicCheckoutPage() {
           <Button
             variant="outline"
             className="w-full mt-2"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/landing-page")}
           >
-            Back to Dashboard
+            Back to Home
           </Button>
         )}
         </div>

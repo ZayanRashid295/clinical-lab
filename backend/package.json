@@ -23,7 +23,10 @@
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "migrate:indexes": "tsx scripts/add-access-control-indexes.ts",
+    "migrate:roles": "tsx scripts/assign-lms-roles.ts",
+    "migrate:all": "npm run migrate:indexes && npm run migrate:roles"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

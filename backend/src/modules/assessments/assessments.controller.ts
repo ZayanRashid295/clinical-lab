@@ -19,6 +19,12 @@ import {
 } from "@nestjs/swagger";
 import { AssessmentsService } from "./assessments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { SubscriptionGuard } from "../auth/guards/subscription.guard";
+import { FeatureGuard } from "../auth/guards/feature.guard";
+import { CombinedAccessGuard } from "../auth/guards/combined-access.guard";
+import { RequireActiveSubscription } from "../auth/decorators/subscription.decorator";
+import { RequiredFeatures } from "../auth/decorators/features.decorator";
+import { Roles } from "../auth/decorators/roles.decorator";
 import { CreateQuestionPaperDto } from "./dto/create-question-paper.dto";
 import { UpdateQuestionPaperDto } from "./dto/update-question-paper.dto";
 import { CreateQuestionPaperQuestionDto } from "./dto/create-question-paper-question.dto";

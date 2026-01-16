@@ -36,7 +36,7 @@ const Login: React.FC = () => {
     // Check if user is already authenticated
     const isAuth = authService.isAuthenticated();
     if (isAuth) {
-      router.push("/dashboard");
+      router.push("/landing-page");
     }
   }, [router]);
 
@@ -100,7 +100,7 @@ const Login: React.FC = () => {
 
     try {
       await authService.login(email, password);
-      router.push("/dashboard");
+      router.push("/landing-page");
     } catch (err) {
       console.error("❌ Next.js login failed:", err);
 

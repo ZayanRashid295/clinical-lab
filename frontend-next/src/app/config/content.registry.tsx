@@ -66,6 +66,7 @@ import TestSessionPage from "../components/test-session/TestSessionPage";
 import QuestionGeneratorPage from "../components/question-generator/QuestionGeneratorPage";
 import QuestionGeneratorStudent from "../components/question-generator/QuestionGeneratorStudent";
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
+import MySubscriptionPage from "../components/Subscriptions/MySubscriptionPage";
 
 // Import development components
 // import MenuManager from "../components/Development/MenuManager"; // Component not found - exists as page
@@ -118,6 +119,7 @@ export const transportationContentRegistry: ContentRegistry = {
       <SubscriptionPackageManagementContent />
     ),
     "/admin/subscriptions/features": () => <PackageFeatureManagementContent />,
+    "/my-subscription": () => <MySubscriptionPage />,
 
     // Product routes
     "/admin/products": () => <ProductManagementContent />,

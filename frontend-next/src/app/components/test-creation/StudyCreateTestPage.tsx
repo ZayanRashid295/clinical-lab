@@ -23,6 +23,9 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { useUIConfigContext } from "@/shared/contexts/UIConfigContext";
 import { ThemeService } from "@/app/config/theme.service";
+import { useAccessControl } from "@/hooks/useAccessControl";
+import { Alert, AlertDescription } from "@/shared/ui/alert";
+import { Info, Crown } from "lucide-react";
 
 interface ValidationErrors {
   subjects?: string;
@@ -52,6 +55,7 @@ export default function StudyCreateTestPage() {
   const [showInsufficientQuestionsDialog, setShowInsufficientQuestionsDialog] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showQuickGuide, setShowQuickGuide] = useState(false);
+  const { hasActiveSubscription } = useAccessControl();
 
   // Get theme config to ensure theme is applied
   const { config: uiConfig } = useUIConfigContext();
@@ -183,8 +187,8 @@ export default function StudyCreateTestPage() {
       try {
         setLoadingCount(true);
         const questionsService = new QuestionsService();
-        // Fetch with max limit (999) to get the count
-        // Note: If there are more than 999 questions, we'll show "999+"
+        // Fetch with max allowed limit (1000) to get the count
+        // If we get exactly 1000, there might be more, so show "1000+"
         // Determine pool filter (exclude "marked" as it's now a separate parameter)
         // Note: "unused" is the default, but we should still pass it explicitly if selected
         const poolFilter: "unused" | "incorrect" | "correct" | "omitted" | undefined = 
@@ -199,10 +203,11 @@ export default function StudyCreateTestPage() {
           topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
+          limit: 1000, // Use max allowed limit (backend validation max is 1000)
         });
-        // If we got exactly 999, there might be more, so show "999+"
+        // If we got exactly 1000, there might be more, so show "1000+"
         // Otherwise show the actual count
-        setAvailableQuestionsCount(questions.length === 999 ? 999 : questions.length);
+        setAvailableQuestionsCount(questions.length === 1000 ? 1000 : questions.length);
       } catch (error) {
         console.error("Failed to fetch available questions count:", error);
         setAvailableQuestionsCount(null);
@@ -363,8 +368,10 @@ export default function StudyCreateTestPage() {
           topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
+          limit: 1000, // Use max allowed limit (backend validation max is 1000)
         });
-        const count = questions.length === 999 ? 999 : questions.length;
+        // If we got exactly 1000, there might be more, so treat as 1000+
+        const count = questions.length === 1000 ? 1000 : questions.length;
         setAvailableQuestionsCount(count);
         
         if (questionCountNum > count) {
@@ -450,6 +457,29 @@ export default function StudyCreateTestPage() {
         {/* Scrollable Content */}
         <main className="flex-1 overflow-auto scrollbar-thin bg-background dark:bg-gray-900">
           <div className="p-6">
+      {/* Demo Mode Indicator */}
+      {!hasActiveSubscription && (
+        <Alert className="mb-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
+          <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+          <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <strong className="font-semibold">Demo Mode:</strong> You're viewing a limited preview. 
+                You'll receive the same 10 demo questions regardless of filters. 
+                <Button
+                  variant="link"
+                  className="h-auto p-0 ml-1 text-yellow-700 dark:text-yellow-300 underline font-semibold"
+                  onClick={() => window.location.href = "/landing-page#pricing"}
+                >
+                  Upgrade to unlock full access
+                </Button>
+              </div>
+              <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400 ml-2" />
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Error/Success Messages */}
       {error && (
               <div className="bg-destructive/5 dark:bg-destructive/10 border border-destructive/20 dark:border-destructive/30 text-destructive dark:text-destructive px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
@@ -621,7 +651,7 @@ export default function StudyCreateTestPage() {
                 <div className="h-5 w-px bg-border mx-2" />
                 <span className="text-sm text-muted-foreground dark:text-gray-400">
                   Available: <span className="font-medium text-foreground dark:text-gray-100">
-                    {loadingCount ? "..." : availableQuestionsCount === 999 ? "999+" : availableQuestionsCount.toLocaleString()}
+                    {loadingCount ? "..." : availableQuestionsCount === 1000 ? "1000+" : availableQuestionsCount.toLocaleString()}
                   </span>
                 </span>
               </>

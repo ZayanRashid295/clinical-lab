@@ -32,10 +32,23 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    const payload = { email: user.email, sub: user.id };
+    // Get user with access information
+    const userWithAccess = await this.getUserWithAccess(user.id);
+
+    // Extract roles and permissions for JWT payload
+    const roles = userWithAccess?.roles || [];
+    const permissions = userWithAccess?.permissions || [];
+
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      roles: roles,
+      permissions: permissions,
+    };
+
     return {
       access_token: this.jwtService.sign(payload),
-      user,
+      user: userWithAccess || user,
     };
   }
 
@@ -92,11 +105,102 @@ export class AuthService {
         userSettings: true,
         roles: {
           include: {
-            role: true,
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        permissions: {
+          include: {
+            permission: true,
           },
         },
       },
     });
+  }
+
+  /**
+   * Get user with all access information (roles, permissions)
+   */
+  async getUserWithAccess(userId: string) {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      return null;
+    }
+
+    // Extract role names
+    const roles = user.roles?.map((ur) => {
+      // ur is a UserRole object with { role: Role }
+      if (ur && typeof ur === 'object' && 'role' in ur) {
+        return ur.role?.name;
+      }
+      return null;
+    }).filter(Boolean) as string[] || [];
+
+    // Extract permissions from roles
+    const rolePermissions = new Set<string>();
+    user.roles?.forEach((ur) => {
+      if (ur && typeof ur === 'object' && 'role' in ur) {
+        const role = ur.role;
+        if (role?.permissions) {
+          role.permissions.forEach((rp: any) => {
+            if (rp && typeof rp === 'object' && 'permission' in rp) {
+              const permission = rp.permission;
+              if (permission?.name) {
+                rolePermissions.add(permission.name);
+              }
+            }
+          });
+        }
+      }
+    });
+
+    // Extract direct user permissions
+    const userPermissions = user.permissions?.map((up) => {
+      if (up && typeof up === 'object' && 'permission' in up) {
+        return up.permission?.name;
+      }
+      return null;
+    }).filter(Boolean) as string[] || [];
+
+    // Combine all permissions
+    const allPermissions = Array.from(
+      new Set([...Array.from(rolePermissions), ...userPermissions])
+    );
+
+    return {
+      ...user,
+      roles: roles,
+      permissions: allPermissions,
+    };
+  }
+
+  /**
+   * Check if user has a specific permission
+   */
+  async userHasPermission(userId: string, permission: string): Promise<boolean> {
+    const userWithAccess = await this.getUserWithAccess(userId);
+    if (!userWithAccess) {
+      return false;
+    }
+    return userWithAccess.permissions.includes(permission);
+  }
+
+  /**
+   * Check if user has a specific role
+   */
+  async userHasRole(userId: string, role: string): Promise<boolean> {
+    const userWithAccess = await this.getUserWithAccess(userId);
+    if (!userWithAccess) {
+      return false;
+    }
+    return userWithAccess.roles.includes(role);
   }
 
   async logout(userId: string, token?: string) {

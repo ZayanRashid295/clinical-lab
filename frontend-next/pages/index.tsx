@@ -11,7 +11,7 @@ export default function Home() {
     if (!authService.isAuthenticated()) {
       router.replace("/login");
     } else {
-      router.replace("/dashboard");
+      router.replace("/landing-page");
     }
   }, [router]);
 

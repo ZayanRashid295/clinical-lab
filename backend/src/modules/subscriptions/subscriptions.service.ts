@@ -499,45 +499,116 @@ export class SubscriptionsService {
     });
   }
 
+  /**
+   * Get all active features for a user based on their active subscriptions
+   */
+  async getUserActiveFeatures(userId: string): Promise<string[]> {
+    const activeSubscriptions = await this.getUserSubscriptions(userId, 'ACTIVE');
+
+    if (!activeSubscriptions || activeSubscriptions.length === 0) {
+      return [];
+    }
+
+    // Collect all unique feature names from all active subscriptions
+    const featureSet = new Set<string>();
+
+    for (const subscription of activeSubscriptions) {
+      const features = subscription.subscriptionPackage?.subscriptionFeatures || [];
+      for (const subFeature of features) {
+        const featureName = subFeature.packageFeature?.name;
+        if (featureName) {
+          featureSet.add(featureName);
+        }
+      }
+    }
+
+    return Array.from(featureSet);
+  }
+
+  /**
+   * Check if user has a specific feature
+   */
+  async userHasFeature(userId: string, featureName: string): Promise<boolean> {
+    const userFeatures = await this.getUserActiveFeatures(userId);
+    return userFeatures.includes(featureName);
+  }
+
+  /**
+   * Get user's active subscription with all features loaded
+   */
+  async getUserActiveSubscriptionWithFeatures(userId: string) {
+    const activeSubscriptions = await this.getUserSubscriptions(userId, 'ACTIVE');
+    
+    if (!activeSubscriptions || activeSubscriptions.length === 0) {
+      return null;
+    }
+
+    // Return the most recent active subscription
+    return activeSubscriptions[0];
+  }
+
   async createSubscription(createSubscriptionDto: CreateSubscriptionDto) {
-    return this.prisma.subscription.create({
-      data: {
-        userId: createSubscriptionDto.userId,
-        subscriptionPackageId: createSubscriptionDto.subscriptionPackageId,
-        status: createSubscriptionDto.status as any,
-        startDate: new Date(createSubscriptionDto.startDate),
-        endDate: new Date(createSubscriptionDto.endDate),
-        autoRenew: createSubscriptionDto.autoRenew,
-      },
-      include: {
-        subscriptionPackage: {
-          include: {
-            productSubtype: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
+    // Use a transaction to ensure atomicity: cancel old subscriptions and create new one
+    // This prevents race conditions and ensures only one ACTIVE subscription per user
+    return await this.prisma.$transaction(async (tx) => {
+      // First, cancel ALL existing ACTIVE subscriptions for this user
+      // This must happen in the same transaction to prevent race conditions
+      const cancelledCount = await tx.subscription.updateMany({
+        where: {
+          userId: createSubscriptionDto.userId,
+          status: "ACTIVE" as any,
+        },
+        data: {
+          status: "CANCELLED" as any,
+        },
+      });
+
+      if (cancelledCount.count > 0) {
+        console.log(
+          `Cancelled ${cancelledCount.count} existing ACTIVE subscription(s) for user ${createSubscriptionDto.userId}`
+        );
+      }
+
+      // Now create the new subscription
+      return await tx.subscription.create({
+        data: {
+          userId: createSubscriptionDto.userId,
+          subscriptionPackageId: createSubscriptionDto.subscriptionPackageId,
+          status: createSubscriptionDto.status as any,
+          startDate: new Date(createSubscriptionDto.startDate),
+          endDate: new Date(createSubscriptionDto.endDate),
+          autoRenew: createSubscriptionDto.autoRenew,
+        },
+        include: {
+          subscriptionPackage: {
+            include: {
+              productSubtype: {
+                include: {
+                  product: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
                   },
                 },
               },
-            },
-            subscriptionFeatures: {
-              include: {
-                packageFeature: true,
+              subscriptionFeatures: {
+                include: {
+                  packageFeature: true,
+                },
               },
             },
           },
-        },
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
           },
         },
-      },
+      });
     });
   }
 
@@ -553,6 +624,75 @@ export class SubscriptionsService {
       throw new NotFoundException(`Subscription with ID ${id} not found`);
     }
 
+    // If updating status to ACTIVE, ensure only one active subscription per user
+    if (updateSubscriptionDto.status === "ACTIVE") {
+      return await this.prisma.$transaction(async (tx) => {
+        // First, cancel ALL other existing ACTIVE subscriptions for this user
+        const cancelledCount = await tx.subscription.updateMany({
+          where: {
+            userId: subscription.userId,
+            status: "ACTIVE" as any,
+            id: { not: id }, // Exclude the current subscription
+          },
+          data: {
+            status: "CANCELLED" as any,
+          },
+        });
+
+        if (cancelledCount.count > 0) {
+          console.log(
+            `Cancelled ${cancelledCount.count} existing ACTIVE subscription(s) for user ${subscription.userId} when updating subscription ${id} to ACTIVE`
+          );
+        }
+
+        // Now update the subscription
+        const updateData: any = {};
+        if (updateSubscriptionDto.status)
+          updateData.status = updateSubscriptionDto.status as any;
+        if (updateSubscriptionDto.startDate)
+          updateData.startDate = new Date(updateSubscriptionDto.startDate);
+        if (updateSubscriptionDto.endDate)
+          updateData.endDate = new Date(updateSubscriptionDto.endDate);
+        if (updateSubscriptionDto.autoRenew !== undefined)
+          updateData.autoRenew = updateSubscriptionDto.autoRenew;
+
+        return await tx.subscription.update({
+          where: { id },
+          data: updateData,
+          include: {
+            subscriptionPackage: {
+              include: {
+                productSubtype: {
+                  include: {
+                    product: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                },
+                subscriptionFeatures: {
+                  include: {
+                    packageFeature: true,
+                  },
+                },
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+          },
+        });
+      });
+    }
+
+    // For non-ACTIVE status updates, proceed normally
     const updateData: any = {};
     if (updateSubscriptionDto.status)
       updateData.status = updateSubscriptionDto.status as any;
@@ -664,23 +804,67 @@ export class SubscriptionsService {
     const toCancel = activeSubscriptions.slice(1); // All except the first (most recent)
     const cancelledIds = toCancel.map((s) => s.id);
 
-    await this.prisma.subscription.updateMany({
+    const updateResult = await this.prisma.subscription.updateMany({
       where: {
         id: {
           in: cancelledIds,
         },
       },
       data: {
-        status: "CANCELLED",
+        status: "CANCELLED" as any,
       },
     });
 
+    console.log(
+      `✅ Cleaned up ${updateResult.count} duplicate ACTIVE subscription(s) for user ${userId}. Kept subscription ${activeSubscriptions[0].id}`
+    );
+
     return {
       kept: 1,
-      cancelled: toCancel.length,
+      cancelled: updateResult.count,
       keptSubscriptionId: activeSubscriptions[0].id,
       cancelledSubscriptionIds: cancelledIds,
-      message: `Kept most recent subscription, cancelled ${toCancel.length} duplicate(s)`,
+      message: `Kept most recent subscription, cancelled ${updateResult.count} duplicate(s)`,
+    };
+  }
+
+  /**
+   * Clean up duplicate active subscriptions for ALL users
+   * Useful for fixing existing data issues
+   */
+  async cleanupAllDuplicateActiveSubscriptions() {
+    // Get all users with multiple active subscriptions
+    const usersWithDuplicates = await this.prisma.subscription.groupBy({
+      by: ["userId"],
+      where: {
+        status: "ACTIVE" as any,
+      },
+      _count: {
+        id: true,
+      },
+      having: {
+        id: {
+          _count: {
+            gt: 1,
+          },
+        },
+      },
+    });
+
+    const results = [];
+    for (const userGroup of usersWithDuplicates) {
+      const result = await this.cleanupDuplicateActiveSubscriptions(userGroup.userId);
+      results.push({
+        userId: userGroup.userId,
+        ...result,
+      });
+    }
+
+    return {
+      totalUsersProcessed: results.length,
+      totalCancelled: results.reduce((sum, r) => sum + r.cancelled, 0),
+      results,
+      message: `Processed ${results.length} user(s) with duplicate active subscriptions`,
     };
   }
 

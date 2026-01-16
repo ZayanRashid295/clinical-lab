@@ -13,9 +13,10 @@ import { useRouter } from "next/router";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  pendingPackageId?: string | null;
 }
 
-export function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, pendingPackageId }: LoginModalProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,9 +63,19 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       // Use the auth service directly
       await authService.login(email, password);
 
-      // Close modal and redirect to dashboard on successful login
+      // Close modal first
       onClose();
-      router.push("/dashboard");
+      
+      // Small delay to ensure modal closes before navigation
+      setTimeout(() => {
+        if (pendingPackageId) {
+          // Redirect to checkout with the selected package
+          router.push(`/checkout-basic?packageId=${pendingPackageId}`);
+        } else {
+          // Redirect to landing page on successful login
+          router.push("/landing-page");
+        }
+      }, 100);
     } catch (err) {
       // Handle login errors
       const errorMessage =

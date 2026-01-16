@@ -120,22 +120,35 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     // Close mobile menu when item selected
     setIsMobileMenuOpen(false);
 
-    // Find the menu item and its path
-    const findMenuPath = (items: MenuItem[], id: string): string | null => {
+    // Find the menu item and its path/action
+    const findMenuItem = (items: MenuItem[], id: string): MenuItem | null => {
       for (const item of items) {
         if (item.id === id) {
-          return item.path;
+          return item;
         }
         if (item.submenu) {
-          const subPath = findMenuPath(item.submenu, id);
-          if (subPath) return subPath;
+          const subItem = findMenuItem(item.submenu, id);
+          if (subItem) return subItem;
         }
       }
       return null;
     };
 
-    const menuPath = findMenuPath(menuItems, menuId);
-    if (menuPath) {
+    const menuItem = findMenuItem(menuItems, menuId);
+    
+    // Handle custom actions
+    if (menuItem?.action === "open-subscription-modal") {
+      // Dispatch custom event to open subscription modal
+      const event = new CustomEvent("open-subscription-modal", { bubbles: true });
+      window.dispatchEvent(event);
+      if (onMenuChange) {
+        onMenuChange(menuId);
+      }
+      return;
+    }
+
+    const menuPath = menuItem?.path;
+    if (menuPath && menuPath !== "#") {
       // Update the active menu immediately
       setActiveMenu(menuId);
       setCurrentPath(menuPath);

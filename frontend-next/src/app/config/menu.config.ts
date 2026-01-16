@@ -83,6 +83,13 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "my-subscription",
+      label: "menu.mySubscription",
+      icon: "💳",
+      path: "/my-subscription",
+      roles: ["STUDENT"],
+    },
+    {
       id: "products",
       label: "menu.products",
       icon: "📦",

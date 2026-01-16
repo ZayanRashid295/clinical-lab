@@ -20,6 +20,8 @@ import { QuestionsService } from "@/app/services/questions/questions.service"
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service"
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service"
 import { authService } from "@/shared/services/auth.service"
+import { useAccessControl } from "@/hooks/useAccessControl"
+import { Crown } from "lucide-react"
 
 const DEMO_QUESTION = {
   id: "demo-1",
@@ -149,6 +151,7 @@ export default function StudentQuestionView() {
   const [error, setError] = useState<string | null>(null)
   const [showEndTestDialog, setShowEndTestDialog] = useState(false)
   const [isEndingTest, setIsEndingTest] = useState(false)
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set())
   const [questionPaperQuestionIds, setQuestionPaperQuestionIds] = useState<Record<string, string>>({})
@@ -157,6 +160,7 @@ export default function StudentQuestionView() {
   const questionsService = new QuestionsService()
   const questionPapersService = new QuestionPapersService()
   const questionPaperQuestionsService = new QuestionPaperQuestionsService()
+  const { hasActiveSubscription } = useAccessControl()
 
   // Helper function to get URL search params
   const getSearchParams = () => {
@@ -1689,8 +1693,13 @@ export default function StudentQuestionView() {
         }
       }
 
-      // Navigate to previous tests page
-      router.push("/previous-tests")
+      // Show upgrade prompt for non-subscribed users after successful test completion
+      if (!hasActiveSubscription) {
+        setShowUpgradePrompt(true)
+      } else {
+        // Navigate to previous tests page
+        router.push("/previous-tests")
+      }
     } catch (error: any) {
       console.error("Failed to end test:", error)
       alert("Failed to save test. Please try again.")
@@ -1864,6 +1873,54 @@ export default function StudentQuestionView() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Upgrade Prompt for Non-Subscribed Users */}
+      {showUpgradePrompt && !hasActiveSubscription && (
+        <AlertDialog open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt}>
+          <AlertDialogContent className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-500 dark:border-yellow-700">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
+                <Crown className="h-5 w-5" />
+                Great Job! 🎉
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-yellow-700 dark:text-yellow-300">
+                <p className="mb-3">
+                  You've completed the demo test! You've seen a preview of our question bank with 10 sample questions.
+                </p>
+                <p className="mb-4 font-semibold">
+                  Upgrade now to unlock:
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-sm mb-4">
+                  <li>Full access to all questions in the question bank</li>
+                  <li>Unlimited test creation with custom filters</li>
+                  <li>Advanced analytics and performance tracking</li>
+                  <li>Study planner and progress monitoring</li>
+                </ul>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel 
+                onClick={() => {
+                  setShowUpgradePrompt(false)
+                  router.push("/previous-tests")
+                }}
+                className="dark:bg-gray-700 dark:text-gray-200"
+              >
+                Maybe Later
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setShowUpgradePrompt(false)
+                  router.push("/landing-page#pricing")
+                }}
+                className="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white font-semibold"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                View Plans
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
 
       <div className="flex-1 overflow-hidden">
         <div className="h-full grid grid-cols-1 lg:grid-cols-5 gap-3 p-3 lg:p-4">

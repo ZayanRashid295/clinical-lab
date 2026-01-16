@@ -257,11 +257,26 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      router.replace("/login");
-    } else {
+    const checkAccess = async () => {
+      if (!authService.isAuthenticated()) {
+        router.replace("/login");
+        return;
+      }
+
+      // Check if user has ADMIN role
+      const user = authService.getCurrentUser();
+      const userRoles = user?.roles || [];
+      
+      if (!userRoles.includes("ADMIN")) {
+        // Redirect non-admin users to dashboard
+        router.replace("/dashboard");
+        return;
+      }
+
       setIsLoading(false);
-    }
+    };
+
+    checkAccess();
   }, [router]);
 
   if (isLoading) {

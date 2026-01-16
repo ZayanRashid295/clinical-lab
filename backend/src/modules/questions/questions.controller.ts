@@ -25,6 +25,10 @@ import {
 import { Express } from "express";
 import { QuestionsService } from "./questions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { FeatureGuard } from "../auth/guards/feature.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { RequiredFeatures } from "../auth/decorators/features.decorator";
+import { Roles } from "../auth/decorators/roles.decorator";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
@@ -39,7 +43,8 @@ export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredFeatures("Qbank Access")
   @ApiBearerAuth()
   @ApiOperation({
     summary: "Get all questions with filtering, pagination, and sorting",
@@ -49,12 +54,14 @@ export class QuestionsController {
     description: "Questions retrieved successfully",
   })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank Access feature required" })
   async findAll(@Query() query: QueryQuestionDto) {
     return this.questionsService.findAll(query);
   }
 
   @Get("stats")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredFeatures("Qbank Access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get question statistics" })
   @ApiResponse({
@@ -62,6 +69,7 @@ export class QuestionsController {
     description: "Question statistics retrieved successfully",
   })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank Access feature required" })
   getStats() {
     return this.questionsService.getStats();
   }
@@ -261,34 +269,40 @@ export class QuestionsController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredFeatures("Qbank Access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get question by ID with choices" })
   @ApiResponse({ status: 200, description: "Question retrieved successfully" })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank Access feature required" })
   async findOne(@Param("id") id: string) {
     return this.questionsService.findOne(id);
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create new question (Admin only)" })
   @ApiResponse({ status: 201, description: "Question created successfully" })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Admin role required" })
   async create(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionsService.create(createQuestionDto);
   }
 
   @Patch(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update question (Admin only)" })
   @ApiResponse({ status: 200, description: "Question updated successfully" })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Admin role required" })
   async update(
     @Param("id") id: string,
     @Body() updateQuestionDto: UpdateQuestionDto
@@ -297,7 +311,8 @@ export class QuestionsController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Delete question (Admin only)" })
   @ApiResponse({ status: 200, description: "Question deleted successfully" })

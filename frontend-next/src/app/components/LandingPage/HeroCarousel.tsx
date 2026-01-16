@@ -18,12 +18,14 @@ interface HeroCarouselProps {
   slides: HeroSlide[];
   onLoginClick?: () => void;
   onDemoClick?: () => void;
+  isAuthenticated?: boolean;
 }
 
 export function HeroCarousel({
   slides,
   onLoginClick,
   onDemoClick,
+  isAuthenticated = false,
 }: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);

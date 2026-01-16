@@ -31,46 +31,65 @@ export function PricingCard({
   return (
     <Card
       className={cn(
-        "p-8 relative bg-card border-border",
-        popular && "border-primary border-2"
+        "p-8 relative bg-card border-border h-full flex flex-col",
+        popular && "border-primary border-2 shadow-lg"
       )}
     >
       {popular && (
-        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-          Most Popular
-        </Badge>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+          <Badge 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-xs font-semibold rounded-full shadow-lg border-2 border-blue-700 whitespace-nowrap"
+          >
+            Most Popular
+          </Badge>
+        </div>
       )}
 
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold mb-2 text-card-foreground">{name}</h3>
-        <p className="text-sm text-muted-foreground">{description}</p>
+      {/* Header section with fixed height */}
+      <div className={cn("mb-6", popular && "mt-2")}>
+        <h3 className="text-2xl font-bold mb-3 text-card-foreground min-h-[2rem] flex items-center">
+          {name}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed min-h-[3rem]">
+          {description}
+        </p>
       </div>
 
-      <div className="mb-6">
-        <div className="flex items-baseline gap-2">
+      {/* Price section with fixed height */}
+      <div className="mb-6 min-h-[4rem] flex items-end">
+        <div className="flex items-baseline gap-1 flex-wrap">
           <span className="text-4xl font-bold text-card-foreground">
             {price}
           </span>
-          <span className="text-muted-foreground">/{period}</span>
+          <span className="text-base text-muted-foreground font-medium">
+            /{period}
+          </span>
         </div>
       </div>
 
-      <Button
-        className="w-full mb-6"
-        variant={popular ? "default" : "outline"}
-        onClick={onSelect}
-        data-testid={`button-select-${name.toLowerCase().replace(/\s+/g, "-")}`}
-      >
-        {cta}
-      </Button>
+      {/* Button section - fixed position */}
+      <div className="mb-6 min-h-[3.5rem] flex items-center">
+        <Button
+          className="w-full font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-600 shadow-md"
+          variant="default"
+          onClick={onSelect}
+          size="lg"
+          data-testid={`button-select-${name.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          {cta}
+        </Button>
+      </div>
 
-      <div className="space-y-3">
+      {/* Features section - flexible to fill remaining space */}
+      <div className="space-y-3 flex-1">
         {features.map((feature, idx) => (
           <div key={idx} className="flex items-start gap-3">
             <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Check className="h-3 w-3 text-primary" />
+              <Check className="h-3.5 w-3.5 text-primary" />
             </div>
-            <span className="text-sm text-card-foreground">{feature}</span>
+            <span className="text-sm text-card-foreground leading-relaxed break-words">
+              {feature}
+            </span>
           </div>
         ))}
       </div>

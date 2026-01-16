@@ -45,29 +45,75 @@ export class AuthService extends BaseApiService {
           localStorage.setItem("authToken", responseData.access_token);
         }
 
-        // Fetch complete user profile with roles
+        // Fetch complete user profile with roles and permissions
         try {
           const profileResponse = await this.getProfile();
           console.log(`✅ Profile fetched with roles:`, profileResponse);
 
-          // Transform roles to simple array format for menu system
-          const userWithRoles = {
+          // Extract roles and permissions from JWT token if available
+          let jwtRoles: string[] = [];
+          let jwtPermissions: string[] = [];
+          
+          if (responseData.access_token) {
+            try {
+              const { decodeJWT } = await import("../utils/jwt-decoder");
+              const decoded = decodeJWT(responseData.access_token);
+              jwtRoles = decoded?.roles || [];
+              jwtPermissions = decoded?.permissions || [];
+            } catch (jwtError) {
+              console.warn("Could not decode JWT:", jwtError);
+            }
+          }
+
+          // Transform roles to simple array format
+          const rolesFromProfile = profileResponse.roles
+            ?.map((userRole: any) => 
+              typeof userRole === 'string' ? userRole : userRole.role?.name || userRole.name
+            )
+            .filter(Boolean) || [];
+
+          // Combine JWT roles with profile roles (JWT takes precedence)
+          const allRoles = jwtRoles.length > 0 ? jwtRoles : rolesFromProfile;
+
+          // Extract permissions from profile
+          const permissionsFromProfile = profileResponse.permissions
+            ?.map((userPerm: any) =>
+              typeof userPerm === 'string' ? userPerm : userPerm.permission?.name || userPerm.name
+            )
+            .filter(Boolean) || [];
+
+          // Combine JWT permissions with profile permissions (JWT takes precedence)
+          const allPermissions = jwtPermissions.length > 0 ? jwtPermissions : permissionsFromProfile;
+
+          const userWithAccess = {
             ...profileResponse,
-            roles:
-              profileResponse.roles
-                ?.map((userRole: any) => userRole.role?.name)
-                .filter(Boolean) || [],
+            roles: allRoles,
+            permissions: allPermissions,
           };
 
-          localStorage.setItem("userData", JSON.stringify(userWithRoles));
-          resolve({ ...responseData, user: userWithRoles });
+          localStorage.setItem("userData", JSON.stringify(userWithAccess));
+          resolve({ ...responseData, user: userWithAccess });
         } catch (profileError) {
           console.error("Failed to fetch user profile:", profileError);
-          // Fallback to basic user data
-          if (responseData.user) {
-            localStorage.setItem("userData", JSON.stringify(responseData.user));
+          // Fallback to basic user data with JWT roles/permissions if available
+          let userData = responseData.user || {};
+          
+          if (responseData.access_token) {
+            try {
+              const { decodeJWT } = await import("../utils/jwt-decoder");
+              const decoded = decodeJWT(responseData.access_token);
+              userData = {
+                ...userData,
+                roles: decoded?.roles || [],
+                permissions: decoded?.permissions || [],
+              };
+            } catch (jwtError) {
+              // Ignore JWT decode errors
+            }
           }
-          resolve(responseData);
+          
+          localStorage.setItem("userData", JSON.stringify(userData));
+          resolve({ ...responseData, user: userData });
         }
       } catch (error) {
         console.error("Login request failed:", error);

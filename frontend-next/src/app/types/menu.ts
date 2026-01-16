@@ -7,6 +7,7 @@ export interface MenuItem {
   path: string;
   roles: string[];
   submenu?: MenuItem[] | null;
+  action?: string; // Custom action like "open-subscription-modal"
 }
 
 export interface MenuPermissions {

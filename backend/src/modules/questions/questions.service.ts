@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import * as fs from "fs";
 import * as path from "path";
 import { Express } from "express";
@@ -29,7 +31,19 @@ interface RandomQuestionFilters {
 
 @Injectable()
 export class QuestionsService {
-  constructor(private prisma: PrismaService) {}
+  // Fixed demo question IDs for non-subscribed users (always the same questions)
+  // These will be populated on first access
+  private demoQuestionIds: string[] | null = null;
+  private readonly demoQuestionCount: number;
+
+  constructor(
+    private prisma: PrismaService,
+    private subscriptionsService: SubscriptionsService,
+    private configService: ConfigService
+  ) {
+    // Get demo question count from environment variable, default to 10
+    this.demoQuestionCount = this.configService.get<number>("DEMO_QUESTION_COUNT") || 10;
+  }
 
   async findAll(query: QueryQuestionDto) {
     try {
@@ -1848,13 +1862,142 @@ export class QuestionsService {
         }
       }
 
-      // Limit to requested amount
-      questions = questions.slice(0, limit);
+      // Check subscription status for non-subscribed users
+      // If user has no active subscription, always return the same 10 fixed demo questions
+      // But allow full count for count checks (when limit is very high or not set)
+      let hasActiveSubscription = false;
+      if (userId) {
+        try {
+          const activeSubscriptions = await this.subscriptionsService.getUserSubscriptions(
+            userId,
+            "ACTIVE"
+          );
+          hasActiveSubscription = activeSubscriptions && activeSubscriptions.length > 0;
+        } catch (error) {
+          // If subscription check fails, assume no subscription (fail-safe)
+          console.error("Error checking subscription status:", error);
+          hasActiveSubscription = false;
+        }
+      }
+
+      // Determine if this is a count check or test generation
+      // Count checks typically set limit to 999+ or use default 100
+      // Test generation typically sets a specific limit (like 40)
+      const isCountCheck = limit >= 999;
+      const isTestGeneration = limit < 999 && limit > 0;
+
+      // For non-subscribed users during test generation, always return the same 10 fixed demo questions
+      if (!hasActiveSubscription && isTestGeneration) {
+        // Get or initialize the fixed demo question IDs
+        if (!this.demoQuestionIds) {
+          await this.initializeDemoQuestions();
+        }
+
+        // Fetch the fixed demo questions with full details
+        if (this.demoQuestionIds && this.demoQuestionIds.length > 0) {
+          const demoQuestions = await this.prisma.question.findMany({
+            where: {
+              id: { in: this.demoQuestionIds },
+              isActive: true,
+            },
+            include: {
+              choices: {
+                orderBy: { order: "asc" },
+              },
+              questionStemBlocks: {
+                orderBy: { order: "asc" },
+              },
+              explanationBlocks: {
+                orderBy: { order: "asc" },
+              },
+              perAnswerExplanations: {
+                include: {
+                  blocks: { orderBy: { order: "asc" } },
+                },
+              },
+              productTag: true,
+              chapter: true,
+              section: true,
+              topic: {
+                include: {
+                  chapter: {
+                    include: {
+                      section: {
+                        include: {
+                          product: {
+                            select: {
+                              id: true,
+                              name: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          });
+
+          // Return the demo questions in the same order as stored IDs
+          const orderedDemoQuestions = this.demoQuestionIds
+            .map((id) => demoQuestions.find((q) => q.id === id))
+            .filter((q) => q !== undefined);
+
+          return orderedDemoQuestions;
+        }
+      } else if (hasActiveSubscription || isCountCheck) {
+        // Subscribed users or count checks: limit to requested amount
+        questions = questions.slice(0, limit || questions.length);
+      } else {
+        // No subscription but count check: return all for accurate count
+        questions = questions.slice(0, limit || questions.length);
+      }
 
       return questions;
     } catch (error) {
       console.error("Error fetching filtered questions:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Initialize the fixed demo questions for non-subscribed users
+   * Selects the first N active questions from the database (N = DEMO_QUESTION_COUNT)
+   */
+  private async initializeDemoQuestions(): Promise<void> {
+    try {
+      // Get the first N active questions (ordered by creation date for consistency)
+      const demoQuestions = await this.prisma.question.findMany({
+        where: {
+          isActive: true,
+        },
+        select: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        take: this.demoQuestionCount,
+      });
+
+      this.demoQuestionIds = demoQuestions.map((q) => q.id);
+
+      if (this.demoQuestionIds.length < this.demoQuestionCount) {
+        console.warn(
+          `⚠️ Only found ${this.demoQuestionIds.length} active questions for demo. Expected ${this.demoQuestionCount}.`
+        );
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `✅ Initialized ${this.demoQuestionIds.length} demo questions for non-subscribed users (config: ${this.demoQuestionCount})`
+        );
+      }
+    } catch (error) {
+      console.error("Error initializing demo questions:", error);
+      // Set to empty array as fallback
+      this.demoQuestionIds = [];
     }
   }
 }

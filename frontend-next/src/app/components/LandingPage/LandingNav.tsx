@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { Button } from "@/shared/ui/button";
-import { Stethoscope, Trophy, Sun, Moon } from "lucide-react";
+import { Stethoscope, Trophy, Sun, Moon, LayoutDashboard } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { authService } from "@/shared";
 import {
   Dialog,
   DialogContent,
@@ -18,12 +20,53 @@ interface LandingNavProps {
 }
 
 export function LandingNav({ onLoginClick }: LandingNavProps) {
+  const router = useRouter();
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
   const { config, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
+    // Check authentication status and get user info
+    const checkAuth = async () => {
+      const authenticated = authService.isAuthenticated();
+      setIsAuthenticated(authenticated);
+      
+      if (authenticated) {
+        try {
+          const profile = await authService.getProfile();
+          const name = profile?.firstName && profile?.lastName
+            ? `${profile.firstName} ${profile.lastName}`
+            : profile?.email?.split('@')[0] || 'User';
+          setUserName(name);
+        } catch (error) {
+          setUserName(null);
+        }
+      } else {
+        setUserName(null);
+      }
+    };
+    checkAuth();
+    
+    // Listen for storage changes (when login happens in another tab/window)
+    const handleStorageChange = (e: StorageEvent) => {
+      // Only react to auth-related storage changes
+      if (e.key === 'authToken' || e.key === 'userData') {
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically in case login happens in same window (every 2 seconds to reduce load)
+    const interval = setInterval(checkAuth, 2000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -47,6 +90,10 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
       // Navigate to login page in Next.js
       window.location.href = "/login";
     }
+  };
+
+  const handleDashboard = () => {
+    router.push("/dashboard");
   };
 
   const globalEntries = [
@@ -147,16 +194,34 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
                 <Moon className="h-5 w-5" />
               )}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={handleLogin}
-              data-testid="button-login"
-            >
-              Log In
-            </Button>
-            <Button onClick={handleSignup} data-testid="button-signup">
-              Sign Up
-            </Button>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {userName || "User"}
+                </span>
+                <Button
+                  onClick={handleDashboard}
+                  data-testid="button-dashboard"
+                  className="flex items-center gap-2"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={handleLogin}
+                  data-testid="button-login"
+                >
+                  Log In
+                </Button>
+                <Button onClick={handleSignup} data-testid="button-signup">
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
