@@ -464,8 +464,8 @@ export default function StudyCreateTestPage() {
           <AlertDescription className="text-yellow-800 dark:text-yellow-200">
             <div className="flex items-center justify-between">
               <div>
-                <strong className="font-semibold">Demo Mode:</strong> You're viewing a limited preview. 
-                You'll receive the same 10 demo questions regardless of filters. 
+                <strong className="font-semibold">Demo Mode:</strong> You&apos;re viewing a limited preview. 
+                You&apos;ll receive the same 10 demo questions regardless of filters. 
                 <Button
                   variant="link"
                   className="h-auto p-0 ml-1 text-yellow-700 dark:text-yellow-300 underline font-semibold"

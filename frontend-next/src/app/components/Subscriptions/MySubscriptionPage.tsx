@@ -592,7 +592,7 @@ export default function MySubscriptionPage() {
             <AlertDialogDescription>
               {packageToUpgrade && (
                 <>
-                  You're about to upgrade to <strong>{packageToUpgrade.name}</strong>.
+                  You&apos;re about to upgrade to <strong>{packageToUpgrade.name}</strong>.
                   <div className="mt-3 space-y-2">
                     <p className="text-sm">
                       <strong>Price:</strong> ${packageToUpgrade.price} {packageToUpgrade.currency}

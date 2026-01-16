@@ -1884,7 +1884,7 @@ export default function StudentQuestionView() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-yellow-700 dark:text-yellow-300">
                 <p className="mb-3">
-                  You've completed the demo test! You've seen a preview of our question bank with 10 sample questions.
+                  You&apos;ve completed the demo test! You&apos;ve seen a preview of our question bank with 10 sample questions.
                 </p>
                 <p className="mb-4 font-semibold">
                   Upgrade now to unlock:

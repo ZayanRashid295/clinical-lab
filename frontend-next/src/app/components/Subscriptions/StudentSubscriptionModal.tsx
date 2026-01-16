@@ -169,7 +169,7 @@ export default function StudentSubscriptionModal({
                 No Subscription Found
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
-                You don't have any active subscriptions. Subscribe now to unlock
+                You don&apos;t have any active subscriptions. Subscribe now to unlock
                 full access to all features.
               </p>
               <Button onClick={handleUpgrade} className="bg-blue-600 hover:bg-blue-700">

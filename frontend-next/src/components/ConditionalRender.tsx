@@ -98,21 +98,21 @@ export function IfSubscription({
  * Render children only if user has the specified role
  */
 export function IfAdmin({ children, fallback = null }: ConditionalRenderProps) {
-  return <IfRole role="ADMIN" children={children} fallback={fallback} />;
+  return <IfRole role="ADMIN" fallback={fallback}>{children}</IfRole>;
 }
 
 /**
  * Render children only if user has STUDENT role
  */
 export function IfStudent({ children, fallback = null }: ConditionalRenderProps) {
-  return <IfRole role="STUDENT" children={children} fallback={fallback} />;
+  return <IfRole role="STUDENT" fallback={fallback}>{children}</IfRole>;
 }
 
 /**
  * Render children only if user has Qbank Access feature
  */
 export function IfQbankAccess({ children, fallback = null }: ConditionalRenderProps) {
-  return <IfFeature feature="Qbank Access" children={children} fallback={fallback} />;
+  return <IfFeature feature="Qbank Access" fallback={fallback}>{children}</IfFeature>;
 }
 
 
