@@ -118,3 +118,4 @@ This is handled in:
 **Issue**: Runtime Error - "Active subscription required to access this resource"
 **Resolution**: Removed subscription guards from read-only and demo-accessible endpoints
 
+
