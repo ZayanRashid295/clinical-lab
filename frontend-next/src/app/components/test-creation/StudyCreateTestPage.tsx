@@ -641,9 +641,9 @@ export default function StudyCreateTestPage() {
                 {selectedTags.length} subjects
               </span>
             )}
-            {selectedSystems.length > 0 && (
+            {selectedSubjects.length > 0 && (
               <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/20 dark:border-amber-500/30">
-                {selectedSystems.length} systems
+                {selectedSubjects.length} Systems
               </span>
             )}
               {availableQuestionsCount !== null && (

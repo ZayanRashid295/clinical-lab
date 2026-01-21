@@ -6,12 +6,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { Express } from "express";
 import * as sharp from "sharp";
+import OpenAI from "openai";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
 import { UpdateQuestionChoiceDto } from "./dto/update-question-choice.dto";
 import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
+import { ConvertDocxDto } from "./dto/convert-docx.dto";
 
 interface QuestionFilters {
   topicId?: string;
@@ -31,6 +33,7 @@ interface RandomQuestionFilters {
 
 @Injectable()
 export class QuestionsService {
+  private openai: OpenAI | null = null;
   // Fixed demo question IDs for non-subscribed users (always the same questions)
   // These will be populated on first access
   private demoQuestionIds: string[] | null = null;
@@ -38,9 +41,16 @@ export class QuestionsService {
 
   constructor(
     private prisma: PrismaService,
-    private subscriptionsService: SubscriptionsService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private subscriptionsService: SubscriptionsService
   ) {
+    // Initialize OpenAI client if API key is available
+    const openaiApiKey = this.configService.get<string>("OPENAI_API_KEY");
+    if (openaiApiKey) {
+      this.openai = new OpenAI({
+        apiKey: openaiApiKey,
+      });
+    }
     // Get demo question count from environment variable, default to 10
     this.demoQuestionCount = this.configService.get<number>("DEMO_QUESTION_COUNT") || 10;
   }
@@ -1236,7 +1246,6 @@ export class QuestionsService {
   }) {
     try {
       const { pool, marked, userId } = options || {};
-      console.log(`🔍 Service - Processing: pool=${pool}, marked=${marked}, userId=${userId}`);
 
       // Get all active product tags
       const productTags = await this.prisma.productTag.findMany({
@@ -1281,7 +1290,6 @@ export class QuestionsService {
         // Early return: unused questions can't be marked, so if pool is "unused" and marked is true, return empty set
         if (pool === "unused" && marked === true) {
           filteredQuestionIds = new Set<string>();
-          console.log(`🔍 Early return: pool=unused, marked=true, filteredQuestionIds size=${filteredQuestionIds.size}`);
         } else {
         // Get user's question paper questions to determine pool status
         const userQuestionPapers = await this.prisma.questionPaper.findMany({
@@ -1420,7 +1428,6 @@ export class QuestionsService {
               bothMatchCount++;
             }
           }
-          console.log(`🔍 Filtering results: pool=${pool}, marked=${marked}, poolMatch=${poolMatchCount}, markedMatch=${markedMatchCount}, bothMatch=${bothMatchCount}, finalCount=${filteredQuestionIds.size}`);
         } else if (pool === "unused") {
           // User has no tests, so all questions are unused
             // But if marked filter is enabled and true, unused questions can't be marked, so return empty
@@ -1462,16 +1469,12 @@ export class QuestionsService {
       };
 
       // Calculate question counts for each tag
-      console.log(`🔍 Before tag counts: filteredQuestionIds is ${filteredQuestionIds === null ? 'null' : filteredQuestionIds instanceof Set ? `Set with size ${filteredQuestionIds.size}` : 'unknown'}`);
       const tagsWithCounts = productTags.map((tag) => {
         let questionsToCount = allQuestions.filter((q) => questionMatchesTag(q, tag.id));
         if (filteredQuestionIds !== null) {
           questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
         }
         const count = questionsToCount.length;
-        if (tag.name === "Anatomy" || tag.name === "Behavioral science") {
-          console.log(`🔍 Tag ${tag.name}: filteredQuestionIds=${filteredQuestionIds === null ? 'null' : `Set(size=${filteredQuestionIds.size})`}, beforeFilter=${allQuestions.filter((q) => questionMatchesTag(q, tag.id)).length}, afterFilter=${count}`);
-        }
         return {
           id: tag.id,
           name: tag.name,
@@ -1615,9 +1618,10 @@ export class QuestionsService {
     marked?: boolean;
     limit?: number;
     userId?: string;
+    userRoles?: string[]; // User roles to check for ADMIN/SUPERADMIN bypass
   }) {
     try {
-      const { tagIds = [], systemIds = [], subjectIds = [], topicIds = [], pool, marked, limit = 100, userId } = filters;
+      const { tagIds = [], systemIds = [], subjectIds = [], topicIds = [], pool, marked, limit = 100, userId, userRoles = [] } = filters;
 
       // Build where clause
       const where: any = {
@@ -1862,11 +1866,18 @@ export class QuestionsService {
         }
       }
 
+      // Check if user has ADMIN or SUPERADMIN role - bypass subscription checks
+      const isAdmin = userRoles.includes('ADMIN') || userRoles.includes('SUPERADMIN');
+      
       // Check subscription status for non-subscribed users
       // If user has no active subscription, always return the same 10 fixed demo questions
       // But allow full count for count checks (when limit is very high or not set)
+      // ADMIN and SUPERADMIN bypass subscription checks
       let hasActiveSubscription = false;
-      if (userId) {
+      if (isAdmin) {
+        // ADMIN and SUPERADMIN have full access regardless of subscription
+        hasActiveSubscription = true;
+      } else if (userId) {
         try {
           const activeSubscriptions = await this.subscriptionsService.getUserSubscriptions(
             userId,
@@ -2000,4 +2011,481 @@ export class QuestionsService {
       this.demoQuestionIds = [];
     }
   }
+
+  /**
+   * Convert DOCX HTML content to Markdown using OpenAI.
+   *
+   * IMPORTANT: The model returns Markdown directly, following the
+   * existing question-generator template. The frontend parser
+   * expects this exact structure.
+   */
+  async convertDocxToMarkdown(dto: ConvertDocxDto): Promise<{ markdown: string }> {
+    if (!this.openai) {
+      throw new BadRequestException(
+        "OpenAI API key is not configured. Please set OPENAI_API_KEY in environment variables."
+      );
+    }
+
+    const template = `---
+title: "<Subject & Topic> — <Specific Focus>"
+tags: [<Tag1>, <Tag2>]
+difficulty: <easy|medium|hard>
+correct_answer: <Correct Option Letter>
+question_id: <Unique Question ID>
+---
+
+# <Subject & Topic> — <Specific Focus>
+## Topic: <Topic or Subtopic>
+
+## Question
+<Question Stem Here>
+
+## Options and Explanations
+
+**A. <Option A Text>**
+
+### Choice A Explanation
+<Explanation for Option A>
+
+**B. <Option B Text>** 
+
+### Choice B Explanation
+<Explanation for Option B>
+
+**C. <Option C Text>**
+
+### Choice C Explanation
+<Explanation for Option C>
+
+<!-- Add more options as needed -->
+
+**Correct Answer:** <Correct Option Letter>
+
+---
+
+## Explanation
+
+<If keywords are provided, include this section:>
+
+### Keywords in the Stem to Identify the Correct Option
+- **"<Keyword1>"** – <Explanation of relevance>  
+- **"<Keyword2>"** – <Explanation of relevance>  
+<Add more keywords if needed>
+
+---
+
+## Choice-by-Choice Explanations
+
+<Per-option explanations go here, in the form:
+(Option A) ...
+(Option B) ...
+etc. After this block, include any remaining tables, differential diagnosis,
+and notes as plain markdown.>`;
+
+    // Build image information for LLM (as plain instructions)
+    let imageNote = "";
+    let imageInstructions = "";
+    if (dto.imagePlaceholders && dto.imagePlaceholders.length > 0) {
+      imageNote = `\n\n⚠️ CRITICAL: IMAGE PLACEHOLDERS DETECTED ⚠️\n\nThe HTML content contains ${
+        dto.imagePlaceholders.length
+      } embedded image(s) with placeholders like: <img src="[IMAGE_PLACEHOLDER:filename]" />\n\nAvailable image placeholders in the HTML:\n${dto.imagePlaceholders
+        .map((name, idx) => `  ${idx + 1}. [IMAGE_PLACEHOLDER:${name}]`)
+        .join(
+          "\n"
+        )}\n\nYou MUST preserve these placeholders in your Markdown output!`;
+      
+      imageInstructions = `\n\n7. IMAGES (CRITICAL - DO NOT OMIT)\n   - The HTML source contains image placeholders like:\n     <img src="[IMAGE_PLACEHOLDER:image_0.png]" />\n   - You MUST include these placeholders in your Markdown output.\n   - Convert them to Markdown image syntax:\n     ![Description]([IMAGE_PLACEHOLDER:image_0.png])\n   - Place images in the appropriate location:\n     * If in the question stem → place in "## Question" section\n     * If in explanations → place in "## Explanation" section\n   - DO NOT remove or ignore image placeholders.\n   - DO NOT replace them with text descriptions.\n   - The system requires these placeholders to work correctly.\n   - Available placeholders: ${dto.imagePlaceholders.join(", ")}`;
+    }
+
+    const prompt = `You are a medical question parser.
+Your task is to convert HTML content (extracted from a DOCX exam question) into
+Markdown that EXACTLY follows the template below.
+
+The frontend parser expects this exact structure:
+- YAML frontmatter with: title, tags, difficulty, correct_answer, question_id
+- "# ..." title line
+- "## Topic: ..." line
+- "## Question" section with the full clinical case / stem
+- "## Options and Explanations" with options A–E in the '**A. text**' format and
+  a '### Choice X Explanation' block for each option
+- A line '**Correct Answer:** X' where X is A–E
+- "## Explanation" section with:
+  - ONE '### Keywords in the Stem to Identify the Correct Option' heading
+  - A bullet list of keywords (each keyword appears only once)
+  - A '---' separator
+- '## Choice-by-Choice Explanations' section with:
+  - Per-option explanations in the form:
+    (Option A) Option A text:
+    explanation...
+
+    (Option B) Option B text:
+    explanation...
+    etc.
+  - AFTER those per-option blocks, include any remaining explanation content
+    such as tables, differential diagnosis tables, and notes as plain markdown
+    (do NOT repeat the keywords heading there).
+
+DO NOT change this structure. Do NOT omit the correct answer.
+
+====================
+HTML CONTENT (SOURCE)
+====================
+${dto.htmlContent}
+${imageNote}
+
+====================
+TEMPLATE FORMAT TO FOLLOW
+====================
+${template}
+
+====================
+CRITICAL INSTRUCTIONS
+====================
+1. FRONTMATTER
+   - Fill in: title, tags, difficulty (easy/medium/hard), correct_answer (A–E), question_id.
+2. QUESTION STEM
+   - Put the full clinical case/question text under '## Question'.
+3. OPTIONS
+   - Extract all options (A–E) and render them exactly as:
+     **A. Option A text**
+     **B. Option B text**
+     ...
+   - For each option, include a '### Choice X Explanation' section immediately after.
+4. CORRECT ANSWER
+   - Determine the correct answer letter (A–E) from the HTML (e.g. "ANSWER: C").
+   - Set it in both:
+     - Frontmatter: correct_answer: C
+     - Body: **Correct Answer:** C
+5. KEYWORDS SECTION (MUST NOT AFFECT OTHER HEADINGS)
+   - Under '## Explanation', include at most ONE heading:
+     '### Keywords in the Stem to Identify the Correct Option'
+   - List each keyword once as a bullet:
+     - **"Keyword"** – explanation
+   - Do NOT repeat the heading or duplicate bullets.
+   - After the keywords list, include a '---' line, then a blank line.
+   - VERY IMPORTANT: Do NOT remove, rename, or merge any other headings
+     from the explanation content (e.g. "Key Concepts", "Additional Content",
+     "Notes", "Tables", "Differential Diagnosis"). Preserve them exactly as
+     they appear in the source, and keep their relative order AFTER the
+     keywords section.
+6. CHOICE-BY-CHOICE EXPLANATIONS (PLACEHOLDER HEADER IS REQUIRED)
+   - You MUST always include a line with exactly:
+     ## Choice-by-Choice Explanations
+     even if the source document does not contain this heading. Without this
+     line the system will fail.
+   - Under '## Choice-by-Choice Explanations', first output the per-option block:
+     (Option A) Option A text:
+     explanation...
+
+     (Option B) Option B text:
+     explanation...
+     etc.
+   - After that per-option block, append all remaining explanation content:
+     - Tables (converted to markdown tables)
+     - Differential diagnosis sections
+     - Notes / key concepts
+   - Do NOT repeat the keywords heading here.${imageInstructions}
+
+Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 4000,
+      });
+
+      
+      const rawMarkdown = completion.choices[0]?.message?.content?.trim() || "";
+      if (!rawMarkdown) {
+        throw new BadRequestException("OpenAI did not return any content");
+      }
+
+      // Log the raw markdown so you can inspect it in the backend terminal
+      // (look for "DOCX->Markdown (raw)" in the NestJS logs).
+      console.log("===== DOCX->Markdown (raw) =====\n", rawMarkdown, "\n===============================");
+      
+      // Check for image placeholders before normalization
+      const placeholderCount = (rawMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
+      console.log(`[Backend] Found ${placeholderCount} image placeholders in raw markdown`);
+
+      let processedMarkdown = normalizeKeywordsSection(rawMarkdown);
+      
+      // Verify placeholders are still present after normalization
+      const placeholderCountAfter = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
+      console.log(`[Backend] Found ${placeholderCountAfter} image placeholders after normalization`);
+      
+      // If placeholders are missing, try to inject them from HTML
+      if (dto.imagePlaceholders && dto.imagePlaceholders.length > 0 && placeholderCountAfter === 0) {
+        console.warn(`[Backend] ⚠️ WARNING: LLM did not include image placeholders. Attempting to inject them from HTML...`);
+        processedMarkdown = injectMissingImagePlaceholders(processedMarkdown, dto.htmlContent, dto.imagePlaceholders);
+        const injectedCount = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
+        console.log(`[Backend] Injected ${injectedCount} image placeholders from HTML`);
+      }
+      
+      return { markdown: processedMarkdown };
+    } catch (error: any) {
+      console.error("OpenAI API error:", error);
+      throw new BadRequestException(
+        `Failed to convert DOCX to Markdown: ${error.message || "Unknown error"}`
+      );
+    }
+  }
+}
+
+/**
+ * Post-process the markdown to:
+ * - Ensure the "Keywords in the Stem..." section appears only once
+ * - De-duplicate keyword bullet lines
+ * - Avoid touching other headings like "Key Concepts", "Notes", etc.
+ */
+function normalizeKeywordsSection(markdown: string): string {
+  const lines = markdown.split("\n");
+  const result: string[] = [];
+  const seenKeywords = new Set<string>();
+
+  let inKeywords = false;
+  let keywordsSectionSeen = false;
+
+  const isKeywordsHeading = (line: string) =>
+    /^###\s+Keywords in the Stem to Identify the Correct Option/i.test(line.trim());
+
+  const isSectionBreak = (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed) return true;
+    if (/^---\s*$/.test(trimmed)) return true;
+    if (/^##\s+/.test(trimmed)) return true;
+    if (/^###\s+/.test(trimmed) && !isKeywordsHeading(trimmed)) return true;
+    return false;
+  };
+
+  // First pass: normalize and deduplicate keywords section
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Start of a keywords heading
+    if (isKeywordsHeading(trimmed)) {
+      // If we've already handled a keywords section, skip this entire duplicate block
+      if (keywordsSectionSeen) {
+        inKeywords = true;
+        // Skip this heading and its bullets
+        continue;
+      }
+
+      // First (and only) keywords section
+      keywordsSectionSeen = true;
+      inKeywords = true;
+      result.push("### Keywords in the Stem to Identify the Correct Option");
+      continue;
+    }
+
+    if (inKeywords) {
+      // If we hit a break, close the keywords block and continue normal copy
+      if (isSectionBreak(line)) {
+        inKeywords = false;
+        // Preserve the break line itself
+        result.push(line);
+        continue;
+      }
+
+      // Handle bullet lines in keywords section
+      if (/^[-*•]\s+/.test(trimmed)) {
+        // Try to extract the quoted keyword text between **"..."**
+        // Examples:
+        // - **"Keyword"** – explanation
+        // - **“Keyword”** – explanation
+        const keywordMatch = trimmed.match(/\*\*["“]?([^"”]+)["”]?\*\*/);
+        const keywordText = keywordMatch ? keywordMatch[1].trim() : trimmed;
+
+        if (!seenKeywords.has(keywordText)) {
+          seenKeywords.add(keywordText);
+          result.push(line);
+        }
+        // Skip duplicate bullets
+        continue;
+      }
+
+      // Any non-bullet non-break line inside keywords: just copy once
+      result.push(line);
+      continue;
+    }
+
+    // Outside keywords block: copy as-is
+    result.push(line);
+  }
+
+  // Second pass: remove duplicated per-option blocks under "## Choice-by-Choice Explanations"
+  const lines2 = result.join("\n").split("\n");
+  const finalLines: string[] = [];
+  let inChoiceSection = false;
+
+  for (let i = 0; i < lines2.length; i++) {
+    const line = lines2[i];
+    const trimmed = line.trim();
+
+    if (/^##\s+Choice-by-Choice Explanations/i.test(trimmed)) {
+      inChoiceSection = true;
+      finalLines.push(line);
+      continue;
+    }
+
+    if (inChoiceSection) {
+      // Skip (Option X) blocks – these are duplicates of the per-choice explanations
+      if (/^\(Option\s+[A-E]\)/i.test(trimmed)) {
+        // Skip this line and following non-empty lines (the explanation paragraph)
+        i++;
+        while (i < lines2.length && lines2[i].trim() !== "") {
+          i++;
+        }
+        // The for-loop will increment i again; adjust
+        i--;
+        continue;
+      }
+
+      // If we hit another section/header, we are out of the choice section
+      if (/^##\s+/.test(trimmed) && !/^##\s+Choice-by-Choice Explanations/i.test(trimmed)) {
+        inChoiceSection = false;
+        finalLines.push(line);
+        continue;
+      }
+
+      // Otherwise, keep whatever remains (e.g. Key Concept, Exam Pearl headings, tables)
+      finalLines.push(line);
+      continue;
+    }
+
+    finalLines.push(line);
+  }
+
+  return finalLines.join("\n");
+}
+
+/**
+ * Inject missing image placeholders into markdown by analyzing HTML source
+ * This is a fallback when LLM doesn't preserve placeholders
+ */
+function injectMissingImagePlaceholders(
+  markdown: string,
+  htmlContent: string,
+  imagePlaceholders: string[]
+): string {
+  // Extract image positions from HTML
+  const imagePositions: Array<{ placeholder: string; context: string; position: number }> = [];
+  
+  for (const placeholder of imagePlaceholders) {
+    const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const imgPattern = new RegExp(`<img[^>]*src=["']\\[IMAGE_PLACEHOLDER:${escapedPlaceholder}\\][^>]*>`, "gi");
+    const matches = Array.from(htmlContent.matchAll(imgPattern));
+    
+    for (const match of matches) {
+      const position = match.index || 0;
+      // Extract surrounding context (50 chars before and after)
+      const contextStart = Math.max(0, position - 50);
+      const contextEnd = Math.min(htmlContent.length, position + match[0].length + 50);
+      const context = htmlContent.substring(contextStart, contextEnd).replace(/<[^>]+>/g, " ").trim();
+      
+      imagePositions.push({
+        placeholder,
+        context: context.substring(0, 100), // Limit context length
+        position,
+      });
+    }
+  }
+  
+  // If no images found in HTML, return markdown as-is
+  if (imagePositions.length === 0) {
+    return markdown;
+  }
+  
+  // Try to find appropriate locations in markdown to inject placeholders
+  // Strategy: Look for sections that might contain images (Question, Explanation sections)
+  let result = markdown;
+  const injected: Set<string> = new Set();
+  
+  for (const imgInfo of imagePositions) {
+    if (injected.has(imgInfo.placeholder)) continue;
+    
+    // Try to find a good location based on context
+    // If context mentions "question", "stem", "case" → inject in Question section
+    // Otherwise → inject in Explanation section
+    
+    const contextLower = imgInfo.context.toLowerCase();
+    let insertionPoint = -1;
+    
+    if (contextLower.includes("question") || contextLower.includes("stem") || contextLower.includes("case") || contextLower.includes("patient")) {
+      // Insert in Question section
+      const questionMatch = result.match(/^##\s+Question\s*$/m);
+      if (questionMatch && questionMatch.index !== undefined) {
+        // Find the end of the question text (before Options section)
+        const questionEnd = result.indexOf("## Options", questionMatch.index);
+        if (questionEnd > questionMatch.index) {
+          insertionPoint = questionEnd;
+        } else {
+          insertionPoint = questionMatch.index + questionMatch[0].length;
+        }
+      }
+    } else {
+      // Insert in Explanation section (after Choice-by-Choice Explanations)
+      const choiceSectionMatch = result.match(/^##\s+Choice-by-Choice Explanations\s*$/m);
+      if (choiceSectionMatch && choiceSectionMatch.index !== undefined) {
+        // Find the end of per-option blocks (look for next ## heading or end of section)
+        let searchStart = choiceSectionMatch.index + choiceSectionMatch[0].length;
+        const nextSectionMatch = result.substring(searchStart).match(/^##\s+/m);
+        if (nextSectionMatch) {
+          insertionPoint = searchStart + nextSectionMatch.index;
+        } else {
+          // Insert at end of Choice-by-Choice section
+          insertionPoint = result.length;
+        }
+      } else {
+        // Fallback: insert at end of Explanation section
+        const explanationMatch = result.match(/^##\s+Explanation\s*$/m);
+        if (explanationMatch && explanationMatch.index !== undefined) {
+          insertionPoint = explanationMatch.index + explanationMatch[0].length;
+        }
+      }
+    }
+    
+    // Insert placeholder if we found a location
+    if (insertionPoint >= 0) {
+      const imageMarkdown = `\n\n![Image]([IMAGE_PLACEHOLDER:${imgInfo.placeholder}])\n\n`;
+      result = result.substring(0, insertionPoint) + imageMarkdown + result.substring(insertionPoint);
+      injected.add(imgInfo.placeholder);
+      console.log(`[Backend] Injected placeholder ${imgInfo.placeholder} at position ${insertionPoint}`);
+    }
+  }
+  
+  // If we still have uninjected placeholders, add them at the end of Explanation section
+  for (const placeholder of imagePlaceholders) {
+    if (!injected.has(placeholder)) {
+      const explanationMatch = result.match(/^##\s+Explanation\s*$/m);
+      if (explanationMatch && explanationMatch.index !== undefined) {
+        // Find end of explanation section
+        let searchStart = explanationMatch.index + explanationMatch[0].length;
+        const nextMajorSection = result.substring(searchStart).match(/^#\s+/m);
+        const insertionPoint = nextMajorSection 
+          ? searchStart + nextMajorSection.index 
+          : result.length;
+        
+        const imageMarkdown = `\n\n![Image]([IMAGE_PLACEHOLDER:${placeholder}])\n\n`;
+        result = result.substring(0, insertionPoint) + imageMarkdown + result.substring(insertionPoint);
+        injected.add(placeholder);
+        console.log(`[Backend] Injected placeholder ${placeholder} at end of Explanation section`);
+      }
+    }
+  }
+  
+  return result;
 }

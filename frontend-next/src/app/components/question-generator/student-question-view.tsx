@@ -162,6 +162,61 @@ export default function StudentQuestionView() {
   const questionPaperQuestionsService = new QuestionPaperQuestionsService()
   const { hasActiveSubscription } = useAccessControl()
 
+  // #region agent log
+  useEffect(() => {
+    const measureLayout = () => {
+      if (typeof window === "undefined") return
+
+      const mainContainer = document.querySelector('[data-testid="student-question-view"]') as HTMLElement | null
+      const header = document.querySelector('[data-testid="student-question-header"]') as HTMLElement | null
+      const contentArea = document.querySelector('[data-testid="student-question-content"]') as HTMLElement | null
+      const grid = document.querySelector('[data-testid="student-question-grid"]') as HTMLElement | null
+      const leftColumn = document.querySelector('[data-testid="student-question-left"]') as HTMLElement | null
+      const navButtons = document.querySelector('[data-testid="student-question-nav"]') as HTMLElement | null
+
+      const measurements = {
+        viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth,
+        mainContainerHeight: mainContainer?.offsetHeight || 0,
+        mainContainerScrollHeight: mainContainer?.scrollHeight || 0,
+        headerHeight: header?.offsetHeight || 0,
+        contentAreaHeight: contentArea?.offsetHeight || 0,
+        contentAreaScrollHeight: contentArea?.scrollHeight || 0,
+        gridHeight: grid?.offsetHeight || 0,
+        gridScrollHeight: grid?.scrollHeight || 0,
+        leftColumnHeight: leftColumn?.offsetHeight || 0,
+        leftColumnScrollHeight: leftColumn?.scrollHeight || 0,
+        navButtonsHeight: navButtons?.offsetHeight || 0,
+        documentScrollY: window.scrollY,
+        documentScrollHeight: document.documentElement.scrollHeight,
+        documentClientHeight: document.documentElement.clientHeight,
+      }
+
+      fetch("http://127.0.0.1:7243/ingest/dd4f1a30-0aa3-4851-b0c4-b4c06fa5c388", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          location: "student-question-view.tsx:measureLayout",
+          message: "Layout measurements",
+          data: measurements,
+          timestamp: Date.now(),
+          sessionId: "debug-session",
+          runId: "run1",
+          hypothesisId: "A,B,C,D,E",
+        }),
+      }).catch(() => {})
+    }
+
+    measureLayout()
+    const timeoutId = setTimeout(measureLayout, 100)
+    window.addEventListener("resize", measureLayout)
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener("resize", measureLayout)
+    }
+  }, [currentQuestionIndex, answered])
+  // #endregion
+
   // Helper function to get URL search params
   const getSearchParams = () => {
     if (typeof window === "undefined") return new URLSearchParams()
@@ -536,8 +591,6 @@ export default function StudentQuestionView() {
 
       // If questionPaperId is provided, load from saved test
       if (questionPaperIdParam) {
-        console.log("📚 Loading questions from saved question paper:", questionPaperIdParam)
-        
         // Fetch question paper questions
         const questionsResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
           questionPaperId: questionPaperIdParam,
@@ -566,13 +619,6 @@ export default function StudentQuestionView() {
         // Sort by order to maintain question sequence
         questionPaperQuestions.sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
         
-        console.log(`📋 Loaded ${questionPaperQuestions.length} question paper questions`)
-        console.log("🔍 Sample question paper question:", questionPaperQuestions[0] ? {
-          questionId: questionPaperQuestions[0].questionId,
-          markedForReview: questionPaperQuestions[0].markedForReview,
-          markedForReviewType: typeof questionPaperQuestions[0].markedForReview,
-        } : "No questions")
-        
         // Extract question IDs and restore answers, marked status, and question paper question IDs
         const questionIds = questionPaperQuestions.map((qpq: any) => qpq.questionId)
         const restoredAnswers: Record<string, string> = {}
@@ -587,14 +633,12 @@ export default function StudentQuestionView() {
           const isMarked = qpq.markedForReview === true || qpq.markedForReview === "true" || qpq.markedForReview === 1
           if (isMarked) {
             restoredMarked.add(qpq.questionId)
-            console.log(`✅ Restored marked status for question ${qpq.questionId} (value: ${qpq.markedForReview}, type: ${typeof qpq.markedForReview})`)
           } else {
             // Explicitly handle false values - question is NOT marked
             const isUnmarked = qpq.markedForReview === false || qpq.markedForReview === "false" || qpq.markedForReview === 0
             if (isUnmarked) {
               // Ensure question is NOT in the marked set (explicitly remove if it was there)
               restoredMarked.delete(qpq.questionId)
-              console.log(`❌ Question ${qpq.questionId} is unmarked (value: ${qpq.markedForReview}, type: ${typeof qpq.markedForReview})`)
             } else if (qpq.markedForReview !== null && qpq.markedForReview !== undefined) {
               // Log unexpected values (neither true nor false)
               console.warn(`⚠️ Unexpected markedForReview value for question ${qpq.questionId}:`, qpq.markedForReview, typeof qpq.markedForReview)
@@ -603,7 +647,6 @@ export default function StudentQuestionView() {
           restoredQPQIds[qpq.questionId] = qpq.id
         })
         
-        console.log(`📌 Restored ${restoredMarked.size} marked questions:`, Array.from(restoredMarked))
         setMarkedQuestions(restoredMarked)
         setQuestionPaperQuestionIds(restoredQPQIds)
         
@@ -621,15 +664,12 @@ export default function StudentQuestionView() {
         })
         
         allQuestions = await Promise.all(questionPromises)
-        console.log(`✅ Loaded ${allQuestions.length} questions from saved test`)
       } else {
         // Original logic for loading from filters or all questions
         const hasFilters = tagIdsParam || systemIdsParam || subjectIdsParam || topicIdsParam
 
         if (hasFilters) {
         // Use filtered questions endpoint
-        console.log("🔍 Loading filtered questions based on test configuration...")
-        
         const filters: any = {}
         if (tagIdsParam) {
           filters.tagIds = tagIdsParam.split(",").filter((id) => id.trim())
@@ -731,14 +771,10 @@ export default function StudentQuestionView() {
         }
       }).filter((q) => q !== null)
       
-      console.log(`✅ Transformed ${transformedQuestions.length} questions successfully`)
-      
       if (transformedQuestions.length === 0) {
-        console.log("⚠️ All questions failed transformation, using demo question")
         setError("Failed to process questions from database. Using demo question.")
         setQuestions([DEMO_QUESTION])
       } else {
-        console.log(`✅ Setting ${transformedQuestions.length} questions`)
         setQuestions(transformedQuestions)
         
         // Check if questionPaperId exists in URL - if so, reload marked status from that paper
@@ -748,8 +784,6 @@ export default function StudentQuestionView() {
         if (existingQuestionPaperIdForCheck) {
           // Reload marked status from the existing question paper
           try {
-            console.log("🔄 Reloading marked status from question paper:", existingQuestionPaperIdForCheck)
-            
             // Fetch all question paper questions with pagination
             let questionPaperQuestions: any[] = []
             let page = 1
@@ -921,7 +955,6 @@ export default function StudentQuestionView() {
           try {
             const user = authService.getCurrentUser()
             if (user && user.id) {
-              console.log("📝 Creating question paper for test session...")
               const questionPaper = await questionPapersService.createQuestionPaper({
                 userId: user.id,
                 name: `Practice Test - ${new Date().toLocaleDateString()}`,
@@ -1179,8 +1212,6 @@ export default function StudentQuestionView() {
       const questionPaperId = params.get("questionPaperId")
       if (!questionPaperId) return
 
-      console.log(`💾 Saving marked status for question ${questionId}: marked=${marked}`)
-
       const qpqId = questionPaperQuestionIds[questionId]
       if (!qpqId) {
         // If question paper question doesn't exist yet, create it
@@ -1240,16 +1271,12 @@ export default function StudentQuestionView() {
         updatePayload.isCorrect = isCorrect
       }
       
-      console.log(`📤 Sending update payload for question ${questionId}:`, updatePayload)
-      
       const updated = await questionPaperQuestionsService.updateQuestionPaperQuestion(qpqId, updatePayload)
-      console.log(`✅ Successfully updated marked status for question ${questionId}: marked=${marked}`, updated)
       
       // Check the returned value from the update
       const returnedMarked = (updated as any)?.markedForReview ?? (updated as any)?.data?.markedForReview
       if (returnedMarked !== undefined) {
         const isMarkedInReturned = returnedMarked === true || returnedMarked === "true" || returnedMarked === 1
-        console.log(`🔍 Update returned markedForReview: ${returnedMarked} (expected: ${marked})`)
         
         // Sync local state with returned value
         setMarkedQuestions((prev) => {
@@ -1276,7 +1303,6 @@ export default function StudentQuestionView() {
         if (verifyArray.length > 0) {
           const latestMarked = verifyArray[0].markedForReview
           const isMarkedInDb = latestMarked === true || latestMarked === "true" || latestMarked === 1
-          console.log(`🔍 Verified marked status for question ${questionId}: ${latestMarked} (expected: ${marked})`)
           
           // Sync local state with database value to ensure consistency
           setMarkedQuestions((prev) => {
@@ -1386,7 +1412,6 @@ export default function StudentQuestionView() {
 
       // Check if we're resuming an existing test
       if (existingQuestionPaperId) {
-        console.log("📝 Updating existing test:", existingQuestionPaperId)
         questionPaperId = existingQuestionPaperId
 
         // Fetch existing question paper questions to get their IDs
@@ -1431,8 +1456,6 @@ export default function StudentQuestionView() {
             .map((qpq: any) => [qpq.questionId || qpq.question?.id, qpq])
         )
 
-        console.log(`🗺️ Built existingQPQMap with ${existingQPQMap.size} entries`)
-        console.log(`📝 Questions to process: ${questions.length}`)
         const questionIdsInMap = Array.from(existingQPQMap.keys())
         const questionIdsToProcess = questions.map(q => q.id)
         const missingFromMap = questionIdsToProcess.filter(id => !questionIdsInMap.includes(id))
@@ -1463,7 +1486,6 @@ export default function StudentQuestionView() {
                 order: index,
                 markedForReview: isMarked, // Explicitly true or false
               })
-              console.log(`💾 End test: Updated question ${question.id} - markedForReview=${isMarked}`)
               return { id: existingQPQ.id, question, success: true }
             } else {
               // Create new question paper question if it doesn't exist
@@ -1482,7 +1504,6 @@ export default function StudentQuestionView() {
                 
                 if (existingQPQFromCheck && existingQPQFromCheck.id) {
                   // It actually exists, update it instead
-                  console.log(`🔄 Found existing question ${question.id} on double-check, updating instead of creating`)
                   const userAnswer = answers[question.id] || null
                   const correctOption = question.options.find((o: any) => o.correct)
                   const isCorrect = userAnswer === correctOption?.value ? true : userAnswer ? false : null
@@ -1496,7 +1517,6 @@ export default function StudentQuestionView() {
                     order: index,
                     markedForReview: isMarked,
                   })
-                  console.log(`💾 End test: Updated question ${question.id} (found on double-check) - markedForReview=${isMarked}`)
                   return { id: existingQPQFromCheck.id, question, success: true }
                 }
               } catch (checkError) {
@@ -1527,7 +1547,6 @@ export default function StudentQuestionView() {
                 timeSpent: timeSpent,
                 markedForReview: isMarked, // Explicitly true or false
               })
-              console.log(`💾 End test: Created and updated question ${question.id} - markedForReview=${isMarked}`)
                 return { id, question, success: true }
               } catch (error: any) {
                 // If question already exists, try to fetch it and update it instead
@@ -1562,7 +1581,6 @@ export default function StudentQuestionView() {
                         order: index,
                         markedForReview: isMarked,
                       })
-                      console.log(`✅ End test: Fetched and updated existing question ${question.id} - markedForReview=${isMarked}`)
                       return { id: existingQPQ.id, question, success: true }
                     } else {
                       console.error(`❌ Could not find existing question paper question for ${question.id} in fetched results`)
@@ -1577,11 +1595,8 @@ export default function StudentQuestionView() {
             }
           })
         )
-
-        console.log(`✅ Updated ${questionUpdates.filter(q => q.success).length} questions in existing test`)
       } else {
         // Create new question paper
-        console.log("📝 Creating new test")
         const questionPaper = await questionPapersService.createQuestionPaper({
           userId: user.id,
           name: `Practice Test - ${new Date().toLocaleDateString()}`,
@@ -1760,8 +1775,8 @@ export default function StudentQuestionView() {
 
 
   return (
-    <div className="h-full bg-background dark:bg-gray-900 flex flex-col">
-      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 dark:border-gray-700/50 bg-card/20 dark:bg-gray-800/50 backdrop-blur-sm">
+    <div className="h-full bg-background dark:bg-gray-900 flex flex-col" data-testid="student-question-view">
+      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 dark:border-gray-700/50 bg-card/20 dark:bg-gray-800/50 backdrop-blur-sm" data-testid="student-question-header">
         <div className="max-w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3 flex-wrap flex-1">
@@ -1830,6 +1845,20 @@ export default function StudentQuestionView() {
               ) : null}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                className="px-3 py-2 rounded-lg border border-border/50 dark:border-gray-600 text-foreground/80 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:border-primary/30 dark:hover:border-blue-500/30 hover:bg-primary/5 dark:hover:bg-blue-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-sm whitespace-nowrap"
+              >
+                ← Previous
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentQuestionIndex === questions.length - 1}
+                className="px-3 py-2 rounded-lg border border-border/50 dark:border-gray-600 text-foreground/80 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:border-primary/30 dark:hover:border-blue-500/30 hover:bg-primary/5 dark:hover:bg-blue-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-sm whitespace-nowrap"
+              >
+                Next →
+              </button>
               <Button
                 onClick={() => setShowEndTestDialog(true)}
                 variant="destructive"
@@ -1922,69 +1951,51 @@ export default function StudentQuestionView() {
         </AlertDialog>
       )}
 
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full grid grid-cols-1 lg:grid-cols-5 gap-3 p-3 lg:p-4">
+      <div className="flex-1 min-h-0 overflow-hidden" data-testid="student-question-content">
+        <div className="h-full min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-3 p-3 lg:p-4" data-testid="student-question-grid">
           {/* Left column - Questions */}
-          <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0">
-            {/* Question Panel - Scrollable */}
-            <div className="overflow-y-auto flex-1 pr-2 mb-3">
-              <div className="animate-fade-in">
-                <QuestionPanel
-                  question={currentQuestion}
-                  selectedAnswer={selectedAnswer}
-                  answered={answered}
-                  onSelectAnswer={handleSelectAnswer}
-                />
-              </div>
-            </div>
-
-            {/* Feedback Box - ALWAYS VISIBLE (outside scroll area) */}
-            {answered && (
-              <div className="flex-shrink-0 mb-3 animate-slide-in-up">
-                <div
-                  className={`p-5 rounded-xl border-l-4 backdrop-blur-sm shadow-md transition-all ${
-                    isCorrect
-                      ? "border-success/70 bg-success/12 dark:bg-success/8"
-                      : "border-destructive/70 bg-destructive/12 dark:bg-destructive/8"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`text-2xl flex-shrink-0 ${isCorrect ? "text-success" : "text-destructive"}`}>
-                      {isCorrect ? "✓" : "✕"}
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <p className={`font-bold text-base ${isCorrect ? "text-success" : "text-destructive"}`}>
-                        {isCorrect ? "Correct!" : "Incorrect"}
-                      </p>
-                      <p className="text-foreground/70 dark:text-gray-300 text-sm">
-                        Correct Answer:{" "}
-                        <span className="font-semibold text-foreground dark:text-gray-100">
-                          {correctAnswerLabel}. {correctAnswerText}
-                        </span>
-                      </p>
+          <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0" data-testid="student-question-left">
+            {/* Question Panel - Scrollable (includes clinical case, options, and feedback) */}
+            <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+              <div className="space-y-3">
+                <div className="animate-fade-in">
+                  <QuestionPanel
+                    question={currentQuestion}
+                    selectedAnswer={selectedAnswer}
+                    answered={answered}
+                    onSelectAnswer={handleSelectAnswer}
+                  />
+                </div>
+                
+                {/* Feedback Box - Inside scrollable area */}
+                {answered && (
+                  <div className="animate-slide-in-up">
+                    <div
+                      className={`p-5 rounded-xl border-l-4 backdrop-blur-sm shadow-md transition-all ${
+                        isCorrect
+                          ? "border-success/70 bg-success/12 dark:bg-success/8"
+                          : "border-destructive/70 bg-destructive/12 dark:bg-destructive/8"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`text-2xl flex-shrink-0 ${isCorrect ? "text-success" : "text-destructive"}`}>
+                          {isCorrect ? "✓" : "✕"}
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <p className={`font-bold text-base ${isCorrect ? "text-success" : "text-destructive"}`}>
+                            {isCorrect ? "Correct!" : "Incorrect"}
+                          </p>
+                          <p className="text-foreground/70 dark:text-gray-300 text-sm">
+                            Correct Answer:{" "}
+                            <span className="font-semibold text-foreground dark:text-gray-100">
+                              {correctAnswerLabel}. {correctAnswerText}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation - Always visible */}
-            <div className="flex-shrink-0 flex flex-col gap-2.5 pt-3 border-t border-border/40 dark:border-gray-700/50">
-              <div className="flex flex-col sm:flex-row gap-2.5">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className="flex-1 px-3 py-2.5 rounded-lg border border-border/50 dark:border-gray-600 text-foreground/80 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:border-primary/30 dark:hover:border-blue-500/30 hover:bg-primary/5 dark:hover:bg-blue-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-sm"
-              >
-                ← Previous
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentQuestionIndex === questions.length - 1}
-                className="flex-1 px-3 py-2.5 rounded-lg border border-border/50 dark:border-gray-600 text-foreground/80 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:border-primary/30 dark:hover:border-blue-500/30 hover:bg-primary/5 dark:hover:bg-blue-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-sm"
-              >
-                Next →
-              </button>
+                )}
               </div>
             </div>
           </div>
@@ -1992,7 +2003,7 @@ export default function StudentQuestionView() {
           {/* Right column - Explanation */}
           <div className="lg:col-span-3 flex flex-col overflow-hidden min-h-0">
             {answered ? (
-              <div className="overflow-y-auto flex-1 pr-2">
+              <div className="flex-1 min-h-0 pr-2">
                 <ExplanationPanel
                   correct={isCorrect}
                   selectedAnswer={selectedAnswer}
@@ -2000,6 +2011,7 @@ export default function StudentQuestionView() {
                   correctAnswerLabel={correctAnswerLabel}
                   options={currentQuestion.options}
                   perAnswerExplanations={currentQuestion.perAnswerExplanations}
+                  chapter={currentQuestion.subject}
                   topic={currentQuestion.topic}
                 />
               </div>

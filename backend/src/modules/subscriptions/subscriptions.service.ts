@@ -563,11 +563,7 @@ export class SubscriptionsService {
         },
       });
 
-      if (cancelledCount.count > 0) {
-        console.log(
-          `Cancelled ${cancelledCount.count} existing ACTIVE subscription(s) for user ${createSubscriptionDto.userId}`
-        );
-      }
+      // Cancelled existing active subscriptions
 
       // Now create the new subscription
       return await tx.subscription.create({
@@ -639,11 +635,7 @@ export class SubscriptionsService {
           },
         });
 
-        if (cancelledCount.count > 0) {
-          console.log(
-            `Cancelled ${cancelledCount.count} existing ACTIVE subscription(s) for user ${subscription.userId} when updating subscription ${id} to ACTIVE`
-          );
-        }
+        // Cancelled existing active subscriptions
 
         // Now update the subscription
         const updateData: any = {};
@@ -814,10 +806,6 @@ export class SubscriptionsService {
         status: "CANCELLED" as any,
       },
     });
-
-    console.log(
-      `✅ Cleaned up ${updateResult.count} duplicate ACTIVE subscription(s) for user ${userId}. Kept subscription ${activeSubscriptions[0].id}`
-    );
 
     return {
       kept: 1,

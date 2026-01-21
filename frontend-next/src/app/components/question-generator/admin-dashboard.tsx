@@ -6,6 +6,8 @@ import { Button } from "@/shared/ui/button"
 import QuestionList from "./question-list"
 import MarkdownUploader from "./markdown-uploader"
 import BulkMarkdownUploader from "./bulk-markdown-uploader"
+import DocxUploader from "./docx-uploader"
+import BulkDocxUploader from "./bulk-docx-uploader"
 import AdminQuestionView from "./admin-question-view"
 import QuestionCreator from "./question-creator/QuestionCreator"
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
@@ -169,6 +171,8 @@ export default function AdminDashboard() {
   const [showNewQuestion, setShowNewQuestion] = useState(false)
   const [showMarkdownUploader, setShowMarkdownUploader] = useState(false)
   const [showBulkUploader, setShowBulkUploader] = useState(false)
+  const [showDocxUploader, setShowDocxUploader] = useState(false)
+  const [showBulkDocxUploader, setShowBulkDocxUploader] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -1299,6 +1303,38 @@ export default function AdminDashboard() {
     setShowNewQuestionMenu(false)
   }
 
+  const handleUploadDocx = () => {
+    setShowDocxUploader(true)
+    setShowBulkDocxUploader(false)
+    setShowMarkdownUploader(false)
+    setShowBulkUploader(false)
+    setShowNewQuestion(false)
+    setParsedMarkdownData(null)
+    setEditingId(null)
+    setViewingId(null)
+    setShowNewQuestionMenu(false)
+  }
+
+  const handleBulkUploadDocx = () => {
+    setShowBulkDocxUploader(true)
+    setShowDocxUploader(false)
+    setShowMarkdownUploader(false)
+    setShowBulkUploader(false)
+    setShowNewQuestion(false)
+    setParsedMarkdownData(null)
+    setEditingId(null)
+    setViewingId(null)
+    setShowNewQuestionMenu(false)
+  }
+
+  const handleDocxParsed = (questionData: any) => {
+    setParsedMarkdownData(questionData)
+    setShowDocxUploader(false)
+    setShowNewQuestion(true)
+    setEditingId(null)
+    setViewingId(null)
+  }
+
   const editingQuestion = editingId ? questions.find((q) => q.id === editingId) : null
   const viewingQuestion = viewingId ? questions.find((q) => q.id === viewingId) : null
   const filteredQuestions = questions.filter((q) => {
@@ -1335,7 +1371,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Search Bar and New Question Button - Only show when viewing list */}
-      {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && !showBulkUploader && (
+      {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader && (
         <div className="space-y-3 mb-4">
           <div className="flex gap-3">
             <Card className="p-4 shadow-md flex-1 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
@@ -1357,18 +1393,21 @@ export default function AdminDashboard() {
               {showNewQuestionMenu && (
                 <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
                   <div className="py-1">
-                    <button
-                      onClick={handleUploadMarkdown}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                    >
-                      📄 Upload Markdown Question
-                    </button>
+                    
                     <button
                       onClick={handleBulkUploadMarkdown}
                       className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
                     >
-                      📚 Bulk Upload Markdown Questions
+                      Upload Markdown Questions
                     </button>
+                    
+                    <button
+                      onClick={handleBulkUploadDocx}
+                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Upload DOCX Questions
+                    </button>
+                    <div className="border-t border-border dark:border-gray-700 my-1"></div>
                     <button
                       onClick={handleCreateManually}
                       className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
@@ -1412,6 +1451,35 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* DOCX Uploader Section */}
+      {showDocxUploader && (
+        <div className="mb-4">
+          <DocxUploader onQuestionParsed={handleDocxParsed} />
+        </div>
+      )}
+
+      {/* Bulk DOCX Uploader Section */}
+      {showBulkDocxUploader && (
+        <div className="mb-4 overflow-y-auto max-h-[calc(100vh-200px)]">
+          <BulkDocxUploader
+            onQuestionsCreated={async (questionIds) => {
+              // Reload questions after bulk creation
+              await loadQuestions()
+              // Optionally show success message
+              alert(`Successfully created ${questionIds.length} question(s)!`)
+            }}
+            onQuestionEdit={(questionId) => {
+              setEditingId(questionId)
+              setShowBulkDocxUploader(false)
+              setShowNewQuestion(false)
+            }}
+            onCancel={() => {
+              setShowBulkDocxUploader(false)
+            }}
+          />
+        </div>
+      )}
+
       {/* Editor, View, or List */}
       {showNewQuestion || editingId ? (
         <div className="flex-1 min-h-0">
@@ -1431,6 +1499,8 @@ export default function AdminDashboard() {
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)
               setShowBulkUploader(false)
+              setShowDocxUploader(false)
+              setShowBulkDocxUploader(false)
               setEditingId(null)
               setViewingId(null)
               setParsedMarkdownData(null)
@@ -1451,7 +1521,7 @@ export default function AdminDashboard() {
           }}
         />
         </div>
-      ) : !showMarkdownUploader && !showBulkUploader ? (
+      ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader ? (
         <div className="flex-1 min-h-0 overflow-y-auto">
           {/* Questions List */}
           {filteredQuestions.length === 0 ? (

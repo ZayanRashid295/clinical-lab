@@ -52,15 +52,15 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
   const processedStem = processStem(displayStem)
 
   return (
-    <Card className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all duration-300 h-full flex flex-col overflow-hidden">
+    <Card className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
       <div className="flex-shrink-0 mb-4">
         <h3 className="text-xs font-bold text-primary/70 dark:text-blue-400 uppercase tracking-widest letter-spacing">
           Clinical Case
         </h3>
       </div>
         
-      {/* Single scrollable container for both question stem and options */}
-      <div className="overflow-y-auto flex-1 min-h-0">
+      {/* Content container (scrolling handled by parent) */}
+      <div className="flex-1 min-h-0">
         <div className="animate-fade-in">
         {/* Render stem blocks if available, otherwise use plain text stem */}
         {hasStemBlocks ? (

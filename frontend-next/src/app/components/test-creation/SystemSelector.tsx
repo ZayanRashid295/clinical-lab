@@ -112,9 +112,7 @@ export function SystemSelector({
         const pool = selectedPool ? selectedPool as "unused" | "incorrect" | "correct" | "omitted" : undefined;
         // Explicitly pass marked parameter: true when enabled, undefined when disabled (to show all)
         const markedParam = isMarked ? true : undefined;
-        console.log(`📊 SystemSelector - Fetching with pool=${pool}, marked=${markedParam}, isMarked=${isMarked}`);
         const data = await questionsService.getTestCreationData({ pool, marked: markedParam });
-        console.log(`📊 SystemSelector - Received systems:`, data.systems.map(s => ({ name: s.name, count: s.count })));
 
         // Use backend data directly - backend handles all filtering logic including marked filter
         // for all question modes (unused, incorrect, correct, omitted)
@@ -403,7 +401,7 @@ export function SystemSelector({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <h3 className="text-sm font-medium text-foreground dark:text-gray-100">Chapters</h3>
+            <h3 className="text-sm font-medium text-foreground dark:text-gray-100">Systems</h3>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
             <span className="text-xs text-muted-foreground dark:text-gray-400">All</span>
@@ -535,7 +533,7 @@ export function SystemSelector({
 
       <div className="px-4 py-2.5 border-t border-border/50 dark:border-gray-700/50 shrink-0 bg-muted/30 dark:bg-gray-700/30">
         <p className="text-xs text-muted-foreground dark:text-gray-400">
-          <span className="font-medium text-foreground dark:text-gray-100">{selectedSubjects.length}</span> of {allSubjects.length} chapters
+          <span className="font-medium text-foreground dark:text-gray-100">{selectedSubjects.length}</span> of {allSubjects.length} systems
           selected
           {selectedTopics.length > 0 && <span className="ml-2 text-primary dark:text-blue-400">({selectedTopics.length} topics)</span>}
         </p>

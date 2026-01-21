@@ -13,14 +13,6 @@ export * from "./payments/payments.types";
 export { UsersService } from "./users/users.service";
 export * from "./users/users.types";
 
-// TODO: Add other services as they are created
-// export { payoutsService, PayoutsService } from "./payouts/payouts.service";
-// export { fleetService, FleetService } from "./fleet/fleet.service";
-// export { locationsService, LocationsService } from "./locations/locations.service";
-// export { chatService, ChatService } from "./chat/chat.service";
-// export { notificationsService, NotificationsService } from "./notifications/notifications.service";
-// export { adminService, AdminService } from "./admin/admin.service";
-
 // Re-import for the api object
 import { paymentsService } from "./payments/payments.service";
 import { authService } from "../../shared/services/auth.service";
@@ -29,5 +21,4 @@ import { authService } from "../../shared/services/auth.service";
 export const api = {
   auth: authService,
   payments: paymentsService,
-  // TODO: Add other services
 };

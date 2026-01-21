@@ -82,13 +82,8 @@ export class PaymentsController {
     description: "Payment methods retrieved successfully",
   })
   async getPaymentMethods(@Query("userId") userId?: string) {
-    console.log(
-      "🔍 PaymentsController.getPaymentMethods called with userId:",
-      userId
-    );
     try {
       const result = await this.paymentsService.getPaymentMethods(userId);
-      console.log("🔍 Controller returning result:", result);
       return result;
     } catch (error) {
       console.error("❌ Controller error:", error);

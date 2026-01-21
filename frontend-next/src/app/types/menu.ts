@@ -26,18 +26,36 @@ export interface MenuPermissions {
 export function getMenuItemsForRole(userRoles: string[]): MenuItem[] {
   if (!userRoles || userRoles.length === 0) return [];
 
-  return MENU_CONFIG.items
+  // Normalize roles to string array
+  const normalizedRoles = userRoles.map((role: any) => 
+    typeof role === 'string' ? role : role.role?.name || role.name || role
+  ).filter(Boolean);
+
+  // SUPERADMIN has access to everything - return all menu items
+  if (normalizedRoles.includes('SUPERADMIN')) {
+    return MENU_CONFIG.items.map((item) => ({
+      ...item,
+      submenu: item.submenu || null, // Include all submenu items for SUPERADMIN
+    }));
+  }
+
+  // For other roles (including ADMIN), filter based on role permissions
+  const filteredItems = MENU_CONFIG.items
     .filter((item) => {
-      return item.roles.some((role) => userRoles.includes(role));
+      const hasAccess = item.roles.some((role) => normalizedRoles.includes(role));
+      return hasAccess;
     })
     .map((item) => ({
       ...item,
       submenu: item.submenu
-        ? item.submenu.filter((subItem) =>
-            subItem.roles.some((role) => userRoles.includes(role))
-          )
+        ? item.submenu.filter((subItem) => {
+            const hasSubAccess = subItem.roles.some((role) => normalizedRoles.includes(role));
+            return hasSubAccess;
+          })
         : null,
     }));
+
+  return filteredItems;
 }
 
 export function hasPermission(

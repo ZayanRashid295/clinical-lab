@@ -207,15 +207,25 @@ export function parseMarkdown(content: string): ParsedQuestion {
       const optionMatch = line.match(/^\*?\*?([A-E])\.\*?\*?\s+(.+)/)
       if (optionMatch) {
         const label = optionMatch[1]
-        const text = optionMatch[2]
+        let text = optionMatch[2]
           .replace(/\*\*/g, "")
           .replace(/$$.*?%$$/g, "") // Remove percentages
           .trim()
+        
+        // Check if option text contains indicators of correct answer
+        const hasCheckmark = text.includes("✅")
+        const isMarkedCorrect = text.match(/\(correct\)/i)
+        
         questionData.options?.push({
           label,
-          text,
-          correct: label === questionData.correctAnswer,
+          text: text.replace(/✅/g, "").replace(/\(correct\)/gi, "").trim(),
+          correct: label === questionData.correctAnswer || hasCheckmark || !!isMarkedCorrect,
         })
+        
+        // If this option is marked as correct and we don't have a correct answer yet, set it
+        if ((hasCheckmark || isMarkedCorrect) && !questionData.correctAnswer) {
+          questionData.correctAnswer = label
+        }
         
         // Check for inline per-answer explanation right after this option
         // Look for "### Choice [A-E] Explanation" on the next non-empty line
@@ -275,22 +285,54 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
 
     // Extract correct answer (various formats)
-    if (
-      (line.includes("Correct Answer:") || line.includes("✅") || line.includes("**Correct Answer:**")) &&
-      !questionData.correctAnswer
-    ) {
-      const match = line.match(/[A-E]/)
-      if (match) {
-        questionData.correctAnswer = match[0]
-        if (questionData.options && questionData.options.length > 0) {
-          questionData.options = questionData.options.map((opt) => ({
-            ...opt,
-            correct: opt.label === match[0],
-          }))
+    if (!questionData.correctAnswer) {
+      // Pattern 1: "Correct Answer: C" or "**Correct Answer:** C"
+      if (line.includes("Correct Answer:") || line.includes("**Correct Answer:**")) {
+        const match = line.match(/[A-E]/i)
+        if (match) {
+          questionData.correctAnswer = match[0].toUpperCase()
+          if (questionData.options && questionData.options.length > 0) {
+            questionData.options = questionData.options.map((opt) => ({
+              ...opt,
+              correct: opt.label === questionData.correctAnswer,
+            }))
+          }
+          i++
+          continue
         }
       }
-      i++
-      continue
+      
+      // Pattern 2: "ANSWER: C" or "Answer: C"
+      if (line.match(/^(?:ANSWER|Answer):\s*([A-E])/i)) {
+        const match = line.match(/^(?:ANSWER|Answer):\s*([A-E])/i)
+        if (match) {
+          questionData.correctAnswer = match[1].toUpperCase()
+          if (questionData.options && questionData.options.length > 0) {
+            questionData.options = questionData.options.map((opt) => ({
+              ...opt,
+              correct: opt.label === questionData.correctAnswer,
+            }))
+          }
+          i++
+          continue
+        }
+      }
+      
+      // Pattern 3: "The correct answer is C" or "Correct option is C"
+      if (line.match(/(?:correct|right)\s+(?:answer|option|choice)\s+is\s+([A-E])/i)) {
+        const match = line.match(/(?:correct|right)\s+(?:answer|option|choice)\s+is\s+([A-E])/i)
+        if (match) {
+          questionData.correctAnswer = match[1].toUpperCase()
+          if (questionData.options && questionData.options.length > 0) {
+            questionData.options = questionData.options.map((opt) => ({
+              ...opt,
+              correct: opt.label === questionData.correctAnswer,
+            }))
+          }
+          i++
+          continue
+        }
+      }
     }
 
     if (line.startsWith("## Explanation") && !line.startsWith("### Explanation") && !line.match(/^## Choice/)) {
@@ -579,10 +621,115 @@ export function parseMarkdown(content: string): ParsedQuestion {
     )
   }
 
+  // Try to infer correct answer if not explicitly set
+  if (!questionData.correctAnswer) {
+    // Method 1: Check if any option is marked as correct
+    const correctOption = questionData.options.find((opt) => opt.correct)
+    if (correctOption) {
+      questionData.correctAnswer = correctOption.label
+      console.log(`[parseMarkdown] Inferred correct answer from option flag: ${questionData.correctAnswer}`)
+    } else {
+      // Method 2: Check for visual markers in option text
+      for (const opt of questionData.options) {
+        if (opt.text && (opt.text.includes("✅") || opt.text.match(/\(correct\)/i))) {
+          questionData.correctAnswer = opt.label
+          console.log(`[parseMarkdown] Inferred correct answer from option marker: ${questionData.correctAnswer}`)
+          break
+        }
+      }
+    }
+    
+    // Method 3: Analyze per-answer explanations to infer correct answer
+    if (!questionData.correctAnswer && questionData.perAnswerExplanations) {
+      const explanationScores: Record<string, number> = {}
+      
+      // Score each option based on explanation characteristics
+      for (const [label, blocks] of Object.entries(questionData.perAnswerExplanations)) {
+        if (!Array.isArray(blocks)) continue
+        
+        let score = 0
+        const explanationText = blocks
+          .map((block: any) => {
+            if (block.type === 'text' && block.data?.markdown) return block.data.markdown
+            if (block.type === 'text' && block.data?.content) return block.data.content
+            return ''
+          })
+          .join(' ')
+          .toLowerCase()
+        
+        // Positive indicators (correct answer)
+        if (explanationText.includes('correct') || explanationText.includes('right answer')) score += 10
+        if (explanationText.includes('gold standard') || explanationText.includes('definitive')) score += 8
+        if (explanationText.includes('is the answer') || explanationText.includes('is correct')) score += 7
+        if (explanationText.includes('most likely') || explanationText.includes('best answer')) score += 5
+        if (explanationText.length > 200) score += 3 // Longer explanations often indicate correct answer
+        
+        // Negative indicators (incorrect answer)
+        if (explanationText.includes('incorrect') || explanationText.includes('wrong')) score -= 5
+        if (explanationText.includes('is not') || explanationText.includes('does not')) score -= 3
+        if (explanationText.includes('cannot') || explanationText.includes('unlikely')) score -= 2
+        
+        explanationScores[label] = score
+      }
+      
+      // Find option with highest score
+      const sortedScores = Object.entries(explanationScores).sort((a, b) => b[1] - a[1])
+      if (sortedScores.length > 0 && sortedScores[0][1] > 0) {
+        questionData.correctAnswer = sortedScores[0][0]
+        console.log(`[parseMarkdown] Inferred correct answer from explanation analysis: ${questionData.correctAnswer} (score: ${sortedScores[0][1]})`)
+      }
+    }
+    
+    // Method 4: Check main explanation for answer hints
+    if (!questionData.correctAnswer && questionData.mainExplanation && questionData.mainExplanation.length > 0) {
+      const mainText = questionData.mainExplanation
+        .map((block: any) => {
+          if (block.type === 'text' && block.data?.markdown) return block.data.markdown
+          if (block.type === 'text' && block.data?.content) return block.data.content
+          return ''
+        })
+        .join(' ')
+        .toLowerCase()
+      
+      // Look for patterns like "Option C is correct" or "Answer is C"
+      const answerPatterns = [
+        /(?:option|answer|correct)\s+([a-e])/gi,
+        /([a-e])\s+(?:is|are)\s+(?:correct|the answer|right)/gi,
+      ]
+      
+      for (const pattern of answerPatterns) {
+        const match = mainText.match(pattern)
+        if (match) {
+          const letter = match[0].match(/[a-e]/i)?.[0]?.toUpperCase()
+          if (letter && ['A', 'B', 'C', 'D', 'E'].includes(letter)) {
+            questionData.correctAnswer = letter
+            console.log(`[parseMarkdown] Inferred correct answer from main explanation: ${questionData.correctAnswer}`)
+            break
+          }
+        }
+      }
+    }
+    
+    // Method 5: Last resort - use first option (better than failing)
+    if (!questionData.correctAnswer && questionData.options && questionData.options.length > 0) {
+      questionData.correctAnswer = questionData.options[0].label
+      console.warn(`[parseMarkdown] ⚠️ Could not determine correct answer, defaulting to first option: ${questionData.correctAnswer}`)
+    }
+  }
+
+  // Final validation - should not reach here if all methods above worked
   if (!questionData.correctAnswer) {
     throw new Error(
-      'Invalid markdown format: Missing correct answer indicator. Please include "Correct Answer: X" where X is A, B, C, D, or E.',
+      'Invalid markdown format: Missing correct answer indicator. Please include "Correct Answer: X" where X is A, B, C, D, or E, or set correct_answer in the frontmatter.',
     )
+  }
+  
+  // Ensure the correct option is marked
+  if (questionData.options && questionData.correctAnswer) {
+    questionData.options = questionData.options.map((opt) => ({
+      ...opt,
+      correct: opt.label === questionData.correctAnswer,
+    }))
   }
 
   // Final cleanup: Remove any remaining question ID patterns from stem text

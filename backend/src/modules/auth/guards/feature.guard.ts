@@ -38,6 +38,17 @@ export class FeatureGuard implements CanActivate {
       throw new ForbiddenException('User ID not found');
     }
 
+    // Get user roles from request
+    const userRoles = user.roles || [];
+    const userRoleNames = userRoles.map((role: any) => 
+      typeof role === 'string' ? role : role.name || role.role?.name
+    ).filter(Boolean);
+
+    // ADMIN and SUPERADMIN bypass feature checks
+    if (userRoleNames.includes('ADMIN') || userRoleNames.includes('SUPERADMIN')) {
+      return true;
+    }
+
     // Get user's active features
     const userFeatures = await this.subscriptionsService.getUserActiveFeatures(
       userId
@@ -60,6 +71,8 @@ export class FeatureGuard implements CanActivate {
     return true;
   }
 }
+
+
 
 
 

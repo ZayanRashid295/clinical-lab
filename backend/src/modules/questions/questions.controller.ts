@@ -36,6 +36,7 @@ import { UpdateQuestionChoiceDto } from "./dto/update-question-choice.dto";
 import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { FilteredQuestionsDto } from "./dto/filtered-questions.dto";
+import { ConvertDocxDto } from "./dto/convert-docx.dto";
 
 @ApiTags("questions")
 @Controller("questions")
@@ -236,7 +237,6 @@ export class QuestionsController {
     } else if (marked === "false") {
       markedBool = false;
     }
-    console.log(`🔍 Controller - Received: pool=${pool}, marked=${marked} (parsed: ${markedBool})`);
     return this.questionsService.getTestCreationData({
       pool: pool as "unused" | "marked" | "incorrect" | "correct" | "omitted" | undefined,
       marked: markedBool,
@@ -265,6 +265,7 @@ export class QuestionsController {
       marked: query.marked,
       limit: query.limit,
       userId: req.user?.userId,
+      userRoles: req.user?.roles || [], // Pass user roles to bypass subscription checks for ADMIN/SUPERADMIN
     });
   }
 
@@ -408,5 +409,25 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.questionsService.uploadImage(file);
+  }
+
+  @Post("convert-docx-to-markdown")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Convert DOCX text content to Markdown using OpenAI" })
+  @ApiResponse({
+    status: 200,
+    description: "Markdown generated successfully",
+    schema: {
+      type: "object",
+      properties: {
+        markdown: { type: "string" },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: "Invalid request or OpenAI error" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async convertDocxToMarkdown(@Body() dto: ConvertDocxDto) {
+    return this.questionsService.convertDocxToMarkdown(dto);
   }
 }

@@ -603,7 +603,12 @@ export default function RichTextEditor({
       // This catches cases where HTML was parsed but marks weren't applied
       // IMPORTANT: This pass specifically handles table cells which might need special treatment
       setTimeout(() => {
-        const editorDOM = editor.view.dom
+        // Editor might be destroyed or not yet mounted at this point
+        if (!editor || !(editor as any).view || (editor as any).isDestroyed) {
+          return
+        }
+
+        const editorDOM = (editor as any).view.dom as HTMLElement
         const elementsWithFontSize = editorDOM.querySelectorAll('[class*="tiptap-fs-"]')
         
         // Also check for font size classes within table cells in the DOM

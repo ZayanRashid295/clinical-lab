@@ -788,13 +788,7 @@ export class PaymentsService {
 
   // Payment Methods methods
   async getPaymentMethods(userId?: string) {
-    console.log(
-      "🔍 PaymentService.getPaymentMethods called with userId:",
-      userId
-    );
-
     const where = userId ? { userId } : {};
-    console.log("🔍 Where clause:", where);
 
     try {
       const result = await this.prisma.paymentMethod.findMany({
@@ -812,9 +806,6 @@ export class PaymentsService {
         },
         orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
       });
-
-      console.log("🔍 Payment methods found:", result.length);
-      console.log("🔍 Result:", result);
 
       return result;
     } catch (error) {

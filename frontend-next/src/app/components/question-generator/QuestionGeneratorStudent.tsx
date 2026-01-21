@@ -11,7 +11,7 @@ export default function QuestionGeneratorStudent() {
     router.push("/question-generator")
   }
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background dark:from-gray-900 via-background dark:via-gray-900 to-background/95 dark:to-gray-900/95">
+    <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-background dark:from-gray-900 via-background dark:via-gray-900 to-background/95 dark:to-gray-900/95">
       <div className="flex-shrink-0 bg-card/40 dark:bg-gray-800/40 backdrop-blur-xl border-b border-border/40 dark:border-gray-700/50 shadow-sm">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
           <button
@@ -37,7 +37,7 @@ export default function QuestionGeneratorStudent() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <StudentQuestionView />
       </div>
     </div>

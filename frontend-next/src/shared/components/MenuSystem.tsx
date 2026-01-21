@@ -45,8 +45,20 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     const currentUser = authService.getCurrentUser();
     if (currentUser) {
       setUser(currentUser);
+      
+      // Extract roles - handle both string array and object array formats
+      let userRoles: string[] = [];
+      if (currentUser.roles) {
+        if (Array.isArray(currentUser.roles)) {
+          userRoles = currentUser.roles.map((role: any) => 
+            typeof role === 'string' ? role : role.role?.name || role.name || role
+          ).filter(Boolean);
+        }
+      }
+      
       const filteredMenuItems =
-        customMenuItems || getMenuItemsForRole(currentUser.roles || []);
+        customMenuItems || getMenuItemsForRole(userRoles);
+      
       setMenuItems(filteredMenuItems);
     }
   }, [customMenuItems]);
@@ -176,7 +188,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   const handleLogout = async () => {
     try {
       await authService.logout();
-      console.log("Logout successful, redirecting to landing page");
       router.replace("/landing-page");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -263,7 +274,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         searchPlaceholder={searchPlaceholder}
         onSearch={(query) => {
           // Handle search functionality
-          console.log("Search query:", query);
         }}
         onLogout={handleLogout}
       >

@@ -1,16 +1,5 @@
 import { ContentRegistry } from "../types/dashboard";
 
-// Helper function to create a content registry
-// export const createContentRegistry = (
-//   config: Partial<ContentRegistry> = {}
-// ): ContentRegistry => {
-//   return {
-//     content: config.content || {},
-//     dashboards: config.dashboards || {},
-//     defaultContent: config.defaultContent,
-//   };
-// };
-
 // Import ride-sharing specific components
 import PaymentHistoryContent from "../components/Content/PaymentHistoryContent";
 import PaymentMethodsContent from "../components/Content/PaymentMethodsContent";
@@ -35,7 +24,6 @@ import QuestionPaperManagementContent from "../components/Content/QuestionPaperM
 import QuestionPaperQuestionManagementContent from "../components/Content/QuestionPaperQuestionManagementContent";
 import QuestionManagementContent from "../components/Content/QuestionManagementContent";
 import QuestionChoiceManagementContent from "../components/Content/QuestionChoiceManagementContent";
-// import TwoTablesWithPagination from "../components/Content/TwoTablesWithPagination";
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
 // Import study components
@@ -51,27 +39,14 @@ import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
 import EnhancedQuestionBuilder from "../components/test-creation/EnhancedQuestionBuilder";
 import NewQuestionBuilder from "../components/test-creation/NewQuestionBuilder";
 
-// Import dashboard - using TestCreationPage as the main dashboard
-
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
-
-// Import zoom simulation components
-// import ZoomSimulation from "../components/zoom-simulation/zoom-simulation"; // Component not found
-
-// Import robotic components
-// import RobotFace from "../components/robotic/RobotFace"; // Component not found
 
 // Import question generator components
 import QuestionGeneratorPage from "../components/question-generator/QuestionGeneratorPage";
 import QuestionGeneratorStudent from "../components/question-generator/QuestionGeneratorStudent";
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
 import MySubscriptionPage from "../components/Subscriptions/MySubscriptionPage";
-
-// Import development components
-// import MenuManager from "../components/Development/MenuManager"; // Component not found - exists as page
-// import RefDesign from "../components/Development/ref-design"; // Component not found - exists as page
-// import AdvDbView from "../components/Development/AdvDbView"; // Component not found
 import OrgChartView from "../components/OrgChart/OrgChartView";
 
 // Import placeholder components

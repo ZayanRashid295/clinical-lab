@@ -943,18 +943,11 @@ export class AssessmentsService {
       );
     }
 
-    console.log(`🔧 Backend: Updating question paper question ${questionPaperQuestionId}`);
-    console.log(`📥 Received update data:`, updateQuestionPaperQuestionDto);
-    console.log(`📊 Current markedForReview value:`, questionPaperQuestion.markedForReview);
-
     // Ensure markedForReview is explicitly updated when provided (including false)
     // This ensures that unmarking a question (setting to false) properly updates the database
     const updateData: any = { ...updateQuestionPaperQuestionDto };
     if (updateQuestionPaperQuestionDto.markedForReview !== undefined) {
       updateData.markedForReview = updateQuestionPaperQuestionDto.markedForReview;
-      console.log(`✅ Setting markedForReview to: ${updateData.markedForReview} (type: ${typeof updateData.markedForReview})`);
-    } else {
-      console.log(`⚠️ markedForReview is undefined, not updating`);
     }
 
     const updated = await this.prisma.questionPaperQuestion.update({
@@ -969,9 +962,6 @@ export class AssessmentsService {
         },
       },
     });
-
-    console.log(`✅ Backend: Updated question paper question ${questionPaperQuestionId}`);
-    console.log(`📊 New markedForReview value:`, updated.markedForReview);
 
     return updated;
   }

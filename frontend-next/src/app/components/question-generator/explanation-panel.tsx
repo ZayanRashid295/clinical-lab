@@ -26,7 +26,7 @@ export default function ExplanationPanel({
   topic,
 }: ExplanationPanelProps) {
   return (
-    <div className="animate-fade-in flex flex-col h-full overflow-hidden">
+    <div className="animate-fade-in flex flex-col h-full min-h-0 overflow-hidden">
       <Card className="shadow-md overflow-hidden flex-1 flex flex-col bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm border border-border/40 dark:border-gray-700 rounded-xl hover:shadow-lg transition-all duration-300 min-h-0">
         <div className="border-b border-border/40 dark:border-gray-700/50 px-6 py-4 flex-shrink-0">
           <h2 className="text-lg font-bold text-primary dark:text-blue-400 tracking-wide uppercase letter-spacing">Explanation</h2>
