@@ -506,25 +506,58 @@ export function parseMarkdown(content: string): ParsedQuestion {
       continue
     }
 
-    // After per-answer explanations, collect any remaining content (like "## Management Approach")
+    // After per-answer explanations, collect any remaining content (like "## Management Approach", "**Key Concept**", tables, images, "**Notes**")
     // and add it to the main explanation
     // This should run after we've seen the per-answer section and processed all per-answer explanations
     const hasPerAnswerSection = seenPerAnswerSection
     const hasPerAnswerExplanations = questionData.perAnswerExplanations && Object.keys(questionData.perAnswerExplanations).length > 0
     
+    // Check if we're past the per-answer explanations and should collect remaining content
+    // This includes: section headers, bold text like "**Key Concept**", tables, images, notes, etc.
     if (hasPerAnswerSection && hasPerAnswerExplanations) {
       // Check if this is additional content that should be added to main explanation
-      // (e.g., "## Management Approach", "## Additional Notes", etc.)
-      // Must be a section header (## or ###) that's not Explanation, Choice-by-Choice, Clinical Case, Question, Stem, or Topic
-      // And not a per-answer explanation header
+      // This can be:
+      // 1. A section header (## or ###) that's not Explanation, Choice-by-Choice, Clinical Case, Question, Stem, or Topic
+      // 2. Content after per-answer explanations (like "**Key Concept**", tables, images, "**Notes**")
+      // 3. Per-answer explanation blocks like "(Option A) ..." that haven't been processed yet
+      
+      // Note: line is already trimmed in the main loop (line 76: const line = lines[i].trim())
+      // First, check if this is a per-answer explanation block in the old format "(Option X) ..."
+      const isPerAnswerBlock = line.match(/^\(Option\s+([A-E])\)/i)
+      if (isPerAnswerBlock) {
+        // Skip these - they're duplicates of inline per-answer explanations
+        i++
+        continue
+      }
+      
+      // Check if this is a section header
       const isSectionHeader = line.match(/^##+\s+/)
       const isExcludedSection = line.match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)
       const isPerAnswerHeader = line.match(/^###\s+(Explanation|Choice)\s+[A-E]/i)
       const isAdditionalSection = isSectionHeader && !isExcludedSection && !isPerAnswerHeader
       
-      if (isAdditionalSection) {
+      // Check if this is content that should be collected (not already processed)
+      // This includes: bold text, tables, images, regular text, section headers, etc.
+      // We want to collect ANY content after per-answer explanations (except excluded sections and per-answer blocks)
+      // Note: line is already trimmed, so we can use it directly
+      const isCollectableContent = line && 
+        !isExcludedSection && 
+        !isPerAnswerHeader &&
+        !line.match(/^\(Option\s+[A-E]\)/i) && // Not a per-answer block
+        !line.match(/^\*End of test question/i) && // Not end marker
+        !line.match(/^Correct Answer:/i) // Not correct answer line (already processed)
+      
+      // Collect content if:
+      // 1. It's a section header (## or ###) that's additional content, OR
+      // 2. It's any collectable content and we haven't collected additional content yet
+      // We need to collect everything after per-answer explanations until end of file or new major section
+      const shouldCollect = (isAdditionalSection || isCollectableContent) && !questionData._additionalContentCollected
+      
+      if (shouldCollect) {
         let additionalContent = ""
         let j = i
+        let startedCollecting = false
+        
         // Collect all content until end of file, end marker, or another major section
         while (
           j < lines.length &&
@@ -532,13 +565,27 @@ export function parseMarkdown(content: string): ParsedQuestion {
           !lines[j].trim().match(/^###\s+(Explanation|Choice)\s+[A-E]/i) &&
           !lines[j].trim().match(/^\*End of test question/i)
         ) {
-          additionalContent += lines[j] + "\n"
+          const currentLine = lines[j].trim()
+          // Skip per-answer blocks in old format
+          if (!currentLine.match(/^\(Option\s+[A-E]\)/i)) {
+            additionalContent += lines[j] + "\n"
+            startedCollecting = true
+          }
           j++
         }
+        
         // Insert additional content AFTER the per-answer-explanation placeholder
-        if (additionalContent.trim()) {
+        if (additionalContent.trim() && startedCollecting) {
           const existingExplanation = questionData.mainExplanation || []
           const additionalBlocks = convertMarkdownToExplanationBlocks(additionalContent.trim())
+          
+          console.log("[MarkdownParser] Collecting additional content after per-answer explanations:", {
+            startLine: i,
+            endLine: j - 1,
+            contentLength: additionalContent.length,
+            blockCount: additionalBlocks.length,
+            firstFewLines: additionalContent.split("\n").slice(0, 5).join(" | "),
+          })
           
           // Find the placeholder block index
           const placeholderIndex = existingExplanation.findIndex(
@@ -565,8 +612,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
             }
             
             questionData.mainExplanation = existingExplanation
+            questionData._additionalContentCollected = true // Mark that we've collected additional content
+            
+            console.log("[MarkdownParser] Successfully inserted additional content:", {
+              placeholderIndex,
+              insertIndex,
+              totalBlocks: existingExplanation.length,
+              insertedBlocks: additionalBlocks.length,
+            })
           } else {
-            // Fallback: if no placeholder found, append to end (shouldn't happen normally)
+            // Fallback: if no placeholder found, append to end
             const maxOrder = existingExplanation.length > 0 
               ? Math.max(...existingExplanation.map((b: any) => typeof b.order === "number" ? b.order : 0))
               : -1
@@ -575,17 +630,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
             })
             
             questionData.mainExplanation = [...existingExplanation, ...additionalBlocks]
+            questionData._additionalContentCollected = true
             
             // Debug: Log when additional content is found (fallback case)
             if (process.env.NODE_ENV === "development") {
-              console.log("[MarkdownParser] Inline: Found additional content but no placeholder found (fallback):", {
+              console.log("[MarkdownParser] Found additional content but no placeholder found (fallback):", {
                 section: line.trim(),
                 startLine: i,
                 endLine: j - 1,
                 blockCount: additionalBlocks.length,
                 firstBlockType: additionalBlocks[0]?.type,
-                maxOrder,
-                newOrders: additionalBlocks.map((b: any) => b.order),
               })
             }
           }
