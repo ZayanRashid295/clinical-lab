@@ -2098,8 +2098,9 @@ and notes as plain markdown.>`;
     }
 
     const prompt = `You are a medical question parser.
-Your task is to convert HTML content (extracted from a DOCX exam question) into
-Markdown that EXACTLY follows the template below.
+Your task is to perform a **faithful, structure-preserving conversion** of HTML
+content (extracted from a DOCX exam question) into Markdown that EXACTLY follows
+the template below.
 
 The frontend parser expects this exact structure:
 - YAML frontmatter with: title, tags, difficulty, correct_answer, question_id
@@ -2122,7 +2123,7 @@ The frontend parser expects this exact structure:
     explanation...
     etc.
   - AFTER those per-option blocks, include any remaining explanation content
-    such as tables, differential diagnosis tables, and notes as plain markdown
+    such as tables, or simple text content as plain markdown
     (do NOT repeat the keywords heading there).
 
 DO NOT change this structure. Do NOT omit the correct answer.
@@ -2156,41 +2157,95 @@ CRITICAL INSTRUCTIONS
    - Set it in both:
      - Frontmatter: correct_answer: C
      - Body: **Correct Answer:** C
-5. KEYWORDS SECTION (MUST NOT AFFECT OTHER HEADINGS)
-   - Under '## Explanation', include at most ONE heading:
-     '### Keywords in the Stem to Identify the Correct Option'
-   - List each keyword once as a bullet:
-     - **"Keyword"** – explanation
-   - Do NOT repeat the heading or duplicate bullets.
-   - After the keywords list, include a '---' line, then a blank line.
-   - VERY IMPORTANT: Do NOT remove, rename, or merge any other headings
-     from the explanation content (e.g. "Key Concepts", "Additional Content",
-     "Notes", "Tables", "Differential Diagnosis"). Preserve them exactly as
-     they appear in the source, and keep their relative order AFTER the
-     keywords section.
-6. CHOICE-BY-CHOICE EXPLANATIONS (PLACEHOLDER HEADER IS REQUIRED)
-   - You MUST always include a line with exactly:
-     ## Choice-by-Choice Explanations
-     even if the source document does not contain this heading. Without this
-     line the system will fail.
-   - Under '## Choice-by-Choice Explanations', first output the per-option block:
-     (Option A) Option A text:
-     explanation...
+5. EXPLANATION SECTION LAYOUT (MUST INCLUDE ALL CONTENT, NOTHING DROPPED)
+   - Under '## Explanation', build the content in **this exact order**:
+     
+     STEP 1 – CHOICE-BY-CHOICE EXPLANATIONS PLACEHOLDER (FIRST)
+     - As the very first line under '## Explanation', you MUST include:
+       ## Choice-by-Choice Explanations
+     - This is a placeholder header that the system requires. Without this
+       line the system will fail.
+     - Under '## Choice-by-Choice Explanations' you MUST output **only this
+       single header line as a placeholder**. Do NOT repeat any per-option
+       explanations here.
+     - All per-option explanations (for A–E) MUST appear **only** as:
+         ### Choice A Explanation
+         ...
+         ### Choice B Explanation
+         ...
+       immediately after their corresponding options in the
+       '## Options and Explanations' section.
+     - Do NOT copy these per-option explanations into the '## Explanation'
+       block.
+     
+     STEP 2 – KEYWORDS BLOCK
+     - After the '## Choice-by-Choice Explanations' placeholder, create one heading:
+       '### Keywords in the Stem to Identify the Correct Option'
+     - Under this heading, include a bullet list of **all important words/phrases
+       from the stem that help identify the correct option**, in this format:
+         - **"Keyword"** – short explanation
+     - These bullets should be derived from the stem text only; do not pull in
+       per-option explanations here.
+     - After the keywords list, include a '---' line, then a blank line.
+     
+     STEP 3 – FULL EXPLANATION CONTENT (QUESTION-LEVEL ONLY)
+     - After the '---' line, you must output **all remaining question-level
+       explanation content** from the DOCX **in the same order it appears in
+       the doc**, converted to Markdown:
+       - Plain text paragraphs
+       - Lists
+       - Headings/subheadings
+       - Tables (as Markdown tables)
+       - Images (as Markdown images with placeholders)
+     - This content should explain the reasoning, key concepts, differentials,
+       tables, notes, etc. that apply to the **question as a whole**.
+     - Do NOT include any per-option explanation blocks in this section (no
+       lines starting with "(Option A)", "(Option B)", etc.).
+     - Do NOT invent new headings; reuse the logical structure from the source.
+     - Do NOT drop, merge, or reorder any content; every piece of text, table,
+       or image that appears in the source explanation must appear here.
 
-     (Option B) Option B text:
-     explanation...
-     etc.
-   - After that per-option block, append all remaining explanation content:
-     - Tables (converted to markdown tables)
-     - Differential diagnosis sections
-     - Notes / key concepts
-   - Do NOT repeat the keywords heading here.${imageInstructions}
+7. FIDELITY TO SOURCE (CRITICAL - NO PARAPHRASING OR RESTRUCTURING)
+   - **Do NOT paraphrase or summarize** any medical content, sentences, or bullet points.
+   - **Preserve wording as-is** from the HTML/source whenever possible; only adjust
+     formatting so it fits valid Markdown and the required template.
+   - **Do NOT invent, infer, or add** new medical facts, explanations, or examples
+     that are not explicitly present in the source.
+   - **Do NOT move content between headings**. Content that appears under a
+     specific heading in the HTML must stay under that same logical heading
+     in the Markdown.
+   - If any heading exists in the source (whatever its exact text is), you MUST:
+       - Preserve the heading text exactly (same wording, same level of meaning).
+       - Keep **all content under that heading together and in the same order** as
+         in the source.
+   - For tables:
+       - **Every table in the HTML must appear in the Markdown**.
+       - Convert each table 1:1 into a Markdown table, preserving:
+         - All rows and columns
+         - All header labels
+         - The original order of rows and columns
+       - Do NOT merge or split tables. Do NOT rename or change column headings.
+   - For any content that you are not sure where to place, do NOT drop it and do
+     NOT rewrite it. It must still appear somewhere in the Markdown, with the
+     same wording and order (you may only adjust formatting to valid Markdown).
+   - If the source contains explicit metadata lines such as "Subject:",
+     "System:", "Topic:", "Competency Domain:", "Cognitive Level:",
+     "Clinical Skill:", or "Difficulty Level:", you may use them to infer
+     frontmatter fields (title, tags, difficulty, etc.), but you MUST NOT
+     copy these label/value lines into the body of the Markdown (they should
+     not appear under '## Question' or '## Explanation').
+   - If the source contains a line like "Question ID:", "Question Id", or
+     similar, you may use it to set the question_id in the frontmatter, but
+     you MUST NOT include that line in the visible question stem or
+     explanation text.
+
+${imageInstructions}
 
 Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
     try {
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1",
         messages: [
           {
             role: "system",
@@ -2336,20 +2391,26 @@ function normalizeKeywordsSection(markdown: string): string {
     const trimmed = line.trim();
 
     if (/^##\s+Choice-by-Choice Explanations/i.test(trimmed)) {
+      // Always keep only the clean header line without any trailing content
+      finalLines.push("## Choice-by-Choice Explanations");
       inChoiceSection = true;
-      finalLines.push(line);
       continue;
     }
 
     if (inChoiceSection) {
-      // Skip (Option X) blocks – these are duplicates of the per-choice explanations
-      if (/^\(Option\s+[A-E]\)/i.test(trimmed)) {
-        // Skip this line and following non-empty lines (the explanation paragraph)
+      // Skip any "(Option X)" blocks – these are duplicates of the per-choice explanations.
+      // We skip the line itself and all following non-empty lines until a blank line
+      // or a new section header. This handles both list-style and paragraph-style blocks.
+      if (/^\(Option\s+[A-E]\)/i.test(trimmed) || /^-\s*\(Option\s+[A-E]\)/i.test(trimmed)) {
         i++;
-        while (i < lines2.length && lines2[i].trim() !== "") {
+        while (
+          i < lines2.length &&
+          lines2[i].trim() !== "" &&
+          !/^##\s+/.test(lines2[i].trim())
+        ) {
           i++;
         }
-        // The for-loop will increment i again; adjust
+        // for-loop will i++ again; adjust
         i--;
         continue;
       }

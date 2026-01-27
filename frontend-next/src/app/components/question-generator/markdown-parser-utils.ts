@@ -96,13 +96,18 @@ export function parseMarkdown(content: string): ParsedQuestion {
       continue
     }
 
-    // Extract question ID from patterns like "Question (ID: 714025):" or "**Question (ID: 714025):**"
-    // This should be checked before the Question/Stem section handler
-    const questionIdMatch = line.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?/i)
+    // Extract question ID lines and ensure they do NOT end up in the visible stem
+    // Supported formats (case-insensitive):
+    // - "Question (ID: 714025):"
+    // - "**Question (ID: 714025):**"
+    // - "Question ID: 714025"
+    // - "Question Id: 714025"
+    const questionIdMatchParen = line.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?/i)
+    const questionIdMatchLabel = line.match(/^\s*(?:\*\*)?Question\s+I[dn]:\s*([A-Za-z0-9\-_.]+)/i)
+    const questionIdMatch = questionIdMatchParen || questionIdMatchLabel
     if (questionIdMatch && questionIdMatch[1]) {
       questionData.questionId = questionIdMatch[1].trim()
-      // Remove the question ID line from the stem if it's on its own line
-      // We'll handle this by not including it in the stem collection
+      // Do NOT include this line in the stem; skip it entirely
       i++
       continue
     }
