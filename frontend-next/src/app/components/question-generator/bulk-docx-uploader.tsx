@@ -11,6 +11,7 @@ import { SectionsService } from "@/app/services/content/sections.service";
 import { ChaptersService } from "@/app/services/content/chapters.service";
 import { TopicsService } from "@/app/services/content/topics.service";
 import { ProductTagsService } from "@/app/services/products/product-tags.service";
+import { ProductsService } from "@/app/services/products/products.service";
 import { runAutoMatch } from "./metadata-auto-match";
 import {
   CheckCircle2,
@@ -65,11 +66,20 @@ export default function BulkDocxUploader({
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [questionMetadata, setQuestionMetadata] = useState<
-    Record<string, { chapterId: string; topicId: string; productTagId?: string }>
+    Record<string, {
+      sectionId?: string;
+      chapterId: string;
+      topicId: string;
+      productTagId?: string;
+      subjectName?: string;
+      systemName?: string;
+      chapterName?: string;
+      topicName?: string;
+    }>
   >({});
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
   const [addToDbContext, setAddToDbContext] = useState<{
-    type: "subject" | "chapter" | "topic";
+    type: "subject" | "chapter" | "topic" | "section";
     fileName: string;
     parsedName?: string;
   } | null>(null);
@@ -84,6 +94,7 @@ export default function BulkDocxUploader({
   const chaptersService = useMemo(() => new ChaptersService(), []);
   const topicsService = useMemo(() => new TopicsService(), []);
   const productTagsService = useMemo(() => new ProductTagsService(), []);
+  const productsService = useMemo(() => new ProductsService(), []);
 
   // State for dropdowns
   const [sections, setSections] = useState<any[]>([]);
@@ -94,11 +105,13 @@ export default function BulkDocxUploader({
   const [loadingTopics, setLoadingTopics] = useState<Record<string, boolean>>({});
   const [productTags, setProductTags] = useState<any[]>([]);
   const [loadingTags, setLoadingTags] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
   // Track which files have had auto-match run (don't overwrite user edits)
   const autoMatchDoneRef = useRef<Set<string>>(new Set());
 
-  // Load sections on mount (for auto-match and Add Chapter)
+  // Load sections on mount (for auto-match and Add Chapter / Add System)
   useEffect(() => {
     setLoadingSections(true);
     sectionsService
@@ -110,6 +123,19 @@ export default function BulkDocxUploader({
       .catch(() => setSections([]))
       .finally(() => setLoadingSections(false));
   }, [sectionsService]);
+
+  // Load products on mount (for Add System)
+  useEffect(() => {
+    setLoadingProducts(true);
+    productsService
+      .getProducts({ status: "ACTIVE" })
+      .then((response) => {
+        const data = Array.isArray(response) ? response : (response as any)?.data || [];
+        setProducts(data);
+      })
+      .catch(() => setProducts([]))
+      .finally(() => setLoadingProducts(false));
+  }, [productsService]);
 
   // Load chapters on mount (section is derived from chapter at backend)
   useEffect(() => {
@@ -442,9 +468,10 @@ export default function BulkDocxUploader({
     await handleMultipleFilesUpload(files);
   };
 
-  // Add to DB: create Subject (product tag), Chapter, or Topic and select it
+  // Add to DB: create Subject (product tag), System (section), Chapter, or Topic and select it
   const [addToDbName, setAddToDbName] = useState("");
   const [addToDbSectionId, setAddToDbSectionId] = useState("");
+  const [addToDbProductId, setAddToDbProductId] = useState("");
   const handleAddToDbSubmit = async () => {
     if (!addToDbContext) return;
     const name = (addToDbName || addToDbContext.parsedName || "").trim();
@@ -466,6 +493,25 @@ export default function BulkDocxUploader({
           setQuestionMetadata((prev) => ({
             ...prev,
             [fileName]: { ...prev[fileName], productTagId: id },
+          }));
+          setAddToDbContext(null);
+        }
+      } else if (type === "section") {
+        const productId = addToDbProductId || products[0]?.id;
+        if (!productId) {
+          setAddToDbError("Select a product first");
+          setAddToDbLoading(false);
+          return;
+        }
+        const res: any = await sectionsService.createSection({ productId, name, isActive: true });
+        const id = res?.id ?? (res?.data as any)?.id;
+        if (id) {
+          const list: any = await sectionsService.getSections({ status: "ACTIVE" });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setSections(data);
+          setQuestionMetadata((prev) => ({
+            ...prev,
+            [fileName]: { ...prev[fileName], sectionId: id },
           }));
           setAddToDbContext(null);
         }
@@ -521,9 +567,10 @@ export default function BulkDocxUploader({
     if (addToDbContext) {
       setAddToDbName(addToDbContext.parsedName || "");
       setAddToDbSectionId(sections[0]?.id || "");
+      setAddToDbProductId(products[0]?.id || "");
       setAddToDbError(null);
     }
-  }, [addToDbContext, sections]);
+  }, [addToDbContext, sections, products]);
 
   // Create questions from processed files
   const handleCreateQuestions = async () => {
@@ -990,9 +1037,18 @@ export default function BulkDocxUploader({
                         {/* Subject (product tag) */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Subject</label>
-                          {result.questionData.tags?.[0] && (
-                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.tags[0]}</p>
-                          )}
+                          <div className="mb-1">
+                            <input
+                              type="text"
+                              className="w-full p-1.5 border rounded text-xs"
+                              placeholder={result.questionData.tags?.[0] ? `Parsed: ${result.questionData.tags[0]}` : "Name (editable)"}
+                              value={questionMetadata[result.fileName]?.subjectName ?? ""}
+                              onChange={(e) => setQuestionMetadata((prev) => ({
+                                ...prev,
+                                [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), subjectName: e.target.value || undefined },
+                              }))}
+                            />
+                          </div>
                           <div className="flex gap-1">
                             <select
                               className="flex-1 p-2 border rounded text-sm"
@@ -1014,7 +1070,50 @@ export default function BulkDocxUploader({
                               variant="outline"
                               size="sm"
                               className="shrink-0"
-                              onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: result.questionData.tags?.[0] || "New Subject" })}
+                              onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.subjectName || result.questionData.tags?.[0] || "New Subject").trim() })}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* System (Section) */}
+                        <div>
+                          <label className="text-xs font-medium mb-1 block">System</label>
+                          <div className="mb-1">
+                            <input
+                              type="text"
+                              className="w-full p-1.5 border rounded text-xs"
+                              placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
+                              value={questionMetadata[result.fileName]?.systemName ?? ""}
+                              onChange={(e) => setQuestionMetadata((prev) => ({
+                                ...prev,
+                                [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), systemName: e.target.value || undefined },
+                              }))}
+                            />
+                          </div>
+                          <div className="flex gap-1">
+                            <select
+                              className="flex-1 p-2 border rounded text-sm"
+                              value={questionMetadata[result.fileName]?.sectionId || ""}
+                              onChange={(e) => {
+                                setQuestionMetadata((prev) => ({
+                                  ...prev,
+                                  [result.fileName]: { ...prev[result.fileName], sectionId: e.target.value || undefined },
+                                }));
+                              }}
+                            >
+                              <option value="">None</option>
+                              {sections.map((s) => (
+                                <option key={s.id} value={s.id}>{s.name}</option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0"
+                              onClick={() => setAddToDbContext({ type: "section", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.systemName || result.questionData.system || "New System").trim() })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -1024,9 +1123,18 @@ export default function BulkDocxUploader({
                         {/* Chapter */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Chapter</label>
-                          {result.questionData.subject && (
-                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.subject}</p>
-                          )}
+                          <div className="mb-1">
+                            <input
+                              type="text"
+                              className="w-full p-1.5 border rounded text-xs"
+                              placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                              value={questionMetadata[result.fileName]?.chapterName ?? ""}
+                              onChange={(e) => setQuestionMetadata((prev) => ({
+                                ...prev,
+                                [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), chapterName: e.target.value || undefined },
+                              }))}
+                            />
+                          </div>
                           <div className="flex gap-1">
                             <select
                               className="flex-1 p-2 border rounded text-sm"
@@ -1050,7 +1158,7 @@ export default function BulkDocxUploader({
                               variant="outline"
                               size="sm"
                               className="shrink-0"
-                              onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: result.questionData.subject || "New Chapter" })}
+                              onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.chapterName || result.questionData.subject || "New Chapter").trim() })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -1060,9 +1168,18 @@ export default function BulkDocxUploader({
                         {/* Topic */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Topic *</label>
-                          {result.questionData.topic && (
-                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.topic}</p>
-                          )}
+                          <div className="mb-1">
+                            <input
+                              type="text"
+                              className="w-full p-1.5 border rounded text-xs"
+                              placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
+                              value={questionMetadata[result.fileName]?.topicName ?? ""}
+                              onChange={(e) => setQuestionMetadata((prev) => ({
+                                ...prev,
+                                [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), topicName: e.target.value || undefined },
+                              }))}
+                            />
+                          </div>
                           <div className="flex gap-1">
                             <select
                               className="flex-1 p-2 border rounded text-sm"
@@ -1087,7 +1204,7 @@ export default function BulkDocxUploader({
                               className="shrink-0"
                               disabled={!questionMetadata[result.fileName]?.chapterId}
                               title={!questionMetadata[result.fileName]?.chapterId ? "Select chapter first" : "Add topic to database"}
-                              onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: result.questionData.topic || "New Topic" })}
+                              onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.topicName || result.questionData.topic || "New Topic").trim() })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -1153,10 +1270,26 @@ export default function BulkDocxUploader({
           <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border">
             <h3 className="text-sm font-semibold mb-3">
               {addToDbContext.type === "subject" && "Add Subject to database"}
+              {addToDbContext.type === "section" && "Add System (Section) to database"}
               {addToDbContext.type === "chapter" && "Add Chapter to database"}
               {addToDbContext.type === "topic" && "Add Topic to database"}
             </h3>
             <div className="space-y-3">
+              {addToDbContext.type === "section" && (
+                <div>
+                  <label className="text-xs font-medium block mb-1">Product</label>
+                  <select
+                    className="w-full p-2 border rounded text-sm"
+                    value={addToDbProductId}
+                    onChange={(e) => setAddToDbProductId(e.target.value)}
+                  >
+                    <option value="">Select Product...</option>
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {addToDbContext.type === "chapter" && (
                 <div>
                   <label className="text-xs font-medium block mb-1">Section</label>

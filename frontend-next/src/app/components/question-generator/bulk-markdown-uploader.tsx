@@ -10,6 +10,7 @@ import { SectionsService } from "@/app/services/content/sections.service"
 import { ChaptersService } from "@/app/services/content/chapters.service"
 import { TopicsService } from "@/app/services/content/topics.service"
 import { ProductTagsService } from "@/app/services/products/product-tags.service"
+import { ProductsService } from "@/app/services/products/products.service"
 import { runAutoMatch } from "./metadata-auto-match"
 import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp, Plus } from "lucide-react"
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
@@ -52,13 +53,23 @@ export default function BulkMarkdownUploader({
   const [errors, setErrors] = useState<string[]>([])
   const [warnings, setWarnings] = useState<string[]>([])
   // Store metadata for each parsed question (frontend-only mapping; backend schema unchanged)
-  const [questionMetadata, setQuestionMetadata] = useState<Record<string, { sectionId: string; chapterId: string; topicId: string; productTagId?: string }>>({})
+  const [questionMetadata, setQuestionMetadata] = useState<Record<string, {
+    sectionId: string
+    chapterId: string
+    topicId: string
+    productTagId?: string
+    subjectName?: string
+    systemName?: string
+    chapterName?: string
+    topicName?: string
+  }>>({})
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set()) // Track expanded questions
-  const [addToDbContext, setAddToDbContext] = useState<{ type: "subject" | "chapter" | "topic"; fileName: string; parsedName?: string } | null>(null)
+  const [addToDbContext, setAddToDbContext] = useState<{ type: "subject" | "chapter" | "topic" | "section"; fileName: string; parsedName?: string } | null>(null)
   const [addToDbLoading, setAddToDbLoading] = useState(false)
   const [addToDbError, setAddToDbError] = useState<string | null>(null)
   const [addToDbName, setAddToDbName] = useState("")
   const [addToDbSectionId, setAddToDbSectionId] = useState("")
+  const [addToDbProductId, setAddToDbProductId] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const directoryInputRef = useRef<HTMLInputElement>(null)
   const questionsService = new QuestionsService()
@@ -68,6 +79,7 @@ export default function BulkMarkdownUploader({
   const chaptersService = useMemo(() => new ChaptersService(), [])
   const topicsService = useMemo(() => new TopicsService(), [])
   const productTagsService = useMemo(() => new ProductTagsService(), [])
+  const productsService = useMemo(() => new ProductsService(), [])
   
   // State for dropdowns (shared across all questions)
   const [sections, setSections] = useState<any[]>([])
@@ -78,6 +90,8 @@ export default function BulkMarkdownUploader({
   const [loadingTopics, setLoadingTopics] = useState<Record<string, boolean>>({})
   const [productTags, setProductTags] = useState<any[]>([])
   const [loadingTags, setLoadingTags] = useState(false)
+  const [products, setProducts] = useState<any[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
   
   // Load sections on mount
   useEffect(() => {
@@ -91,6 +105,19 @@ export default function BulkMarkdownUploader({
       .catch(() => setSections([]))
       .finally(() => setLoadingSections(false))
   }, [sectionsService])
+
+  // Load products on mount (for Add System)
+  useEffect(() => {
+    setLoadingProducts(true)
+    productsService
+      .getProducts({ status: "ACTIVE" })
+      .then((response) => {
+        const data = Array.isArray(response) ? response : (response as any)?.data || []
+        setProducts(data)
+      })
+      .catch(() => setProducts([]))
+      .finally(() => setLoadingProducts(false))
+  }, [productsService])
 
   // Load chapters on mount (no longer dependent on System selection)
   useEffect(() => {
@@ -659,6 +686,22 @@ export default function BulkMarkdownUploader({
           updateQuestionMetadata(fileName, { productTagId: id })
           setAddToDbContext(null)
         }
+      } else if (type === "section") {
+        const productId = addToDbProductId || products[0]?.id
+        if (!productId) {
+          setAddToDbError("Select a product first")
+          setAddToDbLoading(false)
+          return
+        }
+        const res: any = await sectionsService.createSection({ productId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await sectionsService.getSections({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setSections(data)
+          updateQuestionMetadata(fileName, { sectionId: id })
+          setAddToDbContext(null)
+        }
       } else if (type === "chapter") {
         const sectionId = addToDbSectionId || sections[0]?.id
         if (!sectionId) {
@@ -702,9 +745,10 @@ export default function BulkMarkdownUploader({
     if (addToDbContext) {
       setAddToDbName(addToDbContext.parsedName || "")
       setAddToDbSectionId(sections[0]?.id || "")
+      setAddToDbProductId(products[0]?.id || "")
       setAddToDbError(null)
     }
-  }, [addToDbContext, sections])
+  }, [addToDbContext, sections, products])
 
   // Create questions from parsed data
   const createQuestions = async () => {
@@ -1184,16 +1228,28 @@ export default function BulkMarkdownUploader({
                       {/* Question Content (Expandable) */}
                       {result.status === "success" && result.questionData && isExpanded && (
                         <div className="mt-4 space-y-4 pt-4 border-t border-border dark:border-gray-600">
-                          {/* Subject, Chapter, Topic: Parsed from document + DB dropdowns + Add to DB */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Subject, System, Chapter, Topic: Parsed from document + DB dropdowns + Add to DB */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {/* Subject */}
                             <div>
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                 Subject
                               </label>
-                              {result.questionData.tags?.[0] && (
-                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.tags[0]}</p>
-                              )}
+                              <div className="mb-1">
+                                <input
+                                  type="text"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  placeholder={result.questionData.tags?.[0] ? `Parsed: ${result.questionData.tags[0]}` : "Name (editable)"}
+                                  value={(metadata as any).subjectName ?? ""}
+                                  onChange={(e) => {
+                                    const v = e.target.value || undefined
+                                    setQuestionMetadata((prev) => {
+                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, subjectName: v } }
+                                    })
+                                  }}
+                                />
+                              </div>
                               <div className="flex gap-1">
                                 <select
                                   value={(metadata as any).productTagId || ""}
@@ -1206,7 +1262,45 @@ export default function BulkMarkdownUploader({
                                     <option key={tag.id} value={tag.id}>{tag.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: result.questionData.tags?.[0] || "New Subject" })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: ((metadata as any).subjectName || result.questionData.tags?.[0] || "New Subject").trim() })}>
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* System (Section) */}
+                            <div>
+                              <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
+                                System
+                              </label>
+                              <div className="mb-1">
+                                <input
+                                  type="text"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
+                                  value={(metadata as any).systemName ?? ""}
+                                  onChange={(e) => {
+                                    const v = e.target.value || undefined
+                                    setQuestionMetadata((prev) => {
+                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, systemName: v } }
+                                    })
+                                  }}
+                                />
+                              </div>
+                              <div className="flex gap-1">
+                                <select
+                                  value={metadata.sectionId || ""}
+                                  onChange={(e) => updateQuestionMetadata(result.fileName, { sectionId: e.target.value })}
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  disabled={isCreating || loadingSections}
+                                >
+                                  <option value="">Select System...</option>
+                                  {sections.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                  ))}
+                                </select>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "section", fileName: result.fileName, parsedName: ((metadata as any).systemName || result.questionData.system || "New System").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1217,9 +1311,21 @@ export default function BulkMarkdownUploader({
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                 Chapter <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
-                              {result.questionData.subject && (
-                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.subject}</p>
-                              )}
+                              <div className="mb-1">
+                                <input
+                                  type="text"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                                  value={(metadata as any).chapterName ?? ""}
+                                  onChange={(e) => {
+                                    const v = e.target.value || undefined
+                                    setQuestionMetadata((prev) => {
+                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, chapterName: v } }
+                                    })
+                                  }}
+                                />
+                              </div>
                               <div className="flex gap-1">
                                 <select
                                   value={metadata.chapterId}
@@ -1232,7 +1338,7 @@ export default function BulkMarkdownUploader({
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: result.questionData.subject || "New Chapter" })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: ((metadata as any).chapterName || result.questionData.subject || "New Chapter").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1243,9 +1349,21 @@ export default function BulkMarkdownUploader({
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                 Topic <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
-                              {result.questionData.topic && (
-                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.topic}</p>
-                              )}
+                              <div className="mb-1">
+                                <input
+                                  type="text"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
+                                  value={(metadata as any).topicName ?? ""}
+                                  onChange={(e) => {
+                                    const v = e.target.value || undefined
+                                    setQuestionMetadata((prev) => {
+                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, topicName: v } }
+                                    })
+                                  }}
+                                />
+                              </div>
                               <div className="flex gap-1">
                                 <select
                                   value={metadata.topicId}
@@ -1258,7 +1376,7 @@ export default function BulkMarkdownUploader({
                                     <option key={t.id} value={t.id}>{t.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.chapterId} title={!metadata.chapterId ? "Select chapter first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: result.questionData.topic || "New Topic" })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.chapterId} title={!metadata.chapterId ? "Select chapter first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: ((metadata as any).topicName || result.questionData.topic || "New Topic").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1452,10 +1570,20 @@ export default function BulkMarkdownUploader({
           <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border dark:border-gray-600">
             <h3 className="text-sm font-semibold mb-3 text-foreground dark:text-gray-100">
               {addToDbContext.type === "subject" && "Add Subject to database"}
+              {addToDbContext.type === "section" && "Add System (Section) to database"}
               {addToDbContext.type === "chapter" && "Add Chapter to database"}
               {addToDbContext.type === "topic" && "Add Topic to database"}
             </h3>
             <div className="space-y-3">
+              {addToDbContext.type === "section" && (
+                <div>
+                  <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Product</label>
+                  <select className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800 text-foreground dark:text-gray-100" value={addToDbProductId} onChange={(e) => setAddToDbProductId(e.target.value)}>
+                    <option value="">Select Product...</option>
+                    {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+              )}
               {addToDbContext.type === "chapter" && (
                 <div>
                   <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Section</label>
