@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/ui/dialog"
 import { Button } from "@/shared/ui/button"
 import { Label } from "@/shared/ui/label"
-import { SectionsService } from "@/app/services/content/sections.service"
 import { ChaptersService } from "@/app/services/content/chapters.service"
 import { TopicsService } from "@/app/services/content/topics.service"
 
@@ -12,7 +11,6 @@ interface MetadataModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: (metadata: {
-    sectionId?: string
     chapterId?: string
     topicId?: string
     subject?: string
@@ -20,7 +18,6 @@ interface MetadataModalProps {
     tags?: string[]
   }) => void
   initialMetadata?: {
-    sectionId?: string
     chapterId?: string
     topicId?: string
     subject?: string
@@ -30,28 +27,23 @@ interface MetadataModalProps {
 }
 
 export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata }: MetadataModalProps) {
-  const [sectionId, setSectionId] = useState(initialMetadata?.sectionId || "")
   const [chapterId, setChapterId] = useState(initialMetadata?.chapterId || "")
   const [topicId, setTopicId] = useState(initialMetadata?.topicId || "")
   const [subject, setSubject] = useState(initialMetadata?.subject || "")
   const [system, setSystem] = useState(initialMetadata?.system || "")
   const [tags, setTags] = useState(initialMetadata?.tags?.join(", ") || "")
 
-  const sectionsService = useMemo(() => new SectionsService(), [])
   const chaptersService = useMemo(() => new ChaptersService(), [])
   const topicsService = useMemo(() => new TopicsService(), [])
 
-  const [sections, setSections] = useState<any[]>([])
   const [chapters, setChapters] = useState<any[]>([])
   const [topics, setTopics] = useState<any[]>([])
-  const [loadingSections, setLoadingSections] = useState(false)
   const [loadingChapters, setLoadingChapters] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState(false)
 
   // Reset form when modal opens/closes or initialMetadata changes
   useEffect(() => {
     if (isOpen) {
-      setSectionId(initialMetadata?.sectionId || "")
       setChapterId(initialMetadata?.chapterId || "")
       setTopicId(initialMetadata?.topicId || "")
       setSubject(initialMetadata?.subject || "")
@@ -60,36 +52,20 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     }
   }, [isOpen, initialMetadata])
 
+  // Load all chapters when modal opens (section derived from chapter at backend)
   useEffect(() => {
     if (isOpen) {
-      setLoadingSections(true)
-      sectionsService
-        .getSections({ status: "ACTIVE" })
-        .then((response) => {
-          const data = Array.isArray(response) ? response : (response as any)?.data || []
-          setSections(data)
-        })
-        .catch(() => setSections([]))
-        .finally(() => setLoadingSections(false))
-    }
-  }, [isOpen, sectionsService])
-
-  useEffect(() => {
-    if (isOpen && sectionId) {
       setLoadingChapters(true)
       chaptersService
-        .getChapters({ sectionId, status: "ACTIVE" })
+        .getChapters({ status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setChapters(data)
         })
         .catch(() => setChapters([]))
         .finally(() => setLoadingChapters(false))
-    } else {
-      setChapters([])
-      setChapterId("")
     }
-  }, [isOpen, sectionId, chaptersService])
+  }, [isOpen, chaptersService])
 
   useEffect(() => {
     if (isOpen && chapterId) {
@@ -115,7 +91,6 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
       .filter((t) => t)
 
     onSave({
-      sectionId: sectionId || undefined,
       chapterId: chapterId || undefined,
       topicId: topicId || undefined,
       subject: subject || undefined,
@@ -134,28 +109,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
         
         <div className="space-y-4 py-4">
           <div>
-            <Label className="text-sm font-semibold">System (Section) *</Label>
-            <select
-              value={sectionId}
-              onChange={(e) => {
-                setSectionId(e.target.value)
-                setChapterId("")
-                setTopicId("")
-              }}
-              className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              disabled={loadingSections}
-            >
-              <option value="">Select System...</option>
-              {sections.map((section) => (
-                <option key={section.id} value={section.id}>
-                  {section.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <Label className="text-sm font-semibold">Subject (Chapter) *</Label>
+            <Label className="text-sm font-semibold">Chapter *</Label>
             <select
               value={chapterId}
               onChange={(e) => {
@@ -163,9 +117,9 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
                 setTopicId("")
               }}
               className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              disabled={loadingChapters || !sectionId}
+              disabled={loadingChapters}
             >
-              <option value="">Select Subject...</option>
+              <option value="">Select Chapter...</option>
               {chapters.map((chapter) => (
                 <option key={chapter.id} value={chapter.id}>
                   {chapter.name}

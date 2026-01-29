@@ -521,21 +521,24 @@ export class QuestionsService {
       ...questionCore
     } = createQuestionDto as any;
 
-    // If chapterId is provided, fetch chapter name for subject
-    if (chapterId && !questionCore.subject) {
+    let resolvedSectionId = sectionId;
+    // If chapterId is provided, fetch chapter (name and sectionId)
+    if (chapterId) {
       const chapter = await this.prisma.chapter.findUnique({
         where: { id: chapterId },
-        select: { name: true },
+        select: { name: true, sectionId: true },
       });
       if (chapter) {
-        questionCore.subject = chapter.name;
+        if (!questionCore.subject) questionCore.subject = chapter.name;
+        // Derive section from chapter when sectionId not provided
+        if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
     }
 
-    // If sectionId is provided, fetch section name for system
-    if (sectionId && !questionCore.system) {
+    // If sectionId is provided (or derived from chapter), fetch section name for system
+    if (resolvedSectionId && !questionCore.system) {
       const section = await this.prisma.section.findUnique({
-        where: { id: sectionId },
+        where: { id: resolvedSectionId },
         select: { name: true },
       });
       if (section) {
@@ -645,7 +648,7 @@ export class QuestionsService {
         ...questionCore,
         // Add chapterId and sectionId if provided
         ...(chapterId ? { chapterId } : {}),
-        ...(sectionId ? { sectionId } : {}),
+        ...(resolvedSectionId ? { sectionId: resolvedSectionId } : {}),
         // Persist tags as Json if present
         ...(tagsJson ? { tags: tagsJson as unknown as any } : {}),
         // Nested relations
@@ -734,21 +737,24 @@ export class QuestionsService {
       ...questionCore
     } = updateQuestionDto as any;
 
-    // If chapterId is provided, fetch chapter name for subject
-    if (chapterId && !questionCore.subject) {
+    let resolvedSectionId = sectionId;
+    // If chapterId is provided, fetch chapter (name and sectionId)
+    if (chapterId) {
       const chapter = await this.prisma.chapter.findUnique({
         where: { id: chapterId },
-        select: { name: true },
+        select: { name: true, sectionId: true },
       });
       if (chapter) {
-        questionCore.subject = chapter.name;
+        if (!questionCore.subject) questionCore.subject = chapter.name;
+        // Derive section from chapter when sectionId not provided
+        if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
     }
 
-    // If sectionId is provided, fetch section name for system
-    if (sectionId && !questionCore.system) {
+    // If sectionId is provided (or derived from chapter), fetch section name for system
+    if (resolvedSectionId && !questionCore.system) {
       const section = await this.prisma.section.findUnique({
-        where: { id: sectionId },
+        where: { id: resolvedSectionId },
         select: { name: true },
       });
       if (section) {
@@ -766,8 +772,8 @@ export class QuestionsService {
     if (chapterId) {
       data.chapterId = chapterId;
     }
-    if (sectionId) {
-      data.sectionId = sectionId;
+    if (resolvedSectionId) {
+      data.sectionId = resolvedSectionId;
     }
 
     // Execute in a transaction to keep consistency

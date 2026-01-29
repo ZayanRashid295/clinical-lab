@@ -89,7 +89,7 @@ export default function ProductTagViewModal({
           <div className="flex items-center">
             <Tag className="h-6 w-6 text-purple-600 mr-2" />
             <h2 className="text-xl font-semibold text-gray-900">
-              Product Tag Details
+              Subject Details
             </h2>
           </div>
           <button

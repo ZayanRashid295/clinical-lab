@@ -11,6 +11,7 @@ import { SectionsService } from "@/app/services/content/sections.service";
 import { ChaptersService } from "@/app/services/content/chapters.service";
 import { TopicsService } from "@/app/services/content/topics.service";
 import { ProductTagsService } from "@/app/services/products/product-tags.service";
+import { runAutoMatch } from "./metadata-auto-match";
 import {
   CheckCircle2,
   XCircle,
@@ -22,6 +23,7 @@ import {
   Edit,
   ChevronDown,
   ChevronUp,
+  Plus,
 } from "lucide-react";
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils";
 import { QuestionCreatorData } from "./question-creator/types";
@@ -63,9 +65,16 @@ export default function BulkDocxUploader({
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [questionMetadata, setQuestionMetadata] = useState<
-    Record<string, { sectionId: string; chapterId: string; topicId: string; productTagId?: string }>
+    Record<string, { chapterId: string; topicId: string; productTagId?: string }>
   >({});
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
+  const [addToDbContext, setAddToDbContext] = useState<{
+    type: "subject" | "chapter" | "topic";
+    fileName: string;
+    parsedName?: string;
+  } | null>(null);
+  const [addToDbLoading, setAddToDbLoading] = useState(false);
+  const [addToDbError, setAddToDbError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const directoryInputRef = useRef<HTMLInputElement>(null);
   const questionsService = new QuestionsService();
@@ -86,7 +95,10 @@ export default function BulkDocxUploader({
   const [productTags, setProductTags] = useState<any[]>([]);
   const [loadingTags, setLoadingTags] = useState(false);
 
-  // Load sections on mount
+  // Track which files have had auto-match run (don't overwrite user edits)
+  const autoMatchDoneRef = useRef<Set<string>>(new Set());
+
+  // Load sections on mount (for auto-match and Add Chapter)
   useEffect(() => {
     setLoadingSections(true);
     sectionsService
@@ -99,7 +111,7 @@ export default function BulkDocxUploader({
       .finally(() => setLoadingSections(false));
   }, [sectionsService]);
 
-  // Load chapters on mount
+  // Load chapters on mount (section is derived from chapter at backend)
   useEffect(() => {
     setLoadingChapters(true);
     chaptersService
@@ -124,6 +136,45 @@ export default function BulkDocxUploader({
       .catch(() => setProductTags([]))
       .finally(() => setLoadingTags(false));
   }, [productTagsService]);
+
+  // Auto-match parsed metadata when summary and chapters/sections are ready
+  useEffect(() => {
+    if (!summary?.results?.length || chapters.length === 0) return;
+    const getTopicsForChapter = (chapterId: string) =>
+      topicsService
+        .getTopics({ chapterId, status: "ACTIVE" })
+        .then((r) => (Array.isArray(r) ? r : (r as any)?.data || []));
+    let cancelled = false;
+    summary.results.forEach((result) => {
+      if (result.status !== "success" || !result.questionData || autoMatchDoneRef.current.has(result.fileName))
+        return;
+      runAutoMatch(
+        {
+          parsedSubject: result.questionData.subject,
+          parsedSystem: result.questionData.system,
+          parsedTopic: result.questionData.topic,
+        },
+        chapters,
+        { sections, getTopicsForChapter }
+      ).then((matched) => {
+        if (cancelled || (!matched.chapterId && !matched.topicId)) return;
+        autoMatchDoneRef.current.add(result.fileName);
+        setQuestionMetadata((prev) => ({
+          ...prev,
+          [result.fileName]: {
+            ...prev[result.fileName],
+            chapterId: matched.chapterId || prev[result.fileName]?.chapterId || "",
+            topicId: matched.topicId || prev[result.fileName]?.topicId || "",
+          },
+        }));
+        if (matched.chapterId) loadTopicsForChapter(matched.chapterId);
+        setExpandedQuestions((prev) => new Set(prev).add(result.fileName));
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [summary?.results, chapters.length, sections.length, topicsService]);
 
   // Load topics when chapter changes
   const loadTopicsForChapter = async (chapterId: string) => {
@@ -375,6 +426,7 @@ export default function BulkDocxUploader({
 
     setSummary(summary);
     setIsProcessing(false);
+    autoMatchDoneRef.current.clear();
 
     // Collect warnings
     const allWarnings = results
@@ -387,9 +439,91 @@ export default function BulkDocxUploader({
 
   // Handle directory upload (browser limitation: treats as files)
   const handleDirectoryUpload = async (files: FileList) => {
-    // Same as multiple files for now (browsers don't support true directory upload)
     await handleMultipleFilesUpload(files);
   };
+
+  // Add to DB: create Subject (product tag), Chapter, or Topic and select it
+  const [addToDbName, setAddToDbName] = useState("");
+  const [addToDbSectionId, setAddToDbSectionId] = useState("");
+  const handleAddToDbSubmit = async () => {
+    if (!addToDbContext) return;
+    const name = (addToDbName || addToDbContext.parsedName || "").trim();
+    if (!name) {
+      setAddToDbError("Name is required");
+      return;
+    }
+    setAddToDbError(null);
+    setAddToDbLoading(true);
+    try {
+      const { type, fileName } = addToDbContext;
+      if (type === "subject") {
+        const res: any = await productTagsService.createTag({ name, isActive: true });
+        const id = res?.id ?? (res?.data as any)?.id;
+        if (id) {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setProductTags(data);
+          setQuestionMetadata((prev) => ({
+            ...prev,
+            [fileName]: { ...prev[fileName], productTagId: id },
+          }));
+          setAddToDbContext(null);
+        }
+      } else if (type === "chapter") {
+        const sectionId = addToDbSectionId || sections[0]?.id;
+        if (!sectionId) {
+          setAddToDbError("Select a section first");
+          setAddToDbLoading(false);
+          return;
+        }
+        const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true });
+        const id = res?.id ?? (res?.data as any)?.id;
+        if (id) {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE" });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setChapters(data);
+          setQuestionMetadata((prev) => ({
+            ...prev,
+            [fileName]: { ...prev[fileName], chapterId: id, topicId: "" },
+          }));
+          loadTopicsForChapter(id);
+          setAddToDbContext(null);
+        }
+      } else if (type === "topic") {
+        const chapterId = questionMetadata[fileName]?.chapterId;
+        if (!chapterId) {
+          setAddToDbError("Select a chapter first");
+          setAddToDbLoading(false);
+          return;
+        }
+        const res: any = await topicsService.createTopic({ chapterId, name, isActive: true });
+        const id = res?.id ?? (res?.data as any)?.id;
+        if (id) {
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE" });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setTopics((prev) => ({ ...prev, [chapterId]: data }));
+          setQuestionMetadata((prev) => ({
+            ...prev,
+            [fileName]: { ...prev[fileName], topicId: id },
+          }));
+          setAddToDbContext(null);
+        }
+      }
+    } catch (e: any) {
+      setAddToDbError(e?.message || "Failed to create");
+    } finally {
+      setAddToDbLoading(false);
+    }
+  };
+
+  // When opening Add-to-DB modal, sync name from context
+  useEffect(() => {
+    if (addToDbContext) {
+      setAddToDbName(addToDbContext.parsedName || "");
+      setAddToDbSectionId(sections[0]?.id || "");
+      setAddToDbError(null);
+    }
+  }, [addToDbContext, sections]);
 
   // Create questions from processed files
   const handleCreateQuestions = async () => {
@@ -414,7 +548,7 @@ export default function BulkDocxUploader({
 
     if (missingTopics.length > 0) {
       setErrors([
-        `Please select Topic for all questions. Missing for: ${missingTopics
+        `Select or add a Topic for each question. Missing for: ${missingTopics
           .map((r) => r.fileName)
           .join(", ")}`,
       ]);
@@ -443,7 +577,6 @@ export default function BulkDocxUploader({
           }
 
           const questionTopicId = metadata.topicId;
-          const questionSectionId = metadata.sectionId;
           const questionChapterId = metadata.chapterId;
           const questionProductTagId = (metadata as any).productTagId;
 
@@ -470,7 +603,6 @@ export default function BulkDocxUploader({
             metadata: {
               ...newFormatData.metadata,
               topicId: questionTopicId,
-              sectionId: questionSectionId,
               chapterId: questionChapterId,
               productTagId: questionProductTagId,
             },
@@ -511,9 +643,6 @@ export default function BulkDocxUploader({
             isActive: true,
           };
 
-          if (questionSectionId) {
-            questionPayload.sectionId = questionSectionId;
-          }
           if (questionChapterId) {
             questionPayload.chapterId = questionChapterId;
           }
@@ -856,117 +985,116 @@ export default function BulkDocxUploader({
 
                   {expandedQuestions.has(result.fileName) && result.questionData && (
                     <div className="mt-4 space-y-4 p-4 bg-muted/50 rounded-lg">
-                      {/* Metadata Selection */}
+                      {/* Metadata: Parsed values from document + DB dropdowns (optional link) + Add to DB */}
                       <div className="grid grid-cols-2 gap-4">
-                        {/* Section */}
+                        {/* Subject (product tag) */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">Section</label>
-                          <select
-                            className="w-full p-2 border rounded text-sm"
-                            value={questionMetadata[result.fileName]?.sectionId || ""}
-                            onChange={(e) => {
-                              setQuestionMetadata((prev) => ({
-                                ...prev,
-                                [result.fileName]: {
-                                  ...prev[result.fileName],
-                                  sectionId: e.target.value,
-                                  chapterId: "", // Reset chapter when section changes
-                                  topicId: "", // Reset topic when section changes
-                                },
-                              }));
-                            }}
-                          >
-                            <option value="">Select Section</option>
-                            {sections.map((section) => (
-                              <option key={section.id} value={section.id}>
-                                {section.name}
-                              </option>
-                            ))}
-                          </select>
+                          <label className="text-xs font-medium mb-1 block">Subject</label>
+                          {result.questionData.tags?.[0] && (
+                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.tags[0]}</p>
+                          )}
+                          <div className="flex gap-1">
+                            <select
+                              className="flex-1 p-2 border rounded text-sm"
+                              value={questionMetadata[result.fileName]?.productTagId || ""}
+                              onChange={(e) => {
+                                setQuestionMetadata((prev) => ({
+                                  ...prev,
+                                  [result.fileName]: { ...prev[result.fileName], productTagId: e.target.value || undefined },
+                                }));
+                              }}
+                            >
+                              <option value="">None</option>
+                              {productTags.map((tag) => (
+                                <option key={tag.id} value={tag.id}>{tag.name}</option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0"
+                              onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: result.questionData.tags?.[0] || "New Subject" })}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
                         {/* Chapter */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Chapter</label>
-                          <select
-                            className="w-full p-2 border rounded text-sm"
-                            value={questionMetadata[result.fileName]?.chapterId || ""}
-                            onChange={(e) => {
-                              const chapterId = e.target.value;
-                              setQuestionMetadata((prev) => ({
-                                ...prev,
-                                [result.fileName]: {
-                                  ...prev[result.fileName],
-                                  chapterId,
-                                  topicId: "", // Reset topic when chapter changes
-                                },
-                              }));
-                              if (chapterId) {
-                                loadTopicsForChapter(chapterId);
-                              }
-                            }}
-                          >
-                            <option value="">Select Chapter</option>
-                            {chapters.map((chapter) => (
-                              <option key={chapter.id} value={chapter.id}>
-                                {chapter.name}
-                              </option>
-                            ))}
-                          </select>
+                          {result.questionData.subject && (
+                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.subject}</p>
+                          )}
+                          <div className="flex gap-1">
+                            <select
+                              className="flex-1 p-2 border rounded text-sm"
+                              value={questionMetadata[result.fileName]?.chapterId || ""}
+                              onChange={(e) => {
+                                const chapterId = e.target.value;
+                                setQuestionMetadata((prev) => ({
+                                  ...prev,
+                                  [result.fileName]: { ...prev[result.fileName], chapterId, topicId: "" },
+                                }));
+                                if (chapterId) loadTopicsForChapter(chapterId);
+                              }}
+                            >
+                              <option value="">Select Chapter</option>
+                              {chapters.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0"
+                              onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: result.questionData.subject || "New Chapter" })}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
                         {/* Topic */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Topic *</label>
-                          <select
-                            className="w-full p-2 border rounded text-sm"
-                            value={questionMetadata[result.fileName]?.topicId || defaultTopicId || ""}
-                            onChange={(e) => {
-                              setQuestionMetadata((prev) => ({
-                                ...prev,
-                                [result.fileName]: {
-                                  ...prev[result.fileName],
-                                  topicId: e.target.value,
-                                },
-                              }));
-                            }}
-                            required
-                          >
-                            <option value="">Select Topic</option>
-                            {questionMetadata[result.fileName]?.chapterId &&
-                              topics[questionMetadata[result.fileName].chapterId]?.map((topic) => (
-                                <option key={topic.id} value={topic.id}>
-                                  {topic.name}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-
-                        {/* Product Tag */}
-                        <div>
-                          <label className="text-xs font-medium mb-1 block">Product Tag</label>
-                          <select
-                            className="w-full p-2 border rounded text-sm"
-                            value={questionMetadata[result.fileName]?.productTagId || ""}
-                            onChange={(e) => {
-                              setQuestionMetadata((prev) => ({
-                                ...prev,
-                                [result.fileName]: {
-                                  ...prev[result.fileName],
-                                  productTagId: e.target.value || undefined,
-                                },
-                              }));
-                            }}
-                          >
-                            <option value="">None</option>
-                            {productTags.map((tag) => (
-                              <option key={tag.id} value={tag.id}>
-                                {tag.name}
-                              </option>
-                            ))}
-                          </select>
+                          {result.questionData.topic && (
+                            <p className="text-xs text-muted-foreground mb-0.5">Parsed: {result.questionData.topic}</p>
+                          )}
+                          <div className="flex gap-1">
+                            <select
+                              className="flex-1 p-2 border rounded text-sm"
+                              value={questionMetadata[result.fileName]?.topicId || defaultTopicId || ""}
+                              onChange={(e) => {
+                                setQuestionMetadata((prev) => ({
+                                  ...prev,
+                                  [result.fileName]: { ...prev[result.fileName], topicId: e.target.value },
+                                }));
+                              }}
+                            >
+                              <option value="">Select Topic</option>
+                              {questionMetadata[result.fileName]?.chapterId &&
+                                topics[questionMetadata[result.fileName].chapterId]?.map((t) => (
+                                  <option key={t.id} value={t.id}>{t.name}</option>
+                                ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0"
+                              disabled={!questionMetadata[result.fileName]?.chapterId}
+                              title={!questionMetadata[result.fileName]?.chapterId ? "Select chapter first" : "Add topic to database"}
+                              onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: result.questionData.topic || "New Topic" })}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
+                      <p className="text-xs text-muted-foreground">Subject and System from the document are always saved as text. Link to taxonomy via Chapter/Topic (optional).</p>
 
                       {/* Question Preview */}
                       <div className="mt-4">
@@ -1018,6 +1146,54 @@ export default function BulkDocxUploader({
           </div>
         )}
       </div>
+
+      {/* Add to DB modal */}
+      {addToDbContext && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border">
+            <h3 className="text-sm font-semibold mb-3">
+              {addToDbContext.type === "subject" && "Add Subject to database"}
+              {addToDbContext.type === "chapter" && "Add Chapter to database"}
+              {addToDbContext.type === "topic" && "Add Topic to database"}
+            </h3>
+            <div className="space-y-3">
+              {addToDbContext.type === "chapter" && (
+                <div>
+                  <label className="text-xs font-medium block mb-1">Section</label>
+                  <select
+                    className="w-full p-2 border rounded text-sm"
+                    value={addToDbSectionId}
+                    onChange={(e) => setAddToDbSectionId(e.target.value)}
+                  >
+                    {sections.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div>
+                <label className="text-xs font-medium block mb-1">Name</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded text-sm"
+                  value={addToDbName}
+                  onChange={(e) => setAddToDbName(e.target.value)}
+                  placeholder={addToDbContext.parsedName}
+                />
+              </div>
+              {addToDbError && <p className="text-xs text-red-600">{addToDbError}</p>}
+            </div>
+            <div className="flex gap-2 mt-4 justify-end">
+              <Button variant="outline" size="sm" onClick={() => { setAddToDbContext(null); setAddToDbError(null); }} disabled={addToDbLoading}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleAddToDbSubmit} disabled={addToDbLoading}>
+                {addToDbLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

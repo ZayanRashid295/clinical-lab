@@ -126,7 +126,7 @@ export default function QuestionViewModal({
 
                 {question.productTag && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Tag</p>
+                    <p className="text-sm font-medium text-gray-500">Subject</p>
                     <div className="flex items-center mt-1">
                       <Tag className="h-4 w-4 text-gray-400 mr-2" />
                       <span

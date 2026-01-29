@@ -38,132 +38,6 @@ interface Question {
   topic?: any // Topic object or string
 }
 
-const DEMO_QUESTION: Question = {
-  id: "demo-question",
-  stem: "A 13-year-old girl is brought to the clinic by her mother for a yearly physical examination. The patient feels well but is worried that she has not yet started puberty. Temperature is 36.7°C (98°F), blood pressure is 152/91 mm Hg, pulse is 75/min, and respirations are 18/min. Physical examination is significant for a lack of secondary sexual characteristics; a blind vagina is noted on pelvic examination. Laboratory studies reveal hypokalemia and low testosterone and estradiol levels. Cytogenetic analysis shows a 46,XY karyotype. This patient most likely has deficiency of which of the following enzymes?",
-  options: [
-    { label: "A", text: "5 alpha-reductase (11%)", correct: false, value: "A" },
-    { label: "B", text: "17 alpha-hydroxylase (66%)", correct: true, value: "B" },
-    { label: "C", text: "11 beta-hydroxylase (8%)", correct: false, value: "C" },
-    { label: "D", text: "17,20-lyase (7%)", correct: false, value: "D" },
-    { label: "E", text: "3 beta-hydroxysteroid dehydrogenase (8%)", correct: false, value: "E" },
-  ],
-  subject: "Pathology",
-  system: "Endocrine",
-  tags: ["CAH", "Congenital Adrenal Hyperplasia", "Enzyme Deficiency"],
-  createdAt: Date.now(),
-  explanation: [
-    {
-      type: "heading",
-      level: 2,
-      content: "Overview",
-    },
-    {
-      type: "paragraph",
-      content:
-        "This patient is **genetically male (46,XY)** with features suggestive of **17 alpha-hydroxylase deficiency**, a rare cause of **congenital adrenal hyperplasia (CAH)**. This enzyme deficiency impairs both cortisol and androgen synthesis, leading to accumulation of precursor hormones and shunting toward the mineralocorticoid pathway.",
-    },
-    {
-      type: "heading",
-      level: 2,
-      content: "Clinical Presentation",
-    },
-    {
-      type: "paragraph",
-      content: "The classic triad of 17 alpha-hydroxylase deficiency includes:",
-    },
-    {
-      type: "list",
-      items: [
-        "**Hypertension** from excess mineralocorticoid (11-deoxycorticosterone)",
-        "**Hypokalemia** from aldosterone-like effects",
-        "**Sexual underdevelopment** from androgen deficiency",
-      ],
-    },
-    {
-      type: "paragraph",
-      content:
-        "Female external genitalia with XY karyotype (46,XY) results from lack of androgen action during fetal development. The blind-ending vagina occurs because anti-Müllerian hormone (AMH) was produced by the testes, suppressing development of the uterus and fallopian tubes.",
-    },
-    {
-      type: "heading",
-      level: 2,
-      content: "Enzyme Function",
-    },
-    {
-      type: "paragraph",
-      content:
-        "The enzyme **17 alpha-hydroxylase** is active in the **adrenal glands and gonads** and is responsible for converting pregnenolone to 17-hydroxypregnenolone and progesterone to 17-hydroxyprogesterone. This enzyme is critical for both **cortisol and androgen synthesis** pathways. Without this enzyme, steroids are shunted toward the mineralocorticoid pathway.",
-    },
-    {
-      type: "heading",
-      level: 2,
-      content: "Why This Answer?",
-    },
-    {
-      type: "paragraph",
-      content:
-        "The correct answer is **B. 17 alpha-hydroxylase (66%)**. The clinical presentation uniquely points to this enzyme deficiency:",
-    },
-    {
-      type: "list",
-      items: [
-        "**Hypertension + Hypokalemia**: These are hallmark findings of 17 alpha-hydroxylase deficiency due to mineralocorticoid excess",
-        "**Ambiguous genitalia**: Indicates androgen deficiency in a genetically male patient",
-        "**46,XY genetic male**: Rules out pure 5-alpha reductase deficiency (which presents with ambiguous genitalia in males)",
-        "**Low testosterone AND estradiol**: Confirms defect in androgen and estrogen production",
-        "**Lack of virilization**: Would have occurred with 17,20-lyase deficiency (preserved androgen synthesis)",
-      ],
-    },
-    {
-      type: "heading",
-      level: 3,
-      content: "Why Not Other Answers?",
-    },
-    {
-      type: "list",
-      items: [
-        "**5-alpha reductase**: Causes ambiguous genitalia but NO hypertension or hypokalemia; testosterone is elevated",
-        "**11-beta hydroxylase**: Causes hypertension and hypokalemia, but also presents with virilization (elevated androgen)",
-        "**17,20-lyase**: Presents with ambiguous genitalia but NO hypertension (normal mineralocorticoids)",
-        "**3-beta HSD**: Presents with salt-wasting crisis and virilization",
-      ],
-    },
-    {
-      type: "heading",
-      level: 2,
-      content: "Comparative CAH Enzyme Deficiencies",
-    },
-    {
-      type: "table",
-      rows: [
-        [
-          "**Enzyme**",
-          "**Hypertension**",
-          "**Virilization (46,XX)**",
-          "**Ambiguous Genitalia (46,XY)**",
-          "**Key Feature**",
-        ],
-        ["17α-hydroxylase", "Yes", "No", "Yes (↓ androgen)", "↑ Mineralocorticoid"],
-        ["11β-hydroxylase", "Yes", "Yes", "No (normal male)", "↑ Androgen + Mineralocorticoid"],
-        ["21-hydroxylase", "No", "Yes", "No (normal male)", "↑ Androgen, salt-wasting variant"],
-        ["5α-reductase", "No", "No", "Yes (↓ DHT)", "Ambiguous genitalia at birth, virilization at puberty"],
-        ["3β-HSD", "Varies", "No", "Yes (↓ androgen)", "Salt-wasting crisis possible"],
-      ],
-    },
-    {
-      type: "heading",
-      level: 2,
-      content: "Treatment",
-    },
-    {
-      type: "paragraph",
-      content:
-        "Management includes **glucocorticoid replacement** (to suppress ACTH and reduce excess mineralocorticoid production) and **mineralocorticoid antagonist** (spironolactone) to manage hypertension and hypokalemia. Hormone replacement therapy should be individualized based on sex of rearing.",
-    },
-  ],
-}
-
 export default function AdminDashboard() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -1030,12 +904,7 @@ export default function AdminDashboard() {
       
       const transformedQuestions = allQuestions.map(transformBackendToFrontend)
       
-      if (transformedQuestions.length === 0) {
-        // If no questions in DB, show demo question as fallback
-        setQuestions([DEMO_QUESTION])
-      } else {
-        setQuestions(transformedQuestions)
-      }
+      setQuestions(transformedQuestions)
     } catch (err: any) {
       console.error("Failed to load questions:", err)
       
@@ -1047,12 +916,10 @@ export default function AdminDashboard() {
           localStorage.removeItem("userData")
         }
         setError("Your session has expired. Please log in again to continue.")
-        // Fallback to demo question on auth error
-        setQuestions([DEMO_QUESTION])
+        setQuestions([])
       } else {
         setError(err.message || "Failed to load questions")
-        // Fallback to demo question on error
-        setQuestions([DEMO_QUESTION])
+        setQuestions([])
       }
     } finally {
       setLoading(false)
@@ -1066,8 +933,7 @@ export default function AdminDashboard() {
     } else {
       setLoading(false)
       setError("Please log in to access the admin dashboard.")
-      // Show demo question as fallback
-      setQuestions([DEMO_QUESTION])
+      setQuestions([])
     }
   }, [loadQuestions])
 

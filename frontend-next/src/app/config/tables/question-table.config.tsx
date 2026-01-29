@@ -56,7 +56,7 @@ const questionColumns: ColumnConfig<Question>[] = [
   },
   {
     key: "productTag",
-    label: "Tag",
+    label: "Subject",
     sortable: false,
     render: (value) => {
       if (!value) return <span className="text-sm text-gray-400">-</span>;
@@ -178,9 +178,9 @@ const questionFilterConfig: FilterConfig<QuestionFilters> = {
     },
     {
       key: "productTagId",
-      label: "Tag",
+      label: "Subject",
       type: "text",
-      placeholder: "Filter by tag ID",
+      placeholder: "Filter by subject ID",
     },
     {
       key: "dateFrom",

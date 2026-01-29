@@ -23,124 +23,6 @@ import { authService } from "@/shared/services/auth.service"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import { Crown } from "lucide-react"
 
-const DEMO_QUESTION = {
-  id: "demo-1",
-  stem: "A 13-year-old girl is brought to the clinic by her mother for a yearly physical examination. The patient feels well but is worried that she has not yet started puberty. Temperature is 36.7°C (98°F), blood pressure is 152/91 mm Hg, pulse is 75/min, and respirations are 18/min. Physical examination is significant for a lack of secondary sexual characteristics; a blind vagina is noted on pelvic examination. Laboratory studies reveal hypokalemia and low testosterone and estradiol levels. Cytogenetic analysis shows a 46,XY karyotype. This patient most likely has deficiency of which of the following enzymes?",
-  subject: "Pathology",
-  system: "Endocrine",
-  options: [
-    {
-      label: "A",
-      value: "A",
-      text: "5 alpha-reductase (11%)",
-      correct: false,
-    },
-    {
-      label: "B",
-      value: "B",
-      text: "17 alpha-hydroxylase (66%)",
-      correct: true,
-    },
-    {
-      label: "C",
-      value: "C",
-      text: "11 beta-hydroxylase (8%)",
-      correct: false,
-    },
-    {
-      label: "D",
-      value: "D",
-      text: "17,20-lyase (7%)",
-      correct: false,
-    },
-    {
-      label: "E",
-      value: "E",
-      text: "3 beta-hydroxysteroid dehydrogenase (8%)",
-      correct: false,
-    },
-  ],
-  explanation: [
-    {
-      id: 1,
-      type: "text",
-      data: {
-        markdown:
-          "## Overview\n\nThis patient is **genetically male (46,XY)** with features suggestive of **17 alpha-hydroxylase deficiency**, a rare cause of **congenital adrenal hyperplasia (CAH)**. This enzyme deficiency impairs both cortisol and androgen synthesis, leading to accumulation of precursor hormones and shunting toward the mineralocorticoid pathway.",
-      },
-    },
-    {
-      id: 2,
-      type: "text",
-      data: {
-        markdown:
-          "## Clinical Presentation\n\nThe classic triad of 17 alpha-hydroxylase deficiency includes:\n\n- **Hypertension** from excess mineralocorticoid (11-deoxycorticosterone)\n- **Hypokalemia** from aldosterone-like effects\n- **Sexual underdevelopment** from androgen deficiency\n\nFemale external genitalia with XY karyotype (46,XY) results from lack of androgen action during fetal development. The blind-ending vagina occurs because anti-müllerian hormone (AMH) from fetal testes suppresses müllerian duct development, but without androgenic action, external female genitalia form.",
-      },
-    },
-    {
-      id: 3,
-      type: "table",
-      data: {
-        rows: 5,
-        cols: 4,
-        cells: {
-          "0-0": "**Enzyme**",
-          "0-1": "**Defect**",
-          "0-2": "**Clinical Findings**",
-          "0-3": "**Key Feature**",
-          "1-0": "17α-hydroxylase",
-          "1-1": "↓ Cortisol, ↓ Androgens",
-          "1-2": "Hypertension, XX female with XY",
-          "1-3": "46,XY phenotypic female",
-          "2-0": "11β-hydroxylase",
-          "2-1": "↓ Cortisol, ↑ Androgens",
-          "2-2": "Hypertension, virilization",
-          "2-3": "46,XY virilized female",
-          "3-0": "5α-reductase",
-          "3-1": "↓ DHT, normal testosterone",
-          "3-2": "Ambiguous genitalia, gynecomastia",
-          "3-3": "Post-pubertal virilization",
-          "4-0": "17,20-lyase",
-          "4-1": "↓ Androgens, normal cortisol",
-          "4-2": "Sexual underdevelopment only",
-          "4-3": "46,XY without hypertension",
-        },
-      },
-    },
-    {
-      id: 4,
-      type: "text",
-      data: {
-        markdown:
-          "## Enzyme Function\n\nThe enzyme **17 alpha-hydroxylase** (cytochrome P450 17A1) catalyzes two sequential reactions:\n\n1. **17-hydroxylation**: Pregnenolone → 17-hydroxypregnenolone and Progesterone → 17-hydroxyprogesterone\n2. **17,20-lyase activity**: 17-hydroxypregnenolone → DHEA and 17-hydroxyprogesterone → Androstenediol\n\nThis enzyme is expressed in both the **adrenal glands** (for cortisol synthesis) and **gonads** (for androgen synthesis). Without functional 17α-hydroxylase, both cortisol and androgen synthesis are impaired.",
-      },
-    },
-    {
-      id: 5,
-      type: "text",
-      data: {
-        markdown:
-          "## Why This Answer?\n\n### Clinical Reasoning:\n\n- **Hypertension + Hypokalemia**: Indicates excess mineralocorticoid pathway shunting\n- **46,XY with female phenotype**: Requires androgen deficiency during development\n- **Absent secondary sexual characteristics**: Confirms inadequate androgen and estrogen\n- **Low testosterone and estradiol**: Direct result of 17α-hydroxylase deficiency\n\n### Why Not the Others:\n\n- **5α-reductase deficiency**: Would have normal testosterone and hypertension only; virilization occurs at puberty\n- **11β-hydroxylase deficiency**: Causes virilization (elevated androgens), NOT sexual underdevelopment\n- **17,20-lyase deficiency**: Causes sexual underdevelopment but normal blood pressure (no mineralocorticoid excess)\n- **3β-hydroxysteroid dehydrogenase**: Affects multiple pathways; presentation differs",
-      },
-    },
-    {
-      id: 6,
-      type: "text",
-      data: {
-        markdown:
-          "## Treatment\n\nManagement of 17α-hydroxylase deficiency includes:\n\n- **Glucocorticoid replacement** (hydrocortisone) to suppress ACTH and reduce precursor shunting\n- **Mineralocorticoid antagonist** (spironolactone) for hypertension and hypokalemia\n- **Hormone replacement therapy** for sexual development (estrogen/progesterone for female phenotype patients)",
-      },
-    },
-  ],
-  perAnswerExplanations: {
-    A: "5 alpha-reductase deficiency causes ambiguous genitalia and gynecomastia at puberty, but testosterone levels are normal or elevated and there is NO hypertension or hypokalemia. This patient has hypertension and low testosterone, which rules out this diagnosis.",
-    B: "17 alpha-hydroxylase deficiency is the correct answer. It causes deficiency in both cortisol and androgen synthesis, leading to hypertension (from mineralocorticoid shunting), hypokalemia, and sexual underdevelopment. The 46,XY karyotype with female phenotype is pathognomonic.",
-    C: "11 beta-hydroxylase deficiency causes hypertension and hypokalemia like this case, BUT it also causes virilization due to excess androgen production. This patient shows NO virilization and has FEMALE external genitalia, making this diagnosis incompatible.",
-    D: "17,20-lyase deficiency causes selective androgen deficiency and sexual underdevelopment, but it does NOT cause hypertension or hypokalemia. This patient has clear hypertension and electrolyte abnormalities, ruling out this diagnosis.",
-    E: "3 beta-hydroxysteroid dehydrogenase deficiency presents with salt-wasting crisis in severe cases, with a different biochemical pattern. Additionally, mild forms cause virilization, not the findings seen here.",
-  },
-}
-
 export default function StudentQuestionView() {
   const router = useRouter()
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -571,7 +453,7 @@ export default function StudentQuestionView() {
       if (!token) {
         console.warn("⚠️ No auth token found. Questions endpoint requires authentication.")
         setError("Authentication required. Please log in to view questions.")
-        setQuestions([DEMO_QUESTION])
+        setQuestions([])
         setLoading(false)
         return
       }
@@ -755,9 +637,8 @@ export default function StudentQuestionView() {
       }
       
       if (allQuestions.length === 0) {
-        console.log("⚠️ No questions found, using demo question")
         setError("No questions found matching the selected filters.")
-        setQuestions([DEMO_QUESTION])
+        setQuestions([])
         setLoading(false)
         return
       }
@@ -772,8 +653,8 @@ export default function StudentQuestionView() {
       }).filter((q) => q !== null)
       
       if (transformedQuestions.length === 0) {
-        setError("Failed to process questions from database. Using demo question.")
-        setQuestions([DEMO_QUESTION])
+        setError("Failed to process questions from database.")
+        setQuestions([])
       } else {
         setQuestions(transformedQuestions)
         
@@ -1139,7 +1020,7 @@ export default function StudentQuestionView() {
       }
       
       setError(errorMessage)
-      setQuestions([DEMO_QUESTION])
+      setQuestions([])
     } finally {
       setLoading(false)
     }
@@ -1749,9 +1630,6 @@ export default function StudentQuestionView() {
               <p className="text-destructive dark:text-red-400 text-sm">{error}</p>
             </div>
           )}
-          <p className="text-muted-foreground dark:text-gray-400 mt-4 text-sm">
-            Using demo question as fallback
-          </p>
         </Card>
       </div>
     )
@@ -1913,7 +1791,7 @@ export default function StudentQuestionView() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-yellow-700 dark:text-yellow-300">
                 <p className="mb-3">
-                  You&apos;ve completed the demo test! You&apos;ve seen a preview of our question bank with 10 sample questions.
+                  You&apos;ve completed the test! You&apos;ve seen a preview of our question bank.
                 </p>
                 <p className="mb-4 font-semibold">
                   Upgrade now to unlock:

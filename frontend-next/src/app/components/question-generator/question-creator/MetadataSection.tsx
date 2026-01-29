@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { Card } from "@/shared/ui/card"
 import { QuestionMetadata } from "./types"
-import { SectionsService } from "@/app/services/content/sections.service"
 import { ChaptersService } from "@/app/services/content/chapters.service"
 import { TopicsService } from "@/app/services/content/topics.service"
 
@@ -13,52 +12,32 @@ interface MetadataSectionProps {
 }
 
 export default function MetadataSection({ value, onChange }: MetadataSectionProps) {
-  const [sectionId, setSectionId] = useState(value.sectionId || "")
   const [chapterId, setChapterId] = useState(value.chapterId || "")
   const [topicId, setTopicId] = useState(value.topicId || "")
   const [subject, setSubject] = useState(value.subject || "")
   const [system, setSystem] = useState(value.system || "")
   const [tags, setTags] = useState(value.tags?.join(", ") || "")
 
-  const sectionsService = useMemo(() => new SectionsService(), [])
   const chaptersService = useMemo(() => new ChaptersService(), [])
   const topicsService = useMemo(() => new TopicsService(), [])
 
-  const [sections, setSections] = useState<any[]>([])
   const [chapters, setChapters] = useState<any[]>([])
   const [topics, setTopics] = useState<any[]>([])
-  const [loadingSections, setLoadingSections] = useState(false)
   const [loadingChapters, setLoadingChapters] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState(false)
 
+  // Load all chapters on mount (section is derived from chapter at backend)
   useEffect(() => {
-    setLoadingSections(true)
-    sectionsService
-      .getSections({ status: "ACTIVE" })
+    setLoadingChapters(true)
+    chaptersService
+      .getChapters({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setSections(data)
+        setChapters(data)
       })
-      .catch(() => setSections([]))
-      .finally(() => setLoadingSections(false))
-  }, [sectionsService])
-
-  useEffect(() => {
-    if (sectionId) {
-      setLoadingChapters(true)
-      chaptersService
-        .getChapters({ sectionId, status: "ACTIVE" })
-        .then((response) => {
-          const data = Array.isArray(response) ? response : (response as any)?.data || []
-          setChapters(data)
-        })
-        .catch(() => setChapters([]))
-        .finally(() => setLoadingChapters(false))
-    } else {
-      setChapters([])
-      setChapterId("")
-    }
-  }, [sectionId, chaptersService])
+      .catch(() => setChapters([]))
+      .finally(() => setLoadingChapters(false))
+  }, [chaptersService])
 
   useEffect(() => {
     if (chapterId) {
@@ -84,14 +63,13 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
       .filter((t) => t)
 
     onChange({
-      sectionId: sectionId || undefined,
       chapterId: chapterId || undefined,
       topicId: topicId || undefined,
       subject: subject || undefined,
       system: system || undefined,
       tags: parsedTags.length > 0 ? parsedTags : undefined,
     })
-  }, [sectionId, chapterId, topicId, subject, system, tags, onChange])
+  }, [chapterId, topicId, subject, system, tags, onChange])
 
   return (
     <Card className="p-4 shadow-md border border-border/40 bg-card/60 backdrop-blur-sm rounded-xl">
@@ -99,33 +77,10 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
         Question Metadata
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-xs font-semibold text-foreground mb-1">
-            System (Section) *
-          </label>
-          <select
-            value={sectionId}
-            onChange={(e) => {
-              setSectionId(e.target.value)
-              setChapterId("")
-              setTopicId("")
-            }}
-            className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            disabled={loadingSections}
-          >
-            <option value="">Select System...</option>
-            {sections.map((section) => (
-              <option key={section.id} value={section.id}>
-                {section.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-foreground mb-1">
-            Subject (Chapter) *
+            Chapter *
           </label>
           <select
             value={chapterId}
@@ -134,9 +89,9 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
               setTopicId("")
             }}
             className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            disabled={loadingChapters || !sectionId}
+            disabled={loadingChapters}
           >
-            <option value="">Select Subject...</option>
+            <option value="">Select Chapter...</option>
             {chapters.map((chapter) => (
               <option key={chapter.id} value={chapter.id}>
                 {chapter.name}

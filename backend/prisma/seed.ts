@@ -22,10 +22,9 @@ async function main() {
 
     // Seed other data
     // await seedLearningCases(prisma);
-    await seedUSMLE(prisma);
-
-    // Seed questions (requires topics to exist)
-    await seedQuestions(prisma);
+    // Dummy/sample questions disabled – use question generator or import only
+    // await seedUSMLE(prisma);
+    // await seedQuestions(prisma);
 
     console.log("\n🎉 All seeding completed successfully!");
   } catch (error) {

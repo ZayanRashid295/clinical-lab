@@ -307,6 +307,31 @@ export default function QuestionFormModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Subject
+              </label>
+              {loadingTags ? (
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                  Loading subjects...
+                </div>
+              ) : (
+                <select
+                  name="productTagId"
+                  value={formData.productTagId || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">None</option>
+                  {tags.map((tag) => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Topic *
               </label>
               {loadingTopics ? (
@@ -326,31 +351,6 @@ export default function QuestionFormModal({
                     <option key={topic.id} value={topic.id}>
                       {topic.name}
                       {topic.chapter?.name && ` (${topic.chapter.name})`}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Tag
-              </label>
-              {loadingTags ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  Loading tags...
-                </div>
-              ) : (
-                <select
-                  name="productTagId"
-                  value={formData.productTagId || ""}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">No tag</option>
-                  {tags.map((tag) => (
-                    <option key={tag.id} value={tag.id}>
-                      {tag.name}
                     </option>
                   ))}
                 </select>

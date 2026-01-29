@@ -56,7 +56,7 @@ const useProductTags = (
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to fetch product tags"
+        err instanceof Error ? err.message : "Failed to fetch subjects"
       );
       setTags([]);
     } finally {

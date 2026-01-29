@@ -154,8 +154,8 @@ export const productTagTableConfig: TableConfig<
   ProductTag,
   ProductTagFilters
 > = {
-  title: "Product Tag Management",
-  description: "Manage product tags and categories",
+  title: "Subject Management",
+  description: "Manage subjects and categories",
   columns: productTagColumns,
   filterConfig: productTagFilterConfig,
   stats: productTagStatsConfig,

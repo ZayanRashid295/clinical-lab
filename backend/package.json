@@ -28,7 +28,8 @@
     "migrate:roles": "tsx scripts/assign-lms-roles.ts",
     "migrate:all": "npm run migrate:indexes && npm run migrate:roles",
     "create:admin": "tsx scripts/create-admin-user.ts",
-    "create:superadmin": "tsx scripts/create-superadmin-user.ts"
+    "create:superadmin": "tsx scripts/create-superadmin-user.ts",
+    "delete:all-questions": "tsx scripts/delete-all-questions.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

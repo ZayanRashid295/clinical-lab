@@ -10,7 +10,8 @@ import { SectionsService } from "@/app/services/content/sections.service"
 import { ChaptersService } from "@/app/services/content/chapters.service"
 import { TopicsService } from "@/app/services/content/topics.service"
 import { ProductTagsService } from "@/app/services/products/product-tags.service"
-import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp } from "lucide-react"
+import { runAutoMatch } from "./metadata-auto-match"
+import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp, Plus } from "lucide-react"
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
 import { QuestionCreatorData } from "./question-creator/types"
 
@@ -53,6 +54,11 @@ export default function BulkMarkdownUploader({
   // Store metadata for each parsed question (frontend-only mapping; backend schema unchanged)
   const [questionMetadata, setQuestionMetadata] = useState<Record<string, { sectionId: string; chapterId: string; topicId: string; productTagId?: string }>>({})
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set()) // Track expanded questions
+  const [addToDbContext, setAddToDbContext] = useState<{ type: "subject" | "chapter" | "topic"; fileName: string; parsedName?: string } | null>(null)
+  const [addToDbLoading, setAddToDbLoading] = useState(false)
+  const [addToDbError, setAddToDbError] = useState<string | null>(null)
+  const [addToDbName, setAddToDbName] = useState("")
+  const [addToDbSectionId, setAddToDbSectionId] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const directoryInputRef = useRef<HTMLInputElement>(null)
   const questionsService = new QuestionsService()
@@ -155,217 +161,45 @@ export default function BulkMarkdownUploader({
     }
   }
 
-  // Auto-match parsed subject(topic)/topic to database entities.
-  // System is derived automatically from the matched Chapter (frontend-only).
+  // Auto-match parsed subject/system/topic to DB entities (shared logic with bulk-docx)
+  const getTopicsForChapter = (chapterId: string) =>
+    topicsService.getTopics({ chapterId, status: "ACTIVE" }).then((r) => (Array.isArray(r) ? r : (r as any)?.data || []))
   const autoMatchMetadata = async (
     fileName: string,
     parsedSystem?: string,
     parsedSubject?: string,
     parsedTopic?: string
   ) => {
-    console.log(`[AutoMatch] Called for ${fileName} with:`, { parsedSystem, parsedSubject, parsedTopic })
-    
-    if (!parsedSystem && !parsedSubject) {
-      console.log(`[AutoMatch] Exiting early: no system or subject provided`)
-      return
-    }
-
-    let matchedSectionId = ""
-    let matchedChapterId = ""
-    let matchedTopicId = ""
-
-    // Helper function to normalize names for comparison (case-insensitive, trim whitespace)
-    const normalizeName = (name: string): string => {
-      if (!name) return ""
-      return name.toLowerCase().trim().replace(/\s+/g, " ")
-    }
-
-    // Helper function for fuzzy matching (handles partial matches)
-    const fuzzyMatch = (str1: string, str2: string): boolean => {
-      const n1 = normalizeName(str1)
-      const n2 = normalizeName(str2)
-      // Exact match
-      if (n1 === n2) return true
-      // Contains match (one contains the other)
-      if (n1.includes(n2) || n2.includes(n1)) return true
-      // Word-by-word match (all words from shorter string exist in longer)
-      const words1 = n1.split(/\s+/).filter(w => w.length > 0)
-      const words2 = n2.split(/\s+/).filter(w => w.length > 0)
-      if (words1.length > 0 && words2.length > 0) {
-        const shorter = words1.length <= words2.length ? words1 : words2
-        const longer = words1.length > words2.length ? words1 : words2
-        return shorter.every(word => longer.some(lw => lw.includes(word) || word.includes(lw)))
-      }
-      return false
-    }
-
-    // Get current sections - fetch directly if not available in state
-    let currentSections = sections.length > 0 ? sections : []
-    if (currentSections.length === 0) {
+    if (!parsedSystem && !parsedSubject) return
+    let sectionsToUse = sections
+    if (sectionsToUse.length === 0) {
       try {
         const response = await sectionsService.getSections({ status: "ACTIVE" })
-        currentSections = Array.isArray(response) ? response : (response as any)?.data || []
-        // Update state for future use
-        if (currentSections.length > 0) {
-          setSections(currentSections)
+        const data = Array.isArray(response) ? response : (response as any)?.data || []
+        if (data.length > 0) {
+          setSections(data)
+          sectionsToUse = data
         }
-      } catch (error) {
-        console.error("[AutoMatch] Failed to fetch sections:", error)
-      }
+      } catch (_) {}
     }
-    
-    // Prefer matching by Chapter (Subject) first (system gets derived from chapter)
-    if (parsedSubject && chapters.length > 0) {
-      const normalizedSubject = normalizeName(parsedSubject)
-      const allChapters = chapters
-      let matchedChapter = allChapters.find((chapter: any) => normalizeName(chapter.name) === normalizedSubject)
-      if (!matchedChapter) {
-        matchedChapter = allChapters.find((chapter: any) => fuzzyMatch(chapter.name, parsedSubject))
-      }
-      if (matchedChapter) {
-        matchedChapterId = matchedChapter.id
-        matchedSectionId = matchedChapter.sectionId || matchedChapter.section?.id || ""
-        // Load topics for this chapter
-        await loadTopics(matchedChapterId, false)
-        const chapterTopics = await loadTopics(matchedChapterId, true)
-        if (parsedTopic && chapterTopics.length > 0) {
-          const normalizedTopic = normalizeName(parsedTopic)
-          let matchedTopic = chapterTopics.find((t: any) => normalizeName(t.name) === normalizedTopic)
-          if (!matchedTopic) {
-            matchedTopic = chapterTopics.find((t: any) => fuzzyMatch(t.name, parsedTopic))
-          }
-          if (matchedTopic) matchedTopicId = matchedTopic.id
-          else if (chapterTopics.length === 1) matchedTopicId = chapterTopics[0].id
-        } else if (chapterTopics.length === 1) {
-          matchedTopicId = chapterTopics[0].id
-        }
-      }
-    }
-
-    // Fallback to old behavior if chapter couldn't be matched
-    if (!matchedChapterId && parsedSystem && currentSections.length > 0) {
-      const normalizedSystem = normalizeName(parsedSystem)
-      console.log(`[AutoMatch] Matching system: "${parsedSystem}" (normalized: "${normalizedSystem}")`)
-      console.log(`[AutoMatch] Available sections:`, currentSections.map(s => s.name))
-      
-      // First try exact match
-      let matchedSection = currentSections.find(
-        (section) => normalizeName(section.name) === normalizedSystem
-      )
-      
-      // If no exact match, try fuzzy matching
-      if (!matchedSection) {
-        matchedSection = currentSections.find(
-          (section) => fuzzyMatch(section.name, parsedSystem)
-        )
-      }
-      
-      if (matchedSection) {
-        console.log(`[AutoMatch] ✓ Matched system: "${matchedSection.name}" (ID: ${matchedSection.id})`)
-      } else {
-        console.log(`[AutoMatch] ✗ No match found for system: "${parsedSystem}"`)
-      }
-
-      if (matchedSection) {
-        matchedSectionId = matchedSection.id
-        // Load chapters for this section (skip state update to get data immediately)
-        const sectionChapters = await loadChapters(matchedSectionId, true)
-        // Also update state for UI
-        await loadChapters(matchedSectionId, false)
-
-        // Try to match Subject (Chapter) within the matched section
-        if (parsedSubject && sectionChapters.length > 0) {
-          const normalizedSubject = normalizeName(parsedSubject)
-          console.log(`[AutoMatch] Matching subject: "${parsedSubject}" (normalized: "${normalizedSubject}")`)
-          console.log(`[AutoMatch] Available chapters:`, sectionChapters.map(c => c.name))
-          
-          // First try exact match
-          let matchedChapter = sectionChapters.find(
-            (chapter) => normalizeName(chapter.name) === normalizedSubject
-          )
-          
-          // If no exact match, try fuzzy matching
-          if (!matchedChapter) {
-            matchedChapter = sectionChapters.find(
-              (chapter) => fuzzyMatch(chapter.name, parsedSubject)
-            )
-          }
-          
-          if (matchedChapter) {
-            console.log(`[AutoMatch] ✓ Matched subject: "${matchedChapter.name}" (ID: ${matchedChapter.id})`)
-          } else {
-            console.log(`[AutoMatch] ✗ No match found for subject: "${parsedSubject}"`)
-          }
-
-          if (matchedChapter) {
-            matchedChapterId = matchedChapter.id
-            // Load topics for this chapter (skip state update to get data immediately)
-            const chapterTopics = await loadTopics(matchedChapterId, true)
-            // Also update state for UI
-            await loadTopics(matchedChapterId, false)
-
-            // Try to match topic if parsed topic exists
-            if (parsedTopic && chapterTopics.length > 0) {
-              const normalizedTopic = normalizeName(parsedTopic)
-              // First try exact match
-              let matchedTopic = chapterTopics.find(
-                (topic) => normalizeName(topic.name) === normalizedTopic
-              )
-              
-              // If no exact match, try fuzzy matching
-              if (!matchedTopic) {
-                matchedTopic = chapterTopics.find(
-                  (topic) => fuzzyMatch(topic.name, parsedTopic)
-                )
-              }
-
-              if (matchedTopic) {
-                matchedTopicId = matchedTopic.id
-              } else if (chapterTopics.length === 1) {
-                // If there's only one topic and no match, auto-select it
-                matchedTopicId = chapterTopics[0].id
-              }
-            } else if (chapterTopics.length === 1) {
-              // If there's only one topic, auto-select it
-              matchedTopicId = chapterTopics[0].id
-            }
-          }
-        }
-      }
-    }
-
-    // Update metadata if we found matches
-    // Use skipClearing=true to set all three at once without clearing dependent fields
-    if (matchedSectionId || matchedChapterId || matchedTopicId) {
-      console.log(`[AutoMatch] Updating metadata for ${fileName}:`, {
-        sectionId: matchedSectionId,
-        chapterId: matchedChapterId,
-        topicId: matchedTopicId,
-      })
-      
+    const matched = await runAutoMatch(
+      { parsedSubject, parsedSystem, parsedTopic },
+      chapters,
+      { sections: sectionsToUse.length > 0 ? sectionsToUse : [], getTopicsForChapter }
+    )
+    if (matched.sectionId || matched.chapterId || matched.topicId) {
       updateQuestionMetadata(
         fileName,
         {
-          sectionId: matchedSectionId,
-          chapterId: matchedChapterId,
-          topicId: matchedTopicId,
+          sectionId: matched.sectionId || "",
+          chapterId: matched.chapterId || "",
+          topicId: matched.topicId || "",
         },
-        true // skipClearing - we're setting all at once during auto-matching
+        true
       )
-      
-      // Auto-expand the question so user can see the auto-selected values
-      setExpandedQuestions((prev) => {
-        const newSet = new Set(prev)
-        newSet.add(fileName)
-        return newSet
-      })
-    } else {
-      console.log(`[AutoMatch] No matches found for ${fileName}`, {
-        parsedSystem,
-        parsedSubject,
-        parsedTopic,
-      })
+      setExpandedQuestions((prev) => new Set(prev).add(fileName))
     }
+    if (matched.chapterId) loadTopics(matched.chapterId)
   }
 
   // Helper to get filename from path
@@ -804,6 +638,74 @@ export default function BulkMarkdownUploader({
     })
   }
 
+  const handleAddToDbSubmit = async () => {
+    if (!addToDbContext) return
+    const name = (addToDbName || addToDbContext.parsedName || "").trim()
+    if (!name) {
+      setAddToDbError("Name is required")
+      return
+    }
+    setAddToDbError(null)
+    setAddToDbLoading(true)
+    try {
+      const { type, fileName } = addToDbContext
+      if (type === "subject") {
+        const res: any = await productTagsService.createTag({ name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProductTags(data)
+          updateQuestionMetadata(fileName, { productTagId: id })
+          setAddToDbContext(null)
+        }
+      } else if (type === "chapter") {
+        const sectionId = addToDbSectionId || sections[0]?.id
+        if (!sectionId) {
+          setAddToDbError("Select a section first")
+          setAddToDbLoading(false)
+          return
+        }
+        const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setChapters(data)
+          updateQuestionMetadata(fileName, { chapterId: id, topicId: "" })
+          loadTopics(id)
+          setAddToDbContext(null)
+        }
+      } else if (type === "topic") {
+        const chapterId = questionMetadata[fileName]?.chapterId
+        if (!chapterId) {
+          setAddToDbError("Select a chapter first")
+          setAddToDbLoading(false)
+          return
+        }
+        const res: any = await topicsService.createTopic({ chapterId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          await loadTopics(chapterId)
+          updateQuestionMetadata(fileName, { topicId: id })
+          setAddToDbContext(null)
+        }
+      }
+    } catch (e: any) {
+      setAddToDbError(e?.message || "Failed to create")
+    } finally {
+      setAddToDbLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (addToDbContext) {
+      setAddToDbName(addToDbContext.parsedName || "")
+      setAddToDbSectionId(sections[0]?.id || "")
+      setAddToDbError(null)
+    }
+  }, [addToDbContext, sections])
+
   // Create questions from parsed data
   const createQuestions = async () => {
     if (!summary) return
@@ -822,7 +724,7 @@ export default function BulkMarkdownUploader({
 
     if (missingTopics.length > 0) {
       setErrors([
-        `Please select Topic for all questions. Missing for: ${missingTopics.map((r) => r.fileName).join(", ")}`,
+        `Select or add a Topic for each question. Missing for: ${missingTopics.map((r) => r.fileName).join(", ")}`,
       ])
       return
     }
@@ -846,7 +748,6 @@ export default function BulkMarkdownUploader({
           }
           
           const questionTopicId = metadata.topicId
-          const questionSectionId = metadata.sectionId
           const questionChapterId = metadata.chapterId
           const questionProductTagId = (metadata as any).productTagId
 
@@ -910,10 +811,7 @@ export default function BulkMarkdownUploader({
             isActive: true,
           }
           
-          // Add sectionId and chapterId if available
-          if (questionSectionId) {
-            questionPayload.sectionId = questionSectionId
-          }
+          // Add chapterId if available (section is derived from chapter at backend)
           if (questionChapterId) {
             questionPayload.chapterId = questionChapterId
           }
@@ -1286,56 +1184,58 @@ export default function BulkMarkdownUploader({
                       {/* Question Content (Expandable) */}
                       {result.status === "success" && result.questionData && isExpanded && (
                         <div className="mt-4 space-y-4 pt-4 border-t border-border dark:border-gray-600">
-                          {/* Subjects (tag), Chapters, Topic Selection */}
+                          {/* Subject, Chapter, Topic: Parsed from document + DB dropdowns + Add to DB */}
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* Subjects (Product Tag) */}
+                            {/* Subject */}
                             <div>
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
-                                Subjects
-                                {result.questionData.tags && result.questionData.tags.length > 0 && (
-                                  <span className="text-xs text-muted-foreground dark:text-gray-300 ml-2">
-                                    (Parsed: {result.questionData.tags[0]})
-                                  </span>
-                                )}
+                                Subject
                               </label>
-                              <select
-                                value={(metadata as any).productTagId || ""}
-                                onChange={(e) => updateQuestionMetadata(result.fileName, { productTagId: e.target.value })}
-                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                disabled={isCreating || loadingTags}
-                              >
-                                <option value="">Select Subject...</option>
-                                {productTags.map((tag) => (
-                                  <option key={tag.id} value={tag.id}>
-                                    {tag.name}
-                                  </option>
-                                ))}
-                              </select>
+                              {result.questionData.tags?.[0] && (
+                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.tags[0]}</p>
+                              )}
+                              <div className="flex gap-1">
+                                <select
+                                  value={(metadata as any).productTagId || ""}
+                                  onChange={(e) => updateQuestionMetadata(result.fileName, { productTagId: e.target.value })}
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  disabled={isCreating || loadingTags}
+                                >
+                                  <option value="">Select Subject...</option>
+                                  {productTags.map((tag) => (
+                                    <option key={tag.id} value={tag.id}>{tag.name}</option>
+                                  ))}
+                                </select>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: result.questionData.tags?.[0] || "New Subject" })}>
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
 
-                            {/* Chapters */}
+                            {/* Chapter */}
                             <div>
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
-                                Chapters <span className="text-red-500 dark:text-red-400">*</span>
-                                {result.questionData.subject && (
-                                  <span className="text-xs text-muted-foreground dark:text-gray-300 ml-2">
-                                    (Parsed: {result.questionData.subject})
-                                  </span>
-                                )}
+                                Chapter <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
-                              <select
-                                value={metadata.chapterId}
-                                onChange={(e) => updateQuestionMetadata(result.fileName, { chapterId: e.target.value })}
-                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                disabled={isCreating || loadingChapters}
-                              >
-                                <option value="">Select Chapter...</option>
-                                {chapters.map((chapter) => (
-                                  <option key={chapter.id} value={chapter.id}>
-                                    {chapter.name}
-                                  </option>
-                                ))}
-                              </select>
+                              {result.questionData.subject && (
+                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.subject}</p>
+                              )}
+                              <div className="flex gap-1">
+                                <select
+                                  value={metadata.chapterId}
+                                  onChange={(e) => updateQuestionMetadata(result.fileName, { chapterId: e.target.value })}
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  disabled={isCreating || loadingChapters}
+                                >
+                                  <option value="">Select Chapter...</option>
+                                  {chapters.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: result.questionData.subject || "New Chapter" })}>
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
 
                             {/* Topic */}
@@ -1343,21 +1243,28 @@ export default function BulkMarkdownUploader({
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                 Topic <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
-                              <select
-                                value={metadata.topicId}
-                                onChange={(e) => updateQuestionMetadata(result.fileName, { topicId: e.target.value })}
-                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                disabled={isCreating || isLoadingTopics || !metadata.chapterId}
-                              >
-                                <option value="">Select Topic...</option>
-                                {questionTopics.map((topic) => (
-                                  <option key={topic.id} value={topic.id}>
-                                    {topic.name}
-                                  </option>
-                                ))}
-                              </select>
+                              {result.questionData.topic && (
+                                <p className="text-xs text-muted-foreground dark:text-gray-300 mb-0.5">Parsed: {result.questionData.topic}</p>
+                              )}
+                              <div className="flex gap-1">
+                                <select
+                                  value={metadata.topicId}
+                                  onChange={(e) => updateQuestionMetadata(result.fileName, { topicId: e.target.value })}
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  disabled={isCreating || isLoadingTopics || !metadata.chapterId}
+                                >
+                                  <option value="">Select Topic...</option>
+                                  {questionTopics.map((t) => (
+                                    <option key={t.id} value={t.id}>{t.name}</option>
+                                  ))}
+                                </select>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.chapterId} title={!metadata.chapterId ? "Select chapter first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: result.questionData.topic || "New Topic" })}>
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
+                          <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">Subject and System from the document are always saved as text. Link to taxonomy via Chapter/Topic.</p>
 
                           {/* Question Preview */}
                           <div className="space-y-3">
@@ -1538,6 +1445,40 @@ export default function BulkMarkdownUploader({
           </div>
         )}
       </div>
+
+      {/* Add to DB modal */}
+      {addToDbContext && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border dark:border-gray-600">
+            <h3 className="text-sm font-semibold mb-3 text-foreground dark:text-gray-100">
+              {addToDbContext.type === "subject" && "Add Subject to database"}
+              {addToDbContext.type === "chapter" && "Add Chapter to database"}
+              {addToDbContext.type === "topic" && "Add Topic to database"}
+            </h3>
+            <div className="space-y-3">
+              {addToDbContext.type === "chapter" && (
+                <div>
+                  <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Section</label>
+                  <select className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800" value={addToDbSectionId} onChange={(e) => setAddToDbSectionId(e.target.value)}>
+                    {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+              )}
+              <div>
+                <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Name</label>
+                <input type="text" className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800 text-foreground dark:text-gray-100" value={addToDbName} onChange={(e) => setAddToDbName(e.target.value)} placeholder={addToDbContext.parsedName} />
+              </div>
+              {addToDbError && <p className="text-xs text-red-600 dark:text-red-400">{addToDbError}</p>}
+            </div>
+            <div className="flex gap-2 mt-4 justify-end">
+              <Button variant="outline" size="sm" onClick={() => { setAddToDbContext(null); setAddToDbError(null) }} disabled={addToDbLoading}>Cancel</Button>
+              <Button size="sm" onClick={handleAddToDbSubmit} disabled={addToDbLoading}>
+                {addToDbLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

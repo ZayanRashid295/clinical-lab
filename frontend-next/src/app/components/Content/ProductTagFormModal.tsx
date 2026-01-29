@@ -176,7 +176,7 @@ export default function ProductTagFormModal({
       setError(
         err?.response?.data?.message ||
           err?.message ||
-          "Failed to save product tag"
+          "Failed to save subject"
       );
     } finally {
       setLoading(false);
@@ -199,7 +199,7 @@ export default function ProductTagFormModal({
           <div className="flex items-center">
             <Tag className="h-6 w-6 text-purple-600 mr-2" />
             <h2 className="text-xl font-semibold text-gray-900">
-              {isCreateMode ? "Create Product Tag" : "Edit Product Tag"}
+              {isCreateMode ? "Create Subject" : "Edit Subject"}
             </h2>
           </div>
           <button

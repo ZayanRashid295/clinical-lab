@@ -1134,13 +1134,13 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                       }}
                     />
 
-                    {/* Metadata (Subjects/Chapters/Topic) */}
+                    {/* Metadata (Subject/Chapters/Topic) */}
                     <div className="border-t border-border/40 dark:border-gray-700 pt-6 mt-6">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Subjects (Product Tag) */}
+                        {/* Subject */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Subjects
+                            Subject
                           </div>
                           <select
                             value={metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""}
@@ -1236,7 +1236,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
         isOpen={showMetadataModal}
         onClose={() => setShowMetadataModal(false)}
         onSave={(newMetadata) => {
-          setMetadata(newMetadata)
+          const chapter = chapters.find((c: any) => c.id === newMetadata.chapterId)
+          const derivedSectionId = chapter?.sectionId || chapter?.section?.id
+          setMetadata((prev) => ({ ...prev, ...newMetadata, sectionId: derivedSectionId || prev.sectionId }))
         }}
         initialMetadata={metadata}
       />
