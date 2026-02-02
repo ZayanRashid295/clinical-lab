@@ -821,6 +821,17 @@ export function parseMarkdown(content: string): ParsedQuestion {
   } as ParsedQuestion
 }
 
+/**
+ * Ensure long run-on paragraphs get paragraph breaks so rendering shows structure.
+ * Used for per-choice explanation content that may be one long paragraph from LLM.
+ */
+function ensureParagraphBreaksInPlainText(markdown: string): string {
+  if (!markdown || markdown.length < 120) return markdown
+  if (markdown.includes("\n\n")) return markdown
+  if (/^[-*+]\s/m.test(markdown) || /^\d+\.\s/m.test(markdown)) return markdown
+  return markdown.replace(/([a-z])\.\s+([A-Z])/g, "$1.\n\n$2")
+}
+
 export function convertMarkdownToExplanationBlocks(markdownText: string): any[] {
   const blocks: any[] = []
   // Clean up the markdown: remove unnecessary separators and normalize line breaks
@@ -1223,8 +1234,20 @@ export function convertMarkdownToExplanationBlocks(markdownText: string): any[] 
     })
   }
 
+  // For text blocks that are long run-on paragraphs (no lists, no double newlines),
+  // insert paragraph breaks so per-choice explanations render with structure.
+  const normalizedBlocks = blocks.map((block) => {
+    if (block.type === "text" && block.data?.markdown) {
+      const md = ensureParagraphBreaksInPlainText(block.data.markdown)
+      if (md !== block.data.markdown) {
+        return { ...block, data: { ...block.data, markdown: md } }
+      }
+    }
+    return block
+  })
+
   // Ensure blocks are sorted by order (should already be in order, but just in case)
-  return blocks.sort((a, b) => {
+  return normalizedBlocks.sort((a, b) => {
     const orderA = typeof a.order === "number" ? a.order : 999
     const orderB = typeof b.order === "number" ? b.order : 999
     return orderA - orderB

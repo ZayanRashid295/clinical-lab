@@ -2051,12 +2051,15 @@ question_id: <Unique Question ID>
 **A. <Option A Text>**
 
 ### Choice A Explanation
-<Explanation for Option A>
+- <First key point or sentence.>
+- <Second key point. Use bullets for each distinct idea.>
+- <Third key point. Do not use one long paragraph.>
 
-**B. <Option B Text>** 
+**B. <Option B Text>**
 
 ### Choice B Explanation
-<Explanation for Option B>
+- <First key point.>
+- <Second key point.>
 
 **C. <Option C Text>**
 
@@ -2158,12 +2161,28 @@ CRITICAL INSTRUCTIONS
      **B. Option B text**
      ...
    - For each option, include a '### Choice X Explanation' section immediately after.
-4. CORRECT ANSWER
+4. PER-CHOICE EXPLANATION FORMATTING (CRITICAL – BULLETS AND PARAGRAPHS)
+   - Each '### Choice X Explanation' block MUST use proper Markdown so that bullets,
+     lists, and paragraphs display correctly in the app. Do NOT output one long
+     run-on paragraph.
+   - Use bullet lists for key points: start each distinct idea or sentence with
+     \"- \" (dash space). Example:
+       ### Choice A Explanation
+       - Single placenta, one chorion, one amniotic sac.
+       - High-risk due to cord entanglement and twin-to-twin transfusion syndrome (TTTS).
+       - USG would show one sac with both fetuses inside. Not the case here.
+   - If the source has a numbered list, use \"1. \", \"2. \", etc. in Markdown.
+   - Use a blank line between paragraphs when there are multiple distinct ideas
+     that are not in a list.
+   - Use **bold** for important medical terms when appropriate (e.g. **TTTS**).
+   - Preserve all content and wording from the source; only add Markdown structure
+     (bullets, line breaks, bold) so that formatting renders correctly.
+5. CORRECT ANSWER
    - Determine the correct answer letter (A–E) from the HTML (e.g. "ANSWER: C").
    - Set it in both:
      - Frontmatter: correct_answer: C
      - Body: **Correct Answer:** C
-5. EXPLANATION SECTION LAYOUT (MUST INCLUDE ALL CONTENT, NOTHING DROPPED)
+6. EXPLANATION SECTION LAYOUT (MUST INCLUDE ALL CONTENT, NOTHING DROPPED)
    - Under '## Explanation', build the content in **this exact order**:
      
      STEP 1 – CHOICE-BY-CHOICE EXPLANATIONS PLACEHOLDER (FIRST)
@@ -2211,7 +2230,7 @@ CRITICAL INSTRUCTIONS
      - Do NOT drop, merge, or reorder any content; every piece of text, table,
        or image that appears in the source explanation must appear here.
 
-7. FIDELITY TO SOURCE (CRITICAL - NO PARAPHRASING OR RESTRUCTURING)
+7. FIDELITY TO SOURCE (CRITICAL – NO PARAPHRASING OR RESTRUCTURING)
    - **Do NOT paraphrase or summarize** any medical content, sentences, or bullet points.
    - **Preserve wording as-is** from the HTML/source whenever possible; only adjust
      formatting so it fits valid Markdown and the required template.

@@ -117,7 +117,8 @@ question_id: <Unique Question ID>
 **A. <Option A Text>**
 
 ### Choice A Explanation
-<Explanation for Option A>
+- <First key point. Use bullets for each distinct idea.>
+- <Second key point. Do not use one long paragraph.>
 
 ...
 

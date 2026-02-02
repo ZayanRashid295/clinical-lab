@@ -1791,34 +1791,75 @@ function renderPerAnswerExplanations(
                 {hasContent ? (
                   <>
                     {isContentBlocks ? (
-                      // For blocks, check if they contain HTML with colors/highlights
-                      // If so, extract HTML and render directly to preserve formatting
+                      // For blocks: prefer HTML rendering whenever any block has usable HTML,
+                      // so bullets, lists, fonts and formatting match main explanation content.
                       (() => {
-                        // Check if any block has HTML with colors/highlights
-                        const hasHtmlWithFormatting = explanation.some((block: any) => {
-                          const html = block?.data?.html || ""
-                          return html && (html.includes("<span") || html.includes("<mark") || html.includes("style="))
-                        })
-                        
-                        if (hasHtmlWithFormatting) {
-                          // Extract HTML from all blocks and render directly
+                        const emptyHtmlPatterns = [
+                          "", "<p></p>", "<p><br></p>", "<p> </p>", "<p><br/></p>",
+                          "<div></div>", "<div><br></div>", "<div><br/></div>",
+                        ]
+                        const hasUsableHtml = (html: string) =>
+                          html && typeof html === "string" && html.trim() &&
+                          !emptyHtmlPatterns.includes(html.trim().replace(/\s+/g, " "))
+
+                        const blocksWithHtml = explanation
+                          .map((block: any) => block?.data?.html || "")
+                          .filter(hasUsableHtml)
+                        const hasAnyHtml = blocksWithHtml.length > 0
+
+                        if (hasAnyHtml) {
+                          // Combine all block HTML and render with HtmlRenderer so formatting (bullets, lists, fonts) is preserved
                           const combinedHtml = explanation
                             .map((block: any) => block?.data?.html || "")
                             .filter((html: string) => html && html.trim())
                             .join("")
-                          
+
                           if (combinedHtml) {
-                            return <HtmlRenderer html={combinedHtml} itemId={`per-answer-${option.label}`} />
+                            return (
+                              <div className="text-foreground/90 per-answer-explanation-content">
+                                <style dangerouslySetInnerHTML={{
+                                  __html: `
+                                    .per-answer-explanation-content ul {
+                                      list-style-type: disc !important;
+                                      list-style-position: outside !important;
+                                      padding-left: 1.5rem !important;
+                                      margin: 0.5rem 0 1rem 0 !important;
+                                    }
+                                    .per-answer-explanation-content ol {
+                                      list-style-type: decimal !important;
+                                      list-style-position: outside !important;
+                                      padding-left: 1.5rem !important;
+                                      margin: 0.5rem 0 1rem 0 !important;
+                                    }
+                                    .per-answer-explanation-content li {
+                                      display: list-item !important;
+                                      list-style-position: outside !important;
+                                      margin: 0.25rem 0 !important;
+                                    }
+                                    .per-answer-explanation-content p { margin: 0.5rem 0 !important; }
+                                    .per-answer-explanation-content strong { font-weight: 600 !important; }
+                                    .per-answer-explanation-content em { font-style: italic !important; }
+                                  `
+                                }} />
+                                <HtmlRenderer html={combinedHtml} itemId={`per-answer-${option.label}`} />
+                              </div>
+                            )
                           }
                         }
-                        
-                        // Otherwise, use RichContentRenderer (which will handle markdown conversion)
-                        // But ensure it has proper CSS for lists
+
+                        // Fallback: normalize block types (TEXT -> text, etc.) and use RichContentRenderer
+                        const normalizedBlocks = explanation.map((block: any) => {
+                          const t = (block?.type || "text").toString().toLowerCase()
+                          return {
+                            ...block,
+                            type: t === "image" ? "images" : t,
+                            id: block?.id ?? `block-${option.label}-${Math.random()}`,
+                          }
+                        })
                         return (
                           <div className="text-foreground/90 per-answer-explanation-content">
                             <style dangerouslySetInnerHTML={{
                               __html: `
-                                /* Ensure lists in per-answer explanation content blocks show bullets/numbers */
                                 .per-answer-explanation-content ul {
                                   list-style-type: disc !important;
                                   list-style-position: outside !important;
@@ -1851,15 +1892,41 @@ function renderPerAnswerExplanations(
                                 }
                               `
                             }} />
-                            <RichContentRenderer content={explanation} />
+                            <RichContentRenderer content={normalizedBlocks} />
                           </div>
                         )
                       })()
                     ) : (
-                      // Check if explanation contains HTML (like colors, highlights)
-                      // If it does, render as HTML instead of markdown to preserve formatting
-                      (typeof explanation === "string" && (explanation.includes("<span") || explanation.includes("<mark") || explanation.includes("style="))) ? (
-                        <HtmlRenderer html={explanation} itemId={`per-answer-${option.label}`} />
+                      // If explanation is a string with HTML (lists, bullets, formatting), use HtmlRenderer
+                      (typeof explanation === "string" && explanation.trim() && (
+                        explanation.includes("<") && explanation.includes(">") &&
+                        (explanation.includes("<ul") || explanation.includes("<ol") || explanation.includes("<p>") ||
+                         explanation.includes("<span") || explanation.includes("<mark") || explanation.includes("style=") ||
+                         explanation.includes("<strong") || explanation.includes("<em"))
+                      )) ? (
+                        <div className="text-foreground/90 per-answer-explanation-content">
+                          <style dangerouslySetInnerHTML={{
+                            __html: `
+                              .per-answer-explanation-content ul {
+                                list-style-type: disc !important;
+                                list-style-position: outside !important;
+                                padding-left: 1.5rem !important;
+                                margin: 0.5rem 0 1rem 0 !important;
+                              }
+                              .per-answer-explanation-content ol {
+                                list-style-type: decimal !important;
+                                list-style-position: outside !important;
+                                padding-left: 1.5rem !important;
+                                margin: 0.5rem 0 1rem 0 !important;
+                              }
+                              .per-answer-explanation-content li { display: list-item !important; margin: 0.25rem 0 !important; }
+                              .per-answer-explanation-content p { margin: 0.5rem 0 !important; }
+                              .per-answer-explanation-content strong { font-weight: 600 !important; }
+                              .per-answer-explanation-content em { font-style: italic !important; }
+                            `
+                          }} />
+                          <HtmlRenderer html={explanation} itemId={`per-answer-${option.label}`} />
+                        </div>
                       ) : (
                         <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90" style={{ 
                           // Override prose list styles to ensure bullets/numbers are visible
