@@ -393,6 +393,11 @@ export default function AdminDashboard() {
     // Use stored productTagIds or fallback to single productTagId
     const productTagIds = storedProductTagIds || (backendQuestion.productTagId ? [backendQuestion.productTagId] : undefined)
     
+    const chapterName = backendQuestion.chapter?.name ?? backendQuestion.topic?.chapter?.name ?? ""
+    const topicName = backendQuestion.topic?.name ?? ""
+    // Subject = product tag name for display
+    const subjectDisplay = backendQuestion.productTag?.name ?? backendQuestion.subject ?? ""
+
     return {
       id: backendQuestion.id,
       questionId: storedQuestionId || backendQuestion.metadata?.questionId || backendQuestion.questionId || null,
@@ -400,10 +405,12 @@ export default function AdminDashboard() {
       questionStemBlocks,
       options,
       choices: backendQuestion.choices,
-      subject: backendQuestion.subject || "",
+      subject: subjectDisplay,
       system: backendQuestion.system || "",
       chapterId: backendQuestion.chapterId || "",
       sectionId: backendQuestion.sectionId || "",
+      chapterName,
+      topicName,
       productTagId: backendQuestion.productTagId || "",
       productTagIds: productTagIds,
       explanation: transformedExplanation,

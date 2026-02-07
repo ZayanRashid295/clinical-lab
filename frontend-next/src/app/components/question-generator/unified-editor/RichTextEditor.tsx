@@ -1321,12 +1321,12 @@ export default function RichTextEditor({
           editor={editor} 
           className="prose prose-sm dark:prose-invert max-w-none 
             [&_p]:text-foreground dark:[&_p]:text-gray-100 
-            [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-6 [&_h1]:mb-4
-            [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-5 [&_h2]:mb-3
-            [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2
-            [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:text-lg [&_h4]:font-bold [&_h4]:mt-3 [&_h4]:mb-2
-            [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:text-base [&_h5]:font-bold [&_h5]:mt-2 [&_h5]:mb-1
-            [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:text-sm [&_h6]:font-bold [&_h6]:mt-2 [&_h6]:mb-1
+            [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-center [&_h1]:mt-6 [&_h1]:mb-4
+            [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-center [&_h2]:mt-5 [&_h2]:mb-3
+            [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-center [&_h3]:mt-4 [&_h3]:mb-2
+            [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:text-lg [&_h4]:font-bold [&_h4]:text-center [&_h4]:mt-3 [&_h4]:mb-2
+            [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:text-base [&_h5]:font-bold [&_h5]:text-center [&_h5]:mt-2 [&_h5]:mb-1
+            [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:text-sm [&_h6]:font-bold [&_h6]:text-center [&_h6]:mt-2 [&_h6]:mb-1
             [&_ul]:text-foreground dark:[&_ul]:text-gray-100 [&_ul]:list-disc [&_ul]:list-outside [&_ul]:ml-6 [&_ul]:pl-0
             [&_ol]:text-foreground dark:[&_ol]:text-gray-100 [&_ol]:list-decimal [&_ol]:list-outside [&_ol]:ml-6 [&_ol]:pl-0
             [&_li]:text-foreground dark:[&_li]:text-gray-100 [&_li]:ml-0 [&_li]:pl-0"

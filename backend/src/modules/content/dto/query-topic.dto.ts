@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsEnum,
   IsDateString,
+  IsBoolean,
   Min,
   Max,
 } from "class-validator";
@@ -102,5 +103,14 @@ export class QueryTopicDto {
   @IsOptional()
   @IsEnum(["asc", "desc"])
   sortOrder?: "asc" | "desc" = "asc";
+
+  @ApiProperty({
+    description: "Return all matching records without pagination (for dropdowns)",
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value === "true" || value === true)
+  @IsBoolean()
+  listAll?: boolean;
 }
 

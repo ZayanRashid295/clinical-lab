@@ -15,7 +15,6 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
   const [chapterId, setChapterId] = useState(value.chapterId || "")
   const [topicId, setTopicId] = useState(value.topicId || "")
   const [subject, setSubject] = useState(value.subject || "")
-  const [system, setSystem] = useState(value.system || "")
   const [tags, setTags] = useState(value.tags?.join(", ") || "")
 
   const chaptersService = useMemo(() => new ChaptersService(), [])
@@ -30,7 +29,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
   useEffect(() => {
     setLoadingChapters(true)
     chaptersService
-      .getChapters({ status: "ACTIVE" })
+      .getChapters({ status: "ACTIVE", listAll: true })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         setChapters(data)
@@ -43,7 +42,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
     if (chapterId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId, status: "ACTIVE" })
+        .getTopics({ chapterId, status: "ACTIVE", listAll: true })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)
@@ -66,10 +65,9 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
       chapterId: chapterId || undefined,
       topicId: topicId || undefined,
       subject: subject || undefined,
-      system: system || undefined,
       tags: parsedTags.length > 0 ? parsedTags : undefined,
     })
-  }, [chapterId, topicId, subject, system, tags, onChange])
+  }, [chapterId, topicId, subject, tags, onChange])
 
   return (
     <Card className="p-4 shadow-md border border-border/40 bg-card/60 backdrop-blur-sm rounded-xl">

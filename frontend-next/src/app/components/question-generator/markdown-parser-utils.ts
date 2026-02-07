@@ -835,7 +835,9 @@ function ensureParagraphBreaksInPlainText(markdown: string): string {
 export function convertMarkdownToExplanationBlocks(markdownText: string): any[] {
   const blocks: any[] = []
   // Clean up the markdown: remove unnecessary separators and normalize line breaks
+  // Strip "Correct Answer: X" lines so they never appear in explanation blocks
   let cleanedMarkdown = markdownText
+    .replace(/^\s*(\*\*)?Correct Answer(\*\*)?\s*:\s*(\*\*)?\s*[A-Ea-e]\s*$/gim, "") // Standalone "Correct Answer: X" line so it never appears in explanation blocks
     .replace(/^---+$/gm, "") // Remove horizontal rules (---)
     .replace(/^--+$/gm, "") // Remove double dashes (--)
     .replace(/\n{3,}/g, "\n\n") // Normalize multiple line breaks to max 2

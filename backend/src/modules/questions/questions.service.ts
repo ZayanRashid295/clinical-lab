@@ -534,6 +534,14 @@ export class QuestionsService {
         if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
     }
+    // Default to "General Principles" when no section/chapter provided (e.g. uploaded questions)
+    if (!resolvedSectionId) {
+      const defaultSection = await this.prisma.section.findFirst({
+        where: { name: "General Principles", isActive: true },
+        select: { id: true },
+      });
+      if (defaultSection) resolvedSectionId = defaultSection.id;
+    }
 
     // If sectionId is provided (or derived from chapter), fetch section name for system
     if (resolvedSectionId && !questionCore.system) {
@@ -749,6 +757,14 @@ export class QuestionsService {
         // Derive section from chapter when sectionId not provided
         if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
+    }
+    // Default to "General Principles" when no section/chapter provided
+    if (!resolvedSectionId) {
+      const defaultSection = await this.prisma.section.findFirst({
+        where: { name: "General Principles", isActive: true },
+        select: { id: true },
+      });
+      if (defaultSection) resolvedSectionId = defaultSection.id;
     }
 
     // If sectionId is provided (or derived from chapter), fetch section name for system
@@ -2115,15 +2131,15 @@ The frontend parser expects this exact structure:
 - YAML frontmatter with: title, tags, difficulty, correct_answer, question_id
 - "# ..." title line
 - "## Topic: ..." line
-- "## Question" section with the full clinical case / stem
+- "## Question" section with ONLY the clinical case / stem (do not put the "Options and Explanations" heading or options inside it)
 - "## Options and Explanations" with options A–E in the '**A. text**' format and
   a '### Choice X Explanation' block for each option
-- A line '**Correct Answer:** X' where X is A–E
-- "## Explanation" section with:
+- A line '**Correct Answer:** X' where X is A–E may appear once after the options (before ## Explanation); do NOT put it under ## Explanation.
+- "## Explanation" section (this heading must appear ONLY ONCE; do not repeat it). Do NOT include "Correct Answer:" or "**Correct Answer:** X" inside this section.
   - ONE '### Keywords in the Stem to Identify the Correct Option' heading
   - A bullet list of keywords (each keyword appears only once)
   - A '---' separator
-- '## Choice-by-Choice Explanations' section with:
+- '## Choice-by-Choice Explanations' section (as a subheading under the single "## Explanation" block) with:
   - Per-option explanations in the form:
     (Option A) Option A text:
     explanation...
@@ -2136,6 +2152,8 @@ The frontend parser expects this exact structure:
     (do NOT repeat the keywords heading there).
 
 DO NOT change this structure. Do NOT omit the correct answer.
+
+**HEADINGS:** Use standard Markdown heading syntax (##, ###, #### for sections and subsections) for all section and subsection titles. Do not use plain text or bold-only text for section titles. The app renders all headings as bold and center-aligned, so use proper Markdown headings (e.g. ## Question, ## Explanation, ### Choice A Explanation, #### subheadings) so they display correctly.
 
 ====================
 HTML CONTENT (SOURCE)
@@ -2151,10 +2169,14 @@ ${template}
 ====================
 CRITICAL INSTRUCTIONS
 ====================
+0. HEADINGS (DISPLAY)
+   - Use Markdown heading syntax (##, ###, ####) for all section and subsection titles. The app renders headings as bold and center-aligned; do not use plain or bold-only text for section titles.
 1. FRONTMATTER
    - Fill in: title, tags, difficulty (easy/medium/hard), correct_answer (A–E), question_id.
-2. QUESTION STEM
-   - Put the full clinical case/question text under '## Question'.
+2. QUESTION STEM (CLINICAL CASE ONLY – NO "OPTIONS AND EXPLANATIONS" HEADING)
+   - Put ONLY the clinical case / question stem text under '## Question'.
+   - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
+   - The '## Question' section must contain only the scenario, vignette, or question text—no "Options and Explanations" heading, no options, and no per-option explanation content here.
 3. OPTIONS
    - Extract all options (A–E) and render them exactly as:
      **A. Option A text**
@@ -2179,10 +2201,15 @@ CRITICAL INSTRUCTIONS
      (bullets, line breaks, bold) so that formatting renders correctly.
 5. CORRECT ANSWER
    - Determine the correct answer letter (A–E) from the HTML (e.g. "ANSWER: C").
-   - Set it in both:
-     - Frontmatter: correct_answer: C
-     - Body: **Correct Answer:** C
+   - Set it in the frontmatter only: correct_answer: C
+   - Do NOT include "Correct Answer:" or "**Correct Answer:** X" (or any line that only states the correct option letter) inside the '## Explanation' section or anywhere that becomes explanation content. The correct answer is used only from the frontmatter; that line must not appear in explanation blocks.
+   - You may output "**Correct Answer:** X" once in the body, immediately after the options list (in the ## Options and Explanations section, before the --- or ## Explanation), if the template requires it. It must NOT appear under ## Explanation.
 6. EXPLANATION SECTION LAYOUT (MUST INCLUDE ALL CONTENT, NOTHING DROPPED)
+   - **Include the heading "## Explanation" exactly once.** Do NOT repeat "## Explanation"
+     anywhere else in the output. All explanation content (Choice-by-Choice placeholder,
+     Keywords block, and remaining explanation text/tables) must appear under that
+     single "## Explanation" section. Do not add a second "## Explanation" before
+     Keywords, before Choice-by-Choice Explanations, or elsewhere.
    - Under '## Explanation', build the content in **this exact order**:
      
      STEP 1 – CHOICE-BY-CHOICE EXPLANATIONS PLACEHOLDER (FIRST)

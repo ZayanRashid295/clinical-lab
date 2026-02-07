@@ -6,6 +6,7 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { sectionTableConfig } from "../../config/tables/section-table.config";
 import SectionFormModal from "./SectionFormModal";
 import SectionViewModal from "./SectionViewModal";
+import { SectionsService } from "../../services/content/sections.service";
 
 export default function SectionManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -90,6 +91,17 @@ export default function SectionManagementContent() {
     handleCloseFormModal();
   };
 
+  const handleDeleteSection = async (section: Section) => {
+    if (!window.confirm(`Delete section "${section.name}"? This will deactivate it.`)) return;
+    try {
+      const service = new SectionsService();
+      await service.delete(section.id);
+      refetch();
+    } catch (err: any) {
+      alert(err?.message || "Failed to delete section");
+    }
+  };
+
   const getFormModalProps = (section: Section | null, mode: "create" | "edit") => {
     return {
       section: section,
@@ -131,6 +143,7 @@ export default function SectionManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewSection}
       onEdit={handleEditSection}
+      onDelete={handleDeleteSection}
       FormModal={SectionFormModal}
       ViewModal={SectionViewModal}
       formModalOpen={formModalOpen}

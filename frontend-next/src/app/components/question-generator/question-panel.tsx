@@ -6,6 +6,56 @@ import { Card } from "@/shared/ui/card"
 import RichContentRenderer from "./rich-content-renderer"
 import { ExternalLink, Check, X } from "lucide-react"
 
+/** Returns true if this block's content is only the "Options and Explanations" heading (to hide from stem). */
+function isOptionsAndExplanationsBlock(block: any): boolean {
+  if (!block || !block.data) return false
+  const md = String(block.data.markdown ?? block.data.content ?? "").trim()
+  const html = String(block.data.html ?? "").trim()
+  const plainFromMd = md.replace(/^#+\s*/i, "").replace(/\*\*/g, "").trim()
+  const plainFromHtml = html.replace(/<[^>]+>/g, "").trim()
+  const text = (plainFromMd || plainFromHtml).trim()
+  return text.toLowerCase() === "options and explanations"
+}
+
+/** Strip "Options and Explanations" heading from plain stem text (anywhere in the string) so it is not shown in the clinical case. */
+function stripOptionsAndExplanationsFromStem(stem: string): string {
+  return stem
+    .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+    .replace(/\n\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "\n")
+    .replace(/\n\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+    .replace(/^\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "")
+    .replace(/^\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "")
+    .replace(/^\s*Options and Explanations\s*(?=\n|$)/gim, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+}
+
+/** Strip "Options and Explanations" from a block's markdown/html/content so it never appears inside the stem. */
+function stripOptionsAndExplanationsFromBlock(block: any): any {
+  if (!block?.data) return block
+  const strip = (s: string) =>
+    s
+      .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+      .replace(/\n\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "\n")
+      .replace(/\n\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+      .replace(/^\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "")
+      .replace(/^\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "")
+      .replace(/^\s*Options and Explanations\s*(?=\n|$)/gim, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  const stripHtml = (s: string) =>
+    s
+      .replace(/<h[1-6][^>]*>\s*Options and Explanations\s*<\/h[1-6]>/gim, "")
+      .replace(/<p[^>]*>\s*(<strong[^>]*>)?\s*Options and Explanations\s*(<\/strong>)?\s*<\/p>/gim, "")
+      .replace(/<div[^>]*>\s*Options and Explanations\s*<\/div>/gim, "")
+      .trim()
+  const data = { ...block.data }
+  if (typeof data.markdown === "string") data.markdown = strip(data.markdown)
+  if (typeof data.html === "string") data.html = stripHtml(data.html)
+  if (typeof data.content === "string") data.content = data.content.includes("<") ? stripHtml(data.content) : strip(data.content)
+  return { ...block, data }
+}
+
 interface QuestionPanelProps {
   question?: any
   selectedAnswer: string | null
@@ -26,7 +76,9 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
   }
 
   // Check if question has stem blocks (rich content)
-  const hasStemBlocks = question.questionStemBlocks && Array.isArray(question.questionStemBlocks) && question.questionStemBlocks.length > 0
+  const rawStemBlocks = question.questionStemBlocks && Array.isArray(question.questionStemBlocks) ? question.questionStemBlocks : []
+  const questionStemBlocksFiltered = rawStemBlocks.filter((b: any) => !isOptionsAndExplanationsBlock(b))
+  const hasStemBlocks = questionStemBlocksFiltered.length > 0
 
   // Process the stem to add line breaks before each **text:** pattern that appears after other text
   // But preserve images and their exact positioning
@@ -47,8 +99,8 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
   }
 
   // If we have stem blocks, use RichContentRenderer to display all blocks properly
-  // Otherwise, fall back to plain text stem
-  let displayStem = question.stem || ""
+  // Otherwise, fall back to plain text stem (with "Options and Explanations" heading stripped)
+  let displayStem = stripOptionsAndExplanationsFromStem(question.stem || "")
   const processedStem = processStem(displayStem)
 
   return (
@@ -65,10 +117,10 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
         {/* Render stem blocks if available, otherwise use plain text stem */}
         {hasStemBlocks ? (
           <div className="text-foreground text-pretty text-base leading-relaxed font-medium mb-4">
-            <RichContentRenderer content={question.questionStemBlocks} />
+            <RichContentRenderer content={questionStemBlocksFiltered.map((b: any) => stripOptionsAndExplanationsFromBlock(b))} />
           </div>
         ) : (
-        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground dark:text-gray-200 text-pretty text-base leading-relaxed font-medium mb-4">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground dark:text-gray-200 text-pretty text-base leading-relaxed font-medium mb-4 [&_h1]:font-bold [&_h1]:text-center [&_h2]:font-bold [&_h2]:text-center [&_h3]:font-bold [&_h3]:text-center [&_h4]:font-bold [&_h4]:text-center [&_h5]:font-bold [&_h5]:text-center [&_h6]:font-bold [&_h6]:text-center">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -82,13 +134,13 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
                 <em className="italic text-foreground/90 dark:text-gray-200" {...props} />
               ),
               h1: ({ node, ...props }: any) => (
-                <h1 className="text-2xl font-bold text-foreground dark:text-gray-100 mt-8 mb-4" {...props} />
+                <h1 className="text-2xl font-bold text-center text-foreground dark:text-gray-100 mt-8 mb-4" {...props} />
               ),
               h2: ({ node, ...props }: any) => (
-                <h2 className="text-xl font-bold text-foreground dark:text-gray-100 mt-6 mb-3" {...props} />
+                <h2 className="text-xl font-bold text-center text-foreground dark:text-gray-100 mt-6 mb-3" {...props} />
               ),
               h3: ({ node, ...props }: any) => (
-                <h3 className="text-lg font-semibold text-foreground dark:text-gray-100 mt-4 mb-2" {...props} />
+                <h3 className="text-lg font-bold text-center text-foreground dark:text-gray-100 mt-4 mb-2" {...props} />
               ),
               ul: ({ node, ...props }: any) => (
                 <ul className="list-disc list-outside space-y-1 mb-4 text-foreground/90 dark:text-gray-200 ml-6" {...props} />

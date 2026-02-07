@@ -27,6 +27,7 @@ export class ContentService {
         limit = 10,
         sortBy = "order",
         sortOrder = "asc",
+        listAll = false,
       } = query;
 
       // Build where clause
@@ -61,17 +62,41 @@ export class ContentService {
         }
       }
 
-      // Calculate pagination
-      const skip = (page - 1) * limit;
-
-      // Get total count for pagination
-      const total = await this.prisma.section.count({ where });
-
-      // Build orderBy
       const orderBy: any = {};
       orderBy[sortBy] = sortOrder;
 
-      // Get sections with pagination and sorting
+      const total = await this.prisma.section.count({ where });
+
+      if (listAll) {
+        const sections = await this.prisma.section.findMany({
+          where,
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            _count: {
+              select: {
+                chapters: true,
+              },
+            },
+          },
+          orderBy,
+        });
+        return {
+          data: sections,
+          pagination: {
+            page: 1,
+            limit: total,
+            total,
+            totalPages: 1,
+          },
+        };
+      }
+
+      const skip = (page - 1) * limit;
       const sections = await this.prisma.section.findMany({
         where,
         include: {
@@ -289,6 +314,7 @@ export class ContentService {
         limit = 10,
         sortBy = "order",
         sortOrder = "asc",
+        listAll = false,
       } = query;
 
       // Build where clause
@@ -323,17 +349,47 @@ export class ContentService {
         }
       }
 
-      // Calculate pagination
-      const skip = (page - 1) * limit;
-
-      // Get total count for pagination
       const total = await this.prisma.chapter.count({ where });
 
-      // Build orderBy
       const orderBy: any = {};
       orderBy[sortBy] = sortOrder;
 
-      // Get chapters with pagination and sorting
+      if (listAll) {
+        const chapters = await this.prisma.chapter.findMany({
+          where,
+          include: {
+            section: {
+              select: {
+                id: true,
+                name: true,
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                topics: true,
+              },
+            },
+          },
+          orderBy,
+        });
+        return {
+          data: chapters,
+          pagination: {
+            page: 1,
+            limit: total,
+            total,
+            totalPages: 1,
+          },
+        };
+      }
+
+      const skip = (page - 1) * limit;
       const chapters = await this.prisma.chapter.findMany({
         where,
         include: {
@@ -575,6 +631,7 @@ export class ContentService {
         limit = 10,
         sortBy = "order",
         sortOrder = "asc",
+        listAll = false,
       } = query;
 
       // Build where clause
@@ -609,17 +666,49 @@ export class ContentService {
         }
       }
 
-      // Calculate pagination
-      const skip = (page - 1) * limit;
-
-      // Get total count for pagination
       const total = await this.prisma.topic.count({ where });
 
-      // Build orderBy
       const orderBy: any = {};
       orderBy[sortBy] = sortOrder;
 
-      // Get topics with pagination and sorting
+      if (listAll) {
+        const topics = await this.prisma.topic.findMany({
+          where,
+          include: {
+            chapter: {
+              include: {
+                section: {
+                  include: {
+                    product: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                questions: true,
+              },
+            },
+          },
+          orderBy,
+        });
+        return {
+          data: topics,
+          pagination: {
+            page: 1,
+            limit: total,
+            total,
+            totalPages: 1,
+          },
+        };
+      }
+
+      const skip = (page - 1) * limit;
       const topics = await this.prisma.topic.findMany({
         where,
         include: {

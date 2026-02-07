@@ -77,6 +77,7 @@ export interface SectionQueryParams {
   productId?: string;
   dateFrom?: string;
   dateTo?: string;
+  listAll?: boolean;
 }
 
 export interface ChapterQueryParams {
@@ -89,6 +90,7 @@ export interface ChapterQueryParams {
   sectionId?: string;
   dateFrom?: string;
   dateTo?: string;
+  listAll?: boolean;
 }
 
 export interface TopicQueryParams {
@@ -101,6 +103,7 @@ export interface TopicQueryParams {
   chapterId?: string;
   dateFrom?: string;
   dateTo?: string;
+  listAll?: boolean;
 }
 
 // Create DTOs

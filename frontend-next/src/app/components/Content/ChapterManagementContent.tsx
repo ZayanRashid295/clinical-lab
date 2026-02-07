@@ -6,6 +6,7 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { chapterTableConfig } from "../../config/tables/chapter-table.config";
 import ChapterFormModal from "./ChapterFormModal";
 import ChapterViewModal from "./ChapterViewModal";
+import { ChaptersService } from "../../services/content/chapters.service";
 
 export default function ChapterManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -88,6 +89,17 @@ export default function ChapterManagementContent() {
   const handleChapterSaved = () => {
     refetch();
     handleCloseFormModal();
+  };
+
+  const handleDeleteChapter = async (chapter: Chapter) => {
+    if (!window.confirm(`Delete chapter "${chapter.name}"? This will deactivate it.`)) return;
+    try {
+      const service = new ChaptersService();
+      await service.delete(chapter.id);
+      refetch();
+    } catch (err: any) {
+      alert(err?.message || "Failed to delete chapter");
+    }
   };
 
   const getFormModalProps = (chapter: Chapter | null, mode: "create" | "edit") => {

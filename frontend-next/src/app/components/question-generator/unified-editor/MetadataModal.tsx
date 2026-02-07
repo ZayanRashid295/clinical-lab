@@ -14,14 +14,12 @@ interface MetadataModalProps {
     chapterId?: string
     topicId?: string
     subject?: string
-    system?: string
     tags?: string[]
   }) => void
   initialMetadata?: {
     chapterId?: string
     topicId?: string
     subject?: string
-    system?: string
     tags?: string[]
   }
 }
@@ -47,7 +45,6 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
       setChapterId(initialMetadata?.chapterId || "")
       setTopicId(initialMetadata?.topicId || "")
       setSubject(initialMetadata?.subject || "")
-      setSystem(initialMetadata?.system || "")
       setTags(initialMetadata?.tags?.join(", ") || "")
     }
   }, [isOpen, initialMetadata])
@@ -57,7 +54,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     if (isOpen) {
       setLoadingChapters(true)
       chaptersService
-        .getChapters({ status: "ACTIVE" })
+        .getChapters({ status: "ACTIVE", listAll: true })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setChapters(data)
@@ -71,7 +68,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
     if (isOpen && chapterId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId, status: "ACTIVE" })
+        .getTopics({ chapterId, status: "ACTIVE", listAll: true })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)
@@ -94,7 +91,6 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
       chapterId: chapterId || undefined,
       topicId: topicId || undefined,
       subject: subject || undefined,
-      system: system || undefined,
       tags: parsedTags.length > 0 ? parsedTags : undefined,
     })
     onClose()

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
@@ -508,8 +508,14 @@ export class ProductsService {
   }
 
   async createTag(createTagDto: CreateProductTagDto) {
-    return this.prisma.productTag.create({
-      data: createTagDto,
+    const name = (createTagDto.name ?? "").trim();
+    if (!name) {
+      throw new BadRequestException("Tag name is required");
+    }
+    return this.prisma.productTag.upsert({
+      where: { name },
+      create: { ...createTagDto, name },
+      update: { isActive: true },
       include: {
         _count: {
           select: {

@@ -3,7 +3,7 @@ import {
   Eye,
   RefreshCw,
   Edit,
-  Trash2,
+  X,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -205,11 +205,10 @@ function GenericDataTable<T extends { id: string }>({
                         {onDelete && (
                           <button
                             onClick={() => onDelete(row)}
-                            className="text-red-600 hover:text-red-900 flex items-center gap-1"
+                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 flex items-center justify-center"
                             title="Delete"
                           >
-                            <Trash2 size={16} />
-                            Delete
+                            <X size={18} />
                           </button>
                         )}
                         {customActions.map((action, index) => (

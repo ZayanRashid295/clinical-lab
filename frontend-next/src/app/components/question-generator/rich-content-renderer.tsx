@@ -674,12 +674,12 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
       <div 
         className={`html-content-${itemId} max-w-none text-foreground/90 dark:text-gray-200
           [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap 
-          [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-8 [&_h1]:mb-4 
-          [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-6 [&_h2]:mb-3 
-          [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-4 [&_h3]:mb-2 
-          [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
-          [&_h5]:text-sm [&_h5]:font-semibold [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
-          [&_h6]:text-xs [&_h6]:font-semibold [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
+          [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-center [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-8 [&_h1]:mb-4 
+          [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-center [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-6 [&_h2]:mb-3 
+          [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-center [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-4 [&_h3]:mb-2 
+          [&_h4]:text-base [&_h4]:font-bold [&_h4]:text-center [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
+          [&_h5]:text-sm [&_h5]:font-bold [&_h5]:text-center [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
+          [&_h6]:text-xs [&_h6]:font-bold [&_h6]:text-center [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
           [&_span]:whitespace-pre-wrap
           [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
           [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap 
@@ -1738,7 +1738,7 @@ function renderPerAnswerExplanations(
 
   return (
     <div key={item.id} className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
-      <h3 className="text-sm font-bold text-foreground dark:text-gray-100 mb-4 uppercase tracking-wide">Answer Breakdown</h3>
+      <h3 className="text-sm font-bold text-center text-foreground dark:text-gray-100 mb-4 uppercase tracking-wide">Answer Breakdown</h3>
       <div className="space-y-6">
         {sortedOptions.map((option) => {
           const isCorrect = option.correct
@@ -1928,7 +1928,7 @@ function renderPerAnswerExplanations(
                           <HtmlRenderer html={explanation} itemId={`per-answer-${option.label}`} />
                         </div>
                       ) : (
-                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90" style={{ 
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 [&_h1]:font-bold [&_h1]:text-center [&_h2]:font-bold [&_h2]:text-center [&_h3]:font-bold [&_h3]:text-center [&_h4]:font-bold [&_h4]:text-center [&_h5]:font-bold [&_h5]:text-center [&_h6]:font-bold [&_h6]:text-center" style={{ 
                           // Override prose list styles to ensure bullets/numbers are visible
                           '--tw-prose-bullets': 'disc',
                           '--tw-prose-counters': 'decimal',

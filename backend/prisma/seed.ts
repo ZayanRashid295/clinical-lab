@@ -20,10 +20,12 @@ async function main() {
     // Seed payments (requires users to exist)
     await seedPayments(prisma);
 
+    // Seed content hierarchy (Product → Sections → Chapters → Topics) for question creation
+    await seedUSMLE(prisma);
+
     // Seed other data
     // await seedLearningCases(prisma);
     // Dummy/sample questions disabled – use question generator or import only
-    // await seedUSMLE(prisma);
     // await seedQuestions(prisma);
 
     console.log("\n🎉 All seeding completed successfully!");

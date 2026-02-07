@@ -8,7 +8,9 @@ interface Question {
   id: string
   stem: string
   subject: string
-  system: string
+  system?: string
+  chapterName?: string
+  topicName?: string
   tags: string[]
   options: Array<{ label: string; text: string; correct: boolean }>
 }
@@ -35,9 +37,14 @@ export default function QuestionList({ questions, onEdit, onView, onDelete }: Qu
                     <span className="font-medium">Subject:</span> {question.subject}
                   </p>
                 )}
-                {question.system && (
+                {question.chapterName && (
                   <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">System:</span> {question.system}
+                    <span className="font-medium">System:</span> {question.chapterName}
+                  </p>
+                )}
+                {question.topicName && (
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">
+                    <span className="font-medium">Topic:</span> {question.topicName}
                   </p>
                 )}
               </div>

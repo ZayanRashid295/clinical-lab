@@ -92,18 +92,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   // Track if metadata names have been fetched
   const [metadataNamesFetched, setMetadataNamesFetched] = useState(false)
 
-  // Load sections on mount
-  useEffect(() => {
-    setLoadingSections(true)
-    sectionsService
-      .getSections({ status: "ACTIVE" })
-      .then((response) => {
-        const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setSections(data)
-      })
-      .catch(() => setSections([]))
-      .finally(() => setLoadingSections(false))
-  }, [])
+  // Sections are not shown in UI; sectionId is derived from chapter or defaulted by backend
 
   // Load product tags on mount
   useEffect(() => {
@@ -146,7 +135,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   useEffect(() => {
     setLoadingChapters(true)
     chaptersService
-      .getChapters({ status: "ACTIVE" })
+      .getChapters({ status: "ACTIVE", listAll: true })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         setChapters(data)
@@ -310,21 +299,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   }
 
 
-  // Generate question ID based on system, subject, and topic
+  // Generate question ID based on chapter and topic (system removed from UI)
   const generateQuestionId = useCallback(() => {
-    if (!metadata.sectionId || !metadata.chapterId || !metadata.topicId) {
+    if (!metadata.chapterId || !metadata.topicId) {
       return "Q-XXXX-XXXX-XXXX"
     }
 
-    // Get abbreviations from names
-    const systemAbbr = sectionName
-      ? sectionName
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase())
-          .join("")
-          .substring(0, 4)
-      : "SYS"
-    
     const subjectAbbr = chapterName
       ? chapterName
           .split(" ")
@@ -333,21 +313,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
           .substring(0, 4)
       : "SUB"
     
-    const topicAbbr = topicName
-      ? topicName
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase())
-          .join("")
-          .substring(0, 4)
-      : "TOP"
-
-    // Use last 4 characters of IDs as unique identifiers
-    const systemId = metadata.sectionId.slice(-4).toUpperCase()
-    const subjectId = metadata.chapterId.slice(-4).toUpperCase()
-    const topicId = metadata.topicId.slice(-4).toUpperCase()
-
-    return `Q-${systemAbbr}-${subjectAbbr}-${topicId}`
-  }, [metadata.sectionId, metadata.chapterId, metadata.topicId, sectionName, chapterName, topicName])
+    const topicIdPart = metadata.topicId.slice(-4).toUpperCase()
+    return `Q-${subjectAbbr}-${topicIdPart}`
+  }, [metadata.chapterId, metadata.topicId, chapterName])
 
   // Track if questionId was manually edited (including if it was loaded from saved data)
   const [isQuestionIdManuallyEdited, setIsQuestionIdManuallyEdited] = useState(false)

@@ -6,6 +6,7 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { productTagTableConfig } from "../../config/tables/product-tag-table.config";
 import ProductTagFormModal from "./ProductTagFormModal";
 import ProductTagViewModal from "./ProductTagViewModal";
+import { ProductTagsService } from "../../services/products/product-tags.service";
 
 export default function ProductTagManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);

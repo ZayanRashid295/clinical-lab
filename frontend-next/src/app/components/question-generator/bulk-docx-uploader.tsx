@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
+  X,
 } from "lucide-react";
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils";
 import { QuestionCreatorData } from "./question-creator/types";
@@ -67,19 +68,17 @@ export default function BulkDocxUploader({
   const [warnings, setWarnings] = useState<string[]>([]);
   const [questionMetadata, setQuestionMetadata] = useState<
     Record<string, {
-      sectionId?: string;
       chapterId: string;
       topicId: string;
       productTagId?: string;
       subjectName?: string;
-      systemName?: string;
       chapterName?: string;
       topicName?: string;
     }>
   >({});
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
   const [addToDbContext, setAddToDbContext] = useState<{
-    type: "subject" | "chapter" | "topic" | "section";
+    type: "subject" | "chapter" | "topic";
     fileName: string;
     parsedName?: string;
   } | null>(null);
@@ -141,7 +140,7 @@ export default function BulkDocxUploader({
   useEffect(() => {
     setLoadingChapters(true);
     chaptersService
-      .getChapters({ status: "ACTIVE" })
+      .getChapters({ status: "ACTIVE", listAll: true })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || [];
         setChapters(data);
@@ -168,7 +167,7 @@ export default function BulkDocxUploader({
     if (!summary?.results?.length || chapters.length === 0) return;
     const getTopicsForChapter = (chapterId: string) =>
       topicsService
-        .getTopics({ chapterId, status: "ACTIVE" })
+        .getTopics({ chapterId, status: "ACTIVE", listAll: true })
         .then((r) => (Array.isArray(r) ? r : (r as any)?.data || []));
     let cancelled = false;
     summary.results.forEach((result) => {
@@ -188,7 +187,7 @@ export default function BulkDocxUploader({
         setQuestionMetadata((prev) => ({
           ...prev,
           [result.fileName]: {
-            ...prev[result.fileName],
+            ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }),
             chapterId: matched.chapterId || prev[result.fileName]?.chapterId || "",
             topicId: matched.topicId || prev[result.fileName]?.topicId || "",
           },
@@ -496,25 +495,6 @@ export default function BulkDocxUploader({
           }));
           setAddToDbContext(null);
         }
-      } else if (type === "section") {
-        const productId = addToDbProductId || products[0]?.id;
-        if (!productId) {
-          setAddToDbError("Select a product first");
-          setAddToDbLoading(false);
-          return;
-        }
-        const res: any = await sectionsService.createSection({ productId, name, isActive: true });
-        const id = res?.id ?? (res?.data as any)?.id;
-        if (id) {
-          const list: any = await sectionsService.getSections({ status: "ACTIVE" });
-          const data = Array.isArray(list) ? list : (list as any)?.data || [];
-          setSections(data);
-          setQuestionMetadata((prev) => ({
-            ...prev,
-            [fileName]: { ...prev[fileName], sectionId: id },
-          }));
-          setAddToDbContext(null);
-        }
       } else if (type === "chapter") {
         const sectionId = addToDbSectionId || sections[0]?.id;
         if (!sectionId) {
@@ -525,7 +505,7 @@ export default function BulkDocxUploader({
         const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true });
         const id = res?.id ?? (res?.data as any)?.id;
         if (id) {
-          const list: any = await chaptersService.getChapters({ status: "ACTIVE" });
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true });
           const data = Array.isArray(list) ? list : (list as any)?.data || [];
           setChapters(data);
           setQuestionMetadata((prev) => ({
@@ -545,7 +525,7 @@ export default function BulkDocxUploader({
         const res: any = await topicsService.createTopic({ chapterId, name, isActive: true });
         const id = res?.id ?? (res?.data as any)?.id;
         if (id) {
-          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE" });
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
           const data = Array.isArray(list) ? list : (list as any)?.data || [];
           setTopics((prev) => ({ ...prev, [chapterId]: data }));
           setQuestionMetadata((prev) => ({
@@ -559,6 +539,60 @@ export default function BulkDocxUploader({
       setAddToDbError(e?.message || "Failed to create");
     } finally {
       setAddToDbLoading(false);
+    }
+  };
+
+  // Delete from DB: remove selected subject/chapter/topic (soft delete) and refresh lists
+  const handleDeleteSubject = async (fileName: string) => {
+    const id = questionMetadata[fileName]?.productTagId;
+    if (!id) return;
+    const tag = productTags.find((t) => t.id === id);
+    if (!window.confirm(`Delete subject "${tag?.name ?? id}" from database? This will deactivate it.`)) return;
+    try {
+      await productTagsService.delete(id);
+      const list: any = await productTagsService.getTags({ status: "ACTIVE" });
+      const data = Array.isArray(list) ? list : (list as any)?.data || [];
+      setProductTags(data);
+      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], productTagId: undefined } }));
+    } catch (e: any) {
+      alert(e?.message || "Failed to delete subject");
+    }
+  };
+  const handleDeleteChapter = async (fileName: string) => {
+    const id = questionMetadata[fileName]?.chapterId;
+    if (!id) return;
+    const chapter = chapters.find((c) => c.id === id);
+    if (!window.confirm(`Delete chapter "${chapter?.name ?? id}" from database? This will deactivate it.`)) return;
+    try {
+      await chaptersService.delete(id);
+      const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true });
+      const data = Array.isArray(list) ? list : (list as any)?.data || [];
+      setChapters(data);
+      setTopics((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], chapterId: "", topicId: "" } }));
+    } catch (e: any) {
+      alert(e?.message || "Failed to delete chapter");
+    }
+  };
+  const handleDeleteTopic = async (fileName: string) => {
+    const id = questionMetadata[fileName]?.topicId;
+    const chapterId = questionMetadata[fileName]?.chapterId;
+    if (!id || !chapterId) return;
+    const topicList = topics[chapterId] || [];
+    const topic = topicList.find((t) => t.id === id);
+    if (!window.confirm(`Delete topic "${topic?.name ?? id}" from database? This will deactivate it.`)) return;
+    try {
+      await topicsService.delete(id);
+      const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
+      const data = Array.isArray(list) ? list : (list as any)?.data || [];
+      setTopics((prev) => ({ ...prev, [chapterId]: data }));
+      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], topicId: "" } }));
+    } catch (e: any) {
+      alert(e?.message || "Failed to delete topic");
     }
   };
 
@@ -1074,55 +1108,23 @@ export default function BulkDocxUploader({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
-                          </div>
-                        </div>
-
-                        {/* System (Section) */}
-                        <div>
-                          <label className="text-xs font-medium mb-1 block">System</label>
-                          <div className="mb-1">
-                            <input
-                              type="text"
-                              className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
-                              value={questionMetadata[result.fileName]?.systemName ?? ""}
-                              onChange={(e) => setQuestionMetadata((prev) => ({
-                                ...prev,
-                                [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), systemName: e.target.value || undefined },
-                              }))}
-                            />
-                          </div>
-                          <div className="flex gap-1">
-                            <select
-                              className="flex-1 p-2 border rounded text-sm"
-                              value={questionMetadata[result.fileName]?.sectionId || ""}
-                              onChange={(e) => {
-                                setQuestionMetadata((prev) => ({
-                                  ...prev,
-                                  [result.fileName]: { ...prev[result.fileName], sectionId: e.target.value || undefined },
-                                }));
-                              }}
-                            >
-                              <option value="">None</option>
-                              {sections.map((s) => (
-                                <option key={s.id} value={s.id}>{s.name}</option>
-                              ))}
-                            </select>
                             <Button
                               type="button"
                               variant="outline"
                               size="sm"
-                              className="shrink-0"
-                              onClick={() => setAddToDbContext({ type: "section", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.systemName || result.questionData.system || "New System").trim() })}
+                              className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Delete selected subject from database"
+                              disabled={!questionMetadata[result.fileName]?.productTagId}
+                              onClick={() => handleDeleteSubject(result.fileName)}
                             >
-                              <Plus className="h-4 w-4" />
+                              <X className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
 
                         {/* Chapter */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">Chapter</label>
+                          <label className="text-xs font-medium mb-1 block">System</label>
                           <div className="mb-1">
                             <input
                               type="text"
@@ -1161,6 +1163,17 @@ export default function BulkDocxUploader({
                               onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.chapterName || result.questionData.subject || "New Chapter").trim() })}
                             >
                               <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Delete selected chapter from database"
+                              disabled={!questionMetadata[result.fileName]?.chapterId}
+                              onClick={() => handleDeleteChapter(result.fileName)}
+                            >
+                              <X className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -1208,10 +1221,21 @@ export default function BulkDocxUploader({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Delete selected topic from database"
+                              disabled={!questionMetadata[result.fileName]?.topicId}
+                              onClick={() => handleDeleteTopic(result.fileName)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">Subject and System from the document are always saved as text. Link to taxonomy via Chapter/Topic (optional).</p>
+                      <p className="text-xs text-muted-foreground">Subject from the document is saved as text. Link to taxonomy via Chapter/Topic (optional). Questions are saved under General Principles when no chapter is set.</p>
 
                       {/* Question Preview */}
                       <div className="mt-4">
@@ -1219,9 +1243,6 @@ export default function BulkDocxUploader({
                         <div className="text-xs text-muted-foreground space-y-1">
                           <p>
                             <strong>Subject:</strong> {result.questionData.subject || "N/A"}
-                          </p>
-                          <p>
-                            <strong>System:</strong> {result.questionData.system || "N/A"}
                           </p>
                           <p>
                             <strong>Topic:</strong> {result.questionData.topic || "N/A"}
@@ -1270,26 +1291,10 @@ export default function BulkDocxUploader({
           <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border">
             <h3 className="text-sm font-semibold mb-3">
               {addToDbContext.type === "subject" && "Add Subject to database"}
-              {addToDbContext.type === "section" && "Add System (Section) to database"}
               {addToDbContext.type === "chapter" && "Add Chapter to database"}
               {addToDbContext.type === "topic" && "Add Topic to database"}
             </h3>
             <div className="space-y-3">
-              {addToDbContext.type === "section" && (
-                <div>
-                  <label className="text-xs font-medium block mb-1">Product</label>
-                  <select
-                    className="w-full p-2 border rounded text-sm"
-                    value={addToDbProductId}
-                    onChange={(e) => setAddToDbProductId(e.target.value)}
-                  >
-                    <option value="">Select Product...</option>
-                    {products.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
               {addToDbContext.type === "chapter" && (
                 <div>
                   <label className="text-xs font-medium block mb-1">Section</label>

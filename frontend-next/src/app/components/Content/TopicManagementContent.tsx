@@ -6,6 +6,7 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { topicTableConfig } from "../../config/tables/topic-table.config";
 import TopicFormModal from "./TopicFormModal";
 import TopicViewModal from "./TopicViewModal";
+import { TopicsService } from "../../services/content/topics.service";
 
 export default function TopicManagementContent() {
   const [formModalOpen, setFormModalOpen] = useState(false);
