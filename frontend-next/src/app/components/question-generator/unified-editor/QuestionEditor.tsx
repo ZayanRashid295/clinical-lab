@@ -14,6 +14,7 @@ import MetadataModal from "./MetadataModal"
 import EditablePreview from "./EditablePreview"
 import QuestionPanel from "../question-panel"
 import ExplanationPanel from "../explanation-panel"
+import UnifiedQuestionPreview from "../unified-question-preview"
 import { SectionsService } from "@/app/services/content/sections.service"
 import { ChaptersService } from "@/app/services/content/chapters.service"
 import { TopicsService } from "@/app/services/content/topics.service"
@@ -31,9 +32,10 @@ interface QuestionEditorProps {
   initialData?: Partial<QuestionCreatorData>
   onSave: (data: QuestionCreatorData) => void
   onCancel: () => void
+  onPreviewModeChange?: (isPreview: boolean) => void
 }
 
-export default function QuestionEditor({ initialData, onSave, onCancel }: QuestionEditorProps) {
+export default function QuestionEditor({ initialData, onSave, onCancel, onPreviewModeChange }: QuestionEditorProps) {
   const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(initialData?.stem || [])
   const [choices, setChoices] = useState<Choice[]>(initialData?.choices || [])
   const [perAnswerExplanations, setPerAnswerExplanations] = useState<Record<string, ContentBlock[]>>(
@@ -57,6 +59,23 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   const [showMetadataModal, setShowMetadataModal] = useState(false)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [previewSelectedAnswer, setPreviewSelectedAnswer] = useState<string | null>(null)
+
+  // Notify parent when preview mode changes
+  useEffect(() => {
+    onPreviewModeChange?.(isPreviewMode)
+  }, [isPreviewMode, onPreviewModeChange])
+
+  // Listen for exit preview mode event from parent header
+  useEffect(() => {
+    const handleExitPreview = () => {
+      setIsPreviewMode(false)
+      onPreviewModeChange?.(false)
+    }
+    window.addEventListener("exitPreviewMode", handleExitPreview)
+    return () => {
+      window.removeEventListener("exitPreviewMode", handleExitPreview)
+    }
+  }, [onPreviewModeChange])
   const [imageModalContext, setImageModalContext] = useState<"stem" | "explanation" | "choice" | null>(null)
   const [showPerAnswerExplanations, setShowPerAnswerExplanations] = useState(true)
   const [expandedChoices, setExpandedChoices] = useState<Record<string, boolean>>({})
@@ -74,7 +93,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
 
   // State for metadata names - initialize from initialData if available
   const [sectionName, setSectionName] = useState<string>("")
-  const [chapterName, setChapterName] = useState<string>(initialData?.metadata?.subject || "")
+  const [chapterName, setChapterName] = useState<string>(initialData?.metadata?.system || "")
   const [topicName, setTopicName] = useState<string>("")
   const [subjectTagName, setSubjectTagName] = useState<string>("")
 
@@ -186,12 +205,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
       promises.push(
         chaptersService.getChapter(metadataToUse.chapterId)
           .then((chapter) => {
-            setChapterName(chapter?.name || metadataToUse.subject || "")
+            setChapterName(chapter?.name || metadataToUse.system || "")
           })
-          .catch(() => setChapterName(metadataToUse.subject || ""))
+          .catch(() => setChapterName(metadataToUse.system || ""))
       )
     } else if (metadataToUse.subject) {
-      setChapterName(metadataToUse.subject)
+      setChapterName(metadataToUse.system || "")
     }
 
     // Fetch topic name
@@ -699,84 +718,28 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
   // Always get the active editor - will return first available if none focused
   const activeEditor = getActiveEditor()
 
-  // If in preview mode, show student view
+  // If in preview mode, show unified preview component
   if (isPreviewMode) {
-    // Get metadata names with proper fallbacks - ensure we always have the latest values
-    const selectedSubjectTagName = getSelectedTagName()
-    // Use chapterName if available, otherwise fall back to metadata.subject
-    // If we have chapterId but no name yet, show "Loading..." so the section appears
-    const displayChapterName = chapterName || metadata.subject || (metadata.chapterId ? "Loading..." : "")
-    // Use topicName if available, otherwise create object with placeholder if topicId exists
-    const displayTopic = topicName 
-      ? { name: topicName } 
-      : (metadata.topicId ? { name: "Loading..." } : undefined)
-    
-    // Ensure subjectTag shows "Loading..." if we have an ID but no name yet
-    const displaySubjectTag = selectedSubjectTagName || (metadata.productTagId || metadata.productTagIds?.[0] ? "Loading..." : undefined)
+    const questionData: QuestionCreatorData = {
+      stem: stemBlocks,
+      choices: choices,
+      mainExplanation: mainExplanationBlocks,
+      perAnswerExplanations: perAnswerExplanations,
+      metadata: metadata,
+    }
 
     return (
-      <div className="flex flex-col h-full">
-        {/* Header with back button */}
-        <div className="flex-shrink-0 border-b p-4 bg-background dark:bg-gray-900 border-border dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-lg font-semibold text-foreground dark:text-gray-100">Preview - Student Mode</h2>
-              {questionId && (
-                <span className="text-sm font-mono font-bold text-foreground dark:text-gray-100 bg-card dark:bg-gray-800 px-3 py-1.5 rounded border border-border dark:border-gray-700">
-                  {questionId}
-                </span>
-              )}
-            </div>
-            <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
-              Back to Edit
-            </Button>
-          </div>
-        </div>
-
-        {/* Student View Layout */}
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full grid grid-cols-1 lg:grid-cols-5 gap-3 p-3 lg:p-4">
-            {/* Left column - Question */}
-            <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0">
-              <QuestionPanel
-                question={{
-                  questionStemBlocks: stemBlocks,
-                  stem: blocksToHTML(stemBlocks),
-                  options: choices.map((choice) => ({
-                    label: choice.label,
-                    value: choice.value,
-                    text: choice.text,
-                    correct: choice.correct,
-                  })),
-                }}
-                selectedAnswer={previewSelectedAnswer}
-                answered={previewSelectedAnswer !== null}
-                onSelectAnswer={(option) => setPreviewSelectedAnswer(option)}
-                isPreviewMode={true}
-              />
-            </div>
-
-            {/* Right column - Explanation */}
-            <div className="lg:col-span-3 flex flex-col overflow-hidden min-h-0">
-              <ExplanationPanel
-                correct={previewSelectedAnswer !== null && choices.find((c) => c.value === previewSelectedAnswer)?.correct === true}
-                selectedAnswer={previewSelectedAnswer}
-                explanation={mainExplanationBlocks}
-                perAnswerExplanations={perAnswerExplanations}
-                options={choices.map((choice) => ({
-                  label: choice.label,
-                  text: choice.text,
-                  correct: choice.correct,
-                }))}
-                subjectTag={displaySubjectTag}
-                chapter={displayChapterName || undefined}
-                topic={displayTopic}
-                correctAnswerLabel={choices.find((c) => c.correct)?.label || "C"}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnifiedQuestionPreview
+        questionData={questionData}
+        onEdit={() => {
+          setIsPreviewMode(false)
+          onPreviewModeChange?.(false)
+        }}
+        onClose={() => {
+          setIsPreviewMode(false)
+          onPreviewModeChange?.(false)
+        }}
+      />
     )
   }
 
@@ -849,7 +812,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
             <Button variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button variant="outline" onClick={() => setIsPreviewMode(true)}>
+            <Button variant="outline" onClick={() => {
+              setIsPreviewMode(true)
+              onPreviewModeChange?.(true)
+            }}>
               Preview
             </Button>
             <Button onClick={handleSave} className="bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700">
@@ -874,7 +840,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
               {/* Scrollable content area */}
               <div className="flex-1 min-h-0 overflow-y-auto pr-2">
                 {/* Question Stem Editor */}
-                <div className="flex-shrink-0 mb-4">
+                <div className="flex-shrink-0 mb-1">
                   <div
                     onClick={() => setActiveSection("stem")}
                     className={activeSection === "stem" ? "ring-2 ring-primary rounded-lg" : ""}
@@ -896,7 +862,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                         }
                       }}
                       placeholder="Enter the question stem..."
-                      className="min-h-[100px]"
+                      className=""
                     />
                   </div>
                 </div>
@@ -1016,7 +982,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel }: Questi
                                   }
                                 }}
                                 placeholder={`Enter explanation for option ${choice.label}...`}
-                                className="min-h-[80px]"
+                                className=""
                               />
                             </div>
                           )}

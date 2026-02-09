@@ -559,8 +559,15 @@ export class ContentService {
   }
 
   async createChapter(createChapterDto: CreateChapterDto) {
+    // Truncate name to 500 characters if it's too long (database limit)
+    const chapterData = {
+      ...createChapterDto,
+      name: createChapterDto.name.length > 500 
+        ? createChapterDto.name.substring(0, 497) + "..." 
+        : createChapterDto.name,
+    };
     return this.prisma.chapter.create({
-      data: createChapterDto,
+      data: chapterData,
       include: {
         section: {
           include: {
@@ -585,9 +592,13 @@ export class ContentService {
       throw new NotFoundException(`Chapter with ID ${id} not found`);
     }
 
+    // Truncate name to 500 characters if it's too long (database limit)
+    const chapterData = updateChapterDto.name && updateChapterDto.name.length > 500
+      ? { ...updateChapterDto, name: updateChapterDto.name.substring(0, 497) + "..." }
+      : updateChapterDto;
     return this.prisma.chapter.update({
       where: { id },
-      data: updateChapterDto,
+      data: chapterData,
       include: {
         section: {
           include: {

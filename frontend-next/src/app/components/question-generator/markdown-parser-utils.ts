@@ -40,10 +40,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
         const titleMatch = yamlLine.match(/title:\s*"?([^"]*)"?/)
         if (titleMatch) {
           const fullTitle = titleMatch[1]
+          // Split by " — " (em dash) to separate Subject and System
           const titleParts = fullTitle.split(" — ")
           if (titleParts.length >= 2) {
+            // Subject is the first part (maps to Product Tag)
             questionData.subject = titleParts[0].trim()
-            questionData.system = titleParts[1].split("(")[0].trim()
+            // System is everything after " — " (maps to Chapter)
+            questionData.system = titleParts.slice(1).join(" — ").trim()
+          } else if (titleParts.length === 1) {
+            // If no " — " separator, use entire title as subject
+            questionData.subject = titleParts[0].trim()
           }
         }
       }
@@ -77,10 +83,17 @@ export function parseMarkdown(content: string): ParsedQuestion {
 
     // Extract title (# Title) - fallback if YAML not present
     if (line.startsWith("# ") && !questionData.subject) {
-      const titleParts = line.slice(2).split(" — ")
+      const titleText = line.slice(2).trim()
+      // Split by " — " (em dash) to separate Subject and System
+      const titleParts = titleText.split(" — ")
       if (titleParts.length >= 2) {
+        // Subject is the first part (maps to Product Tag)
         questionData.subject = titleParts[0].trim()
-        questionData.system = titleParts[1].trim()
+        // System is everything after " — " (maps to Chapter)
+        questionData.system = titleParts.slice(1).join(" — ").trim()
+      } else if (titleParts.length === 1) {
+        // If no " — " separator, use entire title as subject
+        questionData.subject = titleParts[0].trim()
       }
       i++
       continue

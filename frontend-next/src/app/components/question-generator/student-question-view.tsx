@@ -1654,7 +1654,7 @@ export default function StudentQuestionView() {
 
   return (
     <div className="h-full bg-background dark:bg-gray-900 flex flex-col" data-testid="student-question-view">
-      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-3 border-b border-border/40 dark:border-gray-700/50 bg-card/20 dark:bg-gray-800/50 backdrop-blur-sm" data-testid="student-question-header">
+      <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-2 border-b border-border/40 dark:border-gray-700/50 bg-card/20 dark:bg-gray-800/50 backdrop-blur-sm" data-testid="student-question-header">
         <div className="max-w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3 flex-wrap flex-1">
@@ -1830,12 +1830,12 @@ export default function StudentQuestionView() {
       )}
 
       <div className="flex-1 min-h-0 overflow-hidden" data-testid="student-question-content">
-        <div className="h-full min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-3 p-3 lg:p-4" data-testid="student-question-grid">
+        <div className="h-full min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2 p-2 lg:p-3" data-testid="student-question-grid">
           {/* Left column - Questions */}
           <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0" data-testid="student-question-left">
             {/* Question Panel - Scrollable (includes clinical case, options, and feedback) */}
             <div className="flex-1 min-h-0 overflow-y-auto pr-2">
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="animate-fade-in">
                   <QuestionPanel
                     question={currentQuestion}
@@ -1845,25 +1845,25 @@ export default function StudentQuestionView() {
                   />
                 </div>
                 
-                {/* Feedback Box - Inside scrollable area */}
+                {/* Feedback Box - Inside scrollable area, moved up */}
                 {answered && (
                   <div className="animate-slide-in-up">
                     <div
-                      className={`p-5 rounded-xl border-l-4 backdrop-blur-sm shadow-md transition-all ${
+                      className={`p-3 rounded-xl border-l-4 backdrop-blur-sm shadow-md transition-all ${
                         isCorrect
                           ? "border-success/70 bg-success/12 dark:bg-success/8"
                           : "border-destructive/70 bg-destructive/12 dark:bg-destructive/8"
                       }`}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className={`text-2xl flex-shrink-0 ${isCorrect ? "text-success" : "text-destructive"}`}>
+                      <div className="flex items-start gap-2">
+                        <div className={`text-xl flex-shrink-0 ${isCorrect ? "text-success" : "text-destructive"}`}>
                           {isCorrect ? "✓" : "✕"}
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                          <p className={`font-bold text-base ${isCorrect ? "text-success" : "text-destructive"}`}>
+                        <div className="flex flex-col gap-1">
+                          <p className={`font-bold text-sm ${isCorrect ? "text-success" : "text-destructive"}`}>
                             {isCorrect ? "Correct!" : "Incorrect"}
                           </p>
-                          <p className="text-foreground/70 dark:text-gray-300 text-sm">
+                          <p className="text-foreground/70 dark:text-gray-300 text-xs">
                             Correct Answer:{" "}
                             <span className="font-semibold text-foreground dark:text-gray-100">
                               {correctAnswerLabel}. {correctAnswerText}

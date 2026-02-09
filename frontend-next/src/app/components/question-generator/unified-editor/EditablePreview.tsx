@@ -68,7 +68,7 @@ export default function EditablePreview({
               content={blocksToHTML([block])}
               onChange={(html) => handleBlockChange(originalIndex, html)}
               placeholder="Enter explanation text..."
-              className="min-h-[100px]"
+              className=""
             />
           </div>
         )
@@ -98,7 +98,7 @@ export default function EditablePreview({
                     blocks={perAnswerBlocks}
                     onChange={(html) => handlePerAnswerBlockChange(choice.label, html)}
                     placeholder={`Enter explanation for option ${choice.label}...`}
-                    className="min-h-[80px]"
+                    className=""
                   />
                 </div>
               )

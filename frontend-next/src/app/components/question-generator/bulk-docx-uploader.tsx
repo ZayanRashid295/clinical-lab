@@ -162,9 +162,9 @@ export default function BulkDocxUploader({
       .finally(() => setLoadingTags(false));
   }, [productTagsService]);
 
-  // Auto-match parsed metadata when summary and chapters/sections are ready
+  // Auto-match parsed metadata when summary and chapters/sections/productTags are ready
   useEffect(() => {
-    if (!summary?.results?.length || chapters.length === 0) return;
+    if (!summary?.results?.length || chapters.length === 0 || productTags.length === 0) return;
     const getTopicsForChapter = (chapterId: string) =>
       topicsService
         .getTopics({ chapterId, status: "ACTIVE", listAll: true })
@@ -180,16 +180,19 @@ export default function BulkDocxUploader({
           parsedTopic: result.questionData.topic,
         },
         chapters,
-        { sections, getTopicsForChapter }
+        { sections, productTags, getTopicsForChapter }
       ).then((matched) => {
-        if (cancelled || (!matched.chapterId && !matched.topicId)) return;
+        if (cancelled || (!matched.chapterId && !matched.topicId && !matched.productTagId)) return;
         autoMatchDoneRef.current.add(result.fileName);
         setQuestionMetadata((prev) => ({
           ...prev,
           [result.fileName]: {
-            ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }),
+            ...(prev[result.fileName] ?? { chapterId: "", topicId: "", productTagId: "", subjectName: "" }),
             chapterId: matched.chapterId || prev[result.fileName]?.chapterId || "",
             topicId: matched.topicId || prev[result.fileName]?.topicId || "",
+            productTagId: matched.productTagId || prev[result.fileName]?.productTagId || "",
+            // Preserve parsed subject name - don't override if user has edited it
+            subjectName: prev[result.fileName]?.subjectName || result.questionData.subject || "",
           },
         }));
         if (matched.chapterId) loadTopicsForChapter(matched.chapterId);
@@ -199,7 +202,7 @@ export default function BulkDocxUploader({
     return () => {
       cancelled = true;
     };
-  }, [summary?.results, chapters.length, sections.length, topicsService]);
+  }, [summary?.results, chapters.length, sections.length, productTags.length, topicsService]);
 
   // Load topics when chapter changes
   const loadTopicsForChapter = async (chapterId: string) => {
@@ -662,10 +665,12 @@ export default function BulkDocxUploader({
           const questionProductTagId = (metadata as any).productTagId;
 
           // Build "old" format from parsed question (same shape as bulk-markdown)
+          // Use edited subjectName if available, otherwise use parsed subject
+          const subjectToUse = metadata.subjectName || questionData.subject || ""
           const oldFormatData = {
             stem: questionData.stem, // string stem from parser
             options: questionData.options,
-            subject: questionData.subject,
+            subject: subjectToUse,
             system: questionData.system,
             explanation: questionData.explanation, // blocks
             perAnswerExplanations: questionData.perAnswerExplanations, // blocks
@@ -683,6 +688,9 @@ export default function BulkDocxUploader({
             mainExplanation: newFormatData.mainExplanation || [],
             metadata: {
               ...newFormatData.metadata,
+              // Preserve parsed subject and system from DOCX/Markdown
+              subject: questionData.subject || newFormatData.metadata?.subject,
+              system: questionData.system || newFormatData.metadata?.system,
               topicId: questionTopicId,
               chapterId: questionChapterId,
               productTagId: questionProductTagId,
@@ -1075,8 +1083,8 @@ export default function BulkDocxUploader({
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.tags?.[0] ? `Parsed: ${result.questionData.tags[0]}` : "Name (editable)"}
-                              value={questionMetadata[result.fileName]?.subjectName ?? ""}
+                              placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                              value={questionMetadata[result.fileName]?.subjectName ?? result.questionData.subject ?? ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
                                 [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), subjectName: e.target.value || undefined },
@@ -1104,7 +1112,7 @@ export default function BulkDocxUploader({
                               variant="outline"
                               size="sm"
                               className="shrink-0"
-                              onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.subjectName || result.questionData.tags?.[0] || "New Subject").trim() })}
+                              onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.subjectName || result.questionData.subject || "New Subject").trim() })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -1129,7 +1137,7 @@ export default function BulkDocxUploader({
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                              placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
                               value={questionMetadata[result.fileName]?.chapterName ?? ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
@@ -1160,7 +1168,7 @@ export default function BulkDocxUploader({
                               variant="outline"
                               size="sm"
                               className="shrink-0"
-                              onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.chapterName || result.questionData.subject || "New Chapter").trim() })}
+                              onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: (questionMetadata[result.fileName]?.chapterName || result.questionData.system || "New Chapter").trim() })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>

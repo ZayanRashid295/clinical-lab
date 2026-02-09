@@ -246,7 +246,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[100px]",
+          "prose prose-sm dark:prose-invert max-w-none focus:outline-none",
           className
         ),
       },
@@ -995,7 +995,7 @@ export default function RichTextEditor({
 
   if (!editor) {
     return (
-      <div className={cn("min-h-[100px] border rounded-lg border-border dark:border-gray-700 bg-card dark:bg-gray-800", className)}>
+      <div className={cn("border rounded-lg border-border dark:border-gray-700 bg-card dark:bg-gray-800", className)}>
         <p className="text-muted-foreground dark:text-gray-400">{placeholder}</p>
       </div>
     )
@@ -1005,6 +1005,13 @@ export default function RichTextEditor({
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
+          /* Prevent scrollbars and auto-size to content */
+          .ProseMirror {
+            overflow: visible !important;
+            height: auto !important;
+            min-height: auto !important;
+            max-height: none !important;
+          }
           /* TextStyle helpers (font family / size) */
           .ProseMirror .tiptap-ff-arial { font-family: Arial, sans-serif; }
           .ProseMirror .tiptap-ff-times-new-roman { font-family: "Times New Roman", Times, serif; }
@@ -1301,6 +1308,7 @@ export default function RichTextEditor({
           "border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100",
           !editable && "bg-muted/50 dark:bg-gray-800/50"
         )}
+        style={{ overflow: 'visible', height: 'auto', minHeight: 'auto' }}
         onClick={(e) => {
           if (editable) {
             e.stopPropagation()

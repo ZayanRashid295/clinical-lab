@@ -529,7 +529,12 @@ export class QuestionsService {
         select: { name: true, sectionId: true },
       });
       if (chapter) {
-        if (!questionCore.subject) questionCore.subject = chapter.name;
+        // DO NOT override subject if already provided from frontend
+        // Subject should come from parsed markdown (maps to Product Tag), not from chapter name
+        // Only derive subject from chapter if it's not provided
+        if (!questionCore.subject) {
+          questionCore.subject = chapter.name;
+        }
         // Derive section from chapter when sectionId not provided
         if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
@@ -544,6 +549,9 @@ export class QuestionsService {
     }
 
     // If sectionId is provided (or derived from chapter), fetch section name for system
+    // DO NOT override system if already provided from frontend
+    // System should come from parsed markdown (maps to Chapter), not from section name
+    // Only derive system from section if it's not provided
     if (resolvedSectionId && !questionCore.system) {
       const section = await this.prisma.section.findUnique({
         where: { id: resolvedSectionId },
@@ -651,9 +659,20 @@ export class QuestionsService {
           }
         : undefined;
 
+      // Truncate subject and system to 500 characters if they're too long (database limit)
+      const truncatedQuestionCore = {
+        ...questionCore,
+        ...(questionCore.subject && questionCore.subject.length > 500
+          ? { subject: questionCore.subject.substring(0, 497) + "..." }
+          : {}),
+        ...(questionCore.system && questionCore.system.length > 500
+          ? { system: questionCore.system.substring(0, 497) + "..." }
+          : {}),
+      };
+
       return await this.prisma.question.create({
       data: {
-        ...questionCore,
+        ...truncatedQuestionCore,
         // Add chapterId and sectionId if provided
         ...(chapterId ? { chapterId } : {}),
         ...(resolvedSectionId ? { sectionId: resolvedSectionId } : {}),
@@ -753,7 +772,12 @@ export class QuestionsService {
         select: { name: true, sectionId: true },
       });
       if (chapter) {
-        if (!questionCore.subject) questionCore.subject = chapter.name;
+        // DO NOT override subject if already provided from frontend
+        // Subject should come from parsed markdown (maps to Product Tag), not from chapter name
+        // Only derive subject from chapter if it's not provided
+        if (!questionCore.subject) {
+          questionCore.subject = chapter.name;
+        }
         // Derive section from chapter when sectionId not provided
         if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
@@ -768,6 +792,9 @@ export class QuestionsService {
     }
 
     // If sectionId is provided (or derived from chapter), fetch section name for system
+    // DO NOT override system if already provided from frontend
+    // System should come from parsed markdown (maps to Chapter), not from section name
+    // Only derive system from section if it's not provided
     if (resolvedSectionId && !questionCore.system) {
       const section = await this.prisma.section.findUnique({
         where: { id: resolvedSectionId },
@@ -778,9 +805,20 @@ export class QuestionsService {
       }
     }
 
+    // Truncate subject and system to 500 characters if they're too long (database limit)
+    const truncatedQuestionCore = {
+      ...questionCore,
+      ...(questionCore.subject && questionCore.subject.length > 500
+        ? { subject: questionCore.subject.substring(0, 497) + "..." }
+        : {}),
+      ...(questionCore.system && questionCore.system.length > 500
+        ? { system: questionCore.system.substring(0, 497) + "..." }
+        : {}),
+    };
+
     // Prepare core update data
     const data: any = {
-      ...questionCore,
+      ...truncatedQuestionCore,
     };
     if (Array.isArray(tags)) {
       data.tags = tags as unknown as any;
@@ -2090,22 +2128,19 @@ question_id: <Unique Question ID>
 
 ## Explanation
 
-<If keywords are provided, include this section:>
-
 ### Keywords in the Stem to Identify the Correct Option
 - **"<Keyword1>"** – <Explanation of relevance>  
 - **"<Keyword2>"** – <Explanation of relevance>  
 <Add more keywords if needed>
+<CRITICAL: Include ALL content from "Keywords" heading until "Explanation" heading in the DOCX, including any subheadings (###, ####) and ALL their content (text, lists, tables, images). Preserve the structure exactly as it appears in the DOCX.>
 
 ---
 
 ## Choice-by-Choice Explanations
 
-<Per-option explanations go here, in the form:
-(Option A) ...
-(Option B) ...
-etc. After this block, include any remaining tables, differential diagnosis,
-and notes as plain markdown.>`;
+<This is a placeholder header. Per-option explanations appear under their respective options above.>
+
+<After the placeholder, include any remaining explanation content that appears after "Explanation" heading in the DOCX: tables, differential diagnosis, notes, etc. as plain markdown.>`;
 
     // Build image information for LLM (as plain instructions)
     let imageNote = "";
@@ -2136,9 +2171,10 @@ The frontend parser expects this exact structure:
   a '### Choice X Explanation' block for each option
 - A line '**Correct Answer:** X' where X is A–E may appear once after the options (before ## Explanation); do NOT put it under ## Explanation.
 - "## Explanation" section (this heading must appear ONLY ONCE; do not repeat it). Do NOT include "Correct Answer:" or "**Correct Answer:** X" inside this section.
-  - ONE '### Keywords in the Stem to Identify the Correct Option' heading
-  - A bullet list of keywords (each keyword appears only once)
-  - A '---' separator
+  - FIRST: ONE '### Keywords in the Stem to Identify the Correct Option' heading with ALL content from "Keywords" heading until "Explanation" heading (including subheadings and their content)
+  - A '---' separator after Keywords section
+  - SECOND: '## Choice-by-Choice Explanations' placeholder (as a subheading under the single "## Explanation" block)
+  - THIRD: All remaining explanation content that appears after "Explanation" heading in the DOCX
 - '## Choice-by-Choice Explanations' section (as a subheading under the single "## Explanation" block) with:
   - Per-option explanations in the form:
     (Option A) Option A text:
@@ -2153,7 +2189,17 @@ The frontend parser expects this exact structure:
 
 DO NOT change this structure. Do NOT omit the correct answer.
 
-**HEADINGS:** Use standard Markdown heading syntax (##, ###, #### for sections and subsections) for all section and subsection titles. Do not use plain text or bold-only text for section titles. The app renders all headings as bold and center-aligned, so use proper Markdown headings (e.g. ## Question, ## Explanation, ### Choice A Explanation, #### subheadings) so they display correctly.
+**HEADINGS (CRITICAL - ALWAYS USE HASH SYMBOLS):** 
+   - Use standard Markdown heading syntax (##, ###, ####, #####, ######) for ALL section and subsection titles.
+   - DO NOT use bold text (**Heading**) for headings - always use hash symbols (#).
+   - If the DOCX contains headings formatted as bold text, convert them to proper Markdown heading syntax.
+   - Use appropriate heading levels:
+     * ## for main sections (Question, Explanation, Options and Explanations)
+     * ### for subsections (Choice A Explanation, Keywords in the Stem..., Choice-by-Choice Explanations)
+     * #### for sub-subsections (any subheadings within sections)
+     * ##### and ###### for deeper nested headings
+   - The app renders all headings as bold and center-aligned automatically, so you MUST use proper Markdown heading syntax (##, ###, ####, etc.) for all headings.
+   - Do not use plain text or bold-only text (**text**) for section titles - always use hash symbols.
 
 ====================
 HTML CONTENT (SOURCE)
@@ -2169,10 +2215,39 @@ ${template}
 ====================
 CRITICAL INSTRUCTIONS
 ====================
-0. HEADINGS (DISPLAY)
-   - Use Markdown heading syntax (##, ###, ####) for all section and subsection titles. The app renders headings as bold and center-aligned; do not use plain or bold-only text for section titles.
-1. FRONTMATTER
+0. HEADINGS (CRITICAL - ALWAYS USE HASH SYMBOLS FOR HEADINGS)
+   - Use Markdown heading syntax (##, ###, ####, #####, ######) for ALL section and subsection titles.
+   - DO NOT use bold text (**Heading**) for headings - always use hash symbols (#).
+   - If the DOCX contains headings formatted as bold text (**Heading**), convert them to proper Markdown heading syntax (##, ###, ####, etc.).
+   - The app renders all headings as bold and center-aligned automatically, so you MUST use proper Markdown heading syntax.
+   - Use appropriate heading levels based on hierarchy (## for main sections, ### for subsections, #### for sub-subsections, etc.).
+1. FRONTMATTER AND METADATA EXTRACTION (CRITICAL)
    - Fill in: title, tags, difficulty (easy/medium/hard), correct_answer (A–E), question_id.
+   - **METADATA MAPPING (CRITICAL - EXTRACT FROM DOCX AND MAP CORRECTLY):**
+     * **Subject** (from DOCX) → Extract from DOCX "Subject:" line and use as the first part of the title. This will be mapped to **Product Tag** (productTagId) AND **Subject** field in our system.
+     * **System** (from DOCX) → Extract from DOCX "System:" line and use as the second part of the title after " — ". This will be mapped to **Chapter** (chapterId) AND **System** field in our system.
+     * **Topic** (from DOCX) → Extract from DOCX "Topic:" line and output as "## Topic: <extracted topic>" heading. This will be mapped to **Topic** (topicId) in our system.
+   - **CRITICAL MAPPING SUMMARY:**
+     * DOCX "Subject:" → Markdown title first part → Frontend maps to Product Tag (productTagId) AND Subject field
+     * DOCX "System:" → Markdown title second part → Frontend maps to Chapter (chapterId) AND System field
+     * DOCX "Topic:" → Markdown "## Topic:" heading → Frontend maps to Topic (topicId)
+   - Example: If DOCX contains:
+       Subject: Obstetrics & Gynecology (Obs)
+       System: Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment
+       Topic: Obstetrics – Multiple Pregnancy
+     Then output:
+       title: "Obstetrics & Gynecology (Obs) — Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment"
+       ## Topic: Obstetrics – Multiple Pregnancy
+     This will result in:
+       - Product Tag = "Obstetrics & Gynecology (Obs)" (from Subject) → productTagId
+       - Subject field = "Obstetrics & Gynecology (Obs)" (from Subject)
+       - Chapter = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System) → chapterId
+       - System field = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System)
+       - Topic = "Obstetrics – Multiple Pregnancy" (from Topic) → topicId
+   - If "Subject:", "System:", or "Topic:" lines exist in the DOCX, you MUST extract them and use them exactly as shown above.
+   - The title format must be: "<Subject> — <System>" (Subject and System separated by " — ")
+   - The Topic must appear as a separate "## Topic: <Topic>" heading after the main title line.
+   - Extract the full text from "Subject:", "System:", and "Topic:" lines - do not truncate or shorten them.
 2. QUESTION STEM (CLINICAL CASE ONLY – NO "OPTIONS AND EXPLANATIONS" HEADING)
    - Put ONLY the clinical case / question stem text under '## Question'.
    - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
@@ -2212,8 +2287,34 @@ CRITICAL INSTRUCTIONS
      Keywords, before Choice-by-Choice Explanations, or elsewhere.
    - Under '## Explanation', build the content in **this exact order**:
      
-     STEP 1 – CHOICE-BY-CHOICE EXPLANATIONS PLACEHOLDER (FIRST)
-     - As the very first line under '## Explanation', you MUST include:
+     STEP 1 – KEYWORDS BLOCK (FIRST)
+     - As the very first content under '## Explanation', create one heading:
+       '### Keywords in the Stem to Identify the Correct Option'
+     - **CRITICAL**: Extract ALL content from the DOCX that appears under the "Keywords" heading (or similar heading like "Keywords in the Stem to Identify the Correct Option") until you reach the "Explanation" heading (or "## Explanation").
+     - This includes:
+       * All keyword bullets/lists
+       * ALL subheadings that appear between "Keywords" and "Explanation" headings
+       * ALL content under those subheadings (text, lists, tables, images, etc.)
+     - **HEADING CONVERSION CRITICAL**: When extracting subheadings from the DOCX:
+       * If the DOCX has headings formatted as bold text (**Heading**), convert them to proper Markdown heading syntax (##, ###, ####, #####, ######)
+       * DO NOT use **bold text** for headings - always use hash symbols (#) for headings
+       * Use appropriate heading levels: ### for main subsections, #### for sub-subsections, ##### for deeper levels
+       * All headings will be rendered as bold and center-aligned by the app automatically, so use proper Markdown heading syntax
+     - Preserve the exact structure: if there are subheadings between Keywords and Explanation in the DOCX, include them with their content under the Keywords section using proper Markdown heading syntax (##, ###, ####, etc.).
+     - Convert everything to proper Markdown format (headings with # symbols, bullets, tables, etc.).
+     - After all Keywords content (including subheadings), include a '---' line, then a blank line.
+     - Example structure:
+       ### Keywords in the Stem to Identify the Correct Option
+       - **"Keyword1"** – explanation
+       - **"Keyword2"** – explanation
+       
+       #### Subheading that appeared before Explanation
+       Content under subheading...
+       
+       ---
+     
+     STEP 2 – CHOICE-BY-CHOICE EXPLANATIONS PLACEHOLDER
+     - After the '---' line, you MUST include:
        ## Choice-by-Choice Explanations
      - This is a placeholder header that the system requires. Without this
        line the system will fail.
@@ -2229,33 +2330,26 @@ CRITICAL INSTRUCTIONS
        '## Options and Explanations' section.
      - Do NOT copy these per-option explanations into the '## Explanation'
        block.
-     
-     STEP 2 – KEYWORDS BLOCK
-     - After the '## Choice-by-Choice Explanations' placeholder, create one heading:
-       '### Keywords in the Stem to Identify the Correct Option'
-     - Under this heading, include a bullet list of **all important words/phrases
-       from the stem that help identify the correct option**, in this format:
-         - **"Keyword"** – short explanation
-     - These bullets should be derived from the stem text only; do not pull in
-       per-option explanations here.
-     - After the keywords list, include a '---' line, then a blank line.
+     - After the placeholder, include a blank line.
      
      STEP 3 – FULL EXPLANATION CONTENT (QUESTION-LEVEL ONLY)
-     - After the '---' line, you must output **all remaining question-level
-       explanation content** from the DOCX **in the same order it appears in
+     - After the '## Choice-by-Choice Explanations' placeholder, you must output **all remaining question-level
+       explanation content** from the DOCX that appears AFTER the "Explanation" heading **in the same order it appears in
        the doc**, converted to Markdown:
        - Plain text paragraphs
        - Lists
-       - Headings/subheadings
+       - Headings/subheadings (using proper Markdown heading syntax ##, ###, ####, etc. - NOT bold text **Heading**)
        - Tables (as Markdown tables)
        - Images (as Markdown images with placeholders)
+     - **HEADING CONVERSION**: If any headings in this section are formatted as bold text (**Heading**) in the DOCX, convert them to proper Markdown heading syntax (##, ###, ####, etc.). All headings must use hash symbols, not bold text.
      - This content should explain the reasoning, key concepts, differentials,
        tables, notes, etc. that apply to the **question as a whole**.
      - Do NOT include any per-option explanation blocks in this section (no
        lines starting with "(Option A)", "(Option B)", etc.).
-     - Do NOT invent new headings; reuse the logical structure from the source.
+     - Do NOT include content that was already placed under Keywords section.
+     - Do NOT invent new headings; reuse the logical structure from the source, but convert bold-only headings to proper Markdown heading syntax.
      - Do NOT drop, merge, or reorder any content; every piece of text, table,
-       or image that appears in the source explanation must appear here.
+       or image that appears in the source explanation (after the Explanation heading) must appear here.
 
 7. FIDELITY TO SOURCE (CRITICAL – NO PARAPHRASING OR RESTRUCTURING)
    - **Do NOT paraphrase or summarize** any medical content, sentences, or bullet points.

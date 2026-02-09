@@ -36,14 +36,16 @@ export interface AutoMatchResult {
   sectionId: string;
   chapterId: string;
   topicId: string;
+  productTagId?: string;
 }
 
 export type GetTopicsForChapter = (chapterId: string) => Promise<any[]>;
 
 /**
- * Run auto-match: find sectionId, chapterId, topicId from parsed subject/system/topic.
- * - Prefer matching by Chapter (parsedSubject) first; section is derived from chapter.
- * - If sections provided and parsedSystem given, can match section when chapter not matched.
+ * Run auto-match: find sectionId, chapterId, topicId, and productTagId from parsed subject/system/topic.
+ * - Match parsedSubject → Product Tag (productTagId)
+ * - Match parsedSystem → Chapter (chapterId), section is derived from chapter
+ * - Match parsedTopic → Topic (topicId)
  * - getTopicsForChapter(chapterId) is called when a chapter is matched to resolve topicId.
  */
 export async function runAutoMatch(
@@ -51,29 +53,43 @@ export async function runAutoMatch(
   chapters: any[],
   options: {
     sections?: any[];
+    productTags?: any[];
     getTopicsForChapter: GetTopicsForChapter;
   }
 ): Promise<Partial<AutoMatchResult>> {
   const { parsedSubject, parsedSystem, parsedTopic } = input;
-  const { sections = [], getTopicsForChapter } = options;
+  const { sections = [], productTags = [], getTopicsForChapter } = options;
 
   let matchedSectionId = "";
   let matchedChapterId = "";
   let matchedTopicId = "";
+  let matchedProductTagId = "";
 
-  if (!parsedSystem && !parsedSubject) {
-    return {};
+  // Match Subject → Product Tag
+  if (parsedSubject && productTags.length > 0) {
+    const normalizedSubject = normalizeName(parsedSubject);
+    let matchedProductTag = productTags.find(
+      (t: any) => normalizeName(t.name) === normalizedSubject
+    );
+    if (!matchedProductTag) {
+      matchedProductTag = productTags.find((t: any) =>
+        fuzzyMatch(t.name, parsedSubject!)
+      );
+    }
+    if (matchedProductTag) {
+      matchedProductTagId = matchedProductTag.id;
+    }
   }
 
-  // Prefer matching by Chapter (Subject) first
-  if (parsedSubject && chapters.length > 0) {
-    const normalizedSubject = normalizeName(parsedSubject);
+  // Match System → Chapter
+  if (parsedSystem && chapters.length > 0) {
+    const normalizedSystem = normalizeName(parsedSystem);
     let matchedChapter = chapters.find(
-      (c: any) => normalizeName(c.name) === normalizedSubject
+      (c: any) => normalizeName(c.name) === normalizedSystem
     );
     if (!matchedChapter) {
       matchedChapter = chapters.find((c: any) =>
-        fuzzyMatch(c.name, parsedSubject!)
+        fuzzyMatch(c.name, parsedSystem!)
       );
     }
     if (matchedChapter) {
@@ -99,7 +115,8 @@ export async function runAutoMatch(
     }
   }
 
-  // Fallback: match by System (section) if we have sections and no chapter matched
+  // Fallback: if System didn't match Chapter, try matching System → Section, then find Chapter within that Section
+  // NOTE: Do NOT use parsedSubject here - subject maps to ProductTag, not Chapter
   if (!matchedChapterId && parsedSystem && sections.length > 0) {
     const normalizedSystem = normalizeName(parsedSystem);
     let matchedSection = sections.find(
@@ -116,23 +133,21 @@ export async function runAutoMatch(
         (c: any) =>
           c.sectionId === matchedSection.id || c.section?.id === matchedSection.id
       );
-      if (parsedSubject && sectionChapters.length > 0) {
-        let matchedChapter = sectionChapters.find((c: any) =>
-          fuzzyMatch(c.name, parsedSubject!)
-        );
-        if (matchedChapter) {
-          matchedChapterId = matchedChapter.id;
-          const chapterTopics = await getTopicsForChapter(matchedChapterId);
-          if (parsedTopic && chapterTopics.length > 0) {
-            let matchedTopic = chapterTopics.find((t: any) =>
-              fuzzyMatch(t.name, parsedTopic!)
-            );
-            if (matchedTopic) matchedTopicId = matchedTopic.id;
-            else if (chapterTopics.length === 1)
-              matchedTopicId = chapterTopics[0].id;
-          } else if (chapterTopics.length === 1) {
+      // If we have multiple chapters in this section, prefer the first one
+      // Do NOT use parsedSubject to match chapters - subject maps to ProductTag, not Chapter
+      if (sectionChapters.length > 0) {
+        let matchedChapter = sectionChapters[0]; // Default to first chapter
+        matchedChapterId = matchedChapter.id;
+        const chapterTopics = await getTopicsForChapter(matchedChapterId);
+        if (parsedTopic && chapterTopics.length > 0) {
+          let matchedTopic = chapterTopics.find((t: any) =>
+            fuzzyMatch(t.name, parsedTopic!)
+          );
+          if (matchedTopic) matchedTopicId = matchedTopic.id;
+          else if (chapterTopics.length === 1)
             matchedTopicId = chapterTopics[0].id;
-          }
+        } else if (chapterTopics.length === 1) {
+          matchedTopicId = chapterTopics[0].id;
         }
       }
     }
@@ -142,5 +157,6 @@ export async function runAutoMatch(
   if (matchedSectionId) result.sectionId = matchedSectionId;
   if (matchedChapterId) result.chapterId = matchedChapterId;
   if (matchedTopicId) result.topicId = matchedTopicId;
+  if (matchedProductTagId) result.productTagId = matchedProductTagId;
   return result;
 }

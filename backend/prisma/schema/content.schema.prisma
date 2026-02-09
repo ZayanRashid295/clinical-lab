@@ -23,7 +23,7 @@ model Section {
 model Chapter {
   id          String   @id @default(cuid())
   sectionId   String
-  name        String   // Biochemistry, Microbiology
+  name        String   @db.VarChar(500) // Biochemistry, Microbiology (increased length for long system names)
   description String?
   order       Int      @default(0) // For ordering chapters
   isActive    Boolean  @default(true)
@@ -64,8 +64,8 @@ model Question {
   question    String   @db.Text // The question text/stem (supports long text)
   explanation String?  @db.Text // Explanation for the correct answer (legacy - keep for backward compatibility)
   // Added fields for question-generator
-  subject     String?  // Chapter name (for display)
-  system      String?  // Section name (for display)
+  subject     String?  @db.VarChar(500) // Product Tag name (for display) - increased length for long subject names
+  system      String?  @db.VarChar(500) // Chapter name (for display) - increased length for long system names
   chapterId   String?  // Reference to Chapter (for Subject dropdown)
   sectionId   String?  // Reference to Section (for System dropdown)
   tags        Json?

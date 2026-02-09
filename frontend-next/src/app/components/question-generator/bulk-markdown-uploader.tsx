@@ -212,15 +212,21 @@ export default function BulkMarkdownUploader({
     const matched = await runAutoMatch(
       { parsedSubject, parsedSystem, parsedTopic },
       chapters,
-      { sections: sectionsToUse.length > 0 ? sectionsToUse : [], getTopicsForChapter }
+      { sections: sectionsToUse.length > 0 ? sectionsToUse : [], productTags, getTopicsForChapter }
     )
-    if (matched.chapterId || matched.topicId) {
+    if (matched.chapterId || matched.topicId || matched.productTagId) {
+      // Find the result to get parsed subject
+      const result = summary?.results?.find((r) => r.fileName === fileName)
+      const currentMetadata = questionMetadata[fileName]
       updateQuestionMetadata(
         fileName,
         {
           ...(matched.sectionId ? { sectionId: matched.sectionId } : {}),
           chapterId: matched.chapterId || "",
           topicId: matched.topicId || "",
+          ...(matched.productTagId ? { productTagId: matched.productTagId } : {}),
+          // Preserve parsed subject name - don't override if user has edited it
+          subjectName: currentMetadata?.subjectName || parsedSubject || "",
         },
         true
       )
@@ -615,7 +621,7 @@ export default function BulkMarkdownUploader({
   // Update metadata for a specific question
   const updateQuestionMetadata = (
     fileName: string,
-    updates: { sectionId?: string; chapterId?: string; topicId?: string; productTagId?: string },
+    updates: { sectionId?: string; chapterId?: string; topicId?: string; productTagId?: string; subjectName?: string },
     skipClearing = false // If true, don't clear dependent fields (used for auto-matching)
   ) => {
     setQuestionMetadata((prev) => {
@@ -834,10 +840,12 @@ export default function BulkMarkdownUploader({
 
           // Convert parsed question to the format needed for creation
           // The parsed question has stem as string, but we need to handle it properly
+          // Use edited subjectName if available, otherwise use parsed subject
+          const subjectToUse = (metadata as any).subjectName || result.questionData.subject || ""
           const oldFormatData = {
             stem: result.questionData.stem, // This is a string from parser
             options: result.questionData.options,
-            subject: result.questionData.subject,
+            subject: subjectToUse,
             system: result.questionData.system,
             explanation: result.questionData.explanation, // This is already blocks
             perAnswerExplanations: result.questionData.perAnswerExplanations, // This is already blocks
@@ -856,7 +864,12 @@ export default function BulkMarkdownUploader({
             mainExplanation: newFormatData.mainExplanation || [],
             metadata: {
               ...newFormatData.metadata,
+              // Preserve parsed subject and system from DOCX/Markdown
+              subject: result.questionData.subject || newFormatData.metadata?.subject,
+              system: result.questionData.system || newFormatData.metadata?.system,
               topicId: questionTopicId,
+              chapterId: questionChapterId,
+              productTagId: questionProductTagId,
             },
           }
           const convertedBack = convertNewQuestionToOld(fullFormatData)
@@ -1276,8 +1289,8 @@ export default function BulkMarkdownUploader({
                                 <input
                                   type="text"
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                  placeholder={result.questionData.tags?.[0] ? `Parsed: ${result.questionData.tags[0]}` : "Name (editable)"}
-                                  value={(metadata as any).subjectName ?? ""}
+                                  placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                                  value={(metadata as any).subjectName ?? result.questionData.subject ?? ""}
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
@@ -1299,7 +1312,7 @@ export default function BulkMarkdownUploader({
                                     <option key={tag.id} value={tag.id}>{tag.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: ((metadata as any).subjectName || result.questionData.tags?.[0] || "New Subject").trim() })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: ((metadata as any).subjectName || result.questionData.subject || "New Subject").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected subject from database" disabled={!(metadata as any).productTagId} onClick={() => handleDeleteSubject(result.fileName)}>
@@ -1317,7 +1330,7 @@ export default function BulkMarkdownUploader({
                                 <input
                                   type="text"
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                  placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                                  placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
                                   value={(metadata as any).chapterName ?? ""}
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
@@ -1340,7 +1353,7 @@ export default function BulkMarkdownUploader({
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: ((metadata as any).chapterName || result.questionData.subject || "New Chapter").trim() })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: ((metadata as any).chapterName || result.questionData.system || "New Chapter").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected chapter from database" disabled={!metadata.chapterId} onClick={() => handleDeleteChapter(result.fileName)}>

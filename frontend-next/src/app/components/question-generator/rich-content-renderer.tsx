@@ -70,7 +70,7 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
       }
     })
 
-  return <div className="space-y-6">{renderedContent}</div>
+  return <div className="space-y-1">{renderedContent}</div>
 }
 
 function renderInternalLink(item: ContentItem) {
@@ -83,17 +83,17 @@ function renderInternalLink(item: ContentItem) {
   const href = `/${targetType === 'question' ? 'question-generator' : 'content'}/${targetType}/${targetId}`
   
   return (
-    <div key={item.id} className="my-4 p-4 border border-primary/30 dark:border-primary/40 rounded-lg bg-primary/5 dark:bg-primary/10">
+    <div key={item.id} className="my-1 p-1 border border-primary/30 dark:border-primary/40 rounded-lg bg-primary/5 dark:bg-primary/10">
       <a
         href={href}
-        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-semibold transition-colors"
+        className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-semibold transition-colors"
       >
         <span>🔗</span>
         <span>{linkText}</span>
         <ExternalLink className="w-4 h-4" />
       </a>
       {description && (
-        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">{description}</p>
+        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-0.5">{description}</p>
       )}
     </div>
   )
@@ -107,19 +107,19 @@ function renderExternalLink(item: ContentItem) {
   }
 
   return (
-    <div key={item.id} className="my-4 p-4 border border-blue-500/30 dark:border-blue-500/40 rounded-lg bg-blue-500/5 dark:bg-blue-500/10">
+    <div key={item.id} className="my-1 p-1 border border-blue-500/30 dark:border-blue-500/40 rounded-lg bg-blue-500/5 dark:bg-blue-500/10">
       <a
         href={url}
         target={openInNewTab !== false ? "_blank" : undefined}
         rel={openInNewTab !== false ? "noopener noreferrer" : undefined}
-        className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold transition-colors"
+        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold transition-colors"
       >
         <span>🌐</span>
         <span>{linkText}</span>
         <ExternalLink className="w-4 h-4" />
       </a>
       {description && (
-        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">{description}</p>
+        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-0.5">{description}</p>
       )}
     </div>
   )
@@ -672,22 +672,23 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
         `
       }} />
       <div 
-        className={`html-content-${itemId} max-w-none text-foreground/90 dark:text-gray-200
-          [&_p]:leading-relaxed [&_p]:mb-3 [&_p]:whitespace-pre-wrap 
-          [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-center [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-8 [&_h1]:mb-4 
-          [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-center [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-6 [&_h2]:mb-3 
-          [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-center [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-4 [&_h3]:mb-2 
-          [&_h4]:text-base [&_h4]:font-bold [&_h4]:text-center [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-3 [&_h4]:mb-2 
-          [&_h5]:text-sm [&_h5]:font-bold [&_h5]:text-center [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-2 [&_h5]:mb-1 
-          [&_h6]:text-xs [&_h6]:font-bold [&_h6]:text-center [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-2 [&_h6]:mb-1 
-          [&_span]:whitespace-pre-wrap
+        className={`html-content-${itemId} max-w-none text-sm text-foreground/90 dark:text-gray-200
+          [&_p]:leading-normal [&_p]:mb-1.5 [&_p]:whitespace-pre-wrap [&_p]:text-sm
+          [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-center [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-4 [&_h1]:mb-2 
+          [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-center [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-3 [&_h2]:mb-1.5 
+          [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-center [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-2 [&_h3]:mb-1 
+          [&_h4]:text-sm [&_h4]:font-bold [&_h4]:text-center [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-2 [&_h4]:mb-1 
+          [&_h5]:text-xs [&_h5]:font-bold [&_h5]:text-center [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-1 [&_h5]:mb-0.5 
+          [&_h6]:text-xs [&_h6]:font-bold [&_h6]:text-center [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-1 [&_h6]:mb-0.5 
+          [&_span]:whitespace-pre-wrap [&_span]:text-sm
           [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
-          [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:whitespace-pre-wrap 
-          [&_pre]:bg-muted dark:[&_pre]:bg-gray-800 [&_pre]:text-foreground dark:[&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto 
-          [&_blockquote]:border-l-4 [&_blockquote]:border-border dark:[&_blockquote]:border-gray-600 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-foreground/80 dark:[&_blockquote]:text-gray-300 
+          [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_code]:whitespace-pre-wrap 
+          [&_pre]:bg-muted dark:[&_pre]:bg-gray-800 [&_pre]:text-foreground dark:[&_pre]:text-gray-100 [&_pre]:p-2 [&_pre]:rounded [&_pre]:overflow-x-auto 
+          [&_blockquote]:border-l-4 [&_blockquote]:border-border dark:[&_blockquote]:border-gray-600 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-sm [&_blockquote]:text-foreground/80 dark:[&_blockquote]:text-gray-300 
           [&_strong]:font-semibold 
           [&_em]:italic 
-          [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto`}
+          [&_li]:text-sm
+          [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-2 [&_img]:max-w-full [&_img]:h-auto`}
         dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
       />
     </div>
@@ -1721,8 +1722,8 @@ function renderPerAnswerExplanations(
 
   if (!hasPerAnswerExplanations) {
     return (
-      <div key={item.id} className="border border-border/40 dark:border-gray-700 rounded-lg p-4 bg-muted/20 dark:bg-gray-800/30">
-        <p className="text-sm text-muted-foreground dark:text-gray-400 italic text-center">
+      <div key={item.id} className="border border-border/40 dark:border-gray-700 rounded-lg p-1 bg-muted/20 dark:bg-gray-800/30">
+        <p className="text-xs text-muted-foreground dark:text-gray-400 italic text-center">
           Per-answer explanations will appear here. Configure them in the Per-Answer Explanations section.
         </p>
       </div>
@@ -1737,9 +1738,9 @@ function renderPerAnswerExplanations(
     : options
 
   return (
-    <div key={item.id} className="border-t border-border/40 dark:border-gray-700/50 pt-6 mt-6">
-      <h3 className="text-sm font-bold text-center text-foreground dark:text-gray-100 mb-4 uppercase tracking-wide">Answer Breakdown</h3>
-      <div className="space-y-6">
+    <div key={item.id} className="border-t border-border/40 dark:border-gray-700/50 pt-1 mt-1">
+      <h3 className="text-sm font-bold text-center text-foreground dark:text-gray-100 mb-1 uppercase tracking-wide">Answer Breakdown</h3>
+      <div className="space-y-0.5">
         {sortedOptions.map((option) => {
           const isCorrect = option.correct
           const isSelected = selectedAnswer === option.label
@@ -1766,28 +1767,31 @@ function renderPerAnswerExplanations(
           return (
             <div
               key={option.label}
-              className="border-b border-border/40 dark:border-gray-700/50 pb-6 last:border-b-0 last:pb-0"
+              className="border-b border-border/40 dark:border-gray-700/50 pb-0.5 last:border-b-0 last:pb-0"
             >
               {/* Header */}
-              <div className="mb-3">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="font-bold text-foreground dark:text-gray-100">Option {option.label}:</span>
-                  <span className={`text-sm font-semibold ${
-                    isCorrect ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-                  }`}>
-                    {isCorrect ? "Correct" : "Incorrect"}
+              <div className="mb-0.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-sm text-foreground dark:text-gray-100">
+                    <span className="font-bold">Option {option.label}:</span>{" "}
+                    <span className="text-foreground/70 dark:text-gray-300">{option.text}</span>
+                    {" "}
+                    <span className={`font-semibold ${
+                      isCorrect ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                    }`}>
+                      ({isCorrect ? "Correct" : "Incorrect"})
+                    </span>
                   </span>
                   {isSelected && (
-                    <span className="text-xs font-semibold px-2 py-1 rounded bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border border-primary/20 dark:border-primary/30">
+                    <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border border-primary/20 dark:border-primary/30">
                       You selected
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-foreground/70 dark:text-gray-300 mt-1">{option.text}</p>
               </div>
 
               {/* Explanation Content */}
-              <div className="space-y-2">
+              <div className="space-y-0.5">
                 {hasContent ? (
                   <>
                     {isContentBlocks ? (
@@ -1823,20 +1827,20 @@ function renderPerAnswerExplanations(
                                       list-style-type: disc !important;
                                       list-style-position: outside !important;
                                       padding-left: 1.5rem !important;
-                                      margin: 0.5rem 0 1rem 0 !important;
+                                      margin: 0.25rem 0 0.5rem 0 !important;
                                     }
                                     .per-answer-explanation-content ol {
                                       list-style-type: decimal !important;
                                       list-style-position: outside !important;
                                       padding-left: 1.5rem !important;
-                                      margin: 0.5rem 0 1rem 0 !important;
+                                      margin: 0.25rem 0 0.5rem 0 !important;
                                     }
                                     .per-answer-explanation-content li {
                                       display: list-item !important;
                                       list-style-position: outside !important;
-                                      margin: 0.25rem 0 !important;
+                                      margin: 0.125rem 0 !important;
                                     }
-                                    .per-answer-explanation-content p { margin: 0.5rem 0 !important; }
+                                    .per-answer-explanation-content p { margin: 0.25rem 0 !important; }
                                     .per-answer-explanation-content strong { font-weight: 600 !important; }
                                     .per-answer-explanation-content em { font-style: italic !important; }
                                   `
@@ -1865,24 +1869,24 @@ function renderPerAnswerExplanations(
                                   list-style-position: outside !important;
                                   padding-left: 1.5rem !important;
                                   margin-left: 0 !important;
-                                  margin-top: 0.5rem !important;
-                                  margin-bottom: 1rem !important;
+                                  margin-top: 0.25rem !important;
+                                  margin-bottom: 0.5rem !important;
                                 }
                                 .per-answer-explanation-content ol {
                                   list-style-type: decimal !important;
                                   list-style-position: outside !important;
                                   padding-left: 1.5rem !important;
                                   margin-left: 0 !important;
-                                  margin-top: 0.5rem !important;
-                                  margin-bottom: 1rem !important;
+                                  margin-top: 0.25rem !important;
+                                  margin-bottom: 0.5rem !important;
                                 }
                                 .per-answer-explanation-content li {
                                   display: list-item !important;
                                   list-style-position: outside !important;
                                   margin-left: 0 !important;
                                   padding-left: 0 !important;
-                                  margin-top: 0.5rem !important;
-                                  margin-bottom: 0.5rem !important;
+                                  margin-top: 0.125rem !important;
+                                  margin-bottom: 0.125rem !important;
                                 }
                                 .per-answer-explanation-content li > p,
                                 .per-answer-explanation-content li > div {
@@ -1911,16 +1915,16 @@ function renderPerAnswerExplanations(
                                 list-style-type: disc !important;
                                 list-style-position: outside !important;
                                 padding-left: 1.5rem !important;
-                                margin: 0.5rem 0 1rem 0 !important;
+                                margin: 0.25rem 0 0.5rem 0 !important;
                               }
                               .per-answer-explanation-content ol {
                                 list-style-type: decimal !important;
                                 list-style-position: outside !important;
                                 padding-left: 1.5rem !important;
-                                margin: 0.5rem 0 1rem 0 !important;
+                                margin: 0.25rem 0 0.5rem 0 !important;
                               }
-                              .per-answer-explanation-content li { display: list-item !important; margin: 0.25rem 0 !important; }
-                              .per-answer-explanation-content p { margin: 0.5rem 0 !important; }
+                              .per-answer-explanation-content li { display: list-item !important; margin: 0.125rem 0 !important; }
+                              .per-answer-explanation-content p { margin: 0.25rem 0 !important; }
                               .per-answer-explanation-content strong { font-weight: 600 !important; }
                               .per-answer-explanation-content em { font-style: italic !important; }
                             `

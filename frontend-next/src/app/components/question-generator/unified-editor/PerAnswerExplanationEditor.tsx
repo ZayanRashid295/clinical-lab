@@ -509,7 +509,7 @@ export default function PerAnswerExplanationEditor({
   if (isConverting) {
     return (
       <div className={className}>
-        <div className="min-h-[80px] border rounded-lg flex items-center justify-center">
+        <div className="border rounded-lg flex items-center justify-center py-2">
           <p className="text-muted-foreground text-sm">Loading...</p>
         </div>
       </div>
@@ -534,7 +534,7 @@ export default function PerAnswerExplanationEditor({
         onChange={handleChange}
         editorRef={handleEditorRef}
         placeholder={placeholder || "Enter explanation..."}
-        className="min-h-[80px]"
+        className=""
       />
     </div>
   )

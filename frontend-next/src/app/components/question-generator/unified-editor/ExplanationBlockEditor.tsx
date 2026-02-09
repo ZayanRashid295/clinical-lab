@@ -136,7 +136,7 @@ const TableBlockEditor = memo(({
   // Early returns AFTER all hooks
   if (isConverting) {
     return (
-      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[200px] flex items-center justify-center">
+      <div className="border border-border rounded-md p-2 bg-muted/40 flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Converting markdown table...</p>
       </div>
     )
@@ -144,7 +144,7 @@ const TableBlockEditor = memo(({
   
   if (!stableInitialContent || !stableInitialContent.includes("<table")) {
     return (
-      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[200px]">
+      <div className="border border-border rounded-md p-2 bg-muted/40">
         <p className="text-sm text-muted-foreground">No table content</p>
       </div>
     )
@@ -156,7 +156,7 @@ const TableBlockEditor = memo(({
       initialContent={stableInitialContent}
       initialFormat="html"
       onChange={handleChange}
-      className="min-h-[200px]"
+      className=""
       showToolbar={false}
       editorRef={editorRef}
     />
@@ -501,7 +501,7 @@ const TextBlockEditor = memo(({
   // Show loading state while converting
   if (isConverting) {
     return (
-      <div className="border border-border rounded-md p-4 bg-muted/40 min-h-[100px] flex items-center justify-center">
+      <div className="border border-border rounded-md p-2 bg-muted/40 flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Converting markdown...</p>
       </div>
     )
@@ -1010,7 +1010,7 @@ export default function ExplanationBlockEditor({
 
   return (
     <div 
-      className="space-y-4"
+      className="space-y-1"
       onClick={(e) => {
         // If clicking on the container (not on a block or interactive element), activate explanation section
         const target = e.target as HTMLElement
@@ -1122,7 +1122,7 @@ export default function ExplanationBlockEditor({
                           }
                         }}
                         placeholder={`Enter explanation for option ${choice.label}...`}
-                        className="min-h-[80px]"
+                        className=""
                       />
                     </div>
                   )
@@ -1216,11 +1216,12 @@ export default function ExplanationBlockEditor({
         return (
           <Card
             key={block.id}
-            className={`border bg-card dark:bg-gray-800 ${
+            className={`border bg-card dark:bg-gray-800 !py-0 !px-0 !gap-0 ${
               isTextBlockActive ? "border-primary ring-2 ring-primary dark:border-blue-500 dark:ring-blue-500" : "border-border/30 dark:border-gray-700"
             }`}
+            style={{ padding: 0 }}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2 pt-1 pb-0.5">
               <Label className="text-xs text-muted-foreground dark:text-gray-300">
                 {block.type === "table" ? "Table Block" : block.type === "text" ? "Text Block" : "Content Block"}
               </Label>
@@ -1260,6 +1261,7 @@ export default function ExplanationBlockEditor({
               onClick={() => {
                 onSectionChange(blockActiveSection)
               }}
+              className="px-2 pb-1"
             >
               {shouldRenderAsTable && !hasContentOutsideTable ? (
                 // Block contains ONLY a table - use table editor
@@ -1326,7 +1328,7 @@ export default function ExplanationBlockEditor({
                     }
                   }}
                   placeholder="Enter explanation content with tables..."
-                  className="min-h-[200px]"
+                  className=""
                 />
               ) : (
               <TextBlockEditor
@@ -1344,7 +1346,7 @@ export default function ExplanationBlockEditor({
                   }
                 }}
                 placeholder="Enter explanation text..."
-                className="min-h-[100px]"
+                className=""
               />
               )}
             </div>

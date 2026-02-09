@@ -26,6 +26,7 @@ export default function QuestionCreator(props: QuestionCreatorProps) {
       initialData={props.initialData}
       onSave={handleSave}
       onCancel={props.onCancel}
+      onPreviewModeChange={props.onPreviewModeChange}
     />
   )
 }

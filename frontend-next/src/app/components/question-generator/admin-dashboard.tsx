@@ -38,7 +38,12 @@ interface Question {
   topic?: any // Topic object or string
 }
 
-export default function AdminDashboard() {
+interface AdminDashboardProps {
+  onQuestionViewChange?: (questionId: string | null, dbId: string | null, isViewing: boolean) => void
+  onEditorPreviewModeChange?: (isPreview: boolean) => void
+}
+
+export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange }: AdminDashboardProps) {
   const [questions, setQuestions] = useState<Question[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [viewingId, setViewingId] = useState<string | null>(null)
@@ -1210,6 +1215,48 @@ export default function AdminDashboard() {
 
   const editingQuestion = editingId ? questions.find((q) => q.id === editingId) : null
   const viewingQuestion = viewingId ? questions.find((q) => q.id === viewingId) : null
+
+  // Notify parent when viewing/editing changes
+  useEffect(() => {
+    const currentId = editingId || viewingId
+    if (!currentId) {
+      onQuestionViewChange?.(null, null, false)
+      return
+    }
+    const question = questions.find((q) => q.id === currentId)
+    if (question) {
+      // Use questionId if available, otherwise use the database id as fallback
+      const questionId = question.questionId || question.id || null
+      const isViewing = !!viewingId && !editingId
+      onQuestionViewChange?.(questionId, currentId, isViewing)
+    } else {
+      // Question not loaded yet, set to null
+      onQuestionViewChange?.(null, null, false)
+    }
+  }, [editingId, viewingId, questions, onQuestionViewChange])
+
+  // Handle close question view event from parent
+  useEffect(() => {
+    const handleCloseQuestionView = () => {
+      setViewingId(null)
+      setEditingId(null)
+      // Notify parent that we're no longer viewing/editing
+      onQuestionViewChange?.(null, null, false)
+    }
+    const handleEditQuestion = (event: CustomEvent) => {
+      const questionId = event.detail?.questionId
+      if (questionId) {
+        setEditingId(questionId)
+        setViewingId(null)
+      }
+    }
+    window.addEventListener("closeQuestionView", handleCloseQuestionView)
+    window.addEventListener("editQuestion", handleEditQuestion as EventListener)
+    return () => {
+      window.removeEventListener("closeQuestionView", handleCloseQuestionView)
+      window.removeEventListener("editQuestion", handleEditQuestion as EventListener)
+    }
+  }, [onQuestionViewChange])
   const filteredQuestions = questions.filter((q) => {
     if (!searchTerm || searchTerm.trim() === "") {
       return true // Show all questions if no search term
@@ -1355,7 +1402,7 @@ export default function AdminDashboard() {
 
       {/* Editor, View, or List */}
       {showNewQuestion || editingId ? (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0" style={{ paddingTop: 0, marginTop: 0 }}>
           <QuestionCreator
             initialData={
               editingId && editingQuestion
@@ -1379,10 +1426,11 @@ export default function AdminDashboard() {
               setParsedMarkdownData(null)
               setShowNewQuestionMenu(false)
             }}
+            onPreviewModeChange={onEditorPreviewModeChange}
           />
         </div>
       ) : viewingId ? (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0" style={{ paddingTop: 0, marginTop: 0 }}>
           <AdminQuestionView
             question={viewingQuestion}
             onEdit={() => {

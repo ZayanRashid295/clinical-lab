@@ -29,6 +29,7 @@ export interface QuestionCreatorProps {
   onSave: (data: QuestionCreatorData) => void
   onCancel: () => void
   onPreview?: (data: QuestionCreatorData) => void
+  onPreviewModeChange?: (isPreview: boolean) => void
 }
 
 
