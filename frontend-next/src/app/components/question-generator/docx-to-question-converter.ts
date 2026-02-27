@@ -2,6 +2,7 @@ import { ParsedDocxContent, replaceImageUrls, htmlTableToMarkdown } from "./docx
 import { replaceImagePaths } from "./markdown-parser-utils";
 import { ParsedQuestion } from "./markdown-parser-utils";
 import { convertMarkdownToExplanationBlocks } from "./markdown-parser-utils";
+import { parseKeywordBlock } from "./parse-metadata-utils";
 
 /**
  * Structure extracted from DOCX using AI or rule-based parsing
@@ -189,38 +190,14 @@ function parseDocxWithRules(
     }));
   }
 
-  // Extract Keywords Section
+  // Extract Keywords Section – same parseKeywordBlock as Markdown for consistency
   const keywordsSectionMatch = text.match(
-    /Keywords[^:]*:\s*(.+?)(?=Explanation|Choice-by-Choice|$)/is
+    /Keywords[^:]*:\s*(.+?)(?=Explanation|Choice-by-Choice|Subject:|Topic:|$)/is
   );
   if (keywordsSectionMatch) {
-    const keywordsText = keywordsSectionMatch[1];
-    const keywordLines = keywordsText
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line && !line.match(/^Classic|^This|^These/i));
-
-    const keywords: Array<{ keyword: string; explanation: string }> = [];
-    for (const line of keywordLines) {
-      // Pattern: "Keyword" – explanation or Keyword → explanation
-      const keywordMatch = line.match(/["']?([^"']+)["']?\s*[–—→-]\s*(.+)/);
-      if (keywordMatch) {
-        keywords.push({
-          keyword: keywordMatch[1].trim(),
-          explanation: keywordMatch[2].trim(),
-        });
-      } else if (line.match(/^[A-Z]/)) {
-        // If line starts with capital, might be a keyword
-        const parts = line.split(/[–—→-]/);
-        if (parts.length >= 2) {
-          keywords.push({
-            keyword: parts[0].trim(),
-            explanation: parts.slice(1).join(" ").trim(),
-          });
-        }
-      }
-    }
-    data.keywords = keywords;
+    const keywordsText = keywordsSectionMatch[1].trim();
+    const keywords = parseKeywordBlock(keywordsText);
+    if (keywords.length > 0) data.keywords = keywords;
   }
 
   // Extract Per-Answer Explanations

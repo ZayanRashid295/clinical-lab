@@ -22,10 +22,11 @@ import { ProductTagsService } from "@/app/services/products/product-tags.service
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "../choice-system/types"
 import { blocksToHTML, blocksToHTMLAsync, htmlToBlocks } from "./content-utils"
+import { normalizeStemBlocksForDisplay } from "../stem-blocks-utils"
 import PerAnswerExplanationEditor from "./PerAnswerExplanationEditor"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { Editor } from "@tiptap/react"
-import { RotateCcw, Eye, EyeOff } from "lucide-react"
+import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
 
 interface QuestionEditorProps {
@@ -36,7 +37,9 @@ interface QuestionEditorProps {
 }
 
 export default function QuestionEditor({ initialData, onSave, onCancel, onPreviewModeChange }: QuestionEditorProps) {
-  const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(initialData?.stem || [])
+  const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(() =>
+    normalizeStemBlocksForDisplay(initialData?.stem || [])
+  )
   const [choices, setChoices] = useState<Choice[]>(initialData?.choices || [])
   const [perAnswerExplanations, setPerAnswerExplanations] = useState<Record<string, ContentBlock[]>>(
     initialData?.perAnswerExplanations || {}
@@ -50,6 +53,19 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     return []
   })
   const [metadata, setMetadata] = useState(initialData?.metadata || {})
+  const [tagsInputValue, setTagsInputValue] = useState<string>(
+    Array.isArray(initialData?.metadata?.tags) ? initialData!.metadata!.tags!.join(", ") : ""
+  )
+  const [subjectEditName, setSubjectEditName] = useState("")
+  const [systemEditName, setSystemEditName] = useState("")
+  const [topicEditName, setTopicEditName] = useState("")
+  const [addMetaContext, setAddMetaContext] = useState<{
+    type: "subject" | "chapter" | "topic"
+  } | null>(null)
+  const [addMetaName, setAddMetaName] = useState("")
+  const [addMetaSectionId, setAddMetaSectionId] = useState("")
+  const [addMetaError, setAddMetaError] = useState<string | null>(null)
+  const [addMetaLoading, setAddMetaLoading] = useState(false)
   const [questionId, setQuestionId] = useState<string>("")
 
   const [activeSection, setActiveSection] = useState<"stem" | "explanation" | string | null>(null)
@@ -126,6 +142,20 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       .finally(() => setLoadingTags(false))
   }, [])
 
+  // Load sections on mount for creating new systems
+  useEffect(() => {
+    setLoadingSections(true)
+    sectionsService
+      .getSections({ status: "ACTIVE" })
+      .then((response) => {
+        const data = Array.isArray(response) ? response : (response as any)?.data || []
+        setSections(data)
+      })
+      .catch(() => setSections([]))
+      .finally(() => setLoadingSections(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Initialize productTagIds from productTagId if present (for backward compatibility)
   useEffect(() => {
     if (initialData?.metadata?.productTagId && !metadata.productTagIds) {
@@ -135,6 +165,35 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       }))
     }
   }, [initialData?.metadata?.productTagId])
+
+  // Keep editable names in sync with current selections
+  useEffect(() => {
+    const selectedTagId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    if (selectedTagId) {
+      const tag = productTags.find((t) => t.id === selectedTagId)
+      setSubjectEditName(tag?.name || "")
+    } else {
+      setSubjectEditName("")
+    }
+  }, [metadata.productTagId, metadata.productTagIds, productTags])
+
+  useEffect(() => {
+    if (metadata.chapterId) {
+      const chapter = chapters.find((c: any) => c.id === metadata.chapterId)
+      setSystemEditName(chapter?.name || "")
+    } else {
+      setSystemEditName("")
+    }
+  }, [metadata.chapterId, chapters])
+
+  useEffect(() => {
+    if (metadata.topicId) {
+      const topic = topics.find((t: any) => t.id === metadata.topicId)
+      setTopicEditName(topic?.name || "")
+    } else {
+      setTopicEditName("")
+    }
+  }, [metadata.topicId, topics])
 
   // Close tags dropdown when clicking outside
   useEffect(() => {
@@ -315,6 +374,143 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     if (!selectedId) return ""
     const selected = productTags.find((t) => t.id === selectedId)
     return selected?.name || ""
+  }
+
+  // Add new Subject/System/Topic to DB (same pattern as bulk DOCX uploader)
+  const handleAddMetaSubmit = async () => {
+    if (!addMetaContext) return
+    const name = addMetaName.trim()
+    if (!name) {
+      setAddMetaError("Name is required")
+      return
+    }
+    setAddMetaError(null)
+    setAddMetaLoading(true)
+    try {
+      if (addMetaContext.type === "subject") {
+        const res: any = await productTagsService.createTag({ name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProductTags(data)
+          setMetadata((prev) => ({
+            ...prev,
+            productTagId: id,
+            productTagIds: [id],
+            subject: name,
+          }))
+          setAddMetaContext(null)
+        }
+      } else if (addMetaContext.type === "chapter") {
+        // Auto-assign to the default \"General Principles\" section when creating a new system
+        const generalPrinciplesSection =
+          sections.find((s: any) => typeof s.name === "string" && s.name.toLowerCase().includes("general principles")) ||
+          sections[0]
+        const sectionId = generalPrinciplesSection?.id
+        if (!sectionId) {
+          setAddMetaError("No default section available to attach this system.")
+          setAddMetaLoading(false)
+          return
+        }
+        const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setChapters(data)
+          setMetadata((prev) => ({
+            ...prev,
+            chapterId: id,
+            sectionId,
+            system: name,
+            topicId: undefined,
+          }))
+          setAddMetaContext(null)
+        }
+      } else if (addMetaContext.type === "topic") {
+        const chapterId = metadata.chapterId
+        if (!chapterId) {
+          setAddMetaError("Select a system first")
+          setAddMetaLoading(false)
+          return
+        }
+        const res: any = await topicsService.createTopic({ chapterId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setTopics(data)
+          setMetadata((prev) => ({
+            ...prev,
+            topicId: id,
+          }))
+          setAddMetaContext(null)
+        }
+      }
+    } catch (e: any) {
+      const rawMessage = e?.message || e?.response?.data?.message || ""
+      const lower = String(rawMessage).toLowerCase()
+      if (lower.includes("already exists") || lower.includes("unique constraint")) {
+        const label =
+          addMetaContext.type === "subject"
+            ? "Subject"
+            : addMetaContext.type === "chapter"
+            ? "System"
+            : "Topic"
+        setAddMetaError(`${label} with this name already exists.`)
+      } else {
+        setAddMetaError(rawMessage || "Failed to create")
+      }
+    } finally {
+      setAddMetaLoading(false)
+    }
+  }
+
+  // Update existing Subject/System/Topic names in DB
+  const handleUpdateSubjectName = async () => {
+    const selectedTagId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    const name = subjectEditName.trim()
+    if (!selectedTagId || !name) return
+    try {
+      await productTagsService.updateTag(selectedTagId, { name })
+      const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+      const data = Array.isArray(list) ? list : (list as any)?.data || []
+      setProductTags(data)
+    } catch (e: any) {
+      alert(e?.message || "Failed to update subject")
+    }
+  }
+
+  const handleUpdateSystemName = async () => {
+    const chapterId = metadata.chapterId
+    const name = systemEditName.trim()
+    if (!chapterId || !name) return
+    try {
+      await chaptersService.updateChapter(chapterId, { name })
+      const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+      const data = Array.isArray(list) ? list : (list as any)?.data || []
+      setChapters(data)
+    } catch (e: any) {
+      alert(e?.message || "Failed to update system")
+    }
+  }
+
+  const handleUpdateTopicName = async () => {
+    const topicId = metadata.topicId
+    const name = topicEditName.trim()
+    if (!topicId || !name) return
+    try {
+      const chapterId = metadata.chapterId
+      await topicsService.updateTopic(topicId, { name, chapterId: chapterId as string })
+      if (chapterId) {
+        const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+        const data = Array.isArray(list) ? list : (list as any)?.data || []
+        setTopics(data)
+      }
+    } catch (e: any) {
+      alert(e?.message || "Failed to update topic")
+    }
   }
 
 
@@ -725,12 +921,13 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       choices: choices,
       mainExplanation: mainExplanationBlocks,
       perAnswerExplanations: perAnswerExplanations,
-      metadata: metadata,
+      metadata: { ...metadata, questionId: questionId || metadata?.questionId },
     }
 
     return (
       <UnifiedQuestionPreview
         questionData={questionData}
+        questionId={questionId || metadata?.questionId || undefined}
         onEdit={() => {
           setIsPreviewMode(false)
           onPreviewModeChange?.(false)
@@ -831,7 +1028,16 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           {/* Left column - Question Stem and Choices */}
           <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0">
             <Card className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl h-full flex flex-col overflow-hidden">
-              <div className="flex-shrink-0 mb-4">
+              {/* Clinical Case panel: click anywhere to activate stem editor */}
+              <div
+                className="flex-shrink-0 mb-4 cursor-pointer"
+                onClick={(e) => {
+                  const target = e.target as HTMLElement
+                  if (target.closest("[contenteditable]")) return
+                  setActiveSection("stem")
+                  stemEditorRef.current?.chain().focus().run()
+                }}
+              >
                 <h3 className="text-xs font-bold text-primary/70 dark:text-blue-400 uppercase tracking-widest">
                   Clinical Case
                 </h3>
@@ -840,12 +1046,18 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
               {/* Scrollable content area */}
               <div className="flex-1 min-h-0 overflow-y-auto pr-2">
                 {/* Question Stem Editor */}
-                <div className="flex-shrink-0 mb-1">
-                  <div
-                    onClick={() => setActiveSection("stem")}
-                    className={activeSection === "stem" ? "ring-2 ring-primary rounded-lg" : ""}
-                  >
-                    <RichTextEditor
+                <div
+                  className={`flex-shrink-0 mb-1 rounded-lg ${activeSection === "stem" ? "ring-2 ring-primary" : ""}`}
+                  onClickCapture={() => setActiveSection("stem")}
+                  onClick={(e) => {
+                    const target = e.target as HTMLElement
+                    setActiveSection("stem")
+                    if (!target.closest("[contenteditable]")) {
+                      stemEditorRef.current?.chain().focus().run()
+                    }
+                  }}
+                >
+                  <RichTextEditor
                       content={blocksToHTML(stemBlocks)}
                       onChange={async (html) => {
                         // Preserve existing block IDs when converting HTML back to blocks
@@ -855,16 +1067,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                       editorRef={(editor) => {
                         stemEditorRef.current = editor
                         if (editor) {
-                          // Set up focus handler
-                          editor.on("focus", () => {
-                            handleEditorFocus("stem")
-                          })
+                          editor.on("focus", () => handleEditorFocus("stem"))
                         }
                       }}
                       placeholder="Enter the question stem..."
                       className=""
                     />
-                  </div>
                 </div>
 
                 {/* Choices Editor */}
@@ -904,7 +1112,18 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                       
                       return (
                         <div key={index} className="space-y-2">
-                          <div className="flex items-center gap-3 p-3 rounded-lg border border-border/50 dark:border-gray-700 bg-background/50 dark:bg-gray-800/50">
+                          <div
+                            className={`flex items-center gap-3 p-3 rounded-lg border border-border/50 dark:border-gray-700 bg-background/50 dark:bg-gray-800/50 cursor-pointer ${isPerAnswerActive ? "ring-2 ring-primary" : ""}`}
+                            onClick={(e) => {
+                              const target = e.target as HTMLElement
+                              setActiveSection(`per-answer-${choice.label}`)
+                              setActivePerAnswerLabel(choice.label)
+                              if (!target.closest("input") && !target.closest("button") && !target.closest("[contenteditable]") && isExpanded) {
+                                const editor = perAnswerEditorRefs.current[choice.label]
+                                if (editor) setTimeout(() => editor.chain().focus().run(), 0)
+                              }
+                            }}
+                          >
                             <div className="flex items-center gap-2 min-w-[80px]">
                               <Input
                                 value={choice.label}
@@ -956,11 +1175,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                           {/* Per-Answer Explanation Editor */}
                           {isExpanded && (
                             <div
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation()
                                 setActiveSection(`per-answer-${choice.label}`)
                                 setActivePerAnswerLabel(choice.label)
+                                const target = e.target as HTMLElement
+                                if (!target.closest("[contenteditable]")) {
+                                  const editor = perAnswerEditorRefs.current[choice.label]
+                                  if (editor) setTimeout(() => editor.chain().focus().run(), 0)
+                                }
                               }}
-                              className={isPerAnswerActive ? "ring-2 ring-primary rounded-lg" : "border border-border/30 dark:border-gray-700 rounded-lg bg-muted/20 dark:bg-gray-800/20"}
+                              className="border border-border/30 dark:border-gray-700 rounded-lg bg-muted/20 dark:bg-gray-800/20"
                             >
                               <div className="flex items-center justify-between">
                                 <Label className="text-xs font-semibold text-muted-foreground dark:text-gray-300">
@@ -1006,20 +1231,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
               <Card 
                 className="p-6 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl h-full flex flex-col"
                 onClick={(e) => {
-                  // Activate explanation section when clicking anywhere in the card
-                  // Check if the click is not on an interactive element
+                  // Only run when clicking empty area (not inside a specific block or metadata), so block clicks keep focus on that block
                   const target = e.target as HTMLElement
-                  if (!target.closest('button') && !target.closest('input') && !target.closest('[contenteditable]')) {
-                    setActiveSection("explanation")
-                    // If there are blocks, focus the first one
-                    if (mainExplanationBlocks.length > 0) {
-                      const firstBlock = mainExplanationBlocks[0]
-                      const firstBlockEditor = textBlockEditorRefs.current[firstBlock.id]
-                      if (firstBlockEditor) {
-                        setTimeout(() => {
-                          firstBlockEditor.chain().focus().run()
-                        }, 50)
-                      }
+                  if (target.closest('[data-explanation-block]')) return
+                  if (target.closest('[data-metadata]')) return
+                  if (target.closest('button') || target.closest('input') || target.closest('select') || target.closest('[contenteditable]')) return
+                  setActiveSection("explanation")
+                  if (mainExplanationBlocks.length > 0) {
+                    const firstBlock = mainExplanationBlocks[0]
+                    const firstBlockEditor = textBlockEditorRefs.current[firstBlock.id]
+                    if (firstBlockEditor) {
+                      setTimeout(() => firstBlockEditor.chain().focus().run(), 50)
                     }
                   }
                 }}
@@ -1068,69 +1290,191 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                       }}
                     />
 
-                    {/* Metadata (Subject/Chapters/Topic) */}
-                    <div className="border-t border-border/40 dark:border-gray-700 pt-6 mt-6">
+                    {/* Metadata (Subject/Chapters/Topic) - clicks here must not switch to explanation block */}
+                    <div className="border-t border-border/40 dark:border-gray-700 pt-6 mt-6" data-metadata>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Subject */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
                             Subject
                           </div>
-                          <select
-                            value={metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""}
-                            onChange={(e) => handleTagSelect(e.target.value)}
-                            className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            disabled={loadingTags}
-                          >
-                            <option value="">Select Subject...</option>
-                            {productTags.map((tag) => (
-                              <option key={tag.id} value={tag.id}>
-                                {tag.name}
-                              </option>
-                            ))}
-                          </select>
+                          <div className="flex gap-2 mb-1">
+                            <select
+                              value={
+                                metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""
+                              }
+                              onChange={(e) => handleTagSelect(e.target.value)}
+                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              disabled={loadingTags}
+                            >
+                              <option value="">Select Subject...</option>
+                              {productTags.map((tag) => (
+                                <option key={tag.id} value={tag.id}>
+                                  {tag.name}
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0"
+                              onClick={() => {
+                                setAddMetaContext({ type: "subject" })
+                                setAddMetaName("")
+                                setAddMetaSectionId("")
+                                setAddMetaError(null)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <input
+                            type="text"
+                            value={subjectEditName}
+                            onChange={(e) => setSubjectEditName(e.target.value)}
+                            placeholder="Edit selected subject name"
+                            className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={!metadata.productTagId && !(metadata.productTagIds && metadata.productTagIds[0])}
+                              onClick={handleUpdateSubjectName}
+                            >
+                              Save Subject
+                            </Button>
+                          </div>
                         </div>
                         {/* Chapters */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Chapters
+                            System
                           </div>
-                          <select
-                            value={metadata.chapterId || ""}
-                            onChange={(e) => handleChapterChange(e.target.value)}
-                            className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            disabled={loadingChapters}
-                          >
-                            <option value="">Select Chapter...</option>
-                            {chapters.map((chapter) => (
-                              <option key={chapter.id} value={chapter.id}>
-                                {chapter.name}
-                              </option>
-                            ))}
-                          </select>
+                          <div className="flex gap-2 mb-1">
+                            <select
+                              value={metadata.chapterId || ""}
+                              onChange={(e) => handleChapterChange(e.target.value)}
+                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              disabled={loadingChapters}
+                            >
+                              <option value="">Select System...</option>
+                              {chapters.map((chapter) => (
+                                <option key={chapter.id} value={chapter.id}>
+                                  {chapter.name}
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0"
+                              onClick={() => {
+                                setAddMetaContext({ type: "chapter" })
+                                setAddMetaName("")
+                                setAddMetaSectionId(sections[0]?.id || "")
+                                setAddMetaError(null)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <input
+                            type="text"
+                            value={systemEditName}
+                            onChange={(e) => setSystemEditName(e.target.value)}
+                            placeholder="Edit selected system name"
+                            className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={!metadata.chapterId}
+                              onClick={handleUpdateSystemName}
+                            >
+                              Save System
+                            </Button>
+                          </div>
                         </div>
                         {/* Topic */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
                             Topic
                           </div>
-                          <select
-                            value={metadata.topicId || ""}
-                            onChange={(e) => handleTopicChange(e.target.value)}
-                            className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            disabled={loadingTopics || !metadata.chapterId}
-                          >
-                            <option value="">Select Topic...</option>
-                            {topics.map((topic) => (
-                              <option key={topic.id} value={topic.id}>
-                                {topic.name}
-                              </option>
-                            ))}
-                          </select>
+                          <div className="flex gap-2 mb-1">
+                            <select
+                              value={metadata.topicId || ""}
+                              onChange={(e) => handleTopicChange(e.target.value)}
+                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              disabled={loadingTopics || !metadata.chapterId}
+                            >
+                              <option value="">Select Topic...</option>
+                              {topics.map((topic) => (
+                                <option key={topic.id} value={topic.id}>
+                                  {topic.name}
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0"
+                              disabled={!metadata.chapterId}
+                              title={!metadata.chapterId ? "Select system first" : "Add topic to database"}
+                              onClick={() => {
+                                if (!metadata.chapterId) return
+                                setAddMetaContext({ type: "topic" })
+                                setAddMetaName("")
+                                setAddMetaError(null)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <input
+                            type="text"
+                            value={topicEditName}
+                            onChange={(e) => setTopicEditName(e.target.value)}
+                            placeholder="Edit selected topic name"
+                            className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={!metadata.topicId}
+                              onClick={handleUpdateTopicName}
+                            >
+                              Save Topic
+                            </Button>
+                          </div>
                           {!metadata.chapterId && (
-                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select Chapter first</p>
+                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select System first</p>
                           )}
                         </div>
+                      </div>
+                      {/* Tags (editable by admin) */}
+                      <div className="mt-4">
+                        <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
+                          Tags
+                        </div>
+                        <input
+                          type="text"
+                          value={tagsInputValue}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            setTagsInputValue(v)
+                            const arr = v.split(",").map((t) => t.trim()).filter(Boolean)
+                            setMetadata((prev) => ({ ...prev, tags: arr }))
+                          }}
+                          placeholder="e.g. CAH, Congenital Adrenal Hyperplasia, Enzyme Deficiency (comma-separated)"
+                          className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 placeholder-muted-foreground dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                        <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Free-text labels for this question. Shown in the question list.</p>
                       </div>
                     </div>
                   </div>
@@ -1166,6 +1510,52 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       </div>
 
       {/* Modals */}
+      {addMetaContext && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border">
+            <h3 className="text-sm font-semibold mb-3">
+              {addMetaContext.type === "subject" && "Add Subject"}
+              {addMetaContext.type === "chapter" && "Add System"}
+              {addMetaContext.type === "topic" && "Add Topic"}
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium block mb-1">Name</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded text-sm"
+                  value={addMetaName}
+                  onChange={(e) => setAddMetaName(e.target.value)}
+                  placeholder={
+                    addMetaContext.type === "subject"
+                      ? "New subject name"
+                      : addMetaContext.type === "chapter"
+                      ? "New system name"
+                      : "New topic name"
+                  }
+                />
+              </div>
+              {addMetaError && <p className="text-xs text-red-600">{addMetaError}</p>}
+            </div>
+            <div className="flex gap-2 mt-4 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setAddMetaContext(null)
+                  setAddMetaError(null)
+                }}
+                disabled={addMetaLoading}
+              >
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleAddMetaSubmit} disabled={addMetaLoading}>
+                {addMetaLoading ? <RotateCcw className="h-4 w-4 animate-spin" /> : "Create"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <MetadataModal
         isOpen={showMetadataModal}
         onClose={() => setShowMetadataModal(false)}

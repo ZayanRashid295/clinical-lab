@@ -566,6 +566,32 @@ export class ContentService {
         ? createChapterDto.name.substring(0, 497) + "..." 
         : createChapterDto.name,
     };
+
+    // Prevent unique constraint errors on (sectionId, name) by returning the existing chapter
+    // when a chapter with the same name already exists in the same section.
+    const existing = await this.prisma.chapter.findFirst({
+      where: {
+        sectionId: chapterData.sectionId,
+        name: chapterData.name,
+      },
+      include: {
+        section: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
     return this.prisma.chapter.create({
       data: chapterData,
       include: {

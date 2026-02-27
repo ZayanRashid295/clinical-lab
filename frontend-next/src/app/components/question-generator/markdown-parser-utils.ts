@@ -1,3 +1,48 @@
+import { parseTagsFromString, parseTagsFromYamlLine, parseKeywordBlock } from "./parse-metadata-utils"
+
+/**
+ * Normalize question stem so the doc is parsed exactly:
+ * - Consecutive non-empty lines that are plain text (no image, table, list) with no blank line
+ *   between them are treated as one paragraph — joined with a single space.
+ * - Blank lines are preserved as paragraph breaks.
+ * This fixes "sentence per line" source content displaying as one paragraph as in the original doc.
+ */
+function normalizeQuestionStemParagraphs(stem: string): string {
+  if (!stem || !stem.trim()) return stem
+  const lines = stem.split("\n")
+  const isBlockLine = (line: string): boolean => {
+    const t = line.trim()
+    return (
+      /^!\[.*\]\(.*\)\s*$/.test(t) || // image
+      /^\|[\s\S]*\|?\s*$/.test(t) || // table row
+      /^[-*+]\s/.test(t) || // unordered list
+      /^\d+\.\s/.test(t) // ordered list
+    )
+  }
+  const result: string[] = []
+  let run: string[] = []
+  const flushRun = (joinWithSpace: boolean) => {
+    if (run.length === 0) return
+    result.push(joinWithSpace ? run.map((l) => l.trim()).join(" ") : run.join("\n"))
+    run = []
+  }
+  for (const line of lines) {
+    if (line.trim() === "") {
+      flushRun(true)
+      result.push("")
+      continue
+    }
+    if (isBlockLine(line)) {
+      flushRun(true)
+      result.push(line)
+      continue
+    }
+    run.push(line)
+  }
+  flushRun(true)
+  return result.join("\n").replace(/\n{3,}/g, "\n\n").trim()
+}
+
 export interface ParsedQuestion {
   stem: string
   options: Array<{ label: string; text: string; correct: boolean }>
@@ -54,10 +99,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
         }
       }
       if (yamlLine.includes("tags:")) {
-        const tagsMatch = yamlLine.match(/tags:\s*\[(.*?)\]/)
-        if (tagsMatch) {
-          questionData.tags = tagsMatch[1].split(",").map((tag) => tag.trim())
-        }
+        const parsed = parseTagsFromYamlLine(yamlLine)
+        if (parsed) questionData.tags = parsed
       }
       if (yamlLine.includes("correct_answer:")) {
         const answerMatch = yamlLine.match(/correct_answer:\s*([A-E])/)
@@ -76,7 +119,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
 
   // Track if we've seen per-answer explanations section
   let seenPerAnswerSection = false
-  
+  let keywordsFromSection: Array<{ keyword: string; explanation: string }> = []
+
   // Parse rest of the file
   while (i < lines.length) {
     const line = lines[i].trim()
@@ -109,6 +153,30 @@ export function parseMarkdown(content: string): ParsedQuestion {
       continue
     }
 
+    // Extract Keywords section (## Keywords or ### Keywords or ### Keywords in the Stem...)
+    // Same parsing logic as DOCX via parseKeywordBlock for consistency
+    if (line.match(/^##+\s+Keywords/i) || line.match(/^###\s+Keywords\s+in\s+the\s+Stem/i)) {
+      let keywordLines: string[] = []
+      const sectionLevel = (line.match(/^(#+)/) || [])[1]?.length ?? 2
+      i++
+      while (i < lines.length) {
+        const next = lines[i]
+        const nextTrimmed = next.trim()
+        if (!nextTrimmed) {
+          keywordLines.push(next)
+          i++
+          continue
+        }
+        const nextHeader = nextTrimmed.match(/^(#+)\s/)
+        if (nextHeader && nextHeader[1].length <= sectionLevel) break
+        keywordLines.push(next)
+        i++
+      }
+      const parsed = parseKeywordBlock(keywordLines.join("\n"))
+      if (parsed.length > 0) keywordsFromSection = parsed
+      continue
+    }
+
     // Extract question ID lines and ensure they do NOT end up in the visible stem
     // Supported formats (case-insensitive):
     // - "Question (ID: 714025):"
@@ -133,10 +201,11 @@ export function parseMarkdown(content: string): ParsedQuestion {
         caseLines = questionData.stem.split("\n").filter(l => l.trim())
       }
       i++
-      // Collect text until we hit options or another section
+      // Collect text until we hit options, "## Options and Explanations", or another section (stem = all content before that)
       while (
         i < lines.length &&
         !lines[i].trim().match(/^\*?\*?[A-E]\.\*?\*?\s+/) &&
+        !lines[i].match(/^##+\s+Options and Explanations/i) &&
         !lines[i].match(/^##+ (Explanation|Choice-by-Choice|Additional|Raw|Example|Question)/) &&
         !lines[i].trim().match(/^### (?:Explanation|Choice)\s+[A-E]/)
       ) {
@@ -144,7 +213,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
         // Skip empty lines and horizontal rules, but keep other content
         const trimmed = currentLine.trim()
         if (trimmed && trimmed !== "---" && !trimmed.match(/^---+$/)) {
-          // If it's another section header (including Question), stop
+          // Stop at "## Options and Explanations" or other section headers (do not include that line in stem)
+          if (trimmed.match(/^##+\s+Options and Explanations/i)) break
           if (trimmed.match(/^##+\s+(Clinical Case|Question|Stem|Explanation|Choice-by-Choice)/)) {
             break
           }
@@ -172,8 +242,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
         }
         i++
       }
-      // Join with newlines to preserve markdown structure
-      questionData.stem = caseLines.join("\n")
+      // Join with newlines, then normalize so consecutive sentence-only lines become one paragraph (parse doc exactly)
+      questionData.stem = normalizeQuestionStemParagraphs(caseLines.join("\n"))
       // Don't increment i here since we want to process the line we stopped at
       continue
     }
@@ -217,7 +287,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
           stemLines.push("")
         }
       }
-      questionData.stem = stemLines.join("\n")
+      questionData.stem = normalizeQuestionStemParagraphs(stemLines.join("\n"))
     }
 
     // Extract options (A., B., C., D., E.) and inline per-answer explanations
@@ -381,7 +451,17 @@ export function parseMarkdown(content: string): ParsedQuestion {
       i = j - 1
       // Convert the main explanation markdown to content blocks
       let explanationBlocks = convertMarkdownToExplanationBlocks(explanationText.trim())
-      
+      if (keywordsFromSection.length > 0) {
+        const keywordsMarkdown = "### Keywords in the Stem to Identify the Correct Option\n\n" + keywordsFromSection.map((kw) => `- **"${kw.keyword}"** – ${kw.explanation}`).join("\n") + "\n"
+        explanationBlocks.unshift({
+          id: Date.now(),
+          type: "text",
+          order: 0,
+          data: { markdown: keywordsMarkdown },
+        })
+        explanationBlocks.forEach((block, idx) => { block.order = idx })
+        keywordsFromSection = []
+      }
       // If we found "## Choice-by-Choice Explanations" in the explanation, insert a placeholder there
       if (choiceByChoiceIdx >= 0) {
         // Find the block that contains the Choice-by-Choice header
@@ -668,12 +748,11 @@ export function parseMarkdown(content: string): ParsedQuestion {
       }
     }
 
-    // Extract tags (from tags section)
+    // Extract tags (body line) – same logic as DOCX for consistency
     if (line.startsWith("Tags:") || line.startsWith("**Tags:**")) {
-      const tagsText = line.replace(/\*\*Tags:\*\*|Tags:/, "").trim()
-      if (!questionData.tags || questionData.tags.length === 0) {
-        questionData.tags = tagsText.split(",").map((t) => t.trim())
-      }
+      const tagsText = line.replace(/\*\*Tags:\*\*|Tags:/i, "").trim()
+      const parsed = parseTagsFromString(tagsText)
+      if (parsed.length > 0) questionData.tags = parsed
       i++
       continue
     }
@@ -804,9 +883,17 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }))
   }
 
-  // Final cleanup: Remove any remaining question ID patterns from stem text
-  // and extract question ID if it wasn't found earlier
+  // Final cleanup: Remove question ID patterns and "Options and Explanations" from stem (stem = all content before that heading only)
   let finalStem = questionData.stem || ""
+  finalStem = finalStem
+    .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+    .replace(/\n\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "\n")
+    .replace(/\n\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
+    .replace(/^\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "")
+    .replace(/^\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "")
+    .replace(/^\s*Options and Explanations\s*(?=\n|$)/gim, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
   if (finalStem && !questionData.questionId) {
     // Try to extract question ID from stem text if not already found
     const questionIdMatch = finalStem.match(/(?:\*\*)?Question\s*\(ID:\s*([^)]+)\)(?:\*\*)?:?\s*/i)

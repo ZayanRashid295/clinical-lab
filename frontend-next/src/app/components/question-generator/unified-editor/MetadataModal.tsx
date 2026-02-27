@@ -105,7 +105,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
         
         <div className="space-y-4 py-4">
           <div>
-            <Label className="text-sm font-semibold">Chapter *</Label>
+            <Label className="text-sm font-semibold">System *</Label>
             <select
               value={chapterId}
               onChange={(e) => {
@@ -115,7 +115,7 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
               className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               disabled={loadingChapters}
             >
-              <option value="">Select Chapter...</option>
+              <option value="">Select System...</option>
               {chapters.map((chapter) => (
                 <option key={chapter.id} value={chapter.id}>
                   {chapter.name}

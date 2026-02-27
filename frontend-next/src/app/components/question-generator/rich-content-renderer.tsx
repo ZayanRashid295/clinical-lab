@@ -11,6 +11,7 @@ import rehypeStringify from "rehype-stringify"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { ExternalLink } from "lucide-react"
+import { normalizeStemToParagraphs } from "./stem-blocks-utils"
 
 interface ContentItem {
   id: number | string
@@ -23,9 +24,11 @@ interface RichContentRendererProps {
   perAnswerExplanations?: Record<string, string | any[]>
   options?: Array<{ label: string; text: string; correct: boolean }>
   selectedAnswer?: string | null
+  /** When true, use normal paragraph flow (no pre-wrap) so stem content is not forced to one line per sentence */
+  stemMode?: boolean
 }
 
-export default function RichContentRenderer({ content, perAnswerExplanations = {}, options = [], selectedAnswer = null }: RichContentRendererProps) {
+export default function RichContentRenderer({ content, perAnswerExplanations = {}, options = [], selectedAnswer = null, stemMode = false }: RichContentRendererProps) {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
@@ -53,7 +56,7 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
   const renderedContent = sortedContent.map((item) => {
       switch (item.type) {
         case "text":
-          return renderMarkdown(item, isDark)
+          return renderMarkdown(item, isDark, stemMode)
         case "table":
           return renderTable(item, isDark)
         case "images":
@@ -169,7 +172,7 @@ function fixListItemFormatting(html: string): string {
 }
 
 // Component to render HTML with sanitization
-function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string }) {
+function HtmlRenderer({ html, itemId, paragraphFlow = "pre-wrap" }: { html: string; itemId: number | string; paragraphFlow?: "normal" | "pre-wrap" }) {
   const [sanitizedHtml, setSanitizedHtml] = useState<string>(html)
 
   useEffect(() => {
@@ -673,14 +676,14 @@ function HtmlRenderer({ html, itemId }: { html: string; itemId: number | string 
       }} />
       <div 
         className={`html-content-${itemId} max-w-none text-sm text-foreground/90 dark:text-gray-200
-          [&_p]:leading-normal [&_p]:mb-1.5 [&_p]:whitespace-pre-wrap [&_p]:text-sm
+          [&_p]:leading-normal [&_p]:mb-1.5 ${paragraphFlow === "pre-wrap" ? "[&_p]:whitespace-pre-wrap " : ""}[&_p]:text-sm
           [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-center [&_h1]:text-foreground dark:[&_h1]:text-gray-100 [&_h1]:mt-4 [&_h1]:mb-2 
           [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-center [&_h2]:text-foreground dark:[&_h2]:text-gray-100 [&_h2]:mt-3 [&_h2]:mb-1.5 
           [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-center [&_h3]:text-foreground dark:[&_h3]:text-gray-100 [&_h3]:mt-2 [&_h3]:mb-1 
           [&_h4]:text-sm [&_h4]:font-bold [&_h4]:text-center [&_h4]:text-foreground dark:[&_h4]:text-gray-100 [&_h4]:mt-2 [&_h4]:mb-1 
           [&_h5]:text-xs [&_h5]:font-bold [&_h5]:text-center [&_h5]:text-foreground dark:[&_h5]:text-gray-100 [&_h5]:mt-1 [&_h5]:mb-0.5 
           [&_h6]:text-xs [&_h6]:font-bold [&_h6]:text-center [&_h6]:text-foreground dark:[&_h6]:text-gray-100 [&_h6]:mt-1 [&_h6]:mb-0.5 
-          [&_span]:whitespace-pre-wrap [&_span]:text-sm
+          ${paragraphFlow === "pre-wrap" ? "[&_span]:whitespace-pre-wrap " : ""}[&_span]:text-sm
           [&_a]:text-blue-600 [&_a]:dark:text-blue-400 [&_a]:underline 
           [&_code]:bg-muted dark:[&_code]:bg-gray-800 [&_code]:text-foreground dark:[&_code]:text-gray-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_code]:whitespace-pre-wrap 
           [&_pre]:bg-muted dark:[&_pre]:bg-gray-800 [&_pre]:text-foreground dark:[&_pre]:text-gray-100 [&_pre]:p-2 [&_pre]:rounded [&_pre]:overflow-x-auto 
@@ -908,7 +911,9 @@ async function markdownToHTML(markdown: string): Promise<string> {
   }
 }
 
-function renderMarkdown(item: ContentItem, isDark: boolean = false) {
+function renderMarkdown(item: ContentItem, isDark: boolean = false, stemMode: boolean = false) {
+  const paragraphFlow = stemMode ? ("normal" as const) : ("pre-wrap" as const)
+
   // Skip rendering if this is a placeholder block that shouldn't be rendered as markdown
   if (item.data?.placeholder === true || item.data?.isPerAnswerExplanation === true) {
     return null
@@ -916,7 +921,8 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
   
   // Use HTML, with fallback to markdown conversion if HTML is missing or empty
   const html = item.data?.html
-  const markdown = item.data?.markdown || ""
+  let markdown = item.data?.markdown || ""
+  if (stemMode && markdown) markdown = normalizeStemToParagraphs(markdown)
 
   // Check if HTML is valid and not empty
   if (html && typeof html === "string") {
@@ -924,7 +930,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
     
     // PRIORITY 1: If HTML contains a table, use it directly (don't convert)
     if (trimmedHtml.includes("<table")) {
-      return <HtmlRenderer html={html} itemId={item.id} />
+      return <HtmlRenderer html={html} itemId={item.id} paragraphFlow={paragraphFlow} />
     }
     
     // Only use HTML if it's truly not empty (not just empty tags or whitespace)
@@ -963,7 +969,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
     const hasFormatting = !isEmptyHtml && (html.includes("<span") || html.includes("<mark") || html.includes("style="))
     
     if (!isEmptyHtml && (!containsMarkdownSyntax || hasFormatting)) {
-      return <HtmlRenderer html={html} itemId={item.id} />
+      return <HtmlRenderer html={html} itemId={item.id} paragraphFlow={paragraphFlow} />
     }
     
     // If HTML contains markdown syntax, extract it and convert
@@ -984,14 +990,15 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
       }
       
       if (markdownToConvert && markdownToConvert.trim()) {
-        return <MarkdownToHtmlRenderer markdown={markdownToConvert} itemId={item.id} />
+        if (stemMode) markdownToConvert = normalizeStemToParagraphs(markdownToConvert)
+        return <MarkdownToHtmlRenderer markdown={markdownToConvert} itemId={item.id} paragraphFlow={paragraphFlow} />
       }
     }
   }
 
   // Fallback: If HTML is missing or empty but markdown exists, convert it
   if (markdown && typeof markdown === "string" && markdown.trim()) {
-    return <MarkdownToHtmlRenderer markdown={markdown} itemId={item.id} />
+    return <MarkdownToHtmlRenderer markdown={markdown} itemId={item.id} paragraphFlow={paragraphFlow} />
   }
 
   // Debug: Log when content is missing
@@ -1008,7 +1015,7 @@ function renderMarkdown(item: ContentItem, isDark: boolean = false) {
 }
 
 // Component to convert markdown to HTML and render it
-function MarkdownToHtmlRenderer({ markdown, itemId }: { markdown: string; itemId: number | string }) {
+function MarkdownToHtmlRenderer({ markdown, itemId, paragraphFlow = "pre-wrap" }: { markdown: string; itemId: number | string; paragraphFlow?: "normal" | "pre-wrap" }) {
   const [html, setHtml] = useState<string>("")
 
   useEffect(() => {
@@ -1019,7 +1026,7 @@ function MarkdownToHtmlRenderer({ markdown, itemId }: { markdown: string; itemId
     return <div key={itemId} className="text-muted-foreground text-sm italic">Loading...</div>
   }
 
-  return <HtmlRenderer html={html} itemId={itemId} />
+  return <HtmlRenderer html={html} itemId={itemId} paragraphFlow={paragraphFlow} />
 }
 
 // Helper function to remove empty rows from HTML table

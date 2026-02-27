@@ -2098,7 +2098,7 @@ question_id: <Unique Question ID>
 ## Topic: <Topic or Subtopic>
 
 ## Question
-<Question Stem Here>
+<Question Stem Here — if the DOCX has a single paragraph, output one paragraph with no blank lines between sentences; if multiple paragraphs, preserve blank lines between them.>
 
 ## Options and Explanations
 
@@ -2248,10 +2248,14 @@ CRITICAL INSTRUCTIONS
    - The title format must be: "<Subject> — <System>" (Subject and System separated by " — ")
    - The Topic must appear as a separate "## Topic: <Topic>" heading after the main title line.
    - Extract the full text from "Subject:", "System:", and "Topic:" lines - do not truncate or shorten them.
-2. QUESTION STEM (CLINICAL CASE ONLY – NO "OPTIONS AND EXPLANATIONS" HEADING)
+2. QUESTION STEM (CLINICAL CASE ONLY – PRESERVE PARAGRAPH STRUCTURE AS IN SOURCE)
    - Put ONLY the clinical case / question stem text under '## Question'.
    - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
    - The '## Question' section must contain only the scenario, vignette, or question text—no "Options and Explanations" heading, no options, and no per-option explanation content here.
+   - **PARAGRAPH STRUCTURE (CRITICAL):** Preserve the question stem exactly as in the source DOCX:
+     * If the source question stem is a **single paragraph** (one block of text with no blank lines between sentences), output it as a **single paragraph** in the markdown: do NOT insert line breaks or blank lines between sentences. Use spaces between sentences, not newlines.
+     * If the source has **multiple distinct paragraphs** (clearly separated by blank lines in the DOCX), preserve that: use a single blank line between paragraphs in the markdown.
+     * Do NOT split a single source paragraph into multiple paragraphs. Do NOT add newlines between sentences when the source has one continuous paragraph.
 3. OPTIONS
    - Extract all options (A–E) and render them exactly as:
      **A. Option A text**
@@ -2355,6 +2359,7 @@ CRITICAL INSTRUCTIONS
    - **Do NOT paraphrase or summarize** any medical content, sentences, or bullet points.
    - **Preserve wording as-is** from the HTML/source whenever possible; only adjust
      formatting so it fits valid Markdown and the required template.
+   - **Question stem:** Keep the same paragraph structure as the source: one paragraph in source → one paragraph in output (no extra line breaks); multiple paragraphs in source → same number of paragraphs in output.
    - **Do NOT invent, infer, or add** new medical facts, explanations, or examples
      that are not explicitly present in the source.
    - **Do NOT move content between headings**. Content that appears under a
@@ -2421,7 +2426,8 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       const placeholderCount = (rawMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
       console.log(`[Backend] Found ${placeholderCount} image placeholders in raw markdown`);
 
-      let processedMarkdown = normalizeKeywordsSection(rawMarkdown);
+      let processedMarkdown = normalizeQuestionSectionParagraphs(rawMarkdown);
+      processedMarkdown = normalizeKeywordsSection(processedMarkdown);
       
       // Verify placeholders are still present after normalization
       const placeholderCountAfter = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
@@ -2443,6 +2449,64 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       );
     }
   }
+}
+
+/**
+ * Normalize the ## Question section so the doc is parsed exactly:
+ * Consecutive non-empty plain-text lines (no image, table, list) with no blank line
+ * between them are joined with a single space (one paragraph). Blank lines are kept.
+ */
+function normalizeQuestionSectionParagraphs(markdown: string): string {
+  const lines = markdown.split("\n");
+  const result: string[] = [];
+  let i = 0;
+  const isQuestionHeader = (line: string) => /^##+\s+Question\s*$/i.test(line.trim());
+  const isBlockLine = (line: string): boolean => {
+    const t = line.trim();
+    return (
+      /^!\[.*\]\(.*\)\s*$/.test(t) ||
+      /^\|[\s\S]*\|?\s*$/.test(t) ||
+      /^[-*+]\s/.test(t) ||
+      /^\d+\.\s/.test(t)
+    );
+  };
+
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!isQuestionHeader(line)) {
+      result.push(line);
+      i++;
+      continue;
+    }
+    result.push(line);
+    i++;
+    const paragraphLines: string[] = [];
+    const flushParagraph = (joinWithSpace: boolean) => {
+      if (paragraphLines.length === 0) return;
+      result.push(joinWithSpace ? paragraphLines.map((l) => l.trim()).join(" ") : paragraphLines.join("\n"));
+      paragraphLines.length = 0;
+    };
+    while (i < lines.length && !/^##\s+/.test(lines[i].trim())) {
+      const current = lines[i];
+      const trimmed = current.trim();
+      if (trimmed === "") {
+        flushParagraph(true);
+        result.push("");
+        i++;
+        continue;
+      }
+      if (isBlockLine(current)) {
+        flushParagraph(true);
+        result.push(current);
+        i++;
+        continue;
+      }
+      paragraphLines.push(current);
+      i++;
+    }
+    flushParagraph(true);
+  }
+  return result.join("\n");
 }
 
 /**

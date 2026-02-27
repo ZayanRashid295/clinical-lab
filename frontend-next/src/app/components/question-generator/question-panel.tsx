@@ -5,56 +5,12 @@ import remarkGfm from "remark-gfm"
 import { Card } from "@/shared/ui/card"
 import RichContentRenderer from "./rich-content-renderer"
 import { ExternalLink, Check, X } from "lucide-react"
-
-/** Returns true if this block's content is only the "Options and Explanations" heading (to hide from stem). */
-function isOptionsAndExplanationsBlock(block: any): boolean {
-  if (!block || !block.data) return false
-  const md = String(block.data.markdown ?? block.data.content ?? "").trim()
-  const html = String(block.data.html ?? "").trim()
-  const plainFromMd = md.replace(/^#+\s*/i, "").replace(/\*\*/g, "").trim()
-  const plainFromHtml = html.replace(/<[^>]+>/g, "").trim()
-  const text = (plainFromMd || plainFromHtml).trim()
-  return text.toLowerCase() === "options and explanations"
-}
-
-/** Strip "Options and Explanations" heading from plain stem text (anywhere in the string) so it is not shown in the clinical case. */
-function stripOptionsAndExplanationsFromStem(stem: string): string {
-  return stem
-    .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
-    .replace(/\n\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "\n")
-    .replace(/\n\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
-    .replace(/^\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "")
-    .replace(/^\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "")
-    .replace(/^\s*Options and Explanations\s*(?=\n|$)/gim, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
-}
-
-/** Strip "Options and Explanations" from a block's markdown/html/content so it never appears inside the stem. */
-function stripOptionsAndExplanationsFromBlock(block: any): any {
-  if (!block?.data) return block
-  const strip = (s: string) =>
-    s
-      .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
-      .replace(/\n\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "\n")
-      .replace(/\n\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
-      .replace(/^\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "")
-      .replace(/^\s*\*\*Options and Explanations\*\*\s*(?=\n|$)/gim, "")
-      .replace(/^\s*Options and Explanations\s*(?=\n|$)/gim, "")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim()
-  const stripHtml = (s: string) =>
-    s
-      .replace(/<h[1-6][^>]*>\s*Options and Explanations\s*<\/h[1-6]>/gim, "")
-      .replace(/<p[^>]*>\s*(<strong[^>]*>)?\s*Options and Explanations\s*(<\/strong>)?\s*<\/p>/gim, "")
-      .replace(/<div[^>]*>\s*Options and Explanations\s*<\/div>/gim, "")
-      .trim()
-  const data = { ...block.data }
-  if (typeof data.markdown === "string") data.markdown = strip(data.markdown)
-  if (typeof data.html === "string") data.html = stripHtml(data.html)
-  if (typeof data.content === "string") data.content = data.content.includes("<") ? stripHtml(data.content) : strip(data.content)
-  return { ...block, data }
-}
+import {
+  normalizeStemBlocksForDisplay,
+  isOptionsAndExplanationsBlock,
+  stripOptionsAndExplanationsFromStemString,
+  stripOptionsAndExplanationsFromBlock,
+} from "./stem-blocks-utils"
 
 interface QuestionPanelProps {
   question?: any
@@ -78,30 +34,11 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
   // Check if question has stem blocks (rich content)
   const rawStemBlocks = question.questionStemBlocks && Array.isArray(question.questionStemBlocks) ? question.questionStemBlocks : []
   const questionStemBlocksFiltered = rawStemBlocks.filter((b: any) => !isOptionsAndExplanationsBlock(b))
-  const hasStemBlocks = questionStemBlocksFiltered.length > 0
+  const questionStemBlocksMerged = normalizeStemBlocksForDisplay(questionStemBlocksFiltered)
+  const hasStemBlocks = questionStemBlocksMerged.length > 0
 
-  // Process the stem to add line breaks before each **text:** pattern that appears after other text
-  // But preserve images and their exact positioning
-  const processStem = (text: string): string => {
-    // Split by image markdown to preserve image positioning
-    const imagePattern = /(!\[[^\]]*\]\([^)]+\))/g
-    const parts = text.split(imagePattern)
-    
-    // Process each part - only apply formatting to non-image parts
-    return parts.map((part, index) => {
-      // If this part is an image, return it as-is
-      if (part.match(imagePattern)) {
-        return part
-      }
-      // Otherwise, apply the formatting for **text:** patterns
-      return part.replace(/([^\n\s])\s+(\*\*[^*]+:\*\*)/g, '$1\n$2')
-    }).join('')
-  }
-
-  // If we have stem blocks, use RichContentRenderer to display all blocks properly
-  // Otherwise, fall back to plain text stem (with "Options and Explanations" heading stripped)
-  let displayStem = stripOptionsAndExplanationsFromStem(question.stem || "")
-  const processedStem = processStem(displayStem)
+  // Use stem as-is; no hardcoded parsing or line-breaking. Doc structure is preserved.
+  const displayStem = stripOptionsAndExplanationsFromStemString(question.stem || "")
 
   return (
     <Card className="p-2 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
@@ -111,7 +48,7 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
         {/* Render stem blocks if available, otherwise use plain text stem */}
         {hasStemBlocks ? (
           <div className="text-foreground text-pretty text-base leading-normal font-medium mb-1">
-            <RichContentRenderer content={questionStemBlocksFiltered.map((b: any) => stripOptionsAndExplanationsFromBlock(b))} />
+            <RichContentRenderer content={questionStemBlocksMerged.map((b: any) => stripOptionsAndExplanationsFromBlock(b))} stemMode />
           </div>
         ) : (
         <div className="prose prose-sm dark:prose-invert max-w-none text-foreground dark:text-gray-200 text-pretty text-base leading-normal font-medium mb-1 [&_h1]:font-bold [&_h1]:text-center [&_h2]:font-bold [&_h2]:text-center [&_h3]:font-bold [&_h3]:text-center [&_h4]:font-bold [&_h4]:text-center [&_h5]:font-bold [&_h5]:text-center [&_h6]:font-bold [&_h6]:text-center">
@@ -119,7 +56,7 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
             remarkPlugins={[remarkGfm]}
             components={{
               p: ({ node, ...props }) => (
-                <p className="text-foreground/90 dark:text-gray-200 leading-normal mb-1.5 whitespace-pre-line" {...props} />
+                <p className="text-foreground/90 dark:text-gray-200 leading-normal mb-1.5" {...props} />
               ),
               strong: ({ node, ...props }) => (
                 <strong className="font-semibold text-foreground dark:text-gray-100" {...props} />
@@ -174,7 +111,7 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
               ),
             }}
           >
-            {processedStem}
+            {displayStem}
           </ReactMarkdown>
         </div>
         )}

@@ -10,6 +10,8 @@ interface ExplanationPanelProps {
   options?: Array<{ label: string; text: string; correct: boolean }>
   perAnswerExplanations?: Record<string, string | any[]>
   chapter?: string
+  /** Label for the chapter field in metadata (e.g. "Chapters" or "System"). Default "System". */
+  chapterLabel?: string
   subjectTag?: string
   topic?: string | { name?: string }
 }
@@ -22,6 +24,7 @@ export default function ExplanationPanel({
   options = [],
   perAnswerExplanations = {},
   chapter,
+  chapterLabel = "System",
   subjectTag,
   topic,
 }: ExplanationPanelProps) {
@@ -57,7 +60,7 @@ export default function ExplanationPanel({
                   )}
                   {chapter && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">Chapters</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">System</div>
                       <div className="text-sm font-bold text-foreground dark:text-gray-100">{chapter}</div>
                     </div>
                   )}

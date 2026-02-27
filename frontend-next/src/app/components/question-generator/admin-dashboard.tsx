@@ -57,6 +57,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [error, setError] = useState<string | null>(null)
   const [parsedMarkdownData, setParsedMarkdownData] = useState<any>(null)
   const [showNewQuestionMenu, setShowNewQuestionMenu] = useState(false)
+  const [isSelectMode, setIsSelectMode] = useState(false)
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
   const questionsService = useMemo(() => new QuestionsService(), [])
 
@@ -1144,6 +1146,24 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
   }
 
+  const handleBulkDeleteQuestions = async (ids: string[]) => {
+    if (ids.length === 0) return
+    if (!confirm(`Are you sure you want to delete ${ids.length} question${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) {
+      return
+    }
+    try {
+      setError(null)
+      await Promise.all(ids.map((id) => questionsService.deactivateQuestion(id)))
+      await loadQuestions()
+      setSelectedQuestionIds([])
+      setIsSelectMode(false)
+    } catch (err: any) {
+      console.error("Failed to delete questions:", err)
+      setError(err?.message || "Failed to delete questions")
+      alert(`Failed to delete questions: ${err?.message || "Unknown error"}`)
+    }
+  }
+
   const handleMarkdownParsed = (questionData: any) => {
     setParsedMarkdownData(questionData)
     setShowNewQuestion(true)
@@ -1458,10 +1478,51 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             </Card>
           ) : (
             <>
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
                 <p className="text-sm text-muted-foreground dark:text-gray-400">
                   Showing {filteredQuestions.length} of {questions.length} questions
                 </p>
+                <div className="flex items-center gap-2">
+                  {!isSelectMode ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsSelectMode(true)
+                        setSelectedQuestionIds([])
+                      }}
+                      className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700"
+                    >
+                      Select
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsSelectMode(false)
+                          setSelectedQuestionIds([])
+                        }}
+                        className="border-border dark:border-gray-700 text-foreground dark:text-gray-100"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={selectedQuestionIds.length === 0}
+                        onClick={() => handleBulkDeleteQuestions(selectedQuestionIds)}
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-300 dark:border-red-800 disabled:opacity-50"
+                      >
+                        Delete selected ({selectedQuestionIds.length})
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <QuestionList
                 questions={filteredQuestions}
@@ -1476,6 +1537,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                   setShowNewQuestion(false)
                 }}
                 onDelete={handleDeleteQuestion}
+                selectionMode={isSelectMode}
+                selectedIds={selectedQuestionIds}
+                onSelectionChange={setSelectedQuestionIds}
               />
             </>
           )}

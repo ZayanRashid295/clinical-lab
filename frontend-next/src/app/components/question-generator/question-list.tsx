@@ -3,6 +3,7 @@
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import { Badge } from "@/shared/ui/badge"
+import { Checkbox } from "@/shared/ui/checkbox"
 
 interface Question {
   id: string
@@ -20,14 +21,70 @@ interface QuestionListProps {
   onEdit: (id: string) => void
   onView?: (id: string) => void
   onDelete: (id: string) => void
+  /** When true, show checkboxes to select questions for bulk delete */
+  selectionMode?: boolean
+  selectedIds?: string[]
+  onSelectionChange?: (ids: string[]) => void
 }
 
-export default function QuestionList({ questions, onEdit, onView, onDelete }: QuestionListProps) {
+export default function QuestionList({
+  questions,
+  onEdit,
+  onView,
+  onDelete,
+  selectionMode = false,
+  selectedIds = [],
+  onSelectionChange,
+}: QuestionListProps) {
+  const selectedSet = new Set(selectedIds)
+
+  const handleToggleOne = (id: string, checked: boolean) => {
+    if (!onSelectionChange) return
+    if (checked) {
+      onSelectionChange([...selectedIds, id])
+    } else {
+      onSelectionChange(selectedIds.filter((x) => x !== id))
+    }
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (!onSelectionChange) return
+    if (checked) {
+      onSelectionChange(questions.map((q) => q.id))
+    } else {
+      onSelectionChange([])
+    }
+  }
+
+  const allSelected = questions.length > 0 && questions.every((q) => selectedSet.has(q.id))
+  const someSelected = selectedIds.length > 0
+
   return (
     <div className="space-y-4">
+      {selectionMode && questions.length > 0 && (
+        <div className="flex items-center gap-2 pb-2 border-b border-border dark:border-gray-700">
+          <Checkbox
+            id="select-all-questions"
+            checked={allSelected ? true : someSelected ? "indeterminate" : false}
+            onCheckedChange={(c) => handleSelectAll(c === true)}
+          />
+          <label htmlFor="select-all-questions" className="text-sm text-muted-foreground dark:text-gray-400 cursor-pointer">
+            Select all on page
+          </label>
+        </div>
+      )}
       {questions.map((question) => (
         <Card key={question.id} className="p-6 hover:shadow-lg transition-shadow bg-card dark:bg-gray-800 border-border dark:border-gray-700">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className={`flex gap-4 ${selectionMode ? "flex-row" : ""}`}>
+            {selectionMode && (
+              <div className="flex items-center flex-shrink-0 pt-1">
+                <Checkbox
+                  checked={selectedSet.has(question.id)}
+                  onCheckedChange={(c) => handleToggleOne(question.id, c === true)}
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-w-0">
             {/* Question Stem Content */}
             <div className="lg:col-span-2">
               <h3 className="text-lg font-semibold text-foreground dark:text-gray-100 mb-2 line-clamp-2">{question.stem}</h3>
@@ -50,16 +107,11 @@ export default function QuestionList({ questions, onEdit, onView, onDelete }: Qu
               </div>
               {question.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
-                  {question.tags.slice(0, 3).map((tag) => (
+                  {question.tags.map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs text-foreground dark:text-gray-200 border-border dark:border-gray-600">
                       {tag}
                     </Badge>
                   ))}
-                  {question.tags.length > 3 && (
-                    <Badge variant="outline" className="text-xs text-foreground dark:text-gray-200 border-border dark:border-gray-600">
-                      +{question.tags.length - 3}
-                    </Badge>
-                  )}
                 </div>
               )}
             </div>
@@ -99,6 +151,7 @@ export default function QuestionList({ questions, onEdit, onView, onDelete }: Qu
               >
                 Delete
               </Button>
+            </div>
             </div>
           </div>
         </Card>

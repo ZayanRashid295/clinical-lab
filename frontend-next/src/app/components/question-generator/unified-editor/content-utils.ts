@@ -103,9 +103,9 @@ export function blocksToHTML(blocks: ContentBlock[]): string {
         converted = converted.replace(/^### (.*$)/gim, '<h3>$1</h3>')
         converted = converted.replace(/^## (.*$)/gim, '<h2>$1</h2>')
         converted = converted.replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        // Convert line breaks
-        converted = converted.replace(/\n\n/g, '</p><p>')
-        converted = converted.replace(/\n/g, '<br>')
+        // Paragraph breaks: \n\n -> new </p><p>. Single \n -> space (so one paragraph is not forced line-by-line)
+        converted = converted.replace(/\n\n+/g, '</p><p>')
+        converted = converted.replace(/\n/g, ' ')
         // Convert lists (basic)
         converted = converted.replace(/^[-*+]\s+(.*)$/gim, '<li>$1</li>')
         converted = converted.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')

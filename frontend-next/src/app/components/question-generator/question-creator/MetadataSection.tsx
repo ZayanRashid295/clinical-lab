@@ -78,7 +78,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-xs font-semibold text-foreground mb-1">
-            Chapter *
+            System *
           </label>
           <select
             value={chapterId}
@@ -89,7 +89,7 @@ export default function MetadataSection({ value, onChange }: MetadataSectionProp
             className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={loadingChapters}
           >
-            <option value="">Select Chapter...</option>
+            <option value="">Select System...</option>
             {chapters.map((chapter) => (
               <option key={chapter.id} value={chapter.id}>
                 {chapter.name}

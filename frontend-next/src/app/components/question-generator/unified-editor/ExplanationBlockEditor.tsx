@@ -1012,11 +1012,10 @@ export default function ExplanationBlockEditor({
     <div 
       className="space-y-1"
       onClick={(e) => {
-        // If clicking on the container (not on a block or interactive element), activate explanation section
         const target = e.target as HTMLElement
-        if (target === e.currentTarget || (!target.closest('[contenteditable]') && !target.closest('button') && !target.closest('input'))) {
-          onSectionChange("explanation")
-        }
+        if (target.closest('[data-explanation-block]')) return
+        if (target.closest('[contenteditable]') || target.closest('button') || target.closest('input')) return
+        if (target === e.currentTarget) onSectionChange("explanation")
       }}
     >
       {blocks.map((block, index) => {
@@ -1030,6 +1029,7 @@ export default function ExplanationBlockEditor({
           return (
             <Card
               key={block.id}
+              data-explanation-block
               className={`border-2 bg-card dark:bg-gray-800 ${
                 isActive ? "border-primary ring-2 ring-primary dark:border-blue-500 dark:ring-blue-500" : "border-dashed border-border/50 dark:border-gray-700"
               }`}
@@ -1090,7 +1090,9 @@ export default function ExplanationBlockEditor({
                   return (
                     <div
                       key={choice.label}
-                      onClick={() => {
+                      data-explanation-block
+                      onClick={(e) => {
+                        e.stopPropagation()
                         onSectionChange(`per-answer-${choice.label}`, choice.label)
                       }}
                       className={`rounded-lg border ${
@@ -1216,10 +1218,20 @@ export default function ExplanationBlockEditor({
         return (
           <Card
             key={block.id}
-            className={`border bg-card dark:bg-gray-800 !py-0 !px-0 !gap-0 ${
+            data-explanation-block
+            className={`border bg-card dark:bg-gray-800 !py-0 !px-0 !gap-0 cursor-pointer ${
               isTextBlockActive ? "border-primary ring-2 ring-primary dark:border-blue-500 dark:ring-blue-500" : "border-border/30 dark:border-gray-700"
             }`}
             style={{ padding: 0 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onSectionChange(blockActiveSection)
+              const target = e.target as HTMLElement
+              if (!target.closest("button")) {
+                const editor = textBlockEditorRefs.current[block.id]
+                if (editor) setTimeout(() => editor.chain().focus().run(), 0)
+              }
+            }}
           >
             <div className="flex items-center justify-between px-2 pt-1 pb-0.5">
               <Label className="text-xs text-muted-foreground dark:text-gray-300">
@@ -1258,8 +1270,13 @@ export default function ExplanationBlockEditor({
               </div>
             </div>
             <div
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 onSectionChange(blockActiveSection)
+                const editor = textBlockEditorRefs.current[block.id]
+                if (editor) {
+                  setTimeout(() => editor.chain().focus().run(), 0)
+                }
               }}
               className="px-2 pb-1"
             >

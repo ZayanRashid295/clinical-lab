@@ -129,7 +129,7 @@ export default function UnifiedQuestionPreview({
         <div className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0">
             <div className="flex items-center gap-2 py-0">
-              <h2 className="text-base font-bold text-foreground dark:text-gray-100 m-0 leading-tight py-0">Question Preview</h2>
+              <h2 className="text-base font-bold text-foreground dark:text-gray-100 m-0 leading-tight py-0">Question ID</h2>
               {questionId && (
                 <span className="text-xs font-mono font-bold text-foreground dark:text-gray-100 bg-card dark:bg-gray-800 px-2 py-1 rounded border border-border dark:border-gray-700">
                   {questionId}
@@ -235,6 +235,7 @@ export default function UnifiedQuestionPreview({
               options={options}
               perAnswerExplanations={question.perAnswerExplanations}
               chapter={displayChapterName || undefined}
+              chapterLabel="System"
               subjectTag={displaySubjectTag}
               topic={displayTopic}
             />

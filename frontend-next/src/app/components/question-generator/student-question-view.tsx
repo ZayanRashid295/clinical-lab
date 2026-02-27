@@ -1890,6 +1890,7 @@ export default function StudentQuestionView() {
                   options={currentQuestion.options}
                   perAnswerExplanations={currentQuestion.perAnswerExplanations}
                   chapter={currentQuestion.subject}
+                  chapterLabel="System"
                   topic={currentQuestion.topic}
                 />
               </div>

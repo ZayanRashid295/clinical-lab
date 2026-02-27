@@ -1321,10 +1321,10 @@ export default function BulkMarkdownUploader({
                               </div>
                             </div>
 
-                            {/* Chapter */}
+                            {/* System (chapter in DB) */}
                             <div>
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
-                                Chapter <span className="text-red-500 dark:text-red-400">*</span>
+                                System <span className="text-red-500 dark:text-red-400">*</span>
                               </label>
                               <div className="mb-1">
                                 <input
@@ -1348,7 +1348,7 @@ export default function BulkMarkdownUploader({
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || loadingChapters}
                                 >
-                                  <option value="">Select Chapter...</option>
+                                  <option value="">Select System...</option>
                                   {chapters.map((c) => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                   ))}

@@ -539,7 +539,19 @@ export default function BulkDocxUploader({
         }
       }
     } catch (e: any) {
-      setAddToDbError(e?.message || "Failed to create");
+      const rawMessage = e?.message || e?.response?.data?.message || "";
+      const lower = String(rawMessage).toLowerCase();
+      if (lower.includes("already exists") || lower.includes("unique constraint")) {
+        const label =
+          addToDbContext?.type === "subject"
+            ? "Subject"
+            : addToDbContext?.type === "chapter"
+            ? "System"
+            : "Topic";
+        setAddToDbError(`${label} with this name already exists.`);
+      } else {
+        setAddToDbError(rawMessage || "Failed to create");
+      }
     } finally {
       setAddToDbLoading(false);
     }
@@ -896,24 +908,28 @@ export default function BulkDocxUploader({
 
   return (
     <Card className="p-6">
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">DOCX Upload (AI Conversion)</h2>
-            <p className="text-sm text-muted-foreground mt-1">
+        <div className="flex flex-wrap items-start justify-between gap-3 md:gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-bold break-words">
+              DOCX Upload (AI Conversion)
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1 break-words">
               Upload multiple DOCX files. They will be converted to Markdown, then parsed automatically. Images will be extracted and uploaded.
             </p>
           </div>
           {onCancel && (
-            <Button variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
+            <div className="flex-shrink-0">
+              <Button variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
           )}
         </div>
 
         {/* Upload Mode Selection */}
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-3">
           <Button
             variant={uploadMode === "files" ? "default" : "outline"}
             onClick={() => setUploadMode("files")}
@@ -1002,7 +1018,7 @@ export default function BulkDocxUploader({
         {/* Summary */}
         {summary && (
           <div className="space-y-4">
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="p-4">
                 <div className="text-2xl font-bold">{summary.total}</div>
                 <div className="text-sm text-muted-foreground">Total Files</div>
@@ -1026,8 +1042,8 @@ export default function BulkDocxUploader({
               <h3 className="font-semibold">Processed Files:</h3>
               {summary.results.map((result) => (
                 <Card key={result.fileName} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2 md:gap-3">
+                    <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
                       {result.status === "success" ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : result.status === "error" ? (
@@ -1035,14 +1051,18 @@ export default function BulkDocxUploader({
                       ) : (
                         <AlertCircle className="h-5 w-5 text-yellow-600" />
                       )}
-                      <span className="font-medium">{result.fileName}</span>
-                      {result.questionData && (
-                        <span className="text-xs text-muted-foreground">
-                          ({result.questionData.system} - {result.questionData.subject})
-                        </span>
-                      )}
+                      <div className="min-w-0">
+                        <div className="font-medium break-words">
+                          {result.fileName}
+                        </div>
+                        {result.questionData && (
+                          <div className="text-xs text-muted-foreground break-words mt-0.5">
+                            ({result.questionData.system} - {result.questionData.subject})
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       {result.questionData && (
                         <Button
                           variant="ghost"
@@ -1075,15 +1095,20 @@ export default function BulkDocxUploader({
                   {expandedQuestions.has(result.fileName) && result.questionData && (
                     <div className="mt-4 space-y-4 p-4 bg-muted/50 rounded-lg">
                       {/* Metadata: Parsed values from document + DB dropdowns (optional link) + Add to DB */}
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Subject (product tag) */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Subject</label>
+                          {result.questionData.subject && (
+                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                              Parsed: {result.questionData.subject}
+                            </p>
+                          )}
                           <div className="mb-1">
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                              placeholder="Name (editable)"
                               value={questionMetadata[result.fileName]?.subjectName ?? result.questionData.subject ?? ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
@@ -1091,9 +1116,9 @@ export default function BulkDocxUploader({
                               }))}
                             />
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex flex-wrap gap-1">
                             <select
-                              className="flex-1 p-2 border rounded text-sm"
+                              className="w-full max-w-md p-2 border rounded text-sm"
                               value={questionMetadata[result.fileName]?.productTagId || ""}
                               onChange={(e) => {
                                 setQuestionMetadata((prev) => ({
@@ -1133,11 +1158,16 @@ export default function BulkDocxUploader({
                         {/* Chapter */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">System</label>
+                          {result.questionData.system && (
+                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                              Parsed: {result.questionData.system}
+                            </p>
+                          )}
                           <div className="mb-1">
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
+                              placeholder="Name (editable)"
                               value={questionMetadata[result.fileName]?.chapterName ?? ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
@@ -1145,9 +1175,9 @@ export default function BulkDocxUploader({
                               }))}
                             />
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex flex-wrap gap-1">
                             <select
-                              className="flex-1 p-2 border rounded text-sm"
+                              className="w-full max-w-md p-2 border rounded text-sm"
                               value={questionMetadata[result.fileName]?.chapterId || ""}
                               onChange={(e) => {
                                 const chapterId = e.target.value;
@@ -1158,7 +1188,7 @@ export default function BulkDocxUploader({
                                 if (chapterId) loadTopicsForChapter(chapterId);
                               }}
                             >
-                              <option value="">Select Chapter</option>
+                              <option value="">Select System</option>
                               {chapters.map((c) => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                               ))}
@@ -1189,11 +1219,16 @@ export default function BulkDocxUploader({
                         {/* Topic */}
                         <div>
                           <label className="text-xs font-medium mb-1 block">Topic *</label>
+                          {result.questionData.topic && (
+                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                              Parsed: {result.questionData.topic}
+                            </p>
+                          )}
                           <div className="mb-1">
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
+                              placeholder="Name (editable)"
                               value={questionMetadata[result.fileName]?.topicName ?? ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
@@ -1201,9 +1236,9 @@ export default function BulkDocxUploader({
                               }))}
                             />
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex flex-wrap gap-1">
                             <select
-                              className="flex-1 p-2 border rounded text-sm"
+                              className="w-full max-w-md p-2 border rounded text-sm"
                               value={questionMetadata[result.fileName]?.topicId || defaultTopicId || ""}
                               onChange={(e) => {
                                 setQuestionMetadata((prev) => ({
