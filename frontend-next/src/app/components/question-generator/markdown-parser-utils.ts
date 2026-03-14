@@ -1,4 +1,4 @@
-import { parseTagsFromString, parseTagsFromYamlLine, parseKeywordBlock } from "./parse-metadata-utils"
+import { parseTagsFromString, parseTagsFromYamlLine, parseKeywordBlock, extractSystemFirstSegment } from "./parse-metadata-utils"
 
 /**
  * Normalize question stem so the doc is parsed exactly:
@@ -90,8 +90,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
           if (titleParts.length >= 2) {
             // Subject is the first part (maps to Product Tag)
             questionData.subject = titleParts[0].trim()
-            // System is everything after " — " (maps to Chapter)
-            questionData.system = titleParts.slice(1).join(" — ").trim()
+            // System: only first segment (e.g. "Female Reproductive System") for strict chapter matching
+            questionData.system = extractSystemFirstSegment(titleParts.slice(1).join(" — ").trim())
           } else if (titleParts.length === 1) {
             // If no " — " separator, use entire title as subject
             questionData.subject = titleParts[0].trim()
@@ -133,8 +133,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
       if (titleParts.length >= 2) {
         // Subject is the first part (maps to Product Tag)
         questionData.subject = titleParts[0].trim()
-        // System is everything after " — " (maps to Chapter)
-        questionData.system = titleParts.slice(1).join(" — ").trim()
+        // System: only first segment for strict chapter matching
+        questionData.system = extractSystemFirstSegment(titleParts.slice(1).join(" — ").trim())
       } else if (titleParts.length === 1) {
         // If no " — " separator, use entire title as subject
         questionData.subject = titleParts[0].trim()

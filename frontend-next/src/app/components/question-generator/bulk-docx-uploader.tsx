@@ -27,6 +27,16 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils";
 import { QuestionCreatorData } from "./question-creator/types";
 
@@ -84,6 +94,15 @@ export default function BulkDocxUploader({
   } | null>(null);
   const [addToDbLoading, setAddToDbLoading] = useState(false);
   const [addToDbError, setAddToDbError] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    type: "subject" | "chapter" | "topic";
+    fileName: string;
+    id: string;
+    name: string;
+    chapterId?: string;
+  } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [alreadyExistsMessage, setAlreadyExistsMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const directoryInputRef = useRef<HTMLInputElement>(null);
   const questionsService = new QuestionsService();
@@ -184,17 +203,38 @@ export default function BulkDocxUploader({
       ).then((matched) => {
         if (cancelled || (!matched.chapterId && !matched.topicId && !matched.productTagId)) return;
         autoMatchDoneRef.current.add(result.fileName);
+        const chapter = chapters.find((c: any) => c.id === matched.chapterId);
+        const chapterName = chapter?.name ?? "";
+        const subjectTag = matched.productTagId ? productTags.find((t: any) => t.id === matched.productTagId) : null;
+        const subjectName = subjectTag?.name ?? (matched.productTagId ? result.questionData.subject ?? "" : "");
+        const fileName = result.fileName;
         setQuestionMetadata((prev) => ({
           ...prev,
-          [result.fileName]: {
-            ...(prev[result.fileName] ?? { chapterId: "", topicId: "", productTagId: "", subjectName: "" }),
-            chapterId: matched.chapterId || prev[result.fileName]?.chapterId || "",
-            topicId: matched.topicId || prev[result.fileName]?.topicId || "",
-            productTagId: matched.productTagId || prev[result.fileName]?.productTagId || "",
-            // Preserve parsed subject name - don't override if user has edited it
-            subjectName: prev[result.fileName]?.subjectName || result.questionData.subject || "",
+          [fileName]: {
+            ...(prev[fileName] ?? { chapterId: "", topicId: "", productTagId: "", subjectName: "" }),
+            chapterId: matched.chapterId || prev[fileName]?.chapterId || "",
+            topicId: matched.topicId || prev[fileName]?.topicId || "",
+            productTagId: matched.productTagId || prev[fileName]?.productTagId || "",
+            subjectName: subjectName || prev[fileName]?.subjectName || "",
+            chapterName: chapterName || prev[fileName]?.chapterName || "",
+            topicName: prev[fileName]?.topicName ?? "",
           },
         }));
+        if (matched.topicId && matched.chapterId) {
+          getTopicsForChapter(matched.chapterId).then((topicsList: any[]) => {
+            if (cancelled) return;
+            const topic = topicsList.find((t: any) => t.id === matched.topicId);
+            const topicName = topic?.name ?? result.questionData.topic ?? "";
+            setQuestionMetadata((prev) => ({
+              ...prev,
+              [fileName]: {
+                ...(prev[fileName] ?? { chapterId: "", topicId: "" }),
+                ...prev[fileName],
+                topicName: topicName || prev[fileName]?.topicName || "",
+              },
+            }));
+          });
+        }
         if (matched.chapterId) loadTopicsForChapter(matched.chapterId);
         setExpandedQuestions((prev) => new Set(prev).add(result.fileName));
       });
@@ -482,9 +522,51 @@ export default function BulkDocxUploader({
       return;
     }
     setAddToDbError(null);
+    const { type, fileName } = addToDbContext;
+    const nameLower = name.toLowerCase();
+
+    // Pre-check: if same name already exists in DB, show "already exists" modal and select it (don't call create)
+    if (type === "subject") {
+      const existingSubject = productTags.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower);
+      if (existingSubject) {
+        setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], productTagId: existingSubject.id, subjectName: existingSubject.name } }));
+        setAddToDbContext(null);
+        setAlreadyExistsMessage("This Subject already exists. We've selected it for you.");
+        return;
+      }
+    } else if (type === "chapter") {
+      const sectionId = addToDbSectionId || sections[0]?.id;
+      if (sectionId) {
+        const existingChapter = chapters.find((c: any) => (c.sectionId === sectionId || c.section?.id === sectionId) && String(c?.name ?? "").trim().toLowerCase() === nameLower);
+        if (existingChapter) {
+          setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], chapterId: existingChapter.id, topicId: "", chapterName: existingChapter.name, topicName: undefined } }));
+          loadTopicsForChapter(existingChapter.id);
+          setAddToDbContext(null);
+          setAlreadyExistsMessage("This System already exists. We've selected it for you.");
+          return;
+        }
+      }
+    } else if (type === "topic") {
+      const chapterId = questionMetadata[fileName]?.chapterId;
+      if (chapterId) {
+        let topicList = topics[chapterId] ?? [];
+        if (topicList.length === 0) {
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
+          topicList = Array.isArray(list) ? list : (list as any)?.data ?? [];
+          setTopics((prev) => ({ ...prev, [chapterId]: topicList }));
+        }
+        const existingTopic = topicList.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower);
+        if (existingTopic) {
+          setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], topicId: existingTopic.id, topicName: existingTopic.name } }));
+          setAddToDbContext(null);
+          setAlreadyExistsMessage("This Topic already exists. We've selected it for you.");
+          return;
+        }
+      }
+    }
+
     setAddToDbLoading(true);
     try {
-      const { type, fileName } = addToDbContext;
       if (type === "subject") {
         const res: any = await productTagsService.createTag({ name, isActive: true });
         const id = res?.id ?? (res?.data as any)?.id;
@@ -494,7 +576,7 @@ export default function BulkDocxUploader({
           setProductTags(data);
           setQuestionMetadata((prev) => ({
             ...prev,
-            [fileName]: { ...prev[fileName], productTagId: id },
+            [fileName]: { ...prev[fileName], productTagId: id, subjectName: name },
           }));
           setAddToDbContext(null);
         }
@@ -513,7 +595,7 @@ export default function BulkDocxUploader({
           setChapters(data);
           setQuestionMetadata((prev) => ({
             ...prev,
-            [fileName]: { ...prev[fileName], chapterId: id, topicId: "" },
+            [fileName]: { ...prev[fileName], chapterId: id, topicId: "", chapterName: name, topicName: undefined },
           }));
           loadTopicsForChapter(id);
           setAddToDbContext(null);
@@ -533,22 +615,77 @@ export default function BulkDocxUploader({
           setTopics((prev) => ({ ...prev, [chapterId]: data }));
           setQuestionMetadata((prev) => ({
             ...prev,
-            [fileName]: { ...prev[fileName], topicId: id },
+            [fileName]: { ...prev[fileName], topicId: id, topicName: name },
           }));
           setAddToDbContext(null);
         }
       }
     } catch (e: any) {
-      const rawMessage = e?.message || e?.response?.data?.message || "";
+      const rawMessage = e?.message || e?.response?.data?.message || String(e?.response?.data) || "";
+      const status = e?.response?.status ?? e?.status;
       const lower = String(rawMessage).toLowerCase();
-      if (lower.includes("already exists") || lower.includes("unique constraint")) {
-        const label =
-          addToDbContext?.type === "subject"
-            ? "Subject"
-            : addToDbContext?.type === "chapter"
-            ? "System"
-            : "Topic";
-        setAddToDbError(`${label} with this name already exists.`);
+      const isDuplicate =
+        lower.includes("already exists") ||
+        lower.includes("unique constraint") ||
+        lower.includes("duplicate") ||
+        lower.includes("p2002") ||
+        status === 409 ||
+        (status === 500 && (lower.includes("unique") || lower.includes("duplicate")));
+      const label =
+        addToDbContext?.type === "subject"
+          ? "Subject"
+          : addToDbContext?.type === "chapter"
+          ? "System"
+          : "Topic";
+      if (isDuplicate) {
+        const name = (addToDbName || addToDbContext?.parsedName || "").trim();
+        const { type, fileName } = addToDbContext;
+        if (type === "subject") {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setProductTags(data);
+          const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === name.toLowerCase());
+          if (existing) {
+            setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], productTagId: existing.id, subjectName: existing.name } }));
+            setAddToDbContext(null);
+            setAddToDbError(null);
+            setAlreadyExistsMessage("This Subject already exists. We've selected it for you.");
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`);
+          }
+        } else if (type === "chapter") {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true });
+          const data = Array.isArray(list) ? list : (list as any)?.data || [];
+          setChapters(data);
+          const existing = data.find((c: any) => String(c?.name).trim().toLowerCase() === name.toLowerCase());
+          if (existing) {
+            setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], chapterId: existing.id, topicId: "", chapterName: existing.name, topicName: undefined } }));
+            loadTopicsForChapter(existing.id);
+            setAddToDbContext(null);
+            setAddToDbError(null);
+            setAlreadyExistsMessage("This System already exists. We've selected it for you.");
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`);
+          }
+        } else if (type === "topic") {
+          const chapterId = questionMetadata[fileName]?.chapterId;
+          if (chapterId) {
+            const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
+            const data = Array.isArray(list) ? list : (list as any)?.data || [];
+            setTopics((prev) => ({ ...prev, [chapterId]: data }));
+            const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === name.toLowerCase());
+            if (existing) {
+              setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], topicId: existing.id, topicName: existing.name } }));
+              setAddToDbContext(null);
+              setAddToDbError(null);
+              setAlreadyExistsMessage("This Topic already exists. We've selected it for you.");
+            } else {
+              setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`);
+            }
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`);
+          }
+        }
       } else {
         setAddToDbError(rawMessage || "Failed to create");
       }
@@ -557,57 +694,65 @@ export default function BulkDocxUploader({
     }
   };
 
-  // Delete from DB: remove selected subject/chapter/topic (soft delete) and refresh lists
-  const handleDeleteSubject = async (fileName: string) => {
+  // Delete from DB: open confirmation modal, then perform delete on confirm
+  const handleDeleteSubject = (fileName: string) => {
     const id = questionMetadata[fileName]?.productTagId;
     if (!id) return;
     const tag = productTags.find((t) => t.id === id);
-    if (!window.confirm(`Delete subject "${tag?.name ?? id}" from database? This will deactivate it.`)) return;
-    try {
-      await productTagsService.delete(id);
-      const list: any = await productTagsService.getTags({ status: "ACTIVE" });
-      const data = Array.isArray(list) ? list : (list as any)?.data || [];
-      setProductTags(data);
-      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], productTagId: undefined } }));
-    } catch (e: any) {
-      alert(e?.message || "Failed to delete subject");
-    }
+    setDeleteConfirm({ type: "subject", fileName, id, name: tag?.name ?? id });
   };
-  const handleDeleteChapter = async (fileName: string) => {
+  const handleDeleteChapter = (fileName: string) => {
     const id = questionMetadata[fileName]?.chapterId;
     if (!id) return;
     const chapter = chapters.find((c) => c.id === id);
-    if (!window.confirm(`Delete chapter "${chapter?.name ?? id}" from database? This will deactivate it.`)) return;
-    try {
-      await chaptersService.delete(id);
-      const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true });
-      const data = Array.isArray(list) ? list : (list as any)?.data || [];
-      setChapters(data);
-      setTopics((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
-      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], chapterId: "", topicId: "" } }));
-    } catch (e: any) {
-      alert(e?.message || "Failed to delete chapter");
-    }
+    setDeleteConfirm({ type: "chapter", fileName, id, name: chapter?.name ?? id });
   };
-  const handleDeleteTopic = async (fileName: string) => {
+  const handleDeleteTopic = (fileName: string) => {
     const id = questionMetadata[fileName]?.topicId;
     const chapterId = questionMetadata[fileName]?.chapterId;
     if (!id || !chapterId) return;
     const topicList = topics[chapterId] || [];
     const topic = topicList.find((t) => t.id === id);
-    if (!window.confirm(`Delete topic "${topic?.name ?? id}" from database? This will deactivate it.`)) return;
+    setDeleteConfirm({ type: "topic", fileName, id, name: topic?.name ?? id, chapterId });
+  };
+
+  const performDelete = async () => {
+    if (!deleteConfirm) return;
+    setDeleteLoading(true);
     try {
-      await topicsService.delete(id);
-      const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
-      const data = Array.isArray(list) ? list : (list as any)?.data || [];
-      setTopics((prev) => ({ ...prev, [chapterId]: data }));
-      setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], topicId: "" } }));
+      const { type, fileName, id, chapterId } = deleteConfirm;
+      if (type === "subject") {
+        await productTagsService.delete(id);
+        const list: any = await productTagsService.getTags({ status: "ACTIVE" });
+        const data = Array.isArray(list) ? list : (list as any)?.data || [];
+        setProductTags(data);
+        setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], productTagId: undefined, subjectName: undefined } }));
+      } else if (type === "chapter") {
+        await chaptersService.delete(id);
+        const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true });
+        const data = Array.isArray(list) ? list : (list as any)?.data || [];
+        setChapters(data);
+        setTopics((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        setQuestionMetadata((prev) => ({
+          ...prev,
+          [fileName]: { ...prev[fileName], chapterId: "", topicId: "", chapterName: undefined, topicName: undefined },
+        }));
+      } else if (type === "topic" && chapterId) {
+        await topicsService.delete(id);
+        const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true });
+        const data = Array.isArray(list) ? list : (list as any)?.data || [];
+        setTopics((prev) => ({ ...prev, [chapterId]: data }));
+        setQuestionMetadata((prev) => ({ ...prev, [fileName]: { ...prev[fileName], topicId: "", topicName: undefined } }));
+      }
+      setDeleteConfirm(null);
     } catch (e: any) {
-      alert(e?.message || "Failed to delete topic");
+      alert(e?.message || "Failed to delete");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -677,13 +822,14 @@ export default function BulkDocxUploader({
           const questionProductTagId = (metadata as any).productTagId;
 
           // Build "old" format from parsed question (same shape as bulk-markdown)
-          // Use edited subjectName if available, otherwise use parsed subject
-          const subjectToUse = metadata.subjectName || questionData.subject || ""
+          // Use edited names (subjectName, chapterName, topicName) so edits apply everywhere
+          const subjectToUse = metadata.subjectName ?? productTags.find((t: any) => t.id === questionProductTagId)?.name ?? questionData.subject ?? "";
+          const systemToUse = metadata.chapterName ?? chapters.find((c: any) => c.id === questionChapterId)?.name ?? questionData.system ?? "";
           const oldFormatData = {
             stem: questionData.stem, // string stem from parser
             options: questionData.options,
             subject: subjectToUse,
-            system: questionData.system,
+            system: systemToUse,
             explanation: questionData.explanation, // blocks
             perAnswerExplanations: questionData.perAnswerExplanations, // blocks
             tags: questionData.tags || [],
@@ -700,9 +846,8 @@ export default function BulkDocxUploader({
             mainExplanation: newFormatData.mainExplanation || [],
             metadata: {
               ...newFormatData.metadata,
-              // Preserve parsed subject and system from DOCX/Markdown
-              subject: questionData.subject || newFormatData.metadata?.subject,
-              system: questionData.system || newFormatData.metadata?.system,
+              subject: subjectToUse,
+              system: systemToUse,
               topicId: questionTopicId,
               chapterId: questionChapterId,
               productTagId: questionProductTagId,
@@ -1040,7 +1185,13 @@ export default function BulkDocxUploader({
             {/* Results List */}
             <div className="space-y-2">
               <h3 className="font-semibold">Processed Files:</h3>
-              {summary.results.map((result) => (
+              {summary.results.map((result) => {
+                const fileMeta = questionMetadata[result.fileName];
+                const topicDisplay =
+                  fileMeta?.topicId
+                    ? (fileMeta?.topicName ?? (topics[fileMeta?.chapterId ?? ""] ?? []).find((t: any) => t.id === fileMeta?.topicId)?.name ?? "")
+                    : "";
+                return (
                 <Card key={result.fileName} className="p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2 md:gap-3">
                     <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
@@ -1108,8 +1259,12 @@ export default function BulkDocxUploader({
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder="Name (editable)"
-                              value={questionMetadata[result.fileName]?.subjectName ?? result.questionData.subject ?? ""}
+                              placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
+                              value={
+                                questionMetadata[result.fileName]?.productTagId
+                                  ? (questionMetadata[result.fileName]?.subjectName ?? productTags.find((t: any) => t.id === questionMetadata[result.fileName]?.productTagId)?.name ?? "")
+                                  : ""
+                              }
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
                                 [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), subjectName: e.target.value || undefined },
@@ -1121,9 +1276,16 @@ export default function BulkDocxUploader({
                               className="w-full max-w-md p-2 border rounded text-sm"
                               value={questionMetadata[result.fileName]?.productTagId || ""}
                               onChange={(e) => {
+                                const productTagId = e.target.value || undefined;
+                                const selectedTag = productTagId ? productTags.find((t: any) => t.id === productTagId) : null;
                                 setQuestionMetadata((prev) => ({
                                   ...prev,
-                                  [result.fileName]: { ...prev[result.fileName], productTagId: e.target.value || undefined },
+                                  [result.fileName]: {
+                                    ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }),
+                                    ...prev[result.fileName],
+                                    productTagId,
+                                    subjectName: selectedTag?.name ?? (productTagId ? prev[result.fileName]?.subjectName : undefined),
+                                  },
                                 }));
                               }}
                             >
@@ -1167,8 +1329,12 @@ export default function BulkDocxUploader({
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder="Name (editable)"
-                              value={questionMetadata[result.fileName]?.chapterName ?? ""}
+                              placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
+                              value={
+                                questionMetadata[result.fileName]?.chapterId
+                                  ? (questionMetadata[result.fileName]?.chapterName ?? chapters.find((c: any) => c.id === questionMetadata[result.fileName]?.chapterId)?.name ?? "")
+                                  : ""
+                              }
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
                                 [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), chapterName: e.target.value || undefined },
@@ -1181,9 +1347,17 @@ export default function BulkDocxUploader({
                               value={questionMetadata[result.fileName]?.chapterId || ""}
                               onChange={(e) => {
                                 const chapterId = e.target.value;
+                                const selectedChapter = chapters.find((c: any) => c.id === chapterId);
+                                const chapterName = selectedChapter?.name ?? (chapterId ? "" : undefined);
                                 setQuestionMetadata((prev) => ({
                                   ...prev,
-                                  [result.fileName]: { ...prev[result.fileName], chapterId, topicId: "" },
+                                  [result.fileName]: {
+                                    ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }),
+                                    chapterId,
+                                    topicId: "",
+                                    topicName: undefined,
+                                    chapterName: chapterName ?? prev[result.fileName]?.chapterName,
+                                  },
                                 }));
                                 if (chapterId) loadTopicsForChapter(chapterId);
                               }}
@@ -1228,8 +1402,8 @@ export default function BulkDocxUploader({
                             <input
                               type="text"
                               className="w-full p-1.5 border rounded text-xs"
-                              placeholder="Name (editable)"
-                              value={questionMetadata[result.fileName]?.topicName ?? ""}
+                              placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
+                              value={topicDisplay}
                               onChange={(e) => setQuestionMetadata((prev) => ({
                                 ...prev,
                                 [result.fileName]: { ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }), topicName: e.target.value || undefined },
@@ -1241,10 +1415,24 @@ export default function BulkDocxUploader({
                               className="w-full max-w-md p-2 border rounded text-sm"
                               value={questionMetadata[result.fileName]?.topicId || defaultTopicId || ""}
                               onChange={(e) => {
-                                setQuestionMetadata((prev) => ({
-                                  ...prev,
-                                  [result.fileName]: { ...prev[result.fileName], topicId: e.target.value },
-                                }));
+                                const topicId = e.target.value;
+                                const chapterId = questionMetadata[result.fileName]?.chapterId;
+                                const topicList = chapterId ? topics[chapterId] ?? [] : [];
+                                const selectedTopic = topicList.find((t: any) => t.id === topicId);
+                                setQuestionMetadata((prev) => {
+                                  const nextTopicName = topicId
+                                    ? (selectedTopic?.name ?? prev[result.fileName]?.topicName ?? "")
+                                    : undefined;
+                                  return {
+                                    ...prev,
+                                    [result.fileName]: {
+                                      ...(prev[result.fileName] ?? { chapterId: "", topicId: "" }),
+                                      ...prev[result.fileName],
+                                      topicId,
+                                      topicName: nextTopicName,
+                                    },
+                                  };
+                                });
                               }}
                             >
                               <option value="">Select Topic</option>
@@ -1303,7 +1491,8 @@ export default function BulkDocxUploader({
                     </div>
                   )}
                 </Card>
-              ))}
+              );
+              })}
             </div>
 
             {/* Create Button */}
@@ -1375,6 +1564,50 @@ export default function BulkDocxUploader({
           </div>
         </div>
       )}
+
+      {/* Delete confirmation modal */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => { if (!open) setDeleteConfirm(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete from database?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteConfirm && (
+                <>
+                  Do you want to delete &quot;{deleteConfirm.name}&quot;? This will deactivate it in the database.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                performDelete();
+              }}
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            >
+              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Already exists modal */}
+      <AlertDialog open={!!alreadyExistsMessage} onOpenChange={(open) => { if (!open) setAlreadyExistsMessage(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Already exists</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alreadyExistsMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlreadyExistsMessage(null)}>OK</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

@@ -13,6 +13,16 @@ import { ProductTagsService } from "@/app/services/products/product-tags.service
 import { ProductsService } from "@/app/services/products/products.service"
 import { runAutoMatch } from "./metadata-auto-match"
 import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp, Plus, X } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog"
 import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
 import { QuestionCreatorData } from "./question-creator/types"
 
@@ -70,6 +80,15 @@ export default function BulkMarkdownUploader({
   const [addToDbName, setAddToDbName] = useState("")
   const [addToDbSectionId, setAddToDbSectionId] = useState("")
   const [addToDbProductId, setAddToDbProductId] = useState("")
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    type: "subject" | "chapter" | "topic"
+    fileName: string
+    id: string
+    name: string
+    chapterId?: string
+  } | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [alreadyExistsMessage, setAlreadyExistsMessage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const directoryInputRef = useRef<HTMLInputElement>(null)
   const questionsService = new QuestionsService()
@@ -215,9 +234,12 @@ export default function BulkMarkdownUploader({
       { sections: sectionsToUse.length > 0 ? sectionsToUse : [], productTags, getTopicsForChapter }
     )
     if (matched.chapterId || matched.topicId || matched.productTagId) {
-      // Find the result to get parsed subject
       const result = summary?.results?.find((r) => r.fileName === fileName)
       const currentMetadata = questionMetadata[fileName]
+      const chapter = chapters.find((c: any) => c.id === matched.chapterId)
+      const chapterName = chapter?.name ?? ""
+      const subjectTag = matched.productTagId ? productTags.find((t: any) => t.id === matched.productTagId) : null
+      const subjectName = subjectTag?.name ?? (matched.productTagId ? parsedSubject ?? "" : (currentMetadata?.subjectName ?? ""))
       updateQuestionMetadata(
         fileName,
         {
@@ -225,12 +247,20 @@ export default function BulkMarkdownUploader({
           chapterId: matched.chapterId || "",
           topicId: matched.topicId || "",
           ...(matched.productTagId ? { productTagId: matched.productTagId } : {}),
-          // Preserve parsed subject name - don't override if user has edited it
-          subjectName: currentMetadata?.subjectName || parsedSubject || "",
+          subjectName: subjectName || currentMetadata?.subjectName || "",
+          chapterName: chapterName || currentMetadata?.chapterName || "",
+          topicName: currentMetadata?.topicName ?? "",
         },
         true
       )
       setExpandedQuestions((prev) => new Set(prev).add(fileName))
+      if (matched.topicId && matched.chapterId) {
+        getTopicsForChapter(matched.chapterId).then((topicsList: any[]) => {
+          const topic = topicsList.find((t: any) => t.id === matched.topicId)
+          const topicName = topic?.name ?? parsedTopic ?? ""
+          updateQuestionMetadata(fileName, { topicName }, true)
+        })
+      }
     }
     if (matched.chapterId) loadTopics(matched.chapterId)
   }
@@ -621,7 +651,7 @@ export default function BulkMarkdownUploader({
   // Update metadata for a specific question
   const updateQuestionMetadata = (
     fileName: string,
-    updates: { sectionId?: string; chapterId?: string; topicId?: string; productTagId?: string; subjectName?: string },
+    updates: { sectionId?: string; chapterId?: string; topicId?: string; productTagId?: string; subjectName?: string; chapterName?: string; topicName?: string },
     skipClearing = false // If true, don't clear dependent fields (used for auto-matching)
   ) => {
     setQuestionMetadata((prev) => {
@@ -646,25 +676,38 @@ export default function BulkMarkdownUploader({
       if (updates.sectionId !== undefined && updates.sectionId !== current.sectionId) {
         updated.chapterId = ""
         updated.topicId = ""
+        updated.chapterName = undefined
+        updated.topicName = undefined
         // Load chapters for new section
         if (updates.sectionId) {
           loadChapters(updates.sectionId)
         }
       }
       
-      // If chapter changed, clear topic
+      // If chapter changed, clear topic and set chapterName from selection
       if (updates.chapterId !== undefined && updates.chapterId !== current.chapterId) {
         updated.topicId = ""
+        updated.topicName = undefined
         // Load topics for new chapter
         if (updates.chapterId) {
           loadTopics(updates.chapterId)
         }
-        // Auto-map section from chapter (frontend-only)
+        // Auto-map section from chapter (frontend-only) and set chapterName for text box
         const selectedChapter = chapters.find((c: any) => c.id === updates.chapterId)
         const derivedSectionId = selectedChapter?.sectionId || selectedChapter?.section?.id
         if (derivedSectionId) {
           updated.sectionId = derivedSectionId
         }
+        if (updates.chapterName === undefined && selectedChapter?.name) {
+          updated.chapterName = selectedChapter.name
+        }
+      }
+      if (updates.chapterId === "") {
+        updated.chapterName = undefined
+        updated.topicName = undefined
+      }
+      if (updates.topicId === "") {
+        updated.topicName = undefined
       }
       
       return { ...prev, [fileName]: updated }
@@ -679,9 +722,51 @@ export default function BulkMarkdownUploader({
       return
     }
     setAddToDbError(null)
+    const { type, fileName } = addToDbContext
+    const nameLower = name.toLowerCase()
+
+    // Pre-check: if same name already exists in DB, show "already exists" modal and select it (don't call create)
+    if (type === "subject") {
+      const existingSubject = productTags.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+      if (existingSubject) {
+        updateQuestionMetadata(fileName, { productTagId: existingSubject.id, subjectName: existingSubject.name })
+        setAddToDbContext(null)
+        setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+        return
+      }
+    } else if (type === "chapter") {
+      const sectionId = addToDbSectionId || sections[0]?.id
+      if (sectionId) {
+        const existingChapter = chapters.find((c: any) => (c.sectionId === sectionId || c.section?.id === sectionId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingChapter) {
+          updateQuestionMetadata(fileName, { chapterId: existingChapter.id, topicId: "", chapterName: existingChapter.name, topicName: undefined })
+          loadTopics(existingChapter.id)
+          setAddToDbContext(null)
+          setAlreadyExistsMessage("This System already exists. We've selected it for you.")
+          return
+        }
+      }
+    } else if (type === "topic") {
+      const chapterId = questionMetadata[fileName]?.chapterId
+      if (chapterId) {
+        let topicList = topics[chapterId] ?? []
+        if (topicList.length === 0) {
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          topicList = Array.isArray(list) ? list : (list as any)?.data ?? []
+          setTopics((prev) => ({ ...prev, [chapterId]: topicList }))
+        }
+        const existingTopic = topicList.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingTopic) {
+          updateQuestionMetadata(fileName, { topicId: existingTopic.id, topicName: existingTopic.name })
+          setAddToDbContext(null)
+          setAlreadyExistsMessage("This Topic already exists. We've selected it for you.")
+          return
+        }
+      }
+    }
+
     setAddToDbLoading(true)
     try {
-      const { type, fileName } = addToDbContext
       if (type === "subject") {
         const res: any = await productTagsService.createTag({ name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
@@ -689,7 +774,7 @@ export default function BulkMarkdownUploader({
           const list: any = await productTagsService.getTags({ status: "ACTIVE" })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
           setProductTags(data)
-          updateQuestionMetadata(fileName, { productTagId: id })
+          updateQuestionMetadata(fileName, { productTagId: id, subjectName: name })
           setAddToDbContext(null)
         }
       } else if (type === "chapter") {
@@ -705,7 +790,7 @@ export default function BulkMarkdownUploader({
           const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
           setChapters(data)
-          updateQuestionMetadata(fileName, { chapterId: id, topicId: "" })
+          updateQuestionMetadata(fileName, { chapterId: id, topicId: "", chapterName: name, topicName: undefined })
           loadTopics(id)
           setAddToDbContext(null)
         }
@@ -720,67 +805,139 @@ export default function BulkMarkdownUploader({
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
           await loadTopics(chapterId)
-          updateQuestionMetadata(fileName, { topicId: id })
+          updateQuestionMetadata(fileName, { topicId: id, topicName: name })
           setAddToDbContext(null)
         }
       }
     } catch (e: any) {
-      setAddToDbError(e?.message || "Failed to create")
+      const rawMessage = e?.message || e?.response?.data?.message || String(e?.response?.data) || ""
+      const status = e?.response?.status ?? e?.status
+      const lower = String(rawMessage).toLowerCase()
+      const isDuplicate =
+        lower.includes("already exists") ||
+        lower.includes("unique constraint") ||
+        lower.includes("duplicate") ||
+        lower.includes("p2002") ||
+        status === 409 ||
+        (status === 500 && (lower.includes("unique") || lower.includes("duplicate")))
+      const label =
+        addToDbContext?.type === "subject"
+          ? "Subject"
+          : addToDbContext?.type === "chapter"
+          ? "System"
+          : "Topic"
+      if (isDuplicate) {
+        const nameVal = (addToDbName || addToDbContext?.parsedName || "").trim()
+        const { type, fileName } = addToDbContext
+        if (type === "subject") {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProductTags(data)
+          const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
+          if (existing) {
+            updateQuestionMetadata(fileName, { productTagId: existing.id, subjectName: existing.name })
+            setAddToDbContext(null)
+            setAddToDbError(null)
+            setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (type === "chapter") {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setChapters(data)
+          const existing = data.find((c: any) => String(c?.name).trim().toLowerCase() === nameVal.toLowerCase())
+          if (existing) {
+            updateQuestionMetadata(fileName, { chapterId: existing.id, topicId: "", chapterName: existing.name, topicName: undefined })
+            loadTopics(existing.id)
+            setAddToDbContext(null)
+            setAddToDbError(null)
+            setAlreadyExistsMessage("This System already exists. We've selected it for you.")
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (type === "topic") {
+          const chapterId = questionMetadata[fileName]?.chapterId
+          if (chapterId) {
+            const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+            const data = Array.isArray(list) ? list : (list as any)?.data || []
+            setTopics((prev) => ({ ...prev, [chapterId]: data }))
+            const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
+            if (existing) {
+              updateQuestionMetadata(fileName, { topicId: existing.id, topicName: existing.name })
+              setAddToDbContext(null)
+              setAddToDbError(null)
+              setAlreadyExistsMessage("This Topic already exists. We've selected it for you.")
+            } else {
+              setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
+            }
+          } else {
+            setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        }
+      } else {
+        setAddToDbError(rawMessage || "Failed to create")
+      }
     } finally {
       setAddToDbLoading(false)
     }
   }
 
-  // Delete from DB: remove selected subject/chapter/topic (soft delete) and refresh lists
-  const handleDeleteSubject = async (fileName: string) => {
+  // Delete from DB: open confirmation modal, then perform delete on confirm
+  const handleDeleteSubject = (fileName: string) => {
     const id = (questionMetadata[fileName] as any)?.productTagId
     if (!id) return
     const tag = productTags.find((t) => t.id === id)
-    if (!window.confirm(`Delete subject "${tag?.name ?? id}" from database? This will deactivate it.`)) return
-    try {
-      await productTagsService.delete(id)
-      const list: any = await productTagsService.getTags({ status: "ACTIVE" })
-      const data = Array.isArray(list) ? list : (list as any)?.data || []
-      setProductTags(data)
-      updateQuestionMetadata(fileName, { productTagId: "" })
-    } catch (e: any) {
-      alert(e?.message || "Failed to delete subject")
-    }
+    setDeleteConfirm({ type: "subject", fileName, id, name: tag?.name ?? id })
   }
-  const handleDeleteChapter = async (fileName: string) => {
+  const handleDeleteChapter = (fileName: string) => {
     const id = questionMetadata[fileName]?.chapterId
     if (!id) return
     const chapter = chapters.find((c) => c.id === id)
-    if (!window.confirm(`Delete chapter "${chapter?.name ?? id}" from database? This will deactivate it.`)) return
-    try {
-      await chaptersService.delete(id)
-      const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
-      const data = Array.isArray(list) ? list : (list as any)?.data || []
-      setChapters(data)
-      setTopics((prev) => {
-        const next = { ...prev }
-        delete next[id]
-        return next
-      })
-      updateQuestionMetadata(fileName, { chapterId: "", topicId: "" })
-    } catch (e: any) {
-      alert(e?.message || "Failed to delete chapter")
-    }
+    setDeleteConfirm({ type: "chapter", fileName, id, name: chapter?.name ?? id })
   }
-  const handleDeleteTopic = async (fileName: string) => {
+  const handleDeleteTopic = (fileName: string) => {
     const metadata = questionMetadata[fileName]
     const id = metadata?.topicId
     const chapterId = metadata?.chapterId
     if (!id || !chapterId) return
     const topicList = topics[chapterId] || []
     const topic = topicList.find((t) => t.id === id)
-    if (!window.confirm(`Delete topic "${topic?.name ?? id}" from database? This will deactivate it.`)) return
+    setDeleteConfirm({ type: "topic", fileName, id, name: topic?.name ?? id, chapterId })
+  }
+
+  const performDelete = async () => {
+    if (!deleteConfirm) return
+    setDeleteLoading(true)
     try {
-      await topicsService.delete(id)
-      await loadTopics(chapterId)
-      updateQuestionMetadata(fileName, { topicId: "" })
+      const { type, fileName, id, chapterId } = deleteConfirm
+      if (type === "subject") {
+        await productTagsService.delete(id)
+        const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+        const data = Array.isArray(list) ? list : (list as any)?.data || []
+        setProductTags(data)
+        updateQuestionMetadata(fileName, { productTagId: "", subjectName: undefined })
+      } else if (type === "chapter") {
+        await chaptersService.delete(id)
+        const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+        const data = Array.isArray(list) ? list : (list as any)?.data || []
+        setChapters(data)
+        setTopics((prev) => {
+          const next = { ...prev }
+          delete next[id]
+          return next
+        })
+        updateQuestionMetadata(fileName, { chapterId: "", topicId: "", chapterName: undefined, topicName: undefined })
+      } else if (type === "topic" && chapterId) {
+        await topicsService.delete(id)
+        await loadTopics(chapterId)
+        updateQuestionMetadata(fileName, { topicId: "", topicName: undefined })
+      }
+      setDeleteConfirm(null)
     } catch (e: any) {
-      alert(e?.message || "Failed to delete topic")
+      alert(e?.message || "Failed to delete")
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -839,14 +996,14 @@ export default function BulkMarkdownUploader({
           const questionProductTagId = (metadata as any).productTagId
 
           // Convert parsed question to the format needed for creation
-          // The parsed question has stem as string, but we need to handle it properly
-          // Use edited subjectName if available, otherwise use parsed subject
-          const subjectToUse = (metadata as any).subjectName || result.questionData.subject || ""
+          // Use edited names (subjectName, chapterName) so edits apply everywhere
+          const subjectToUse = (metadata as any).subjectName ?? productTags.find((t: any) => t.id === questionProductTagId)?.name ?? result.questionData.subject ?? ""
+          const systemToUse = (metadata as any).chapterName ?? chapters.find((c: any) => c.id === questionChapterId)?.name ?? result.questionData.system ?? ""
           const oldFormatData = {
             stem: result.questionData.stem, // This is a string from parser
             options: result.questionData.options,
             subject: subjectToUse,
-            system: result.questionData.system,
+            system: systemToUse,
             explanation: result.questionData.explanation, // This is already blocks
             perAnswerExplanations: result.questionData.perAnswerExplanations, // This is already blocks
             tags: result.questionData.tags || [],
@@ -864,9 +1021,8 @@ export default function BulkMarkdownUploader({
             mainExplanation: newFormatData.mainExplanation || [],
             metadata: {
               ...newFormatData.metadata,
-              // Preserve parsed subject and system from DOCX/Markdown
-              subject: result.questionData.subject || newFormatData.metadata?.subject,
-              system: result.questionData.system || newFormatData.metadata?.system,
+              subject: subjectToUse,
+              system: systemToUse,
               topicId: questionTopicId,
               chapterId: questionChapterId,
               productTagId: questionProductTagId,
@@ -1290,7 +1446,11 @@ export default function BulkMarkdownUploader({
                                   type="text"
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
-                                  value={(metadata as any).subjectName ?? result.questionData.subject ?? ""}
+                                  value={
+                                    (metadata as any).productTagId
+                                      ? ((metadata as any).subjectName ?? productTags.find((t: any) => t.id === (metadata as any).productTagId)?.name ?? "")
+                                      : ""
+                                  }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
@@ -1303,7 +1463,14 @@ export default function BulkMarkdownUploader({
                               <div className="flex gap-1">
                                 <select
                                   value={(metadata as any).productTagId || ""}
-                                  onChange={(e) => updateQuestionMetadata(result.fileName, { productTagId: e.target.value })}
+                                  onChange={(e) => {
+                                    const productTagId = e.target.value || undefined
+                                    const selectedTag = productTagId ? productTags.find((t: any) => t.id === productTagId) : null
+                                    updateQuestionMetadata(result.fileName, {
+                                      productTagId: productTagId ?? "",
+                                      subjectName: selectedTag?.name ?? (productTagId ? (metadata as any).subjectName : undefined),
+                                    })
+                                  }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || loadingTags}
                                 >
@@ -1331,7 +1498,11 @@ export default function BulkMarkdownUploader({
                                   type="text"
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
-                                  value={(metadata as any).chapterName ?? ""}
+                                  value={
+                                    metadata.chapterId
+                                      ? ((metadata as any).chapterName ?? chapters.find((c: any) => c.id === metadata.chapterId)?.name ?? "")
+                                      : ""
+                                  }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
@@ -1344,7 +1515,15 @@ export default function BulkMarkdownUploader({
                               <div className="flex gap-1">
                                 <select
                                   value={metadata.chapterId}
-                                  onChange={(e) => updateQuestionMetadata(result.fileName, { chapterId: e.target.value })}
+                                  onChange={(e) => {
+                                    const chapterId = e.target.value
+                                    const selectedChapter = chapters.find((c: any) => c.id === chapterId)
+                                    updateQuestionMetadata(result.fileName, {
+                                      chapterId,
+                                      topicId: "",
+                                      chapterName: selectedChapter?.name ?? (chapterId ? "" : undefined),
+                                    })
+                                  }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || loadingChapters}
                                 >
@@ -1372,7 +1551,11 @@ export default function BulkMarkdownUploader({
                                   type="text"
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
-                                  value={(metadata as any).topicName ?? ""}
+                                  value={
+                                    metadata.topicId
+                                      ? ((metadata as any).topicName ?? questionTopics.find((t: any) => t.id === metadata.topicId)?.name ?? "")
+                                      : ""
+                                  }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
@@ -1385,7 +1568,14 @@ export default function BulkMarkdownUploader({
                               <div className="flex gap-1">
                                 <select
                                   value={metadata.topicId}
-                                  onChange={(e) => updateQuestionMetadata(result.fileName, { topicId: e.target.value })}
+                                  onChange={(e) => {
+                                    const topicId = e.target.value
+                                    const selectedTopic = questionTopics.find((t: any) => t.id === topicId)
+                                    updateQuestionMetadata(result.fileName, {
+                                      topicId,
+                                      topicName: topicId ? (selectedTopic?.name ?? (metadata as any).topicName ?? "") : undefined,
+                                    })
+                                  }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || isLoadingTopics || !metadata.chapterId}
                                 >
@@ -1615,6 +1805,50 @@ export default function BulkMarkdownUploader({
           </div>
         </div>
       )}
+
+      {/* Delete confirmation modal */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => { if (!open) setDeleteConfirm(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete from database?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteConfirm && (
+                <>
+                  Do you want to delete &quot;{deleteConfirm.name}&quot;? This will deactivate it in the database.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                performDelete()
+              }}
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            >
+              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Already exists modal */}
+      <AlertDialog open={!!alreadyExistsMessage} onOpenChange={(open) => { if (!open) setAlreadyExistsMessage(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Already exists</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alreadyExistsMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlreadyExistsMessage(null)}>OK</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

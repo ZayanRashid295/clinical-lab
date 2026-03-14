@@ -2,7 +2,7 @@ import { ParsedDocxContent, replaceImageUrls, htmlTableToMarkdown } from "./docx
 import { replaceImagePaths } from "./markdown-parser-utils";
 import { ParsedQuestion } from "./markdown-parser-utils";
 import { convertMarkdownToExplanationBlocks } from "./markdown-parser-utils";
-import { parseKeywordBlock } from "./parse-metadata-utils";
+import { parseKeywordBlock, extractSystemFirstSegment } from "./parse-metadata-utils";
 
 /**
  * Structure extracted from DOCX using AI or rule-based parsing
@@ -78,11 +78,17 @@ function parseDocxWithRules(
       const parts = subjectLine.split(/[()]/);
       data.subject = parts[0].trim();
       if (parts[1]) {
-        data.system = parts[1].trim();
+        data.system = extractSystemFirstSegment(parts[1].trim());
       }
     } else {
       data.subject = subjectLine;
     }
+  }
+
+  // Optional: explicit System: line (normalize to first segment only)
+  const systemMatch = text.match(/System:\s*([^\n]+)/i);
+  if (systemMatch) {
+    data.system = extractSystemFirstSegment(systemMatch[1].trim());
   }
 
   // Extract Topic

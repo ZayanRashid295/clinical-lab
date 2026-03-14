@@ -81,17 +81,12 @@ export async function runAutoMatch(
     }
   }
 
-  // Match System → Chapter
+  // Match System → Chapter (exact name only – no fuzzy; only show DB chapter when it exists)
   if (parsedSystem && chapters.length > 0) {
     const normalizedSystem = normalizeName(parsedSystem);
-    let matchedChapter = chapters.find(
+    const matchedChapter = chapters.find(
       (c: any) => normalizeName(c.name) === normalizedSystem
     );
-    if (!matchedChapter) {
-      matchedChapter = chapters.find((c: any) =>
-        fuzzyMatch(c.name, parsedSystem!)
-      );
-    }
     if (matchedChapter) {
       matchedChapterId = matchedChapter.id;
       matchedSectionId =
@@ -115,18 +110,12 @@ export async function runAutoMatch(
     }
   }
 
-  // Fallback: if System didn't match Chapter, try matching System → Section, then find Chapter within that Section
-  // NOTE: Do NOT use parsedSubject here - subject maps to ProductTag, not Chapter
+  // Fallback: if System didn't match Chapter, try matching System → Section (exact only), then find Chapter within that Section
   if (!matchedChapterId && parsedSystem && sections.length > 0) {
     const normalizedSystem = normalizeName(parsedSystem);
-    let matchedSection = sections.find(
+    const matchedSection = sections.find(
       (s: any) => normalizeName(s.name) === normalizedSystem
     );
-    if (!matchedSection) {
-      matchedSection = sections.find((s: any) =>
-        fuzzyMatch(s.name, parsedSystem!)
-      );
-    }
     if (matchedSection) {
       matchedSectionId = matchedSection.id;
       const sectionChapters = chapters.filter(

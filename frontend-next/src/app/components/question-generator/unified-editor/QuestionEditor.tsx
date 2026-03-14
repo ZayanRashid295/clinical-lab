@@ -28,6 +28,15 @@ import { QuestionsService } from "@/app/services/questions/questions.service"
 import { Editor } from "@tiptap/react"
 import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog"
 
 interface QuestionEditorProps {
   initialData?: Partial<QuestionCreatorData>
@@ -66,6 +75,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   const [addMetaSectionId, setAddMetaSectionId] = useState("")
   const [addMetaError, setAddMetaError] = useState<string | null>(null)
   const [addMetaLoading, setAddMetaLoading] = useState(false)
+  const [alreadyExistsMessage, setAlreadyExistsMessage] = useState<string | null>(null)
   const [questionId, setQuestionId] = useState<string>("")
 
   const [activeSection, setActiveSection] = useState<"stem" | "explanation" | string | null>(null)
@@ -259,27 +269,40 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       setSectionName(metadataToUse.system)
     }
 
-    // Fetch chapter name
+    // Fetch chapter name (system) – also set systemEditName so text box shows selected system like subject
     if (metadataToUse.chapterId) {
       promises.push(
         chaptersService.getChapter(metadataToUse.chapterId)
           .then((chapter) => {
-            setChapterName(chapter?.name || metadataToUse.system || "")
+            const name = chapter?.name || metadataToUse.system || ""
+            setChapterName(name)
+            setSystemEditName(name)
           })
-          .catch(() => setChapterName(metadataToUse.system || ""))
+          .catch(() => {
+            const fallback = metadataToUse.system || ""
+            setChapterName(fallback)
+            setSystemEditName(fallback)
+          })
       )
     } else if (metadataToUse.subject) {
-      setChapterName(metadataToUse.system || "")
+      const fallback = metadataToUse.system || ""
+      setChapterName(fallback)
+      setSystemEditName(fallback)
     }
 
-    // Fetch topic name
+    // Fetch topic name – also set topicEditName so text box shows selected topic like subject
     if (metadataToUse.topicId) {
       promises.push(
         topicsService.getTopic(metadataToUse.topicId)
           .then((topic) => {
-            setTopicName(topic?.name || "")
+            const name = topic?.name || ""
+            setTopicName(name)
+            setTopicEditName(name)
           })
-          .catch(() => setTopicName(""))
+          .catch(() => {
+            setTopicName("")
+            setTopicEditName("")
+          })
       )
     }
 
@@ -293,13 +316,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         productTagsService.getTag(selectedTagId)
           .then((tag) => {
             if (tag) {
+              const name = tag.name || ""
+              setSubjectTagName(name)
+              setSubjectEditName(name)
               setProductTags((prev) => {
                 const existing = prev.find((t) => t.id === tag.id)
-                if (existing) {
-                  setSubjectTagName(existing.name || "")
-                  return prev
-                }
-                setSubjectTagName(tag.name || "")
+                if (existing) return prev
                 return [...prev, tag]
               })
             }
@@ -308,7 +330,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             // If fetch fails, check if tag is in already loaded productTags
             const existingTag = productTags.find((t) => t.id === selectedTagId)
             if (existingTag) {
-              setSubjectTagName(existingTag.name || "")
+              const name = existingTag.name || ""
+              setSubjectTagName(name)
+              setSubjectEditName(name)
             }
           })
       )
@@ -336,10 +360,11 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     }
   }, [metadata.chapterId, metadata.topicId, metadata.productTagId, metadata.productTagIds, metadata.subject, metadata.system, metadata.sectionId, metadataNamesFetched, isPreviewMode, fetchMetadataNames, metadata])
 
-  // Handle metadata changes
+  // Handle metadata changes – set text box values immediately when selecting from dropdown (same as subject)
   const handleChapterChange = (chapterId: string) => {
     const selectedChapter = chapters.find((c: any) => c.id === chapterId)
     const derivedSectionId = selectedChapter?.sectionId || selectedChapter?.section?.id
+    setSystemEditName(selectedChapter?.name || "")
     setMetadata((prev) => ({
       ...prev,
       chapterId: chapterId || undefined,
@@ -350,6 +375,8 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   }
 
   const handleTopicChange = (topicId: string) => {
+    const selectedTopic = topics.find((t: any) => t.id === topicId)
+    setTopicEditName(selectedTopic?.name || "")
     setMetadata((prev) => ({
       ...prev,
       topicId: topicId || undefined,
@@ -385,6 +412,53 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       return
     }
     setAddMetaError(null)
+    const nameLower = name.toLowerCase()
+
+    // Pre-check: if same name already exists in DB, show "already exists" modal and select it (don't call create)
+    if (addMetaContext.type === "subject") {
+      const existingSubject = productTags.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+      if (existingSubject) {
+        setMetadata((prev) => ({ ...prev, productTagId: existingSubject.id, productTagIds: [existingSubject.id], subject: existingSubject.name }))
+        setSubjectEditName(existingSubject.name)
+        setAddMetaContext(null)
+        setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+        return
+      }
+    } else if (addMetaContext.type === "chapter") {
+      const generalPrinciplesSection =
+        sections.find((s: any) => typeof s.name === "string" && s.name.toLowerCase().includes("general principles")) ||
+        sections[0]
+      const sectionId = generalPrinciplesSection?.id
+      if (sectionId) {
+        const existingChapter = chapters.find((c: any) => (c.sectionId === sectionId || c.section?.id === sectionId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingChapter) {
+          setMetadata((prev) => ({ ...prev, chapterId: existingChapter.id, sectionId: existingChapter.sectionId || existingChapter.section?.id || sectionId, system: existingChapter.name, topicId: undefined }))
+          setSystemEditName(existingChapter.name)
+          setAddMetaContext(null)
+          setAlreadyExistsMessage("This System already exists. We've selected it for you.")
+          return
+        }
+      }
+    } else if (addMetaContext.type === "topic") {
+      const chapterId = metadata.chapterId
+      if (chapterId) {
+        let topicList = topics
+        if (topicList.length === 0) {
+          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          topicList = Array.isArray(list) ? list : (list as any)?.data ?? []
+          setTopics(topicList)
+        }
+        const existingTopic = topicList.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingTopic) {
+          setMetadata((prev) => ({ ...prev, topicId: existingTopic.id }))
+          setTopicEditName(existingTopic.name)
+          setAddMetaContext(null)
+          setAlreadyExistsMessage("This Topic already exists. We've selected it for you.")
+          return
+        }
+      }
+    }
+
     setAddMetaLoading(true)
     try {
       if (addMetaContext.type === "subject") {
@@ -449,16 +523,76 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         }
       }
     } catch (e: any) {
-      const rawMessage = e?.message || e?.response?.data?.message || ""
+      const rawMessage = e?.message || e?.response?.data?.message || String(e?.response?.data) || ""
+      const status = e?.response?.status ?? e?.status
       const lower = String(rawMessage).toLowerCase()
-      if (lower.includes("already exists") || lower.includes("unique constraint")) {
-        const label =
-          addMetaContext.type === "subject"
-            ? "Subject"
-            : addMetaContext.type === "chapter"
-            ? "System"
-            : "Topic"
-        setAddMetaError(`${label} with this name already exists.`)
+      const isDuplicate =
+        lower.includes("already exists") ||
+        lower.includes("unique constraint") ||
+        lower.includes("duplicate") ||
+        lower.includes("p2002") ||
+        status === 409 ||
+        (status === 500 && (lower.includes("unique") || lower.includes("duplicate")))
+      const label =
+        addMetaContext?.type === "subject"
+          ? "Subject"
+          : addMetaContext?.type === "chapter"
+          ? "System"
+          : "Topic"
+      if (isDuplicate) {
+        const nameVal = addMetaName.trim()
+        if (addMetaContext.type === "subject") {
+          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProductTags(data)
+          const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
+          if (existing) {
+            setMetadata((prev) => ({ ...prev, productTagId: existing.id, productTagIds: [existing.id], subject: existing.name }))
+            setSubjectEditName(existing.name)
+            setAddMetaContext(null)
+            setAddMetaError(null)
+            setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+          } else {
+            setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (addMetaContext.type === "chapter") {
+          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setChapters(data)
+          const existing = data.find((c: any) => String(c?.name).trim().toLowerCase() === nameVal.toLowerCase())
+          if (existing) {
+            const sectionId = existing.sectionId || existing.section?.id
+            setMetadata((prev) => ({ ...prev, chapterId: existing.id, sectionId: sectionId || prev.sectionId, system: existing.name, topicId: undefined }))
+            setSystemEditName(existing.name)
+            setAddMetaContext(null)
+            setAddMetaError(null)
+            setAlreadyExistsMessage("This System already exists. We've selected it for you.")
+            const topicRes = await topicsService.getTopics({ chapterId: existing.id, status: "ACTIVE" })
+            const topicData = Array.isArray(topicRes) ? topicRes : (topicRes as any)?.data || []
+            setTopics(topicData)
+          } else {
+            setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (addMetaContext.type === "topic") {
+          const chapterId = metadata.chapterId
+          if (chapterId) {
+            const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+            const data = Array.isArray(list) ? list : (list as any)?.data || []
+            setTopics(data)
+            const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
+            if (existing) {
+              setMetadata((prev) => ({ ...prev, topicId: existing.id }))
+              setTopicEditName(existing.name)
+              setAddMetaContext(null)
+              setAddMetaError(null)
+              setAlreadyExistsMessage("This Topic already exists. We've selected it for you.")
+            } else {
+              setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+            }
+          } else {
+            setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        }
       } else {
         setAddMetaError(rawMessage || "Failed to create")
       }
@@ -1582,6 +1716,20 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         }}
         onSubmit={handleInsertLink}
       />
+      {/* Already exists modal */}
+      <AlertDialog open={!!alreadyExistsMessage} onOpenChange={(open) => { if (!open) setAlreadyExistsMessage(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Already exists</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alreadyExistsMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlreadyExistsMessage(null)}>OK</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

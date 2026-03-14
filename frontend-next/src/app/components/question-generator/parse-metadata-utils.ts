@@ -3,6 +3,22 @@ export interface KeywordEntry {
   explanation: string;
 }
 
+/**
+ * Extract only the first segment of a system string for strict matching.
+ * - Takes the part before any dash separator ( - , – , — ).
+ * - Removes anything in parentheses so the result is e.g. "Female Reproductive System" only.
+ * Nothing is hardcoded; used so parsed system maps to a single chapter name.
+ */
+export function extractSystemFirstSegment(system: string | undefined): string {
+  if (!system || typeof system !== "string") return "";
+  const trimmed = system.trim();
+  if (!trimmed) return "";
+  const segments = trimmed.split(/\s*[-–—]\s+/);
+  const first = (segments[0] ?? "").trim();
+  // Strip parenthetical content (e.g. "(Labour Physiology and Stages)")
+  return first.replace(/\s*\([^)]*\)\s*/g, "").trim();
+}
+
 export function parseTagsFromString(tagString: string): string[] {
   if (!tagString || typeof tagString !== "string") return [];
   const raw = tagString.split(",").map((t) => t.trim()).filter(Boolean);

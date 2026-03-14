@@ -934,8 +934,39 @@ export class ContentService {
   }
 
   async createTopic(createTopicDto: CreateTopicDto) {
+    const { chapterId, name, ...rest } = createTopicDto;
+    const topicName = (name ?? '').trim().length > 500 ? (name as string).substring(0, 497) + '...' : (name ?? '').trim();
+
+    // Prevent unique constraint errors on (chapterId, name) by returning the existing topic when one already exists.
+    const existing = await this.prisma.topic.findFirst({
+      where: {
+        chapterId,
+        name: topicName,
+      },
+      include: {
+        chapter: {
+          include: {
+            section: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
     return this.prisma.topic.create({
-      data: createTopicDto,
+      data: { ...rest, chapterId, name: topicName },
       include: {
         chapter: {
           include: {
