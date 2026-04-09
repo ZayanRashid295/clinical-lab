@@ -1,0 +1,20 @@
+src/modules/questions/questions.controller.ts(259,7): error TS2353: Object literal may only specify known properties, and 'subjectIds' does not exist in type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1316,35): error TS2304: Cannot find name 'tagId'.
+src/modules/questions/questions.service.ts(1326,35): error TS2304: Cannot find name 'tagIds'.
+src/modules/questions/questions.service.ts(1326,65): error TS2552: Cannot find name 'tagId'. Did you mean 'tag'?
+src/modules/questions/questions.service.ts(1349,22): error TS2339: Property 'color' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; name: string; description: string; productId: string; }'.
+src/modules/questions/questions.service.ts(1358,11): error TS2353: Object literal may only specify known properties, and 'topics' does not exist in type 'ProductInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1371,42): error TS2339: Property 'topics' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; categoryId: string; name: string; description: string; }'.
+src/modules/questions/questions.service.ts(1450,37): error TS2339: Property 'topics' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; categoryId: string; name: string; description: string; }'.
+src/modules/questions/questions.service.ts(1466,67): error TS2339: Property 'topics' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; categoryId: string; name: string; description: string; }'.
+src/modules/questions/questions.service.ts(1497,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1498,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1499,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1508,31): error TS2339: Property 'topicIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1508,46): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1508,64): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1555,27): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1555,40): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1590,53): error TS2304: Cannot find name 'tagIdsJson'.
+src/modules/questions/questions.service.ts(1812,27): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1812,40): error TS1117: An object literal cannot have multiple properties with the same name.

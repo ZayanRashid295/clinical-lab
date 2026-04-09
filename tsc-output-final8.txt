@@ -1,0 +1,34 @@
+src/modules/questions/questions.controller.ts(260,7): error TS2353: Object literal may only specify known properties, and 'topicIds' does not exist in type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(143,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(200,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(257,17): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(336,36): error TS2552: Cannot find name 'tagId'. Did you mean 'tag'?
+src/modules/questions/questions.service.ts(355,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(426,17): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(458,13): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(465,49): error TS2551: Property 'system' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; systemId: string; order: number; name: string; description: string; }'. Did you mean 'systemId'?
+src/modules/questions/questions.service.ts(466,45): error TS2551: Property 'system' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; systemId: string; order: number; name: string; description: string; }'. Did you mean 'systemId'?
+src/modules/questions/questions.service.ts(621,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(674,11): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(681,47): error TS2551: Property 'system' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; systemId: string; order: number; name: string; description: string; }'. Did you mean 'systemId'?
+src/modules/questions/questions.service.ts(682,43): error TS2551: Property 'system' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; systemId: string; order: number; name: string; description: string; }'. Did you mean 'systemId'?
+src/modules/questions/questions.service.ts(811,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1364,35): error TS2304: Cannot find name 'tagId'.
+src/modules/questions/questions.service.ts(1373,46): error TS2304: Cannot find name 'tagIdsJson'.
+src/modules/questions/questions.service.ts(1374,35): error TS2304: Cannot find name 'tagIds'.
+src/modules/questions/questions.service.ts(1374,65): error TS2552: Cannot find name 'tagId'. Did you mean 'tag'?
+src/modules/questions/questions.service.ts(1397,22): error TS2339: Property 'color' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; name: string; productId: string; description: string; }'.
+src/modules/questions/questions.service.ts(1406,11): error TS2353: Object literal may only specify known properties, and 'topics' does not exist in type 'ProductInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1419,42): error TS2339: Property 'systems' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; name: string; description: string; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1498,37): error TS2339: Property 'systems' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; name: string; description: string; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1514,67): error TS2339: Property 'systems' does not exist on type '{ createdAt: Date; updatedAt: Date; isActive: boolean; id: string; order: number; name: string; description: string; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1545,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1546,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1547,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1556,31): error TS2339: Property 'subjectIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1556,48): error TS2339: Property 'topicIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1556,63): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1556,81): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1607,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1638,53): error TS2304: Cannot find name 'tagIdsJson'.
+src/modules/questions/questions.service.ts(1864,23): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.

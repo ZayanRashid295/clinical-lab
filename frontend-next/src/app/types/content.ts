@@ -1,6 +1,8 @@
-// Content Management Types (Sections, Chapters, Topics)
+// Content Management Types (Systems → Topics → Subtopics)
+// Renamed from: Chapter → Topic, Topic → Subtopic
+// New: System model between Product and Topic
 
-export interface Section {
+export interface System {
   id: string;
   productId: string;
   name: string;
@@ -14,20 +16,20 @@ export interface Section {
     name: string;
   };
   _count?: {
-    chapters: number;
+    topics: number;
   };
 }
 
-export interface Chapter {
+export interface Topic {
   id: string;
-  sectionId: string;
+  systemId: string;
   name: string;
   description?: string;
   order: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  section?: {
+  system?: {
     id: string;
     name: string;
     product?: {
@@ -36,23 +38,23 @@ export interface Chapter {
     };
   };
   _count?: {
-    topics: number;
+    subtopics: number;
   };
 }
 
-export interface Topic {
+export interface Subtopic {
   id: string;
-  chapterId: string;
+  topicId: string;
   name: string;
   description?: string;
   order: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  chapter?: {
+  topic?: {
     id: string;
     name: string;
-    section?: {
+    system?: {
       id: string;
       name: string;
       product?: {
@@ -67,7 +69,7 @@ export interface Topic {
 }
 
 // Query Parameters
-export interface SectionQueryParams {
+export interface SystemQueryParams {
   page?: number;
   limit?: number;
   sortBy?: "createdAt" | "updatedAt" | "name" | "order" | "isActive";
@@ -75,19 +77,6 @@ export interface SectionQueryParams {
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
   productId?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  listAll?: boolean;
-}
-
-export interface ChapterQueryParams {
-  page?: number;
-  limit?: number;
-  sortBy?: "createdAt" | "updatedAt" | "name" | "order" | "isActive";
-  sortOrder?: "asc" | "desc";
-  search?: string;
-  status?: "ACTIVE" | "INACTIVE";
-  sectionId?: string;
   dateFrom?: string;
   dateTo?: string;
   listAll?: boolean;
@@ -100,14 +89,27 @@ export interface TopicQueryParams {
   sortOrder?: "asc" | "desc";
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
-  chapterId?: string;
+  systemId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  listAll?: boolean;
+}
+
+export interface SubtopicQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "createdAt" | "updatedAt" | "name" | "order" | "isActive";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  topicId?: string;
   dateFrom?: string;
   dateTo?: string;
   listAll?: boolean;
 }
 
 // Create DTOs
-export interface CreateSectionDto {
+export interface CreateSystemDto {
   productId: string;
   name: string;
   description?: string;
@@ -115,7 +117,7 @@ export interface CreateSectionDto {
   isActive?: boolean;
 }
 
-export interface UpdateSectionDto {
+export interface UpdateSystemDto {
   productId?: string;
   name?: string;
   description?: string;
@@ -123,24 +125,8 @@ export interface UpdateSectionDto {
   isActive?: boolean;
 }
 
-export interface CreateChapterDto {
-  sectionId: string;
-  name: string;
-  description?: string;
-  order?: number;
-  isActive?: boolean;
-}
-
-export interface UpdateChapterDto {
-  sectionId?: string;
-  name?: string;
-  description?: string;
-  order?: number;
-  isActive?: boolean;
-}
-
 export interface CreateTopicDto {
-  chapterId: string;
+  systemId: string;
   name: string;
   description?: string;
   order?: number;
@@ -148,7 +134,23 @@ export interface CreateTopicDto {
 }
 
 export interface UpdateTopicDto {
-  chapterId?: string;
+  systemId?: string;
+  name?: string;
+  description?: string;
+  order?: number;
+  isActive?: boolean;
+}
+
+export interface CreateSubtopicDto {
+  topicId: string;
+  name: string;
+  description?: string;
+  order?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateSubtopicDto {
+  topicId?: string;
   name?: string;
   description?: string;
   order?: number;
@@ -156,7 +158,13 @@ export interface UpdateTopicDto {
 }
 
 // Filter interfaces
-export interface SectionFilters extends SectionQueryParams {}
-export interface ChapterFilters extends ChapterQueryParams {}
+export interface SystemFilters extends SystemQueryParams {}
 export interface TopicFilters extends TopicQueryParams {}
+export interface SubtopicFilters extends SubtopicQueryParams {}
 
+// Legacy re-exports for backward compatibility during migration
+export type Chapter = Topic;
+export type ChapterQueryParams = TopicQueryParams;
+export type CreateChapterDto = CreateTopicDto;
+export type UpdateChapterDto = UpdateTopicDto;
+export type ChapterFilters = TopicFilters;

@@ -4,33 +4,20 @@ export interface Product {
   id: string;
   name: string;
   description?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  productTags?: ProductTag[];
-  productSubtypes?: ProductSubtype[];
-  _count?: {
-    sections: number;
-    productTags: number;
-    productSubtypes: number;
-  };
-}
-
-export interface ProductTag {
-  id: string;
-  name: string;
-  description?: string;
-  color?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  products?: Array<{
+  categoryId?: string;
+  category?: {
     id: string;
     name: string;
-  }>;
+    slug: string;
+  };
+  order?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  productSubtypes?: ProductSubtype[];
   _count?: {
-    products: number;
-    questions: number;
+    systems: number;
+    productSubtypes: number;
   };
 }
 
@@ -62,17 +49,7 @@ export interface ProductQueryParams {
   status?: "ACTIVE" | "INACTIVE";
   dateFrom?: string;
   dateTo?: string;
-}
-
-export interface ProductTagQueryParams {
-  page?: number;
-  limit?: number;
-  sortBy?: "createdAt" | "updatedAt" | "name" | "isActive";
-  sortOrder?: "asc" | "desc";
-  search?: string;
-  status?: "ACTIVE" | "INACTIVE";
-  dateFrom?: string;
-  dateTo?: string;
+  listAll?: boolean;
 }
 
 export interface ProductSubtypeQueryParams {
@@ -92,28 +69,14 @@ export interface CreateProductDto {
   name: string;
   description?: string;
   isActive?: boolean;
-  tagIds?: string[];
+  categoryId?: string;
 }
 
 export interface UpdateProductDto {
   name?: string;
   description?: string;
   isActive?: boolean;
-  tagIds?: string[];
-}
-
-export interface CreateProductTagDto {
-  name: string;
-  description?: string;
-  color?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateProductTagDto {
-  name?: string;
-  description?: string;
-  color?: string;
-  isActive?: boolean;
+  categoryId?: string | null;
 }
 
 export interface CreateProductSubtypeDto {
@@ -132,6 +95,5 @@ export interface UpdateProductSubtypeDto {
 
 // Filter interfaces
 export interface ProductFilters extends ProductQueryParams {}
-export interface ProductTagFilters extends ProductTagQueryParams {}
 export interface ProductSubtypeFilters extends ProductSubtypeQueryParams {}
 

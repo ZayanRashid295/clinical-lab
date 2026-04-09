@@ -147,13 +147,13 @@ export default function TopicViewModal({
                 <div className="flex items-center">
                   <BookOpen className="h-5 w-5 text-gray-400 mr-3" />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Chapter</p>
+                    <p className="text-sm font-medium text-gray-500">System</p>
                     <p className="text-gray-900">
-                      {topic.chapter?.name || "N/A"}
+                      {topic.system?.name || "N/A"}
                     </p>
-                    {topic.chapter?.section && (
+                    {topic.system?.product && (
                       <p className="text-sm text-gray-500">
-                        Section: {topic.chapter.section.name}
+                        Product: {topic.system.product.name}
                       </p>
                     )}
                   </div>
@@ -181,9 +181,9 @@ export default function TopicViewModal({
                 {topic._count && (
                   <div>
                     <p className="text-sm font-medium text-gray-500">
-                      Questions Count
+                      Subtopics Count
                     </p>
-                    <p className="text-gray-900">{topic._count.questions}</p>
+                    <p className="text-gray-900">{topic._count.subtopics}</p>
                   </div>
                 )}
               </div>

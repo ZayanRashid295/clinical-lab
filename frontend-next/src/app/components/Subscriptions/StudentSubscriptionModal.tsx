@@ -288,20 +288,20 @@ export default function StudentSubscriptionModal({
                     </div>
 
                     {/* Package Features */}
-                    {subscription.subscriptionPackage?.features &&
-                      subscription.subscriptionPackage.features.length > 0 && (
+                    {subscription.subscriptionPackage?.subscriptionFeatures &&
+                      subscription.subscriptionPackage.subscriptionFeatures.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                             Features:
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {subscription.subscriptionPackage.features.map(
+                            {subscription.subscriptionPackage.subscriptionFeatures.map(
                               (feature: any, index: number) => (
                                 <span
                                   key={index}
                                   className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
                                 >
-                                  {feature.feature?.name || feature.name}
+                                  {feature.packageFeature?.name || feature.name}
                                 </span>
                               )
                             )}

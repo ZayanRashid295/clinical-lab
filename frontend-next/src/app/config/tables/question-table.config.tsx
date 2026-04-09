@@ -38,28 +38,29 @@ const questionColumns: ColumnConfig<Question>[] = [
     label: "Topic",
     sortable: false,
     render: (value, row) => {
-      const topicName = row.topic?.name || "-";
-      const chapterName = row.topic?.chapter?.name;
-      const sectionName = row.topic?.chapter?.section?.name;
+      const subtopicName = (row as any).subtopic?.name || "-";
+      const topicName = row.topic?.name;
+      const systemName = (row as any).system?.name;
       return (
         <div>
-          <div className="text-sm font-medium text-gray-900">{topicName}</div>
-          {chapterName && (
-            <div className="text-xs text-gray-500">{chapterName}</div>
+          <div className="text-sm font-medium text-gray-900">{subtopicName}</div>
+          {topicName && (
+            <div className="text-xs text-gray-500">{topicName}</div>
           )}
-          {sectionName && (
-            <div className="text-xs text-gray-400">{sectionName}</div>
+          {systemName && (
+            <div className="text-xs text-gray-400">{systemName}</div>
           )}
         </div>
       );
     },
   },
   {
-    key: "productTag",
-    label: "Subject",
+    key: "system",
+    label: "System",
     sortable: false,
-    render: (value) => {
-      if (!value) return <span className="text-sm text-gray-400">-</span>;
+    render: (value, row) => {
+      const sys = (row as any).system;
+      if (!sys) return <span className="text-sm text-gray-400">-</span>;
       return (
         <span
           className="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
@@ -69,7 +70,7 @@ const questionColumns: ColumnConfig<Question>[] = [
           }}
         >
           <Tag className="h-3 w-3 mr-1" />
-          {value.name}
+          {sys.name}
         </span>
       );
     },
@@ -175,12 +176,6 @@ const questionFilterConfig: FilterConfig<QuestionFilters> = {
       label: "Topic",
       type: "text",
       placeholder: "Filter by topic ID",
-    },
-    {
-      key: "productTagId",
-      label: "Subject",
-      type: "text",
-      placeholder: "Filter by subject ID",
     },
     {
       key: "dateFrom",

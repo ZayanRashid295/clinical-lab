@@ -1,36 +1,58 @@
 // Product module schema for LMS system
-// This file contains tables for products, tags, and subtypes
+// This file contains tables for categories, products, systems, and subtypes
 
-model Product {
+model Category {
   id          String   @id @default(cuid())
-  name        String   @unique // USMLE, SAT, etc.
+  name        String   @unique // Medical, Nursing, High School, etc.
   description String?
+  icon        String?  // Emoji or icon identifier for UI display
+  slug        String   @unique // URL-friendly name: medical, nursing, etc.
+  order       Int      @default(0) // Display ordering in navbar
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  sections         Section[]
-  productTags      ProductTag[]
-  productSubtypes  ProductSubtype[]
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String?
+  name        String   @unique // USMLE, SAT, etc.
+  description String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0) // Display ordering within category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category        Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  systems         System[]
+  productSubtypes ProductSubtype[]
 
   @@map("products")
 }
 
-model ProductTag {
+model System {
   id          String   @id @default(cuid())
-  name        String   @unique // Anatomy, Biochemistry, Embryology, etc.
+  productId   String
+  name        String   @db.VarChar(500) // Cardiovascular, Respiratory, Neurology, etc.
   description String?
-  color       String?  // Hex color for UI display
+  order       Int      @default(0) // For ordering systems
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  products  Product[]
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  topics    Topic[]
   questions Question[]
 
-  @@map("product_tags")
+  @@unique([productId, name])
+  @@map("systems")
 }
 
 model ProductSubtype {

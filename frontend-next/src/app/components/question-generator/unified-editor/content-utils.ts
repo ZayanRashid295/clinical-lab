@@ -108,10 +108,14 @@ export function blocksToHTML(blocks: ContentBlock[]): string {
         converted = converted.replace(/\n/g, ' ')
         // Convert lists (basic)
         converted = converted.replace(/^[-*+]\s+(.*)$/gim, '<li>$1</li>')
-        converted = converted.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+        converted = converted.replace(/([\s\S]*)/i, (match) => {
+          return match.replace(/(<li>[\s\S]*<\/li>)/i, '<ul>$1</ul>')
+        })
         // Convert numbered lists
         converted = converted.replace(/^\d+\.\s+(.*)$/gim, '<li>$1</li>')
-        converted = converted.replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+        converted = converted.replace(/([\s\S]*)/i, (match) => {
+          return match.replace(/(<li>[\s\S]*<\/li>)/i, '<ol>$1</ol>')
+        })
         
         // If markdown looks like HTML (starts with <), use it directly
         if (markdown.trim().startsWith("<")) {

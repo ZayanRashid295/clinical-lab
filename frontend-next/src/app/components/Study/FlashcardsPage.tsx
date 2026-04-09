@@ -30,7 +30,7 @@ interface Flashcard {
   id: string;
   front: string;
   back: string;
-  subject: string;
+  category: string;
   topic: string;
   difficulty: "beginner" | "intermediate" | "advanced";
   isBookmarked: boolean;
@@ -46,7 +46,7 @@ const mockFlashcards: Flashcard[] = [
     id: "1",
     front: "What is the normal range for systolic blood pressure?",
     back: "90-120 mmHg. Normal systolic blood pressure is considered to be between 90-120 mmHg, with optimal being less than 120 mmHg.",
-    subject: "cardiology",
+    category: "cardiology",
     topic: "vital_signs",
     difficulty: "beginner",
     isBookmarked: false,
@@ -58,7 +58,7 @@ const mockFlashcards: Flashcard[] = [
     id: "2",
     front: "What are the classic symptoms of myocardial infarction?",
     back: "Chest pain, shortness of breath, nausea, sweating, and pain radiating to the left arm, jaw, or back. These symptoms may vary between men and women.",
-    subject: "cardiology",
+    category: "cardiology",
     topic: "myocardial_infarction",
     difficulty: "intermediate",
     isBookmarked: true,
@@ -70,7 +70,7 @@ const mockFlashcards: Flashcard[] = [
     id: "3",
     front: "What is the mechanism of action of ACE inhibitors?",
     back: "ACE inhibitors block the angiotensin-converting enzyme, preventing the conversion of angiotensin I to angiotensin II, which reduces vasoconstriction and aldosterone secretion.",
-    subject: "pharmacology",
+    category: "pharmacology",
     topic: "ace_inhibitors",
     difficulty: "advanced",
     isBookmarked: false,
@@ -82,7 +82,7 @@ const mockFlashcards: Flashcard[] = [
     id: "4",
     front: "What is the normal range for serum creatinine?",
     back: "0.6-1.2 mg/dL for men and 0.5-1.1 mg/dL for women. Creatinine levels are used to assess kidney function.",
-    subject: "nephrology",
+    category: "nephrology",
     topic: "kidney_function",
     difficulty: "beginner",
     isBookmarked: false,
@@ -94,7 +94,7 @@ const mockFlashcards: Flashcard[] = [
     id: "5",
     front: "What are the signs of acute kidney injury?",
     back: "Oliguria (<400ml/day), elevated BUN and creatinine, fluid overload, electrolyte imbalances, and metabolic acidosis.",
-    subject: "nephrology",
+    category: "nephrology",
     topic: "acute_kidney_injury",
     difficulty: "intermediate",
     isBookmarked: true,
@@ -111,7 +111,7 @@ export default function FlashcardsPage() {
   const [flipDirection, setFlipDirection] = useState<"forward" | "backward" | null>(null);
   const [studyMode, setStudyMode] = useState<"review" | "practice">("review");
   const [showAnswer, setShowAnswer] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [isShuffled, setIsShuffled] = useState(false);
   const [studyCards, setStudyCards] = useState<Flashcard[]>(mockFlashcards);
@@ -130,8 +130,8 @@ export default function FlashcardsPage() {
   useEffect(() => {
     let filtered = mockFlashcards;
 
-    if (selectedSubject !== "all") {
-      filtered = filtered.filter((card) => card.subject === selectedSubject);
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((card) => card.category === selectedCategory);
     }
 
     if (selectedDifficulty !== "all") {
@@ -149,7 +149,7 @@ export default function FlashcardsPage() {
     setIsFlipped(false);
     setFlipDirection(null);
     setShowAnswer(false);
-  }, [selectedSubject, selectedDifficulty, isShuffled]);
+  }, [selectedCategory, selectedDifficulty, isShuffled]);
 
   const currentCard = studyCards[currentCardIndex];
   const previousCard = studyCards[previousCardIndex];
@@ -352,13 +352,13 @@ export default function FlashcardsPage() {
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Subject:</label>
+                  <label className="text-sm font-medium">Category:</label>
                   <select
-                    value={selectedSubject}
-                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
                     className="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm"
                   >
-                    <option value="all">All Subjects</option>
+                    <option value="all">All Categories</option>
                     <option value="cardiology">Cardiology</option>
                     <option value="nephrology">Nephrology</option>
                     <option value="pharmacology">Pharmacology</option>
@@ -503,7 +503,7 @@ export default function FlashcardsPage() {
                         >
                           {previousCard.difficulty}
                         </Badge>
-                        <Badge variant="outline">{previousCard.subject}</Badge>
+                        <Badge variant="outline">{previousCard.category}</Badge>
                         <Badge variant="secondary">
                           {previousCard.topic.replace("_", " ")}
                         </Badge>
@@ -569,7 +569,7 @@ export default function FlashcardsPage() {
                       >
                         {currentCard.difficulty}
                       </Badge>
-                      <Badge variant="outline">{currentCard.subject}</Badge>
+                      <Badge variant="outline">{currentCard.category}</Badge>
                       <Badge variant="secondary">
                         {currentCard.topic.replace("_", " ")}
                       </Badge>

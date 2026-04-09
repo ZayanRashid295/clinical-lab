@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useToast } from "@/shared/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -41,6 +42,7 @@ interface QuestionEditorProps {
 export default function QuestionEditor({
   onQuestionCreated,
 }: QuestionEditorProps) {
+  const { toast } = useToast();
   const [question, setQuestion] = useState<Partial<Question>>({
     content: "",
     type: "multiple_choice",
@@ -127,13 +129,21 @@ export default function QuestionEditor({
 
   const handleSave = () => {
     if (!question.content || answers.some((a) => !a.content)) {
-      alert("Please fill in all required fields");
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
       return;
     }
 
     const correctAnswers = answers.filter((a) => a.isCorrect);
     if (correctAnswers.length === 0) {
-      alert("Please select at least one correct answer");
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one correct answer",
+        variant: "destructive",
+      });
       return;
     }
 

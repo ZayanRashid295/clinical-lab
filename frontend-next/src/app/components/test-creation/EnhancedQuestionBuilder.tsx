@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useToast } from "@/shared/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -36,7 +37,7 @@ import {
 import {
   Question,
   Answer,
-  MEDICAL_SUBJECTS,
+  HIERARCHY_SYSTEMS,
   DIFFICULTY_LEVELS,
 } from "@/lib/test-models";
 
@@ -62,6 +63,7 @@ interface EnhancedQuestionBuilderProps {
 export default function EnhancedQuestionBuilder({
   onQuestionCreated,
 }: EnhancedQuestionBuilderProps) {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("standard");
   const [data, setData] = useState<QuestionBuilderData>({
     question: {
@@ -187,13 +189,21 @@ export default function EnhancedQuestionBuilder({
 
   const handleSave = () => {
     if (!data.question.content || data.answers.some((a) => !a.content)) {
-      alert("Please fill in all required fields");
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
       return;
     }
 
     const correctAnswers = data.answers.filter((a) => a.isCorrect);
     if (correctAnswers.length === 0) {
-      alert("Please select at least one correct answer");
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one correct answer",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -551,7 +561,7 @@ export default function EnhancedQuestionBuilder({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {MEDICAL_SUBJECTS.map((subject) => (
+                  {HIERARCHY_SYSTEMS.map((subject) => (
                     <SelectItem key={subject} value={subject}>
                       {subject.replace("_", " ")}
                     </SelectItem>
@@ -681,7 +691,7 @@ export default function EnhancedQuestionBuilder({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {MEDICAL_SUBJECTS.map((subject) => (
+                  {HIERARCHY_SYSTEMS.map((subject) => (
                     <SelectItem key={subject} value={subject}>
                       {subject.replace("_", " ")}
                     </SelectItem>

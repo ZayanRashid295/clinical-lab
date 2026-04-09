@@ -2,8 +2,9 @@
 
 export interface Question {
   id: string;
-  topicId: string;
-  productTagId?: string;
+  subtopicId: string;
+  topicId?: string;
+  title?: string;
   question: string;
   explanation?: string;
   difficulty: "easy" | "medium" | "hard";
@@ -14,23 +15,14 @@ export interface Question {
   topic?: {
     id: string;
     name: string;
-    chapter?: {
+    system?: {
       id: string;
       name: string;
-      section?: {
+      product?: {
         id: string;
         name: string;
-        product?: {
-          id: string;
-          name: string;
-        };
       };
     };
-  };
-  productTag?: {
-    id: string;
-    name: string;
-    color?: string;
   };
   choices?: QuestionChoice[];
 }
@@ -63,7 +55,6 @@ export interface QuestionQueryParams {
   status?: "ACTIVE" | "INACTIVE";
   difficulty?: "easy" | "medium" | "hard";
   topicId?: string;
-  productTagId?: string;
   dateFrom?: string;
   dateTo?: string;
   _t?: string | number; // Cache buster parameter
@@ -82,18 +73,13 @@ export interface QuestionChoiceQueryParams {
 
 // Create DTOs
 export interface CreateQuestionDto {
-  topicId: string;
-  productTagId?: string;
+  subtopicId: string;
+  topicId?: string;
   question: string;
   explanation?: string;
   difficulty?: "easy" | "medium" | "hard";
   points?: number;
   isActive?: boolean;
-  subject?: string;
-  system?: string;
-  chapterId?: string;
-  sectionId?: string;
-  tags?: string[];
   explanationBlocks?: Array<{
     type: "TEXT" | "TABLE" | "IMAGES";
     order?: number;
@@ -119,8 +105,8 @@ export interface CreateQuestionDto {
   }>;
 }
 export interface UpdateQuestionDto {
+  subtopicId?: string;
   topicId?: string;
-  productTagId?: string;
   question?: string;
   explanation?: string;
   difficulty?: "easy" | "medium" | "hard";

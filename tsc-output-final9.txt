@@ -1,0 +1,11 @@
+src/modules/questions/questions.controller.ts(260,7): error TS2353: Object literal may only specify known properties, and 'topicIds' does not exist in type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(334,19): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1372,42): error TS2551: Property 'subtopics' does not exist on type '{ topics: { createdAt: Date; updatedAt: Date; isActive: boolean; id: string; systemId: string; order: number; name: string; description: string; }[]; } & { createdAt: Date; updatedAt: Date; ... 5 more ...; productId: string; }'. Did you mean 'topics'?
+src/modules/questions/questions.service.ts(1497,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1498,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1499,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1508,31): error TS2339: Property 'subjectIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1508,48): error TS2339: Property 'topicIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1508,63): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1508,81): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1577,53): error TS2304: Cannot find name 'tagIdsJson'.

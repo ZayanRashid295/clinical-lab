@@ -4,14 +4,17 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import QuestionList from "./question-list"
+import { useConfirm } from "@/hooks/useConfirm"
+import { useToast } from "@/shared/ui/use-toast"
 import MarkdownUploader from "./markdown-uploader"
 import BulkMarkdownUploader from "./bulk-markdown-uploader"
 import DocxUploader from "./docx-uploader"
 import BulkDocxUploader from "./bulk-docx-uploader"
 import AdminQuestionView from "./admin-question-view"
 import QuestionCreator from "./question-creator/QuestionCreator"
-import { convertOldQuestionToNew, convertNewQuestionToOld } from "./migration-utils"
 import { QuestionCreatorData } from "./question-creator/types"
+import { convertOldQuestionToNew, convertNewQuestionToOld, convertNewBlocksToOld, convertChoicesToOldOptions, convertNewPerAnswerExplanationsToOld } from "./migration-utils"
+import { blocksToHTML } from "./unified-editor/content-utils"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { QuestionChoice } from "@/app/types/question"
 import { CreateQuestionDto } from "@/app/types/question"
@@ -32,9 +35,12 @@ interface Question {
   topicId?: string // Required for backend
   questionStemBlocks?: any[] // Rich content blocks for question stem
   chapterId?: string // Chapter ID for Subject dropdown
-  sectionId?: string // Section ID for System dropdown
-  productTagId?: string // Single tag ID for backward compatibility
-  productTagIds?: string[] // Multiple tag IDs
+  productId?: string // Product ID
+  chapterName?: string
+  topicName?: string
+  categoryId?: string // New 5-level hierarchy: Category -> Product -> System -> Topic -> Subtopic
+  productTagId?: string // Deprecated: use categoryId instead
+  productTagIds?: string[] // Deprecated: use categoryId instead
   topic?: any // Topic object or string
 }
 
@@ -44,6 +50,8 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange }: AdminDashboardProps) {
+  const { toast } = useToast()
+  const { confirm } = useConfirm()
   const [questions, setQuestions] = useState<Question[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [viewingId, setViewingId] = useState<string | null>(null)
@@ -397,8 +405,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       }
     }
     
-    // Use stored productTagIds or fallback to single productTagId
-    const productTagIds = storedProductTagIds || (backendQuestion.productTagId ? [backendQuestion.productTagId] : undefined)
+    // Use stored productTagIds or fallback to single productTagId/categoryId
+    const categoryId = backendQuestion.categoryId || backendQuestion.productTagId
+    const productTagIds = storedProductTagIds || (categoryId ? [categoryId] : undefined)
     
     const chapterName = backendQuestion.chapter?.name ?? backendQuestion.topic?.chapter?.name ?? ""
     const topicName = backendQuestion.topic?.name ?? ""
@@ -413,9 +422,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       options,
       choices: backendQuestion.choices,
       subject: subjectDisplay,
-      system: backendQuestion.system || "",
+      system: (typeof backendQuestion.system === 'string' ? backendQuestion.system : backendQuestion.system?.name) || "",
       chapterId: backendQuestion.chapterId || "",
-      sectionId: backendQuestion.sectionId || "",
+      categoryId: backendQuestion.categoryId || backendQuestion.productTagId || "",
       chapterName,
       topicName,
       productTagId: backendQuestion.productTagId || "",
@@ -719,8 +728,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       }
     }
 
-    // Build the payload - ensure it matches CreateQuestionDto exactly
-    const payload: CreateQuestionDto = {
+    // Build the payload
+    const payload: any = {
       topicId: String(topicId),
       question: questionText,
       difficulty: "medium" as const,
@@ -831,32 +840,25 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       
     }
 
-    // Add chapterId and sectionId if provided
-    if (frontendQuestion.chapterId && String(frontendQuestion.chapterId).trim()) {
+    if (frontendQuestion.chapterId) {
       payload.chapterId = String(frontendQuestion.chapterId).trim()
     }
     
-    if (frontendQuestion.sectionId && String(frontendQuestion.sectionId).trim()) {
-      payload.sectionId = String(frontendQuestion.sectionId).trim()
+    // Only add optional fields if they have values
+    if (frontendQuestion.subject && String(frontendQuestion.subject).trim()) {
+      payload.subject = String(frontendQuestion.subject).trim()
     }
     
-    // Add productTagId if provided (use first from array for backward compatibility)
-    const productTagIds = frontendQuestion.productTagIds || (frontendQuestion.productTagId ? [frontendQuestion.productTagId] : [])
-    if (productTagIds.length > 0) {
-      // Store first tag in productTagId for backward compatibility
-      payload.productTagId = String(productTagIds[0]).trim()
-      
-      // Store all tag IDs in tags JSON field
-      if (!payload.tags) {
-        payload.tags = []
-      }
-      // Add productTagIds to tags JSON as a special entry
-      const tagsArray = Array.isArray(payload.tags) ? [...payload.tags] : []
-      // Store productTagIds in tags JSON
-      tagsArray.push(`__productTagIds:${JSON.stringify(productTagIds)}`)
-      payload.tags = tagsArray
-    } else if (frontendQuestion.productTagId && String(frontendQuestion.productTagId).trim()) {
-      payload.productTagId = String(frontendQuestion.productTagId).trim()
+    if (frontendQuestion.system && String(frontendQuestion.system).trim()) {
+      payload.system = String(frontendQuestion.system).trim()
+    }
+    
+    // Handle categoryId / productTagId
+    const categoryId = frontendQuestion.categoryId || frontendQuestion.productTagId
+    const productTagIds = frontendQuestion.productTagIds || (categoryId ? [categoryId] : [])
+    
+    if (categoryId) {
+      payload.categoryId = String(categoryId).trim()
     }
 
     // Note: questionId is generated on the frontend based on system, subject, and topic
@@ -986,7 +988,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       setError(null)
       
       if (!questionData.metadata.topicId) {
-        alert("Please select a topic for this question.")
+        toast({
+          title: "Registration Error",
+          description: "Please select a topic for this question.",
+          variant: "destructive",
+        })
         return
       }
 
@@ -1034,8 +1040,63 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       const finalPayload = cleanPayload(questionPayload)
       
       if (editingId) {
-        // Update existing question
-        await questionsService.updateQuestion(editingId, finalPayload)
+        // Transform explanation blocks if they exist as ContentBlocks
+        const updatedData: any = {
+          question: questionData.stem ? blocksToHTML(questionData.stem) : undefined,
+          questionStemBlocks: questionData.stem ? convertNewBlocksToOld(questionData.stem) : undefined,
+          explanationBlocks: questionData.mainExplanation ? convertNewBlocksToOld(questionData.mainExplanation) : undefined,
+          perAnswerExplanations: questionData.perAnswerExplanations ? convertNewPerAnswerExplanationsToOld(questionData.perAnswerExplanations) : undefined,
+          topicId: questionData.metadata.topicId,
+          chapterId: questionData.metadata.systemId,
+          productTagId: questionData.metadata.categoryId || questionData.metadata.productTagId,
+          tags: questionData.metadata.tags || [],
+        }
+
+        // Final clean and update
+        const cleanUpdated = cleanPayload(updatedData)
+        await questionsService.updateQuestion(editingId, cleanUpdated)
+
+        // Update choices separately
+        if (questionData.choices) {
+          const QuestionChoicesService = (await import("@/app/services/questions/question-choices.service")).QuestionChoicesService
+          const choicesService = new QuestionChoicesService()
+          
+          try {
+            const existingChoicesRes: any = await choicesService.getQuestionChoices({ questionId: editingId })
+            const existingChoices = Array.isArray(existingChoicesRes) ? existingChoicesRes : (existingChoicesRes.data || [])
+            const newChoiceIds = questionData.choices.map((c: any) => c.id).filter(Boolean)
+            
+            // Delete removed choices
+            for (const ec of existingChoices) {
+              if (!newChoiceIds.includes(ec.id)) {
+                try { await choicesService.deleteQuestionChoice(ec.id) } catch (e) { console.error("Failed to delete choice", e) }
+              }
+            }
+            
+            // Create or update choices
+            for (let i = 0; i < questionData.choices.length; i++) {
+              const choice: any = questionData.choices[i]
+              const order = choice.order !== undefined ? choice.order : (i + 1)
+              
+              if (choice.id && existingChoices.some((ec: any) => ec.id === choice.id)) {
+                await choicesService.updateQuestionChoice(choice.id, {
+                  text: choice.text || "",
+                  isCorrect: choice.isCorrect !== undefined ? choice.isCorrect : choice.correct,
+                  order: order
+                })
+              } else {
+                await choicesService.createQuestionChoice({
+                  questionId: editingId,
+                  text: choice.text || "",
+                  isCorrect: choice.isCorrect !== undefined ? choice.isCorrect : choice.correct,
+                  order: order
+                })
+              }
+            }
+          } catch (error) {
+            console.error("Failed to sync choices:", error)
+          }
+        }
         // Reload questions to get updated data
         await loadQuestions()
         // If viewing the edited question, refresh the view
@@ -1125,13 +1186,24 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       })
       
       setError(err.message || "Failed to save question")
-      alert(`Failed to save question: ${err.message || "Unknown error"}`)
+      toast({
+        title: "Error",
+        description: err.message || "Unknown error during save",
+        variant: "destructive",
+      })
     }
   }
 
 
   const handleDeleteQuestion = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this question?")) {
+    const isConfirmed = await confirm({
+      title: "Delete Question",
+      message: "Are you sure you want to delete this question? This action cannot be undone.",
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    
+    if (!isConfirmed) {
       return
     }
 
@@ -1142,13 +1214,24 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     } catch (err: any) {
       console.error("Failed to delete question:", err)
       setError(err.message || "Failed to delete question")
-      alert(`Failed to delete question: ${err.message}`)
+      toast({
+        title: "Error",
+        description: err.message || "Failed to delete question",
+        variant: "destructive",
+      })
     }
   }
 
   const handleBulkDeleteQuestions = async (ids: string[]) => {
     if (ids.length === 0) return
-    if (!confirm(`Are you sure you want to delete ${ids.length} question${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) {
+    const isConfirmed = await confirm({
+      title: "Bulk Delete",
+      message: `Are you sure you want to delete ${ids.length} question${ids.length === 1 ? "" : "s"}? This cannot be undone.`,
+      confirmText: "Delete All",
+      variant: "danger",
+    })
+
+    if (!isConfirmed) {
       return
     }
     try {
@@ -1160,7 +1243,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     } catch (err: any) {
       console.error("Failed to delete questions:", err)
       setError(err?.message || "Failed to delete questions")
-      alert(`Failed to delete questions: ${err?.message || "Unknown error"}`)
+      toast({
+        title: "Bulk Delete Failed",
+        description: err?.message || "Unknown error",
+        variant: "destructive",
+      })
     }
   }
 
@@ -1376,8 +1463,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             onQuestionsCreated={async (questionIds) => {
               // Reload questions after bulk creation
               await loadQuestions()
-              // Optionally show success message
-              alert(`Successfully created ${questionIds.length} question(s)!`)
+              toast({
+                title: "Success",
+                description: `Successfully created ${questionIds.length} question(s)!`,
+              })
             }}
             onQuestionEdit={(questionId) => {
               setEditingId(questionId)
@@ -1405,8 +1494,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             onQuestionsCreated={async (questionIds) => {
               // Reload questions after bulk creation
               await loadQuestions()
-              // Optionally show success message
-              alert(`Successfully created ${questionIds.length} question(s)!`)
+              toast({
+                title: "Success",
+                description: `Successfully created ${questionIds.length} question(s)!`,
+              })
             }}
             onQuestionEdit={(questionId) => {
               setEditingId(questionId)

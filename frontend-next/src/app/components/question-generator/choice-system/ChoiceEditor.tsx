@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useToast } from "@/shared/ui/use-toast"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import { Badge } from "@/shared/ui/badge"
@@ -19,6 +20,7 @@ export default function ChoiceEditor({
   explanations,
   disabled = false,
 }: ChoiceEditorProps) {
+  const { toast } = useToast()
   const addChoice = () => {
     const nextLabel = String.fromCharCode(65 + choices.length)
     onChange([
@@ -29,7 +31,11 @@ export default function ChoiceEditor({
 
   const removeChoice = (index: number) => {
     if (choices.length <= 2) {
-      alert("You must have at least 2 options")
+      toast({
+        title: "Requirement",
+        description: "You must have at least 2 options",
+        variant: "destructive",
+      })
       return
     }
     const removedLabel = choices[index].label

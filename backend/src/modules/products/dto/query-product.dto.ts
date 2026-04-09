@@ -7,8 +7,9 @@ import {
   IsDateString,
   Min,
   Max,
+  IsBoolean,
 } from "class-validator";
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 
 export class QueryProductDto {
   @ApiProperty({
@@ -93,5 +94,15 @@ export class QueryProductDto {
   @IsOptional()
   @IsEnum(["asc", "desc"])
   sortOrder?: "asc" | "desc" = "desc";
+  
+  @ApiProperty({
+    description: "Whether to return all records without pagination",
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value === "true" || value === true)
+  @IsBoolean()
+  listAll?: boolean;
 }
 

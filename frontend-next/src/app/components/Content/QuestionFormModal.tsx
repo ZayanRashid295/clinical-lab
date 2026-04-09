@@ -7,7 +7,6 @@ import {
   CheckCircle,
   Loader2,
   BookOpen,
-  Tag,
   Award,
 } from "lucide-react";
 import {
@@ -16,10 +15,8 @@ import {
   UpdateQuestionDto,
 } from "../../types/question";
 import { QuestionsService } from "../../services/questions/questions.service";
-import { TopicsService } from "../../services/content/topics.service";
-import { ProductTagsService } from "../../services/products/product-tags.service";
-import { Topic } from "../../types/content";
-import { ProductTag } from "../../types/product";
+import { SubtopicsService } from "../../services/content/subtopics.service";
+import { Subtopic } from "../../types/content";
 import { CreateResponse } from "../../services/base/api-types";
 
 interface QuestionFormModalProps {
@@ -38,69 +35,46 @@ export default function QuestionFormModal({
   mode,
 }: QuestionFormModalProps) {
   const [formData, setFormData] = useState<CreateQuestionDto>({
-    topicId: "",
-    productTagId: "",
+    subtopicId: "",
     question: "",
     explanation: "",
     difficulty: "medium",
     points: 1,
     isActive: true,
   });
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [tags, setTags] = useState<ProductTag[]>([]);
-  const [loadingTopics, setLoadingTopics] = useState(false);
-  const [loadingTags, setLoadingTags] = useState(false);
+  const [subtopics, setSubtopics] = useState<Subtopic[]>([]);
+  const [loadingSubtopics, setLoadingSubtopics] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const questionsService = useMemo(() => new QuestionsService(), []);
-  const topicsService = useMemo(() => new TopicsService(), []);
-  const tagsService = useMemo(() => new ProductTagsService(), []);
+  const subtopicsService = useMemo(() => new SubtopicsService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
     if (isOpen) {
-      // Load topics
-      setLoadingTopics(true);
-      topicsService
-        .getTopics({ status: "ACTIVE" })
+      // Load subtopics
+      setLoadingSubtopics(true);
+      subtopicsService
+        .getSubtopics({ status: "ACTIVE", listAll: true })
         .then((response) => {
           if (Array.isArray(response)) {
-            setTopics(response);
+            setSubtopics(response);
           } else {
-            setTopics(response.data || []);
+            setSubtopics(response.data || []);
           }
         })
         .catch(() => {
-          setTopics([]);
+          setSubtopics([]);
         })
         .finally(() => {
-          setLoadingTopics(false);
-        });
-
-      // Load tags
-      setLoadingTags(true);
-      tagsService
-        .getTags({ status: "ACTIVE" })
-        .then((response) => {
-          if (Array.isArray(response)) {
-            setTags(response);
-          } else {
-            setTags(response.data || []);
-          }
-        })
-        .catch(() => {
-          setTags([]);
-        })
-        .finally(() => {
-          setLoadingTags(false);
+          setLoadingSubtopics(false);
         });
 
       if (isCreateMode) {
         setFormData({
-          topicId: "",
-          productTagId: "",
+          subtopicId: "",
           question: "",
           explanation: "",
           difficulty: "medium",
@@ -109,8 +83,7 @@ export default function QuestionFormModal({
         });
       } else if (question) {
         setFormData({
-          topicId: question.topicId,
-          productTagId: question.productTagId || "",
+          subtopicId: question.subtopicId || question.topicId || "", // fallback to topicId if legacy
           question: question.question,
           explanation: question.explanation || "",
           difficulty: question.difficulty,
@@ -121,7 +94,7 @@ export default function QuestionFormModal({
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, question, isCreateMode, topicsService, tagsService]);
+  }, [isOpen, question, isCreateMode, subtopicsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -159,8 +132,8 @@ export default function QuestionFormModal({
   };
 
   const validateForm = (): string | null => {
-    if (!formData.topicId.trim()) {
-      return "Topic is required";
+    if (!formData.subtopicId?.trim()) {
+      return "Subtopic is required";
     }
     if (!formData.question.trim()) {
       return "Question text is required";
@@ -184,8 +157,8 @@ export default function QuestionFormModal({
     try {
       if (isCreateMode) {
         const createData: CreateQuestionDto = {
-          topicId: formData.topicId,
-          productTagId: formData.productTagId || undefined,
+          subtopicId: formData.subtopicId,
+          topicId: formData.subtopicId, // Provide topicId for backend compatibility if required
           question: formData.question,
           explanation: formData.explanation,
           difficulty: formData.difficulty,
@@ -196,7 +169,7 @@ export default function QuestionFormModal({
         setSuccess(true);
         setTimeout(() => {
           // Handle union type: response is either CreateResponse or Question
-          if ("topicId" in response && "question" in response) {
+          if ("question" in response) {
             // It's a Question
             onQuestionSaved(response);
             onClose();
@@ -216,8 +189,8 @@ export default function QuestionFormModal({
         }, 1000);
       } else if (question) {
         const updateData: UpdateQuestionDto = {
-          topicId: formData.topicId,
-          productTagId: formData.productTagId || undefined,
+          subtopicId: formData.subtopicId,
+          topicId: formData.subtopicId, // Provide topicId for backend compatibility if required
           question: formData.question,
           explanation: formData.explanation,
           difficulty: formData.difficulty,
@@ -231,7 +204,7 @@ export default function QuestionFormModal({
         setSuccess(true);
         setTimeout(() => {
           // Handle union type: response is either UpdateResponse or Question
-          if ("topicId" in response && "question" in response) {
+          if ("question" in response) {
             // It's a Question
             onQuestionSaved(response);
             onClose();
@@ -307,50 +280,25 @@ export default function QuestionFormModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Subject
+                Subtopic *
               </label>
-              {loadingTags ? (
+              {loadingSubtopics ? (
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  Loading subjects...
+                  Loading subtopics...
                 </div>
               ) : (
                 <select
-                  name="productTagId"
-                  value={formData.productTagId || ""}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">None</option>
-                  {tags.map((tag) => (
-                    <option key={tag.id} value={tag.id}>
-                      {tag.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Topic *
-              </label>
-              {loadingTopics ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  Loading topics...
-                </div>
-              ) : (
-                <select
-                  name="topicId"
-                  value={formData.topicId}
+                  name="subtopicId"
+                  value={formData.subtopicId}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 >
-                  <option value="">Select a topic</option>
-                  {topics.map((topic) => (
-                    <option key={topic.id} value={topic.id}>
-                      {topic.name}
-                      {topic.chapter?.name && ` (${topic.chapter.name})`}
+                  <option value="">Select a subtopic</option>
+                  {subtopics.map((subtopic) => (
+                    <option key={subtopic.id} value={subtopic.id}>
+                      {subtopic.name}
+                      {subtopic.topic?.name && ` (${subtopic.topic.name})`}
                     </option>
                   ))}
                 </select>
@@ -443,7 +391,7 @@ export default function QuestionFormModal({
             </button>
             <button
               type="submit"
-              disabled={loading || loadingTopics || loadingTags}
+              disabled={loading || loadingSubtopics}
               className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {loading ? (

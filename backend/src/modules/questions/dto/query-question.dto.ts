@@ -42,6 +42,15 @@ export class QueryQuestionDto {
   difficulty?: "easy" | "medium" | "hard";
 
   @ApiProperty({
+    description: "Filter by subtopic ID",
+    example: "cmguoh2dg000hlj45zxmb3rsl",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  subtopicId?: string;
+
+  @ApiProperty({
     description: "Filter by topic ID",
     example: "cmguoh2dg000hlj45zxmb3rsl",
     required: false,
@@ -51,13 +60,13 @@ export class QueryQuestionDto {
   topicId?: string;
 
   @ApiProperty({
-    description: "Filter by product tag ID",
+    description: "Filter by system ID",
     example: "cmguoh2bu0001lj45dttw7000",
     required: false,
   })
   @IsOptional()
   @IsString()
-  productTagId?: string;
+  systemId?: string;
 
   @ApiProperty({
     description: "Filter questions created from this date",

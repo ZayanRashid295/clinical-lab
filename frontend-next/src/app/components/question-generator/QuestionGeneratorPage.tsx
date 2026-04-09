@@ -1,9 +1,9 @@
 "use client"
 
-import QuestionGeneratorLanding from "./QuestionGeneratorLanding"
+import QuestionGeneratorAdmin from "./QuestionGeneratorAdmin"
 
 export default function QuestionGeneratorPage() {
-  return <QuestionGeneratorLanding />
+  return <QuestionGeneratorAdmin />
 }
 
 

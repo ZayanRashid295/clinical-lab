@@ -19,34 +19,22 @@ export class TopicsService extends BaseDataService<
 > {
   protected readonly endpoint = "/content/topics";
 
-  /**
-   * Get topics with optional filtering and pagination
-   */
   async getTopics(
     params?: TopicQueryParams
   ): Promise<PaginatedResponse<Topic> | Topic[]> {
     return this.getAll(params);
   }
 
-  /**
-   * Get a specific topic by ID
-   */
   async getTopic(id: string): Promise<Topic> {
     return this.getById(id);
   }
 
-  /**
-   * Create a new topic
-   */
   async createTopic(
     topicData: CreateTopicDto
   ): Promise<CreateResponse | Topic> {
     return this.create(topicData);
   }
 
-  /**
-   * Update an existing topic
-   */
   async updateTopic(
     id: string,
     topicData: UpdateTopicDto
@@ -54,16 +42,10 @@ export class TopicsService extends BaseDataService<
     return this.update(id, topicData);
   }
 
-  /**
-   * Deactivate a topic (soft delete)
-   */
   async deactivateTopic(id: string): Promise<{ message: string }> {
     return this.delete(id);
   }
 
-  /**
-   * Get topic statistics
-   */
   async getTopicStats(): Promise<{
     total: number;
     active: number;
@@ -72,4 +54,3 @@ export class TopicsService extends BaseDataService<
     return this.get(`${this.endpoint}/stats`);
   }
 }
-

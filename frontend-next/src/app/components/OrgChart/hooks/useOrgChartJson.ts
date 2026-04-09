@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
+import { useToast } from "@/shared/ui/use-toast";
 import { OrgChartData } from "@/app/components/OrgChart/org-chart-types/org-chart-model";
 
 export function useOrgChartJson(
   data: OrgChartData,
   setData: React.Dispatch<React.SetStateAction<OrgChartData>>
 ) {
+  const { toast } = useToast();
   const [showJsonEditor, setShowJsonEditor] = useState<boolean>(false);
   const [jsonEditorValue, setJsonEditorValue] = useState<string>("");
 
@@ -14,7 +16,11 @@ export function useOrgChartJson(
       const parsedData = JSON.parse(text);
 
       if (!parsedData.hierarchy || !Array.isArray(parsedData.hierarchy)) {
-        alert("Invalid JSON format. Must contain a 'hierarchy' array.");
+        toast({
+          title: "Invalid JSON",
+          description: "Invalid JSON format. Must contain a 'hierarchy' array.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -24,10 +30,17 @@ export function useOrgChartJson(
         hierarchy: parsedData.hierarchy,
       });
 
-      alert("Chart updated successfully!");
+      toast({
+        title: "Success",
+        description: "Chart updated successfully!",
+      });
     } catch (error) {
       console.error("Error parsing JSON:", error);
-      alert("Failed to parse JSON. Please check the format and try again.");
+      toast({
+        title: "Error",
+        description: "Failed to parse JSON. Please check the format and try again.",
+        variant: "destructive",
+      });
     }
   }, [setData]);
 
@@ -41,7 +54,11 @@ export function useOrgChartJson(
       const parsedData = JSON.parse(jsonEditorValue);
 
       if (!parsedData.hierarchy || !Array.isArray(parsedData.hierarchy)) {
-        alert("Invalid JSON format. Must contain a 'hierarchy' array.");
+        toast({
+          title: "Invalid JSON",
+          description: "Invalid JSON format. Must contain a 'hierarchy' array.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -52,10 +69,17 @@ export function useOrgChartJson(
       });
 
       setShowJsonEditor(false);
-      alert("Chart updated successfully!");
+      toast({
+        title: "Success",
+        description: "Chart updated successfully!",
+      });
     } catch (error) {
       console.error("Error parsing JSON:", error);
-      alert("Failed to parse JSON. Please check the format and try again.");
+      toast({
+        title: "Error",
+        description: "Failed to parse JSON. Please check the format and try again.",
+        variant: "destructive",
+      });
     }
   }, [jsonEditorValue, setData]);
 
@@ -66,8 +90,11 @@ export function useOrgChartJson(
 
   const copyJSON = useCallback(() => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    alert("JSON copied to clipboard!");
-  }, [data]);
+    toast({
+      title: "Copied",
+      description: "JSON copied to clipboard!",
+    });
+  }, [data, toast]);
 
   const downloadJSON = useCallback(() => {
     const dataStr = JSON.stringify(data, null, 2);

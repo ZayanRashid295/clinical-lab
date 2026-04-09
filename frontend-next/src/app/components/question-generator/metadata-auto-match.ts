@@ -1,6 +1,6 @@
 /**
- * Shared metadata auto-match: match parsed document values (subject/system/topic)
- * to DB entities (chapter/section/topic) using fuzzy name matching.
+ * Shared metadata auto-match: match parsed document values (category/system/topic)
+ * to DB entities (system/topic/subtopic) using fuzzy name matching.
  * Used by both bulk-docx-uploader and bulk-markdown-uploader.
  */
 
@@ -27,125 +27,166 @@ export function fuzzyMatch(str1: string, str2: string): boolean {
 }
 
 export interface AutoMatchInput {
-  parsedSubject?: string;
+  parsedCategory?: string;
   parsedSystem?: string;
   parsedTopic?: string;
+  parsedSubtopic?: string;
 }
 
 export interface AutoMatchResult {
-  sectionId: string;
-  chapterId: string;
+  productId: string;
+  systemId: string;
   topicId: string;
-  productTagId?: string;
+  subtopicId: string;
+  categoryId?: string;
 }
 
-export type GetTopicsForChapter = (chapterId: string) => Promise<any[]>;
+export type GetTopicsForSystem = (systemId: string) => Promise<any[]>;
+export type GetSubtopicsForTopic = (topicId: string) => Promise<any[]>;
 
 /**
- * Run auto-match: find sectionId, chapterId, topicId, and productTagId from parsed subject/system/topic.
- * - Match parsedSubject → Product Tag (productTagId)
- * - Match parsedSystem → Chapter (chapterId), section is derived from chapter
+ * Run auto-match: find productId, systemId, topicId, and subtopicId from parsed category/system/topic.
+ * - Match parsedCategory → Category (categoryId)
+ * - Match parsedSystem → System (systemId), product is derived from system
  * - Match parsedTopic → Topic (topicId)
- * - getTopicsForChapter(chapterId) is called when a chapter is matched to resolve topicId.
+ * - Match parsedSubtopic → Subtopic (subtopicId)
+ * - getTopicsForSystem(systemId) is called when a system is matched to resolve topicId.
+ * - getSubtopicsForTopic(topicId) is called when a topic is matched to resolve subtopicId.
  */
 export async function runAutoMatch(
   input: AutoMatchInput,
-  chapters: any[],
+  systems: any[],
   options: {
-    sections?: any[];
-    productTags?: any[];
-    getTopicsForChapter: GetTopicsForChapter;
+    products?: any[];
+    categories?: any[];
+    getTopicsForSystem: GetTopicsForSystem;
+    getSubtopicsForTopic: GetSubtopicsForTopic;
   }
 ): Promise<Partial<AutoMatchResult>> {
-  const { parsedSubject, parsedSystem, parsedTopic } = input;
-  const { sections = [], productTags = [], getTopicsForChapter } = options;
+  const { parsedCategory, parsedSystem, parsedTopic, parsedSubtopic } = input;
+  const { products = [], categories = [], getTopicsForSystem, getSubtopicsForTopic } = options;
 
-  let matchedSectionId = "";
-  let matchedChapterId = "";
+  let matchedProductId = "";
+  let matchedSystemId = "";
   let matchedTopicId = "";
-  let matchedProductTagId = "";
+  let matchedSubtopicId = "";
+  let matchedCategoryId = "";
 
-  // Match Subject → Product Tag
-  if (parsedSubject && productTags.length > 0) {
-    const normalizedSubject = normalizeName(parsedSubject);
-    let matchedProductTag = productTags.find(
-      (t: any) => normalizeName(t.name) === normalizedSubject
+  // Match Category → Category
+  if (parsedCategory && categories.length > 0) {
+    const normalizedCategory = normalizeName(parsedCategory);
+    let matchedCategory = categories.find(
+      (t: any) => normalizeName(t.name) === normalizedCategory
     );
-    if (!matchedProductTag) {
-      matchedProductTag = productTags.find((t: any) =>
-        fuzzyMatch(t.name, parsedSubject!)
+    if (!matchedCategory) {
+      matchedCategory = categories.find((t: any) =>
+        fuzzyMatch(t.name, parsedCategory!)
       );
     }
-    if (matchedProductTag) {
-      matchedProductTagId = matchedProductTag.id;
+    if (matchedCategory) {
+      matchedCategoryId = matchedCategory.id;
     }
   }
 
-  // Match System → Chapter (exact name only – no fuzzy; only show DB chapter when it exists)
-  if (parsedSystem && chapters.length > 0) {
+  // Match System → System (exact name only – no fuzzy)
+  if (parsedSystem && systems.length > 0) {
     const normalizedSystem = normalizeName(parsedSystem);
-    const matchedChapter = chapters.find(
-      (c: any) => normalizeName(c.name) === normalizedSystem
+    const matchedSystem = systems.find(
+      (s: any) => normalizeName(s.name) === normalizedSystem
     );
-    if (matchedChapter) {
-      matchedChapterId = matchedChapter.id;
-      matchedSectionId =
-        matchedChapter.sectionId || matchedChapter.section?.id || "";
-      const chapterTopics = await getTopicsForChapter(matchedChapterId);
-      if (parsedTopic && chapterTopics.length > 0) {
+    if (matchedSystem) {
+      matchedSystemId = matchedSystem.id;
+      matchedProductId =
+        matchedSystem.productId || matchedSystem.product?.id || "";
+        
+      const systemTopics = await getTopicsForSystem(matchedSystemId);
+      if (parsedTopic && systemTopics.length > 0) {
         const normalizedTopic = normalizeName(parsedTopic);
-        let matchedTopic = chapterTopics.find(
+        let matchedTopic = systemTopics.find(
           (t: any) => normalizeName(t.name) === normalizedTopic
         );
         if (!matchedTopic) {
-          matchedTopic = chapterTopics.find((t: any) =>
+          matchedTopic = systemTopics.find((t: any) =>
             fuzzyMatch(t.name, parsedTopic!)
           );
         }
         if (matchedTopic) matchedTopicId = matchedTopic.id;
-        else if (chapterTopics.length === 1) matchedTopicId = chapterTopics[0].id;
-      } else if (chapterTopics.length === 1) {
-        matchedTopicId = chapterTopics[0].id;
+        else if (systemTopics.length === 1) matchedTopicId = systemTopics[0].id;
+      } else if (systemTopics.length === 1) {
+        matchedTopicId = systemTopics[0].id;
+      }
+
+      // If Topic was matched, resolve Subtopic
+      if (matchedTopicId) {
+        const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
+        if (parsedSubtopic && topicSubtopics.length > 0) {
+          const normalizedSubtopic = normalizeName(parsedSubtopic);
+          let matchedSubtopic = topicSubtopics.find(
+            (t: any) => normalizeName(t.name) === normalizedSubtopic
+          );
+          if (!matchedSubtopic) {
+            matchedSubtopic = topicSubtopics.find((t: any) =>
+              fuzzyMatch(t.name, parsedSubtopic!)
+            );
+          }
+          if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
+          else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
+        } else if (topicSubtopics.length === 1) {
+          matchedSubtopicId = topicSubtopics[0].id;
+        }
       }
     }
   }
 
-  // Fallback: if System didn't match Chapter, try matching System → Section (exact only), then find Chapter within that Section
-  if (!matchedChapterId && parsedSystem && sections.length > 0) {
+  // Fallback: if System didn't match System directly, try matching System → Product (exact only), then find System within that Product
+  if (!matchedSystemId && parsedSystem && products.length > 0) {
     const normalizedSystem = normalizeName(parsedSystem);
-    const matchedSection = sections.find(
-      (s: any) => normalizeName(s.name) === normalizedSystem
+    const matchedProduct = products.find(
+      (p: any) => normalizeName(p.name) === normalizedSystem
     );
-    if (matchedSection) {
-      matchedSectionId = matchedSection.id;
-      const sectionChapters = chapters.filter(
-        (c: any) =>
-          c.sectionId === matchedSection.id || c.section?.id === matchedSection.id
+    if (matchedProduct) {
+      matchedProductId = matchedProduct.id;
+      const productSystems = systems.filter(
+        (s: any) =>
+          s.productId === matchedProduct.id || s.product?.id === matchedProduct.id
       );
-      // If we have multiple chapters in this section, prefer the first one
-      // Do NOT use parsedSubject to match chapters - subject maps to ProductTag, not Chapter
-      if (sectionChapters.length > 0) {
-        let matchedChapter = sectionChapters[0]; // Default to first chapter
-        matchedChapterId = matchedChapter.id;
-        const chapterTopics = await getTopicsForChapter(matchedChapterId);
-        if (parsedTopic && chapterTopics.length > 0) {
-          let matchedTopic = chapterTopics.find((t: any) =>
+      if (productSystems.length > 0) {
+        let matchedSystem = productSystems[0]; // Default to first system
+        matchedSystemId = matchedSystem.id;
+        const systemTopics = await getTopicsForSystem(matchedSystemId);
+        if (parsedTopic && systemTopics.length > 0) {
+          let matchedTopic = systemTopics.find((t: any) =>
             fuzzyMatch(t.name, parsedTopic!)
           );
           if (matchedTopic) matchedTopicId = matchedTopic.id;
-          else if (chapterTopics.length === 1)
-            matchedTopicId = chapterTopics[0].id;
-        } else if (chapterTopics.length === 1) {
-          matchedTopicId = chapterTopics[0].id;
+          else if (systemTopics.length === 1)
+            matchedTopicId = systemTopics[0].id;
+        } else if (systemTopics.length === 1) {
+          matchedTopicId = systemTopics[0].id;
+        }
+
+        // Apply same subtopic resolution logically
+        if (matchedTopicId) {
+          const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
+          if (parsedSubtopic && topicSubtopics.length > 0) {
+            let matchedSubtopic = topicSubtopics.find((t: any) =>
+              fuzzyMatch(t.name, parsedSubtopic!)
+            );
+            if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
+            else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
+          } else if (topicSubtopics.length === 1) {
+            matchedSubtopicId = topicSubtopics[0].id;
+          }
         }
       }
     }
   }
 
   const result: Partial<AutoMatchResult> = {};
-  if (matchedSectionId) result.sectionId = matchedSectionId;
-  if (matchedChapterId) result.chapterId = matchedChapterId;
+  if (matchedProductId) result.productId = matchedProductId;
+  if (matchedSystemId) result.systemId = matchedSystemId;
   if (matchedTopicId) result.topicId = matchedTopicId;
-  if (matchedProductTagId) result.productTagId = matchedProductTagId;
+  if (matchedSubtopicId) result.subtopicId = matchedSubtopicId;
+  if (matchedCategoryId) result.categoryId = matchedCategoryId;
   return result;
 }

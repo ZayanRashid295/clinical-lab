@@ -1,789 +1,66 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
-import { CreateSectionDto } from "./dto/create-section.dto";
-import { UpdateSectionDto } from "./dto/update-section.dto";
-import { CreateChapterDto } from "./dto/create-chapter.dto";
-import { UpdateChapterDto } from "./dto/update-chapter.dto";
 import { CreateTopicDto } from "./dto/create-topic.dto";
 import { UpdateTopicDto } from "./dto/update-topic.dto";
-import { QuerySectionDto } from "./dto/query-section.dto";
-import { QueryChapterDto } from "./dto/query-chapter.dto";
+import { CreateSubtopicDto } from "./dto/create-subtopic.dto";
+import { UpdateSubtopicDto } from "./dto/update-subtopic.dto";
 import { QueryTopicDto } from "./dto/query-topic.dto";
+import { QuerySubtopicDto } from "./dto/query-subtopic.dto";
 
 @Injectable()
 export class ContentService {
   constructor(private prisma: PrismaService) {}
 
-  // ========== SECTIONS ==========
-  async findAllSections(query: QuerySectionDto) {
-    try {
-      const {
-        search,
-        status,
-        productId,
-        dateFrom,
-        dateTo,
-        page = 1,
-        limit = 10,
-        sortBy = "order",
-        sortOrder = "asc",
-        listAll = false,
-      } = query;
-
-      // Build where clause
-      const where: any = {};
-
-      // Search filter
-      if (search) {
-        where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
-        ];
-      }
-
-      // Status filter
-      if (status) {
-        where.isActive = status === "ACTIVE";
-      }
-
-      // Product ID filter
-      if (productId) {
-        where.productId = productId;
-      }
-
-      // Date range filter
-      if (dateFrom || dateTo) {
-        where.createdAt = {};
-        if (dateFrom) {
-          where.createdAt.gte = new Date(dateFrom);
-        }
-        if (dateTo) {
-          where.createdAt.lte = new Date(dateTo);
-        }
-      }
-
-      const orderBy: any = {};
-      orderBy[sortBy] = sortOrder;
-
-      const total = await this.prisma.section.count({ where });
-
-      if (listAll) {
-        const sections = await this.prisma.section.findMany({
-          where,
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            _count: {
-              select: {
-                chapters: true,
-              },
-            },
-          },
-          orderBy,
-        });
-        return {
-          data: sections,
-          pagination: {
-            page: 1,
-            limit: total,
-            total,
-            totalPages: 1,
-          },
-        };
-      }
-
-      const skip = (page - 1) * limit;
-      const sections = await this.prisma.section.findMany({
-        where,
-        include: {
-          product: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          _count: {
-            select: {
-              chapters: true,
-            },
-          },
-        },
-        skip,
-        take: limit,
-        orderBy,
-      });
-
-      const totalPages = Math.ceil(total / limit);
-
-      return {
-        data: sections,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-        },
-      };
-    } catch (error) {
-      console.error("Error fetching sections:", error);
-      throw error;
-    }
-  }
-
-  async getSections(productId?: string, isActive?: boolean) {
-    const where: any = {};
-
-    if (productId) {
-      where.productId = productId;
-    }
-
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
-
-    return this.prisma.section.findMany({
-      where,
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            chapters: true,
-          },
-        },
-      },
-      orderBy: {
-        order: "asc",
-      },
-    });
-  }
-
-  async getSectionStats() {
-    const total = await this.prisma.section.count();
-    const active = await this.prisma.section.count({
-      where: { isActive: true },
-    });
-    const inactive = await this.prisma.section.count({
-      where: { isActive: false },
-    });
-
-    return {
-      total,
-      active,
-      inactive,
-    };
-  }
-
-  async getSection(id: string) {
-    const section = await this.prisma.section.findUnique({
-      where: { id },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        chapters: {
-          include: {
-            _count: {
-              select: {
-                topics: true,
-              },
-            },
-          },
-          orderBy: {
-            order: "asc",
-          },
-        },
-        _count: {
-          select: {
-            chapters: true,
-          },
-        },
-      },
-    });
-
-    if (!section) {
-      throw new NotFoundException(`Section with ID ${id} not found`);
-    }
-
-    return section;
-  }
-
-  async getSectionChapters(id: string, isActive?: boolean) {
-    // First check if section exists
-    const section = await this.prisma.section.findUnique({
-      where: { id },
-    });
-
-    if (!section) {
-      throw new NotFoundException(`Section with ID ${id} not found`);
-    }
-
-    const where: any = { sectionId: id };
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
-
-    return this.prisma.chapter.findMany({
-      where,
-      include: {
-        _count: {
-          select: {
-            topics: true,
-          },
-        },
-      },
-      orderBy: {
-        order: "asc",
-      },
-    });
-  }
-
-  async createSection(createSectionDto: CreateSectionDto) {
-    return this.prisma.section.create({
-      data: createSectionDto,
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  }
-
-  async updateSection(id: string, updateSectionDto: UpdateSectionDto) {
-    const section = await this.prisma.section.findUnique({
-      where: { id },
-    });
-
-    if (!section) {
-      throw new NotFoundException(`Section with ID ${id} not found`);
-    }
-
-    return this.prisma.section.update({
-      where: { id },
-      data: updateSectionDto,
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  }
-
-  async removeSection(id: string) {
-    const section = await this.prisma.section.findUnique({
-      where: { id },
-    });
-
-    if (!section) {
-      throw new NotFoundException(`Section with ID ${id} not found`);
-    }
-
-    return this.prisma.section.update({
-      where: { id },
-      data: { isActive: false },
-    });
-  }
-
-  // ========== CHAPTERS ==========
-  async findAllChapters(query: QueryChapterDto) {
-    try {
-      const {
-        search,
-        status,
-        sectionId,
-        dateFrom,
-        dateTo,
-        page = 1,
-        limit = 10,
-        sortBy = "order",
-        sortOrder = "asc",
-        listAll = false,
-      } = query;
-
-      // Build where clause
-      const where: any = {};
-
-      // Search filter
-      if (search) {
-        where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
-        ];
-      }
-
-      // Status filter
-      if (status) {
-        where.isActive = status === "ACTIVE";
-      }
-
-      // Section ID filter
-      if (sectionId) {
-        where.sectionId = sectionId;
-      }
-
-      // Date range filter
-      if (dateFrom || dateTo) {
-        where.createdAt = {};
-        if (dateFrom) {
-          where.createdAt.gte = new Date(dateFrom);
-        }
-        if (dateTo) {
-          where.createdAt.lte = new Date(dateTo);
-        }
-      }
-
-      const total = await this.prisma.chapter.count({ where });
-
-      const orderBy: any = {};
-      orderBy[sortBy] = sortOrder;
-
-      if (listAll) {
-        const chapters = await this.prisma.chapter.findMany({
-          where,
-          include: {
-            section: {
-              select: {
-                id: true,
-                name: true,
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-            _count: {
-              select: {
-                topics: true,
-              },
-            },
-          },
-          orderBy,
-        });
-        return {
-          data: chapters,
-          pagination: {
-            page: 1,
-            limit: total,
-            total,
-            totalPages: 1,
-          },
-        };
-      }
-
-      const skip = (page - 1) * limit;
-      const chapters = await this.prisma.chapter.findMany({
-        where,
-        include: {
-          section: {
-            select: {
-              id: true,
-              name: true,
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              topics: true,
-            },
-          },
-        },
-        skip,
-        take: limit,
-        orderBy,
-      });
-
-      const totalPages = Math.ceil(total / limit);
-
-      return {
-        data: chapters,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-        },
-      };
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
-      throw error;
-    }
-  }
-
-  async getChapters(sectionId?: string, isActive?: boolean) {
-    const where: any = {};
-
-    if (sectionId) {
-      where.sectionId = sectionId;
-    }
-
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
-
-    return this.prisma.chapter.findMany({
-      where,
-      include: {
-        section: {
-          select: {
-            id: true,
-            name: true,
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            topics: true,
-          },
-        },
-      },
-      orderBy: {
-        order: "asc",
-      },
-    });
-  }
-
-  async getChapterStats() {
-    const total = await this.prisma.chapter.count();
-    const active = await this.prisma.chapter.count({
-      where: { isActive: true },
-    });
-    const inactive = await this.prisma.chapter.count({
-      where: { isActive: false },
-    });
-
-    return {
-      total,
-      active,
-      inactive,
-    };
-  }
-
-  async getChapter(id: string) {
-    const chapter = await this.prisma.chapter.findUnique({
-      where: { id },
-      include: {
-        section: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        topics: {
-          include: {
-            _count: {
-              select: {
-                questions: true,
-              },
-            },
-          },
-          orderBy: {
-            order: "asc",
-          },
-        },
-        _count: {
-          select: {
-            topics: true,
-          },
-        },
-      },
-    });
-
-    if (!chapter) {
-      throw new NotFoundException(`Chapter with ID ${id} not found`);
-    }
-
-    return chapter;
-  }
-
-  async getChapterTopics(id: string, isActive?: boolean) {
-    // First check if chapter exists
-    const chapter = await this.prisma.chapter.findUnique({
-      where: { id },
-    });
-
-    if (!chapter) {
-      throw new NotFoundException(`Chapter with ID ${id} not found`);
-    }
-
-    const where: any = { chapterId: id };
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
-
-    return this.prisma.topic.findMany({
-      where,
-      include: {
-        _count: {
-          select: {
-            questions: true,
-          },
-        },
-      },
-      orderBy: {
-        order: "asc",
-      },
-    });
-  }
-
-  async createChapter(createChapterDto: CreateChapterDto) {
-    // Truncate name to 500 characters if it's too long (database limit)
-    const chapterData = {
-      ...createChapterDto,
-      name: createChapterDto.name.length > 500 
-        ? createChapterDto.name.substring(0, 497) + "..." 
-        : createChapterDto.name,
-    };
-
-    // Prevent unique constraint errors on (sectionId, name) by returning the existing chapter
-    // when a chapter with the same name already exists in the same section.
-    const existing = await this.prisma.chapter.findFirst({
-      where: {
-        sectionId: chapterData.sectionId,
-        name: chapterData.name,
-      },
-      include: {
-        section: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (existing) {
-      return existing;
-    }
-
-    return this.prisma.chapter.create({
-      data: chapterData,
-      include: {
-        section: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  async updateChapter(id: string, updateChapterDto: UpdateChapterDto) {
-    const chapter = await this.prisma.chapter.findUnique({
-      where: { id },
-    });
-
-    if (!chapter) {
-      throw new NotFoundException(`Chapter with ID ${id} not found`);
-    }
-
-    // Truncate name to 500 characters if it's too long (database limit)
-    const chapterData = updateChapterDto.name && updateChapterDto.name.length > 500
-      ? { ...updateChapterDto, name: updateChapterDto.name.substring(0, 497) + "..." }
-      : updateChapterDto;
-    return this.prisma.chapter.update({
-      where: { id },
-      data: chapterData,
-      include: {
-        section: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  async removeChapter(id: string) {
-    const chapter = await this.prisma.chapter.findUnique({
-      where: { id },
-    });
-
-    if (!chapter) {
-      throw new NotFoundException(`Chapter with ID ${id} not found`);
-    }
-
-    return this.prisma.chapter.update({
-      where: { id },
-      data: { isActive: false },
-    });
-  }
-
-  // ========== TOPICS ==========
+  // ========== TOPICS (was Chapters) ==========
   async findAllTopics(query: QueryTopicDto) {
     try {
       const {
-        search,
-        status,
-        chapterId,
-        dateFrom,
-        dateTo,
-        page = 1,
-        limit = 10,
-        sortBy = "order",
-        sortOrder = "asc",
+        search, status, systemId, dateFrom, dateTo,
+        page = 1, limit = 10, sortBy = "order", sortOrder = "asc",
         listAll = false,
       } = query;
 
-      // Build where clause
       const where: any = {};
-
-      // Search filter
       if (search) {
         where.OR = [
           { name: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
         ];
       }
-
-      // Status filter
-      if (status) {
-        where.isActive = status === "ACTIVE";
-      }
-
-      // Chapter ID filter
-      if (chapterId) {
-        where.chapterId = chapterId;
-      }
-
-      // Date range filter
+      if (status) where.isActive = status === "ACTIVE";
+      if (systemId) where.systemId = systemId;
       if (dateFrom || dateTo) {
         where.createdAt = {};
-        if (dateFrom) {
-          where.createdAt.gte = new Date(dateFrom);
-        }
-        if (dateTo) {
-          where.createdAt.lte = new Date(dateTo);
-        }
+        if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+        if (dateTo) where.createdAt.lte = new Date(dateTo);
       }
 
       const total = await this.prisma.topic.count({ where });
-
       const orderBy: any = {};
       orderBy[sortBy] = sortOrder;
 
-      if (listAll) {
-        const topics = await this.prisma.topic.findMany({
-          where,
+      const include = {
+        system: {
           include: {
-            chapter: {
-              include: {
-                section: {
-                  include: {
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            _count: {
-              select: {
-                questions: true,
-              },
-            },
+            product: { select: { id: true, name: true } },
           },
-          orderBy,
-        });
+        },
+        _count: { select: { subtopics: true } },
+      };
+
+      if (listAll) {
+        const topics = await this.prisma.topic.findMany({ where, include, orderBy });
         return {
           data: topics,
-          pagination: {
-            page: 1,
-            limit: total,
-            total,
-            totalPages: 1,
-          },
+          pagination: { page: 1, limit: total, total, totalPages: 1 },
         };
       }
 
       const skip = (page - 1) * limit;
-      const topics = await this.prisma.topic.findMany({
-        where,
-        include: {
-          chapter: {
-            include: {
-              section: {
-                include: {
-                  product: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              questions: true,
-            },
-          },
-        },
-        skip,
-        take: limit,
-        orderBy,
-      });
-
-      const totalPages = Math.ceil(total / limit);
-
+      const topics = await this.prisma.topic.findMany({ where, include, skip, take: limit, orderBy });
       return {
         data: topics,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-        },
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       };
     } catch (error) {
       console.error("Error fetching topics:", error);
@@ -791,244 +68,273 @@ export class ContentService {
     }
   }
 
-  async getTopics(chapterId?: string, isActive?: boolean) {
+  async getTopics(systemId?: string, isActive?: boolean) {
     const where: any = {};
-
-    if (chapterId) {
-      where.chapterId = chapterId;
-    }
-
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
+    if (systemId) where.systemId = systemId;
+    if (isActive !== undefined) where.isActive = isActive;
 
     return this.prisma.topic.findMany({
       where,
       include: {
-        chapter: {
-          include: {
-            section: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
+        system: {
+          include: { product: { select: { id: true, name: true } } },
         },
-        _count: {
-          select: {
-            questions: true,
-          },
-        },
+        _count: { select: { subtopics: true } },
       },
-      orderBy: {
-        order: "asc",
-      },
+      orderBy: { order: "asc" },
     });
   }
 
   async getTopicStats() {
     const total = await this.prisma.topic.count();
-    const active = await this.prisma.topic.count({
-      where: { isActive: true },
-    });
-    const inactive = await this.prisma.topic.count({
-      where: { isActive: false },
-    });
-
-    return {
-      total,
-      active,
-      inactive,
-    };
+    const active = await this.prisma.topic.count({ where: { isActive: true } });
+    const inactive = await this.prisma.topic.count({ where: { isActive: false } });
+    return { total, active, inactive };
   }
 
   async getTopic(id: string) {
     const topic = await this.prisma.topic.findUnique({
       where: { id },
       include: {
-        chapter: {
-          include: {
-            section: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
+        system: {
+          include: { product: { select: { id: true, name: true } } },
         },
-        questions: {
-          include: {
-            choices: true,
-            productTag: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
+        subtopics: {
+          include: { _count: { select: { questions: true } } },
+          orderBy: { order: "asc" },
         },
-        _count: {
-          select: {
-            questions: true,
-          },
-        },
+        _count: { select: { subtopics: true } },
       },
     });
-
-    if (!topic) {
-      throw new NotFoundException(`Topic with ID ${id} not found`);
-    }
-
+    if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
     return topic;
   }
 
-  async getTopicQuestions(
-    id: string,
-    isActive?: boolean,
-    limit?: number,
-    offset?: number
-  ) {
-    // First check if topic exists
-    const topic = await this.prisma.topic.findUnique({
-      where: { id },
-    });
-
-    if (!topic) {
-      throw new NotFoundException(`Topic with ID ${id} not found`);
-    }
+  async getTopicSubtopics(id: string, isActive?: boolean) {
+    const topic = await this.prisma.topic.findUnique({ where: { id } });
+    if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
 
     const where: any = { topicId: id };
-    if (isActive !== undefined) {
-      where.isActive = isActive;
+    if (isActive !== undefined) where.isActive = isActive;
+
+    return this.prisma.subtopic.findMany({
+      where,
+      include: { _count: { select: { questions: true } } },
+      orderBy: { order: "asc" },
+    });
+  }
+
+  async createTopic(createDto: CreateTopicDto) {
+    const { systemId, name, ...rest } = createDto;
+    const topicName = (name ?? "").trim().length > 500 ? (name as string).substring(0, 497) + "..." : (name ?? "").trim();
+
+    const existing = await this.prisma.topic.findFirst({
+      where: { systemId, name: topicName },
+      include: {
+        system: { include: { product: { select: { id: true, name: true } } } },
+      },
+    });
+    if (existing) return existing;
+
+    return this.prisma.topic.create({
+      data: { ...rest, systemId, name: topicName },
+      include: {
+        system: { include: { product: { select: { id: true, name: true } } } },
+      },
+    });
+  }
+
+  async updateTopic(id: string, updateDto: UpdateTopicDto) {
+    const topic = await this.prisma.topic.findUnique({ where: { id } });
+    if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
+
+    return this.prisma.topic.update({
+      where: { id }, data: updateDto,
+      include: {
+        system: { include: { product: { select: { id: true, name: true } } } },
+      },
+    });
+  }
+
+  async removeTopic(id: string) {
+    const topic = await this.prisma.topic.findUnique({ where: { id } });
+    if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
+    return this.prisma.topic.update({ where: { id }, data: { isActive: false } });
+  }
+
+  // ========== SUBTOPICS (was Topics) ==========
+  async findAllSubtopics(query: QuerySubtopicDto) {
+    try {
+      const {
+        search, status, topicId, dateFrom, dateTo,
+        page = 1, limit = 10, sortBy = "order", sortOrder = "asc",
+        listAll = false,
+      } = query;
+
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+      if (status) where.isActive = status === "ACTIVE";
+      if (topicId) where.topicId = topicId;
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+        if (dateTo) where.createdAt.lte = new Date(dateTo);
+      }
+
+      const total = await this.prisma.subtopic.count({ where });
+      const orderBy: any = {};
+      orderBy[sortBy] = sortOrder;
+
+      const include = {
+        topic: {
+          include: {
+            system: {
+              include: { product: { select: { id: true, name: true } } },
+            },
+          },
+        },
+        _count: { select: { questions: true } },
+      };
+
+      if (listAll) {
+        const subtopics = await this.prisma.subtopic.findMany({ where, include, orderBy });
+        return {
+          data: subtopics,
+          pagination: { page: 1, limit: total, total, totalPages: 1 },
+        };
+      }
+
+      const skip = (page - 1) * limit;
+      const subtopics = await this.prisma.subtopic.findMany({ where, include, skip, take: limit, orderBy });
+      return {
+        data: subtopics,
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error) {
+      console.error("Error fetching subtopics:", error);
+      throw error;
     }
+  }
+
+  async getSubtopics(topicId?: string, isActive?: boolean) {
+    const where: any = {};
+    if (topicId) where.topicId = topicId;
+    if (isActive !== undefined) where.isActive = isActive;
+
+    return this.prisma.subtopic.findMany({
+      where,
+      include: {
+        topic: {
+          include: {
+            system: { include: { product: { select: { id: true, name: true } } } },
+          },
+        },
+        _count: { select: { questions: true } },
+      },
+      orderBy: { order: "asc" },
+    });
+  }
+
+  async getSubtopicStats() {
+    const total = await this.prisma.subtopic.count();
+    const active = await this.prisma.subtopic.count({ where: { isActive: true } });
+    const inactive = await this.prisma.subtopic.count({ where: { isActive: false } });
+    return { total, active, inactive };
+  }
+
+  async getSubtopic(id: string) {
+    const subtopic = await this.prisma.subtopic.findUnique({
+      where: { id },
+      include: {
+        topic: {
+          include: {
+            system: { include: { product: { select: { id: true, name: true } } } },
+          },
+        },
+        questions: {
+          include: { choices: true },
+          orderBy: { createdAt: "desc" },
+        },
+        _count: { select: { questions: true } },
+      },
+    });
+    if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
+    return subtopic;
+  }
+
+  async getSubtopicQuestions(id: string, isActive?: boolean, limit?: number, offset?: number) {
+    const subtopic = await this.prisma.subtopic.findUnique({ where: { id } });
+    if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
+
+    const where: any = { subtopicId: id };
+    if (isActive !== undefined) where.isActive = isActive;
 
     const [questions, total] = await Promise.all([
       this.prisma.question.findMany({
         where,
-        include: {
-          choices: true,
-          productTag: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        include: { choices: true },
+        orderBy: { createdAt: "desc" },
         take: limit,
         skip: offset,
       }),
       this.prisma.question.count({ where }),
     ]);
 
-    return {
-      questions,
-      total,
-      limit,
-      offset,
-    };
+    return { questions, total, limit, offset };
   }
 
-  async createTopic(createTopicDto: CreateTopicDto) {
-    const { chapterId, name, ...rest } = createTopicDto;
-    const topicName = (name ?? '').trim().length > 500 ? (name as string).substring(0, 497) + '...' : (name ?? '').trim();
+  async createSubtopic(createDto: CreateSubtopicDto) {
+    const { topicId, name, ...rest } = createDto;
+    const subtopicName = (name ?? "").trim().length > 500 ? (name as string).substring(0, 497) + "..." : (name ?? "").trim();
 
-    // Prevent unique constraint errors on (chapterId, name) by returning the existing topic when one already exists.
-    const existing = await this.prisma.topic.findFirst({
-      where: {
-        chapterId,
-        name: topicName,
-      },
+    const existing = await this.prisma.subtopic.findFirst({
+      where: { topicId, name: subtopicName },
       include: {
-        chapter: {
+        topic: {
           include: {
-            section: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
+            system: { include: { product: { select: { id: true, name: true } } } },
           },
         },
       },
     });
+    if (existing) return existing;
 
-    if (existing) {
-      return existing;
-    }
-
-    return this.prisma.topic.create({
-      data: { ...rest, chapterId, name: topicName },
+    return this.prisma.subtopic.create({
+      data: { ...rest, topicId, name: subtopicName },
       include: {
-        chapter: {
+        topic: {
           include: {
-            section: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
+            system: { include: { product: { select: { id: true, name: true } } } },
           },
         },
       },
     });
   }
 
-  async updateTopic(id: string, updateTopicDto: UpdateTopicDto) {
-    const topic = await this.prisma.topic.findUnique({
-      where: { id },
-    });
+  async updateSubtopic(id: string, updateDto: UpdateSubtopicDto) {
+    const subtopic = await this.prisma.subtopic.findUnique({ where: { id } });
+    if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
 
-    if (!topic) {
-      throw new NotFoundException(`Topic with ID ${id} not found`);
-    }
-
-    return this.prisma.topic.update({
-      where: { id },
-      data: updateTopicDto,
+    return this.prisma.subtopic.update({
+      where: { id }, data: updateDto,
       include: {
-        chapter: {
+        topic: {
           include: {
-            section: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
+            system: { include: { product: { select: { id: true, name: true } } } },
           },
         },
       },
     });
   }
 
-  async removeTopic(id: string) {
-    const topic = await this.prisma.topic.findUnique({
-      where: { id },
-    });
-
-    if (!topic) {
-      throw new NotFoundException(`Topic with ID ${id} not found`);
-    }
-
-    return this.prisma.topic.update({
-      where: { id },
-      data: { isActive: false },
-    });
+  async removeSubtopic(id: string) {
+    const subtopic = await this.prisma.subtopic.findUnique({ where: { id } });
+    if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
+    return this.prisma.subtopic.update({ where: { id }, data: { isActive: false } });
   }
 }

@@ -129,14 +129,14 @@ export default function TestSessionPage() {
               // Transform backend question to frontend format
               return {
                 id: question.id,
-                text: question.stem || question.text,
+                text: (question as any).stem || question.question,
                 options: (question.choices || []).map((c: any) => c.text),
                 correctAnswer: (question.choices || []).find((c: any) => c.isCorrect)?.text || "",
                 explanation: question.explanation || "",
-                subject: question.topic?.chapter?.name || "",
-                system: question.topic?.chapter?.section?.name || "",
+                subject: (question as any).system?.name || "General",
+                system: question.topic?.name || "General",
                 difficulty: "Medium" as const,
-                imageUrl: question.imageUrl,
+                imageUrl: (question as any).imageUrl,
               };
             } catch (err) {
               console.error(`Failed to fetch question ${questionId}:`, err);

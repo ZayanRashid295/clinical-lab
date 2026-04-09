@@ -122,14 +122,15 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
     metadata: {
       subject: oldQuestion.subject,
       system: oldQuestion.system,
-      sectionId: oldQuestion.sectionId,
-      chapterId: oldQuestion.chapterId,
+      systemId: oldQuestion.systemId,
       topicId: oldQuestion.topicId,
+      subtopicId: oldQuestion.subtopicId,
+      categoryId: oldQuestion.categoryId || oldQuestion.productTagId,
       productTagId: oldQuestion.productTagId,
-      // Convert single productTagId to array for backward compatibility
-      productTagIds: oldQuestion.productTagId 
-        ? [oldQuestion.productTagId] 
-        : oldQuestion.productTagIds || undefined,
+      // Convert single productTagId/categoryId to array for backward compatibility
+      productTagIds: oldQuestion.categoryId 
+        ? [oldQuestion.categoryId] 
+        : (oldQuestion.productTagId ? [oldQuestion.productTagId] : oldQuestion.productTagIds || undefined),
       tags: filteredTags, // Return tags without the questionId marker
       questionId: questionId, // Preserve questionId from tags or existing metadata
     },
@@ -149,10 +150,11 @@ export function convertNewQuestionToOld(newData: QuestionCreatorData): any {
     explanation: convertNewBlocksToOld(newData.mainExplanation),
     subject: newData.metadata.subject,
     system: newData.metadata.system,
-    sectionId: newData.metadata.sectionId,
-    chapterId: newData.metadata.chapterId,
+    systemId: newData.metadata.systemId,
     topicId: newData.metadata.topicId,
-    productTagId: newData.metadata.productTagId || (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0 ? newData.metadata.productTagIds[0] : undefined),
+    subtopicId: newData.metadata.subtopicId,
+    categoryId: newData.metadata.categoryId,
+    productTagId: newData.metadata.categoryId || newData.metadata.productTagId || (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0 ? newData.metadata.productTagIds[0] : undefined),
     productTagIds: newData.metadata.productTagIds,
     tags: newData.metadata.tags || [],
     metadata: {
@@ -322,7 +324,7 @@ function convertNewDataToOld(newType: ContentBlock["type"], newData: any): any {
   return newData || {}
 }
 
-function convertOldOptionsToChoices(oldOptions: any[]): Choice[] {
+export function convertOldOptionsToChoices(oldOptions: any[]): Choice[] {
   if (!Array.isArray(oldOptions)) return []
 
   return oldOptions.map((opt) => ({
@@ -333,7 +335,7 @@ function convertOldOptionsToChoices(oldOptions: any[]): Choice[] {
   }))
 }
 
-function convertChoicesToOldOptions(choices: Choice[]): any[] {
+export function convertChoicesToOldOptions(choices: Choice[]): any[] {
   if (!Array.isArray(choices)) return []
 
   return choices.map((choice, index) => ({
@@ -345,7 +347,7 @@ function convertChoicesToOldOptions(choices: Choice[]): any[] {
   }))
 }
 
-function convertOldPerAnswerExplanationsToNew(
+export function convertOldPerAnswerExplanationsToNew(
   oldExplanations: Record<string, any> | any[]
 ): Record<string, ContentBlock[]> {
   if (Array.isArray(oldExplanations)) {
@@ -375,7 +377,7 @@ function convertOldPerAnswerExplanationsToNew(
   return {}
 }
 
-function convertNewPerAnswerExplanationsToOld(
+export function convertNewPerAnswerExplanationsToOld(
   newExplanations: Record<string, ContentBlock[]>
 ): Record<string, any[]> {
   const result: Record<string, any[]> = {}

@@ -4,8 +4,8 @@ import React, { useState, useCallback, useEffect } from "react";
 import { TestModeSelector } from "./TestModeSelector";
 import { QuestionPoolSelector } from "./QuestionPoolSelector";
 import { MarkedToggle } from "./MarkedToggle";
-import { SubjectSelector } from "./SubjectSelector";
 import { SystemSelector } from "./SystemSelector";
+import { TopicSelector } from "./TopicSelector";
 import { QuickGuideModal } from "./QuickGuideModal";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -197,10 +197,9 @@ export default function StudyCreateTestPage() {
             : undefined;
 
         const questions = await questionsService.getFilteredQuestions({
-          tagIds: selectedTags.length > 0 ? selectedTags : undefined,
-          systemIds: selectedSystems.length > 0 ? selectedSystems : undefined,
-          subjectIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-          topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+          systemIds: selectedTags.length > 0 ? selectedTags : undefined,
+          topicIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
+          subtopicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
           limit: 1000, // Use max allowed limit (backend validation max is 1000)
@@ -362,10 +361,9 @@ export default function StudyCreateTestPage() {
             : undefined;
 
         const questions = await questionsService.getFilteredQuestions({
-          tagIds: selectedTags.length > 0 ? selectedTags : undefined,
-          systemIds: selectedSystems.length > 0 ? selectedSystems : undefined,
-          subjectIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-          topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+          systemIds: selectedTags.length > 0 ? selectedTags : undefined,
+          topicIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
+          subtopicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
           limit: 1000, // Use max allowed limit (backend validation max is 1000)
@@ -393,16 +391,13 @@ export default function StudyCreateTestPage() {
     // Build query parameters
     const params = new URLSearchParams();
     if (selectedTags.length > 0) {
-      params.set("tagIds", selectedTags.join(","));
-    }
-    if (selectedSystems.length > 0) {
-      params.set("systemIds", selectedSystems.join(","));
+      params.set("systemIds", selectedTags.join(","));
     }
     if (selectedSubjects.length > 0) {
-      params.set("subjectIds", selectedSubjects.join(","));
+      params.set("topicIds", selectedSubjects.join(","));
     }
     if (selectedTopics.length > 0) {
-      params.set("topicIds", selectedTopics.join(","));
+      params.set("subtopicIds", selectedTopics.join(","));
     }
     if (selectedPool) {
       params.set("pool", selectedPool);
@@ -517,18 +512,23 @@ export default function StudyCreateTestPage() {
           <QuestionPoolSelector
             selectedPool={selectedPool}
             onPoolChange={setSelectedPool}
-                isMarked={isMarked}
-                refreshTrigger={refreshTrigger}
-              />
+            isMarked={isMarked}
+            refreshTrigger={refreshTrigger}
+            filters={{
+              systemIds: selectedTags,
+              topicIds: selectedSubjects,
+              subtopicIds: selectedTopics,
+            }}
+          />
             </div>
 
             {/* Subjects & Systems */}
             <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden mb-4">
               <div className="grid grid-cols-[280px_1fr] divide-x divide-border dark:divide-gray-700 min-h-[500px]">
                 <div data-validation-error={!!validationErrors.subjects} className="flex flex-col">
-            <SubjectSelector
-              selectedSubjects={selectedTags}
-              onSubjectToggle={handleTagToggle}
+            <SystemSelector
+              selectedSystems={selectedTags}
+              onSystemToggle={handleTagToggle}
             selectedPool={selectedPool}
                     isMarked={isMarked}
                     refreshTrigger={refreshTrigger}
@@ -544,16 +544,15 @@ export default function StudyCreateTestPage() {
           </div>
 
                 <div className="flex flex-col" data-validation-error={!!validationErrors.systems}>
-            <SystemSelector
-              selectedSystems={selectedSystems}
-              onSystemToggle={handleSystemToggle}
-              selectedTags={selectedTags}
+            <TopicSelector
+              selectedSystems={selectedTags}
+              onSystemToggle={handleTagToggle}
             selectedPool={selectedPool}
-              selectedSubjects={selectedSubjects}
-              selectedTopics={selectedTopics}
+              selectedTopics={selectedSubjects}
+              selectedSubtopics={selectedTopics}
                     isMarked={isMarked}
-              onSubjectToggle={handleSubjectToggle}
-              onTopicToggle={handleTopicToggle}
+              onTopicToggle={handleSubjectToggle}
+              onSubtopicToggle={handleTopicToggle}
                     refreshTrigger={refreshTrigger}
             />
             {validationErrors.systems && (

@@ -12,11 +12,19 @@ import {
 
 export class CreateQuestionDto {
   @ApiProperty({
-    description: "Topic ID this question belongs to",
+    description: "Subtopic ID this question belongs to",
     example: "cmguoh2dg000hlj45zxmb3rsl",
   })
   @IsString()
-  topicId: string;
+  subtopicId: string;
+
+  @ApiProperty({
+    description: "Topic ID (optional/legacy)",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  topicId?: string;
 
   @ApiProperty({
     description: "Product tag ID (optional)",
@@ -29,11 +37,18 @@ export class CreateQuestionDto {
 
   @ApiProperty({
     description: "Question text",
-    example:
-      "Which of the following is the most common cause of acute myocardial infarction?",
+    example: "Which of the following is the most common cause of acute myocardial infarction?",
   })
   @IsString()
   question: string;
+
+  @ApiProperty({
+    description: "Question title",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  title?: string;
 
   @ApiProperty({
     description: "Explanation for the correct answer",
@@ -79,7 +94,7 @@ export class CreateQuestionDto {
 
   // New optional metadata fields for question-generator
   @ApiProperty({
-    description: "Subject for categorization (e.g., Pathology) - display name from Chapter",
+    description: "Subject for categorization (e.g., Pathology) - display name from Product",
     required: false,
     example: "Pathology",
   })
@@ -88,7 +103,7 @@ export class CreateQuestionDto {
   subject?: string;
 
   @ApiProperty({
-    description: "System for categorization (e.g., Endocrine) - display name from Section",
+    description: "System for categorization (e.g., Endocrine) - display name from Chapter",
     required: false,
     example: "Endocrine",
   })
@@ -104,15 +119,6 @@ export class CreateQuestionDto {
   @IsOptional()
   @IsString()
   chapterId?: string;
-
-  @ApiProperty({
-    description: "Section ID for System dropdown",
-    required: false,
-    example: "cmguoh2dg000hlj45zxmb3rsm",
-  })
-  @IsOptional()
-  @IsString()
-  sectionId?: string;
 
   @ApiProperty({
     description: "Tags for the question",

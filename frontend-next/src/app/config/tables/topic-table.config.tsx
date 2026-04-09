@@ -32,17 +32,17 @@ const topicColumns: ColumnConfig<Topic>[] = [
     ),
   },
   {
-    key: "chapter",
-    label: "Chapter",
+    key: "system",
+    label: "System",
     sortable: false,
     render: (value, row) => {
-      const chapterName = row.chapter?.name || "-";
-      const sectionName = row.chapter?.section?.name;
+      const systemName = row.system?.name || "-";
+      const productName = row.system?.product?.name;
       return (
         <div>
-          <div className="text-sm font-medium text-gray-900">{chapterName}</div>
-          {sectionName && (
-            <div className="text-sm text-gray-500">{sectionName}</div>
+          <div className="text-sm font-medium text-gray-900">{systemName}</div>
+          {productName && (
+            <div className="text-sm text-gray-500">{productName}</div>
           )}
         </div>
       );
@@ -61,7 +61,7 @@ const topicColumns: ColumnConfig<Topic>[] = [
     label: "Questions",
     sortable: false,
     render: (value) => {
-      const count = value?.questions || 0;
+      const count = value?.subtopics || 0;
       return (
         <div className="flex items-center">
           <BookOpen className="h-4 w-4 text-gray-400 mr-1" />
@@ -155,7 +155,7 @@ const topicStatsConfig: StatsConfig = {
 
 export const topicTableConfig: TableConfig<Topic, TopicFilters> = {
   title: "Topic Management",
-  description: "Manage content topics within chapters",
+  description: "Manage content topics within systems",
   columns: topicColumns,
   filterConfig: topicFilterConfig,
   stats: topicStatsConfig,

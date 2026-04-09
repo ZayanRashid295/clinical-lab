@@ -44,18 +44,14 @@ interface QuestionPaperQuestion {
     topic?: {
       id: string;
       name: string;
-      chapter?: {
+      system?: {
         id: string;
         name: string;
-        section?: {
+        category?: {
           id: string;
           name: string;
         };
       };
-    };
-    productTag?: {
-      id: string;
-      name: string;
     };
   };
 }
@@ -71,7 +67,7 @@ interface PerformanceStats {
   totalTimeSpent: number;
 }
 
-interface SubjectStats {
+interface TopicStats {
   name: string;
   total: number;
   correct: number;
@@ -100,7 +96,7 @@ export default function TestAnalysisPage() {
   const [questionPaper, setQuestionPaper] = useState<any>(null);
   const [questions, setQuestions] = useState<QuestionPaperQuestion[]>([]);
   const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null);
-  const [subjectStats, setSubjectStats] = useState<SubjectStats[]>([]);
+  const [topicStats, setTopicStats] = useState<TopicStats[]>([]);
   const [systemStats, setSystemStats] = useState<SystemStats[]>([]);
   const [weakAreas, setWeakAreas] = useState<string[]>([]);
   const [strongAreas, setStrongAreas] = useState<string[]>([]);
@@ -186,15 +182,15 @@ export default function TestAnalysisPage() {
       totalTimeSpent,
     });
 
-    // Calculate subject-wise stats
-    const subjectMap = new Map<string, { total: number; correct: number; incorrect: number; unanswered: number; totalTime: number; questionsWithTime: number }>();
+    // Calculate topic-wise stats
+    const topicMap = new Map<string, { total: number; correct: number; incorrect: number; unanswered: number; totalTime: number; questionsWithTime: number }>();
     
     questionsData.forEach((q) => {
-      const subject = q.question?.topic?.chapter?.name || "Unknown";
-      if (!subjectMap.has(subject)) {
-        subjectMap.set(subject, { total: 0, correct: 0, incorrect: 0, unanswered: 0, totalTime: 0, questionsWithTime: 0 });
+      const topic = q.question?.topic?.name || "Unknown";
+      if (!topicMap.has(topic)) {
+        topicMap.set(topic, { total: 0, correct: 0, incorrect: 0, unanswered: 0, totalTime: 0, questionsWithTime: 0 });
       }
-      const stats = subjectMap.get(subject)!;
+      const stats = topicMap.get(topic)!;
       stats.total++;
       if (q.timeSpent && q.timeSpent > 0) {
         stats.totalTime += q.timeSpent;
@@ -209,7 +205,7 @@ export default function TestAnalysisPage() {
       }
     });
 
-    const subjectStatsArray: SubjectStats[] = Array.from(subjectMap.entries()).map(([name, stats]) => ({
+    const topicStatsArray: TopicStats[] = Array.from(topicMap.entries()).map(([name, stats]) => ({
       name,
       total: stats.total,
       correct: stats.correct,
@@ -220,13 +216,13 @@ export default function TestAnalysisPage() {
       trend: "stable" as const, // Could be calculated based on historical data
     })).sort((a, b) => b.total - a.total);
 
-    setSubjectStats(subjectStatsArray);
+    setTopicStats(topicStatsArray);
 
     // Calculate system-wise stats
     const systemMap = new Map<string, { total: number; correct: number; incorrect: number; unanswered: number; totalTime: number; questionsWithTime: number }>();
     
     questionsData.forEach((q) => {
-      const system = q.question?.topic?.chapter?.section?.name || "Unknown";
+      const system = q.question?.topic?.system?.name || "Unknown";
       if (!systemMap.has(system)) {
         systemMap.set(system, { total: 0, correct: 0, incorrect: 0, unanswered: 0, totalTime: 0, questionsWithTime: 0 });
       }
@@ -259,31 +255,31 @@ export default function TestAnalysisPage() {
     setSystemStats(systemStatsArray);
 
     // Identify weak and strong areas
-    const weakSubjects = subjectStatsArray
+    const weakTopics = topicStatsArray
       .filter((s) => s.percentage < 60 && s.total >= 3)
       .map((s) => s.name);
     const weakSystems = systemStatsArray
       .filter((s) => s.percentage < 60 && s.total >= 3)
       .map((s) => s.name);
     
-    setWeakAreas([...weakSubjects, ...weakSystems]);
+    setWeakAreas([...weakTopics, ...weakSystems]);
 
-    const strongSubjects = subjectStatsArray
+    const strongTopics = topicStatsArray
       .filter((s) => s.percentage >= 80 && s.total >= 3)
       .map((s) => s.name);
     const strongSystems = systemStatsArray
       .filter((s) => s.percentage >= 80 && s.total >= 3)
       .map((s) => s.name);
     
-    setStrongAreas([...strongSubjects, ...strongSystems]);
+    setStrongAreas([...strongTopics, ...strongSystems]);
 
     // Generate recommendations
     const recs: string[] = [];
     if (score < 60) {
       recs.push("Focus on fundamental concepts and review basic principles");
     }
-    if (weakSubjects.length > 0) {
-      recs.push(`Review ${weakSubjects.slice(0, 2).join(" and ")} - these subjects need more attention`);
+    if (weakTopics.length > 0) {
+      recs.push(`Review ${weakTopics.slice(0, 2).join(" and ")} - these topics need more attention`);
     }
     if (averageTimePerQuestion > 120) {
       recs.push("Practice time management - you're spending too much time per question");
@@ -483,18 +479,18 @@ export default function TestAnalysisPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="subjects" className="space-y-4">
+              <TabsContent value="subjects" className="space-y-4">
             <Card className="border-border dark:border-gray-700 bg-card dark:bg-gray-800">
               <CardHeader className="border-b border-border dark:border-gray-700">
-                <CardTitle className="text-base font-semibold text-foreground dark:text-white">Subject Performance</CardTitle>
-                <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Breakdown by subject area</p>
+                <CardTitle className="text-base font-semibold text-foreground dark:text-white">Topic Performance</CardTitle>
+                <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Breakdown by topic area</p>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="border-border dark:border-gray-700 hover:bg-transparent dark:hover:bg-transparent">
-                        <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Subject</TableHead>
+                        <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Topic</TableHead>
                         <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400 text-right">
                           Questions
                         </TableHead>
@@ -512,7 +508,7 @@ export default function TestAnalysisPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {subjectStats.map((stat) => (
+                      {topicStats.map((stat) => (
                         <TableRow key={stat.name} className="border-border dark:border-gray-700 hover:bg-muted/50 dark:hover:bg-gray-700/50 transition-colors">
                           <TableCell className="px-4 py-3 font-medium text-sm text-foreground dark:text-white">{stat.name}</TableCell>
                           <TableCell className="px-4 py-3 text-right text-sm text-foreground dark:text-white">{stat.total}</TableCell>

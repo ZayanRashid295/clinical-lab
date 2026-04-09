@@ -14,12 +14,12 @@ import SystemSettingsContent from "../components/Content/SystemSettingsContent";
 import SubscriptionManagementContent from "../components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../components/Content/PackageFeatureManagementContent";
+import CategoryManagementContent from "../components/Content/CategoryManagementContent";
 import ProductManagementContent from "../components/Content/ProductManagementContent";
-import ProductTagManagementContent from "../components/Content/ProductTagManagementContent";
+import SystemManagementContent from "../components/Content/SystemManagementContent";
 import ProductSubtypeManagementContent from "../components/Content/ProductSubtypeManagementContent";
-import SectionManagementContent from "../components/Content/SectionManagementContent";
-import ChapterManagementContent from "../components/Content/ChapterManagementContent";
 import TopicManagementContent from "../components/Content/TopicManagementContent";
+import SubtopicManagementContent from "../components/Content/SubtopicManagementContent";
 import QuestionPaperManagementContent from "../components/Content/QuestionPaperManagementContent";
 import QuestionPaperQuestionManagementContent from "../components/Content/QuestionPaperQuestionManagementContent";
 import QuestionManagementContent from "../components/Content/QuestionManagementContent";
@@ -97,14 +97,14 @@ export const transportationContentRegistry: ContentRegistry = {
     "/my-subscription": () => <MySubscriptionPage />,
 
     // Product routes
+    "/admin/categories": () => <CategoryManagementContent />,
     "/admin/products": () => <ProductManagementContent />,
-    "/admin/products/tags": () => <ProductTagManagementContent />,
+    "/admin/systems": () => <SystemManagementContent />,
     "/admin/products/subtypes": () => <ProductSubtypeManagementContent />,
 
     // Content routes (Learning/Content Management)
-    "/admin/content/sections": () => <SectionManagementContent />,
-    "/admin/content/chapters": () => <ChapterManagementContent />,
     "/admin/content/topics": () => <TopicManagementContent />,
+    "/admin/content/subtopics": () => <SubtopicManagementContent />,
     "/admin/content/questions": () => <QuestionManagementContent />,
     "/admin/content/question-choices": () => (
       <QuestionChoiceManagementContent />
@@ -136,10 +136,10 @@ export const transportationContentRegistry: ContentRegistry = {
         description="Pre-built test templates for quick test creation with customizable questions and formats."
         estimatedCompletion="2 weeks"
         features={[
-          "Template library with medical specialties",
+          "Template library with medical categories",
           "Customizable question sets",
           "Difficulty level adjustments",
-          "Subject-specific templates",
+          "Product-specific templates",
           "One-click test generation",
         ]}
       />

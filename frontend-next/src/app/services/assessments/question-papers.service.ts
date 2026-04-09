@@ -77,10 +77,9 @@ export class QuestionPapersService extends BaseDataService<
    * Get user question pool statistics (unused, incorrect, marked, omitted, correct)
    */
   async getUserQuestionPoolStats(filters?: {
-    tagIds?: string[];
     systemIds?: string[];
-    subjectIds?: string[];
     topicIds?: string[];
+    subtopicIds?: string[];
     marked?: boolean;
   }): Promise<{
     unused: number;
@@ -92,17 +91,14 @@ export class QuestionPapersService extends BaseDataService<
   }> {
     const queryParams: Record<string, string> = {};
     
-    if (filters?.tagIds && filters.tagIds.length > 0) {
-      queryParams.tagIds = filters.tagIds.join(",");
-    }
     if (filters?.systemIds && filters.systemIds.length > 0) {
       queryParams.systemIds = filters.systemIds.join(",");
     }
-    if (filters?.subjectIds && filters.subjectIds.length > 0) {
-      queryParams.subjectIds = filters.subjectIds.join(",");
-    }
     if (filters?.topicIds && filters.topicIds.length > 0) {
       queryParams.topicIds = filters.topicIds.join(",");
+    }
+    if (filters?.subtopicIds && filters.subtopicIds.length > 0) {
+      queryParams.subtopicIds = filters.subtopicIds.join(",");
     }
     if (filters?.marked !== undefined) {
       queryParams.marked = filters.marked.toString();

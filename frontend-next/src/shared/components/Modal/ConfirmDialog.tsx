@@ -65,6 +65,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       size="sm"
+      showCloseButton={false}
       closeOnOverlayClick={!loading}
       closeOnEscape={!loading}
     >
@@ -79,10 +80,19 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </div>
 
           {/* Content */}
-          <div className="flex-1 text-center sm:text-left">
-            <h3 className={`${typography.heading[4]} text-gray-900 mb-2`}>
-              {title}
-            </h3>
+          <div className="flex-1 text-center sm:text-left relative">
+            <div className="flex items-start justify-between">
+              <h3 className={`${typography.heading[4]} text-gray-900 mb-2 pr-8`}>
+                {title}
+              </h3>
+              <button
+                onClick={onClose}
+                className="p-1 -mr-1 -mt-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                aria-label="Close dialog"
+              >
+                <X size={18} />
+              </button>
+            </div>
             <p className={`${typography.body.regular} text-gray-600 mb-6`}>
               {message}
             </p>

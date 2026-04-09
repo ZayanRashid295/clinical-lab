@@ -99,40 +99,30 @@ export class QuestionsService extends BaseDataService<
   }
 
   /**
-   * Get hierarchical data for test creation (tags, systems, subjects, topics with question counts)
+   * Get hierarchical data for test creation (systems, topics, subtopics with question counts)
    */
   async getTestCreationData(params?: {
     pool?: "unused" | "marked" | "incorrect" | "correct" | "omitted";
     marked?: boolean;
   }): Promise<{
-    tags: Array<{
-      id: string;
-      name: string;
-      description?: string;
-      color?: string;
-      count: number;
-    }>;
     systems: Array<{
       id: string;
       name: string;
       description?: string;
       order: number;
       count: number;
-      countsByTag: Record<string, number>;
-      subjects: Array<{
+      topics: Array<{
         id: string;
         name: string;
         description?: string;
         order: number;
         count: number;
-        countsByTag: Record<string, number>;
-        topics: Array<{
+        subtopics: Array<{
           id: string;
           name: string;
           description?: string;
           order: number;
           count: number;
-          countsByTag: Record<string, number>;
         }>;
       }>;
     }>;
@@ -148,30 +138,26 @@ export class QuestionsService extends BaseDataService<
   }
 
   /**
-   * Get filtered questions for test taking based on tags, systems, subjects, topics, and question pool
+   * Get filtered questions for test taking based on systems, topics, subtopics, and question pool
    */
   async getFilteredQuestions(params: {
-    tagIds?: string[];
     systemIds?: string[];
-    subjectIds?: string[];
     topicIds?: string[];
+    subtopicIds?: string[];
     pool?: "unused" | "incorrect" | "correct" | "omitted";
     marked?: boolean;
     limit?: number;
   }): Promise<Question[]> {
     const queryParams: Record<string, any> = {};
     
-    if (params.tagIds && params.tagIds.length > 0) {
-      queryParams.tagIds = params.tagIds.join(",");
-    }
     if (params.systemIds && params.systemIds.length > 0) {
       queryParams.systemIds = params.systemIds.join(",");
     }
-    if (params.subjectIds && params.subjectIds.length > 0) {
-      queryParams.subjectIds = params.subjectIds.join(",");
-    }
     if (params.topicIds && params.topicIds.length > 0) {
       queryParams.topicIds = params.topicIds.join(",");
+    }
+    if (params.subtopicIds && params.subtopicIds.length > 0) {
+      queryParams.subtopicIds = params.subtopicIds.join(",");
     }
     if (params.pool) {
       queryParams.pool = params.pool;

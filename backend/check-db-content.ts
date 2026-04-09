@@ -7,18 +7,24 @@ async function checkDatabaseContent() {
     console.log("🔍 Checking Database Content...\n");
     console.log("=".repeat(80));
 
-    // Get all sections (Systems)
-    const sections = await prisma.section.findMany({
+    // Get all Products with their Systems, Topics, Subtopics
+    const products = await prisma.product.findMany({
       where: { isActive: true },
       include: {
-        product: {
-          select: { name: true },
-        },
-        chapters: {
+        systems: {
           where: { isActive: true },
           include: {
             topics: {
               where: { isActive: true },
+              include: {
+                subtopics: {
+                  where: { isActive: true },
+                  orderBy: { order: "asc" }
+                },
+                _count: {
+                  select: { subtopics: true },
+                },
+              },
               orderBy: { order: "asc" },
             },
             _count: {
@@ -28,57 +34,62 @@ async function checkDatabaseContent() {
           orderBy: { order: "asc" },
         },
         _count: {
-          select: { chapters: true },
+          select: { systems: true },
         },
       },
-      orderBy: { order: "asc" },
+      orderBy: { createdAt: "desc" },
     });
 
-    console.log(`\n📚 SECTIONS (Systems): ${sections.length}\n`);
+    console.log(`\n📚 PRODUCTS: ${products.length}\n`);
 
-    for (const section of sections) {
+    for (const product of products) {
       console.log(`\n${"=".repeat(80)}`);
       console.log(
-        `\n🏛️  SECTION: ${section.name} (ID: ${section.id})`
+        `\n🏛️  PRODUCT: ${product.name} (ID: ${product.id})`
       );
-      console.log(`   Product: ${section.product.name}`);
-      console.log(`   Description: ${section.description || "N/A"}`);
-      console.log(`   Chapters: ${section._count.chapters}`);
+      console.log(`   Description: ${product.description || "N/A"}`);
+      console.log(`   Systems: ${product._count.systems}`);
 
-      if (section.chapters.length > 0) {
-        console.log(`\n   📖 CHAPTERS (Subjects):`);
-        for (const chapter of section.chapters) {
-          console.log(`\n      • ${chapter.name} (ID: ${chapter.id})`);
-          console.log(`        Topics: ${chapter._count.topics}`);
+      if (product.systems.length > 0) {
+        console.log(`\n   📖 SYSTEMS:`);
+        for (const system of product.systems) {
+          console.log(`\n      • ${system.name} (ID: ${system.id})`);
+          console.log(`        Topics: ${system._count.topics}`);
 
-          if (chapter.topics.length > 0) {
-            console.log(`        Topics List:`);
-            chapter.topics.forEach((topic, index) => {
-              console.log(`          ${index + 1}. ${topic.name}`);
+          if (system.topics.length > 0) {
+            console.log(`        Topics Lst:`);
+            system.topics.forEach((topic, index) => {
+              console.log(`          ${index + 1}. ${topic.name} (Subtopics: ${topic._count.subtopics})`);
             });
           }
         }
       } else {
-        console.log(`   ⚠️  No chapters found for this section`);
+        console.log(`   ⚠️  No systems found for this product`);
       }
     }
 
     // Summary
     console.log(`\n${"=".repeat(80)}`);
     console.log(`\n📊 SUMMARY:\n`);
-    let totalChapters = 0;
+    let totalSystems = 0;
     let totalTopics = 0;
+    let totalSubtopics = 0;
 
-    for (const section of sections) {
-      totalChapters += section.chapters.length;
-      for (const chapter of section.chapters) {
-        totalTopics += chapter.topics.length;
+    for (const product of products) {
+      totalSystems += product.systems.length;
+      for (const system of product.systems) {
+        // topics
+        totalTopics += system.topics.length;
+        for (const topic of system.topics) {
+          totalSubtopics += topic.subtopics.length;
+        }
       }
     }
 
-    console.log(`   Total Sections: ${sections.length}`);
-    console.log(`   Total Chapters: ${totalChapters}`);
+    console.log(`   Total Products: ${products.length}`);
+    console.log(`   Total Systems: ${totalSystems}`);
     console.log(`   Total Topics: ${totalTopics}`);
+    console.log(`   Total Subtopics: ${totalSubtopics}`);
     console.log(`\n${"=".repeat(80)}\n`);
   } catch (error) {
     console.error("❌ Error checking database:", error);
@@ -88,4 +99,3 @@ async function checkDatabaseContent() {
 }
 
 checkDatabaseContent();
-

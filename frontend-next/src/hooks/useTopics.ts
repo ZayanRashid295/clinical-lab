@@ -90,4 +90,3 @@ const useTopics = (
 };
 
 export default useTopics;
-

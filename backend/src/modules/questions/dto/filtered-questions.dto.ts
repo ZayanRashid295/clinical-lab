@@ -4,24 +4,7 @@ import { Transform } from "class-transformer";
 
 export class FilteredQuestionsDto {
   @ApiProperty({
-    description: "Array of tag IDs to filter by",
-    example: ["tag1", "tag2"],
-    required: false,
-    type: [String],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @Transform(({ value }) => {
-    if (typeof value === "string") {
-      return value.split(",").filter((v) => v.trim());
-    }
-    return Array.isArray(value) ? value : [];
-  })
-  tagIds?: string[];
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-  @ApiProperty({
-    description: "Array of system (section) IDs to filter by",
+    description: "Array of system IDs to filter by",
     example: ["system1", "system2"],
     required: false,
     type: [String],
@@ -36,10 +19,10 @@ export class FilteredQuestionsDto {
     return Array.isArray(value) ? value : [];
   })
   systemIds?: string[];
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      
   @ApiProperty({
-    description: "Array of subject (chapter) IDs to filter by",
-    example: ["subject1", "subject2"],
+    description: "Array of system (section) IDs to filter by",
+    example: ["system1", "system2"],
     required: false,
     type: [String],
   })
@@ -70,6 +53,23 @@ export class FilteredQuestionsDto {
     return Array.isArray(value) ? value : [];
   })
   topicIds?: string[];
+
+  @ApiProperty({
+    description: "Array of subtopic IDs to filter by",
+    example: ["subtopic1", "subtopic2"],
+    required: false,
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (typeof value === "string") {
+      return value.split(",").filter((v) => v.trim());
+    }
+    return Array.isArray(value) ? value : [];
+  })
+  subtopicIds?: string[];
 
   @ApiProperty({
     description: "Question pool to filter by (unused, incorrect, correct, omitted). Use 'marked' parameter separately to filter by marked status.",

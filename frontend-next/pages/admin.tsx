@@ -8,11 +8,9 @@ import SystemSettingsContent from "../src/app/components/Content/SystemSettingsC
 import SubscriptionManagementContent from "../src/app/components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../src/app/components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../src/app/components/Content/PackageFeatureManagementContent";
+import CategoryManagementContent from "../src/app/components/Content/CategoryManagementContent";
 import ProductManagementContent from "../src/app/components/Content/ProductManagementContent";
-import ProductTagManagementContent from "../src/app/components/Content/ProductTagManagementContent";
 import ProductSubtypeManagementContent from "../src/app/components/Content/ProductSubtypeManagementContent";
-import SectionManagementContent from "../src/app/components/Content/SectionManagementContent";
-import ChapterManagementContent from "../src/app/components/Content/ChapterManagementContent";
 import TopicManagementContent from "../src/app/components/Content/TopicManagementContent";
 import QuestionPaperManagementContent from "../src/app/components/Content/QuestionPaperManagementContent";
 import QuestionPaperQuestionManagementContent from "../src/app/components/Content/QuestionPaperQuestionManagementContent";
@@ -237,13 +235,12 @@ export default function AdminPage() {
       "subscriptions-list": () => <SubscriptionManagementContent />,
       "subscription-packages": () => <SubscriptionPackageManagementContent />,
       "package-features": () => <PackageFeatureManagementContent />,
+      categories: () => <CategoryManagementContent />,
       products: () => <ProductManagementContent />,
       "products-list": () => <ProductManagementContent />,
-      "product-tags": () => <ProductTagManagementContent />,
       "product-subtypes": () => <ProductSubtypeManagementContent />,
-      content: () => <SectionManagementContent />,
-      sections: () => <SectionManagementContent />,
-      chapters: () => <ChapterManagementContent />,
+      content: () => <ProductManagementContent />,
+      sections: () => <ProductManagementContent />,
       topics: () => <TopicManagementContent />,
       questions: () => <QuestionManagementContent />,
       "question-choices": () => <QuestionChoiceManagementContent />,

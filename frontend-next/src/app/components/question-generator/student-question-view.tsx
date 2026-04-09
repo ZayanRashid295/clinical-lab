@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
+import { useToast } from "@/shared/ui/use-toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,7 @@ import { useAccessControl } from "@/hooks/useAccessControl"
 import { Crown } from "lucide-react"
 
 export default function StudentQuestionView() {
+  const { toast } = useToast()
   const router = useRouter()
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [answered, setAnswered] = useState(false)
@@ -348,14 +350,13 @@ export default function StudentQuestionView() {
       }
     }
     
-    // Generate questionId based on system, subject, and topic (same logic as edit mode)
+    // Generate questionId based on system and topic (same logic as edit mode)
     // Only generate if not stored in tags
     const generateQuestionId = () => {
-      const system = backendQuestion.system || backendQuestion.subject || ""
-      const subject = backendQuestion.subject || ""
+      const system = backendQuestion.system?.name || backendQuestion.system || ""
       const topicId = backendQuestion.topicId || backendQuestion.topic?.id || ""
       
-      if (!system && !subject && !topicId) {
+      if (!system && !topicId) {
         return null
       }
 
@@ -368,18 +369,10 @@ export default function StudentQuestionView() {
             .substring(0, 4)
         : "SYS"
       
-      const subjectAbbr = subject
-        ? subject
-            .split(" ")
-            .map((word: string) => word.charAt(0).toUpperCase())
-            .join("")
-            .substring(0, 4)
-        : "SUB"
-      
       // Use last 4 characters of topic ID as unique identifier
       const topicAbbr = topicId ? topicId.slice(-4).toUpperCase() : "TOP"
 
-      return `Q-${systemAbbr}-${subjectAbbr}-${topicAbbr}`
+      return `Q-${systemAbbr}-${topicAbbr}`
     }
 
     return {
@@ -387,8 +380,7 @@ export default function StudentQuestionView() {
       questionId: storedQuestionId || generateQuestionId(),
       stem: backendQuestion.question || "",
       questionStemBlocks,
-      subject: backendQuestion.subject || "",
-      system: backendQuestion.system || "",
+      system: backendQuestion.system?.name || backendQuestion.system || "",
       topic: backendQuestion.topic,
       topicId: backendQuestion.topicId,
       options,
@@ -463,7 +455,7 @@ export default function StudentQuestionView() {
       const questionPaperIdParam = searchParams.get("questionPaperId")
       const tagIdsParam = searchParams.get("tagIds")
       const systemIdsParam = searchParams.get("systemIds")
-      const subjectIdsParam = searchParams.get("subjectIds")
+      const subjectIdsParam = searchParams.get("subjectIds") // Deprecated, but keep for fallback if needed during transition
       const topicIdsParam = searchParams.get("topicIds")
       const poolParam = searchParams.get("pool")
       const markedParam = searchParams.get("marked")
@@ -548,7 +540,7 @@ export default function StudentQuestionView() {
         allQuestions = await Promise.all(questionPromises)
       } else {
         // Original logic for loading from filters or all questions
-        const hasFilters = tagIdsParam || systemIdsParam || subjectIdsParam || topicIdsParam
+        const hasFilters = tagIdsParam || systemIdsParam || topicIdsParam
 
         if (hasFilters) {
         // Use filtered questions endpoint
@@ -558,9 +550,6 @@ export default function StudentQuestionView() {
         }
         if (systemIdsParam) {
           filters.systemIds = systemIdsParam.split(",").filter((id) => id.trim())
-        }
-        if (subjectIdsParam) {
-          filters.subjectIds = subjectIdsParam.split(",").filter((id) => id.trim())
         }
         if (topicIdsParam) {
           filters.topicIds = topicIdsParam.split(",").filter((id) => id.trim())
@@ -1598,7 +1587,11 @@ export default function StudentQuestionView() {
       }
     } catch (error: any) {
       console.error("Failed to end test:", error)
-      alert("Failed to save test. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to save test. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsEndingTest(false)
       setShowEndTestDialog(false)
@@ -1707,20 +1700,13 @@ export default function StudentQuestionView() {
               >
                 {loading ? "⏳ Loading..." : "↻ Refresh"}
               </button>
-              {currentQuestion.subject || currentQuestion.system ? (
+              {currentQuestion.system && (
                 <div className="flex flex-wrap gap-2">
-                  {currentQuestion.subject && (
-                    <span className="px-3 py-1 bg-primary/12 dark:bg-primary/20 text-primary dark:text-blue-400 rounded-lg text-xs font-semibold border border-primary/25 dark:border-primary/30">
-                      {currentQuestion.subject}
-                    </span>
-                  )}
-                  {currentQuestion.system && (
-                    <span className="px-3 py-1 bg-secondary/12 dark:bg-secondary/20 text-secondary dark:text-purple-400 rounded-lg text-xs font-semibold border border-secondary/25 dark:border-secondary/30">
-                      {currentQuestion.system}
-                    </span>
-                  )}
+                  <span className="px-3 py-1 bg-secondary/12 dark:bg-secondary/20 text-secondary dark:text-purple-400 rounded-lg text-xs font-semibold border border-secondary/25 dark:border-secondary/30">
+                    {currentQuestion.system}
+                  </span>
                 </div>
-              ) : null}
+              )}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -1889,7 +1875,7 @@ export default function StudentQuestionView() {
                   correctAnswerLabel={correctAnswerLabel}
                   options={currentQuestion.options}
                   perAnswerExplanations={currentQuestion.perAnswerExplanations}
-                  chapter={currentQuestion.subject}
+                  chapter={currentQuestion.system}
                   chapterLabel="System"
                   topic={currentQuestion.topic}
                 />

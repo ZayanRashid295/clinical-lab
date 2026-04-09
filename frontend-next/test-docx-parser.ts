@@ -122,8 +122,8 @@ async function testParseDocxFile(filePath: string) {
 
     // Extract Question Stem
     const questionPatterns = [
-      /Q\s*\d+:\s*(.+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/is,
-      /Question[^:]*:\s*(.+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/is,
+      /Q\s*\d+:\s*([\s\S]+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/i,
+      /Question[^:]*:\s*([\s\S]+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/i,
     ];
 
     let stemFound = false;
@@ -172,7 +172,7 @@ async function testParseDocxFile(filePath: string) {
     }
 
     // Extract Keywords
-    const keywordsMatch = text.match(/Keywords[^:]*:\s*(.+?)(?=Explanation|Choice-by-Choice|$)/is);
+    const keywordsMatch = text.match(/Keywords[^:]*:\s*([\s\S]+?)(?=Explanation|Choice-by-Choice|$)/i);
     if (keywordsMatch) {
       const keywordsText = keywordsMatch[1].substring(0, 200);
       console.log(`✅ Keywords section found (${keywordsText.length} chars)`);
@@ -182,7 +182,7 @@ async function testParseDocxFile(filePath: string) {
     }
 
     // Extract Explanation
-    const explanationMatch = text.match(/Explanation\s*(.+?)(?=Subject:|Topic:|$)/is);
+    const explanationMatch = text.match(/Explanation\s*([\s\S]+?)(?=Subject:|Topic:|$)/i);
     if (explanationMatch) {
       const explanationText = explanationMatch[1].substring(0, 200);
       console.log(`✅ Explanation section found (${explanationText.length} chars)`);

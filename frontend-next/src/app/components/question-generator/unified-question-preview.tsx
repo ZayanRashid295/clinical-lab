@@ -7,10 +7,8 @@ import QuestionPanel from "./question-panel"
 import ExplanationPanel from "./explanation-panel"
 import { QuestionCreatorData } from "./question-creator/types"
 import { blocksToHTML } from "./unified-editor/content-utils"
-import { SectionsService } from "@/app/services/content/sections.service"
-import { ChaptersService } from "@/app/services/content/chapters.service"
+import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
-import { ProductTagsService } from "@/app/services/products/product-tags.service"
 
 interface UnifiedQuestionPreviewProps {
   questionData: QuestionCreatorData
@@ -31,12 +29,9 @@ export default function UnifiedQuestionPreview({
   // Metadata name states
   const [chapterName, setChapterName] = useState<string>("")
   const [topicName, setTopicName] = useState<string>("")
-  const [subjectTagName, setSubjectTagName] = useState<string>("")
   
-  const sectionsService = new SectionsService()
-  const chaptersService = new ChaptersService()
+  const systemsService = new SystemsService()
   const topicsService = new TopicsService()
-  const productTagsService = new ProductTagsService()
 
   // Fetch metadata names
   const fetchMetadataNames = useCallback(async () => {
@@ -46,9 +41,9 @@ export default function UnifiedQuestionPreview({
     const promises: Promise<any>[] = []
 
     // Fetch chapter name
-    if (metadata.chapterId) {
+    if (metadata.systemId) {
       promises.push(
-        chaptersService.getChapter(metadata.chapterId)
+        systemsService.getSystem(metadata.systemId)
           .then((chapter) => {
             setChapterName(chapter?.name || metadata.system || "")
           })
@@ -69,20 +64,8 @@ export default function UnifiedQuestionPreview({
       )
     }
 
-    // Fetch tag name
-    const selectedTagId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
-    if (selectedTagId) {
-      promises.push(
-        productTagsService.getTag(selectedTagId)
-          .then((tag) => {
-            setSubjectTagName(tag?.name || "")
-          })
-          .catch(() => setSubjectTagName(""))
-      )
-    }
-
     await Promise.all(promises)
-  }, [questionData.metadata?.chapterId, questionData.metadata?.topicId, questionData.metadata?.productTagId, questionData.metadata?.productTagIds, questionData.metadata?.subject])
+  }, [questionData.metadata?.systemId, questionData.metadata?.topicId])
 
   useEffect(() => {
     fetchMetadataNames()
@@ -118,9 +101,9 @@ export default function UnifiedQuestionPreview({
   }
   
   // Prepare metadata for ExplanationPanel
-  const displayChapterName = chapterName || questionData.metadata?.system || ""
+  const systemMeta = questionData.metadata?.system;
+  const displayChapterName = chapterName || (typeof systemMeta === 'string' ? systemMeta : (systemMeta as any)?.name) || ""
   const displayTopic = topicName ? { name: topicName } : (questionData.metadata?.topicId ? { name: "Loading..." } : undefined)
-  const displaySubjectTag = subjectTagName || (questionData.metadata?.productTagId || questionData.metadata?.productTagIds?.[0] ? "Loading..." : undefined)
 
   return (
     <div className="h-full bg-background dark:bg-gray-900 flex flex-col w-full" style={{ marginTop: '-2rem', paddingTop: 0 }}>
@@ -168,7 +151,7 @@ export default function UnifiedQuestionPreview({
             <div className="overflow-y-auto flex-1 pr-1">
               <div className="animate-fade-in space-y-2">
                 <QuestionPanel
-                  question={question}
+                   question={question}
                   selectedAnswer={selectedAnswer}
                   answered={answered}
                   onSelectAnswer={handleSelectAnswer}
@@ -236,7 +219,6 @@ export default function UnifiedQuestionPreview({
               perAnswerExplanations={question.perAnswerExplanations}
               chapter={displayChapterName || undefined}
               chapterLabel="System"
-              subjectTag={displaySubjectTag}
               topic={displayTopic}
             />
           </div>
@@ -245,3 +227,4 @@ export default function UnifiedQuestionPreview({
     </div>
   )
 }
+

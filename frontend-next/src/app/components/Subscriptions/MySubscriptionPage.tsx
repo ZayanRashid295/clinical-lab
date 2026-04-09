@@ -31,9 +31,11 @@ import {
 import { Switch } from "../../../shared/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../shared/ui/card";
 import { Badge } from "../../../shared/ui/badge";
+import { useToast } from "../../../shared/ui/use-toast";
 import { Alert, AlertDescription } from "../../../shared/ui/alert";
 
 export default function MySubscriptionPage() {
+  const { toast } = useToast();
   const router = useRouter();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [availablePackages, setAvailablePackages] = useState<SubscriptionPackage[]>([]);
@@ -131,7 +133,11 @@ export default function MySubscriptionPage() {
       router.push(`/checkout-basic?packageId=${packageToUpgrade.id}`);
     } catch (err: any) {
       console.error("Error initiating upgrade:", err);
-      alert(err.message || "Failed to initiate upgrade");
+      toast({
+        title: "Upgrade Failed",
+        description: err.message || "Failed to initiate upgrade",
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }
@@ -153,7 +159,11 @@ export default function MySubscriptionPage() {
       setSubscriptionToCancel(null);
     } catch (err: any) {
       console.error("Error cancelling subscription:", err);
-      alert(err.message || "Failed to cancel subscription");
+      toast({
+        title: "Cancellation Failed",
+        description: err.message || "Failed to cancel subscription",
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }
@@ -168,7 +178,11 @@ export default function MySubscriptionPage() {
       await loadData(); // Reload subscriptions
     } catch (err: any) {
       console.error("Error updating auto-renew:", err);
-      alert(err.message || "Failed to update auto-renew setting");
+      toast({
+        title: "Update Failed",
+        description: err.message || "Failed to update auto-renew setting",
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }

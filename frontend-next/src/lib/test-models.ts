@@ -25,8 +25,9 @@ export interface Question {
   content: string; // The question text
   type: "multiple_choice" | "true_false" | "fill_blank" | "essay";
   difficulty: "beginner" | "intermediate" | "advanced";
-  subject: string; // e.g., cardiology, neurology, internal_medicine
-  topic?: string; // more specific topic within subject
+  system: string; // e.g., cardiology, neurology, internal_medicine
+  topic?: string; // more specific topic within system
+  subtopic?: string; // more specific subtopic within topic
   explanation?: string; // Detailed explanation of the answer
   isActive: boolean;
   createdBy: string;
@@ -113,20 +114,22 @@ export interface TestCreationConfig {
   type: "practice" | "assessment" | "exam";
   difficulty: "beginner" | "intermediate" | "advanced";
   timeLimit?: number;
-  subjectFilters: string[];
+  systemFilters: string[];
   topicFilters: string[];
+  subtopicFilters: string[];
   difficultyFilters: string[];
   questionCount: number;
 }
 
 export interface QuestionFilter {
-  subjects: string[];
+  systems: string[];
   topics: string[];
+  subtopics: string[];
   difficulties: string[];
   questionTypes: string[];
   searchTerm?: string;
   hasExplanation?: boolean;
-  sortBy: "created" | "difficulty" | "subject" | "topic";
+  sortBy: "created" | "difficulty" | "system" | "topic";
   sortOrder: "asc" | "desc";
 }
 
@@ -139,7 +142,7 @@ export interface TestSessionState {
 }
 
 // Medical-specific question categories
-export const MEDICAL_SUBJECTS = [
+export const HIERARCHY_SYSTEMS = [
   "internal_medicine",
   "cardiology",
   "neurology",
@@ -189,7 +192,7 @@ export const DIFFICULTY_LEVELS = [
 export const TEST_TYPES = ["practice", "assessment", "exam"] as const;
 
 // Utility types
-export type MedicalSubject = (typeof MEDICAL_SUBJECTS)[number];
+export type HierarchySystem = (typeof HIERARCHY_SYSTEMS)[number];
 export type QuestionType = (typeof QUESTION_TYPES)[number];
 export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];
 export type TestType = (typeof TEST_TYPES)[number];

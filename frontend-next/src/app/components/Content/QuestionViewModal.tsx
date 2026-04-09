@@ -116,33 +116,13 @@ export default function QuestionViewModal({
                     <p className="text-gray-900">
                       {question.topic?.name || "N/A"}
                     </p>
-                    {question.topic?.chapter?.name && (
+                    {question.topic?.system?.name && (
                       <span className="ml-2 text-xs text-gray-500">
-                        ({question.topic.chapter.name})
+                        ({question.topic.system.name})
                       </span>
                     )}
                   </div>
                 </div>
-
-                {question.productTag && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Subject</p>
-                    <div className="flex items-center mt-1">
-                      <Tag className="h-4 w-4 text-gray-400 mr-2" />
-                      <span
-                        className="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                        style={{
-                          backgroundColor: question.productTag.color
-                            ? `${question.productTag.color}20`
-                            : "#f3f4f6",
-                          color: question.productTag.color || "#6b7280",
-                        }}
-                      >
-                        {question.productTag.name}
-                      </span>
-                    </div>
-                  </div>
-                )}
 
                 <div>
                   <p className="text-sm font-medium text-gray-500">

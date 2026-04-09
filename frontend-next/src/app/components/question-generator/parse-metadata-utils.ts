@@ -37,7 +37,7 @@ export function parseTagsFromString(tagString: string): string[] {
 export function parseTagsFromYamlLine(yamlLine: string): string[] | null {
   if (!yamlLine || !yamlLine.includes("tags:")) return null;
   const trimmed = yamlLine.trim();
-  const bracketMatch = trimmed.match(/tags:\s*\[\s*(.*?)\s*\]/s);
+  const bracketMatch = trimmed.match(/tags:\s*\[\s*([\s\S]*?)\s*\]/i);
   if (bracketMatch) {
     const inner = bracketMatch[1].trim();
     if (!inner) return [];

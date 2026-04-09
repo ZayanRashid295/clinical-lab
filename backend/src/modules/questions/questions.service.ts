@@ -16,8 +16,9 @@ import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { ConvertDocxDto } from "./dto/convert-docx.dto";
 
 interface QuestionFilters {
+  subtopicId?: string;
+  systemId?: string;
   topicId?: string;
-  tagId?: string;
   difficulty?: string;
   isActive?: boolean;
   limit?: number;
@@ -25,8 +26,9 @@ interface QuestionFilters {
 }
 
 interface RandomQuestionFilters {
+  subtopicId?: string;
+  systemId?: string;
   topicId?: string;
-  tagId?: string;
   difficulty?: string;
   count?: number;
 }
@@ -61,8 +63,8 @@ export class QuestionsService {
         search,
         status,
         difficulty,
-        topicId,
-        productTagId,
+        subtopicId,
+        systemId,
         dateFrom,
         dateTo,
         page = 1,
@@ -93,13 +95,13 @@ export class QuestionsService {
       }
 
       // Topic ID filter
-      if (topicId) {
-        where.topicId = topicId;
+      if (subtopicId) {
+        where.subtopicId = subtopicId;
       }
 
       // Product tag ID filter
-      if (productTagId) {
-        where.productTagId = productTagId;
+      if (systemId) {
+        where.systemId = systemId;
       }
 
       // Date range filter
@@ -127,43 +129,15 @@ export class QuestionsService {
       const questions = await this.prisma.question.findMany({
         where,
         include: {
-          choices: {
-            orderBy: {
-              order: "asc",
-            },
-          },
-          questionStemBlocks: {
-            orderBy: { order: "asc" },
-          },
-          explanationBlocks: {
-            orderBy: { order: "asc" },
-          },
+          choices: { orderBy: { order: "asc" } },
+          questionStemBlocks: { orderBy: { order: "asc" } },
+          explanationBlocks: { orderBy: { order: "asc" } },
           perAnswerExplanations: {
-            include: {
-              blocks: { orderBy: { order: "asc" } },
-            },
+            include: { blocks: { orderBy: { order: "asc" } } },
           },
-          productTag: true,
-          chapter: true,
-          section: true,
-          topic: {
-            include: {
-              chapter: {
-                include: {
-                  section: {
-                    include: {
-                      product: {
-                        select: {
-                          id: true,
-                          name: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
         skip,
         take: limit,
@@ -190,12 +164,12 @@ export class QuestionsService {
   async findAllLegacy(filters: QuestionFilters) {
     const where: any = {};
 
-    if (filters.topicId) {
-      where.topicId = filters.topicId;
+    if (filters.subtopicId) {
+      where.subtopicId = filters.subtopicId;
     }
 
-    if (filters.tagId) {
-      where.productTagId = filters.tagId;
+    if (filters.systemId) {
+      where.systemId = filters.systemId;
     }
 
     if (filters.difficulty) {
@@ -210,30 +184,10 @@ export class QuestionsService {
       this.prisma.question.findMany({
         where,
         include: {
-          choices: {
-            orderBy: {
-              order: "asc",
-            },
-          },
-          productTag: true,
-          topic: {
-            include: {
-              chapter: {
-                include: {
-                  section: {
-                    include: {
-                      product: {
-                        select: {
-                          id: true,
-                          name: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          choices: { orderBy: { order: "asc" } },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
         orderBy: {
           createdAt: "asc",
@@ -255,12 +209,12 @@ export class QuestionsService {
   async getRandomQuestions(filters: RandomQuestionFilters) {
     const where: any = { isActive: true };
 
-    if (filters.topicId) {
-      where.topicId = filters.topicId;
+    if (filters.subtopicId) {
+      where.subtopicId = filters.subtopicId;
     }
 
-    if (filters.tagId) {
-      where.productTagId = filters.tagId;
+    if (filters.systemId) {
+      where.systemId = filters.systemId;
     }
 
     if (filters.difficulty) {
@@ -280,30 +234,10 @@ export class QuestionsService {
     const questions = await this.prisma.question.findMany({
       where,
       include: {
-        choices: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-        productTag: true,
-        topic: {
-          include: {
-            chapter: {
-              include: {
-                section: {
-                  include: {
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        choices: { orderBy: { order: "asc" } },
+        system: { include: { product: { select: { id: true, name: true } } } },
+        topic: true,
+        subtopic: true,
       },
       take: Math.min(count, totalCount),
       orderBy: {
@@ -316,21 +250,21 @@ export class QuestionsService {
   }
 
   async getQuestionsByTopic(
-    topicId: string,
+    subtopicId: string,
     isActive?: boolean,
     limit?: number,
     offset?: number
   ) {
     // First check if topic exists
-    const topic = await this.prisma.topic.findUnique({
-      where: { id: topicId },
+    const topic = await this.prisma.subtopic.findUnique({
+      where: { id: subtopicId },
     });
 
     if (!topic) {
-      throw new NotFoundException(`Topic with ID ${topicId} not found`);
+      throw new NotFoundException(`Topic with ID ${subtopicId} not found`);
     }
 
-    const where: any = { topicId };
+    const where: any = { subtopicId };
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -344,7 +278,7 @@ export class QuestionsService {
               order: "asc",
             },
           },
-          productTag: true,
+          system: true,
         },
         orderBy: {
           createdAt: "asc",
@@ -364,21 +298,21 @@ export class QuestionsService {
   }
 
   async getQuestionsByTag(
-    tagId: string,
+    systemId: string,
     isActive?: boolean,
     limit?: number,
     offset?: number
   ) {
     // First check if tag exists
-    const tag = await this.prisma.productTag.findUnique({
-      where: { id: tagId },
+    const tag = await this.prisma.system.findUnique({
+      where: { id: systemId },
     });
 
     if (!tag) {
-      throw new NotFoundException(`Tag with ID ${tagId} not found`);
+      throw new NotFoundException(`Tag with ID ${systemId} not found`);
     }
 
-    const where: any = { productTagId: tagId };
+    const where: any = { systemId };
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -392,25 +326,9 @@ export class QuestionsService {
               order: "asc",
             },
           },
-          productTag: true,
-          topic: {
-            include: {
-              chapter: {
-                include: {
-                  section: {
-                    include: {
-                      product: {
-                        select: {
-                          id: true,
-                          name: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
         orderBy: {
           createdAt: "asc",
@@ -461,43 +379,15 @@ export class QuestionsService {
     const question = await this.prisma.question.findUnique({
       where: { id },
       include: {
-        choices: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-        questionStemBlocks: {
-          orderBy: { order: "asc" },
-        },
-        explanationBlocks: {
-          orderBy: { order: "asc" },
-        },
+        choices: { orderBy: { order: "asc" } },
+        questionStemBlocks: { orderBy: { order: "asc" } },
+        explanationBlocks: { orderBy: { order: "asc" } },
         perAnswerExplanations: {
-          include: {
-            blocks: { orderBy: { order: "asc" } },
-          },
+          include: { blocks: { orderBy: { order: "asc" } } },
         },
-        productTag: true,
-        chapter: true,
-        section: true,
-        topic: {
-          include: {
-            chapter: {
-              include: {
-                section: {
-                  include: {
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        system: { include: { product: { select: { id: true, name: true } } } },
+        topic: true,
+        subtopic: true,
       },
     });
 
@@ -510,65 +400,49 @@ export class QuestionsService {
 
   async create(createQuestionDto: CreateQuestionDto) {
     try {
-    // Extract rich explanation parts not directly mappable to Question fields
-    const {
-      explanationBlocks,
-      perAnswerExplanations,
-      questionStemBlocks,
-      tags,
-      chapterId,
-      sectionId,
-      ...questionCore
-    } = createQuestionDto as any;
+      // Extract rich explanation parts not directly mappable to Question fields
+      const {
+        explanationBlocks,
+        perAnswerExplanations,
+        questionStemBlocks,
+        tags,
+        topicId,
+        subtopicId,
+        ...questionCore
+      } = createQuestionDto as any;
 
-    let resolvedSectionId = sectionId;
-    // If chapterId is provided, fetch chapter (name and sectionId)
-    if (chapterId) {
-      const chapter = await this.prisma.chapter.findUnique({
-        where: { id: chapterId },
-        select: { name: true, sectionId: true },
-      });
-      if (chapter) {
-        // DO NOT override subject if already provided from frontend
-        // Subject should come from parsed markdown (maps to Product Tag), not from chapter name
-        // Only derive subject from chapter if it's not provided
-        if (!questionCore.subject) {
-          questionCore.subject = chapter.name;
+      let finalTopicId = topicId;
+
+      // If subtopicId is provided, fetch topic, system, and product info
+      if (subtopicId) {
+        const subtopic = await this.prisma.subtopic.findUnique({
+          where: { id: subtopicId },
+          include: {
+            topic: {
+              include: {
+                system: {
+                  include: { product: { select: { name: true } } }
+                }
+              }
+            }
+          },
+        });
+        if (subtopic?.topic?.system) {
+          // System matches the parent relation
+          questionCore.systemId = subtopic.topic.systemId;
+          
+          // Forcefully override topicId to guarantee hierarchy integrity
+          finalTopicId = subtopic.topicId;
         }
-        // Derive section from chapter when sectionId not provided
-        if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
       }
-    }
-    // Default to "General Principles" when no section/chapter provided (e.g. uploaded questions)
-    if (!resolvedSectionId) {
-      const defaultSection = await this.prisma.section.findFirst({
-        where: { name: "General Principles", isActive: true },
-        select: { id: true },
-      });
-      if (defaultSection) resolvedSectionId = defaultSection.id;
-    }
 
-    // If sectionId is provided (or derived from chapter), fetch section name for system
-    // DO NOT override system if already provided from frontend
-    // System should come from parsed markdown (maps to Chapter), not from section name
-    // Only derive system from section if it's not provided
-    if (resolvedSectionId && !questionCore.system) {
-      const section = await this.prisma.section.findUnique({
-        where: { id: resolvedSectionId },
-        select: { name: true },
-      });
-      if (section) {
-        questionCore.system = section.name;
-      }
-    }
+      // Prepare tags as JSON if provided
+      const tagsJson = Array.isArray(tags) ? (tags as string[]) : undefined;
 
-    // Prepare tags as JSON if provided
-    const tagsJson = Array.isArray(tags) ? (tags as string[]) : undefined;
-
-    // Build nested create for explanation blocks
-    const explanationBlocksCreate =
-      Array.isArray(explanationBlocks) && explanationBlocks.length > 0
-        ? {
+      // Build nested create for explanation blocks
+      const explanationBlocksCreate =
+        Array.isArray(explanationBlocks) && explanationBlocks.length > 0
+          ? {
               create: explanationBlocks.map((b: any, idx: number) => {
                 // Ensure data is a valid JSON object
                 let blockData = b.data;
@@ -584,18 +458,18 @@ export class QuestionsService {
 
                 return {
                   type: blockType,
-              order: typeof b.order === "number" ? b.order : idx,
+                  order: typeof b.order === "number" ? b.order : idx,
                   data: blockData,
                 };
               }),
-          }
-        : undefined;
+            }
+          : undefined;
 
-    // Build nested create for per-answer explanations
-    const perAnswerCreate =
-      perAnswerExplanations && typeof perAnswerExplanations === "object"
-        ? {
-            create: Object.entries(perAnswerExplanations).map(
+      // Build nested create for per-answer explanations
+      const perAnswerCreate =
+        perAnswerExplanations && typeof perAnswerExplanations === "object"
+          ? {
+              create: Object.entries(perAnswerExplanations).map(
                 ([label, blocks]: [string, any[]]) => {
                   if (!Array.isArray(blocks)) {
                     return {
@@ -605,8 +479,8 @@ export class QuestionsService {
                   }
 
                   return {
-                choiceLabel: String(label),
-                blocks: {
+                    choiceLabel: String(label),
+                    blocks: {
                       create: blocks.map((b: any, idx: number) => {
                         // Ensure data is a valid JSON object
                         let blockData = b.data;
@@ -622,111 +496,85 @@ export class QuestionsService {
 
                         return {
                           type: blockType,
-                        order: typeof b.order === "number" ? b.order : idx,
+                          order: typeof b.order === "number" ? b.order : idx,
                           data: blockData,
                         };
                       }),
-                },
+                    },
                   };
                 }
-            ),
-          }
-        : undefined;
+              ),
+            }
+          : undefined;
 
-    // Build nested create for question stem blocks
-    const questionStemBlocksCreate =
-      Array.isArray(questionStemBlocks) && questionStemBlocks.length > 0
-        ? {
-            create: questionStemBlocks.map((b: any, idx: number) => {
-              // Ensure data is a valid JSON object
-              let blockData = b.data;
-              if (typeof blockData !== "object" || blockData === null) {
-                blockData = {};
-              }
-              
-              // Ensure type is valid
-              const validTypes = ["TEXT", "IMAGES", "TABLE"];
-              const blockType = validTypes.includes(b.type?.toUpperCase()) 
-                ? b.type.toUpperCase() 
-                : "TEXT";
+      // Build nested create for question stem blocks
+      const questionStemBlocksCreate =
+        Array.isArray(questionStemBlocks) && questionStemBlocks.length > 0
+          ? {
+              create: questionStemBlocks.map((b: any, idx: number) => {
+                // Ensure data is a valid JSON object
+                let blockData = b.data;
+                if (typeof blockData !== "object" || blockData === null) {
+                  blockData = {};
+                }
+                
+                // Ensure type is valid
+                const validTypes = ["TEXT", "IMAGES", "TABLE"];
+                const blockType = validTypes.includes(b.type?.toUpperCase()) 
+                  ? b.type.toUpperCase() 
+                  : "TEXT";
 
-              return {
-                type: blockType,
-                order: typeof b.order === "number" ? b.order : idx,
-                data: blockData,
-              };
-            }),
-          }
-        : undefined;
+                return {
+                  type: blockType,
+                  order: typeof b.order === "number" ? b.order : idx,
+                  data: blockData,
+                };
+              }),
+            }
+          : undefined;
 
-      // Truncate subject and system to 500 characters if they're too long (database limit)
-      const truncatedQuestionCore = {
-        ...questionCore,
-        ...(questionCore.subject && questionCore.subject.length > 500
-          ? { subject: questionCore.subject.substring(0, 497) + "..." }
-          : {}),
-        ...(questionCore.system && questionCore.system.length > 500
-          ? { system: questionCore.system.substring(0, 497) + "..." }
-          : {}),
-      };
+      // Truncate fields if they're too long (not needed for deprecated string fields)
+      
+      const { subject: _subject, system: _system, chapterId: _chapterId, productTagId: _productTagId, ...cleanedQuestionCore } = questionCore;
 
       return await this.prisma.question.create({
-      data: {
-        ...truncatedQuestionCore,
-        // Add chapterId and sectionId if provided
-        ...(chapterId ? { chapterId } : {}),
-        ...(resolvedSectionId ? { sectionId: resolvedSectionId } : {}),
-        // Persist tags as Json if present
-        ...(tagsJson ? { tags: tagsJson as unknown as any } : {}),
-        // Nested relations
-        ...(questionStemBlocksCreate
-          ? { questionStemBlocks: questionStemBlocksCreate }
-          : {}),
-        ...(explanationBlocksCreate
-          ? { explanationBlocks: explanationBlocksCreate }
-          : {}),
-        ...(perAnswerCreate ? { perAnswerExplanations: perAnswerCreate } : {}),
-      },
-      include: {
-        choices: {
-          orderBy: { order: "asc" },
+        data: {
+          ...cleanedQuestionCore,
+          ...(subtopicId ? { subtopicId } : {}),
+          ...(finalTopicId ? { topicId: finalTopicId } : {}),
+          // Persist tags as Json if present
+          ...(tagsJson ? { tags: tagsJson as unknown as any } : {}),
+          // Nested relations
+          ...(questionStemBlocksCreate
+            ? { questionStemBlocks: questionStemBlocksCreate }
+            : {}),
+          ...(explanationBlocksCreate
+            ? { explanationBlocks: explanationBlocksCreate }
+            : {}),
+          ...(perAnswerCreate ? { perAnswerExplanations: perAnswerCreate } : {}),
         },
-        questionStemBlocks: {
-          orderBy: { order: "asc" },
-        },
-        explanationBlocks: {
-          orderBy: { order: "asc" },
-        },
-        perAnswerExplanations: {
-          include: {
-            blocks: {
-              orderBy: { order: "asc" },
-            },
+        include: {
+          choices: {
+            orderBy: { order: "asc" },
           },
-        },
-        productTag: true,
-        chapter: true,
-        section: true,
-        topic: {
-          include: {
-            chapter: {
-              include: {
-                section: {
-                  include: {
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
+          questionStemBlocks: {
+            orderBy: { order: "asc" },
+          },
+          explanationBlocks: {
+            orderBy: { order: "asc" },
+          },
+          perAnswerExplanations: {
+            include: {
+              blocks: {
+                orderBy: { order: "asc" },
               },
             },
           },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
-      },
-    });
+      });
     } catch (error: any) {
       console.error("Error creating question:", error);
       console.error("Question DTO:", JSON.stringify(createQuestionDto, null, 2));
@@ -759,81 +607,52 @@ export class QuestionsService {
       perAnswerExplanations,
       questionStemBlocks,
       tags,
-      chapterId,
-      sectionId,
+      topicId,
+      subtopicId,
       ...questionCore
     } = updateQuestionDto as any;
 
-    let resolvedSectionId = sectionId;
-    // If chapterId is provided, fetch chapter (name and sectionId)
-    if (chapterId) {
-      const chapter = await this.prisma.chapter.findUnique({
-        where: { id: chapterId },
-        select: { name: true, sectionId: true },
-      });
-      if (chapter) {
-        // DO NOT override subject if already provided from frontend
-        // Subject should come from parsed markdown (maps to Product Tag), not from chapter name
-        // Only derive subject from chapter if it's not provided
-        if (!questionCore.subject) {
-          questionCore.subject = chapter.name;
-        }
-        // Derive section from chapter when sectionId not provided
-        if (!resolvedSectionId && chapter.sectionId) resolvedSectionId = chapter.sectionId;
-      }
-    }
-    // Default to "General Principles" when no section/chapter provided
-    if (!resolvedSectionId) {
-      const defaultSection = await this.prisma.section.findFirst({
-        where: { name: "General Principles", isActive: true },
-        select: { id: true },
-      });
-      if (defaultSection) resolvedSectionId = defaultSection.id;
-    }
+    let finalTopicId = topicId;
 
-    // If sectionId is provided (or derived from chapter), fetch section name for system
-    // DO NOT override system if already provided from frontend
-    // System should come from parsed markdown (maps to Chapter), not from section name
-    // Only derive system from section if it's not provided
-    if (resolvedSectionId && !questionCore.system) {
-      const section = await this.prisma.section.findUnique({
-        where: { id: resolvedSectionId },
-        select: { name: true },
+    // If subtopicId is provided, fetch topic and product info
+    if (subtopicId) {
+      const subtopic = await this.prisma.subtopic.findUnique({
+        where: { id: subtopicId },
+        include: {
+          topic: {
+            include: {
+              system: {
+                include: { product: { select: { name: true } } }
+              }
+            }
+          }
+        },
       });
-      if (section) {
-        questionCore.system = section.name;
+      if (subtopic?.topic?.system) {
+        questionCore.systemId = subtopic.topic.systemId;
+        finalTopicId = subtopic.topicId;
       }
     }
 
-    // Truncate subject and system to 500 characters if they're too long (database limit)
-    const truncatedQuestionCore = {
-      ...questionCore,
-      ...(questionCore.subject && questionCore.subject.length > 500
-        ? { subject: questionCore.subject.substring(0, 497) + "..." }
-        : {}),
-      ...(questionCore.system && questionCore.system.length > 500
-        ? { system: questionCore.system.substring(0, 497) + "..." }
-        : {}),
-    };
+    const { subject: _subject, system: _system, chapterId: _chapterId, productTagId: _productTagId, ...cleanedQuestionCore } = questionCore;
 
-    // Prepare core update data
     const data: any = {
-      ...truncatedQuestionCore,
+      ...cleanedQuestionCore,
     };
     if (Array.isArray(tags)) {
       data.tags = tags as unknown as any;
     }
-    if (chapterId) {
-      data.chapterId = chapterId;
+    if (subtopicId) {
+      data.subtopicId = subtopicId;
     }
-    if (resolvedSectionId) {
-      data.sectionId = resolvedSectionId;
+    if (finalTopicId) {
+      data.topicId = finalTopicId;
     }
 
     // Execute in a transaction to keep consistency
     return this.prisma.$transaction(async (tx) => {
       // Update core fields
-      const updated = await tx.question.update({
+      await tx.question.update({
         where: { id },
         data,
       });
@@ -923,22 +742,9 @@ export class QuestionsService {
           perAnswerExplanations: {
             include: { blocks: { orderBy: { order: "asc" } } },
           },
-          productTag: true,
-          chapter: true,
-          section: true,
-          topic: {
-            include: {
-              chapter: {
-                include: {
-                  section: {
-                    include: {
-                      product: { select: { id: true, name: true } },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
       });
     });
@@ -1015,7 +821,7 @@ export class QuestionsService {
             select: {
               id: true,
               question: true,
-              topic: {
+              subtopic: {
                 select: {
                   id: true,
                   name: true,
@@ -1068,7 +874,7 @@ export class QuestionsService {
       include: {
         question: {
           include: {
-            topic: {
+            subtopic: {
               select: {
                 id: true,
                 name: true,
@@ -1143,7 +949,7 @@ export class QuestionsService {
           select: {
             id: true,
             question: true,
-            topic: {
+            subtopic: {
               select: {
                 id: true,
                 name: true,
@@ -1308,27 +1114,9 @@ export class QuestionsService {
       const { pool, marked, userId } = options || {};
 
       // Get all active product tags
-      const productTags = await this.prisma.productTag.findMany({
+      const systems = await this.prisma.system.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
-      });
-
-      // Get all active sections with their chapters and topics
-      const sections = await this.prisma.section.findMany({
-        where: { isActive: true },
-        include: {
-          chapters: {
-            where: { isActive: true },
-            include: {
-              topics: {
-                where: { isActive: true },
-                orderBy: { order: "asc" },
-              },
-            },
-            orderBy: { order: "asc" },
-          },
-        },
-        orderBy: { order: "asc" },
       });
 
       // Get all active questions to calculate counts
@@ -1336,10 +1124,9 @@ export class QuestionsService {
         where: { isActive: true },
         select: {
           id: true,
-          productTagId: true,
-          sectionId: true,
-          chapterId: true,
+          systemId: true,
           topicId: true,
+          subtopicId: true,
           tags: true,
         },
       });
@@ -1503,20 +1290,20 @@ export class QuestionsService {
         }
       }
 
-      // Helper function to check if a question matches a tag
-      const questionMatchesTag = (question: any, tagId: string): boolean => {
-        // Check direct productTagId
-        if (question.productTagId === tagId) {
+      // Helper function to check if a question matches a system
+      const questionMatchesTag = (question: any, systemId: string): boolean => {
+        // Check direct systemId
+        if (question.systemId === systemId) {
           return true;
         }
-        // Check tags JSON field for productTagIds
+        // Check tags JSON field for systemIds
         if (question.tags && Array.isArray(question.tags)) {
           for (const tag of question.tags) {
-            if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+            if (typeof tag === "string" && tag.startsWith("__systemIds:")) {
               try {
-                const tagIdsJson = tag.replace("__productTagIds:", "");
-                const tagIds = JSON.parse(tagIdsJson);
-                if (Array.isArray(tagIds) && tagIds.includes(tagId)) {
+                const systemIdsJson = tag.replace("__systemIds:", "");
+                const systemIds = JSON.parse(systemIdsJson);
+                if (Array.isArray(systemIds) && systemIds.includes(systemId)) {
                   return true;
                 }
               } catch (e) {
@@ -1529,7 +1316,7 @@ export class QuestionsService {
       };
 
       // Calculate question counts for each tag
-      const tagsWithCounts = productTags.map((tag) => {
+      const tagsWithCounts = systems.map((tag) => {
         let questionsToCount = allQuestions.filter((q) => questionMatchesTag(q, tag.id));
         if (filteredQuestionIds !== null) {
           questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
@@ -1539,126 +1326,91 @@ export class QuestionsService {
           id: tag.id,
           name: tag.name,
           description: tag.description,
-          color: tag.color,
           count,
         };
       });
 
-      // Build hierarchical structure for systems
-      const systemsWithData = sections.map((section) => {
-        const subjectsWithData = section.chapters.map((chapter) => {
-          const topicsWithData = chapter.topics.map((topic) => {
-            // Count questions for this topic across all tags
-            const topicCountsByTag: Record<string, number> = {};
-            
-            productTags.forEach((tag) => {
-              let questionsToCount = allQuestions.filter((q) => {
-                return (
-                  q.topicId === topic.id &&
-                  questionMatchesTag(q, tag.id)
-                );
-              });
-              if (filteredQuestionIds !== null) {
-                questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
-              }
-              const count = questionsToCount.length;
-              if (count > 0) {
-                topicCountsByTag[tag.id] = count;
-              }
-            });
+      // Build hierarchical structure starting from Systems
+      const systemsWithDataArr = await this.prisma.system.findMany({
+        where: { isActive: true },
+        include: {
+          topics: {
+            where: { isActive: true },
+            orderBy: { order: "asc" },
+            include: {
+              subtopics: {
+                where: { isActive: true },
+                orderBy: { order: "asc" },
+              },
+            },
+          },
+        },
+        orderBy: { order: "asc" },
+      });
 
-            // Total count for this topic (across all tags)
-            let topicQuestions = allQuestions.filter((q) => q.topicId === topic.id);
+      const systemsWithData = systemsWithDataArr.map((system) => {
+        const topicsWithData = system.topics.map((topic) => {
+          const subtopicsWithData = topic.subtopics.map((subtopic) => {
+            // Total count for this subtopic
+            let subtopicQuestions = allQuestions.filter((q) => q.subtopicId === subtopic.id);
             if (filteredQuestionIds !== null) {
-              topicQuestions = topicQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+              subtopicQuestions = subtopicQuestions.filter((q) => filteredQuestionIds!.has(q.id));
             }
-            const totalCount = topicQuestions.length;
+            const totalCount = subtopicQuestions.length;
 
             return {
-              id: topic.id,
-              name: topic.name,
-              description: topic.description,
-              order: topic.order,
+              id: subtopic.id,
+              name: subtopic.name,
+              description: subtopic.description,
+              order: subtopic.order,
               count: totalCount,
-              countsByTag: topicCountsByTag,
             };
           });
 
-          // Count questions for this chapter (subject) across all tags
-          const chapterCountsByTag: Record<string, number> = {};
-          productTags.forEach((tag) => {
-            let questionsToCount = allQuestions.filter((q) => {
-              return (
-                q.chapterId === chapter.id &&
-                questionMatchesTag(q, tag.id)
-              );
-            });
-            if (filteredQuestionIds !== null) {
-              questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
-            }
-            const count = questionsToCount.length;
-            if (count > 0) {
-              chapterCountsByTag[tag.id] = count;
-            }
-          });
-
-          // Total count for this chapter
-          let chapterQuestions = allQuestions.filter((q) => q.chapterId === chapter.id);
+          // Total count for this topic
+          const subtopicIds = new Set(topic.subtopics.map(st => st.id));
+          let topicQuestions = allQuestions.filter((q) => q.topicId === topic.id || (q.subtopicId && subtopicIds.has(q.subtopicId)));
           if (filteredQuestionIds !== null) {
-            chapterQuestions = chapterQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+            topicQuestions = topicQuestions.filter((q) => filteredQuestionIds!.has(q.id));
           }
-          const totalChapterCount = chapterQuestions.length;
+          const totalTopicCount = topicQuestions.length;
 
           return {
-            id: chapter.id,
-            name: chapter.name,
-            description: chapter.description,
-            order: chapter.order,
-            count: totalChapterCount,
-            countsByTag: chapterCountsByTag,
-            topics: topicsWithData,
+            id: topic.id,
+            name: topic.name,
+            description: topic.description,
+            order: topic.order,
+            count: totalTopicCount,
+            subtopics: subtopicsWithData,
           };
         });
 
-        // Count questions for this section (system) across all tags
-        const sectionCountsByTag: Record<string, number> = {};
-        productTags.forEach((tag) => {
-          let questionsToCount = allQuestions.filter((q) => {
-            return (
-              q.sectionId === section.id &&
-              questionMatchesTag(q, tag.id)
-            );
-          });
-          if (filteredQuestionIds !== null) {
-            questionsToCount = questionsToCount.filter((q) => filteredQuestionIds!.has(q.id));
-          }
-          const count = questionsToCount.length;
-          if (count > 0) {
-            sectionCountsByTag[tag.id] = count;
-          }
-        });
-
-        // Total count for this section
-        let sectionQuestions = allQuestions.filter((q) => q.sectionId === section.id);
+        // Total count for this system across all tags
+        const systemTopicIds = new Set(system.topics.map(t => t.id));
+        const systemSubtopicIds = new Set(system.topics.flatMap(t => t.subtopics.map(st => st.id)));
+        let systemQuestions = allQuestions.filter((q) => 
+          q.systemId === system.id || 
+          (q.topicId && systemTopicIds.has(q.topicId)) || 
+          (q.subtopicId && systemSubtopicIds.has(q.subtopicId))
+        );
         if (filteredQuestionIds !== null) {
-          sectionQuestions = sectionQuestions.filter((q) => filteredQuestionIds!.has(q.id));
+          systemQuestions = systemQuestions.filter((q) => filteredQuestionIds!.has(q.id));
         }
-        const totalSectionCount = sectionQuestions.length;
+        const totalSystemCount = systemQuestions.length;
 
         return {
-          id: section.id,
-          name: section.name,
-          description: section.description,
-          order: section.order,
-          count: totalSectionCount,
-          countsByTag: sectionCountsByTag,
-          subjects: subjectsWithData,
+          id: system.id,
+          name: system.name,
+          description: system.description,
+          order: system.order,
+          count: totalSystemCount,
+          topics: topicsWithData,
         };
       });
 
       return {
-        tags: tagsWithCounts,
         systems: systemsWithData,
+        tags: tagsWithCounts,
       };
     } catch (error) {
       console.error("Error fetching test creation data:", error);
@@ -1670,10 +1422,10 @@ export class QuestionsService {
    * Get filtered questions for test taking based on tags, systems, subjects, and topics
    */
   async getFilteredQuestions(filters: {
-    tagIds?: string[];
     systemIds?: string[];
     subjectIds?: string[];
     topicIds?: string[];
+    subtopicIds?: string[];
     pool?: "unused" | "incorrect" | "correct" | "omitted";
     marked?: boolean;
     limit?: number;
@@ -1681,26 +1433,33 @@ export class QuestionsService {
     userRoles?: string[]; // User roles to check for ADMIN/SUPERADMIN bypass
   }) {
     try {
-      const { tagIds = [], systemIds = [], subjectIds = [], topicIds = [], pool, marked, limit = 100, userId, userRoles = [] } = filters;
+      const { systemIds = [], subjectIds = [], topicIds = [], subtopicIds = [], pool, marked, limit = 100, userId, userRoles = [] } = filters;
 
       // Build where clause
       const where: any = {
         isActive: true,
       };
 
-      // Filter by topics (if provided)
+      // Filter by subtopics (if provided)
+      if (subtopicIds.length > 0) {
+        where.subtopicId = { in: subtopicIds };
+      }
+
+      // Filter by topic (if provided)
       if (topicIds.length > 0) {
         where.topicId = { in: topicIds };
       }
 
-      // Filter by sections/systems (if provided)
+      // Filter by system (if provided)
       if (systemIds.length > 0) {
-        where.sectionId = { in: systemIds };
+        where.systemId = { in: systemIds };
       }
 
-      // Filter by chapters/subjects (if provided)
+      // Filter by category/product (subjectIds) if provided (legacy)
       if (subjectIds.length > 0) {
-        where.chapterId = { in: subjectIds };
+        where.system = {
+          productId: { in: subjectIds }
+        };
       }
 
       // Get all questions first to filter by tags (since tags can be in JSON field)
@@ -1724,27 +1483,9 @@ export class QuestionsService {
               blocks: { orderBy: { order: "asc" } },
             },
           },
-          productTag: true,
-          chapter: true,
-          section: true,
-          topic: {
-            include: {
-              chapter: {
-                include: {
-                  section: {
-                    include: {
-                      product: {
-                        select: {
-                          id: true,
-                          name: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          system: { include: { product: { select: { id: true, name: true } } } },
+          topic: true,
+          subtopic: true,
         },
         orderBy: {
           createdAt: "asc",
@@ -1753,23 +1494,23 @@ export class QuestionsService {
       });
 
       // Filter by tags if provided
-      if (tagIds.length > 0) {
+      if (systemIds.length > 0) {
         questions = questions.filter((question) => {
-          // Check direct productTagId
-          if (question.productTagId && tagIds.includes(question.productTagId)) {
+          // Check direct systemId
+          if (question.systemId && systemIds.includes(question.systemId)) {
             return true;
           }
           
-          // Check tags JSON field for productTagIds
+          // Check tags JSON field for systemIds
           if (question.tags && Array.isArray(question.tags)) {
             for (const tag of question.tags) {
-              if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+              if (typeof tag === "string" && tag.startsWith("__systemIds:")) {
                 try {
-                  const tagIdsJson = tag.replace("__productTagIds:", "");
-                  const questionTagIds = JSON.parse(tagIdsJson);
+                  const systemIdsJson = tag.replace("__systemIds:", "");
+                  const questionTagIds = JSON.parse(systemIdsJson);
                   if (Array.isArray(questionTagIds)) {
                     // Check if any of the question's tags match any selected tag
-                    if (questionTagIds.some((qTagId) => tagIds.includes(qTagId))) {
+                    if (questionTagIds.some((qTagId) => systemIds.includes(qTagId))) {
                       return true;
                     }
                   }
@@ -1986,27 +1727,9 @@ export class QuestionsService {
                   blocks: { orderBy: { order: "asc" } },
                 },
               },
-              productTag: true,
-              chapter: true,
-              section: true,
-              topic: {
-                include: {
-                  chapter: {
-                    include: {
-                      section: {
-                        include: {
-                          product: {
-                            select: {
-                              id: true,
-                              name: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
+              system: { include: { product: { select: { id: true, name: true } } } },
+              topic: true,
+              subtopic: true,
             },
           });
 
@@ -2095,7 +1818,7 @@ question_id: <Unique Question ID>
 ---
 
 # <Subject & Topic> — <Specific Focus>
-## Topic: <Topic or Subtopic>
+## Subtopic: <Topic or Subtopic>
 
 ## Question
 <Question Stem Here — if the DOCX has a single paragraph, output one paragraph with no blank lines between sentences; if multiple paragraphs, preserve blank lines between them.>
@@ -2165,7 +1888,7 @@ the template below.
 The frontend parser expects this exact structure:
 - YAML frontmatter with: title, tags, difficulty, correct_answer, question_id
 - "# ..." title line
-- "## Topic: ..." line
+- "## Subtopic: ..." line
 - "## Question" section with ONLY the clinical case / stem (do not put the "Options and Explanations" heading or options inside it)
 - "## Options and Explanations" with options A–E in the '**A. text**' format and
   a '### Choice X Explanation' block for each option
@@ -2224,30 +1947,30 @@ CRITICAL INSTRUCTIONS
 1. FRONTMATTER AND METADATA EXTRACTION (CRITICAL)
    - Fill in: title, tags, difficulty (easy/medium/hard), correct_answer (A–E), question_id.
    - **METADATA MAPPING (CRITICAL - EXTRACT FROM DOCX AND MAP CORRECTLY):**
-     * **Subject** (from DOCX) → Extract from DOCX "Subject:" line and use as the first part of the title. This will be mapped to **Product Tag** (productTagId) AND **Subject** field in our system.
-     * **System** (from DOCX) → Extract from DOCX "System:" line and use as the second part of the title after " — ". This will be mapped to **Chapter** (chapterId) AND **System** field in our system.
-     * **Topic** (from DOCX) → Extract from DOCX "Topic:" line and output as "## Topic: <extracted topic>" heading. This will be mapped to **Topic** (topicId) in our system.
+     * **Subject** (from DOCX) → Extract from DOCX "Subject:" line and use as the first part of the title. This will be mapped to **Product Tag** (systemId) AND **Subject** field in our system.
+     * **System** (from DOCX) → Extract from DOCX "System:" line and use as the second part of the title after " — ". This will be mapped to **Chapter** (topicId) AND **System** field in our system.
+     * **Topic** (from DOCX) → Extract from DOCX "Subtopic:" line and output as "## Subtopic: <extracted topic>" heading. This will be mapped to **Topic** (subtopicId) in our system.
    - **CRITICAL MAPPING SUMMARY:**
-     * DOCX "Subject:" → Markdown title first part → Frontend maps to Product Tag (productTagId) AND Subject field
-     * DOCX "System:" → Markdown title second part → Frontend maps to Chapter (chapterId) AND System field
-     * DOCX "Topic:" → Markdown "## Topic:" heading → Frontend maps to Topic (topicId)
+     * DOCX "Subject:" → Markdown title first part → Frontend maps to Product Tag (systemId) AND Subject field
+     * DOCX "System:" → Markdown title second part → Frontend maps to Chapter (topicId) AND System field
+     * DOCX "Subtopic:" → Markdown "## Subtopic:" heading → Frontend maps to Topic (subtopicId)
    - Example: If DOCX contains:
        Subject: Obstetrics & Gynecology (Obs)
        System: Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment
-       Topic: Obstetrics – Multiple Pregnancy
+       Subtopic: Obstetrics – Multiple Pregnancy
      Then output:
        title: "Obstetrics & Gynecology (Obs) — Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment"
-       ## Topic: Obstetrics – Multiple Pregnancy
+       ## Subtopic: Obstetrics – Multiple Pregnancy
      This will result in:
-       - Product Tag = "Obstetrics & Gynecology (Obs)" (from Subject) → productTagId
+       - Product Tag = "Obstetrics & Gynecology (Obs)" (from Subject) → systemId
        - Subject field = "Obstetrics & Gynecology (Obs)" (from Subject)
-       - Chapter = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System) → chapterId
+       - Chapter = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System) → topicId
        - System field = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System)
-       - Topic = "Obstetrics – Multiple Pregnancy" (from Topic) → topicId
-   - If "Subject:", "System:", or "Topic:" lines exist in the DOCX, you MUST extract them and use them exactly as shown above.
+       - Topic = "Obstetrics – Multiple Pregnancy" (from Topic) → subtopicId
+   - If "Subject:", "System:", or "Subtopic:" lines exist in the DOCX, you MUST extract them and use them exactly as shown above.
    - The title format must be: "<Subject> — <System>" (Subject and System separated by " — ")
-   - The Topic must appear as a separate "## Topic: <Topic>" heading after the main title line.
-   - Extract the full text from "Subject:", "System:", and "Topic:" lines - do not truncate or shorten them.
+   - The Topic must appear as a separate "## Subtopic: <Topic>" heading after the main title line.
+   - Extract the full text from "Subject:", "System:", and "Subtopic:" lines - do not truncate or shorten them.
 2. QUESTION STEM (CLINICAL CASE ONLY – PRESERVE PARAGRAPH STRUCTURE AS IN SOURCE)
    - Put ONLY the clinical case / question stem text under '## Question'.
    - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
@@ -2380,7 +2103,7 @@ CRITICAL INSTRUCTIONS
      NOT rewrite it. It must still appear somewhere in the Markdown, with the
      same wording and order (you may only adjust formatting to valid Markdown).
    - If the source contains explicit metadata lines such as "Subject:",
-     "System:", "Topic:", "Competency Domain:", "Cognitive Level:",
+     "System:", "Subtopic:", "Competency Domain:", "Cognitive Level:",
      "Clinical Skill:", or "Difficulty Level:", you may use them to infer
      frontmatter fields (title, tags, difficulty, etc.), but you MUST NOT
      copy these label/value lines into the body of the Markdown (they should

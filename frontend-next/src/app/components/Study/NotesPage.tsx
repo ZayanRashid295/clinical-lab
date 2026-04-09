@@ -30,7 +30,7 @@ interface Note {
   id: string;
   title: string;
   content: string;
-  subject: string;
+  system: string;
   topic: string;
   tags: string[];
   isBookmarked: boolean;
@@ -47,7 +47,7 @@ const mockNotes: Note[] = [
     id: "1",
     title: "Cardiology Fundamentals - Heart Anatomy",
     content: "The heart is a four-chambered organ consisting of two atria and two ventricles. The right side pumps deoxygenated blood to the lungs, while the left side pumps oxygenated blood to the body. Key structures include the mitral valve, tricuspid valve, aortic valve, and pulmonary valve.",
-    subject: "cardiology",
+    system: "cardiology",
     topic: "heart_anatomy",
     tags: ["anatomy", "fundamentals", "valves"],
     isBookmarked: true,
@@ -60,7 +60,7 @@ const mockNotes: Note[] = [
     id: "2",
     title: "ECG Interpretation - Basic Patterns",
     content: "ECG interpretation involves analyzing the P wave, QRS complex, and T wave. Normal intervals: PR interval 0.12-0.20s, QRS duration <0.12s, QT interval varies with heart rate. Common abnormalities include ST elevation (STEMI), ST depression (ischemia), and various arrhythmias.",
-    subject: "cardiology",
+    system: "cardiology",
     topic: "ecg_interpretation",
     tags: ["ecg", "diagnosis", "patterns"],
     isBookmarked: false,
@@ -73,7 +73,7 @@ const mockNotes: Note[] = [
     id: "3",
     title: "Nephrology - Acute Kidney Injury",
     content: "AKI is defined as a rapid decline in kidney function. Causes include prerenal (hypovolemia), renal (ATN), and postrenal (obstruction). Management involves fluid resuscitation, addressing underlying cause, and monitoring electrolytes. Dialysis may be required in severe cases.",
-    subject: "nephrology",
+    system: "nephrology",
     topic: "acute_kidney_injury",
     tags: ["kidney", "emergency", "management"],
     isBookmarked: true,
@@ -86,7 +86,7 @@ const mockNotes: Note[] = [
     id: "4",
     title: "Pharmacology - ACE Inhibitors",
     content: "ACE inhibitors block the conversion of angiotensin I to angiotensin II, reducing vasoconstriction and aldosterone secretion. Common side effects include dry cough, hyperkalemia, and angioedema. Contraindicated in pregnancy due to teratogenic effects.",
-    subject: "pharmacology",
+    system: "pharmacology",
     topic: "ace_inhibitors",
     tags: ["pharmacology", "cardiovascular", "side_effects"],
     isBookmarked: false,
@@ -99,7 +99,7 @@ const mockNotes: Note[] = [
     id: "5",
     title: "Hematology - Anemia Classification",
     content: "Anemia can be classified by morphology (microcytic, normocytic, macrocytic) or etiology (blood loss, decreased production, increased destruction). Common causes include iron deficiency (microcytic), B12/folate deficiency (macrocytic), and chronic disease (normocytic).",
-    subject: "hematology",
+    system: "hematology",
     topic: "anemia",
     tags: ["anemia", "classification", "diagnosis"],
     isBookmarked: false,
@@ -113,7 +113,7 @@ const mockNotes: Note[] = [
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>(mockNotes);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState<string>("all");
+  const [selectedSystem, setSelectedSystem] = useState<string>("all");
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isCreating, setIsCreating] = useState(false);
@@ -121,7 +121,7 @@ export default function NotesPage() {
   const [newNote, setNewNote] = useState({
     title: "",
     content: "",
-    subject: "",
+    system: "",
     topic: "",
     tags: [] as string[],
     isPublic: false,
@@ -142,10 +142,10 @@ export default function NotesPage() {
                          note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesSubject = selectedSubject === "all" || note.subject === selectedSubject;
+    const matchesSystem = selectedSystem === "all" || note.system === selectedSystem;
     const matchesTag = selectedTag === "all" || note.tags.includes(selectedTag);
 
-    return matchesSearch && matchesSubject && matchesTag;
+    return matchesSearch && matchesSystem && matchesTag;
   });
 
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
@@ -156,7 +156,7 @@ export default function NotesPage() {
         id: Date.now().toString(),
         title: newNote.title,
         content: newNote.content,
-        subject: newNote.subject,
+        system: newNote.system,
         topic: newNote.topic,
         tags: newNote.tags,
         isBookmarked: false,
@@ -170,7 +170,7 @@ export default function NotesPage() {
       setNewNote({
         title: "",
         content: "",
-        subject: "",
+        system: "",
         topic: "",
         tags: [],
         isPublic: false,
@@ -271,11 +271,11 @@ export default function NotesPage() {
             {/* Filters */}
             <div className="flex gap-4">
               <select
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
+                value={selectedSystem}
+                onChange={(e) => setSelectedSystem(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md bg-white"
               >
-                <option value="all">All Subjects</option>
+                <option value="all">All Systems</option>
                 <option value="cardiology">Cardiology</option>
                 <option value="nephrology">Nephrology</option>
                 <option value="pharmacology">Pharmacology</option>
@@ -393,9 +393,9 @@ export default function NotesPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                placeholder="Subject..."
-                value={newNote.subject}
-                onChange={(e) => setNewNote({ ...newNote, subject: e.target.value })}
+                placeholder="System..."
+                value={newNote.system}
+                onChange={(e) => setNewNote({ ...newNote, system: e.target.value })}
               />
               <Input
                 placeholder="Topic..."
@@ -479,8 +479,8 @@ export default function NotesPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                value={editingNote.subject}
-                onChange={(e) => setEditingNote({ ...editingNote, subject: e.target.value })}
+                value={editingNote.system}
+                onChange={(e) => setEditingNote({ ...editingNote, system: e.target.value })}
               />
               <Input
                 value={editingNote.topic}
@@ -524,7 +524,7 @@ export default function NotesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-lg line-clamp-2 mb-2">
-                      {note.title}
+                       {note.title}
                     </CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
@@ -562,7 +562,7 @@ export default function NotesPage() {
 
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="outline" className="text-xs">
-                    {note.subject}
+                    {note.system}
                   </Badge>
                   <Badge variant="secondary" className="text-xs">
                     {note.topic.replace("_", " ")}
@@ -632,7 +632,7 @@ export default function NotesPage() {
 
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge variant="outline" className="text-xs">
-                            {note.subject}
+                            {note.system}
                           </Badge>
                           <Badge variant="secondary" className="text-xs">
                             {note.topic.replace("_", " ")}

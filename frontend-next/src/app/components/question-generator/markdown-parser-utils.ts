@@ -47,9 +47,10 @@ export interface ParsedQuestion {
   stem: string
   options: Array<{ label: string; text: string; correct: boolean }>
   correctAnswer: string
-  subject: string
+  productId: string
   system: string
   topic?: string
+  subtopic?: string
   mainExplanation: any[]
   perAnswerExplanations: Record<string, any[]>
   tags: string[]
@@ -85,16 +86,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
         const titleMatch = yamlLine.match(/title:\s*"?([^"]*)"?/)
         if (titleMatch) {
           const fullTitle = titleMatch[1]
-          // Split by " — " (em dash) to separate Subject and System
+          // Split by " — " (em dash) to separate Product and System
           const titleParts = fullTitle.split(" — ")
           if (titleParts.length >= 2) {
-            // Subject is the first part (maps to Product Tag)
-            questionData.subject = titleParts[0].trim()
+            // Product ID is the first part (maps to Product)
+            questionData.productId = titleParts[0].trim()
             // System: only first segment (e.g. "Female Reproductive System") for strict chapter matching
             questionData.system = extractSystemFirstSegment(titleParts.slice(1).join(" — ").trim())
           } else if (titleParts.length === 1) {
-            // If no " — " separator, use entire title as subject
-            questionData.subject = titleParts[0].trim()
+            // If no " — " separator, use entire title as product
+            questionData.productId = titleParts[0].trim()
           }
         }
       }
@@ -126,18 +127,18 @@ export function parseMarkdown(content: string): ParsedQuestion {
     const line = lines[i].trim()
 
     // Extract title (# Title) - fallback if YAML not present
-    if (line.startsWith("# ") && !questionData.subject) {
+    if (line.startsWith("# ") && !questionData.productId) {
       const titleText = line.slice(2).trim()
-      // Split by " — " (em dash) to separate Subject and System
+      // Split by " — " (em dash) to separate Product and System
       const titleParts = titleText.split(" — ")
       if (titleParts.length >= 2) {
-        // Subject is the first part (maps to Product Tag)
-        questionData.subject = titleParts[0].trim()
+        // Product ID is the first part (maps to Product)
+        questionData.productId = titleParts[0].trim()
         // System: only first segment for strict chapter matching
         questionData.system = extractSystemFirstSegment(titleParts.slice(1).join(" — ").trim())
       } else if (titleParts.length === 1) {
-        // If no " — " separator, use entire title as subject
-        questionData.subject = titleParts[0].trim()
+        // If no " — " separator, use entire title as product
+        questionData.productId = titleParts[0].trim()
       }
       i++
       continue
@@ -148,6 +149,16 @@ export function parseMarkdown(content: string): ParsedQuestion {
       const topicMatch = line.match(/^##\s+Topic:\s*(.+)/i)
       if (topicMatch) {
         questionData.topic = topicMatch[1].trim()
+      }
+      i++
+      continue
+    }
+
+    // Extract subtopic (## Subtopic: ...)
+    if (line.match(/^##\s+Subtopic:\s*(.+)/i)) {
+      const subtopicMatch = line.match(/^##\s+Subtopic:\s*(.+)/i)
+      if (subtopicMatch) {
+        questionData.subtopic = subtopicMatch[1].trim()
       }
       i++
       continue
@@ -649,7 +660,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
       // 1. It's a section header (## or ###) that's additional content, OR
       // 2. It's any collectable content and we haven't collected additional content yet
       // We need to collect everything after per-answer explanations until end of file or new major section
-      const shouldCollect = (isAdditionalSection || isCollectableContent) && !questionData._additionalContentCollected
+      const shouldCollect = (isAdditionalSection || isCollectableContent) && !(questionData as any)._additionalContentCollected
       
       if (shouldCollect) {
         let additionalContent = ""
@@ -709,8 +720,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
               existingExplanation[k].order = placeholderOrder + additionalBlocks.length + (k - startRenumberFrom) + 1
             }
             
-            questionData.mainExplanation = existingExplanation
-            questionData._additionalContentCollected = true // Mark that we've collected additional content
+            questionData.mainExplanation = existingExplanation;
+            (questionData as any)._additionalContentCollected = true // Mark that we've collected additional content
             
             console.log("[MarkdownParser] Successfully inserted additional content:", {
               placeholderIndex,
@@ -727,8 +738,8 @@ export function parseMarkdown(content: string): ParsedQuestion {
               block.order = maxOrder + 1 + idx
             })
             
-            questionData.mainExplanation = [...existingExplanation, ...additionalBlocks]
-            questionData._additionalContentCollected = true
+            questionData.mainExplanation = [...existingExplanation, ...additionalBlocks];
+            (questionData as any)._additionalContentCollected = true
             
             // Debug: Log when additional content is found (fallback case)
             if (process.env.NODE_ENV === "development") {
@@ -911,7 +922,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     stem: finalStem,
     options: questionData.options || [],
     correctAnswer: questionData.correctAnswer || "",
-    subject: questionData.subject || "General",
+    productId: questionData.productId || "General",
     system: questionData.system || "General",
     topic: questionData.topic,
     mainExplanation: questionData.mainExplanation || [],

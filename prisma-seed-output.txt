@@ -1,0 +1,120 @@
+Environment variables loaded from .env
+Running seed command `ts-node prisma/seed.ts` ...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+🌱 Starting database seeding...
+📝 Creating roles...
+🔐 Creating permissions...
+👥 Creating users...
+🔗 Assigning roles to users...
+⚙️ Creating user settings...
+📍 Creating locations...
+💰 Creating wallets...
+💳 Creating payment methods...
+💬 Creating chat rooms...
+📝 Creating chat messages...
+🔕 Creating notification preferences...
+🎟️ Creating promo codes...
+⚙️ Creating system settings...
+✅ Database seeding completed successfully!
+
+📊 Summary:
+- Users created: 7
+- Roles created: 5
+- Permissions created: 13
+- Rides created: 2
+- Chat rooms created: 2
+- Notifications created: 2
+- Promo codes created: 2
+- System settings created: 7
+- Payout fees created: 3
+- Payout settings created: 2
+- Earnings created: 1
+- Payouts created: 2
+- Payout schedules created: 2
+
+🔑 Test Credentials:
+Passenger: john.doe@example.com / password123
+Driver: mike.wilson@example.com / password123
+Admin: admin@uber.com / password123
+Support: support@uber.com / password123
+Fleet Manager: fleet@uber.com / password123
+💳 Starting payment seeding...
+💰 Creating payments...
+🔄 Creating refunds...
+💼 Creating wallet transactions...
+🎟️ Creating promo code usages...
+💳 Creating additional payment methods...
+✅ Payment seeding completed successfully!
+
+📊 Payment Summary:
+- Total payments created: 100
+- Completed payments: 16
+- Refunds created: 10
+- Wallet transactions: 27
+- Additional payment methods: 5
+
+📈 Payment Status Distribution:
+  COMPLETED: 16
+  PENDING: 13
+  PROCESSING: 19
+  FAILED: 17
+  CANCELLED: 19
+  REFUNDED: 16
+
+💳 Payment Method Distribution:
+  CARD: 22
+  WALLET: 27
+  CASH: 21
+  BANK_TRANSFER: 30
+
+🏦 Payment Gateway Distribution:
+  STRIPE: 27
+  PAYPAL: 26
+  RAZORPAY: 19
+  SQUARE: 28
+
+💰 Total Payment Volume: $55600.00
+📊 Average Payment Amount: $556.00
+🌱 Seeding categorys and products...
+
+✅ Category: Medical (cmnlr1n1b00cq17i2tx7yxp7l)
+   📦 Product: USMLE Step 1
+   📦 Product: USMLE Step 2 CK
+   📦 Product: USMLE Step 2 CS
+   📦 Product: USMLE Step 3
+   📦 Product: COMLEX Level 1
+   📦 Product: COMLEX Level 2
+   📦 Product: Internal Medicine (ABIM)
+   📦 Product: Family Medicine (ABFM)
+   📦 Product: FCPS Part 1
+   📦 Product: JCAT
+   📦 Product: International Clinical QBank
+   📦 Product: Medical Library
+   📦 Product: PA (PANCE | PANRE)
+✅ Category: Nursing (cmnlr1n2n00dh17i2xknnquy1)
+   📦 Product: NCLEX-RN
+   📦 Product: NCLEX-PN
+✅ Category: High School (cmnlr1n2u00dm17i2sgpxaz5g)
+   📦 Product: SAT
+   📦 Product: ACT
+   📦 Product: AP Biology
+   📦 Product: AP Chemistry
+✅ Category: Grad School (cmnlr1n3c00dv17i2jatwt9vc)
+   📦 Product: GRE
+   📦 Product: MCAT
+✅ Category: Accounting (cmnlr1n3l00e017i28a1ntoeq)
+   📦 Product: CPA
+✅ Category: Finance (cmnlr1n3q00e317i2h03i9rqe)
+   📦 Product: CFA Level 1
+   📦 Product: CFA Level 2
+✅ Category: Legal (cmnlr1n3y00e817i2z8mx5ov3)
+   📦 Product: Bar Exam
+   📦 Product: LSAT
+🏥 Starting Dummy Product Content database seeding (FCPS-1 / JCAT)...
+📚 Creating Product...
+📖 Creating systems, topics, and subtopics...
+✅ Content Hierarchy Seeded Successfully!
+
+🎉 All seeding completed successfully!
+
+🌱  The seed command has been executed.

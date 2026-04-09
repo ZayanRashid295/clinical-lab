@@ -161,17 +161,9 @@ export default function ProductViewModal({
                   <>
                     <div>
                       <p className="text-sm font-medium text-gray-500">
-                        Sections Count
+                        Systems Count
                       </p>
-                      <p className="text-gray-900">{product._count.sections}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        Tags Count
-                      </p>
-                      <p className="text-gray-900">
-                        {product._count.productTags}
-                      </p>
+                      <p className="text-gray-900">{product._count.systems}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">

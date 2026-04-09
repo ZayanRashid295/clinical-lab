@@ -32,29 +32,6 @@ const productColumns: ColumnConfig<Product>[] = [
     ),
   },
   {
-    key: "productTags",
-    label: "Tags",
-    sortable: false,
-    render: (value) => {
-      const tags = Array.isArray(value) ? value : [];
-      return (
-        <div className="flex flex-wrap gap-1">
-          {tags.slice(0, 3).map((tag: any) => (
-            <span
-              key={tag.id}
-              className="inline-flex px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
-            >
-              {tag.name}
-            </span>
-          ))}
-          {tags.length > 3 && (
-            <span className="text-xs text-gray-500">+{tags.length - 3}</span>
-          )}
-        </div>
-      );
-    },
-  },
-  {
     key: "productSubtypes",
     label: "Subtypes",
     sortable: false,

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
+import { useToast } from "@/shared/ui/use-toast"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import RichTextEditor from "./RichTextEditor"
@@ -15,10 +16,10 @@ import EditablePreview from "./EditablePreview"
 import QuestionPanel from "../question-panel"
 import ExplanationPanel from "../explanation-panel"
 import UnifiedQuestionPreview from "../unified-question-preview"
-import { SectionsService } from "@/app/services/content/sections.service"
-import { ChaptersService } from "@/app/services/content/chapters.service"
+import { ProductsService } from "@/app/services/products/products.service"
+import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
-import { ProductTagsService } from "@/app/services/products/product-tags.service"
+import { CategoriesService } from "@/app/services/categories/categories.service"
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "../choice-system/types"
 import { blocksToHTML, blocksToHTMLAsync, htmlToBlocks } from "./content-utils"
@@ -46,6 +47,7 @@ interface QuestionEditorProps {
 }
 
 export default function QuestionEditor({ initialData, onSave, onCancel, onPreviewModeChange }: QuestionEditorProps) {
+  const { toast } = useToast()
   const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(() =>
     normalizeStemBlocksForDisplay(initialData?.stem || [])
   )
@@ -72,7 +74,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     type: "subject" | "chapter" | "topic"
   } | null>(null)
   const [addMetaName, setAddMetaName] = useState("")
-  const [addMetaSectionId, setAddMetaSectionId] = useState("")
+  const [addMetaProductId, setAddMetaProductId] = useState("")
   const [addMetaError, setAddMetaError] = useState<string | null>(null)
   const [addMetaLoading, setAddMetaLoading] = useState(false)
   const [alreadyExistsMessage, setAlreadyExistsMessage] = useState<string | null>(null)
@@ -112,89 +114,93 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   const textBlockEditorRefs = useRef<Record<string, Editor | null>>({})
 
   const questionsService = new QuestionsService()
-  const sectionsService = new SectionsService()
-  const chaptersService = new ChaptersService()
+  const productsService = new ProductsService()
+  const systemsService = new SystemsService()
   const topicsService = new TopicsService()
-  const productTagsService = new ProductTagsService()
+  const categoriesService = new CategoriesService()
 
   // State for metadata names - initialize from initialData if available
   const [sectionName, setSectionName] = useState<string>("")
-  const [chapterName, setChapterName] = useState<string>(initialData?.metadata?.system || "")
+  const [systemName, setSystemName] = useState<string>(
+    typeof initialData?.metadata?.system === "string" 
+      ? initialData.metadata.system 
+      : (initialData?.metadata?.system as any)?.name || ""
+  )
   const [topicName, setTopicName] = useState<string>("")
-  const [subjectTagName, setSubjectTagName] = useState<string>("")
+  const [categoryName, setCategoryName] = useState<string>("")
 
   // State for editable metadata dropdowns
-  const [sections, setSections] = useState<any[]>([])
-  const [chapters, setChapters] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [chapters, setSystems] = useState<any[]>([])
   const [topics, setTopics] = useState<any[]>([])
-  const [productTags, setProductTags] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
   const [showTagsDropdown, setShowTagsDropdown] = useState(false)
-  const [loadingSections, setLoadingSections] = useState(false)
-  const [loadingChapters, setLoadingChapters] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [loadingSystems, setLoadingSystems] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState(false)
-  const [loadingTags, setLoadingTags] = useState(false)
+  const [loadingCategories, setLoadingCategories] = useState(false)
   
   // Track if metadata names have been fetched
   const [metadataNamesFetched, setMetadataNamesFetched] = useState(false)
 
-  // Sections are not shown in UI; sectionId is derived from chapter or defaulted by backend
 
-  // Load product tags on mount
+  // Load categories on mount
   useEffect(() => {
-    setLoadingTags(true)
-    productTagsService
-      .getTags({ status: "ACTIVE" })
+    setLoadingCategories(true)
+    categoriesService
+      .getCategories({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setProductTags(data)
+        setCategories(data)
       })
-      .catch(() => setProductTags([]))
-      .finally(() => setLoadingTags(false))
+      .catch(() => setCategories([]))
+      .finally(() => setLoadingCategories(false))
   }, [])
 
-  // Load sections on mount for creating new systems
+  // Load products on mount for creating new systems
   useEffect(() => {
-    setLoadingSections(true)
-    sectionsService
-      .getSections({ status: "ACTIVE" })
+    setLoadingProducts(true)
+    productsService
+      .getProducts({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setSections(data)
+        setProducts(data)
       })
-      .catch(() => setSections([]))
-      .finally(() => setLoadingSections(false))
+      .catch(() => setProducts([]))
+      .finally(() => setLoadingProducts(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Initialize productTagIds from productTagId if present (for backward compatibility)
+  // Initialize categoryId and productTagIds from existing data (for backward compatibility)
   useEffect(() => {
-    if (initialData?.metadata?.productTagId && !metadata.productTagIds) {
+    if ((initialData?.metadata?.productTagId || initialData?.metadata?.categoryId) && !metadata.categoryId) {
       setMetadata((prev) => ({
         ...prev,
-        productTagIds: [initialData.metadata!.productTagId!],
+        categoryId: initialData.metadata!.categoryId || initialData.metadata!.productTagId,
+        productTagIds: [initialData.metadata!.categoryId || initialData.metadata!.productTagId!],
       }))
     }
-  }, [initialData?.metadata?.productTagId])
+  }, [initialData?.metadata?.productTagId, initialData?.metadata?.categoryId])
 
   // Keep editable names in sync with current selections
   useEffect(() => {
-    const selectedTagId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
-    if (selectedTagId) {
-      const tag = productTags.find((t) => t.id === selectedTagId)
-      setSubjectEditName(tag?.name || "")
+    const selectedId = metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    if (selectedId) {
+      const cat = categories.find((t) => t.id === selectedId)
+      setSubjectEditName(cat?.name || "")
     } else {
       setSubjectEditName("")
     }
-  }, [metadata.productTagId, metadata.productTagIds, productTags])
+  }, [metadata.categoryId, metadata.productTagId, metadata.productTagIds, categories])
 
   useEffect(() => {
-    if (metadata.chapterId) {
-      const chapter = chapters.find((c: any) => c.id === metadata.chapterId)
+    if (metadata.systemId) {
+      const chapter = chapters.find((c: any) => c.id === metadata.systemId)
       setSystemEditName(chapter?.name || "")
     } else {
       setSystemEditName("")
     }
-  }, [metadata.chapterId, chapters])
+  }, [metadata.systemId, chapters])
 
   useEffect(() => {
     if (metadata.topicId) {
@@ -221,24 +227,24 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
   // Load chapters on mount (no longer dependent on System selection)
   useEffect(() => {
-    setLoadingChapters(true)
-    chaptersService
-      .getChapters({ status: "ACTIVE", listAll: true })
+    setLoadingSystems(true)
+    systemsService
+      .getSystems({ status: "ACTIVE", listAll: true })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setChapters(data)
+        setSystems(data)
       })
-      .catch(() => setChapters([]))
-      .finally(() => setLoadingChapters(false))
+      .catch(() => setSystems([]))
+      .finally(() => setLoadingSystems(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Load topics when chapter changes
   useEffect(() => {
-    if (metadata.chapterId) {
+    if (metadata.systemId) {
       setLoadingTopics(true)
       topicsService
-        .getTopics({ chapterId: metadata.chapterId, status: "ACTIVE" })
+        .getTopics({ systemId: metadata.systemId, status: "ACTIVE" })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || []
           setTopics(data)
@@ -248,7 +254,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     } else {
       setTopics([])
     }
-  }, [metadata.chapterId])
+  }, [metadata.systemId])
 
   // Comprehensive metadata name fetching function
   const fetchMetadataNames = useCallback(async (metadataToUse: any) => {
@@ -256,37 +262,25 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
     const promises: Promise<any>[] = []
 
-    // Fetch section name
-    if (metadataToUse.sectionId) {
-      promises.push(
-        sectionsService.getSection(metadataToUse.sectionId)
-          .then((section) => {
-            setSectionName(section?.name || metadataToUse.system || "")
-          })
-          .catch(() => setSectionName(metadataToUse.system || ""))
-      )
-    } else if (metadataToUse.system) {
-      setSectionName(metadataToUse.system)
-    }
 
     // Fetch chapter name (system) – also set systemEditName so text box shows selected system like subject
-    if (metadataToUse.chapterId) {
+    if (metadataToUse.systemId) {
       promises.push(
-        chaptersService.getChapter(metadataToUse.chapterId)
+        systemsService.getSystem(metadataToUse.systemId)
           .then((chapter) => {
             const name = chapter?.name || metadataToUse.system || ""
-            setChapterName(name)
+            setSystemName(name)
             setSystemEditName(name)
           })
           .catch(() => {
             const fallback = metadataToUse.system || ""
-            setChapterName(fallback)
+            setSystemName(fallback)
             setSystemEditName(fallback)
           })
       )
     } else if (metadataToUse.subject) {
       const fallback = metadataToUse.system || ""
-      setChapterName(fallback)
+      setSystemName(fallback)
       setSystemEditName(fallback)
     }
 
@@ -306,20 +300,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       )
     }
 
-    // Fetch tag name
-    const selectedTagId = metadataToUse.productTagId || (metadataToUse.productTagIds && metadataToUse.productTagIds[0])
-    if (selectedTagId) {
-      // Use a ref or closure to access current productTags
-      // Check if tag is already in productTags array (will be checked after productTags loads)
-      // For now, fetch it directly
+    // Fetch category name
+    const selectedId = metadataToUse.categoryId || metadataToUse.productTagId || (metadataToUse.productTagIds && metadataToUse.productTagIds[0])
+    if (selectedId) {
       promises.push(
-        productTagsService.getTag(selectedTagId)
+        categoriesService.getCategory(selectedId)
           .then((tag) => {
             if (tag) {
               const name = tag.name || ""
-              setSubjectTagName(name)
+              setCategoryName(name)
               setSubjectEditName(name)
-              setProductTags((prev) => {
+              setCategories((prev) => {
                 const existing = prev.find((t) => t.id === tag.id)
                 if (existing) return prev
                 return [...prev, tag]
@@ -327,11 +318,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             }
           })
           .catch(() => {
-            // If fetch fails, check if tag is in already loaded productTags
-            const existingTag = productTags.find((t) => t.id === selectedTagId)
-            if (existingTag) {
-              const name = existingTag.name || ""
-              setSubjectTagName(name)
+            const existingCat = categories.find((t) => t.id === selectedId)
+            if (existingCat) {
+              const name = existingCat.name || ""
+              setCategoryName(name)
               setSubjectEditName(name)
             }
           })
@@ -351,25 +341,24 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
   // Fetch metadata names when metadata state changes or when entering preview mode
   useEffect(() => {
-    const hasMetadata = metadata.chapterId || metadata.topicId || metadata.productTagId || metadata.productTagIds || metadata.subject || metadata.system || metadata.sectionId
+    const hasMetadata = metadata.systemId || metadata.topicId || metadata.productTagId || metadata.productTagIds || metadata.subject || metadata.system || metadata.productId
     if (hasMetadata) {
       // Always fetch when entering preview mode, or if not fetched yet
       if (isPreviewMode || !metadataNamesFetched) {
         fetchMetadataNames(metadata)
       }
     }
-  }, [metadata.chapterId, metadata.topicId, metadata.productTagId, metadata.productTagIds, metadata.subject, metadata.system, metadata.sectionId, metadataNamesFetched, isPreviewMode, fetchMetadataNames, metadata])
+  }, [metadata.systemId, metadata.topicId, metadata.productTagId, metadata.productTagIds, metadata.subject, metadata.system, metadata.productId, metadataNamesFetched, isPreviewMode, fetchMetadataNames, metadata])
 
   // Handle metadata changes – set text box values immediately when selecting from dropdown (same as subject)
-  const handleChapterChange = (chapterId: string) => {
-    const selectedChapter = chapters.find((c: any) => c.id === chapterId)
-    const derivedSectionId = selectedChapter?.sectionId || selectedChapter?.section?.id
-    setSystemEditName(selectedChapter?.name || "")
+  const handleSystemChange = (systemId: string) => {
+    const selectedSystem = chapters.find((c: any) => c.id === systemId)
+    const derivedProductId = selectedSystem?.productId || selectedSystem?.product?.id
+    setSystemEditName(selectedSystem?.name || "")
     setMetadata((prev) => ({
       ...prev,
-      chapterId: chapterId || undefined,
-      // Auto-map System from selected Chapter (frontend-only)
-      sectionId: derivedSectionId || prev.sectionId,
+      systemId: systemId || undefined,
+      productId: derivedProductId || prev.productId,
       topicId: undefined,
     }))
   }
@@ -394,12 +383,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   
   const getSelectedTagName = () => {
     // First check if we have it in state
-    if (subjectTagName) return subjectTagName
+    if (categoryName) return categoryName
     
-    // Then check productTags array
-    const selectedId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    // Then check categories array
+    const selectedId = metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
     if (!selectedId) return ""
-    const selected = productTags.find((t) => t.id === selectedId)
+    const selected = categories.find((t) => t.id === selectedId)
     return selected?.name || ""
   }
 
@@ -416,35 +405,36 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
     // Pre-check: if same name already exists in DB, show "already exists" modal and select it (don't call create)
     if (addMetaContext.type === "subject") {
-      const existingSubject = productTags.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
-      if (existingSubject) {
-        setMetadata((prev) => ({ ...prev, productTagId: existingSubject.id, productTagIds: [existingSubject.id], subject: existingSubject.name }))
-        setSubjectEditName(existingSubject.name)
+      const existingCategory = categories.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+      if (existingCategory) {
+        setMetadata((prev) => ({ ...prev, categoryId: existingCategory.id, productTagIds: [existingCategory.id], subject: existingCategory.name }))
+        setSubjectEditName(existingCategory.name)
         setAddMetaContext(null)
-        setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+        setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
         return
       }
     } else if (addMetaContext.type === "chapter") {
-      const generalPrinciplesSection =
-        sections.find((s: any) => typeof s.name === "string" && s.name.toLowerCase().includes("general principles")) ||
-        sections[0]
-      const sectionId = generalPrinciplesSection?.id
-      if (sectionId) {
-        const existingChapter = chapters.find((c: any) => (c.sectionId === sectionId || c.section?.id === sectionId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
-        if (existingChapter) {
-          setMetadata((prev) => ({ ...prev, chapterId: existingChapter.id, sectionId: existingChapter.sectionId || existingChapter.section?.id || sectionId, system: existingChapter.name, topicId: undefined }))
-          setSystemEditName(existingChapter.name)
+      // Find a default product (e.g. USMLE Step 1) or use the first one
+      const defaultProduct =
+        products.find((p: any) => typeof p.name === "string" && p.name.toLowerCase().includes("step 1")) ||
+        products[0]
+      const productId = defaultProduct?.id
+      if (productId) {
+        const existingSystem = chapters.find((c: any) => (c.productId === productId || c.product?.id === productId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingSystem) {
+          setMetadata((prev) => ({ ...prev, systemId: existingSystem.id, productId: existingSystem.productId || existingSystem.product?.id || productId, system: existingSystem.name, topicId: undefined }))
+          setSystemEditName(existingSystem.name)
           setAddMetaContext(null)
           setAlreadyExistsMessage("This System already exists. We've selected it for you.")
           return
         }
       }
     } else if (addMetaContext.type === "topic") {
-      const chapterId = metadata.chapterId
-      if (chapterId) {
+      const systemId = metadata.systemId
+      if (systemId) {
         let topicList = topics
         if (topicList.length === 0) {
-          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
           topicList = Array.isArray(list) ? list : (list as any)?.data ?? []
           setTopics(topicList)
         }
@@ -462,57 +452,58 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     setAddMetaLoading(true)
     try {
       if (addMetaContext.type === "subject") {
-        const res: any = await productTagsService.createTag({ name, isActive: true })
+        const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+        const res: any = await categoriesService.createCategory({ name, slug, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setProductTags(data)
+          setCategories(data)
           setMetadata((prev) => ({
             ...prev,
-            productTagId: id,
+            categoryId: id,
             productTagIds: [id],
             subject: name,
           }))
           setAddMetaContext(null)
         }
       } else if (addMetaContext.type === "chapter") {
-        // Auto-assign to the default \"General Principles\" section when creating a new system
-        const generalPrinciplesSection =
-          sections.find((s: any) => typeof s.name === "string" && s.name.toLowerCase().includes("general principles")) ||
-          sections[0]
-        const sectionId = generalPrinciplesSection?.id
-        if (!sectionId) {
-          setAddMetaError("No default section available to attach this system.")
+        // Find a default product (e.g. USMLE Step 1) or use the first one
+        const fallbackProduct =
+          products.find((p: any) => typeof p.name === "string" && p.name.toLowerCase().includes("step 1")) ||
+          products[0]
+        const productId = fallbackProduct?.id
+        if (!productId) {
+          setAddMetaError("No default product available to attach this system.")
           setAddMetaLoading(false)
           return
         }
-        const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true })
+        const res: any = await systemsService.createSystem({ productId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setChapters(data)
+          setSystems(data)
           setMetadata((prev) => ({
             ...prev,
-            chapterId: id,
-            sectionId,
+            systemId: id,
+            productId,
             system: name,
             topicId: undefined,
           }))
           setAddMetaContext(null)
         }
       } else if (addMetaContext.type === "topic") {
-        const chapterId = metadata.chapterId
-        if (!chapterId) {
+        const systemId = metadata.systemId
+        if (!systemId) {
           setAddMetaError("Select a system first")
           setAddMetaLoading(false)
           return
         }
-        const res: any = await topicsService.createTopic({ chapterId, name, isActive: true })
+        const res: any = await topicsService.createTopic({ systemId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
           setTopics(data)
           setMetadata((prev) => ({
@@ -535,48 +526,48 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         (status === 500 && (lower.includes("unique") || lower.includes("duplicate")))
       const label =
         addMetaContext?.type === "subject"
-          ? "Subject"
+          ? "Category"
           : addMetaContext?.type === "chapter"
           ? "System"
           : "Topic"
       if (isDuplicate) {
         const nameVal = addMetaName.trim()
         if (addMetaContext.type === "subject") {
-          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setProductTags(data)
+          setCategories(data)
           const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
           if (existing) {
-            setMetadata((prev) => ({ ...prev, productTagId: existing.id, productTagIds: [existing.id], subject: existing.name }))
+            setMetadata((prev) => ({ ...prev, categoryId: existing.id, productTagIds: [existing.id], subject: existing.name }))
             setSubjectEditName(existing.name)
             setAddMetaContext(null)
             setAddMetaError(null)
-            setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+            setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
           } else {
             setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
           }
         } else if (addMetaContext.type === "chapter") {
-          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setChapters(data)
+          setSystems(data)
           const existing = data.find((c: any) => String(c?.name).trim().toLowerCase() === nameVal.toLowerCase())
           if (existing) {
-            const sectionId = existing.sectionId || existing.section?.id
-            setMetadata((prev) => ({ ...prev, chapterId: existing.id, sectionId: sectionId || prev.sectionId, system: existing.name, topicId: undefined }))
+            const productId = existing.productId || existing.product?.id
+            setMetadata((prev) => ({ ...prev, systemId: existing.id, productId: productId || prev.productId, system: existing.name, topicId: undefined }))
             setSystemEditName(existing.name)
             setAddMetaContext(null)
             setAddMetaError(null)
             setAlreadyExistsMessage("This System already exists. We've selected it for you.")
-            const topicRes = await topicsService.getTopics({ chapterId: existing.id, status: "ACTIVE" })
+            const topicRes = await topicsService.getTopics({ systemId: existing.id, status: "ACTIVE" })
             const topicData = Array.isArray(topicRes) ? topicRes : (topicRes as any)?.data || []
             setTopics(topicData)
           } else {
             setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
           }
         } else if (addMetaContext.type === "topic") {
-          const chapterId = metadata.chapterId
-          if (chapterId) {
-            const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const systemId = metadata.systemId
+          if (systemId) {
+            const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
             const data = Array.isArray(list) ? list : (list as any)?.data || []
             setTopics(data)
             const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
@@ -603,30 +594,38 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
   // Update existing Subject/System/Topic names in DB
   const handleUpdateSubjectName = async () => {
-    const selectedTagId = metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    const selectedId = metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
     const name = subjectEditName.trim()
-    if (!selectedTagId || !name) return
+    if (!selectedId || !name) return
     try {
-      await productTagsService.updateTag(selectedTagId, { name })
-      const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+      await categoriesService.updateCategory(selectedId, { name })
+      const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
       const data = Array.isArray(list) ? list : (list as any)?.data || []
-      setProductTags(data)
+      setCategories(data)
     } catch (e: any) {
-      alert(e?.message || "Failed to update subject")
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to update category",
+        variant: "destructive",
+      })
     }
   }
 
   const handleUpdateSystemName = async () => {
-    const chapterId = metadata.chapterId
+    const systemId = metadata.systemId
     const name = systemEditName.trim()
-    if (!chapterId || !name) return
+    if (!systemId || !name) return
     try {
-      await chaptersService.updateChapter(chapterId, { name })
-      const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+      await systemsService.updateSystem(systemId, { name })
+      const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
       const data = Array.isArray(list) ? list : (list as any)?.data || []
-      setChapters(data)
+      setSystems(data)
     } catch (e: any) {
-      alert(e?.message || "Failed to update system")
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to update system",
+        variant: "destructive",
+      })
     }
   }
 
@@ -635,27 +634,31 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     const name = topicEditName.trim()
     if (!topicId || !name) return
     try {
-      const chapterId = metadata.chapterId
-      await topicsService.updateTopic(topicId, { name, chapterId: chapterId as string })
-      if (chapterId) {
-        const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+      const systemId = metadata.systemId
+      await topicsService.updateTopic(topicId, { name, systemId: systemId as string })
+      if (systemId) {
+        const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
         const data = Array.isArray(list) ? list : (list as any)?.data || []
         setTopics(data)
       }
     } catch (e: any) {
-      alert(e?.message || "Failed to update topic")
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to update topic",
+        variant: "destructive",
+      })
     }
   }
 
 
   // Generate question ID based on chapter and topic (system removed from UI)
   const generateQuestionId = useCallback(() => {
-    if (!metadata.chapterId || !metadata.topicId) {
+    if (!metadata.systemId || !metadata.topicId) {
       return "Q-XXXX-XXXX-XXXX"
     }
 
-    const subjectAbbr = chapterName
-      ? chapterName
+    const subjectAbbr = systemName
+      ? systemName
           .split(" ")
           .map((word) => word.charAt(0).toUpperCase())
           .join("")
@@ -664,7 +667,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     
     const topicIdPart = metadata.topicId.slice(-4).toUpperCase()
     return `Q-${subjectAbbr}-${topicIdPart}`
-  }, [metadata.chapterId, metadata.topicId, chapterName])
+  }, [metadata.systemId, metadata.topicId, systemName])
 
   // Track if questionId was manually edited (including if it was loaded from saved data)
   const [isQuestionIdManuallyEdited, setIsQuestionIdManuallyEdited] = useState(false)
@@ -901,7 +904,11 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         }
       } catch (error) {
         console.error("Failed to upload image:", error)
-        alert("Failed to upload image. Please try again.")
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        })
       }
     },
     [getActiveEditor, questionsService]
@@ -1427,22 +1434,22 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                     {/* Metadata (Subject/Chapters/Topic) - clicks here must not switch to explanation block */}
                     <div className="border-t border-border/40 dark:border-gray-700 pt-6 mt-6" data-metadata>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Subject */}
+                        {/* Subject (Category) */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Subject
+                            Category
                           </div>
                           <div className="flex gap-2 mb-1">
                             <select
                               value={
-                                metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""
+                                metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""
                               }
                               onChange={(e) => handleTagSelect(e.target.value)}
                               className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingTags}
+                              disabled={loadingCategories}
                             >
-                              <option value="">Select Subject...</option>
-                              {productTags.map((tag) => (
+                              <option value="">Select Category...</option>
+                              {categories.map((tag) => (
                                 <option key={tag.id} value={tag.id}>
                                   {tag.name}
                                 </option>
@@ -1454,9 +1461,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               size="icon"
                               className="shrink-0"
                               onClick={() => {
-                                setAddMetaContext({ type: "subject" })
+                                setAddMetaContext({ type: "subject" }) // "subject" type is used for Category creation
                                 setAddMetaName("")
-                                setAddMetaSectionId("")
+                                setAddMetaProductId("")
                                 setAddMetaError(null)
                               }}
                             >
@@ -1467,17 +1474,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             type="text"
                             value={subjectEditName}
                             onChange={(e) => setSubjectEditName(e.target.value)}
-                            placeholder="Edit selected subject name"
+                            placeholder="Edit selected category name"
                             className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
                           />
                           <div className="flex justify-end mt-1">
                             <Button
                               type="button"
                               variant="outline"
-                              disabled={!metadata.productTagId && !(metadata.productTagIds && metadata.productTagIds[0])}
+                              disabled={!metadata.categoryId && !metadata.productTagId && !(metadata.productTagIds && metadata.productTagIds[0])}
                               onClick={handleUpdateSubjectName}
                             >
-                              Save Subject
+                              Save Category
                             </Button>
                           </div>
                         </div>
@@ -1488,10 +1495,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                           </div>
                           <div className="flex gap-2 mb-1">
                             <select
-                              value={metadata.chapterId || ""}
-                              onChange={(e) => handleChapterChange(e.target.value)}
+                              value={metadata.systemId || ""}
+                              onChange={(e) => handleSystemChange(e.target.value)}
                               className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingChapters}
+                              disabled={loadingSystems}
                             >
                               <option value="">Select System...</option>
                               {chapters.map((chapter) => (
@@ -1508,7 +1515,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               onClick={() => {
                                 setAddMetaContext({ type: "chapter" })
                                 setAddMetaName("")
-                                setAddMetaSectionId(sections[0]?.id || "")
+                                setAddMetaProductId(products[0]?.id || "")
                                 setAddMetaError(null)
                               }}
                             >
@@ -1526,7 +1533,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             <Button
                               type="button"
                               variant="outline"
-                              disabled={!metadata.chapterId}
+                              disabled={!metadata.systemId}
                               onClick={handleUpdateSystemName}
                             >
                               Save System
@@ -1543,7 +1550,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               value={metadata.topicId || ""}
                               onChange={(e) => handleTopicChange(e.target.value)}
                               className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingTopics || !metadata.chapterId}
+                              disabled={loadingTopics || !metadata.systemId}
                             >
                               <option value="">Select Topic...</option>
                               {topics.map((topic) => (
@@ -1557,10 +1564,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               variant="outline"
                               size="icon"
                               className="shrink-0"
-                              disabled={!metadata.chapterId}
-                              title={!metadata.chapterId ? "Select system first" : "Add topic to database"}
+                              disabled={!metadata.systemId}
+                              title={!metadata.systemId ? "Select system first" : "Add topic to database"}
                               onClick={() => {
-                                if (!metadata.chapterId) return
+                                if (!metadata.systemId) return
                                 setAddMetaContext({ type: "topic" })
                                 setAddMetaName("")
                                 setAddMetaError(null)
@@ -1586,7 +1593,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               Save Topic
                             </Button>
                           </div>
-                          {!metadata.chapterId && (
+                          {!metadata.systemId && (
                             <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select System first</p>
                           )}
                         </div>
@@ -1694,9 +1701,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         isOpen={showMetadataModal}
         onClose={() => setShowMetadataModal(false)}
         onSave={(newMetadata) => {
-          const chapter = chapters.find((c: any) => c.id === newMetadata.chapterId)
-          const derivedSectionId = chapter?.sectionId || chapter?.section?.id
-          setMetadata((prev) => ({ ...prev, ...newMetadata, sectionId: derivedSectionId || prev.sectionId }))
+          const chapter = chapters.find((c: any) => c.id === newMetadata.systemId)
+          const derivedProductId = chapter?.productId || chapter?.product?.id
+          setMetadata((prev) => ({ ...prev, ...newMetadata, productId: derivedProductId || prev.productId }))
         }}
         initialMetadata={metadata}
       />

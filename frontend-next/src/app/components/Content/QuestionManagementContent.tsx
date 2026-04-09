@@ -41,7 +41,6 @@ export default function QuestionManagementContent() {
       status: undefined,
       difficulty: undefined,
       topicId: undefined,
-      productTagId: undefined,
       dateFrom: undefined,
       dateTo: undefined,
     });

@@ -52,24 +52,29 @@ export function useAccessControl() {
       ).filter(Boolean) || [];
 
       // Get active subscription and features
-      const subscriptionsService = new SubscriptionsService();
-      const activeSubscriptions = await subscriptionsService.getUserSubscriptions(
-        profile.id,
-        "ACTIVE"
-      );
-
-      const hasActiveSubscription = activeSubscriptions && activeSubscriptions.length > 0;
-      const subscription = hasActiveSubscription ? activeSubscriptions[0] : null;
-
-      // Extract features from active subscription
+      let hasActiveSubscription = false;
+      let subscription = null;
       const features: string[] = [];
-      if (subscription?.subscriptionPackage?.subscriptionFeatures) {
-        subscription.subscriptionPackage.subscriptionFeatures.forEach((sf: any) => {
-          const featureName = sf.packageFeature?.name;
-          if (featureName) {
-            features.push(featureName);
-          }
-        });
+
+      if (profile?.id) {
+        const subscriptionsService = new SubscriptionsService();
+        const activeSubscriptions = await subscriptionsService.getUserSubscriptions(
+          profile.id,
+          "ACTIVE"
+        );
+
+        hasActiveSubscription = activeSubscriptions && activeSubscriptions.length > 0;
+        subscription = hasActiveSubscription ? activeSubscriptions[0] : null;
+
+        // Extract features from active subscription
+        if (subscription?.subscriptionPackage?.subscriptionFeatures) {
+          subscription.subscriptionPackage.subscriptionFeatures.forEach((sf: any) => {
+            const featureName = sf.packageFeature?.name;
+            if (featureName) {
+              features.push(featureName);
+            }
+          });
+        }
       }
 
       setAccessInfo({

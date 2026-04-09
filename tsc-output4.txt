@@ -1,0 +1,152 @@
+src/modules/questions/questions.service.ts(146,9): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(146,10): error TS1472: 'catch' or 'finally' expected.
+src/modules/questions/questions.service.ts(148,13): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(150,7): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(150,8): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+src/modules/questions/questions.service.ts(154,7): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+src/modules/questions/questions.service.ts(163,5): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(163,7): error TS1005: 'try' expected.
+src/modules/questions/questions.service.ts(167,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(169,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(169,30): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(169,49): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(201,9): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(201,10): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(204,9): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(204,10): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(206,13): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(207,7): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(207,8): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(207,9): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(209,5): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(209,6): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(217,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(219,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(219,35): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(219,60): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(256,7): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(256,8): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(258,14): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(260,7): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(260,8): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(261,5): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(261,6): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(265,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(267,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(268,15): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(269,14): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(270,11): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(271,12): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(272,5): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(315,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(316,13): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(317,14): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(318,11): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(319,12): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(320,5): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(377,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(377,20): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(405,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(405,19): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(405,29): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(423,7): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(423,8): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(424,5): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(424,6): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(431,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(433,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(433,33): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(433,54): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(642,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(642,18): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(642,45): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(642,66): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(806,9): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(807,7): error TS1135: Argument expression expected.
+src/modules/questions/questions.service.ts(807,8): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(808,5): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(808,6): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(809,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(811,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(811,18): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(811,28): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(827,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(827,37): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(827,63): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(913,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(913,34): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(929,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(929,33): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(929,43): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(955,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(956,15): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(957,20): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(958,5): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(984,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(984,45): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(985,23): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(986,6): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1022,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1023,13): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1024,20): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1025,5): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1048,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1049,7): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1050,20): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1051,5): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1055,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1055,30): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1055,40): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1069,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1069,32): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1069,42): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1073,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1073,25): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1073,48): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1166,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1166,37): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(1167,69): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1168,21): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1169,20): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1170,6): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1536,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1536,37): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1537,24): error TS1011: An element access expression should take an argument.
+src/modules/questions/questions.service.ts(1537,25): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1538,24): error TS1011: An element access expression should take an argument.
+src/modules/questions/questions.service.ts(1538,25): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1539,24): error TS1011: An element access expression should take an argument.
+src/modules/questions/questions.service.ts(1539,25): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1540,26): error TS1011: An element access expression should take an argument.
+src/modules/questions/questions.service.ts(1540,27): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1541,58): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1542,21): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1543,19): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1544,20): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1545,24): error TS1011: An element access expression should take an argument.
+src/modules/questions/questions.service.ts(1545,25): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1546,6): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1895,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(1895,11): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1895,42): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1895,56): error TS1109: Expression expected.
+src/modules/questions/questions.service.ts(1896,9): error TS1005: ':' expected.
+src/modules/questions/questions.service.ts(1898,13): error TS1005: ':' expected.
+src/modules/questions/questions.service.ts(1909,9): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1911,11): error TS1005: ':' expected.
+src/modules/questions/questions.service.ts(1911,60): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1913,15): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1913,63): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1913,65): error TS1136: Property assignment expected.
+src/modules/questions/questions.service.ts(1924,5): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(1924,7): error TS1005: 'try' expected.
+src/modules/questions/questions.service.ts(1929,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(1938,3): error TS1434: Unexpected keyword or identifier.
+src/modules/questions/questions.service.ts(1938,34): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1938,51): error TS1005: ';' expected.
+src/modules/questions/questions.service.ts(1939,9): error TS1003: Identifier expected.
+src/modules/questions/questions.service.ts(1939,14): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1939,21): error TS1005: ',' expected.
+src/modules/questions/questions.service.ts(1939,23): error TS1136: Property assignment expected.
+src/modules/questions/questions.service.ts(2307,3): error TS1128: Declaration or statement expected.
+src/modules/questions/questions.service.ts(2308,1): error TS1128: Declaration or statement expected.

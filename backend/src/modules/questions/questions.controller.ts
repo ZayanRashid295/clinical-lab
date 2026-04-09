@@ -85,17 +85,16 @@ export class QuestionsController {
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
   async findAllLegacy(
+    @Query("topicId") subtopicId?: string,
+    @Query("systemId") systemId?: string,
     @Query("topicId") topicId?: string,
-    @Query("tagId") tagId?: string,
     @Query("difficulty") difficulty?: string,
     @Query("isActive") isActive?: boolean,
     @Query("limit") limit?: number,
     @Query("offset") offset?: number
   ) {
     return this.questionsService.findAllLegacy({
-      topicId,
-      tagId,
-      difficulty,
+      subtopicId, systemId, topicId, difficulty,
       isActive,
       limit,
       offset,
@@ -113,15 +112,14 @@ export class QuestionsController {
   @ApiQuery({ name: "difficulty", required: false, type: String })
   @ApiQuery({ name: "count", required: false, type: Number })
   async getRandomQuestions(
+    @Query("topicId") subtopicId?: string,
+    @Query("systemId") systemId?: string,
     @Query("topicId") topicId?: string,
-    @Query("tagId") tagId?: string,
     @Query("difficulty") difficulty?: string,
     @Query("count") count?: number
   ) {
     return this.questionsService.getRandomQuestions({
-      topicId,
-      tagId,
-      difficulty,
+      subtopicId, systemId, topicId, difficulty,
       count,
     });
   }
@@ -134,13 +132,13 @@ export class QuestionsController {
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
   async getQuestionsByTopic(
-    @Param("topicId") topicId: string,
+    @Param("topicId") subtopicId: string,
     @Query("isActive") isActive?: boolean,
     @Query("limit") limit?: number,
     @Query("offset") offset?: number
   ) {
     return this.questionsService.getQuestionsByTopic(
-      topicId,
+      subtopicId,
       isActive,
       limit,
       offset
@@ -257,10 +255,10 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async getFilteredQuestions(@Request() req, @Query() query: FilteredQuestionsDto) {
     return this.questionsService.getFilteredQuestions({
-      tagIds: query.tagIds,
       systemIds: query.systemIds,
       subjectIds: query.subjectIds,
       topicIds: query.topicIds,
+      subtopicIds: query.subtopicIds,
       pool: query.pool,
       marked: query.marked,
       limit: query.limit,

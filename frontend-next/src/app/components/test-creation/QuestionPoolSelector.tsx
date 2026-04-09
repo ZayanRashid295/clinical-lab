@@ -15,13 +15,11 @@ interface QuestionPoolSelectorProps {
   selectedPool: string;
   onPoolChange: (pool: string) => void;
   filters?: {
-    tagIds?: string[];
     systemIds?: string[];
-    subjectIds?: string[];
     topicIds?: string[];
+    subtopicIds?: string[];
   };
   isMarked?: boolean; // If true, apply AND logic to show only questions that are in pool AND marked
-  refreshTrigger?: number; // Increment this to trigger a refresh
 }
 
 export function QuestionPoolSelector({ 
@@ -29,7 +27,6 @@ export function QuestionPoolSelector({
   onPoolChange,
   filters,
   isMarked,
-  refreshTrigger 
 }: QuestionPoolSelectorProps) {
   const [stats, setStats] = useState<{
     unused: number;
@@ -39,16 +36,14 @@ export function QuestionPoolSelector({
     correct: number;
     total: number;
   } | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const questionPapersService = new QuestionPapersService();
 
   const fetchStats = async () => {
     try {
-      setLoading(true);
-      // Fetch stats without tag/system/subject/topic filters to keep counts static
-      // But include marked filter if enabled (AND logic)
+      // Fetch stats with filters to ensure counts reflect the current selections
       const data = await questionPapersService.getUserQuestionPoolStats({
+        ...filters,
         marked: isMarked ? true : undefined,
       });
       setStats(data);
@@ -63,15 +58,13 @@ export function QuestionPoolSelector({
         correct: 0,
         total: 0,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger, isMarked]); // Refresh when refreshTrigger or isMarked changes, but NOT when other filters change
+  }, [isMarked, filters]); // Refresh when isMarked or other filters change
 
   const pools: QuestionPool[] = [
     {
@@ -113,48 +106,42 @@ export function QuestionPoolSelector({
   return (
     <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden" data-testid="card-question-pool">
       <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500" />
           <h3 className="text-sm font-medium text-foreground dark:text-gray-100">Question Pool</h3>
-                  </div>
-                </div>
-      <div className="p-4">
-        {loading ? (
-          <div className="flex items-center justify-center py-4">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground dark:text-gray-400" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-4 gap-2">
-            {pools.map((pool) => {
-              const isSelected = selectedPool === pool.id;
-              return (
-            <button
-                  key={pool.id}
-                  onClick={() => onPoolChange(pool.id)}
-                  className={`flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg text-center transition-all ${
-                    isSelected
-                      ? pool.id === "unused"
-                        ? "bg-blue-500 dark:bg-blue-600 text-white shadow-sm"
-                        : pool.id === "correct"
-                          ? "bg-emerald-500 dark:bg-emerald-600 text-white shadow-sm"
-                          : pool.id === "incorrect"
-                            ? "bg-red-500 dark:bg-red-600 text-white shadow-sm"
-                            : "bg-amber-500 dark:bg-amber-600 text-white shadow-sm"
-                      : "bg-muted/50 dark:bg-gray-700/30 text-muted-foreground hover:bg-muted dark:hover:bg-gray-700/50 hover:text-foreground dark:hover:text-foreground"
-                  }`}
-                  data-testid={`checkbox-${pool.id}`}
-                >
-                  <div className={`p-1 rounded ${isSelected ? "bg-white/20" : pool.color}`}>{pool.icon}</div>
-                  <span className="text-[11px] font-medium">{pool.label}</span>
-                  <span className={`text-sm font-bold tabular-nums ${isSelected ? "" : "text-foreground dark:text-gray-100"}`}>
-                    {pool.count.toLocaleString()}
-                  </span>
-                </button>
-              );
-            })}
-                </div>
-        )}
-            </div>
         </div>
+      </div>
+      <div className="p-4">
+        <div className="grid grid-cols-4 gap-2">
+          {pools.map((pool) => {
+            const isSelected = selectedPool === pool.id;
+            return (
+              <button
+                key={pool.id}
+                onClick={() => onPoolChange(pool.id)}
+                className={`flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg text-center transition-all ${
+                  isSelected
+                    ? pool.id === "unused"
+                      ? "bg-blue-500 dark:bg-blue-600 text-white shadow-sm"
+                      : pool.id === "correct"
+                        ? "bg-emerald-500 dark:bg-emerald-600 text-white shadow-sm"
+                        : pool.id === "incorrect"
+                          ? "bg-red-500 dark:bg-red-600 text-white shadow-sm"
+                          : "bg-amber-500 dark:bg-amber-600 text-white shadow-sm"
+                    : "bg-muted/50 dark:bg-gray-700/30 text-muted-foreground hover:bg-muted dark:hover:bg-gray-700/50 hover:text-foreground dark:hover:text-foreground"
+                }`}
+                data-testid={`checkbox-${pool.id}`}
+              >
+                <div className={`p-1 rounded ${isSelected ? "bg-white/20" : pool.color}`}>{pool.icon}</div>
+                <span className="text-[11px] font-medium">{pool.label}</span>
+                <span className={`text-sm font-bold tabular-nums ${isSelected ? "" : "text-foreground dark:text-gray-100"}`}>
+                  {pool.count.toLocaleString()}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

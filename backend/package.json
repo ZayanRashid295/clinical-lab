@@ -42,7 +42,7 @@
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.17",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "5.22.0",
     "@stripe/stripe-js": "^8.5.3",
     "@types/multer": "^2.0.0",
     "bcryptjs": "^2.4.3",
@@ -61,6 +61,7 @@
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

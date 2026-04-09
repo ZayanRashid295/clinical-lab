@@ -40,7 +40,7 @@ export default function TopicManagementContent() {
     updateFilters({
       search: undefined,
       status: undefined,
-      chapterId: undefined,
+      systemId: undefined,
       dateFrom: undefined,
       dateTo: undefined,
     });

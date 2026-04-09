@@ -108,8 +108,8 @@ function parseDocxWithRules(
   // Extract Question Stem
   // Look for patterns like "Q 01:", "Question:", etc.
   const questionPatterns = [
-    /Q\s*\d+:\s*(.+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/is,
-    /Question[^:]*:\s*(.+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/is,
+    /Q\s*\d+:\s*([\s\S]+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/i,
+    /Question[^:]*:\s*([\s\S]+?)(?=Atopic|Papular|Scabies|ANSWER|Keywords|Explanation)/i,
   ];
 
   for (const pattern of questionPatterns) {
@@ -198,7 +198,7 @@ function parseDocxWithRules(
 
   // Extract Keywords Section – same parseKeywordBlock as Markdown for consistency
   const keywordsSectionMatch = text.match(
-    /Keywords[^:]*:\s*(.+?)(?=Explanation|Choice-by-Choice|Subject:|Topic:|$)/is
+    /Keywords[^:]*:\s*([\s\S]+?)(?=Explanation|Choice-by-Choice|Subject:|Topic:|$)/i
   );
   if (keywordsSectionMatch) {
     const keywordsText = keywordsSectionMatch[1].trim();
@@ -207,12 +207,12 @@ function parseDocxWithRules(
   }
 
   // Extract Per-Answer Explanations
-  const explanationMatch = text.match(/Explanation\s*(.+?)(?=Subject:|Topic:|$)/is);
+  const explanationMatch = text.match(/Explanation\s*([\s\S]+?)(?=Subject:|Topic:|$)/i);
   if (explanationMatch) {
     const explanationText = explanationMatch[1];
     
     // Extract per-answer explanations: (Option A) ..., (Option B) ...
-    const perAnswerPattern = /\(Option\s+([A-E])\)\s*([^:]+):\s*(.+?)(?=\(Option|Subject:|Topic:|$)/gis;
+    const perAnswerPattern = /\(Option\s+([A-E])\)\s*([^:]+):\s*([\s\S]+?)(?=\(Option|Subject:|Topic:|$)/gi;
     let match;
     const perAnswerExplanations: Record<string, string> = {};
 
@@ -234,9 +234,9 @@ function parseDocxWithRules(
       
       // Remove "Subject:", "Topic:" etc. from end
       const cleanedExplanation = mainExplanationText
-        .replace(/Subject:.*$/is, "")
-        .replace(/Topic:.*$/is, "")
-        .replace(/System:.*$/is, "")
+        .replace(/Subject:[\s\S]*$/i, "")
+        .replace(/Topic:[\s\S]*$/i, "")
+        .replace(/System:[\s\S]*$/i, "")
         .trim();
 
       if (cleanedExplanation) {

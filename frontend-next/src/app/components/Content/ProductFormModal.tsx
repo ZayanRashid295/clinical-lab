@@ -13,10 +13,10 @@ import {
   Product,
   CreateProductDto,
   UpdateProductDto,
-  ProductTag,
 } from "../../types/product";
 import { ProductsService } from "../../services/products/products.service";
-import { ProductTagsService } from "../../services/products/product-tags.service";
+import { CategoriesService } from "../../services/categories/categories.service";
+import { Category } from "../../types/category";
 import { CreateResponse } from "../../services/base/api-types";
 
 interface ProductFormModalProps {
@@ -38,57 +38,49 @@ export default function ProductFormModal({
     name: "",
     description: "",
     isActive: true,
-    tagIds: [],
+    categoryId: "",
   });
-  const [availableTags, setAvailableTags] = useState<ProductTag[]>([]);
-  const [loadingTags, setLoadingTags] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const productsService = useMemo(() => new ProductsService(), []);
-  const tagsService = useMemo(() => new ProductTagsService(), []);
+  const categoriesService = useMemo(() => new CategoriesService(), []);
   const isCreateMode = mode === "create";
 
   useEffect(() => {
     if (isOpen) {
-      // Load available tags
-      setLoadingTags(true);
-      tagsService
-        .getTags({ status: "ACTIVE" })
+      // Load categories
+      categoriesService.getCategories()
         .then((response) => {
           if (Array.isArray(response)) {
-            setAvailableTags(response);
+            setCategories(response);
           } else {
-            setAvailableTags(response.data || []);
+            setCategories(response.data || []);
           }
         })
-        .catch(() => {
-          setAvailableTags([]);
-        })
-        .finally(() => {
-          setLoadingTags(false);
-        });
+        .catch(() => setCategories([]));
 
       if (isCreateMode) {
         setFormData({
           name: "",
           description: "",
           isActive: true,
-          tagIds: [],
+          categoryId: "",
         });
       } else if (product) {
         setFormData({
           name: product.name,
           description: product.description || "",
           isActive: product.isActive,
-          tagIds: product.productTags?.map((tag) => tag.id) || [],
+          categoryId: (product as any).categoryId || "",
         });
       }
       setError(null);
       setSuccess(false);
     }
-  }, [isOpen, product, isCreateMode, tagsService]);
+  }, [isOpen, product, isCreateMode, categoriesService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -145,22 +137,19 @@ export default function ProductFormModal({
 
     try {
       if (isCreateMode) {
-        const createData: CreateProductDto = {
+        const createData: any = {
           name: formData.name,
           description: formData.description,
           isActive: formData.isActive,
-          tagIds: formData.tagIds,
+          categoryId: formData.categoryId || undefined,
         };
         const response = await productsService.createProduct(createData);
         setSuccess(true);
         setTimeout(() => {
-          // Handle union type: response is either CreateResponse or Product
           if ("name" in response && !("message" in response)) {
-            // It's a Product
-            onProductSaved(response);
+            onProductSaved(response as Product);
             onClose();
           } else {
-            // It's a CreateResponse, refetch the created entity
             const createResponse = response as CreateResponse;
             productsService
               .getProduct(createResponse.id)
@@ -174,11 +163,11 @@ export default function ProductFormModal({
           }
         }, 1000);
       } else if (product) {
-        const updateData: UpdateProductDto = {
+        const updateData: any = {
           name: formData.name,
           description: formData.description,
           isActive: formData.isActive,
-          tagIds: formData.tagIds,
+          categoryId: formData.categoryId === "" ? null : formData.categoryId,
         };
         const response = await productsService.updateProduct(
           product.id,
@@ -186,13 +175,10 @@ export default function ProductFormModal({
         );
         setSuccess(true);
         setTimeout(() => {
-          // Handle union type: response is either UpdateResponse or Product
           if ("name" in response && !("message" in response)) {
-            // It's a Product
-            onProductSaved(response);
+            onProductSaved(response as Product);
             onClose();
           } else {
-            // It's an UpdateResponse, refetch the updated entity
             productsService
               .getProduct(product.id)
               .then((entity) => {
@@ -287,77 +273,25 @@ export default function ProductFormModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tags
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
               </label>
-              {loadingTags ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  Loading tags...
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <select
-                    onChange={(e) => {
-                      const tagId = e.target.value;
-                      if (tagId && !formData.tagIds?.includes(tagId)) {
-                        setFormData((prev) => ({
-                          ...prev,
-                          tagIds: [...(prev.tagIds || []), tagId],
-                        }));
-                        e.target.value = "";
-                      }
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select a tag to add</option>
-                    {availableTags
-                      .filter((tag) => !formData.tagIds?.includes(tag.id))
-                      .map((tag) => (
-                        <option key={tag.id} value={tag.id}>
-                          {tag.name}
-                        </option>
-                      ))}
-                  </select>
-                  {formData.tagIds && formData.tagIds.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.tagIds.map((tagId) => {
-                        const tag = availableTags.find((t) => t.id === tagId);
-                        if (!tag) return null;
-                        return (
-                          <span
-                            key={tagId}
-                            className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                            style={{
-                              backgroundColor: tag.color
-                                ? `${tag.color}20`
-                                : undefined,
-                              color: tag.color || undefined,
-                            }}
-                          >
-                            <Tag className="h-3 w-3" />
-                            {tag.name}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  tagIds: prev.tagIds?.filter(
-                                    (id) => id !== tagId
-                                  ) || [],
-                                }));
-                              }}
-                              className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-                            >
-                              <XIcon className="h-3 w-3" />
-                            </button>
-                          </span>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+              <select
+                name="categoryId"
+                value={formData.categoryId || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">No Category / Unassigned</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.icon ? `${cat.icon} ` : ""}{cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
+
+
 
             <div className="flex items-center">
               <input

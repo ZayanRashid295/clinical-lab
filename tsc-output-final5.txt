@@ -1,0 +1,32 @@
+prisma/seed-usmle.ts(27,23): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type '(Without<ProductCreateInput, ProductUncheckedCreateInput> & ProductUncheckedCreateInput) | (Without<...> & ProductCreateInput)'.
+prisma/seed-usmle.ts(60,25): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type '(Without<SystemCreateInput, SystemUncheckedCreateInput> & SystemUncheckedCreateInput) | (Without<...> & SystemCreateInput)'.
+prisma/seed-usmle.ts(89,33): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type '(Without<TopicCreateInput, TopicUncheckedCreateInput> & TopicUncheckedCreateInput) | (Without<...> & TopicCreateInput)'.
+prisma/seed-usmle.ts(107,33): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type '(Without<SubtopicCreateInput, SubtopicUncheckedCreateInput> & SubtopicUncheckedCreateInput) | (Without<...> & SubtopicCreateInput)'.
+src/modules/questions/questions.controller.ts(259,7): error TS2353: Object literal may only specify known properties, and 'subjectIds' does not exist in type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(327,40): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(426,13): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(433,48): error TS2339: Property 'product' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; systemId: string; }'.
+src/modules/questions/questions.service.ts(434,44): error TS2339: Property 'product' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; systemId: string; }'.
+src/modules/questions/questions.service.ts(585,40): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(642,11): error TS2353: Object literal may only specify known properties, and 'product' does not exist in type 'TopicInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(649,46): error TS2339: Property 'product' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; systemId: string; }'.
+src/modules/questions/questions.service.ts(650,42): error TS2339: Property 'product' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; systemId: string; }'.
+src/modules/questions/questions.service.ts(1324,35): error TS2304: Cannot find name 'tagId'.
+src/modules/questions/questions.service.ts(1333,46): error TS2552: Cannot find name 'systemIdsJson'. Did you mean 'systemIds'?
+src/modules/questions/questions.service.ts(1334,35): error TS2304: Cannot find name 'tagIds'.
+src/modules/questions/questions.service.ts(1334,65): error TS2552: Cannot find name 'tagId'. Did you mean 'tag'?
+src/modules/questions/questions.service.ts(1357,22): error TS2339: Property 'color' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; productId: string; }'.
+src/modules/questions/questions.service.ts(1366,11): error TS2353: Object literal may only specify known properties, and 'topics' does not exist in type 'ProductInclude<DefaultArgs>'.
+src/modules/questions/questions.service.ts(1379,42): error TS2339: Property 'topics' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1458,37): error TS2339: Property 'topics' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1474,67): error TS2339: Property 'topics' does not exist on type '{ id: string; name: string; description: string; order: number; isActive: boolean; createdAt: Date; updatedAt: Date; categoryId: string; }'.
+src/modules/questions/questions.service.ts(1505,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1506,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1507,5): error TS2300: Duplicate identifier 'systemIds'.
+src/modules/questions/questions.service.ts(1516,31): error TS2339: Property 'topicIds' does not exist on type '{ systemIds?: string[]; subtopicIds?: string[]; pool?: "unused" | "incorrect" | "correct" | "omitted"; marked?: boolean; limit?: number; userId?: string; userRoles?: string[]; }'.
+src/modules/questions/questions.service.ts(1516,46): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1516,64): error TS2451: Cannot redeclare block-scoped variable 'subtopicIds'.
+src/modules/questions/questions.service.ts(1563,27): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1563,40): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1820,27): error TS1117: An object literal cannot have multiple properties with the same name.
+src/modules/questions/questions.service.ts(1820,40): error TS1117: An object literal cannot have multiple properties with the same name.

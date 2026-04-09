@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useToast } from "@/shared/ui/use-toast";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -8,10 +9,11 @@ import { Label } from "@/shared/ui/label";
 import { Rocket } from "lucide-react";
 import { TestModeSelector } from "./TestModeSelector";
 import { QuestionPoolSelector } from "./QuestionPoolSelector";
-import { SubjectSelector } from "./SubjectSelector";
 import { SystemSelector } from "./SystemSelector";
+import { TopicSelector } from "./TopicSelector";
 
 export default function StudyCreateTest() {
+  const { toast } = useToast();
   const [isTutor, setIsTutor] = useState(true);
   const [isTimed, setIsTimed] = useState(false);
   const [selectedPool, setSelectedPool] = useState("unused");
@@ -56,15 +58,27 @@ export default function StudyCreateTest() {
   const handleGenerateTest = () => {
     // Validation
     if (selectedTags.length === 0) {
-      alert("Please select at least one tag.");
+      toast({
+        title: "Selection Needed",
+        description: "Please select at least one tag.",
+        variant: "destructive",
+      });
       return;
     }
     if (selectedSystems.length === 0) {
-      alert("Please select at least one system.");
+      toast({
+        title: "Selection Needed",
+        description: "Please select at least one system.",
+        variant: "destructive",
+      });
       return;
     }
     if (!questionCount || parseInt(questionCount) <= 0 || parseInt(questionCount) > 40) {
-      alert("Please enter a valid number of questions (1-40).");
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid number of questions (1-40).",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -133,20 +147,19 @@ export default function StudyCreateTest() {
         </div>
 
         <div className="space-y-6">
-          <SubjectSelector
-            selectedSubjects={selectedTags}
-            onSubjectToggle={handleTagToggle}
+          <SystemSelector
+            selectedSystems={selectedTags}
+            onSystemToggle={handleTagToggle}
             selectedPool={selectedPool}
           />
-          <SystemSelector
-            selectedSystems={selectedSystems}
-            onSystemToggle={handleSystemToggle}
-            selectedTags={selectedTags}
+          <TopicSelector
+            selectedSystems={selectedTags}
+            onSystemToggle={handleTagToggle}
             selectedPool={selectedPool}
-            selectedSubjects={selectedSubjects}
-            selectedTopics={selectedTopics}
-            onSubjectToggle={handleSubjectToggle}
-            onTopicToggle={handleTopicToggle}
+            selectedTopics={selectedSubjects}
+            selectedSubtopics={selectedTopics}
+            onTopicToggle={handleSubjectToggle}
+            onSubtopicToggle={handleTopicToggle}
           />
         </div>
       </div>

@@ -238,32 +238,6 @@ export const initialData: ProjectData = {
       moduleName: "Content",
       tables: [
         {
-          id: "sections",
-          name: "Section",
-          x: 0,
-          y: 0,
-          column: 0,
-          fields: [
-            { id: "id", name: "id", type: "string", primaryKey: true },
-            {
-              id: "productId",
-              name: "productId",
-              type: "string",
-              foreignKey: {
-                tableName: "products",
-                columnName: "id",
-                reverseRelationName: "sections",
-              },
-            },
-            { id: "name", name: "name", type: "string" },
-            { id: "description", name: "description", type: "string" },
-            { id: "order", name: "order", type: "integer" },
-            { id: "isActive", name: "isActive", type: "boolean" },
-            { id: "createdAt", name: "createdAt", type: "timestamp" },
-            { id: "updatedAt", name: "updatedAt", type: "timestamp" },
-          ],
-        },
-        {
           id: "chapters",
           name: "Chapter",
           x: 0,
@@ -272,11 +246,11 @@ export const initialData: ProjectData = {
           fields: [
             { id: "id", name: "id", type: "string", primaryKey: true },
             {
-              id: "sectionId",
-              name: "sectionId",
+              id: "productId",
+              name: "productId",
               type: "string",
               foreignKey: {
-                tableName: "sections",
+                tableName: "products",
                 columnName: "id",
                 reverseRelationName: "chapters",
               },

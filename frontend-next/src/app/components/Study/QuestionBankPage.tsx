@@ -31,7 +31,7 @@ import {
 import {
   Question,
   QuestionFilter,
-  MEDICAL_SUBJECTS,
+  HIERARCHY_SYSTEMS,
   DIFFICULTY_LEVELS,
   QUESTION_TYPES,
 } from "@/lib/test-models";
@@ -44,7 +44,7 @@ const mockQuestions: Question[] = [
       "A 65-year-old male presents with chest pain that radiates to the left arm. ECG shows ST elevation in leads II, III, and aVF. What is the most likely diagnosis?",
     type: "multiple_choice",
     difficulty: "intermediate",
-    subject: "cardiology",
+    system: "cardiology",
     topic: "myocardial_infarction",
     explanation:
       "The patient presents with classic symptoms of inferior wall myocardial infarction. ST elevation in leads II, III, and aVF indicates inferior wall involvement.",
@@ -93,7 +93,7 @@ const mockQuestions: Question[] = [
       "Which of the following is the most common cause of acute kidney injury in hospitalized patients?",
     type: "multiple_choice",
     difficulty: "beginner",
-    subject: "nephrology",
+    system: "nephrology",
     topic: "acute_kidney_injury",
     explanation:
       "Prerenal causes, particularly hypovolemia and decreased effective circulating volume, account for 60-70% of acute kidney injury cases in hospitalized patients.",
@@ -142,7 +142,7 @@ const mockQuestions: Question[] = [
       "A 45-year-old woman presents with progressive weakness and fatigue. Laboratory studies reveal macrocytic anemia and low vitamin B12 levels. What is the most likely underlying cause?",
     type: "multiple_choice",
     difficulty: "advanced",
-    subject: "hematology",
+    system: "hematology",
     topic: "vitamin_b12_deficiency",
     explanation:
       "Pernicious anemia, caused by autoimmune destruction of gastric parietal cells leading to intrinsic factor deficiency, is the most common cause of vitamin B12 deficiency in adults.",
@@ -197,8 +197,9 @@ export default function QuestionBankPage() {
     new Set()
   );
   const [questionFilter, setQuestionFilter] = useState<QuestionFilter>({
-    subjects: [],
+    systems: [],
     topics: [],
+    subtopics: [],
     difficulties: [],
     questionTypes: [],
     sortBy: "created",
@@ -217,10 +218,10 @@ export default function QuestionBankPage() {
           return false;
         }
 
-        // Subject filter
+        // System filter
         if (
-          questionFilter.subjects.length > 0 &&
-          !questionFilter.subjects.includes(question.subject)
+          questionFilter.systems.length > 0 &&
+          !questionFilter.systems.includes(question.system)
         ) {
           return false;
         }
@@ -360,21 +361,21 @@ export default function QuestionBankPage() {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
               <div className="space-y-2">
-                <Label>Subjects</Label>
+                <Label>Systems</Label>
                 <Select
-                  value={questionFilter.subjects[0] || ""}
+                  value={questionFilter.systems[0] || ""}
                   onValueChange={(value) =>
-                    handleFilterChange("subjects", value ? [value] : [])
+                    handleFilterChange("systems", value ? [value] : [])
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All subjects" />
+                    <SelectValue placeholder="All systems" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All subjects</SelectItem>
-                    {MEDICAL_SUBJECTS.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
-                        {subject.replace("_", " ")}
+                    <SelectItem value="">All systems</SelectItem>
+                    {HIERARCHY_SYSTEMS.map((system) => (
+                      <SelectItem key={system} value={system}>
+                        {system.replace("_", " ")}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -437,7 +438,7 @@ export default function QuestionBankPage() {
                   <SelectContent>
                     <SelectItem value="created">Date Created</SelectItem>
                     <SelectItem value="difficulty">Difficulty</SelectItem>
-                    <SelectItem value="subject">Subject</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
                     <SelectItem value="topic">Topic</SelectItem>
                   </SelectContent>
                 </Select>
@@ -548,7 +549,7 @@ export default function QuestionBankPage() {
 
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="outline" className="text-xs">
-                      {question.subject.replace("_", " ")}
+                      {question.system.replace("_", " ")}
                     </Badge>
                     {question.topic && (
                       <Badge variant="secondary" className="text-xs">

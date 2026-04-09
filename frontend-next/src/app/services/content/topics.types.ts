@@ -5,4 +5,3 @@ import {
 } from "../../types/content";
 
 export type { TopicQueryParams, CreateTopicDto, UpdateTopicDto };
-

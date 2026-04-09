@@ -786,6 +786,7 @@ export default function UnifiedToolbar({
               // Fallback to normal toggle
               editor.chain().focus().toggleBulletList().run()
             }
+            return true;
           })
         }}
         className={cn((() => {
@@ -847,6 +848,7 @@ export default function UnifiedToolbar({
               // Fallback to normal toggle
               editor.chain().focus().toggleOrderedList().run()
             }
+            return true;
           })
         }}
         className={cn((() => {

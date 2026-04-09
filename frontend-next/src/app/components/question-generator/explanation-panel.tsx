@@ -12,7 +12,6 @@ interface ExplanationPanelProps {
   chapter?: string
   /** Label for the chapter field in metadata (e.g. "Chapters" or "System"). Default "System". */
   chapterLabel?: string
-  subjectTag?: string
   topic?: string | { name?: string }
 }
 
@@ -25,7 +24,6 @@ export default function ExplanationPanel({
   perAnswerExplanations = {},
   chapter,
   chapterLabel = "System",
-  subjectTag,
   topic,
 }: ExplanationPanelProps) {
   return (
@@ -47,17 +45,11 @@ export default function ExplanationPanel({
               </div>
             )}
 
-            {/* Metadata (Subjects/Chapters/Topic) */}
+            {/* Metadata (System/Topic) */}
             {/* Show metadata section if any value exists (including empty strings for loading states) */}
-            {(subjectTag || chapter || (topic && (typeof topic === "string" ? topic : topic?.name))) && (
+            {(chapter || (topic && (typeof topic === "string" ? topic : topic?.name))) && (
               <div className="border-t border-border/40 dark:border-gray-700/50 pt-1 mt-1">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-                  {subjectTag && (
-                    <div>
-                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">Subjects</div>
-                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{subjectTag}</div>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                   {chapter && (
                     <div>
                       <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">System</div>
@@ -81,3 +73,4 @@ export default function ExplanationPanel({
     </div>
   )
 }
+

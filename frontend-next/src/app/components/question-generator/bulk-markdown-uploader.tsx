@@ -4,12 +4,13 @@ import type React from "react"
 import { useState, useRef, useMemo, useEffect } from "react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
+import { useToast } from "@/shared/ui/use-toast"
 import { parseMarkdown, extractImageReferences, replaceImagePathsInBlocks, replaceImagePaths } from "./markdown-parser-utils"
 import { QuestionsService } from "@/app/services/questions/questions.service"
-import { SectionsService } from "@/app/services/content/sections.service"
-import { ChaptersService } from "@/app/services/content/chapters.service"
+import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
-import { ProductTagsService } from "@/app/services/products/product-tags.service"
+import { SubtopicsService } from "@/app/services/content/subtopics.service"
+import { CategoriesService } from "@/app/services/categories/categories.service"
 import { ProductsService } from "@/app/services/products/products.service"
 import { runAutoMatch } from "./metadata-auto-match"
 import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp, Plus, X } from "lucide-react"
@@ -43,6 +44,26 @@ interface BulkUploadSummary {
   results: ProcessingResult[]
 }
 
+interface QuestionMetadata {
+  productId: string
+  systemId: string
+  topicId: string
+  subtopicId?: string
+  categoryId?: string
+  categoryName?: string
+  systemName?: string
+  topicName?: string
+  subtopicName?: string
+}
+
+interface BulkUploadSummary {
+  total: number
+  successful: number
+  failed: number
+  skipped: number
+  results: ProcessingResult[]
+}
+
 interface BulkMarkdownUploaderProps {
   onQuestionsCreated?: (questionIds: string[]) => void
   onCancel?: () => void
@@ -56,6 +77,7 @@ export default function BulkMarkdownUploader({
   defaultTopicId,
   onQuestionEdit,
 }: BulkMarkdownUploaderProps) {
+  const { toast } = useToast()
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [uploadMode, setUploadMode] = useState<"files" | "directory">("files")
@@ -63,29 +85,19 @@ export default function BulkMarkdownUploader({
   const [errors, setErrors] = useState<string[]>([])
   const [warnings, setWarnings] = useState<string[]>([])
   // Store metadata for each parsed question (frontend-only mapping; backend schema unchanged)
-  const [questionMetadata, setQuestionMetadata] = useState<Record<string, {
-    sectionId: string
-    chapterId: string
-    topicId: string
-    productTagId?: string
-    subjectName?: string
-    systemName?: string
-    chapterName?: string
-    topicName?: string
-  }>>({})
+  const [questionMetadata, setQuestionMetadata] = useState<Record<string, QuestionMetadata>>({})
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set()) // Track expanded questions
   const [addToDbContext, setAddToDbContext] = useState<{ type: "subject" | "chapter" | "topic"; fileName: string; parsedName?: string } | null>(null)
   const [addToDbLoading, setAddToDbLoading] = useState(false)
   const [addToDbError, setAddToDbError] = useState<string | null>(null)
   const [addToDbName, setAddToDbName] = useState("")
-  const [addToDbSectionId, setAddToDbSectionId] = useState("")
   const [addToDbProductId, setAddToDbProductId] = useState("")
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: "subject" | "chapter" | "topic"
     fileName: string
     id: string
     name: string
-    chapterId?: string
+    systemId?: string
   } | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [alreadyExistsMessage, setAlreadyExistsMessage] = useState<string | null>(null)
@@ -94,36 +106,25 @@ export default function BulkMarkdownUploader({
   const questionsService = new QuestionsService()
   
   // Services for dropdowns
-  const sectionsService = useMemo(() => new SectionsService(), [])
-  const chaptersService = useMemo(() => new ChaptersService(), [])
+  const systemsService = useMemo(() => new SystemsService(), [])
   const topicsService = useMemo(() => new TopicsService(), [])
-  const productTagsService = useMemo(() => new ProductTagsService(), [])
+  const categoriesService = useMemo(() => new CategoriesService(), [])
   const productsService = useMemo(() => new ProductsService(), [])
   
   // State for dropdowns (shared across all questions)
-  const [sections, setSections] = useState<any[]>([])
-  const [chapters, setChapters] = useState<any[]>([]) // all chapters (no longer dependent on section)
-  const [topics, setTopics] = useState<Record<string, any[]>>({}) // topics by chapterId
-  const [loadingSections, setLoadingSections] = useState(false)
-  const [loadingChapters, setLoadingChapters] = useState(false)
+  const [systems, setSystems] = useState<any[]>([]) 
+  const [topics, setTopics] = useState<Record<string, any[]>>({}) // topics by systemId
+  const [subtopics, setSubtopics] = useState<Record<string, any[]>>({}) // subtopics by topicId
+  const [loadingSystems, setLoadingSystems] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState<Record<string, boolean>>({})
-  const [productTags, setProductTags] = useState<any[]>([])
-  const [loadingTags, setLoadingTags] = useState(false)
+  const [loadingSubtopics, setLoadingSubtopics] = useState<Record<string, boolean>>({})
+  const [categories, setCategories] = useState<any[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(false)
   const [products, setProducts] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
   
-  // Load sections on mount
-  useEffect(() => {
-    setLoadingSections(true)
-    sectionsService
-      .getSections({ status: "ACTIVE", listAll: true })
-      .then((response) => {
-        const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setSections(data)
-      })
-      .catch(() => setSections([]))
-      .finally(() => setLoadingSections(false))
-  }, [sectionsService])
+  const subtopicsService = useMemo(() => new SubtopicsService(), [])
+  
 
   // Load products on mount (for Add System)
   useEffect(() => {
@@ -138,131 +139,174 @@ export default function BulkMarkdownUploader({
       .finally(() => setLoadingProducts(false))
   }, [productsService])
 
-  // Load chapters on mount (no longer dependent on System selection)
+  // Load systems on mount
   useEffect(() => {
-    setLoadingChapters(true)
-    chaptersService
-      .getChapters({ status: "ACTIVE", listAll: true })
+    setLoadingSystems(true)
+    systemsService
+      .getSystems({ status: "ACTIVE", listAll: true })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setChapters(data)
+        setSystems(data)
       })
-      .catch(() => setChapters([]))
-      .finally(() => setLoadingChapters(false))
-  }, [chaptersService])
+      .catch(() => setSystems([]))
+      .finally(() => setLoadingSystems(false))
+  }, [systemsService])
 
-  // Load product tags on mount (Subjects)
+  // Load categories on mount (Subjects)
   useEffect(() => {
-    setLoadingTags(true)
-    productTagsService
-      .getTags({ status: "ACTIVE" })
+    setLoadingCategories(true)
+    categoriesService
+      .getCategories({ status: "ACTIVE" })
       .then((response) => {
         const data = Array.isArray(response) ? response : (response as any)?.data || []
-        setProductTags(data)
+        setCategories(data)
       })
-      .catch(() => setProductTags([]))
-      .finally(() => setLoadingTags(false))
-  }, [productTagsService])
+      .catch(() => setCategories([]))
+      .finally(() => setLoadingCategories(false))
+  }, [categoriesService])
   
-  // Load chapters when section is selected for any question
-  const loadChapters = async (sectionId: string, skipStateUpdate = false): Promise<any[]> => {
-    // Backward compatible helper (autoMatch still calls this). We now keep chapters globally.
-    // If sectionId provided, filter; otherwise return all.
-    if (!sectionId) return chapters
-    return chapters.filter((c: any) => c.sectionId === sectionId || c.section?.id === sectionId)
+  // Load systems when needed for any question
+  const loadSystems = async (productId?: string, skipStateUpdate = false): Promise<any[]> => {
+    if (!productId) return systems
+    return systems.filter((c: any) => c.productId === productId || c.product?.id === productId)
   }
   
   // Load topics when chapter is selected for any question
-  const loadTopics = async (chapterId: string, skipStateUpdate = false): Promise<any[]> => {
-    if (!chapterId) return []
+  const loadTopics = async (systemId: string, skipStateUpdate = false): Promise<any[]> => {
+    if (!systemId) return []
     
     // Return cached data if available
-    if (topics[chapterId]) {
-      return topics[chapterId]
+    if (topics[systemId]) {
+      return topics[systemId]
     }
     
     if (!skipStateUpdate) {
-      setLoadingTopics((prev) => ({ ...prev, [chapterId]: true }))
+      setLoadingTopics((prev) => ({ ...prev, [systemId]: true }))
     }
     
     try {
-      const response = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+      const response = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
       const data = Array.isArray(response) ? response : (response as any)?.data || []
       
       if (!skipStateUpdate) {
-        setTopics((prev) => ({ ...prev, [chapterId]: data }))
+        setTopics((prev) => ({ ...prev, [systemId]: data }))
       }
       
       return data
     } catch {
       const emptyData: any[] = []
       if (!skipStateUpdate) {
-        setTopics((prev) => ({ ...prev, [chapterId]: emptyData }))
+        setTopics((prev) => ({ ...prev, [systemId]: emptyData }))
       }
       return emptyData
     } finally {
       if (!skipStateUpdate) {
-        setLoadingTopics((prev => ({ ...prev, [chapterId]: false })))
+        setLoadingTopics((prev => ({ ...prev, [systemId]: false })))
+      }
+    }
+  }
+
+  // Load subtopics when topic is selected for any question
+  const loadSubtopics = async (topicId: string, skipStateUpdate = false): Promise<any[]> => {
+    if (!topicId) return []
+    
+    // Return cached data if available
+    if (subtopics[topicId]) {
+      return subtopics[topicId]
+    }
+    
+    if (!skipStateUpdate) {
+      setLoadingSubtopics((prev) => ({ ...prev, [topicId]: true }))
+    }
+    
+    try {
+      const response = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+      const data = Array.isArray(response) ? response : (response as any)?.data || []
+      
+      if (!skipStateUpdate) {
+        setSubtopics((prev) => ({ ...prev, [topicId]: data }))
+      }
+      
+      return data
+    } catch {
+      const emptyData: any[] = []
+      if (!skipStateUpdate) {
+        setSubtopics((prev) => ({ ...prev, [topicId]: emptyData }))
+      }
+      return emptyData
+    } finally {
+      if (!skipStateUpdate) {
+        setLoadingSubtopics((prev => ({ ...prev, [topicId]: false })))
       }
     }
   }
 
   // Auto-match parsed subject/system/topic to DB entities (shared logic with bulk-docx)
-  const getTopicsForChapter = (chapterId: string) =>
-    topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true }).then((r) => (Array.isArray(r) ? r : (r as any)?.data || []))
+  const getTopicsForSystem = (systemId: string) =>
+    topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true }).then((r) => (Array.isArray(r) ? r : (r as any)?.data || []))
   const autoMatchMetadata = async (
     fileName: string,
     parsedSystem?: string,
     parsedSubject?: string,
-    parsedTopic?: string
+    parsedTopic?: string,
+    parsedSubtopic?: string
   ) => {
     if (!parsedSystem && !parsedSubject) return
-    let sectionsToUse = sections
-    if (sectionsToUse.length === 0) {
+    let productsToUse = products
+    if (productsToUse.length === 0) {
       try {
-        const response = await sectionsService.getSections({ status: "ACTIVE", listAll: true })
+        const response = await productsService.getProducts({ status: "ACTIVE" })
         const data = Array.isArray(response) ? response : (response as any)?.data || []
         if (data.length > 0) {
-          setSections(data)
-          sectionsToUse = data
+          setProducts(data)
+          productsToUse = data
         }
       } catch (_) {}
     }
     const matched = await runAutoMatch(
-      { parsedSubject, parsedSystem, parsedTopic },
-      chapters,
-      { sections: sectionsToUse.length > 0 ? sectionsToUse : [], productTags, getTopicsForChapter }
+      { parsedCategory: parsedSubject, parsedSystem, parsedTopic, parsedSubtopic },
+      systems,
+      { products: products.length > 0 ? products : [], categories, getTopicsForSystem, getSubtopicsForTopic: async (topicId) => {
+          try {
+            const r = await fetch(`/api/content/subtopics?topicId=${topicId}&status=ACTIVE&limit=100`);
+            const json = await r.json();
+            return (Array.isArray(json) ? json : json.data) || [];
+          } catch(e) { return []; }
+        } }
     )
-    if (matched.chapterId || matched.topicId || matched.productTagId) {
+    if (matched.systemId || matched.topicId || matched.categoryId) {
       const result = summary?.results?.find((r) => r.fileName === fileName)
       const currentMetadata = questionMetadata[fileName]
-      const chapter = chapters.find((c: any) => c.id === matched.chapterId)
-      const chapterName = chapter?.name ?? ""
-      const subjectTag = matched.productTagId ? productTags.find((t: any) => t.id === matched.productTagId) : null
-      const subjectName = subjectTag?.name ?? (matched.productTagId ? parsedSubject ?? "" : (currentMetadata?.subjectName ?? ""))
+      const system = systems.find((c: any) => c.id === matched.systemId)
+      const systemName = system?.name ?? ""
+      const category = matched.categoryId ? categories.find((t: any) => t.id === matched.categoryId) : null
+      const categoryName = category?.name ?? (matched.categoryId ? parsedSubject ?? "" : (currentMetadata?.categoryName ?? ""))
       updateQuestionMetadata(
         fileName,
         {
-          ...(matched.sectionId ? { sectionId: matched.sectionId } : {}),
-          chapterId: matched.chapterId || "",
+          ...(matched.productId ? { productId: matched.productId } : {}),
+          systemId: matched.systemId || "",
           topicId: matched.topicId || "",
-          ...(matched.productTagId ? { productTagId: matched.productTagId } : {}),
-          subjectName: subjectName || currentMetadata?.subjectName || "",
-          chapterName: chapterName || currentMetadata?.chapterName || "",
+          subtopicId: matched.subtopicId || "",
+          ...(matched.categoryId ? { categoryId: matched.categoryId } : {}),
+          categoryName: categoryName || currentMetadata?.categoryName || "",
+          systemName: systemName || currentMetadata?.systemName || "",
           topicName: currentMetadata?.topicName ?? "",
+          subtopicName: currentMetadata?.subtopicName ?? "",
         },
         true
       )
       setExpandedQuestions((prev) => new Set(prev).add(fileName))
-      if (matched.topicId && matched.chapterId) {
-        getTopicsForChapter(matched.chapterId).then((topicsList: any[]) => {
+      if (matched.topicId && matched.systemId) {
+        getTopicsForSystem(matched.systemId).then((topicsList: any[]) => {
           const topic = topicsList.find((t: any) => t.id === matched.topicId)
-          const topicName = topic?.name ?? parsedTopic ?? ""
-          updateQuestionMetadata(fileName, { topicName }, true)
-        })
-      }
+            const topicName = topic?.name ?? parsedTopic ?? ""
+            updateQuestionMetadata(fileName, { topicName }, true)
+            // Note: If you want to update subtopicName here, you'd fetch the subtopic similarly
+          })
+        }
     }
-    if (matched.chapterId) loadTopics(matched.chapterId)
+    if (matched.systemId) loadTopics(matched.systemId)
   }
 
   // Helper to get filename from path
@@ -336,7 +380,7 @@ export default function BulkMarkdownUploader({
       const parsed = parseMarkdown(content)
       console.log(`[ProcessFile] Parsed result:`, {
         system: parsed.system,
-        subject: parsed.subject,
+        productId: parsed.productId,
         topic: parsed.topic,
         hasStem: !!parsed.stem,
         optionsCount: parsed.options?.length || 0,
@@ -359,9 +403,10 @@ export default function BulkMarkdownUploader({
       // Convert to question data format
       const questionData = {
         stem: updatedStem,
-        subject: parsed.subject,
+        productId: parsed.productId,
         system: parsed.system,
         topic: parsed.topic,
+        subtopic: parsed.subtopic,
         options: parsed.options,
         explanation: updatedMainExplanation,
         perAnswerExplanations: updatedPerAnswerExplanations,
@@ -371,7 +416,7 @@ export default function BulkMarkdownUploader({
       
       console.log(`[ProcessFile] Final questionData for ${fileName}:`, {
         system: questionData.system,
-        subject: questionData.subject,
+        productId: questionData.productId,
         topic: questionData.topic,
       })
 
@@ -460,33 +505,33 @@ export default function BulkMarkdownUploader({
       setWarnings(allWarnings)
     }
 
-    // Ensure sections are loaded before auto-matching
-    let sectionsLoaded = sections.length > 0
-    if (!sectionsLoaded) {
-      // Wait for sections to load (with timeout)
+    // Ensure products are loaded before auto-matching
+    let productsLoaded = products.length > 0
+    if (!productsLoaded) {
+      // Wait for products to load (with timeout)
       let attempts = 0
-      while (!sectionsLoaded && attempts < 10) {
+      while (!productsLoaded && attempts < 10) {
         await new Promise(resolve => setTimeout(resolve, 200))
-        sectionsLoaded = sections.length > 0
+        productsLoaded = products.length > 0
         attempts++
       }
       
-      // If still not loaded, fetch sections directly
-      if (!sectionsLoaded) {
+      // If still not loaded, fetch products directly
+      if (!productsLoaded) {
         try {
-          const response = await sectionsService.getSections({ status: "ACTIVE", listAll: true })
+          const response = await productsService.getProducts({ status: "ACTIVE" })
           const data = Array.isArray(response) ? response : (response as any)?.data || []
-          setSections(data)
-          sectionsLoaded = data.length > 0
+          setProducts(data)
+          productsLoaded = data.length > 0
         } catch (error) {
-          console.error("Failed to load sections for auto-matching:", error)
+          console.error("Failed to load products for auto-matching:", error)
         }
       }
     }
 
     // Auto-match metadata for all successfully parsed questions
     console.log("[BulkUpload] Starting auto-matching for", results.length, "results")
-    console.log("[BulkUpload] Sections available:", sections.length)
+    console.log("[BulkUpload] Products available:", products.length)
     
     for (const result of results) {
       if (result.status === "success" && result.questionData) {
@@ -580,33 +625,33 @@ export default function BulkMarkdownUploader({
       setWarnings(allWarnings)
     }
 
-    // Ensure sections are loaded before auto-matching
-    let sectionsLoaded = sections.length > 0
-    if (!sectionsLoaded) {
-      // Wait for sections to load (with timeout)
+    // Ensure products are loaded before auto-matching
+    let productsLoaded = products.length > 0
+    if (!productsLoaded) {
+      // Wait for products to load (with timeout)
       let attempts = 0
-      while (!sectionsLoaded && attempts < 10) {
+      while (!productsLoaded && attempts < 10) {
         await new Promise(resolve => setTimeout(resolve, 200))
-        sectionsLoaded = sections.length > 0
+        productsLoaded = products.length > 0
         attempts++
       }
       
-      // If still not loaded, fetch sections directly
-      if (!sectionsLoaded) {
+      // If still not loaded, fetch products directly
+      if (!productsLoaded) {
         try {
-          const response = await sectionsService.getSections({ status: "ACTIVE", listAll: true })
+          const response = await productsService.getProducts({ status: "ACTIVE" })
           const data = Array.isArray(response) ? response : (response as any)?.data || []
-          setSections(data)
-          sectionsLoaded = data.length > 0
+          setProducts(data)
+          productsLoaded = data.length > 0
         } catch (error) {
-          console.error("Failed to load sections for auto-matching:", error)
+          console.error("Failed to load products for auto-matching:", error)
         }
       }
     }
 
     // Auto-match metadata for all successfully parsed questions
     console.log("[BulkUpload] Starting auto-matching for", results.length, "results")
-    console.log("[BulkUpload] Sections available:", sections.length)
+    console.log("[BulkUpload] Products available:", products.length)
     
     for (const result of results) {
       if (result.status === "success" && result.questionData) {
@@ -651,63 +696,108 @@ export default function BulkMarkdownUploader({
   // Update metadata for a specific question
   const updateQuestionMetadata = (
     fileName: string,
-    updates: { sectionId?: string; chapterId?: string; topicId?: string; productTagId?: string; subjectName?: string; chapterName?: string; topicName?: string },
+    updates: { productId?: string; systemId?: string; topicId?: string; subtopicId?: string; categoryId?: string; categoryName?: string; systemName?: string; topicName?: string; subtopicName?: string },
     skipClearing = false // If true, don't clear dependent fields (used for auto-matching)
   ) => {
     setQuestionMetadata((prev) => {
-      const current = prev[fileName] || { sectionId: "", chapterId: "", topicId: "" }
+      const current = prev[fileName] || { productId: "", systemId: "", topicId: "", subtopicId: "", categoryId: "" }
       const updated: any = { ...current, ...updates }
       
       // If skipClearing is true (auto-matching), just apply all updates and load data
       if (skipClearing) {
-        // Load chapters if section is set
-        if (updates.sectionId && updates.sectionId !== current.sectionId) {
-          loadChapters(updates.sectionId)
+        // Load chapters if product is set
+        if (updates.productId && updates.productId !== current.productId) {
+          loadSystems(updates.productId)
         }
         // Load topics if chapter is set
-        if (updates.chapterId && updates.chapterId !== current.chapterId) {
-          loadTopics(updates.chapterId)
+        if (updates.systemId && updates.systemId !== current.systemId) {
+          loadTopics(updates.systemId)
+        }
+        // Load subtopics if topic is set
+        if (updates.topicId && updates.topicId !== current.topicId) {
+          loadSubtopics(updates.topicId)
         }
         return { ...prev, [fileName]: updated }
       }
       
       // Normal behavior: clear dependent fields when parent changes
-      // If section changed, clear chapter and topic
-      if (updates.sectionId !== undefined && updates.sectionId !== current.sectionId) {
-        updated.chapterId = ""
+      // If product changed, clear chapter and topic
+      if (updates.productId !== undefined && updates.productId !== current.productId) {
+        updated.systemId = ""
         updated.topicId = ""
-        updated.chapterName = undefined
+        updated.subtopicId = ""
+        updated.systemName = undefined
         updated.topicName = undefined
-        // Load chapters for new section
-        if (updates.sectionId) {
-          loadChapters(updates.sectionId)
+        updated.subtopicName = undefined
+        // Load chapters for new product
+        if (updates.productId) {
+          loadSystems(updates.productId)
         }
       }
       
-      // If chapter changed, clear topic and set chapterName from selection
-      if (updates.chapterId !== undefined && updates.chapterId !== current.chapterId) {
+      // If System changed, clear Topic and Subtopic
+      if (updates.systemId !== undefined && updates.systemId !== current.systemId) {
         updated.topicId = ""
+        updated.subtopicId = ""
         updated.topicName = undefined
-        // Load topics for new chapter
-        if (updates.chapterId) {
-          loadTopics(updates.chapterId)
+        updated.subtopicName = undefined
+        // Load topics for new system
+        if (updates.systemId) {
+          loadTopics(updates.systemId)
         }
-        // Auto-map section from chapter (frontend-only) and set chapterName for text box
-        const selectedChapter = chapters.find((c: any) => c.id === updates.chapterId)
-        const derivedSectionId = selectedChapter?.sectionId || selectedChapter?.section?.id
-        if (derivedSectionId) {
-          updated.sectionId = derivedSectionId
+        // Auto-map product from system (frontend-only) and set chapterName for text box (using chapterName as System label for now)
+        const selectedSystem = systems.find((c: any) => c.id === updates.systemId)
+        const derivedProductId = selectedSystem?.productId || selectedSystem?.product?.id
+        if (derivedProductId) {
+          updated.productId = derivedProductId
         }
-        if (updates.chapterName === undefined && selectedChapter?.name) {
-          updated.chapterName = selectedChapter.name
+        if (updates.systemName === undefined && selectedSystem?.name) {
+          updated.systemName = selectedSystem.name
         }
       }
-      if (updates.chapterId === "") {
-        updated.chapterName = undefined
+
+      // If Topic changed, clear Subtopic
+      if (updates.topicId !== undefined && updates.topicId !== current.topicId) {
+        updated.subtopicId = ""
+        updated.subtopicName = undefined
+        // We might need to load subtopics here if we had a loadSubtopics function
+        // For now, subtopics are likely handled similarly to topics
+        const systemId = updates.systemId || current.systemId
+        if (systemId && updates.topicId) {
+           // If we have a local cache of topics for this system, we can find the name
+           const systemTopics = topics[systemId] || []
+           const selectedTopic = systemTopics.find((t: any) => t.id === updates.topicId)
+           if (updates.topicName === undefined && selectedTopic?.name) {
+             updated.topicName = selectedTopic.name
+           }
+           // Load subtopics for new topic
+           loadSubtopics(updates.topicId)
+        }
+      }
+
+      // If Subtopic changed, set subtopicName from selection
+      if (updates.subtopicId !== undefined && updates.subtopicId !== current.subtopicId) {
+        const topicId = updates.topicId || current.topicId
+        if (topicId && updates.subtopicId) {
+          const topicSubtopics = subtopics[topicId] || []
+          const selectedSubtopic = topicSubtopics.find((s: any) => s.id === updates.subtopicId)
+          if (updates.subtopicName === undefined && selectedSubtopic?.name) {
+            updated.subtopicName = selectedSubtopic.name
+          }
+        }
+      }
+
+      if (updates.systemId === "") {
+        updated.systemName = undefined
         updated.topicName = undefined
+        updated.subtopicName = undefined
       }
       if (updates.topicId === "") {
         updated.topicName = undefined
+        updated.subtopicName = undefined
+      }
+      if (updates.subtopicId === "") {
+        updated.subtopicName = undefined
       }
       
       return { ...prev, [fileName]: updated }
@@ -727,33 +817,33 @@ export default function BulkMarkdownUploader({
 
     // Pre-check: if same name already exists in DB, show "already exists" modal and select it (don't call create)
     if (type === "subject") {
-      const existingSubject = productTags.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
-      if (existingSubject) {
-        updateQuestionMetadata(fileName, { productTagId: existingSubject.id, subjectName: existingSubject.name })
+      const existingCategory = categories.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
+      if (existingCategory) {
+        updateQuestionMetadata(fileName, { categoryId: existingCategory.id, categoryName: existingCategory.name })
         setAddToDbContext(null)
-        setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+        setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
         return
       }
     } else if (type === "chapter") {
-      const sectionId = addToDbSectionId || sections[0]?.id
-      if (sectionId) {
-        const existingChapter = chapters.find((c: any) => (c.sectionId === sectionId || c.section?.id === sectionId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
-        if (existingChapter) {
-          updateQuestionMetadata(fileName, { chapterId: existingChapter.id, topicId: "", chapterName: existingChapter.name, topicName: undefined })
-          loadTopics(existingChapter.id)
+      const productId = addToDbProductId || products[0]?.id
+      if (productId) {
+        const existingSystem = systems.find((c: any) => (c.productId === productId || c.product?.id === productId) && String(c?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingSystem) {
+          updateQuestionMetadata(fileName, { systemId: existingSystem.id, topicId: "", systemName: existingSystem.name, topicName: undefined })
+          loadTopics(existingSystem.id)
           setAddToDbContext(null)
           setAlreadyExistsMessage("This System already exists. We've selected it for you.")
           return
         }
       }
     } else if (type === "topic") {
-      const chapterId = questionMetadata[fileName]?.chapterId
-      if (chapterId) {
-        let topicList = topics[chapterId] ?? []
+      const systemId = questionMetadata[fileName]?.systemId
+      if (systemId) {
+        let topicList = topics[systemId] ?? []
         if (topicList.length === 0) {
-          const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
           topicList = Array.isArray(list) ? list : (list as any)?.data ?? []
-          setTopics((prev) => ({ ...prev, [chapterId]: topicList }))
+          setTopics((prev) => ({ ...prev, [systemId]: topicList }))
         }
         const existingTopic = topicList.find((t: any) => String(t?.name ?? "").trim().toLowerCase() === nameLower)
         if (existingTopic) {
@@ -768,43 +858,44 @@ export default function BulkMarkdownUploader({
     setAddToDbLoading(true)
     try {
       if (type === "subject") {
-        const res: any = await productTagsService.createTag({ name, isActive: true })
+        const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+        const res: any = await categoriesService.createCategory({ name, slug, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
-          const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setProductTags(data)
-          updateQuestionMetadata(fileName, { productTagId: id, subjectName: name })
+          const categoriesList: any = await categoriesService.getCategories({ status: "ACTIVE" })
+          const data = Array.isArray(categoriesList) ? categoriesList : (categoriesList as any)?.data || []
+          setCategories(data)
+          updateQuestionMetadata(fileName, { categoryId: id, categoryName: name })
           setAddToDbContext(null)
         }
       } else if (type === "chapter") {
-        const sectionId = addToDbSectionId || sections[0]?.id
-        if (!sectionId) {
-          setAddToDbError("Select a section first")
+        const productId = addToDbProductId || products[0]?.id
+        if (!productId) {
+          setAddToDbError("Select a product first")
           setAddToDbLoading(false)
           return
         }
-        const res: any = await chaptersService.createChapter({ sectionId, name, isActive: true })
+        const res: any = await systemsService.createSystem({ productId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setChapters(data)
-          updateQuestionMetadata(fileName, { chapterId: id, topicId: "", chapterName: name, topicName: undefined })
+          setSystems(data)
+          updateQuestionMetadata(fileName, { systemId: id, topicId: "", systemName: name, topicName: undefined })
           loadTopics(id)
           setAddToDbContext(null)
         }
       } else if (type === "topic") {
-        const chapterId = questionMetadata[fileName]?.chapterId
-        if (!chapterId) {
+        const systemId = questionMetadata[fileName]?.systemId
+        if (!systemId) {
           setAddToDbError("Select a chapter first")
           setAddToDbLoading(false)
           return
         }
-        const res: any = await topicsService.createTopic({ chapterId, name, isActive: true })
+        const res: any = await topicsService.createTopic({ systemId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          await loadTopics(chapterId)
+          await loadTopics(systemId)
           updateQuestionMetadata(fileName, { topicId: id, topicName: name })
           setAddToDbContext(null)
         }
@@ -822,7 +913,7 @@ export default function BulkMarkdownUploader({
         (status === 500 && (lower.includes("unique") || lower.includes("duplicate")))
       const label =
         addToDbContext?.type === "subject"
-          ? "Subject"
+          ? "Category"
           : addToDbContext?.type === "chapter"
           ? "System"
           : "Topic"
@@ -830,25 +921,25 @@ export default function BulkMarkdownUploader({
         const nameVal = (addToDbName || addToDbContext?.parsedName || "").trim()
         const { type, fileName } = addToDbContext
         if (type === "subject") {
-          const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+          const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setProductTags(data)
+          setCategories(data)
           const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
           if (existing) {
-            updateQuestionMetadata(fileName, { productTagId: existing.id, subjectName: existing.name })
+            updateQuestionMetadata(fileName, { categoryId: existing.id, categoryName: existing.name })
             setAddToDbContext(null)
             setAddToDbError(null)
-            setAlreadyExistsMessage("This Subject already exists. We've selected it for you.")
+            setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
           } else {
             setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
           }
         } else if (type === "chapter") {
-          const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+          const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
           const data = Array.isArray(list) ? list : (list as any)?.data || []
-          setChapters(data)
+          setSystems(data)
           const existing = data.find((c: any) => String(c?.name).trim().toLowerCase() === nameVal.toLowerCase())
           if (existing) {
-            updateQuestionMetadata(fileName, { chapterId: existing.id, topicId: "", chapterName: existing.name, topicName: undefined })
+            updateQuestionMetadata(fileName, { systemId: existing.id, topicId: "", systemName: existing.name, topicName: undefined })
             loadTopics(existing.id)
             setAddToDbContext(null)
             setAddToDbError(null)
@@ -857,11 +948,11 @@ export default function BulkMarkdownUploader({
             setAddToDbError(`${label} with this name already exists. Please select it from the dropdown.`)
           }
         } else if (type === "topic") {
-          const chapterId = questionMetadata[fileName]?.chapterId
-          if (chapterId) {
-            const list = await topicsService.getTopics({ chapterId, status: "ACTIVE", listAll: true })
+          const systemId = questionMetadata[fileName]?.systemId
+          if (systemId) {
+            const list = await topicsService.getTopics({ systemId, status: "ACTIVE", listAll: true })
             const data = Array.isArray(list) ? list : (list as any)?.data || []
-            setTopics((prev) => ({ ...prev, [chapterId]: data }))
+            setTopics((prev) => ({ ...prev, [systemId]: data }))
             const existing = data.find((t: any) => String(t?.name).trim().toLowerCase() === nameVal.toLowerCase())
             if (existing) {
               updateQuestionMetadata(fileName, { topicId: existing.id, topicName: existing.name })
@@ -885,57 +976,57 @@ export default function BulkMarkdownUploader({
 
   // Delete from DB: open confirmation modal, then perform delete on confirm
   const handleDeleteSubject = (fileName: string) => {
-    const id = (questionMetadata[fileName] as any)?.productTagId
+    const id = (questionMetadata[fileName] as any)?.categoryId
     if (!id) return
-    const tag = productTags.find((t) => t.id === id)
-    setDeleteConfirm({ type: "subject", fileName, id, name: tag?.name ?? id })
+    const cat = categories.find((t) => t.id === id)
+    setDeleteConfirm({ type: "subject", fileName, id, name: cat?.name ?? id })
   }
-  const handleDeleteChapter = (fileName: string) => {
-    const id = questionMetadata[fileName]?.chapterId
+  const handleDeleteSystem = (fileName: string) => {
+    const id = questionMetadata[fileName]?.systemId
     if (!id) return
-    const chapter = chapters.find((c) => c.id === id)
-    setDeleteConfirm({ type: "chapter", fileName, id, name: chapter?.name ?? id })
+    const system = systems.find((c: any) => c.id === id)
+    setDeleteConfirm({ type: "chapter", fileName, id, name: system?.name ?? id })
   }
   const handleDeleteTopic = (fileName: string) => {
     const metadata = questionMetadata[fileName]
     const id = metadata?.topicId
-    const chapterId = metadata?.chapterId
-    if (!id || !chapterId) return
-    const topicList = topics[chapterId] || []
+    const systemId = metadata?.systemId
+    if (!id || !systemId) return
+    const topicList = topics[systemId] || []
     const topic = topicList.find((t) => t.id === id)
-    setDeleteConfirm({ type: "topic", fileName, id, name: topic?.name ?? id, chapterId })
+    setDeleteConfirm({ type: "topic", fileName, id, name: topic?.name ?? id, systemId })
   }
-
   const performDelete = async () => {
     if (!deleteConfirm) return
     setDeleteLoading(true)
     try {
-      const { type, fileName, id, chapterId } = deleteConfirm
+      const { type, fileName, id, systemId } = deleteConfirm
       if (type === "subject") {
-        await productTagsService.delete(id)
-        const list: any = await productTagsService.getTags({ status: "ACTIVE" })
+        await categoriesService.deactivateCategory(id)
+        const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
         const data = Array.isArray(list) ? list : (list as any)?.data || []
-        setProductTags(data)
-        updateQuestionMetadata(fileName, { productTagId: "", subjectName: undefined })
+        setCategories(data)
+        updateQuestionMetadata(fileName, { categoryId: "", categoryName: "" })
       } else if (type === "chapter") {
-        await chaptersService.delete(id)
-        const list: any = await chaptersService.getChapters({ status: "ACTIVE", listAll: true })
+        await systemsService.delete(id)
+        const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
         const data = Array.isArray(list) ? list : (list as any)?.data || []
-        setChapters(data)
-        setTopics((prev) => {
-          const next = { ...prev }
-          delete next[id]
-          return next
-        })
-        updateQuestionMetadata(fileName, { chapterId: "", topicId: "", chapterName: undefined, topicName: undefined })
-      } else if (type === "topic" && chapterId) {
+        setSystems(data)
+        updateQuestionMetadata(fileName, { systemId: "", topicId: "", systemName: "", topicName: undefined })
+      } else if (type === "topic") {
         await topicsService.delete(id)
-        await loadTopics(chapterId)
-        updateQuestionMetadata(fileName, { topicId: "", topicName: undefined })
+        if (systemId) {
+          await loadTopics(systemId)
+        }
+        updateQuestionMetadata(fileName, { topicId: "", topicName: "" })
       }
       setDeleteConfirm(null)
     } catch (e: any) {
-      alert(e?.message || "Failed to delete")
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to delete",
+        variant: "destructive",
+      })
     } finally {
       setDeleteLoading(false)
     }
@@ -944,11 +1035,10 @@ export default function BulkMarkdownUploader({
   useEffect(() => {
     if (addToDbContext) {
       setAddToDbName(addToDbContext.parsedName || "")
-      setAddToDbSectionId(sections[0]?.id || "")
       setAddToDbProductId(products[0]?.id || "")
       setAddToDbError(null)
     }
-  }, [addToDbContext, sections, products])
+  }, [addToDbContext, products])
 
   // Create questions from parsed data
   const createQuestions = async () => {
@@ -991,14 +1081,15 @@ export default function BulkMarkdownUploader({
             continue // Skip if no topic ID
           }
           
+          const questionSubtopicId = metadata.subtopicId
           const questionTopicId = metadata.topicId
-          const questionChapterId = metadata.chapterId
-          const questionProductTagId = (metadata as any).productTagId
+          const questionSystemId = metadata.systemId
+          const questionCategoryId = (metadata as any).categoryId
 
           // Convert parsed question to the format needed for creation
-          // Use edited names (subjectName, chapterName) so edits apply everywhere
-          const subjectToUse = (metadata as any).subjectName ?? productTags.find((t: any) => t.id === questionProductTagId)?.name ?? result.questionData.subject ?? ""
-          const systemToUse = (metadata as any).chapterName ?? chapters.find((c: any) => c.id === questionChapterId)?.name ?? result.questionData.system ?? ""
+          // Use edited names (categoryName, systemName) so edits apply everywhere
+          const subjectToUse = metadata.categoryName ?? categories.find((t: any) => t.id === questionCategoryId)?.name ?? result.questionData.subject ?? ""
+          const systemToUse = metadata.systemName ?? systems.find((c: any) => c.id === questionSystemId)?.name ?? result.questionData.system ?? ""
           const oldFormatData = {
             stem: result.questionData.stem, // This is a string from parser
             options: result.questionData.options,
@@ -1007,7 +1098,9 @@ export default function BulkMarkdownUploader({
             explanation: result.questionData.explanation, // This is already blocks
             perAnswerExplanations: result.questionData.perAnswerExplanations, // This is already blocks
             tags: result.questionData.tags || [],
+            subtopicId: questionSubtopicId,
             topicId: questionTopicId,
+            systemId: questionSystemId,
             questionId: result.questionData.questionId, // Pass through parsed questionId if it exists
           }
 
@@ -1023,9 +1116,10 @@ export default function BulkMarkdownUploader({
               ...newFormatData.metadata,
               subject: subjectToUse,
               system: systemToUse,
+              subtopicId: questionSubtopicId,
               topicId: questionTopicId,
-              chapterId: questionChapterId,
-              productTagId: questionProductTagId,
+              systemId: questionSystemId,
+              categoryId: questionCategoryId,
             },
           }
           const convertedBack = convertNewQuestionToOld(fullFormatData)
@@ -1054,16 +1148,13 @@ export default function BulkMarkdownUploader({
           }
 
           const questionPayload: any = {
+            subtopicId: questionSubtopicId,
             topicId: questionTopicId,
+            systemId: questionSystemId,
             question: questionText.trim(),
             difficulty: "medium",
             points: 1,
             isActive: true,
-          }
-          
-          // Add chapterId if available (section is derived from chapter at backend)
-          if (questionChapterId) {
-            questionPayload.chapterId = questionChapterId
           }
 
           if (convertedBack.subject) questionPayload.subject = convertedBack.subject
@@ -1090,8 +1181,8 @@ export default function BulkMarkdownUploader({
             questionPayload.tags = tagsArray
           }
           
-          if (questionProductTagId) {
-            questionPayload.productTagId = questionProductTagId
+          if (questionCategoryId) {
+            questionPayload.categoryId = questionCategoryId
           }
 
           // Add question stem blocks if available
@@ -1360,9 +1451,11 @@ export default function BulkMarkdownUploader({
               <div className="space-y-3 max-h-[70vh] overflow-y-auto">
                 {summary.results.map((result, idx) => {
                   const isExpanded = expandedQuestions.has(result.fileName)
-                  const metadata = questionMetadata[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
-                  const questionTopics = metadata.chapterId ? (topics[metadata.chapterId] || []) : []
-                  const isLoadingTopics = metadata.chapterId ? (loadingTopics[metadata.chapterId] || false) : false
+                  const metadata = questionMetadata[result.fileName] || { productId: "", systemId: "", topicId: "" }
+                  const questionTopics = metadata.systemId ? (topics[metadata.systemId] || []) : []
+                  const isLoadingTopics = metadata.systemId ? (loadingTopics[metadata.systemId] || false) : false
+                  const questionSubtopics = metadata.topicId ? (subtopics[metadata.topicId] || []) : []
+                  const isLoadingSubtopics = metadata.topicId ? (loadingSubtopics[metadata.topicId] || false) : false
                   
                   return (
                     <div
@@ -1439,7 +1532,7 @@ export default function BulkMarkdownUploader({
                             {/* Subject */}
                             <div>
                               <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
-                                Subject
+                                Category
                               </label>
                               <div className="mb-1">
                                 <input
@@ -1447,42 +1540,49 @@ export default function BulkMarkdownUploader({
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.subject ? `Parsed: ${result.questionData.subject}` : "Name (editable)"}
                                   value={
-                                    (metadata as any).productTagId
-                                      ? ((metadata as any).subjectName ?? productTags.find((t: any) => t.id === (metadata as any).productTagId)?.name ?? "")
+                                    metadata.categoryId
+                                      ? (metadata.categoryName ?? categories.find((t: any) => t.id === metadata.categoryId)?.name ?? "")
                                       : ""
                                   }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
-                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
-                                      return { ...prev, [result.fileName]: { ...cur, subjectName: v } }
+                                      const cur = prev[result.fileName] || { productId: "", systemId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, categoryName: v } }
                                     })
                                   }}
                                 />
                               </div>
                               <div className="flex gap-1">
                                 <select
-                                  value={(metadata as any).productTagId || ""}
+                                  value={metadata.categoryId || ""}
                                   onChange={(e) => {
-                                    const productTagId = e.target.value || undefined
-                                    const selectedTag = productTagId ? productTags.find((t: any) => t.id === productTagId) : null
+                                    const categoryId = e.target.value || undefined
+                                    const selectedCat = categoryId ? categories.find((t: any) => t.id === categoryId) : null
                                     updateQuestionMetadata(result.fileName, {
-                                      productTagId: productTagId ?? "",
-                                      subjectName: selectedTag?.name ?? (productTagId ? (metadata as any).subjectName : undefined),
+                                      categoryId: categoryId ?? "",
+                                      categoryName: selectedCat?.name ?? (categoryId ? metadata.categoryName : undefined),
                                     })
                                   }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                  disabled={isCreating || loadingTags}
+                                  disabled={isCreating || loadingCategories}
                                 >
-                                  <option value="">Select Subject...</option>
-                                  {productTags.map((tag) => (
+                                  <option value="">Select Category...</option>
+                                  {categories.map((tag) => (
                                     <option key={tag.id} value={tag.id}>{tag.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: ((metadata as any).subjectName || result.questionData.subject || "New Subject").trim() })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => {
+                                  const cat = categories.find((t: any) => t.id === metadata.categoryId)
+                                  if (cat) {
+                                    setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: cat.name })
+                                  } else {
+                                    setAddToDbContext({ type: "subject", fileName: result.fileName, parsedName: (metadata.categoryName || result.questionData.subject || "New Category").trim() })
+                                  }
+                                }}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected subject from database" disabled={!(metadata as any).productTagId} onClick={() => handleDeleteSubject(result.fileName)}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected category from database" disabled={!metadata.categoryId} onClick={() => handleDeleteSubject(result.fileName)}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1499,43 +1599,43 @@ export default function BulkMarkdownUploader({
                                   className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
                                   value={
-                                    metadata.chapterId
-                                      ? ((metadata as any).chapterName ?? chapters.find((c: any) => c.id === metadata.chapterId)?.name ?? "")
+                                    metadata.systemId
+                                      ? (metadata.systemName ?? systems.find((c: any) => c.id === metadata.systemId)?.name ?? "")
                                       : ""
                                   }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
-                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
-                                      return { ...prev, [result.fileName]: { ...cur, chapterName: v } }
+                                      const cur = prev[result.fileName] || { productId: "", systemId: "", topicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, systemName: v } }
                                     })
                                   }}
                                 />
                               </div>
                               <div className="flex gap-1">
                                 <select
-                                  value={metadata.chapterId}
+                                  value={metadata.systemId}
                                   onChange={(e) => {
-                                    const chapterId = e.target.value
-                                    const selectedChapter = chapters.find((c: any) => c.id === chapterId)
+                                    const systemId = e.target.value
+                                    const selectedSystem = systems.find((c: any) => c.id === systemId)
                                     updateQuestionMetadata(result.fileName, {
-                                      chapterId,
+                                      systemId,
                                       topicId: "",
-                                      chapterName: selectedChapter?.name ?? (chapterId ? "" : undefined),
+                                      systemName: selectedSystem?.name ?? (systemId ? "" : undefined),
                                     })
                                   }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                  disabled={isCreating || loadingChapters}
+                                  disabled={isCreating || loadingSystems}
                                 >
                                   <option value="">Select System...</option>
-                                  {chapters.map((c) => (
+                                  {systems.map((c) => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: ((metadata as any).chapterName || result.questionData.system || "New Chapter").trim() })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "chapter", fileName: result.fileName, parsedName: (metadata.systemName || result.questionData.system || "New System").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected chapter from database" disabled={!metadata.chapterId} onClick={() => handleDeleteChapter(result.fileName)}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected system from database" disabled={!metadata.systemId} onClick={() => handleDeleteSystem(result.fileName)}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1553,13 +1653,13 @@ export default function BulkMarkdownUploader({
                                   placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
                                   value={
                                     metadata.topicId
-                                      ? ((metadata as any).topicName ?? questionTopics.find((t: any) => t.id === metadata.topicId)?.name ?? "")
+                                      ? (metadata.topicName ?? questionTopics.find((t: any) => t.id === metadata.topicId)?.name ?? "")
                                       : ""
                                   }
                                   onChange={(e) => {
                                     const v = e.target.value || undefined
                                     setQuestionMetadata((prev) => {
-                                      const cur = prev[result.fileName] || { sectionId: "", chapterId: "", topicId: "" }
+                                      const cur = prev[result.fileName] || { productId: "", systemId: "", topicId: "" }
                                       return { ...prev, [result.fileName]: { ...cur, topicName: v } }
                                     })
                                   }}
@@ -1577,18 +1677,66 @@ export default function BulkMarkdownUploader({
                                     })
                                   }}
                                   className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                                  disabled={isCreating || isLoadingTopics || !metadata.chapterId}
+                                  disabled={isCreating || isLoadingTopics || !metadata.systemId}
                                 >
                                   <option value="">Select Topic...</option>
                                   {questionTopics.map((t) => (
                                     <option key={t.id} value={t.id}>{t.name}</option>
                                   ))}
                                 </select>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.chapterId} title={!metadata.chapterId ? "Select chapter first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: ((metadata as any).topicName || result.questionData.topic || "New Topic").trim() })}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.systemId} title={!metadata.systemId ? "Select chapter first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: ((metadata as any).topicName || result.questionData.topic || "New Topic").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected topic from database" disabled={!metadata.topicId} onClick={() => handleDeleteTopic(result.fileName)}>
                                   <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            {/* Subtopic */}
+                            <div>
+                              <label className="block text-sm font-medium text-foreground dark:text-gray-100 mb-2">
+                                Subtopic
+                              </label>
+                              <div className="mb-1">
+                                <input
+                                  type="text"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  placeholder={result.questionData.subtopic ? `Parsed: ${result.questionData.subtopic}` : "Name (editable)"}
+                                  value={
+                                    metadata.subtopicId
+                                      ? (metadata.subtopicName ?? questionSubtopics.find((s: any) => s.id === metadata.subtopicId)?.name ?? "")
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const v = e.target.value || undefined
+                                    setQuestionMetadata((prev) => {
+                                      const cur = prev[result.fileName] || { productId: "", systemId: "", topicId: "", subtopicId: "" }
+                                      return { ...prev, [result.fileName]: { ...cur, subtopicName: v } }
+                                    })
+                                  }}
+                                />
+                              </div>
+                              <div className="flex gap-1">
+                                <select
+                                  value={metadata.subtopicId}
+                                  onChange={(e) => {
+                                    const subtopicId = e.target.value
+                                    const selectedSubtopic = questionSubtopics.find((s: any) => s.id === subtopicId)
+                                    updateQuestionMetadata(result.fileName, {
+                                      subtopicId,
+                                      subtopicName: subtopicId ? (selectedSubtopic?.name ?? metadata.subtopicName ?? "") : undefined,
+                                    })
+                                  }}
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  disabled={isCreating || isLoadingSubtopics || !metadata.topicId}
+                                >
+                                  <option value="">Select Subtopic...</option>
+                                  {questionSubtopics.map((s: any) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                  ))}
+                                </select>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.topicId} title={!metadata.topicId ? "Select topic first" : "Add subtopic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: (metadata.subtopicName || result.questionData.subtopic || "New Subtopic").trim() })}>
+                                  <Plus className="h-4 w-4" />
                                 </Button>
                               </div>
                             </div>
@@ -1784,9 +1932,9 @@ export default function BulkMarkdownUploader({
             <div className="space-y-3">
               {addToDbContext.type === "chapter" && (
                 <div>
-                  <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Section</label>
-                  <select className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800" value={addToDbSectionId} onChange={(e) => setAddToDbSectionId(e.target.value)}>
-                    {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Product</label>
+                  <select className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800" value={addToDbProductId} onChange={(e) => setAddToDbProductId(e.target.value)}>
+                    {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 </div>
               )}

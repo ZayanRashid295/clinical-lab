@@ -2,46 +2,26 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, IsBoolean, IsInt, Min } from "class-validator";
 
 export class CreateTopicDto {
-  @ApiProperty({
-    description: "Chapter ID this topic belongs to",
-    example: "cmguoh2dg000hlj45zxmb3rsl",
-  })
+  @ApiProperty({ description: "System ID this topic belongs to" })
   @IsString()
-  chapterId: string;
+  systemId: string;
 
-  @ApiProperty({
-    description: "Topic name",
-    example: "Amino acids, proteins, and enzymes",
-  })
+  @ApiProperty({ description: "Topic name", example: "Acute Chest Pain" })
   @IsString()
   name: string;
 
-  @ApiProperty({
-    description: "Topic description",
-    example: "Fundamental concepts of protein structure and function",
-    required: false,
-  })
+  @ApiProperty({ description: "Topic description", required: false })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({
-    description: "Order of the topic",
-    example: 1,
-    default: 0,
-    required: false,
-  })
+  @ApiProperty({ description: "Display order", default: 0, required: false })
   @IsOptional()
   @IsInt()
   @Min(0)
   order?: number;
 
-  @ApiProperty({
-    description: "Whether the topic is active",
-    example: true,
-    default: true,
-    required: false,
-  })
+  @ApiProperty({ description: "Whether active", default: true, required: false })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

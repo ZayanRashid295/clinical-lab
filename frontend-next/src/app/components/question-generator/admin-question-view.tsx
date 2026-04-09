@@ -32,13 +32,12 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
     mainExplanation: Array.isArray(question.explanation) ? question.explanation : [],
     perAnswerExplanations: question.perAnswerExplanations && typeof question.perAnswerExplanations === 'object' ? question.perAnswerExplanations : {},
     metadata: {
-      chapterId: question.chapterId || "",
+      systemId: question.systemId || "",
       topicId: question.topicId || "",
       productTagId: question.productTagId || "",
       productTagIds: Array.isArray(question.productTagIds) ? question.productTagIds : [],
       subject: question.subject || "",
       system: question.system || "",
-      sectionId: question.sectionId || "",
     },
   }
 

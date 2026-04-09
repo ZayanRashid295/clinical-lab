@@ -7,11 +7,13 @@ import { Choice } from "../choice-system/types"
 export interface QuestionMetadata {
   subject?: string
   system?: string
-  sectionId?: string
-  chapterId?: string
+  systemId?: string
   topicId?: string
-  productTagId?: string // Single tag ID for backward compatibility
-  productTagIds?: string[] // Multiple tag IDs
+  subtopicId?: string
+  productId?: string
+  categoryId?: string // New 5-level hierarchy: Category -> Product -> System -> Topic -> Subtopic
+  productTagId?: string // Deprecated: use categoryId
+  productTagIds?: string[] // Deprecated: use categoryId
   questionId?: string | null // Optional question ID stored in metadata/tags
   tags?: string[]
 }

@@ -6,6 +6,7 @@ import { seedBase } from "./seed-base";
 import { seedUSMLE } from "./seed-usmle";
 import { seedPayments } from "./seed-payments";
 import { seedQuestions } from "./seed-questions";
+import { seedCategories } from "./seed-categories";
 
 // Load .env file from the backend directory (parent of prisma folder)
 config({ path: resolve(process.cwd(), ".env") });
@@ -19,6 +20,9 @@ async function main() {
 
     // Seed payments (requires users to exist)
     await seedPayments(prisma);
+
+    // Seed categories hierarchy first
+    await seedCategories(prisma);
 
     // Seed content hierarchy (Product → Sections → Chapters → Topics) for question creation
     await seedUSMLE(prisma);

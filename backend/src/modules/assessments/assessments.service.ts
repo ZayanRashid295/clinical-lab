@@ -199,25 +199,15 @@ export class AssessmentsService {
                     order: "asc",
                   },
                 },
-                productTag: true,
-                topic: {
-                  include: {
-                    chapter: {
-                      include: {
-                        section: {
-                          include: {
-                            product: {
-                              select: {
-                                id: true,
-                                name: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
+                system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
               },
             },
           },
@@ -262,25 +252,15 @@ export class AssessmentsService {
                 order: "asc",
               },
             },
-            productTag: true,
-            topic: {
-              include: {
-                chapter: {
-                  include: {
-                    section: {
-                      include: {
-                        product: {
-                          select: {
-                            id: true,
-                            name: true,
-                          },
-                        },
-                      },
-                    },
-                  },
+            system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
-              },
-            },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
           },
         },
       },
@@ -295,24 +275,31 @@ export class AssessmentsService {
   }
 
   async createQuestionPaper(createQuestionPaperDto: CreateQuestionPaperDto) {
-    return this.prisma.questionPaper.create({
-      data: createQuestionPaperDto,
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
+    try {
+      console.log(`[AssessmentsService] Creating question paper for user: ${createQuestionPaperDto.userId}`);
+      return await this.prisma.questionPaper.create({
+        data: createQuestionPaperDto,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              questionPaperQuestions: true,
+            },
           },
         },
-        _count: {
-          select: {
-            questionPaperQuestions: true,
-          },
-        },
-      },
-    });
+      });
+    } catch (error) {
+      console.error(`[AssessmentsService] Error creating question paper:`, error);
+      console.error(`[AssessmentsService] DTO Content:`, JSON.stringify(createQuestionPaperDto, null, 2));
+      throw error;
+    }
   }
 
   async update(id: string, updateQuestionPaperDto: UpdateQuestionPaperDto) {
@@ -498,25 +485,15 @@ export class AssessmentsService {
                   order: "asc",
                 },
               },
-              productTag: true,
-              topic: {
-                include: {
-                  chapter: {
-                    include: {
-                      section: {
-                        include: {
-                          product: {
-                            select: {
-                              id: true,
-                              name: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
+              system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
-              },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
             },
           },
         },
@@ -560,7 +537,7 @@ export class AssessmentsService {
       questions: questionPaperQuestions.map((qpq) => ({
         id: qpq.id,
         order: qpq.order,
-        question: qpq.question,
+        question: qpq.questionId as any, // Cast to avoid inference issues in complex includes
         userAnswer: qpq.userAnswer,
         isCorrect: qpq.isCorrect,
         timeSpent: qpq.timeSpent,
@@ -651,25 +628,15 @@ export class AssessmentsService {
                     order: "asc",
                   },
                 },
-                productTag: true,
-                topic: {
-                  include: {
-                    chapter: {
-                      include: {
-                        section: {
-                          include: {
-                            product: {
-                              select: {
-                                id: true,
-                                name: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
+                system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
               },
             },
           },
@@ -738,25 +705,15 @@ export class AssessmentsService {
                   order: "asc",
                 },
               },
-              productTag: true,
-              topic: {
-                include: {
-                  chapter: {
-                    include: {
-                      section: {
-                        include: {
-                          product: {
-                            select: {
-                              id: true,
-                              name: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
+              system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
-              },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
             },
           },
         },
@@ -850,25 +807,15 @@ export class AssessmentsService {
                 order: "asc",
               },
             },
-            productTag: true,
-            topic: {
-              include: {
-                chapter: {
-                  include: {
-                    section: {
-                      include: {
-                        product: {
-                          select: {
-                            id: true,
-                            name: true,
-                          },
-                        },
-                      },
-                    },
-                  },
+            system: {
+                  select: {
+                    id: true,
+                    name: true,
+                    product: { select: { id: true, name: true } }
+                  }
                 },
-              },
-            },
+                topic: { select: { id: true, name: true } },
+                subtopic: { select: { id: true, name: true } },
           },
         },
       },
@@ -911,7 +858,7 @@ export class AssessmentsService {
         question: {
           include: {
             choices: true,
-            productTag: true,
+            system: true,
           },
         },
       },
@@ -957,7 +904,7 @@ export class AssessmentsService {
         question: {
           include: {
             choices: true,
-            productTag: true,
+            system: true,
           },
         },
       },
@@ -1007,14 +954,14 @@ export class AssessmentsService {
       questionWhere.topicId = { in: filters.topicIds };
     }
 
-    // Filter by sections/systems (if provided)
+    // Filter by systems (if provided)
     if (filters?.systemIds && filters.systemIds.length > 0) {
-      questionWhere.sectionId = { in: filters.systemIds };
+      questionWhere.systemId = { in: filters.systemIds };
     }
 
-    // Filter by chapters/subjects (if provided)
+    // Filter by subtopics (subjectIds in some legacy contexts)
     if (filters?.subjectIds && filters.subjectIds.length > 0) {
-      questionWhere.chapterId = { in: filters.subjectIds };
+      questionWhere.subtopicId = { in: filters.subjectIds };
     }
 
     // Fetch full question data for tag filtering
@@ -1022,7 +969,7 @@ export class AssessmentsService {
       where: questionWhere,
       select: {
         id: true,
-        productTagId: true,
+        systemId: true,
         tags: true,
       },
     });
@@ -1032,17 +979,17 @@ export class AssessmentsService {
     if (filters?.tagIds && filters.tagIds.length > 0) {
       filteredQuestionIds = allFilteredQuestions
         .filter((question) => {
-          // Check direct productTagId
-          if (question.productTagId && filters.tagIds!.includes(question.productTagId)) {
+          // Check direct systemId
+          if (question.systemId && filters.tagIds!.includes(question.systemId)) {
             return true;
           }
 
-          // Check tags JSON field for productTagIds
+          // Check tags JSON field for systemIds
           if (question.tags && Array.isArray(question.tags)) {
             for (const tag of question.tags) {
-              if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
+              if (typeof tag === "string" && tag.startsWith("__systemIds:")) {
                 try {
-                  const tagIdsJson = tag.replace("__productTagIds:", "");
+                  const tagIdsJson = tag.replace("__systemIds:", "");
                   const questionTagIds = JSON.parse(tagIdsJson);
                   if (Array.isArray(questionTagIds)) {
                     // Check if any of the question's tags match any selected tag
@@ -1089,8 +1036,6 @@ export class AssessmentsService {
     }
 
     // Get all question paper questions for this user (across all tests)
-    // We need to check all questions first, then filter to only those in filteredQuestionIds
-    // Include updatedAt to get the latest status for each question
     const allUserAnswers = await this.prisma.questionPaperQuestion.findMany({
       where: {
         questionPaperId: { in: questionPaperIds },
@@ -1108,16 +1053,14 @@ export class AssessmentsService {
     });
 
     // Track question status across all attempts for ALL questions
-    // For marked status, use the LATEST value (most recent updatedAt)
-    // For other statuses, use "ever" logic (once true, always true)
     const questionStatus = new Map<
       string,
       {
         everCorrect: boolean;
         everIncorrect: boolean;
         everOmitted: boolean;
-        isMarked: boolean; // Changed from everMarked to isMarked - uses latest value
-        latestUpdatedAt: Date; // Track the most recent update time
+        isMarked: boolean;
+        latestUpdatedAt: Date;
       }
     >();
 
@@ -1125,24 +1068,20 @@ export class AssessmentsService {
       const existing = questionStatus.get(answer.questionId);
       
       if (!existing) {
-        // First time seeing this question - since we ordered by updatedAt desc,
-        // this is the most recent record for this question
         questionStatus.set(answer.questionId, {
           everCorrect: answer.isCorrect === true,
           everIncorrect: answer.isCorrect === false,
           everOmitted: answer.userAnswer === null,
-          isMarked: answer.markedForReview === true, // Use latest value (first record = most recent)
+          isMarked: answer.markedForReview === true,
           latestUpdatedAt: answer.updatedAt,
         });
       } else {
-        // We've seen this question before - update "ever" flags but keep the latest marked status
-        // Since records are ordered by updatedAt desc, the first record we processed is the most recent
         questionStatus.set(answer.questionId, {
-        everCorrect: existing.everCorrect || (answer.isCorrect === true),
-        everIncorrect: existing.everIncorrect || (answer.isCorrect === false),
+          everCorrect: existing.everCorrect || (answer.isCorrect === true),
+          everIncorrect: existing.everIncorrect || (answer.isCorrect === false),
           everOmitted: existing.everOmitted || (answer.userAnswer === null),
-          isMarked: existing.isMarked, // Keep the first (most recent) value we saw
-          latestUpdatedAt: existing.latestUpdatedAt, // Keep the first (most recent) timestamp
+          isMarked: existing.isMarked, // Keep most recent
+          latestUpdatedAt: existing.latestUpdatedAt,
         });
       }
     }

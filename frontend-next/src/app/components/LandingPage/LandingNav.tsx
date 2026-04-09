@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@/shared/ui/button";
-import { Stethoscope, Trophy, Sun, Moon, LayoutDashboard } from "lucide-react";
+import { Stethoscope, Trophy, Sun, Moon, LayoutDashboard, ChevronDown } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { authService } from "@/shared";
+import { CategoriesService } from "@/app/services/categories/categories.service";
+import { Category } from "@/app/types/category";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +27,8 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const { config, setTheme } = useTheme();
 
   useEffect(() => {
@@ -49,6 +53,18 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
       }
     };
     checkAuth();
+    
+    // Fetch categories
+    const fetchCategories = async () => {
+      try {
+        const service = new CategoriesService();
+        const data = await service.getCategoriesPublic();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to load categories", error);
+      }
+    };
+    fetchCategories();
     
     // Listen for storage changes (when login happens in another tab/window)
     const handleStorageChange = (e: StorageEvent) => {
@@ -94,6 +110,14 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
 
   const handleDashboard = () => {
     router.push("/dashboard");
+  };
+
+  const handleProductClick = (productId: string) => {
+    if (isAuthenticated) {
+      router.push(`/dashboard`);
+    } else {
+      handleLogin();
+    }
   };
 
   const globalEntries = [
@@ -224,6 +248,53 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
             )}
           </div>
         </div>
+
+        {/* Secondary Navigation - Categories */}
+        {categories.length > 0 && (
+          <div className="w-full bg-gray-900 border-t border-gray-800 relative z-40">
+            <div className="max-w-7xl mx-auto px-6 min-h-[48px] flex flex-wrap items-center gap-1 md:gap-4 relative overflow-visible">
+              {categories.map((cat) => (
+                <div 
+                  key={cat.id} 
+                  className="relative group py-2 flex items-center"
+                  onMouseEnter={() => setActiveDropdown(cat.id)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <button className="flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition-colors whitespace-nowrap">
+                    {cat.icon && <span>{cat.icon}</span>}
+                    <span>{cat.name}</span>
+                    {cat.products && cat.products.length > 0 && (
+                      <ChevronDown className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    )}
+                  </button>
+
+                 {/* Dropdown Menu */}
+                 {cat.products && cat.products.length > 0 && activeDropdown === cat.id && (
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute -top-2 left-6 w-4 h-4 bg-white dark:bg-gray-800 border-t border-l border-gray-200 dark:border-gray-700 transform rotate-45"></div>
+                      <div className="relative bg-white dark:bg-gray-800 z-10 px-2 flex flex-col gap-1 max-h-96 overflow-y-auto">
+                        {cat.products.map((product) => (
+                          <button
+                            key={product.id}
+                            onClick={() => handleProductClick(product.id)}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-md transition-colors"
+                          >
+                            <div className="font-medium">{product.name}</div>
+                            {product.description && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                {product.description}
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       <Dialog open={leaderboardOpen} onOpenChange={setLeaderboardOpen}>

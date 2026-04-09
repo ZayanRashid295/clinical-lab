@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useToast } from "@/shared/ui/use-toast"
 
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
@@ -116,6 +117,7 @@ export default function AdvancedTableEditor({
   showToolbar = false,
   editorRef,
 }: AdvancedTableEditorProps) {
+  const { toast } = useToast()
   const [mode, setMode] = useState<TableEditorMode>("visual")
   const [markdownDraft, setMarkdownDraft] = useState("")
   const [importMarkdownText, setImportMarkdownText] = useState("")
@@ -539,7 +541,11 @@ export default function AdvancedTableEditor({
                     // This is a workaround - user should select cells manually
                     console.warn("Merge failed. Please select multiple cells by clicking and dragging, then try again.")
                     // Show a helpful message
-                    alert("Please select multiple cells by clicking and dragging across them, then click Merge again.")
+                    toast({
+                      title: "Selection Needed",
+                      description: "Please select multiple cells by clicking and dragging across them, then click Merge again.",
+                      variant: "destructive",
+                    })
                   } else {
                     // Force update to ensure HTML is saved
                     setTimeout(async () => {
