@@ -18,6 +18,8 @@ import { ConvertDocxDto } from "./dto/convert-docx.dto";
 interface QuestionFilters {
   subtopicId?: string;
   systemId?: string;
+  productId?: string;
+  categoryId?: string;
   topicId?: string;
   difficulty?: string;
   isActive?: boolean;
@@ -28,6 +30,8 @@ interface QuestionFilters {
 interface RandomQuestionFilters {
   subtopicId?: string;
   systemId?: string;
+  productId?: string;
+  categoryId?: string;
   topicId?: string;
   difficulty?: string;
   count?: number;
@@ -65,6 +69,8 @@ export class QuestionsService {
         difficulty,
         subtopicId,
         systemId,
+        productId,
+        categoryId,
         dateFrom,
         dateTo,
         page = 1,
@@ -102,6 +108,14 @@ export class QuestionsService {
       // Product tag ID filter
       if (systemId) {
         where.systemId = systemId;
+      }
+
+      if (productId) {
+        where.productId = productId;
+      }
+
+      if (categoryId) {
+        where.categoryId = categoryId;
       }
 
       // Date range filter
@@ -170,6 +184,22 @@ export class QuestionsService {
 
     if (filters.systemId) {
       where.systemId = filters.systemId;
+    }
+
+    if (filters.productId) {
+      where.productId = filters.productId;
+    }
+
+    if (filters.categoryId) {
+      where.categoryId = filters.categoryId;
+    }
+
+    if (filters.productId) {
+      where.productId = filters.productId;
+    }
+
+    if (filters.categoryId) {
+      where.categoryId = filters.categoryId;
     }
 
     if (filters.difficulty) {
@@ -421,7 +451,7 @@ export class QuestionsService {
             topic: {
               include: {
                 system: {
-                  include: { product: { select: { name: true } } }
+                  include: { product: { select: { id: true, categoryId: true, name: true } } }
                 }
               }
             }
@@ -430,6 +460,8 @@ export class QuestionsService {
         if (subtopic?.topic?.system) {
           // System matches the parent relation
           questionCore.systemId = subtopic.topic.systemId;
+          questionCore.productId = subtopic.topic.system.productId;
+          questionCore.categoryId = subtopic.topic.system.product?.categoryId ?? null;
           
           // Forcefully override topicId to guarantee hierarchy integrity
           finalTopicId = subtopic.topicId;
@@ -622,7 +654,7 @@ export class QuestionsService {
           topic: {
             include: {
               system: {
-                include: { product: { select: { name: true } } }
+                include: { product: { select: { id: true, categoryId: true, name: true } } }
               }
             }
           }
@@ -630,6 +662,8 @@ export class QuestionsService {
       });
       if (subtopic?.topic?.system) {
         questionCore.systemId = subtopic.topic.systemId;
+        questionCore.productId = subtopic.topic.system.productId;
+        questionCore.categoryId = subtopic.topic.system.product?.categoryId ?? null;
         finalTopicId = subtopic.topicId;
       }
     }
@@ -663,13 +697,27 @@ export class QuestionsService {
           where: { questionId: id },
         });
         if (explanationBlocks.length > 0) {
+          const validExplanationTypes = ["TEXT", "TABLE", "IMAGES"] as const;
           await tx.explanationBlock.createMany({
-            data: explanationBlocks.map((b: any, idx: number) => ({
-              questionId: id,
-              type: b.type,
-              order: typeof b.order === "number" ? b.order : idx,
-              data: b.data,
-            })),
+            data: explanationBlocks.map((b: any, idx: number) => {
+              const normalizedType = String(b?.type || "").toUpperCase();
+              const type: "TEXT" | "TABLE" | "IMAGES" =
+                validExplanationTypes.includes(
+                  normalizedType as "TEXT" | "TABLE" | "IMAGES"
+                )
+                  ? (normalizedType as "TEXT" | "TABLE" | "IMAGES")
+                  : "TEXT";
+              const data =
+                b?.data && typeof b.data === "object" && b.data !== null
+                  ? b.data
+                  : {};
+              return {
+                questionId: id,
+                type,
+                order: typeof b?.order === "number" ? b.order : idx,
+                data,
+              };
+            }),
           });
         }
       }
@@ -699,13 +747,27 @@ export class QuestionsService {
             },
           });
           if (Array.isArray(blocks) && blocks.length > 0) {
+            const validExplanationTypes = ["TEXT", "TABLE", "IMAGES"] as const;
             await tx.explanationBlock.createMany({
-              data: blocks.map((b: any, idx: number) => ({
-                perAnswerId: pae.id,
-                type: b.type,
-                order: typeof b.order === "number" ? b.order : idx,
-                data: b.data,
-              })),
+              data: blocks.map((b: any, idx: number) => {
+                const normalizedType = String(b?.type || "").toUpperCase();
+                const type: "TEXT" | "TABLE" | "IMAGES" =
+                  validExplanationTypes.includes(
+                    normalizedType as "TEXT" | "TABLE" | "IMAGES"
+                  )
+                    ? (normalizedType as "TEXT" | "TABLE" | "IMAGES")
+                    : "TEXT";
+                const data =
+                  b?.data && typeof b.data === "object" && b.data !== null
+                    ? b.data
+                    : {};
+                return {
+                  perAnswerId: pae.id,
+                  type,
+                  order: typeof b?.order === "number" ? b.order : idx,
+                  data,
+                };
+              }),
             });
           }
         }
@@ -1946,31 +2008,26 @@ CRITICAL INSTRUCTIONS
    - Use appropriate heading levels based on hierarchy (## for main sections, ### for subsections, #### for sub-subsections, etc.).
 1. FRONTMATTER AND METADATA EXTRACTION (CRITICAL)
    - Fill in: title, tags, difficulty (easy/medium/hard), correct_answer (A–E), question_id.
-   - **METADATA MAPPING (CRITICAL - EXTRACT FROM DOCX AND MAP CORRECTLY):**
-     * **Subject** (from DOCX) → Extract from DOCX "Subject:" line and use as the first part of the title. This will be mapped to **Product Tag** (systemId) AND **Subject** field in our system.
-     * **System** (from DOCX) → Extract from DOCX "System:" line and use as the second part of the title after " — ". This will be mapped to **Chapter** (topicId) AND **System** field in our system.
-     * **Topic** (from DOCX) → Extract from DOCX "Subtopic:" line and output as "## Subtopic: <extracted topic>" heading. This will be mapped to **Topic** (subtopicId) in our system.
-   - **CRITICAL MAPPING SUMMARY:**
-     * DOCX "Subject:" → Markdown title first part → Frontend maps to Product Tag (systemId) AND Subject field
-     * DOCX "System:" → Markdown title second part → Frontend maps to Chapter (topicId) AND System field
-     * DOCX "Subtopic:" → Markdown "## Subtopic:" heading → Frontend maps to Topic (subtopicId)
-   - Example: If DOCX contains:
-       Subject: Obstetrics & Gynecology (Obs)
-       System: Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment
-       Subtopic: Obstetrics – Multiple Pregnancy
-     Then output:
-       title: "Obstetrics & Gynecology (Obs) — Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment"
-       ## Subtopic: Obstetrics – Multiple Pregnancy
-     This will result in:
-       - Product Tag = "Obstetrics & Gynecology (Obs)" (from Subject) → systemId
-       - Subject field = "Obstetrics & Gynecology (Obs)" (from Subject)
-       - Chapter = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System) → topicId
-       - System field = "Female Reproductive System (Pregnancy and placenta, multiple gestations) - PATHOLOGY IN RELATION TO OBSTETRICS AND GYNECOLOGY – Obstetric Complications - Multiple Pregnancy - Diagnosis & Early Pregnancy Assessment" (from System)
-       - Topic = "Obstetrics – Multiple Pregnancy" (from Topic) → subtopicId
-   - If "Subject:", "System:", or "Subtopic:" lines exist in the DOCX, you MUST extract them and use them exactly as shown above.
-   - The title format must be: "<Subject> — <System>" (Subject and System separated by " — ")
-   - The Topic must appear as a separate "## Subtopic: <Topic>" heading after the main title line.
-   - Extract the full text from "Subject:", "System:", and "Subtopic:" lines - do not truncate or shorten them.
+   - **NEW HIERARCHY EXTRACTION (CRITICAL):**
+     * Extract these lines when present in DOCX body:
+       - Category:
+       - Product:
+       - System:
+       - Topic:
+       - Sub-Topic:
+       - MCQ Title:
+   - If present, preserve exact text and output these body lines (outside frontmatter), ideally together near the metadata area:
+       Category: <value>
+       Product: <value>
+       System: <value>
+       Topic: <value>
+       Sub-Topic: <value>
+       MCQ Title: <value>
+   - Also set frontmatter/body title using the best available title value:
+    * Prefer "MCQ Title" when available.
+    * Otherwise fallback to "<Product> — <System>" when available.
+  - Keep "## Subtopic: ..." populated from Sub-Topic when available.
+   - Do not truncate any extracted hierarchy values.
 2. QUESTION STEM (CLINICAL CASE ONLY – PRESERVE PARAGRAPH STRUCTURE AS IN SOURCE)
    - Put ONLY the clinical case / question stem text under '## Question'.
    - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.

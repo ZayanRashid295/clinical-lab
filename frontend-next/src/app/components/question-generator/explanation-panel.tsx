@@ -13,6 +13,7 @@ interface ExplanationPanelProps {
   /** Label for the chapter field in metadata (e.g. "Chapters" or "System"). Default "System". */
   chapterLabel?: string
   topic?: string | { name?: string }
+  mcqTitle?: string
 }
 
 export default function ExplanationPanel({
@@ -25,6 +26,7 @@ export default function ExplanationPanel({
   chapter,
   chapterLabel = "System",
   topic,
+  mcqTitle,
 }: ExplanationPanelProps) {
   return (
     <div className="animate-fade-in flex flex-col h-full min-h-0 overflow-hidden">
@@ -45,14 +47,14 @@ export default function ExplanationPanel({
               </div>
             )}
 
-            {/* Metadata (System/Topic) */}
+            {/* Metadata (System/Topic/Title) */}
             {/* Show metadata section if any value exists (including empty strings for loading states) */}
-            {(chapter || (topic && (typeof topic === "string" ? topic : topic?.name))) && (
+            {(chapter || (topic && (typeof topic === "string" ? topic : topic?.name)) || mcqTitle) && (
               <div className="border-t border-border/40 dark:border-gray-700/50 pt-1 mt-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
                   {chapter && (
                     <div>
-                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">System</div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">{chapterLabel}</div>
                       <div className="text-sm font-bold text-foreground dark:text-gray-100">{chapter}</div>
                     </div>
                   )}
@@ -62,6 +64,12 @@ export default function ExplanationPanel({
                       <div className="text-sm font-bold text-foreground dark:text-gray-100">
                         {typeof topic === "string" ? topic : topic?.name || ""}
                       </div>
+                    </div>
+                  )}
+                  {mcqTitle && (
+                    <div>
+                      <div className="text-xs font-semibold text-muted-foreground dark:text-gray-400 uppercase tracking-wide mb-0">Title</div>
+                      <div className="text-sm font-bold text-foreground dark:text-gray-100">{mcqTitle}</div>
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateQuestionPaperDto } from "./dto/create-question-paper.dto";
 import { UpdateQuestionPaperDto } from "./dto/update-question-paper.dto";
@@ -277,17 +277,16 @@ export class AssessmentsService {
   async createQuestionPaper(createQuestionPaperDto: CreateQuestionPaperDto) {
     try {
       console.log(`[AssessmentsService] Creating question paper for user: ${createQuestionPaperDto.userId}`);
+      const { userId, ...paperData } = createQuestionPaperDto;
+
       return await this.prisma.questionPaper.create({
-        data: createQuestionPaperDto,
-        include: {
+        data: {
+          ...paperData,
           user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-            },
+            connect: { id: userId },
           },
+        },
+        include: {
           _count: {
             select: {
               questionPaperQuestions: true,
@@ -298,6 +297,9 @@ export class AssessmentsService {
     } catch (error) {
       console.error(`[AssessmentsService] Error creating question paper:`, error);
       console.error(`[AssessmentsService] DTO Content:`, JSON.stringify(createQuestionPaperDto, null, 2));
+      if ((error as any)?.code === "P2025") {
+        throw new UnauthorizedException("Authenticated user not found. Please sign in again.");
+      }
       throw error;
     }
   }

@@ -27,14 +27,20 @@ interface Question {
   options: Array<{ label: string; text: string; correct: boolean; value?: string }>
   choices?: QuestionChoice[] // Backend uses 'choices'
   subject: string
+  category?: string
+  product?: string
   system: string
+  subtopicName?: string
+  mcqTitle?: string
   explanation: any
   perAnswerExplanations?: Record<string, any[]> // Per-answer explanations in frontend format
   tags: string[]
   createdAt: number | string
   topicId?: string // Required for backend
+  subtopicId?: string
+  systemId?: string
   questionStemBlocks?: any[] // Rich content blocks for question stem
-  chapterId?: string // Chapter ID for Subject dropdown
+  chapterId?: string // legacy
   productId?: string // Product ID
   chapterName?: string
   topicName?: string
@@ -386,6 +392,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
 
     // Extract questionId and productTagIds from tags if stored there
     let storedQuestionId: string | null = null
+    let storedProductName: string | null = null
+    let storedMcqTitle: string | null = null
     let storedProductTagIds: string[] | undefined = undefined
     const tags = Array.isArray(backendQuestion.tags) ? backendQuestion.tags : []
     const filteredTags: string[] = []
@@ -393,6 +401,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     for (const tag of tags) {
       if (typeof tag === "string" && tag.startsWith("__questionId:")) {
         storedQuestionId = tag.replace("__questionId:", "")
+      } else if (typeof tag === "string" && tag.startsWith("__product:")) {
+        storedProductName = tag.replace("__product:", "").trim()
+      } else if (typeof tag === "string" && tag.startsWith("__mcqTitle:")) {
+        storedMcqTitle = tag.replace("__mcqTitle:", "").trim()
       } else if (typeof tag === "string" && tag.startsWith("__productTagIds:")) {
         try {
           const tagIdsJson = tag.replace("__productTagIds:", "")
@@ -411,8 +423,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     
     const chapterName = backendQuestion.chapter?.name ?? backendQuestion.topic?.chapter?.name ?? ""
     const topicName = backendQuestion.topic?.name ?? ""
+    const subtopicName = backendQuestion.subtopic?.name ?? ""
     // Subject = product tag name for display
     const subjectDisplay = backendQuestion.productTag?.name ?? backendQuestion.subject ?? ""
+    const categoryDisplay = backendQuestion.category?.name ?? subjectDisplay
+    const productDisplay = backendQuestion.system?.product?.name ?? storedProductName ?? ""
 
     return {
       id: backendQuestion.id,
@@ -422,9 +437,15 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       options,
       choices: backendQuestion.choices,
       subject: subjectDisplay,
+      category: categoryDisplay,
+      product: productDisplay,
       system: (typeof backendQuestion.system === 'string' ? backendQuestion.system : backendQuestion.system?.name) || "",
-      chapterId: backendQuestion.chapterId || "",
+      systemId: backendQuestion.systemId || backendQuestion.system?.id || "",
+      subtopicName,
+      mcqTitle: storedMcqTitle || backendQuestion.title || "",
+      chapterId: backendQuestion.chapterId || "", // legacy fallback
       categoryId: backendQuestion.categoryId || backendQuestion.productTagId || "",
+      productId: backendQuestion.system?.product?.id || backendQuestion.productId || "",
       chapterName,
       topicName,
       productTagId: backendQuestion.productTagId || "",
@@ -434,6 +455,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       tags: filteredTags, // Return tags without the questionId and productTagIds markers
       createdAt: backendQuestion.createdAt,
       topicId: backendQuestion.topicId,
+      subtopicId: backendQuestion.subtopicId || "",
       topic: backendQuestion.topic,
     }
   }
@@ -731,6 +753,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     // Build the payload
     const payload: any = {
       topicId: String(topicId),
+      ...(frontendQuestion.subtopicId ? { subtopicId: String(frontendQuestion.subtopicId) } : {}),
       question: questionText,
       difficulty: "medium" as const,
       points: 1,
@@ -738,6 +761,14 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
 
     // Only add optional fields if they have values
+    if (frontendQuestion.categoryId && String(frontendQuestion.categoryId).trim()) {
+      payload.categoryId = String(frontendQuestion.categoryId).trim()
+    }
+
+    if (frontendQuestion.title && String(frontendQuestion.title).trim()) {
+      payload.title = String(frontendQuestion.title).trim()
+    }
+
     if (frontendQuestion.subject && String(frontendQuestion.subject).trim()) {
       payload.subject = String(frontendQuestion.subject).trim()
     }
@@ -840,25 +871,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       
     }
 
-    if (frontendQuestion.chapterId) {
-      payload.chapterId = String(frontendQuestion.chapterId).trim()
-    }
-    
-    // Only add optional fields if they have values
-    if (frontendQuestion.subject && String(frontendQuestion.subject).trim()) {
-      payload.subject = String(frontendQuestion.subject).trim()
-    }
-    
+    // Persist display labels in compatible fields/tags
     if (frontendQuestion.system && String(frontendQuestion.system).trim()) {
       payload.system = String(frontendQuestion.system).trim()
-    }
-    
-    // Handle categoryId / productTagId
-    const categoryId = frontendQuestion.categoryId || frontendQuestion.productTagId
-    const productTagIds = frontendQuestion.productTagIds || (categoryId ? [categoryId] : [])
-    
-    if (categoryId) {
-      payload.categoryId = String(categoryId).trim()
     }
 
     // Note: questionId is generated on the frontend based on system, subject, and topic
@@ -1046,9 +1061,13 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           questionStemBlocks: questionData.stem ? convertNewBlocksToOld(questionData.stem) : undefined,
           explanationBlocks: questionData.mainExplanation ? convertNewBlocksToOld(questionData.mainExplanation) : undefined,
           perAnswerExplanations: questionData.perAnswerExplanations ? convertNewPerAnswerExplanationsToOld(questionData.perAnswerExplanations) : undefined,
+          categoryId: questionData.metadata.categoryId,
+          productId: questionData.metadata.productId,
+          title: questionData.metadata.title,
           topicId: questionData.metadata.topicId,
-          chapterId: questionData.metadata.systemId,
-          productTagId: questionData.metadata.categoryId || questionData.metadata.productTagId,
+          subtopicId: questionData.metadata.subtopicId,
+          systemId: questionData.metadata.systemId,
+          system: questionData.metadata.system,
           tags: questionData.metadata.tags || [],
         }
 
@@ -1370,9 +1389,21 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
     const searchLower = searchTerm.toLowerCase()
     const stem = (q.stem || "").toLowerCase()
-    const subject = (q.subject || "").toLowerCase()
+    const category = (q.category || "").toLowerCase()
+    const product = (q.product || "").toLowerCase()
     const system = (q.system || "").toLowerCase()
-    return stem.includes(searchLower) || subject.includes(searchLower) || system.includes(searchLower)
+    const topicName = (q.topicName || "").toLowerCase()
+    const subtopicName = (q.subtopicName || "").toLowerCase()
+    const mcqTitle = (q.mcqTitle || "").toLowerCase()
+    return (
+      stem.includes(searchLower) ||
+      category.includes(searchLower) ||
+      product.includes(searchLower) ||
+      system.includes(searchLower) ||
+      topicName.includes(searchLower) ||
+      subtopicName.includes(searchLower) ||
+      mcqTitle.includes(searchLower)
+    )
   })
 
   if (loading) {
@@ -1404,7 +1435,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             <Card className="p-4 shadow-md flex-1 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
               <input
                 type="text"
-                placeholder="Search questions by stem, subject, or system..."
+                placeholder="Search by stem, category, product, system, topic, subtopic, or title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 placeholder-muted-foreground dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary/30"

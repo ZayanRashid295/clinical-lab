@@ -205,6 +205,8 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       // Format for question creator
       const questionData = {
         stem: updatedStem,
+        category: parsed.category || parsed.subject,
+        product: parsed.product,
         subject: parsed.subject,
         system: parsed.system,
         options: parsed.options,
@@ -213,6 +215,8 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
         tags: parsed.tags,
         questionId: parsed.questionId,
         topic: parsed.topic,
+        subtopic: parsed.subtopic,
+        title: parsed.title,
       };
 
       setProgress("Finalizing...");

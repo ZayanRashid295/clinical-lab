@@ -36,6 +36,8 @@ export default function MarkdownUploader({ onQuestionParsed }: MarkdownUploaderP
 
       const questionData = {
         stem: parsed.stem,
+        category: parsed.category || parsed.subject,
+        product: parsed.product,
         subject: parsed.subject,
         system: parsed.system,
         options: parsed.options,
@@ -43,6 +45,9 @@ export default function MarkdownUploader({ onQuestionParsed }: MarkdownUploaderP
         perAnswerExplanations: parsed.perAnswerExplanations, // Now contains content blocks for each option
         tags: parsed.tags,
         questionId: parsed.questionId, // Include parsed questionId if it exists
+        topic: parsed.topic,
+        subtopic: parsed.subtopic,
+        title: parsed.title,
       }
 
       onQuestionParsed(questionData)

@@ -28,6 +28,7 @@ export function fuzzyMatch(str1: string, str2: string): boolean {
 
 export interface AutoMatchInput {
   parsedCategory?: string;
+  parsedProduct?: string;
   parsedSystem?: string;
   parsedTopic?: string;
   parsedSubtopic?: string;
@@ -63,7 +64,7 @@ export async function runAutoMatch(
     getSubtopicsForTopic: GetSubtopicsForTopic;
   }
 ): Promise<Partial<AutoMatchResult>> {
-  const { parsedCategory, parsedSystem, parsedTopic, parsedSubtopic } = input;
+  const { parsedCategory, parsedProduct, parsedSystem, parsedTopic, parsedSubtopic } = input;
   const { products = [], categories = [], getTopicsForSystem, getSubtopicsForTopic } = options;
 
   let matchedProductId = "";
@@ -72,17 +73,23 @@ export async function runAutoMatch(
   let matchedSubtopicId = "";
   let matchedCategoryId = "";
 
-  // Match Category → Category
+  // Match Product -> Product (exact only)
+  if (parsedProduct && products.length > 0) {
+    const normalizedProduct = normalizeName(parsedProduct);
+    const matchedProduct = products.find(
+      (p: any) => normalizeName(p.name) === normalizedProduct
+    );
+    if (matchedProduct) {
+      matchedProductId = matchedProduct.id;
+    }
+  }
+
+  // Match Category → Category (exact only)
   if (parsedCategory && categories.length > 0) {
     const normalizedCategory = normalizeName(parsedCategory);
-    let matchedCategory = categories.find(
+    const matchedCategory = categories.find(
       (t: any) => normalizeName(t.name) === normalizedCategory
     );
-    if (!matchedCategory) {
-      matchedCategory = categories.find((t: any) =>
-        fuzzyMatch(t.name, parsedCategory!)
-      );
-    }
     if (matchedCategory) {
       matchedCategoryId = matchedCategory.id;
     }
@@ -97,19 +104,17 @@ export async function runAutoMatch(
     if (matchedSystem) {
       matchedSystemId = matchedSystem.id;
       matchedProductId =
-        matchedSystem.productId || matchedSystem.product?.id || "";
+        matchedProductId ||
+        matchedSystem.productId ||
+        matchedSystem.product?.id ||
+        "";
         
       const systemTopics = await getTopicsForSystem(matchedSystemId);
       if (parsedTopic && systemTopics.length > 0) {
         const normalizedTopic = normalizeName(parsedTopic);
-        let matchedTopic = systemTopics.find(
+        const matchedTopic = systemTopics.find(
           (t: any) => normalizeName(t.name) === normalizedTopic
         );
-        if (!matchedTopic) {
-          matchedTopic = systemTopics.find((t: any) =>
-            fuzzyMatch(t.name, parsedTopic!)
-          );
-        }
         if (matchedTopic) matchedTopicId = matchedTopic.id;
         else if (systemTopics.length === 1) matchedTopicId = systemTopics[0].id;
       } else if (systemTopics.length === 1) {
@@ -121,14 +126,9 @@ export async function runAutoMatch(
         const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
         if (parsedSubtopic && topicSubtopics.length > 0) {
           const normalizedSubtopic = normalizeName(parsedSubtopic);
-          let matchedSubtopic = topicSubtopics.find(
+          const matchedSubtopic = topicSubtopics.find(
             (t: any) => normalizeName(t.name) === normalizedSubtopic
           );
-          if (!matchedSubtopic) {
-            matchedSubtopic = topicSubtopics.find((t: any) =>
-              fuzzyMatch(t.name, parsedSubtopic!)
-            );
-          }
           if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
           else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
         } else if (topicSubtopics.length === 1) {
@@ -155,8 +155,9 @@ export async function runAutoMatch(
         matchedSystemId = matchedSystem.id;
         const systemTopics = await getTopicsForSystem(matchedSystemId);
         if (parsedTopic && systemTopics.length > 0) {
-          let matchedTopic = systemTopics.find((t: any) =>
-            fuzzyMatch(t.name, parsedTopic!)
+          const normalizedTopic = normalizeName(parsedTopic);
+          const matchedTopic = systemTopics.find(
+            (t: any) => normalizeName(t.name) === normalizedTopic
           );
           if (matchedTopic) matchedTopicId = matchedTopic.id;
           else if (systemTopics.length === 1)
@@ -169,8 +170,9 @@ export async function runAutoMatch(
         if (matchedTopicId) {
           const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
           if (parsedSubtopic && topicSubtopics.length > 0) {
-            let matchedSubtopic = topicSubtopics.find((t: any) =>
-              fuzzyMatch(t.name, parsedSubtopic!)
+            const normalizedSubtopic = normalizeName(parsedSubtopic);
+            const matchedSubtopic = topicSubtopics.find(
+              (t: any) => normalizeName(t.name) === normalizedSubtopic
             );
             if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
             else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;

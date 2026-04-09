@@ -69,6 +69,24 @@ export class QueryQuestionDto {
   systemId?: string;
 
   @ApiProperty({
+    description: "Filter by product ID",
+    example: "cmguoh2bu0001lj45dttw7000",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  productId?: string;
+
+  @ApiProperty({
+    description: "Filter by category ID",
+    example: "cmguoh2bu0001lj45dttw7000",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiProperty({
     description: "Filter questions created from this date",
     example: "2024-01-01",
     required: false,

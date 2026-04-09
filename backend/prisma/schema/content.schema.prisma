@@ -42,6 +42,8 @@ model Subtopic {
 model Question {
   id           String   @id @default(cuid())
   subtopicId   String
+  categoryId   String?
+  productId    String?
   systemId     String?
   topicId      String?
   title        String?  @db.VarChar(500) // Short, meaningful title for the question
@@ -56,6 +58,8 @@ model Question {
 
   // Relations
   subtopic             Subtopic              @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  product              Product?              @relation(fields: [productId], references: [id], onDelete: SetNull)
   system               System?               @relation(fields: [systemId], references: [id], onDelete: SetNull)
   topic                Topic?                @relation(fields: [topicId], references: [id], onDelete: SetNull)
   choices              QuestionChoice[]

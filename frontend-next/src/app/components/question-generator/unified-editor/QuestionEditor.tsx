@@ -19,6 +19,7 @@ import UnifiedQuestionPreview from "../unified-question-preview"
 import { ProductsService } from "@/app/services/products/products.service"
 import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
+import { SubtopicsService } from "@/app/services/content/subtopics.service"
 import { CategoriesService } from "@/app/services/categories/categories.service"
 import { ContentBlock } from "../rich-editor/types"
 import { Choice } from "../choice-system/types"
@@ -68,10 +69,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     Array.isArray(initialData?.metadata?.tags) ? initialData!.metadata!.tags!.join(", ") : ""
   )
   const [subjectEditName, setSubjectEditName] = useState("")
+  const [productEditName, setProductEditName] = useState("")
   const [systemEditName, setSystemEditName] = useState("")
   const [topicEditName, setTopicEditName] = useState("")
+  const [subtopicEditName, setSubtopicEditName] = useState("")
   const [addMetaContext, setAddMetaContext] = useState<{
-    type: "subject" | "chapter" | "topic"
+    type: "subject" | "product" | "chapter" | "topic" | "subtopic"
   } | null>(null)
   const [addMetaName, setAddMetaName] = useState("")
   const [addMetaProductId, setAddMetaProductId] = useState("")
@@ -117,6 +120,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   const productsService = new ProductsService()
   const systemsService = new SystemsService()
   const topicsService = new TopicsService()
+  const subtopicsService = new SubtopicsService()
   const categoriesService = new CategoriesService()
 
   // State for metadata names - initialize from initialData if available
@@ -133,11 +137,13 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   const [products, setProducts] = useState<any[]>([])
   const [chapters, setSystems] = useState<any[]>([])
   const [topics, setTopics] = useState<any[]>([])
+  const [subtopics, setSubtopics] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [showTagsDropdown, setShowTagsDropdown] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(false)
   const [loadingSystems, setLoadingSystems] = useState(false)
   const [loadingTopics, setLoadingTopics] = useState(false)
+  const [loadingSubtopics, setLoadingSubtopics] = useState(false)
   const [loadingCategories, setLoadingCategories] = useState(false)
   
   // Track if metadata names have been fetched
@@ -171,20 +177,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Initialize categoryId and productTagIds from existing data (for backward compatibility)
-  useEffect(() => {
-    if ((initialData?.metadata?.productTagId || initialData?.metadata?.categoryId) && !metadata.categoryId) {
-      setMetadata((prev) => ({
-        ...prev,
-        categoryId: initialData.metadata!.categoryId || initialData.metadata!.productTagId,
-        productTagIds: [initialData.metadata!.categoryId || initialData.metadata!.productTagId!],
-      }))
-    }
-  }, [initialData?.metadata?.productTagId, initialData?.metadata?.categoryId])
-
   // Keep editable names in sync with current selections
   useEffect(() => {
-    const selectedId = metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0])
+    const selectedId = metadata.categoryId
     if (selectedId) {
       const cat = categories.find((t) => t.id === selectedId)
       setSubjectEditName(cat?.name || "")
@@ -192,6 +187,15 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       setSubjectEditName("")
     }
   }, [metadata.categoryId, metadata.productTagId, metadata.productTagIds, categories])
+
+  useEffect(() => {
+    if (metadata.productId) {
+      const product = products.find((p: any) => p.id === metadata.productId)
+      setProductEditName(product?.name || "")
+    } else {
+      setProductEditName("")
+    }
+  }, [metadata.productId, products])
 
   useEffect(() => {
     if (metadata.systemId) {
@@ -210,6 +214,15 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       setTopicEditName("")
     }
   }, [metadata.topicId, topics])
+
+  useEffect(() => {
+    if (metadata.subtopicId) {
+      const subtopic = subtopics.find((s: any) => s.id === metadata.subtopicId)
+      setSubtopicEditName(subtopic?.name || "")
+    } else {
+      setSubtopicEditName("")
+    }
+  }, [metadata.subtopicId, subtopics])
 
   // Close tags dropdown when clicking outside
   useEffect(() => {
@@ -256,6 +269,23 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     }
   }, [metadata.systemId])
 
+  // Load subtopics when topic changes
+  useEffect(() => {
+    if (metadata.topicId) {
+      setLoadingSubtopics(true)
+      subtopicsService
+        .getSubtopics({ topicId: metadata.topicId, status: "ACTIVE", listAll: true })
+        .then((response) => {
+          const data = Array.isArray(response) ? response : (response as any)?.data || []
+          setSubtopics(data)
+        })
+        .catch(() => setSubtopics([]))
+        .finally(() => setLoadingSubtopics(false))
+    } else {
+      setSubtopics([])
+    }
+  }, [metadata.topicId])
+
   // Comprehensive metadata name fetching function
   const fetchMetadataNames = useCallback(async (metadataToUse: any) => {
     if (!metadataToUse) return
@@ -268,20 +298,18 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       promises.push(
         systemsService.getSystem(metadataToUse.systemId)
           .then((chapter) => {
-            const name = chapter?.name || metadataToUse.system || ""
+            const name = chapter?.name || ""
             setSystemName(name)
             setSystemEditName(name)
           })
           .catch(() => {
-            const fallback = metadataToUse.system || ""
-            setSystemName(fallback)
-            setSystemEditName(fallback)
+            setSystemName("")
+            setSystemEditName("")
           })
       )
-    } else if (metadataToUse.subject) {
-      const fallback = metadataToUse.system || ""
-      setSystemName(fallback)
-      setSystemEditName(fallback)
+    } else {
+      setSystemName("")
+      setSystemEditName("")
     }
 
     // Fetch topic name – also set topicEditName so text box shows selected topic like subject
@@ -301,7 +329,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     }
 
     // Fetch category name
-    const selectedId = metadataToUse.categoryId || metadataToUse.productTagId || (metadataToUse.productTagIds && metadataToUse.productTagIds[0])
+    const selectedId = metadataToUse.categoryId
     if (selectedId) {
       promises.push(
         categoriesService.getCategory(selectedId)
@@ -318,14 +346,13 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             }
           })
           .catch(() => {
-            const existingCat = categories.find((t) => t.id === selectedId)
-            if (existingCat) {
-              const name = existingCat.name || ""
-              setCategoryName(name)
-              setSubjectEditName(name)
-            }
+            setCategoryName("")
+            setSubjectEditName("")
           })
       )
+    } else {
+      setCategoryName("")
+      setSubjectEditName("")
     }
 
     await Promise.all(promises)
@@ -369,6 +396,16 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     setMetadata((prev) => ({
       ...prev,
       topicId: topicId || undefined,
+      subtopicId: undefined,
+    }))
+  }
+
+  const handleSubtopicChange = (subtopicId: string) => {
+    const selectedSubtopic = subtopics.find((s: any) => s.id === subtopicId)
+    setSubtopicEditName(selectedSubtopic?.name || "")
+    setMetadata((prev) => ({
+      ...prev,
+      subtopicId: subtopicId || undefined,
     }))
   }
 
@@ -413,6 +450,15 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
         return
       }
+    } else if (addMetaContext.type === "product") {
+      const existingProduct = products.find((p: any) => String(p?.name ?? "").trim().toLowerCase() === nameLower)
+      if (existingProduct) {
+        setMetadata((prev) => ({ ...prev, productId: existingProduct.id }))
+        setProductEditName(existingProduct.name)
+        setAddMetaContext(null)
+        setAlreadyExistsMessage("This Product already exists. We've selected it for you.")
+        return
+      }
     } else if (addMetaContext.type === "chapter") {
       // Find a default product (e.g. USMLE Step 1) or use the first one
       const defaultProduct =
@@ -447,6 +493,24 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           return
         }
       }
+    } else if (addMetaContext.type === "subtopic") {
+      const topicId = metadata.topicId
+      if (topicId) {
+        let subtopicList = subtopics
+        if (subtopicList.length === 0) {
+          const list = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+          subtopicList = Array.isArray(list) ? list : (list as any)?.data ?? []
+          setSubtopics(subtopicList)
+        }
+        const existingSubtopic = subtopicList.find((s: any) => String(s?.name ?? "").trim().toLowerCase() === nameLower)
+        if (existingSubtopic) {
+          setMetadata((prev) => ({ ...prev, subtopicId: existingSubtopic.id }))
+          setSubtopicEditName(existingSubtopic.name)
+          setAddMetaContext(null)
+          setAlreadyExistsMessage("This Subtopic already exists. We've selected it for you.")
+          return
+        }
+      }
     }
 
     setAddMetaLoading(true)
@@ -465,6 +529,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             productTagIds: [id],
             subject: name,
           }))
+          setAddMetaContext(null)
+        }
+      } else if (addMetaContext.type === "product") {
+        const categoryId = metadata.categoryId
+        const res: any = await productsService.createProduct({ name, categoryId, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list: any = await productsService.getProducts({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProducts(data)
+          setMetadata((prev) => ({ ...prev, productId: id }))
           setAddMetaContext(null)
         }
       } else if (addMetaContext.type === "chapter") {
@@ -512,6 +587,22 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           }))
           setAddMetaContext(null)
         }
+      } else if (addMetaContext.type === "subtopic") {
+        const topicId = metadata.topicId
+        if (!topicId) {
+          setAddMetaError("Select a topic first")
+          setAddMetaLoading(false)
+          return
+        }
+        const res: any = await subtopicsService.createSubtopic({ topicId, name, isActive: true })
+        const id = res?.id ?? (res?.data as any)?.id
+        if (id) {
+          const list = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setSubtopics(data)
+          setMetadata((prev) => ({ ...prev, subtopicId: id }))
+          setAddMetaContext(null)
+        }
       }
     } catch (e: any) {
       const rawMessage = e?.message || e?.response?.data?.message || String(e?.response?.data) || ""
@@ -527,8 +618,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       const label =
         addMetaContext?.type === "subject"
           ? "Category"
+          : addMetaContext?.type === "product"
+          ? "Product"
           : addMetaContext?.type === "chapter"
           ? "System"
+          : addMetaContext?.type === "subtopic"
+          ? "Subtopic"
           : "Topic"
       if (isDuplicate) {
         const nameVal = addMetaName.trim()
@@ -543,6 +638,20 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             setAddMetaContext(null)
             setAddMetaError(null)
             setAlreadyExistsMessage("This Category already exists. We've selected it for you.")
+          } else {
+            setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (addMetaContext.type === "product") {
+          const list: any = await productsService.getProducts({ status: "ACTIVE" })
+          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          setProducts(data)
+          const existing = data.find((p: any) => String(p?.name).trim().toLowerCase() === nameVal.toLowerCase())
+          if (existing) {
+            setMetadata((prev) => ({ ...prev, productId: existing.id }))
+            setProductEditName(existing.name)
+            setAddMetaContext(null)
+            setAddMetaError(null)
+            setAlreadyExistsMessage("This Product already exists. We've selected it for you.")
           } else {
             setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
           }
@@ -577,6 +686,25 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
               setAddMetaContext(null)
               setAddMetaError(null)
               setAlreadyExistsMessage("This Topic already exists. We've selected it for you.")
+            } else {
+              setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+            }
+          } else {
+            setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
+          }
+        } else if (addMetaContext.type === "subtopic") {
+          const topicId = metadata.topicId
+          if (topicId) {
+            const list = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+            const data = Array.isArray(list) ? list : (list as any)?.data || []
+            setSubtopics(data)
+            const existing = data.find((s: any) => String(s?.name).trim().toLowerCase() === nameVal.toLowerCase())
+            if (existing) {
+              setMetadata((prev) => ({ ...prev, subtopicId: existing.id }))
+              setSubtopicEditName(existing.name)
+              setAddMetaContext(null)
+              setAddMetaError(null)
+              setAlreadyExistsMessage("This Subtopic already exists. We've selected it for you.")
             } else {
               setAddMetaError(`${label} with this name already exists. Please select it from the dropdown.`)
             }
@@ -645,6 +773,45 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       toast({
         title: "Error",
         description: e?.message || "Failed to update topic",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdateProductName = async () => {
+    const productId = metadata.productId
+    const name = productEditName.trim()
+    if (!productId || !name) return
+    try {
+      await productsService.updateProduct(productId, { name, categoryId: metadata.categoryId || undefined })
+      const list: any = await productsService.getProducts({ status: "ACTIVE" })
+      const data = Array.isArray(list) ? list : (list as any)?.data || []
+      setProducts(data)
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to update product",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdateSubtopicName = async () => {
+    const subtopicId = metadata.subtopicId
+    const topicId = metadata.topicId
+    const name = subtopicEditName.trim()
+    if (!subtopicId || !name) return
+    try {
+      await subtopicsService.updateSubtopic(subtopicId, { name, topicId: topicId || undefined })
+      if (topicId) {
+        const list = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+        const data = Array.isArray(list) ? list : (list as any)?.data || []
+        setSubtopics(data)
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message || "Failed to update subtopic",
         variant: "destructive",
       })
     }
@@ -1488,6 +1655,59 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             </Button>
                           </div>
                         </div>
+                        {/* Product */}
+                        <div>
+                          <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
+                            Product
+                          </div>
+                          <div className="flex gap-2 mb-1">
+                            <select
+                              value={metadata.productId || ""}
+                              onChange={(e) =>
+                                setMetadata((prev) => ({ ...prev, productId: e.target.value || undefined }))
+                              }
+                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              disabled={loadingProducts}
+                            >
+                              <option value="">Select Product...</option>
+                              {products.map((p: any) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name}
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0"
+                              onClick={() => {
+                                setAddMetaContext({ type: "product" })
+                                setAddMetaName("")
+                                setAddMetaError(null)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <input
+                            type="text"
+                            value={productEditName}
+                            onChange={(e) => setProductEditName(e.target.value)}
+                            placeholder="Edit selected product name"
+                            className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={!metadata.productId}
+                              onClick={handleUpdateProductName}
+                            >
+                              Save Product
+                            </Button>
+                          </div>
+                        </div>
                         {/* Chapters */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
@@ -1597,6 +1817,76 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select System first</p>
                           )}
                         </div>
+                        {/* Subtopic */}
+                        <div>
+                          <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
+                            Subtopic
+                          </div>
+                          <div className="flex gap-2 mb-1">
+                            <select
+                              value={metadata.subtopicId || ""}
+                              onChange={(e) => handleSubtopicChange(e.target.value)}
+                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              disabled={loadingSubtopics || !metadata.topicId}
+                            >
+                              <option value="">Select Subtopic...</option>
+                              {subtopics.map((s: any) => (
+                                <option key={s.id} value={s.id}>
+                                  {s.name}
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0"
+                              disabled={!metadata.topicId}
+                              title={!metadata.topicId ? "Select topic first" : "Add subtopic to database"}
+                              onClick={() => {
+                                if (!metadata.topicId) return
+                                setAddMetaContext({ type: "subtopic" })
+                                setAddMetaName("")
+                                setAddMetaError(null)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <input
+                            type="text"
+                            value={subtopicEditName}
+                            onChange={(e) => setSubtopicEditName(e.target.value)}
+                            placeholder="Edit selected subtopic name"
+                            className="mt-1 w-full px-3 py-1.5 text-xs rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={!metadata.subtopicId}
+                              onClick={handleUpdateSubtopicName}
+                            >
+                              Save Subtopic
+                            </Button>
+                          </div>
+                          {!metadata.topicId && (
+                            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Select Topic first</p>
+                          )}
+                        </div>
+                        {/* MCQ Title */}
+                        <div>
+                          <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
+                            MCQ Title
+                          </div>
+                          <input
+                            type="text"
+                            value={(metadata as any).title || ""}
+                            onChange={(e) => setMetadata((prev) => ({ ...prev, title: e.target.value || undefined }))}
+                            placeholder="Enter MCQ title"
+                            className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100"
+                          />
+                        </div>
                       </div>
                       {/* Tags (editable by admin) */}
                       <div className="mt-4">
@@ -1656,8 +1946,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border">
             <h3 className="text-sm font-semibold mb-3">
               {addMetaContext.type === "subject" && "Add Subject"}
+              {addMetaContext.type === "product" && "Add Product"}
               {addMetaContext.type === "chapter" && "Add System"}
               {addMetaContext.type === "topic" && "Add Topic"}
+              {addMetaContext.type === "subtopic" && "Add Subtopic"}
             </h3>
             <div className="space-y-3">
               <div>
@@ -1670,8 +1962,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                   placeholder={
                     addMetaContext.type === "subject"
                       ? "New subject name"
+                      : addMetaContext.type === "product"
+                      ? "New product name"
                       : addMetaContext.type === "chapter"
                       ? "New system name"
+                      : addMetaContext.type === "subtopic"
+                      ? "New subtopic name"
                       : "New topic name"
                   }
                 />

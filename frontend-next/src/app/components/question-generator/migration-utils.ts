@@ -125,7 +125,9 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
       systemId: oldQuestion.systemId,
       topicId: oldQuestion.topicId,
       subtopicId: oldQuestion.subtopicId,
-      categoryId: oldQuestion.categoryId || oldQuestion.productTagId,
+      productId: oldQuestion.productId,
+      categoryId: oldQuestion.categoryId,
+      title: oldQuestion.title ?? oldQuestion.mcqTitle,
       productTagId: oldQuestion.productTagId,
       // Convert single productTagId/categoryId to array for backward compatibility
       productTagIds: oldQuestion.categoryId 
@@ -151,8 +153,10 @@ export function convertNewQuestionToOld(newData: QuestionCreatorData): any {
     subject: newData.metadata.subject,
     system: newData.metadata.system,
     systemId: newData.metadata.systemId,
+    productId: newData.metadata.productId,
     topicId: newData.metadata.topicId,
     subtopicId: newData.metadata.subtopicId,
+    title: newData.metadata.title,
     categoryId: newData.metadata.categoryId,
     productTagId: newData.metadata.categoryId || newData.metadata.productTagId || (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0 ? newData.metadata.productTagIds[0] : undefined),
     productTagIds: newData.metadata.productTagIds,

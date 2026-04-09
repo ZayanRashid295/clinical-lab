@@ -27,6 +27,30 @@ export class CreateQuestionDto {
   topicId?: string;
 
   @ApiProperty({
+    description: "System ID (optional, for full hierarchy payloads)",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  systemId?: string;
+
+  @ApiProperty({
+    description: "Category ID (optional, persisted on question)",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiProperty({
+    description: "Product ID (optional, persisted on question)",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  productId?: string;
+
+  @ApiProperty({
     description: "Product tag ID (optional)",
     example: "cmguoh2bu0001lj45dttw7000",
     required: false,

@@ -48,9 +48,13 @@ export interface ParsedQuestion {
   options: Array<{ label: string; text: string; correct: boolean }>
   correctAnswer: string
   productId: string
+  product?: string
+  category?: string
+  subject?: string
   system: string
   topic?: string
   subtopic?: string
+  title?: string
   mainExplanation: any[]
   perAnswerExplanations: Record<string, any[]>
   tags: string[]
@@ -86,6 +90,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
         const titleMatch = yamlLine.match(/title:\s*"?([^"]*)"?/)
         if (titleMatch) {
           const fullTitle = titleMatch[1]
+          questionData.title = fullTitle.trim()
           // Split by " — " (em dash) to separate Product and System
           const titleParts = fullTitle.split(" — ")
           if (titleParts.length >= 2) {
@@ -125,6 +130,49 @@ export function parseMarkdown(content: string): ParsedQuestion {
   // Parse rest of the file
   while (i < lines.length) {
     const line = lines[i].trim()
+
+    // Extract hierarchy metadata lines from the new format.
+    // These may appear as plain lines and should override looser fallbacks.
+    const categoryMatch = line.match(/^Category:\s*(.+)/i)
+    if (categoryMatch) {
+      const category = categoryMatch[1].trim()
+      questionData.category = category
+      questionData.subject = category
+      i++
+      continue
+    }
+    const productMatch = line.match(/^Product:\s*(.+)/i)
+    if (productMatch) {
+      const product = productMatch[1].trim()
+      questionData.product = product
+      questionData.productId = product
+      i++
+      continue
+    }
+    const systemLineMatch = line.match(/^System:\s*(.+)/i)
+    if (systemLineMatch) {
+      questionData.system = extractSystemFirstSegment(systemLineMatch[1].trim())
+      i++
+      continue
+    }
+    const topicLineMatch = line.match(/^Topic:\s*(.+)/i)
+    if (topicLineMatch) {
+      questionData.topic = topicLineMatch[1].trim()
+      i++
+      continue
+    }
+    const subtopicLineMatch = line.match(/^Sub-?Topic:\s*(.+)/i)
+    if (subtopicLineMatch) {
+      questionData.subtopic = subtopicLineMatch[1].trim()
+      i++
+      continue
+    }
+    const mcqTitleMatch = line.match(/^MCQ\s*Title:\s*(.+)/i)
+    if (mcqTitleMatch) {
+      questionData.title = mcqTitleMatch[1].trim()
+      i++
+      continue
+    }
 
     // Extract title (# Title) - fallback if YAML not present
     if (line.startsWith("# ") && !questionData.productId) {
@@ -923,8 +971,13 @@ export function parseMarkdown(content: string): ParsedQuestion {
     options: questionData.options || [],
     correctAnswer: questionData.correctAnswer || "",
     productId: questionData.productId || "General",
+    product: questionData.product,
+    category: questionData.category,
+    subject: questionData.subject || questionData.category,
     system: questionData.system || "General",
     topic: questionData.topic,
+    subtopic: questionData.subtopic,
+    title: questionData.title,
     mainExplanation: questionData.mainExplanation || [],
     perAnswerExplanations: questionData.perAnswerExplanations || {},
     tags: questionData.tags || [],

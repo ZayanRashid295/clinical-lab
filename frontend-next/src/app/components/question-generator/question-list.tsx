@@ -4,14 +4,19 @@ import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import { Badge } from "@/shared/ui/badge"
 import { Checkbox } from "@/shared/ui/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip"
 
 interface Question {
   id: string
   stem: string
   subject: string
+  category?: string
+  product?: string
   system?: string
   chapterName?: string
   topicName?: string
+  subtopicName?: string
+  mcqTitle?: string
   tags: string[]
   options: Array<{ label: string; text: string; correct: boolean }>
 }
@@ -36,6 +41,12 @@ export default function QuestionList({
   selectedIds = [],
   onSelectionChange,
 }: QuestionListProps) {
+  const toPlainText = (value: string) =>
+    (value || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+
   const selectedSet = new Set(selectedIds)
 
   const handleToggleOne = (id: string, checked: boolean) => {
@@ -75,6 +86,9 @@ export default function QuestionList({
       )}
       {questions.map((question) => (
         <Card key={question.id} className="p-6 hover:shadow-lg transition-shadow bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+          {(() => {
+            const plainStem = toPlainText(question.stem)
+            return (
           <div className={`flex gap-4 ${selectionMode ? "flex-row" : ""}`}>
             {selectionMode && (
               <div className="flex items-center flex-shrink-0 pt-1">
@@ -87,16 +101,30 @@ export default function QuestionList({
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-w-0">
             {/* Question Stem Content */}
             <div className="lg:col-span-2">
-              <h3 className="text-lg font-semibold text-foreground dark:text-gray-100 mb-2 line-clamp-2">{question.stem}</h3>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <h3 className="text-lg font-semibold text-foreground dark:text-gray-100 mb-2 line-clamp-2 cursor-help">
+                    {plainStem}
+                  </h3>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="start" className="max-w-[700px] whitespace-pre-wrap break-words text-sm leading-relaxed">
+                  {plainStem}
+                </TooltipContent>
+              </Tooltip>
               <div className="space-y-1">
-                {question.subject && (
+                {(question.category || question.subject) && (
                   <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">Subject:</span> {question.subject}
+                    <span className="font-medium">Category:</span> {question.category || question.subject}
                   </p>
                 )}
-                {question.chapterName && (
+                {question.product && (
                   <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">System:</span> {question.chapterName}
+                    <span className="font-medium">Product:</span> {question.product}
+                  </p>
+                )}
+                {(question.system || question.chapterName) && (
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">
+                    <span className="font-medium">System:</span> {question.system || question.chapterName}
                   </p>
                 )}
                 {question.topicName && (
@@ -104,10 +132,20 @@ export default function QuestionList({
                     <span className="font-medium">Topic:</span> {question.topicName}
                   </p>
                 )}
+                {question.subtopicName && (
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">
+                    <span className="font-medium">Subtopic:</span> {question.subtopicName}
+                  </p>
+                )}
+                {question.mcqTitle && (
+                  <p className="text-sm text-muted-foreground dark:text-gray-300 line-clamp-2">
+                    <span className="font-medium">MCQ Title:</span> {question.mcqTitle}
+                  </p>
+                )}
               </div>
               {question.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
-                  {question.tags.map((tag) => (
+                  {question.tags.filter((tag) => !tag.startsWith("__")).map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs text-foreground dark:text-gray-200 border-border dark:border-gray-600">
                       {tag}
                     </Badge>
@@ -154,6 +192,8 @@ export default function QuestionList({
             </div>
             </div>
           </div>
+            )
+          })()}
         </Card>
       ))}
     </div>

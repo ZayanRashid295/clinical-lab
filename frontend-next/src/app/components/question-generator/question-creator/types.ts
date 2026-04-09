@@ -12,6 +12,7 @@ export interface QuestionMetadata {
   subtopicId?: string
   productId?: string
   categoryId?: string // New 5-level hierarchy: Category -> Product -> System -> Topic -> Subtopic
+  title?: string
   productTagId?: string // Deprecated: use categoryId
   productTagIds?: string[] // Deprecated: use categoryId
   questionId?: string | null // Optional question ID stored in metadata/tags

@@ -34,6 +34,7 @@ export default function AdminQuestionView({ question, onEdit, onCancel }: AdminQ
     metadata: {
       systemId: question.systemId || "",
       topicId: question.topicId || "",
+      title: question.mcqTitle || question.title || "",
       productTagId: question.productTagId || "",
       productTagIds: Array.isArray(question.productTagIds) ? question.productTagIds : [],
       subject: question.subject || "",

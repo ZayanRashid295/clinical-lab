@@ -104,6 +104,7 @@ export default function UnifiedQuestionPreview({
   const systemMeta = questionData.metadata?.system;
   const displayChapterName = chapterName || (typeof systemMeta === 'string' ? systemMeta : (systemMeta as any)?.name) || ""
   const displayTopic = topicName ? { name: topicName } : (questionData.metadata?.topicId ? { name: "Loading..." } : undefined)
+  const displayMcqTitle = questionData.metadata?.title || ""
 
   return (
     <div className="h-full bg-background dark:bg-gray-900 flex flex-col w-full" style={{ marginTop: '-2rem', paddingTop: 0 }}>
@@ -220,6 +221,7 @@ export default function UnifiedQuestionPreview({
               chapter={displayChapterName || undefined}
               chapterLabel="System"
               topic={displayTopic}
+              mcqTitle={displayMcqTitle || undefined}
             />
           </div>
         </div>
