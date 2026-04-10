@@ -38,8 +38,6 @@ export default function Invoices() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search invoices..."
-        enableSearch={true}
       />
     </>
   );

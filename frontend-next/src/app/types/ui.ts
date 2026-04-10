@@ -37,8 +37,8 @@ export interface MenuItem {
 export interface HeaderProps {
   user: User | null;
   onLogout: () => void;
-  enableSearch?: boolean;
-  searchPlaceholder?: string;
+  /** Renders after the mobile menu button (e.g. route-specific search). Pass a function to re-render on each parent update without stale closures. */
+  leadingContent?: React.ReactNode | (() => React.ReactNode);
   customActions?: React.ReactNode;
   onMobileMenuToggle?: () => void;
   onSidebarToggle?: () => void;
@@ -51,8 +51,6 @@ export interface MenuSystemProps {
   customMenuItems?: MenuItem[];
   onMenuChange?: (menuId: string) => void;
   applicationTitle?: string;
-  enableSearch?: boolean;
-  searchPlaceholder?: string;
   customContent?: { [key: string]: React.ComponentType<any> };
   contentRegistry?: import("./dashboard").ContentRegistry;
 }

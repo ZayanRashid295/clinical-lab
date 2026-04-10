@@ -31,8 +31,6 @@ export default function Users() {
     <MenuSystem
       contentRegistry={transportationContentRegistry}
       applicationTitle="Medical Lab"
-      searchPlaceholder="Search users, roles, permissions..."
-      enableSearch={true}
     />
   );
 }

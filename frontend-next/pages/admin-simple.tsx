@@ -288,8 +288,6 @@ export default function AdminSimplePage() {
       </Head>
       <MenuSystem
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search administration..."
-        enableSearch={true}
         customContent={customContent}
       />
     </>

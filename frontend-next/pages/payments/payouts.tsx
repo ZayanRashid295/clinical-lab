@@ -38,8 +38,6 @@ export default function Payouts() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search payouts, drivers..."
-        enableSearch={true}
       />
     </>
   );

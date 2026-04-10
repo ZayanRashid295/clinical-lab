@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MenuItem } from "../../../app/types/menu";
 import { useUIConfigContext } from "../../contexts/UIConfigContext";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import { useLanguage } from "../../contexts/LanguageContext";
+import {
+  LayoutHeaderLeadingContext,
+  type HeaderLeadingContent,
+} from "../../contexts/LayoutHeaderLeadingContext";
 import Sidebar from "../Navigation/Sidebar";
 import HorizontalMenu from "../Navigation/HorizontalMenu";
 import Header from "./Header";
@@ -18,9 +22,6 @@ interface AdaptiveLayoutProps {
   onToggleMenu: (menuId: string) => void;
   isSidebarCollapsed?: boolean;
   onToggleCollapse?: () => void;
-  enableSearch?: boolean;
-  searchPlaceholder?: string;
-  onSearch?: (query: string) => void;
   onLogout?: () => void;
 }
 
@@ -35,9 +36,6 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
   onToggleMenu,
   isSidebarCollapsed = false,
   onToggleCollapse,
-  enableSearch = true,
-  searchPlaceholder = "Search...",
-  onSearch,
   onLogout,
 }) => {
   const { config } = useUIConfigContext();
@@ -45,6 +43,19 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLayoutSwitchNotification, setShowLayoutSwitchNotification] =
     useState(false);
+  const [headerLeadingContent, setHeaderLeadingContent] =
+    useState<HeaderLeadingContent | null>(null);
+  const setLeadingContent = useCallback(
+    (node: HeaderLeadingContent | null) => {
+      // Functional update so a stored render function is not mistaken for a React state updater.
+      setHeaderLeadingContent(() => node);
+    },
+    []
+  );
+  const headerLeadingContextValue = useMemo(
+    () => ({ setLeadingContent }),
+    [setLeadingContent]
+  );
 
   // Use responsive layout hook to determine if we should switch to vertical mode
   const { shouldUseVerticalLayout, isMobile, isTablet } = useResponsiveLayout(
@@ -78,6 +89,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
 
   if (isHorizontalLayout) {
     return (
+      <LayoutHeaderLeadingContext.Provider value={headerLeadingContextValue}>
       <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
         {/* Layout Switch Notification */}
         {showLayoutSwitchNotification && (
@@ -112,8 +124,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
           {config.menuStyle === "topbar" && (
             <Header
               user={user}
-              enableSearch={enableSearch}
-              searchPlaceholder={searchPlaceholder}
+              leadingContent={headerLeadingContent}
               onLogout={onLogout || (() => {})}
               isSidebarCollapsed={false}
               onMobileMenuToggle={handleMobileMenuToggle}
@@ -122,16 +133,18 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
           )}
 
           {/* Main Content */}
-          <main className="flex-1 overflow-y-auto p-3 bg-white dark:bg-gray-800">
+          <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-white dark:bg-gray-800">
             {children}
           </main>
         </div>
       </div>
+      </LayoutHeaderLeadingContext.Provider>
     );
   }
 
   // Vertical Layout (existing sidebar layout)
   return (
+    <LayoutHeaderLeadingContext.Provider value={headerLeadingContextValue}>
     <div
       className={`flex h-screen bg-gray-100 dark:bg-gray-900 ${
         isRTL ? "flex-row-reverse" : ""
@@ -198,8 +211,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
         {/* Header */}
         <Header
           user={user}
-          enableSearch={enableSearch}
-          searchPlaceholder={searchPlaceholder}
+          leadingContent={headerLeadingContent}
           isSidebarCollapsed={isSidebarCollapsed}
           onLogout={onLogout || (() => {})}
           onMobileMenuToggle={handleMobileMenuToggle}
@@ -207,11 +219,12 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
         />
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-3 bg-white dark:bg-gray-800">
+        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-white dark:bg-gray-800">
           {children}
         </main>
       </div>
     </div>
+    </LayoutHeaderLeadingContext.Provider>
   );
 };
 

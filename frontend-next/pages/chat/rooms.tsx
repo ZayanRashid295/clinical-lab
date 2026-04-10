@@ -41,8 +41,6 @@ export default function ChatRooms() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search conversations..."
-        enableSearch={true}
       />
     </>
   );

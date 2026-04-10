@@ -38,8 +38,6 @@ export default function Notifications() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search notifications..."
-        enableSearch={true}
       />
     </>
   );

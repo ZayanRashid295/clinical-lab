@@ -38,8 +38,6 @@ export default function App() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search vehicles, drivers, or passengers..."
-        enableSearch={true}
       />
     </>
   );

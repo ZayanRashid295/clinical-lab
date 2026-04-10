@@ -24,7 +24,6 @@ export interface UIConfig {
   fontSize: "small" | "medium" | "large";
   borderRadius: "none" | "small" | "medium" | "large";
   enableAnimations: boolean;
-  enableSearch: boolean;
   enableNotifications: boolean;
 }
 
@@ -36,7 +35,6 @@ export const DEFAULT_UI_CONFIG: UIConfig = {
   fontSize: "medium",
   borderRadius: "medium",
   enableAnimations: true,
-  enableSearch: true,
   enableNotifications: true,
 };
 

@@ -23,8 +23,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   customMenuItems,
   onMenuChange,
   applicationTitle = "Application Portal",
-  enableSearch = true,
-  searchPlaceholder,
   customContent = {},
   contentRegistry,
 }) => {
@@ -270,14 +268,9 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
         onToggleMenu={toggleMenu}
         isSidebarCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        enableSearch={enableSearch}
-        searchPlaceholder={searchPlaceholder}
-        onSearch={(query) => {
-          // Handle search functionality
-        }}
         onLogout={handleLogout}
       >
-        <div key={activeMenu}>
+        <div key={activeMenu} className="h-full min-h-0 flex flex-col">
           {renderContent()}
         </div>
       </AdaptiveLayout>

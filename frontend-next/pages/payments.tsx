@@ -31,8 +31,6 @@ export default function Payments() {
     <MenuSystem
       contentRegistry={transportationContentRegistry}
       applicationTitle="Medical Lab"
-      searchPlaceholder="Search payments, transactions..."
-      enableSearch={true}
     />
   );
 }

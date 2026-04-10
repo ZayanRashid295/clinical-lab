@@ -7,8 +7,6 @@ export default function RefDesignPage() {
     <MenuSystem
       contentRegistry={transportationContentRegistry}
       applicationTitle="Medical Lab"
-      searchPlaceholder="Search..."
-      enableSearch={true}
     />
   );
 }

@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import { Search } from "lucide-react"
+import { useLayoutHeaderLeading } from "@/shared/contexts/LayoutHeaderLeadingContext"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import QuestionList from "./question-list"
@@ -75,6 +77,50 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
   const questionsService = useMemo(() => new QuestionsService(), [])
+  const layoutHeader = useLayoutHeaderLeading()
+
+  const showListSearchInHeader =
+    !showNewQuestion &&
+    !editingId &&
+    !viewingId &&
+    !showMarkdownUploader &&
+    !showBulkUploader &&
+    !showDocxUploader &&
+    !showBulkDocxUploader
+
+  useEffect(() => {
+    if (!layoutHeader) return
+    const { setLeadingContent } = layoutHeader
+    if (!showListSearchInHeader) {
+      setLeadingContent(null)
+      return
+    }
+    setLeadingContent(() => (
+      <div className="w-full flex items-center min-w-0 max-w-full lg:max-w-2xl xl:max-w-3xl">
+        <div className="relative w-full flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 shadow-sm">
+          <Search
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 shrink-0 pointer-events-none"
+            size={16}
+            aria-hidden
+          />
+          <input
+            type="text"
+            placeholder="Search by stem, category, product, system, topic, subtopic, or title..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-8 pr-2 py-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-md min-w-0"
+            aria-label="Search questions"
+          />
+        </div>
+      </div>
+    ))
+  }, [layoutHeader, showListSearchInHeader, searchTerm])
+
+  useEffect(() => {
+    return () => {
+      layoutHeader?.setLeadingContent(null)
+    }
+  }, [layoutHeader])
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -1428,57 +1474,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         </div>
       )}
 
-      {/* Search Bar and New Question Button - Only show when viewing list */}
-      {!showNewQuestion && !editingId && !viewingId && !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader && (
-        <div className="space-y-3 mb-4">
-          <div className="flex gap-3">
-            <Card className="p-4 shadow-md flex-1 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
-              <input
-                type="text"
-                placeholder="Search by stem, category, product, system, topic, subtopic, or title..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 placeholder-muted-foreground dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary/30"
-              />
-            </Card>
-            <div className="relative" ref={menuRef}>
-              <Button
-                onClick={() => setShowNewQuestionMenu(!showNewQuestionMenu)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                + New Question
-              </Button>
-              {showNewQuestionMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
-                  <div className="py-1">
-                    
-                    <button
-                      onClick={handleBulkUploadMarkdown}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Upload Markdown Questions
-                    </button>
-                    
-                    <button
-                      onClick={handleBulkUploadDocx}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Upload DOCX Questions
-                    </button>
-                    <div className="border-t border-border dark:border-gray-700 my-1"></div>
-                    <button
-                      onClick={handleCreateManually}
-                      className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                    >
-                      ✏️ Create Question Manually
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* + New Question lives on the list toolbar row (with Select); search is in the app header */}
 
       {/* Markdown Uploader Section - Only shown when upload mode is selected */}
       {showMarkdownUploader && (
@@ -1585,7 +1581,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         />
         </div>
       ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader ? (
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           {/* Questions List */}
           {filteredQuestions.length === 0 ? (
             <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
@@ -1600,11 +1596,49 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             </Card>
           ) : (
             <>
-              <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
-                <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <div className="mb-4 flex flex-nowrap items-center justify-between gap-3 min-w-0 pt-1">
+                <p className="text-sm text-muted-foreground dark:text-gray-400 min-w-0 shrink">
                   Showing {filteredQuestions.length} of {questions.length} questions
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-nowrap items-center gap-3 sm:gap-4 shrink-0 pl-2">
+                  <div className="relative isolate" ref={menuRef}>
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => setShowNewQuestionMenu(!showNewQuestionMenu)}
+                      className="bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 ring-1 ring-primary/40 ring-offset-2 ring-offset-background hover:shadow-lg hover:shadow-primary/25 dark:ring-offset-gray-900"
+                    >
+                      + New Question
+                    </Button>
+                    {showNewQuestionMenu && (
+                      <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
+                        <div className="py-1">
+                          <button
+                            type="button"
+                            onClick={handleBulkUploadMarkdown}
+                            className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                          >
+                            Upload Markdown Questions
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleBulkUploadDocx}
+                            className="text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors w-full"
+                          >
+                            Upload DOCX Questions
+                          </button>
+                          <div className="border-t border-border dark:border-gray-700 my-1" />
+                          <button
+                            type="button"
+                            onClick={handleCreateManually}
+                            className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                          >
+                            ✏️ Create Question Manually
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   {!isSelectMode ? (
                     <Button
                       type="button"

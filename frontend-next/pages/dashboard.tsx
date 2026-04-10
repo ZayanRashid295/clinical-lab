@@ -188,8 +188,6 @@ function DashboardContent() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Clinical Lab"
-        searchPlaceholder="Search..."
-        enableSearch={true}
       />
     </>
   );

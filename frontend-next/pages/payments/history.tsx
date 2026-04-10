@@ -38,8 +38,6 @@ export default function PaymentHistory() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search payments, transactions..."
-        enableSearch={true}
       />
     </>
   );

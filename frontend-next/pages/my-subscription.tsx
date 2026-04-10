@@ -42,8 +42,6 @@ export default function MySubscription() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Clinical Lab"
-        searchPlaceholder="Search..."
-        enableSearch={true}
       >
         <MySubscriptionPage />
       </MenuSystem>

@@ -299,8 +299,6 @@ export default function AdminPage() {
 
       <MenuSystem
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search administration..."
-        enableSearch={true}
         customContent={customContent}
         contentRegistry={transportationContentRegistry}
       />

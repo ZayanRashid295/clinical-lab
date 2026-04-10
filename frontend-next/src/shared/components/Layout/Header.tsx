@@ -1,4 +1,4 @@
-import { Search, Bell, LogOut, Menu } from "lucide-react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import { HeaderProps } from "../../../app/types/ui";
 import { typography, spacing, interactive } from "../../utils/responsive";
 import ColorPicker from "../ColorPicker";
@@ -6,8 +6,7 @@ import ColorPicker from "../ColorPicker";
 const Header: React.FC<HeaderProps> = ({
   user,
   onLogout,
-  enableSearch = true,
-  searchPlaceholder = "Search...",
+  leadingContent,
   customActions,
   onMobileMenuToggle,
 }) => {
@@ -15,40 +14,28 @@ const Header: React.FC<HeaderProps> = ({
     <header
       className={`bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${spacing.container.xs}`}
     >
-      <div className="flex items-center justify-between">
-        <div className={`flex items-center ${spacing.element.sm}`}>
+      <div className="flex items-center justify-between gap-3 w-full min-w-0">
+        <div
+          className={`flex items-center ${spacing.element.sm} flex-1 min-w-0 gap-2 sm:gap-3`}
+        >
           {/* Mobile menu toggle */}
           <button
             onClick={onMobileMenuToggle}
-            className={`lg:hidden ${interactive.touch.md} flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors`}
+            className={`lg:hidden shrink-0 ${interactive.touch.md} flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors`}
             title="Open menu"
           >
             <Menu size={20} />
           </button>
-
-          {enableSearch && (
-            <div className="relative hidden sm:block">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={16}
-              />
-              <input
-                type="text"
-                placeholder={searchPlaceholder}
-                className="pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 lg:w-96"
-              />
+          {leadingContent ? (
+            <div className="flex-1 min-w-0 flex items-center">
+              {typeof leadingContent === "function"
+                ? (leadingContent as () => React.ReactNode)()
+                : leadingContent}
             </div>
-          )}
-
-          {/* Mobile search button */}
-          {enableSearch && (
-            <button className="sm:hidden min-h-[44px] min-w-[44px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-              <Search size={20} />
-            </button>
-          )}
+          ) : null}
         </div>
 
-        <div className={`flex items-center ${spacing.element.sm}`}>
+        <div className={`flex items-center ${spacing.element.sm} shrink-0`}>
           {customActions}
 
           {/* Color Picker */}

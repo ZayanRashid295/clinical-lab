@@ -41,7 +41,6 @@ export default function ZoomPage() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Clinical Lab"
-        enableSearch={false}
       />
     </>
   );

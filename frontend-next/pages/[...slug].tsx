@@ -98,8 +98,6 @@ export default function CatchAllPage() {
       <MenuSystem
         contentRegistry={transportationContentRegistry}
         applicationTitle="Medical Lab"
-        searchPlaceholder="Search..."
-        enableSearch={true}
         customContent={
           menuId === "under-construction"
             ? {
