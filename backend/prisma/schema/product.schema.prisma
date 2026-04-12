@@ -30,7 +30,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  category        Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category        Category?       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   systems         System[]
   productSubtypes ProductSubtype[]
   questions       Question[]

@@ -42,6 +42,10 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
   onView,
   onEdit,
   onDelete,
+  onDeactivate,
+  onDeletePermanent,
+  onBulkDeletePermanent,
+  showDeactivateAction = true,
   FormModal,
   ViewModal,
   formModalOpen,
@@ -58,6 +62,11 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const contentRef = useRef<HTMLDivElement>(null);
   const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const bulkEnabled = Boolean(onBulkDeletePermanent);
+  const deactivateHandler = showDeactivateAction ? onDeactivate : undefined;
 
   // Track content height to prevent layout shift
   useEffect(() => {
@@ -195,6 +204,68 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
             />
             Refresh
           </button>
+          {bulkEnabled && viewMode === "table" && (
+            <>
+              {!selectionMode ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectionMode(true);
+                    setSelectedIds([]);
+                  }}
+                  className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  Select
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectionMode(false);
+                      setSelectedIds([]);
+                    }}
+                    className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pageIds = data.map((row) => row.id);
+                      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])]);
+                    }}
+                    disabled={data.length === 0}
+                    className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Select all on page
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds([])}
+                    className="inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Deselect all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!onBulkDeletePermanent || selectedIds.length === 0) return;
+                      try {
+                        await Promise.resolve(onBulkDeletePermanent(selectedIds));
+                      } finally {
+                        setSelectedIds([]);
+                      }
+                    }}
+                    disabled={selectedIds.length === 0}
+                    className="inline-flex items-center px-4 py-2 text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors disabled:opacity-50"
+                  >
+                    Delete selected ({selectedIds.length})
+                  </button>
+                </>
+              )}
+            </>
+          )}
           {config.onAdd && (
             <button
               onClick={config.onAdd}
@@ -271,6 +342,11 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onDeactivate={deactivateHandler}
+                onDeletePermanent={onDeletePermanent}
+                selectionMode={bulkEnabled && selectionMode}
+                selectedIds={selectedIds}
+                onSelectionChange={setSelectedIds}
                 customActions={config.actions}
                 emptyStateIcon={config.emptyStateIcon}
                 emptyStateMessage={config.emptyStateMessage}

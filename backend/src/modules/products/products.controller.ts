@@ -74,6 +74,14 @@ export class ProductsController {
     return this.productsService.updateSubtype(id, updateSubtypeDto);
   }
 
+  @Delete("subtypes/permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete product subtype" })
+  async removeSubtypePermanent(@Param("id") id: string) {
+    return this.productsService.removeSubtypePermanent(id);
+  }
+
   @Delete("subtypes/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -126,6 +134,14 @@ export class ProductsController {
   @ApiOperation({ summary: "Update product" })
   async update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
+  }
+
+  @Delete("permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete product" })
+  async removePermanent(@Param("id") id: string) {
+    return this.productsService.removePermanent(id);
   }
 
   @Delete(":id")

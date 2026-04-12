@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import { ProductsService } from "../products/products.service";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { QueryCategoryDto } from "./dto/query-category.dto";
 
 @Injectable()
 export class CategoriesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private productsService: ProductsService,
+  ) {}
 
   async findAll(query: QueryCategoryDto) {
     try {
@@ -134,5 +138,39 @@ export class CategoriesService {
     const existing = await this.prisma.category.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Category with ID ${id} not found`);
     return this.prisma.category.update({ where: { id }, data: { isActive: false } });
+  }
+
+  async removePermanent(id: string) {
+    const existing = await this.prisma.category.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Category with ID ${id} not found`);
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        const products = await tx.product.findMany({
+          where: { categoryId: id },
+          select: { id: true },
+        });
+        for (const { id: productId } of products) {
+          await this.productsService.deleteProductTreeInTx(tx, productId);
+        }
+
+        const categoryQuestions = await tx.question.findMany({
+          where: { categoryId: id },
+          select: { id: true },
+        });
+        for (const { id: qid } of categoryQuestions) {
+          await this.productsService.deleteQuestionGraphInTx(tx, qid);
+        }
+
+        await tx.category.delete({ where: { id } });
+      });
+      return { message: "Category permanently deleted with all nested content" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this category while some records still reference it. Resolve those references first.",
+        );
+      }
+      throw e;
+    }
   }
 }

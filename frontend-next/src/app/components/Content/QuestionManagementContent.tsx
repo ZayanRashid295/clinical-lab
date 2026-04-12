@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useQuestions from "../../../hooks/useQuestions";
 import useQuestionStats from "../../../hooks/useQuestionStats";
 import { Question, QuestionQueryParams } from "../../types/question";
@@ -6,8 +6,11 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { questionTableConfig } from "../../config/tables/question-table.config";
 import QuestionFormModal from "./QuestionFormModal";
 import QuestionViewModal from "./QuestionViewModal";
+import { QuestionsService } from "../../services/questions/questions.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function QuestionManagementContent() {
+  const questionsService = useMemo(() => new QuestionsService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -117,6 +120,14 @@ export default function QuestionManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<Question>({
+    entitySingular: "question",
+    entityPlural: "questions",
+    deactivate: (id) => questionsService.delete(id),
+    deletePermanent: (id) => questionsService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -135,6 +146,9 @@ export default function QuestionManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewQuestion}
       onEdit={handleEditQuestion}
+      onDeactivate={destructive.onDeactivate}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={QuestionFormModal}
       ViewModal={QuestionViewModal}
       formModalOpen={formModalOpen}

@@ -8,6 +8,8 @@ import {
   ArrowUp,
   ArrowDown,
   Users,
+  Trash2,
+  Ban,
 } from "lucide-react";
 import { GenericDataTableProps, ColumnConfig } from "./types";
 
@@ -29,6 +31,11 @@ function GenericDataTable<T extends { id: string }>({
   onView,
   onEdit,
   onDelete,
+  onDeactivate,
+  onDeletePermanent,
+  selectionMode = false,
+  selectedIds = [],
+  onSelectionChange,
   customActions = [],
   emptyStateIcon,
   emptyStateMessage = "No items found",
@@ -69,7 +76,35 @@ function GenericDataTable<T extends { id: string }>({
     return value;
   };
 
-  const hasActions = onView || onEdit || onDelete || customActions.length > 0;
+  const hasActions =
+    onView ||
+    onEdit ||
+    onDelete ||
+    onDeactivate ||
+    onDeletePermanent ||
+    customActions.length > 0;
+
+  const pageIds = data.map((row) => row.id);
+  const allOnPageSelected =
+    pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+  const someOnPageSelected = pageIds.some((id) => selectedIds.includes(id));
+
+  const toggleRowSelected = (id: string) => {
+    if (!onSelectionChange) return;
+    const set = new Set(selectedIds);
+    if (set.has(id)) set.delete(id);
+    else set.add(id);
+    onSelectionChange(Array.from(set));
+  };
+
+  const toggleSelectAllOnPage = () => {
+    if (!onSelectionChange) return;
+    if (allOnPageSelected) {
+      onSelectionChange(selectedIds.filter((id) => !pageIds.includes(id)));
+    } else {
+      onSelectionChange([...new Set([...selectedIds, ...pageIds])]);
+    }
+  };
 
   if (error) {
     return (
@@ -85,7 +120,8 @@ function GenericDataTable<T extends { id: string }>({
     );
   }
 
-  const totalColumns = columns.length + (hasActions ? 1 : 0);
+  const totalColumns =
+    columns.length + (selectionMode ? 1 : 0) + (hasActions ? 1 : 0);
 
   return (
     <div className="bg-white rounded-lg shadow border">
@@ -101,6 +137,20 @@ function GenericDataTable<T extends { id: string }>({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {selectionMode && (
+                <th className="px-3 py-3 w-10 text-left">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={allOnPageSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someOnPageSelected && !allOnPageSelected;
+                    }}
+                    onChange={toggleSelectAllOnPage}
+                    aria-label="Select all on this page"
+                  />
+                </th>
+              )}
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -159,6 +209,17 @@ function GenericDataTable<T extends { id: string }>({
             ) : (
               data.map((row, rowIndex) => (
                 <tr key={row.id} className="hover:bg-gray-50">
+                  {selectionMode && (
+                    <td className="px-3 py-4">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => toggleRowSelected(row.id)}
+                        aria-label={`Select row ${row.id}`}
+                      />
+                    </td>
+                  )}
                   {columns.map((column) => {
                     const value = getValue(row, column);
                     return (
@@ -202,7 +263,29 @@ function GenericDataTable<T extends { id: string }>({
                             Edit
                           </button>
                         )}
-                        {onDelete && (
+                        {onDeactivate && (
+                          <button
+                            type="button"
+                            onClick={() => onDeactivate(row)}
+                            className="text-amber-700 hover:text-amber-900 flex items-center gap-1"
+                            title="Deactivate (hide)"
+                          >
+                            <Ban size={16} />
+                            Deactivate
+                          </button>
+                        )}
+                        {onDeletePermanent && (
+                          <button
+                            type="button"
+                            onClick={() => onDeletePermanent(row)}
+                            className="text-red-600 hover:text-red-900 flex items-center gap-1"
+                            title="Delete permanently"
+                          >
+                            <Trash2 size={16} />
+                            Delete
+                          </button>
+                        )}
+                        {onDelete && !onDeletePermanent && (
                           <button
                             onClick={() => onDelete(row)}
                             className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 flex items-center justify-center"

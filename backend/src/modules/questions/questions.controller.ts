@@ -309,12 +309,23 @@ export class QuestionsController {
     return this.questionsService.update(id, updateQuestionDto);
   }
 
+  @Delete("permanent/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete question (Admin only)" })
+  @ApiResponse({ status: 200, description: "Question permanently deleted" })
+  @ApiResponse({ status: 404, description: "Question not found" })
+  async removePermanent(@Param("id") id: string) {
+    return this.questionsService.removePermanent(id);
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Delete question (Admin only)" })
-  @ApiResponse({ status: 200, description: "Question deleted successfully" })
+  @ApiOperation({ summary: "Deactivate question (Admin only)" })
+  @ApiResponse({ status: 200, description: "Question deactivated successfully" })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async remove(@Param("id") id: string) {

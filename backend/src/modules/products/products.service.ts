@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
@@ -199,6 +200,171 @@ export class ProductsService {
     return this.prisma.product.update({ where: { id }, data: { isActive: false } });
   }
 
+  /**
+   * Deletes a question and all dependent rows (choices, blocks, paper links).
+   * Used for product/category cascades where relationMode=prisma may not DB-cascade.
+   */
+  async deleteQuestionGraphInTx(tx: Prisma.TransactionClient, questionId: string): Promise<void> {
+    const exists = await tx.question.findUnique({ where: { id: questionId } });
+    if (!exists) return;
+
+    await tx.questionChoice.deleteMany({ where: { questionId } });
+    await tx.questionStemBlock.deleteMany({ where: { questionId } });
+
+    const perAnswers = await tx.perAnswerExplanation.findMany({
+      where: { questionId },
+      select: { id: true },
+    });
+    for (const pa of perAnswers) {
+      await tx.explanationBlock.deleteMany({ where: { perAnswerId: pa.id } });
+    }
+    await tx.perAnswerExplanation.deleteMany({ where: { questionId } });
+    await tx.explanationBlock.deleteMany({ where: { questionId } });
+
+    await tx.questionPaperQuestion.deleteMany({ where: { questionId } });
+
+    await tx.question.delete({ where: { id: questionId } });
+  }
+
+  private async deleteSubtopicTreeInTx(tx: Prisma.TransactionClient, subtopicId: string): Promise<void> {
+    const questions = await tx.question.findMany({
+      where: { subtopicId },
+      select: { id: true },
+    });
+    for (const { id: qid } of questions) {
+      await this.deleteQuestionGraphInTx(tx, qid);
+    }
+    await tx.subtopic.delete({ where: { id: subtopicId } });
+  }
+
+  private async deleteTopicTreeInTx(tx: Prisma.TransactionClient, topicId: string): Promise<void> {
+    const subtopics = await tx.subtopic.findMany({
+      where: { topicId },
+      select: { id: true },
+    });
+    for (const { id: sid } of subtopics) {
+      await this.deleteSubtopicTreeInTx(tx, sid);
+    }
+    const topicQuestions = await tx.question.findMany({
+      where: { topicId },
+      select: { id: true },
+    });
+    for (const { id: qid } of topicQuestions) {
+      await this.deleteQuestionGraphInTx(tx, qid);
+    }
+    await tx.topic.delete({ where: { id: topicId } });
+  }
+
+  private async deleteSystemTreeInTx(tx: Prisma.TransactionClient, systemId: string): Promise<void> {
+    const topics = await tx.topic.findMany({
+      where: { systemId },
+      select: { id: true },
+    });
+    for (const { id: tid } of topics) {
+      await this.deleteTopicTreeInTx(tx, tid);
+    }
+    const systemQuestions = await tx.question.findMany({
+      where: { systemId },
+      select: { id: true },
+    });
+    for (const { id: qid } of systemQuestions) {
+      await this.deleteQuestionGraphInTx(tx, qid);
+    }
+    await tx.system.delete({ where: { id: systemId } });
+  }
+
+  /**
+   * Removes subtypes, their packages, user subscriptions, and linked payments so the product can be deleted.
+   */
+  private async deleteProductSubtypeCommercialChainInTx(
+    tx: Prisma.TransactionClient,
+    productId: string,
+  ): Promise<void> {
+    const subtypes = await tx.productSubtype.findMany({
+      where: { productId },
+      select: { id: true },
+    });
+    const subtypeIds = subtypes.map((s) => s.id);
+    if (subtypeIds.length === 0) return;
+
+    const packages = await tx.subscriptionPackage.findMany({
+      where: { productSubtypeId: { in: subtypeIds } },
+      select: { id: true },
+    });
+    const packageIds = packages.map((p) => p.id);
+
+    if (packageIds.length > 0) {
+      const subscriptions = await tx.subscription.findMany({
+        where: { subscriptionPackageId: { in: packageIds } },
+        select: { id: true },
+      });
+      const subscriptionIds = subscriptions.map((s) => s.id);
+
+      if (subscriptionIds.length > 0) {
+        const payments = await tx.payment.findMany({
+          where: { subscriptionId: { in: subscriptionIds } },
+          select: { id: true },
+        });
+        const paymentIds = payments.map((p) => p.id);
+        if (paymentIds.length > 0) {
+          await tx.promoCodeUsage.deleteMany({ where: { paymentId: { in: paymentIds } } });
+          await tx.walletTransaction.deleteMany({ where: { paymentId: { in: paymentIds } } });
+          await tx.refund.deleteMany({ where: { paymentId: { in: paymentIds } } });
+          await tx.payment.deleteMany({ where: { id: { in: paymentIds } } });
+        }
+        await tx.subscription.deleteMany({ where: { id: { in: subscriptionIds } } });
+      }
+      await tx.subscriptionFeatures.deleteMany({
+        where: { subscriptionPackageId: { in: packageIds } },
+      });
+      await tx.subscriptionPackage.deleteMany({ where: { id: { in: packageIds } } });
+    }
+
+    await tx.productSubtype.deleteMany({ where: { id: { in: subtypeIds } } });
+  }
+
+  /**
+   * Permanently removes a product and all nested systems → topics → subtopics → questions → choices (etc.).
+   */
+  async deleteProductTreeInTx(tx: Prisma.TransactionClient, productId: string): Promise<void> {
+    const systems = await tx.system.findMany({
+      where: { productId },
+      select: { id: true },
+    });
+    for (const { id: sid } of systems) {
+      await this.deleteSystemTreeInTx(tx, sid);
+    }
+
+    const productQuestions = await tx.question.findMany({
+      where: { productId },
+      select: { id: true },
+    });
+    for (const { id: qid } of productQuestions) {
+      await this.deleteQuestionGraphInTx(tx, qid);
+    }
+
+    await this.deleteProductSubtypeCommercialChainInTx(tx, productId);
+    await tx.product.delete({ where: { id: productId } });
+  }
+
+  async removePermanent(id: string) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) throw new NotFoundException(`Product with ID ${id} not found`);
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        await this.deleteProductTreeInTx(tx, id);
+      });
+      return { message: "Product permanently deleted with all nested content" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this product while it is still referenced outside the content tree (e.g. subscriptions).",
+        );
+      }
+      throw e;
+    }
+  }
+
   // ========== PRODUCT SUBTYPES ==========
   async findAllSubtypes(query: QueryProductSubtypeDto) {
     try {
@@ -285,6 +451,22 @@ export class ProductsService {
     const subtype = await this.prisma.productSubtype.findUnique({ where: { id } });
     if (!subtype) throw new NotFoundException(`Product subtype with ID ${id} not found`);
     return this.prisma.productSubtype.update({ where: { id }, data: { isActive: false } });
+  }
+
+  async removeSubtypePermanent(id: string) {
+    const subtype = await this.prisma.productSubtype.findUnique({ where: { id } });
+    if (!subtype) throw new NotFoundException(`Product subtype with ID ${id} not found`);
+    try {
+      await this.prisma.productSubtype.delete({ where: { id } });
+      return { message: "Product subtype permanently deleted" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this subtype while subscriptions or other records still reference it.",
+        );
+      }
+      throw e;
+    }
   }
 
   async getSubtypeStats() {

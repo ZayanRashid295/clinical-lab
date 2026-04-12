@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useProductSubtypes from "../../../hooks/useProductSubtypes";
 import useProductSubtypeStats from "../../../hooks/useProductSubtypeStats";
 import {
@@ -9,8 +9,11 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { productSubtypeTableConfig } from "../../config/tables/product-subtype-table.config";
 import ProductSubtypeFormModal from "./ProductSubtypeFormModal";
 import ProductSubtypeViewModal from "./ProductSubtypeViewModal";
+import { ProductSubtypesService } from "../../services/products/product-subtypes.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function ProductSubtypeManagementContent() {
+  const subtypesService = useMemo(() => new ProductSubtypesService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -116,6 +119,14 @@ export default function ProductSubtypeManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<ProductSubtype>({
+    entitySingular: "product subtype",
+    entityPlural: "product subtypes",
+    deactivate: (id) => subtypesService.delete(id),
+    deletePermanent: (id) => subtypesService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -134,6 +145,9 @@ export default function ProductSubtypeManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewSubtype}
       onEdit={handleEditSubtype}
+      onDeactivate={destructive.onDeactivate}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={ProductSubtypeFormModal}
       ViewModal={ProductSubtypeViewModal}
       formModalOpen={formModalOpen}

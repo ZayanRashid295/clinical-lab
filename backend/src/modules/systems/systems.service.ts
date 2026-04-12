@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateSystemDto } from "./dto/create-system.dto";
 import { UpdateSystemDto } from "./dto/update-system.dto";
@@ -147,5 +147,21 @@ export class SystemsService {
     const existing = await this.prisma.system.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`System with ID ${id} not found`);
     return this.prisma.system.update({ where: { id }, data: { isActive: false } });
+  }
+
+  async removeSystemPermanent(id: string) {
+    const existing = await this.prisma.system.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`System with ID ${id} not found`);
+    try {
+      await this.prisma.system.delete({ where: { id } });
+      return { message: "System permanently deleted" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this system while it is still referenced. Remove dependent records first.",
+        );
+      }
+      throw e;
+    }
   }
 }

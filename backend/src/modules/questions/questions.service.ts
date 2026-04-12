@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
@@ -825,6 +825,24 @@ export class QuestionsService {
       where: { id },
       data: { isActive: false },
     });
+  }
+
+  async removePermanent(id: string) {
+    const question = await this.prisma.question.findUnique({ where: { id } });
+    if (!question) {
+      throw new NotFoundException(`Question with ID ${id} not found`);
+    }
+    try {
+      await this.prisma.question.delete({ where: { id } });
+      return { message: "Question permanently deleted" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this question while it is still referenced. Remove dependent records first.",
+        );
+      }
+      throw e;
+    }
   }
 
   // ========== QUESTION CHOICES ==========

@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useSubtopics from "../../../hooks/useSubtopics";
 import { Subtopic, SubtopicQueryParams } from "../../types/content";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { subtopicTableConfig } from "../../config/tables/subtopic-table.config";
 import SubtopicFormModal from "./SubtopicFormModal";
 import SubtopicViewModal from "./SubtopicViewModal";
+import { SubtopicsService } from "../../services/content/subtopics.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function SubtopicManagementContent() {
+  const subtopicsService = useMemo(() => new SubtopicsService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -31,10 +34,19 @@ export default function SubtopicManagementContent() {
 
   const configWithHandlers = { ...subtopicTableConfig, onAdd: () => { setFormMode("create"); setSelectedSubtopic(null); setFormModalOpen(true); } };
 
+  const destructive = useContentManagementDestructiveActions<Subtopic>({
+    entitySingular: "subtopic",
+    entityPlural: "subtopics",
+    deactivate: (id) => subtopicsService.delete(id),
+    deletePermanent: (id) => subtopicsService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent config={configWithHandlers} data={subtopics} loading={loading} error={error} pagination={pagination} filters={filters}
       onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange}
       onSortChange={handleSortChange} onRefresh={handleRefresh} onView={handleView} onEdit={handleEdit}
+      onDeactivate={destructive.onDeactivate} onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={SubtopicFormModal} ViewModal={SubtopicViewModal} formModalOpen={formModalOpen} viewModalOpen={viewModalOpen}
       selectedItem={selectedSubtopic} formMode={formMode} onCloseFormModal={handleCloseFormModal} onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleItemSaved} getFormModalProps={getFormModalProps} getViewModalProps={getViewModalProps} />

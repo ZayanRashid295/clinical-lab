@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTheme } from "../../../hooks/useTheme";
 import useCategories from "../../../hooks/useCategories";
 import useCategoryStats from "../../../hooks/useCategoryStats";
@@ -7,9 +7,12 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { categoryTableConfig } from "../../config/tables/category-table.config";
 import CategoryFormModal from "./CategoryFormModal";
 import CategoryViewModal from "./CategoryViewModal";
+import { CategoriesService } from "../../services/categories/categories.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function CategoryManagementContent() {
   const { config } = useTheme();
+  const categoriesService = useMemo(() => new CategoriesService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -115,6 +118,14 @@ export default function CategoryManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<Category>({
+    entitySingular: "category",
+    entityPlural: "categories",
+    deactivate: (id) => categoriesService.delete(id),
+    deletePermanent: (id) => categoriesService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -133,6 +144,9 @@ export default function CategoryManagementContent() {
       onRefresh={handleRefresh}
       onView={handleView}
       onEdit={handleEdit}
+      onDeactivate={destructive.onDeactivate}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={CategoryFormModal}
       ViewModal={CategoryViewModal}
       formModalOpen={formModalOpen}

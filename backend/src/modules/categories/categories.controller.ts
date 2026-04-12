@@ -70,6 +70,14 @@ export class CategoriesController {
     return this.categoriesService.update(id, updateDto);
   }
 
+  @Delete("permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete category" })
+  async removePermanent(@Param("id") id: string) {
+    return this.categoriesService.removePermanent(id);
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

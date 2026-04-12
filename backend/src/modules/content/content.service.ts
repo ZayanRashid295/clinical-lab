@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateTopicDto } from "./dto/create-topic.dto";
 import { UpdateTopicDto } from "./dto/update-topic.dto";
@@ -160,6 +160,22 @@ export class ContentService {
     const topic = await this.prisma.topic.findUnique({ where: { id } });
     if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
     return this.prisma.topic.update({ where: { id }, data: { isActive: false } });
+  }
+
+  async removeTopicPermanent(id: string) {
+    const topic = await this.prisma.topic.findUnique({ where: { id } });
+    if (!topic) throw new NotFoundException(`Topic with ID ${id} not found`);
+    try {
+      await this.prisma.topic.delete({ where: { id } });
+      return { message: "Topic permanently deleted" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this topic while it is still referenced. Remove dependent records first.",
+        );
+      }
+      throw e;
+    }
   }
 
   // ========== SUBTOPICS (was Topics) ==========
@@ -336,5 +352,21 @@ export class ContentService {
     const subtopic = await this.prisma.subtopic.findUnique({ where: { id } });
     if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
     return this.prisma.subtopic.update({ where: { id }, data: { isActive: false } });
+  }
+
+  async removeSubtopicPermanent(id: string) {
+    const subtopic = await this.prisma.subtopic.findUnique({ where: { id } });
+    if (!subtopic) throw new NotFoundException(`Subtopic with ID ${id} not found`);
+    try {
+      await this.prisma.subtopic.delete({ where: { id } });
+      return { message: "Subtopic permanently deleted" };
+    } catch (e: any) {
+      if (e?.code === "P2003" || e?.code === "P2014") {
+        throw new ConflictException(
+          "Cannot delete this subtopic while it is still referenced. Remove dependent records first.",
+        );
+      }
+      throw e;
+    }
   }
 }

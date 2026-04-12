@@ -87,6 +87,13 @@ export abstract class BaseDataService<T, TQueryParams extends Record<string, any
   }
 
   /**
+   * Permanently remove an item (hard delete). Backend route: DELETE {endpoint}/permanent/:id
+   */
+  async deletePermanent(id: string): Promise<{ message: string }> {
+    return super.delete(`${this.endpoint}/permanent/${id}`);
+  }
+
+  /**
    * Get statistics (optional - override in subclasses if needed)
    */
   async getStats?(): Promise<any> {

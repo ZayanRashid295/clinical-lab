@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useTopics from "../../../hooks/useTopics";
 import useTopicStats from "../../../hooks/useTopicStats";
 import { Topic, TopicQueryParams } from "../../types/content";
@@ -7,8 +7,10 @@ import { topicTableConfig } from "../../config/tables/topic-table.config";
 import TopicFormModal from "./TopicFormModal";
 import TopicViewModal from "./TopicViewModal";
 import { TopicsService } from "../../services/content/topics.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function TopicManagementContent() {
+  const topicsService = useMemo(() => new TopicsService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -114,6 +116,14 @@ export default function TopicManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<Topic>({
+    entitySingular: "topic",
+    entityPlural: "topics",
+    deactivate: (id) => topicsService.delete(id),
+    deletePermanent: (id) => topicsService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -132,6 +142,9 @@ export default function TopicManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewTopic}
       onEdit={handleEditTopic}
+      onDeactivate={destructive.onDeactivate}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={TopicFormModal}
       ViewModal={TopicViewModal}
       formModalOpen={formModalOpen}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTheme } from "../../../hooks/useTheme";
 import useProducts from "../../../hooks/useProducts";
 import useProductStats from "../../../hooks/useProductStats";
@@ -7,8 +7,11 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { productTableConfig } from "../../config/tables/product-table.config";
 import ProductFormModal from "./ProductFormModal";
 import ProductViewModal from "./ProductViewModal";
+import { ProductsService } from "../../services/products/products.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function ProductManagementContent() {
+  const productsService = useMemo(() => new ProductsService(), []);
   const { config } = useTheme();
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -115,6 +118,14 @@ export default function ProductManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<Product>({
+    entitySingular: "product",
+    entityPlural: "products",
+    deactivate: (id) => productsService.delete(id),
+    deletePermanent: (id) => productsService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -133,6 +144,9 @@ export default function ProductManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewProduct}
       onEdit={handleEditProduct}
+      onDeactivate={destructive.onDeactivate}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={ProductFormModal}
       ViewModal={ProductViewModal}
       formModalOpen={formModalOpen}

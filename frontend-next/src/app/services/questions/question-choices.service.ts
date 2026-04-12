@@ -61,6 +61,11 @@ export class QuestionChoicesService extends BaseDataService<
     return this.delete(id);
   }
 
+  /** Choices are removed from the database immediately (no soft-delete). */
+  async deletePermanent(id: string): Promise<{ message: string }> {
+    return this.delete(id);
+  }
+
   /**
    * Get question choice statistics
    */

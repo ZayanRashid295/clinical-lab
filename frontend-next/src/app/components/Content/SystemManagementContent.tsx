@@ -1,13 +1,16 @@
 // SystemManagementContent - Manages Systems (children of Products, parents of Topics)
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useSystems from "../../../hooks/useSystems";
 import { System, SystemQueryParams } from "../../types/content";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { systemTableConfig } from "../../config/tables/system-table.config";
 import SystemFormModal from "./SystemFormModal";
 import SystemViewModal from "./SystemViewModal";
+import { SystemsService } from "../../services/systems/systems.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function SystemManagementContent() {
+  const systemsService = useMemo(() => new SystemsService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -32,10 +35,19 @@ export default function SystemManagementContent() {
 
   const configWithHandlers = { ...systemTableConfig, onAdd: () => { setFormMode("create"); setSelectedSystem(null); setFormModalOpen(true); } };
 
+  const destructive = useContentManagementDestructiveActions<System>({
+    entitySingular: "system",
+    entityPlural: "systems",
+    deactivate: (id) => systemsService.delete(id),
+    deletePermanent: (id) => systemsService.deletePermanent(id),
+    refetch,
+  });
+
   return (
     <DataManagementContent config={configWithHandlers} data={systems} loading={loading} error={error} pagination={pagination} filters={filters}
       onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange}
       onSortChange={handleSortChange} onRefresh={handleRefresh} onView={handleView} onEdit={handleEdit}
+      onDeactivate={destructive.onDeactivate} onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={SystemFormModal} ViewModal={SystemViewModal} formModalOpen={formModalOpen} viewModalOpen={viewModalOpen}
       selectedItem={selectedSystem} formMode={formMode} onCloseFormModal={handleCloseFormModal} onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleItemSaved} getFormModalProps={getFormModalProps} getViewModalProps={getViewModalProps} />

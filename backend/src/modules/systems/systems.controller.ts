@@ -75,6 +75,14 @@ export class SystemsController {
     return this.systemsService.updateSystem(id, updateDto);
   }
 
+  @Delete("permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete system" })
+  async removePermanent(@Param("id") id: string) {
+    return this.systemsService.removeSystemPermanent(id);
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

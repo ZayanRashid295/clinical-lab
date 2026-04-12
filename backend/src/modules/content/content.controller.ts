@@ -64,6 +64,14 @@ export class ContentController {
     return this.contentService.updateTopic(id, updateDto);
   }
 
+  @Delete("topics/permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete topic" })
+  async removeTopicPermanent(@Param("id") id: string) {
+    return this.contentService.removeTopicPermanent(id);
+  }
+
   @Delete("topics/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -125,6 +133,14 @@ export class ContentController {
   @ApiOperation({ summary: "Update subtopic" })
   async updateSubtopic(@Param("id") id: string, @Body() updateDto: UpdateSubtopicDto) {
     return this.contentService.updateSubtopic(id, updateDto);
+  }
+
+  @Delete("subtopics/permanent/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Permanently delete subtopic" })
+  async removeSubtopicPermanent(@Param("id") id: string) {
+    return this.contentService.removeSubtopicPermanent(id);
   }
 
   @Delete("subtopics/:id")

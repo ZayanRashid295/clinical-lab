@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useQuestionChoices from "../../../hooks/useQuestionChoices";
 import useQuestionChoiceStats from "../../../hooks/useQuestionChoiceStats";
 import {
@@ -9,8 +9,11 @@ import DataManagementContent from "../../../shared/components/DataTable/DataMana
 import { questionChoiceTableConfig } from "../../config/tables/question-choice-table.config";
 import QuestionChoiceFormModal from "./QuestionChoiceFormModal";
 import QuestionChoiceViewModal from "./QuestionChoiceViewModal";
+import { QuestionChoicesService } from "../../services/questions/question-choices.service";
+import { useContentManagementDestructiveActions } from "../../../hooks/useContentManagementDestructiveActions";
 
 export default function QuestionChoiceManagementContent() {
+  const choicesService = useMemo(() => new QuestionChoicesService(), []);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -119,6 +122,14 @@ export default function QuestionChoiceManagementContent() {
     },
   };
 
+  const destructive = useContentManagementDestructiveActions<QuestionChoice>({
+    entitySingular: "question choice",
+    entityPlural: "question choices",
+    deletePermanent: (id) => choicesService.deletePermanent(id),
+    refetch,
+    skipDeactivate: true,
+  });
+
   return (
     <DataManagementContent
       config={configWithHandlers}
@@ -137,6 +148,9 @@ export default function QuestionChoiceManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewQuestionChoice}
       onEdit={handleEditQuestionChoice}
+      showDeactivateAction={false}
+      onDeletePermanent={destructive.onDeletePermanent}
+      onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={QuestionChoiceFormModal}
       ViewModal={QuestionChoiceViewModal}
       formModalOpen={formModalOpen}
