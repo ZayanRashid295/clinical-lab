@@ -260,7 +260,7 @@ export default function AdminSimplePage() {
 
   useEffect(() => {
     if (!authService.isAuthenticated()) {
-      router.replace("/login");
+      router.replace("/");
     } else {
       setIsLoading(false);
     }

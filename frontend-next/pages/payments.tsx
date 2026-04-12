@@ -10,7 +10,7 @@ export default function Payments() {
   useEffect(() => {
     // Check authentication status
     if (!authService.isAuthenticated()) {
-      router.replace("/login");
+      router.replace("/");
     } else {
       setIsLoading(false);
     }

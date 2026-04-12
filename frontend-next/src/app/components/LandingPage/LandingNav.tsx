@@ -19,9 +19,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 interface LandingNavProps {
   onLoginClick?: () => void;
+  /** Opens the auth modal on the sign-up tab (creates a user via API). */
+  onSignupClick?: () => void;
 }
 
-export function LandingNav({ onLoginClick }: LandingNavProps) {
+export function LandingNav({ onLoginClick, onSignupClick }: LandingNavProps) {
   const router = useRouter();
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -94,17 +96,17 @@ export function LandingNav({ onLoginClick }: LandingNavProps) {
     if (onLoginClick) {
       onLoginClick();
     } else {
-      // Navigate to login page in Next.js
-      window.location.href = "/login";
+      void router.push("/auth");
     }
   };
 
   const handleSignup = () => {
-    if (onLoginClick) {
+    if (onSignupClick) {
+      onSignupClick();
+    } else if (onLoginClick) {
       onLoginClick();
     } else {
-      // Navigate to login page in Next.js
-      window.location.href = "/login";
+      void router.push("/auth?mode=signup");
     }
   };
 

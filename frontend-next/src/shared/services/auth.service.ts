@@ -131,8 +131,62 @@ export class AuthService extends BaseApiService {
     });
   }
 
-  async register(userData: any): Promise<any> {
-    return this.post("/auth/register", userData);
+  /**
+   * Create a new user via POST /auth/register (persists to DB).
+   * Does not set session — call login() after success if you need a token.
+   */
+  async register(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+  }): Promise<any> {
+    const url = `${this.baseURL}/auth/register`;
+    const body = {
+      email: userData.email.trim(),
+      password: userData.password,
+      firstName: userData.firstName.trim(),
+      lastName: userData.lastName.trim(),
+      ...(userData.phone?.trim() ? { phone: userData.phone.trim() } : {}),
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    let responseData: Record<string, unknown> = {};
+    try {
+      responseData = await response.json();
+    } catch {
+      responseData = {};
+    }
+
+    if (!response.ok) {
+      const raw = responseData.message;
+      const message = Array.isArray(raw)
+        ? raw.join(". ")
+        : typeof raw === "string"
+          ? raw
+          : `Registration failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    return responseData;
+  }
+
+  /** Register then sign in (same as login() side effects: token + userData in localStorage). */
+  async registerAndSignIn(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+  }): Promise<any> {
+    await this.register(userData);
+    return this.login(userData.email, userData.password);
   }
 
   async getProfile(): Promise<any> {

@@ -1582,122 +1582,131 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         </div>
       ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader ? (
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-          {/* Questions List */}
+          {/* Toolbar: always show on list view so Create / Select stay available with zero questions */}
+          <div className="mb-4 flex flex-nowrap items-center justify-between gap-3 min-w-0 pt-1">
+            <p className="text-sm text-muted-foreground dark:text-gray-400 min-w-0 shrink">
+              {questions.length === 0
+                ? "No questions yet"
+                : filteredQuestions.length === 0
+                  ? "No questions match your search"
+                  : `Showing ${filteredQuestions.length} of ${questions.length} questions`}
+            </p>
+            <div className="flex flex-nowrap items-center gap-3 sm:gap-4 shrink-0 pl-2">
+              <div className="relative isolate" ref={menuRef}>
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => setShowNewQuestionMenu(!showNewQuestionMenu)}
+                  className="bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 ring-1 ring-primary/40 ring-offset-2 ring-offset-background hover:shadow-lg hover:shadow-primary/25 dark:ring-offset-gray-900"
+                >
+                  + New Question
+                </Button>
+                {showNewQuestionMenu && (
+                  <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        onClick={handleBulkUploadMarkdown}
+                        className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Upload Markdown Questions
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleBulkUploadDocx}
+                        className="text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors w-full"
+                      >
+                        Upload DOCX Questions
+                      </button>
+                      <div className="border-t border-border dark:border-gray-700 my-1" />
+                      <button
+                        type="button"
+                        onClick={handleCreateManually}
+                        className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                      >
+                        ✏️ Create Question Manually
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {!isSelectMode ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsSelectMode(true)
+                    setSelectedQuestionIds([])
+                  }}
+                  className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700"
+                >
+                  Select
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsSelectMode(false)
+                      setSelectedQuestionIds([])
+                    }}
+                    className="border-border dark:border-gray-700 text-foreground dark:text-gray-100"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={selectedQuestionIds.length === 0}
+                    onClick={() => handleBulkDeleteQuestions(selectedQuestionIds)}
+                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-300 dark:border-red-800 disabled:opacity-50"
+                  >
+                    Delete selected ({selectedQuestionIds.length})
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
           {filteredQuestions.length === 0 ? (
             <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
               <div className="text-center">
                 <p className="text-muted-foreground dark:text-gray-400 mb-4">
-                  {questions.length === 0 ? "No questions created yet" : "No questions match your search"}
+                  {questions.length === 0
+                    ? "Get started by creating a question or uploading a batch."
+                    : "Try adjusting your search."}
                 </p>
-                <Button onClick={handleCreateManually} variant="outline" className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700">
-                  {questions.length === 0 ? "Create First Question" : "New Question"}
+                <Button
+                  onClick={handleCreateManually}
+                  variant="outline"
+                  className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700"
+                >
+                  {questions.length === 0 ? "Create first question" : "New question"}
                 </Button>
               </div>
             </Card>
           ) : (
-            <>
-              <div className="mb-4 flex flex-nowrap items-center justify-between gap-3 min-w-0 pt-1">
-                <p className="text-sm text-muted-foreground dark:text-gray-400 min-w-0 shrink">
-                  Showing {filteredQuestions.length} of {questions.length} questions
-                </p>
-                <div className="flex flex-nowrap items-center gap-3 sm:gap-4 shrink-0 pl-2">
-                  <div className="relative isolate" ref={menuRef}>
-                    <Button
-                      type="button"
-                      size="lg"
-                      onClick={() => setShowNewQuestionMenu(!showNewQuestionMenu)}
-                      className="bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 ring-1 ring-primary/40 ring-offset-2 ring-offset-background hover:shadow-lg hover:shadow-primary/25 dark:ring-offset-gray-900"
-                    >
-                      + New Question
-                    </Button>
-                    {showNewQuestionMenu && (
-                      <div className="absolute right-0 mt-2 w-56 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
-                        <div className="py-1">
-                          <button
-                            type="button"
-                            onClick={handleBulkUploadMarkdown}
-                            className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                          >
-                            Upload Markdown Questions
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleBulkUploadDocx}
-                            className="text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors w-full"
-                          >
-                            Upload DOCX Questions
-                          </button>
-                          <div className="border-t border-border dark:border-gray-700 my-1" />
-                          <button
-                            type="button"
-                            onClick={handleCreateManually}
-                            className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
-                          >
-                            ✏️ Create Question Manually
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {!isSelectMode ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setIsSelectMode(true)
-                        setSelectedQuestionIds([])
-                      }}
-                      className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700"
-                    >
-                      Select
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setIsSelectMode(false)
-                          setSelectedQuestionIds([])
-                        }}
-                        className="border-border dark:border-gray-700 text-foreground dark:text-gray-100"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={selectedQuestionIds.length === 0}
-                        onClick={() => handleBulkDeleteQuestions(selectedQuestionIds)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-300 dark:border-red-800 disabled:opacity-50"
-                      >
-                        Delete selected ({selectedQuestionIds.length})
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-              <QuestionList
-                questions={filteredQuestions}
-                onEdit={(id: string) => {
-                  setEditingId(id)
-                  setViewingId(null)
-                  setShowNewQuestion(false)
-                }}
-                onView={(id: string) => {
-                  setViewingId(id)
-                  setEditingId(null)
-                  setShowNewQuestion(false)
-                }}
-                onDelete={handleDeleteQuestion}
-                selectionMode={isSelectMode}
-                selectedIds={selectedQuestionIds}
-                onSelectionChange={setSelectedQuestionIds}
-              />
-            </>
+            <QuestionList
+              questions={filteredQuestions}
+              onEdit={(id: string) => {
+                setEditingId(id)
+                setViewingId(null)
+                setShowNewQuestion(false)
+              }}
+              onView={(id: string) => {
+                setViewingId(id)
+                setEditingId(null)
+                setShowNewQuestion(false)
+              }}
+              onDelete={handleDeleteQuestion}
+              selectionMode={isSelectMode}
+              selectedIds={selectedQuestionIds}
+              onSelectionChange={setSelectedQuestionIds}
+            />
           )}
         </div>
       ) : null}

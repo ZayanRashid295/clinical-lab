@@ -256,7 +256,7 @@ export default function AdminPage() {
   useEffect(() => {
     const checkAccess = async () => {
       if (!authService.isAuthenticated()) {
-        router.replace("/login");
+        router.replace("/");
         return;
       }
 

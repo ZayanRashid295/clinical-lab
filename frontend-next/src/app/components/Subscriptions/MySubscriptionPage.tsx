@@ -52,7 +52,7 @@ export default function MySubscriptionPage() {
   useEffect(() => {
     // Check authentication
     if (!authService.isAuthenticated()) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     loadData();

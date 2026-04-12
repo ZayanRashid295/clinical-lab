@@ -7,7 +7,6 @@ import { LandingNav } from "./LandingNav";
 import { HeroCarousel } from "./HeroCarousel";
 import { FeatureCard } from "./FeatureCard";
 import { PricingCard } from "./PricingCard";
-import { LoginModal } from "./LoginModal";
 import { VideoModal } from "./VideoModal";
 import { SettingsButton } from "@/shared/components/Settings/SettingsButton";
 import MenuLayoutSettings from "@/shared/components/Settings/MenuLayoutSettings";
@@ -464,11 +463,9 @@ function HowItWorksSection2() {
 
 export function LandingPage() {
   const router = useRouter();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pendingPackageId, setPendingPackageId] = useState<string | null>(null);
 
   // Check authentication status
   useEffect(() => {
@@ -495,24 +492,19 @@ export function LandingPage() {
     };
   }, []);
 
-  const handleOpenLoginModal = (packageId?: string) => {
-    if (packageId) {
-      setPendingPackageId(packageId);
-    }
-    setIsLoginModalOpen(true);
-  };
-
-  const handleCloseLoginModal = () => {
-    setIsLoginModalOpen(false);
-    // Note: Redirect is handled in LoginModal after successful login
-    // This just closes the modal
+  const goToAuth = (opts?: { mode?: "login" | "signup"; packageId?: string }) => {
+    const q: Record<string, string> = {};
+    if (opts?.mode === "signup") q.mode = "signup";
+    if (opts?.packageId) q.packageId = opts.packageId;
+    const search = new URLSearchParams(q).toString();
+    void router.push(search ? `/auth?${search}` : "/auth");
   };
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
       router.push("/dashboard");
     } else {
-      handleOpenLoginModal();
+      goToAuth();
     }
   };
 
@@ -520,7 +512,7 @@ export function LandingPage() {
     if (isAuthenticated) {
       router.push(`/checkout-basic?packageId=${packageId}`);
     } else {
-      handleOpenLoginModal(packageId);
+      goToAuth({ packageId });
     }
   };
 
@@ -577,9 +569,9 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <LandingNav 
-        onLoginClick={handleOpenLoginModal}
-        key={isLoginModalOpen ? "open" : "closed"} // Force re-render when modal state changes
+      <LandingNav
+        onLoginClick={() => goToAuth()}
+        onSignupClick={() => goToAuth({ mode: "signup" })}
       />
 
       <main className="flex-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -637,7 +629,7 @@ export function LandingPage() {
             </div>
 
             <PricingGrid
-              onLoginClick={handleOpenLoginModal}
+              onLoginClick={() => goToAuth()}
               onPackageSelect={handlePackageSelect}
               isAuthenticated={isAuthenticated}
             />
@@ -671,11 +663,6 @@ export function LandingPage() {
         </div>
       </footer>
 
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={handleCloseLoginModal}
-        pendingPackageId={pendingPackageId}
-      />
       <VideoModal
         isOpen={isVideoModalOpen}
         onClose={handleCloseVideoModal}

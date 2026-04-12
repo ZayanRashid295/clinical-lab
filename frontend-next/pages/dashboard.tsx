@@ -23,7 +23,7 @@ function DashboardContent() {
     const checkSubscription = async () => {
       // Check authentication status
       if (!authService.isAuthenticated()) {
-        router.replace("/login");
+        router.replace("/");
         return;
       }
 

@@ -11,7 +11,7 @@ export default function Invoices() {
   useEffect(() => {
     // Check authentication status
     if (!authService.isAuthenticated()) {
-      router.replace("/login");
+      router.replace("/");
     } else {
       setIsLoading(false);
     }

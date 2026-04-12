@@ -12,7 +12,7 @@ export default function MySubscription() {
   useEffect(() => {
     // Check authentication status
     if (!authService.isAuthenticated()) {
-      router.replace("/login");
+      router.replace("/");
     } else {
       setIsLoading(false);
     }

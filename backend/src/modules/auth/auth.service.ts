@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  ConflictException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import * as bcrypt from "bcryptjs";
@@ -27,7 +32,8 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
+    const email = loginDto.email.trim().toLowerCase();
+    const user = await this.validateUser(email, loginDto.password);
     if (!user) {
       throw new UnauthorizedException("Invalid credentials");
     }
@@ -53,33 +59,34 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    // Validate email format
-    if (!this.isValidEmail(registerDto.email)) {
-      throw new Error("Invalid email format");
+    const email = registerDto.email.trim().toLowerCase();
+    if (!this.isValidEmail(email)) {
+      throw new BadRequestException("Invalid email format");
     }
 
-    // Validate password strength
     if (!this.isValidPassword(registerDto.password)) {
-      throw new Error(
-        "Password must be at least 8 characters long and contain at least one letter and one number"
+      throw new BadRequestException(
+        "Password must be at least 8 characters and include at least one letter and one number"
       );
     }
 
-    // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: registerDto.email },
+      where: { email },
     });
 
     if (existingUser) {
-      throw new Error("User with this email already exists");
+      throw new ConflictException("An account with this email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
+    const phoneTrimmed = registerDto.phone?.trim();
     const user = await this.prisma.user.create({
       data: {
-        ...registerDto,
+        email,
+        firstName: registerDto.firstName.trim(),
+        lastName: registerDto.lastName.trim(),
         password: hashedPassword,
+        ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
       },
     });
 

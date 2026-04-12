@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: "/login", destination: "/", permanent: true },
+    ];
+  },
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
