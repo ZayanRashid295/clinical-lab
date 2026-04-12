@@ -100,8 +100,8 @@ export class SubscriptionsController {
   @Delete("packages/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate subscription package (Admin only)" })
-  @ApiResponse({ status: 200, description: "Package deactivated successfully" })
+  @ApiOperation({ summary: "Mark subscription package as inactive (Admin only)" })
+  @ApiResponse({ status: 200, description: "Package marked inactive successfully" })
   @ApiResponse({ status: 404, description: "Package not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async removePackage(@Param("id") id: string) {
@@ -306,8 +306,8 @@ export class SubscriptionsController {
   @Delete("features/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate package feature (Admin only)" })
-  @ApiResponse({ status: 200, description: "Feature deactivated successfully" })
+  @ApiOperation({ summary: "Mark package feature as inactive (Admin only)" })
+  @ApiResponse({ status: 200, description: "Feature marked inactive successfully" })
   @ApiResponse({ status: 404, description: "Feature not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async removeFeature(@Param("id") id: string) {

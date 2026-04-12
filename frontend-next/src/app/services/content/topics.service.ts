@@ -42,10 +42,6 @@ export class TopicsService extends BaseDataService<
     return this.update(id, topicData);
   }
 
-  async deactivateTopic(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
   async getTopicStats(): Promise<{
     total: number;
     active: number;

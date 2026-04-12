@@ -42,10 +42,6 @@ export class SystemsService extends BaseDataService<
     return this.update(id, data);
   }
 
-  async deactivateSystem(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
   async getSystemStats(): Promise<{
     total: number;
     active: number;

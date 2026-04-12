@@ -1240,13 +1240,13 @@ export default function BulkMarkdownUploader({
     try {
       const { type, fileName, id, systemId } = deleteConfirm
       if (type === "category") {
-        await categoriesService.deactivateCategory(id)
+        await categoriesService.delete(id)
         const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
         const data = Array.isArray(list) ? list : (list as any)?.data || []
         setCategories(data)
         updateQuestionMetadata(fileName, { categoryId: "", categoryName: "" })
       } else if (type === "product") {
-        await productsService.deactivateProduct(id)
+        await productsService.delete(id)
         const list: any = await productsService.getProducts({ status: "ACTIVE" })
         const data = Array.isArray(list) ? list : (list as any)?.data || []
         setProducts(data)
@@ -2320,7 +2320,7 @@ export default function BulkMarkdownUploader({
             <AlertDialogDescription>
               {deleteConfirm && (
                 <>
-                  Do you want to delete &quot;{deleteConfirm.name}&quot;? This will deactivate it in the database.
+                  Do you want to delete &quot;{deleteConfirm.name}&quot;? This will mark it inactive in the database.
                 </>
               )}
             </AlertDialogDescription>

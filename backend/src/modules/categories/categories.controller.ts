@@ -81,7 +81,7 @@ export class CategoriesController {
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate category" })
+  @ApiOperation({ summary: "Mark category as inactive" })
   async remove(@Param("id") id: string) {
     return this.categoriesService.remove(id);
   }

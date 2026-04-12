@@ -133,7 +133,7 @@ Authorization: Bearer <your-jwt-token>
 - `GET /users` - Get all users
 - `GET /users/:id` - Get user by ID
 - `PATCH /users/:id` - Update user
-- `DELETE /users/:id` - Deactivate user
+- `DELETE /users/:id` - Mark user inactive
 
 ### Rides
 - `POST /rides` - Create ride request

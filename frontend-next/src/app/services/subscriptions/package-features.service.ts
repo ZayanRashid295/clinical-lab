@@ -55,13 +55,6 @@ export class PackageFeaturesService extends BaseDataService<
   }
 
   /**
-   * Deactivate a package feature (soft delete)
-   */
-  async deactivateFeature(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get feature statistics
    */
   async getFeatureStats(): Promise<{

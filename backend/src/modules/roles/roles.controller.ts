@@ -82,8 +82,8 @@ export class RolesController {
   }
 
   @Delete(":id")
-  @ApiOperation({ summary: "Deactivate role" })
-  @ApiResponse({ status: 200, description: "Role deactivated successfully" })
+  @ApiOperation({ summary: "Mark role as inactive" })
+  @ApiResponse({ status: 200, description: "Role marked inactive successfully" })
   @ApiResponse({ status: 404, description: "Role not found" })
   remove(@Param("id") id: string) {
     return this.rolesService.remove(id);

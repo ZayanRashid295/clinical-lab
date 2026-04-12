@@ -55,13 +55,6 @@ export class SubscriptionPackagesService extends BaseDataService<
   }
 
   /**
-   * Deactivate a subscription package (soft delete)
-   */
-  async deactivatePackage(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get package statistics
    */
   async getPackageStats(): Promise<{

@@ -119,7 +119,6 @@ export default function TopicManagementContent() {
   const destructive = useContentManagementDestructiveActions<Topic>({
     entitySingular: "topic",
     entityPlural: "topics",
-    deactivate: (id) => topicsService.delete(id),
     deletePermanent: (id) => topicsService.deletePermanent(id),
     refetch,
   });
@@ -142,7 +141,6 @@ export default function TopicManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewTopic}
       onEdit={handleEditTopic}
-      onDeactivate={destructive.onDeactivate}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={TopicFormModal}

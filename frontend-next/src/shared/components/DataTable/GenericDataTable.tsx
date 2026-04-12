@@ -9,7 +9,6 @@ import {
   ArrowDown,
   Users,
   Trash2,
-  Ban,
 } from "lucide-react";
 import { GenericDataTableProps, ColumnConfig } from "./types";
 
@@ -31,7 +30,6 @@ function GenericDataTable<T extends { id: string }>({
   onView,
   onEdit,
   onDelete,
-  onDeactivate,
   onDeletePermanent,
   selectionMode = false,
   selectedIds = [],
@@ -80,7 +78,6 @@ function GenericDataTable<T extends { id: string }>({
     onView ||
     onEdit ||
     onDelete ||
-    onDeactivate ||
     onDeletePermanent ||
     customActions.length > 0;
 
@@ -261,17 +258,6 @@ function GenericDataTable<T extends { id: string }>({
                           >
                             <Edit size={16} />
                             Edit
-                          </button>
-                        )}
-                        {onDeactivate && (
-                          <button
-                            type="button"
-                            onClick={() => onDeactivate(row)}
-                            className="text-amber-700 hover:text-amber-900 flex items-center gap-1"
-                            title="Deactivate (hide)"
-                          >
-                            <Ban size={16} />
-                            Deactivate
                           </button>
                         )}
                         {onDeletePermanent && (

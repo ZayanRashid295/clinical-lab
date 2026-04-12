@@ -324,8 +324,8 @@ export class QuestionsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate question (Admin only)" })
-  @ApiResponse({ status: 200, description: "Question deactivated successfully" })
+  @ApiOperation({ summary: "Mark question as inactive (Admin only)" })
+  @ApiResponse({ status: 200, description: "Question marked inactive successfully" })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async remove(@Param("id") id: string) {

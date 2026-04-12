@@ -50,13 +50,6 @@ export class QuestionsService extends BaseDataService<
   }
 
   /**
-   * Deactivate a question (soft delete)
-   */
-  async deactivateQuestion(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get question statistics
    */
   async getQuestionStats(): Promise<{

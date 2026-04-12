@@ -55,13 +55,6 @@ export class ProductsService extends BaseDataService<
   }
 
   /**
-   * Deactivate a product (soft delete)
-   */
-  async deactivateProduct(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get product statistics
    */
   async getProductStats(): Promise<{

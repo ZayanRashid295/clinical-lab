@@ -86,7 +86,7 @@ export class SystemsController {
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate system" })
+  @ApiOperation({ summary: "Mark system as inactive" })
   async remove(@Param("id") id: string) {
     return this.systemsService.removeSystem(id);
   }

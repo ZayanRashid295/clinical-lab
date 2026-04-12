@@ -38,7 +38,6 @@ export default function SystemManagementContent() {
   const destructive = useContentManagementDestructiveActions<System>({
     entitySingular: "system",
     entityPlural: "systems",
-    deactivate: (id) => systemsService.delete(id),
     deletePermanent: (id) => systemsService.deletePermanent(id),
     refetch,
   });
@@ -47,7 +46,7 @@ export default function SystemManagementContent() {
     <DataManagementContent config={configWithHandlers} data={systems} loading={loading} error={error} pagination={pagination} filters={filters}
       onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange}
       onSortChange={handleSortChange} onRefresh={handleRefresh} onView={handleView} onEdit={handleEdit}
-      onDeactivate={destructive.onDeactivate} onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
+      onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={SystemFormModal} ViewModal={SystemViewModal} formModalOpen={formModalOpen} viewModalOpen={viewModalOpen}
       selectedItem={selectedSystem} formMode={formMode} onCloseFormModal={handleCloseFormModal} onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleItemSaved} getFormModalProps={getFormModalProps} getViewModalProps={getViewModalProps} />

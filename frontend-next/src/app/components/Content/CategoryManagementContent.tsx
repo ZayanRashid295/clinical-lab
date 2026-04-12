@@ -121,7 +121,6 @@ export default function CategoryManagementContent() {
   const destructive = useContentManagementDestructiveActions<Category>({
     entitySingular: "category",
     entityPlural: "categories",
-    deactivate: (id) => categoriesService.delete(id),
     deletePermanent: (id) => categoriesService.deletePermanent(id),
     refetch,
   });
@@ -144,7 +143,6 @@ export default function CategoryManagementContent() {
       onRefresh={handleRefresh}
       onView={handleView}
       onEdit={handleEdit}
-      onDeactivate={destructive.onDeactivate}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={CategoryFormModal}

@@ -127,7 +127,6 @@ export default function QuestionChoiceManagementContent() {
     entityPlural: "question choices",
     deletePermanent: (id) => choicesService.deletePermanent(id),
     refetch,
-    skipDeactivate: true,
   });
 
   return (
@@ -148,7 +147,6 @@ export default function QuestionChoiceManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewQuestionChoice}
       onEdit={handleEditQuestionChoice}
-      showDeactivateAction={false}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={QuestionChoiceFormModal}

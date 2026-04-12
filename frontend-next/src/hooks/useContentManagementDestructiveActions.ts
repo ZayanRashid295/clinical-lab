@@ -5,17 +5,13 @@ import { useToast } from "@/shared/ui/use-toast";
 export interface ContentDestructiveOptions<T extends { id: string }> {
   entitySingular: string;
   entityPlural: string;
-  /** Soft-deactivate (sets inactive). Omit when `skipDeactivate` is true. */
-  deactivate?: (id: string) => Promise<unknown>;
   deletePermanent: (id: string) => Promise<unknown>;
   refetch: () => void | Promise<void>;
-  /** Question choices have no soft-deactivate in the API */
-  skipDeactivate?: boolean;
 }
 
 /**
  * Shared confirm + toast + refetch handlers for admin content tables
- * (deactivate vs permanent delete + bulk permanent delete).
+ * (permanent delete + bulk permanent delete). Use edit / isActive for hiding items.
  */
 export function useContentManagementDestructiveActions<T extends { id: string }>(
   options: ContentDestructiveOptions<T>
@@ -23,41 +19,7 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
   const { confirm } = useConfirm();
   const { toast } = useToast();
 
-  const {
-    entitySingular,
-    entityPlural,
-    deactivate,
-    deletePermanent,
-    refetch,
-    skipDeactivate = false,
-  } = options;
-
-  const onDeactivate = useCallback(
-    async (item: T) => {
-      if (skipDeactivate || !deactivate) return;
-      const ok = await confirm({
-        title: `Deactivate ${entitySingular}?`,
-        message: `This will mark the ${entitySingular} as inactive. You can still restore it by editing and setting active again.`,
-        confirmText: "Deactivate",
-        variant: "warning",
-      });
-      if (!ok) return;
-      try {
-        await deactivate(item.id);
-        toast({ title: "Deactivated", description: `The ${entitySingular} was deactivated.` });
-        await refetch();
-      } catch (e) {
-        toast({
-          variant: "destructive",
-          title: "Could not deactivate",
-          description: e instanceof Error ? e.message : "Request failed",
-        });
-      }
-    },
-    [confirm, toast, deactivate, refetch, entitySingular, skipDeactivate]
-  );
-
-  const deactivateFn = skipDeactivate || !deactivate ? undefined : onDeactivate;
+  const { entitySingular, entityPlural, deletePermanent, refetch } = options;
 
   const onDeletePermanent = useCallback(
     async (item: T) => {
@@ -123,10 +85,9 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
 
   return useMemo(
     () => ({
-      onDeactivate: deactivateFn,
       onDeletePermanent,
       onBulkDeletePermanent,
     }),
-    [deactivateFn, onDeletePermanent, onBulkDeletePermanent]
+    [onDeletePermanent, onBulkDeletePermanent]
   );
 }

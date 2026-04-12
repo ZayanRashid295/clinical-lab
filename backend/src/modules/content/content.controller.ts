@@ -75,7 +75,7 @@ export class ContentController {
   @Delete("topics/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate topic" })
+  @ApiOperation({ summary: "Mark topic as inactive" })
   async removeTopic(@Param("id") id: string) {
     return this.contentService.removeTopic(id);
   }
@@ -146,7 +146,7 @@ export class ContentController {
   @Delete("subtopics/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate subtopic" })
+  @ApiOperation({ summary: "Mark subtopic as inactive" })
   async removeSubtopic(@Param("id") id: string) {
     return this.contentService.removeSubtopic(id);
   }

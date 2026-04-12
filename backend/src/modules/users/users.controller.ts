@@ -81,8 +81,8 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @ApiOperation({ summary: "Deactivate user" })
-  @ApiResponse({ status: 200, description: "User deactivated successfully" })
+  @ApiOperation({ summary: "Mark user as inactive" })
+  @ApiResponse({ status: 200, description: "User marked inactive successfully" })
   @ApiResponse({ status: 404, description: "User not found" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(id);

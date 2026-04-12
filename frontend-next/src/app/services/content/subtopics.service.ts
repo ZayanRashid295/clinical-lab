@@ -42,10 +42,6 @@ export class SubtopicsService extends BaseDataService<
     return this.update(id, data);
   }
 
-  async deactivateSubtopic(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
   async getSubtopicStats(): Promise<{
     total: number;
     active: number;

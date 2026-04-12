@@ -55,13 +55,6 @@ export class QuestionPapersService extends BaseDataService<
   }
 
   /**
-   * Deactivate a question paper (soft delete)
-   */
-  async deactivateQuestionPaper(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get question paper statistics
    */
   async getQuestionPaperStats(): Promise<{

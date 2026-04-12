@@ -120,9 +120,8 @@ export interface GenericDataTableProps<T> {
   onPageSizeChange?: (pageSize: number) => void;
   onView?: (item: T) => void;
   onEdit?: (item: T) => void;
-  /** @deprecated Prefer onDeactivate / onDeletePermanent */
+  /** Legacy soft-delete entry point; prefer editing isActive where available */
   onDelete?: (item: T) => void;
-  onDeactivate?: (item: T) => void;
   onDeletePermanent?: (item: T) => void;
   selectionMode?: boolean;
   selectedIds?: string[];
@@ -168,11 +167,8 @@ export interface DataManagementContentProps<T, TFilters> {
   onView: (item: T) => void;
   onEdit: (item: T) => void;
   onDelete?: (item: T) => void;
-  onDeactivate?: (item: T) => void | Promise<void>;
   onDeletePermanent?: (item: T) => void | Promise<void>;
   onBulkDeletePermanent?: (ids: string[]) => void | Promise<void>;
-  /** When false, hide "Deactivate" (e.g. question choices). Default true. */
-  showDeactivateAction?: boolean;
   
   // Modal components (domain-specific)
   FormModal?: React.ComponentType<any>;

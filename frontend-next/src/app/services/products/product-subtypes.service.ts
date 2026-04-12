@@ -55,13 +55,6 @@ export class ProductSubtypesService extends BaseDataService<
   }
 
   /**
-   * Deactivate a product subtype (soft delete)
-   */
-  async deactivateSubtype(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get subtype statistics
    */
   async getSubtypeStats(): Promise<{

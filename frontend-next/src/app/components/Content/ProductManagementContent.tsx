@@ -121,7 +121,6 @@ export default function ProductManagementContent() {
   const destructive = useContentManagementDestructiveActions<Product>({
     entitySingular: "product",
     entityPlural: "products",
-    deactivate: (id) => productsService.delete(id),
     deletePermanent: (id) => productsService.deletePermanent(id),
     refetch,
   });
@@ -144,7 +143,6 @@ export default function ProductManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewProduct}
       onEdit={handleEditProduct}
-      onDeactivate={destructive.onDeactivate}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={ProductFormModal}

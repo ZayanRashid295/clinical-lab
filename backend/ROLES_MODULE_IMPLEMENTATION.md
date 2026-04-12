@@ -51,7 +51,7 @@ This document describes the backend implementation of the Roles module in the Ne
    - Creates new permissions if needed
    - Returns updated role with permissions
 
-5. **remove(id)** - Deactivate a role (soft delete)
+5. **remove(id)** - Mark role inactive (soft delete)
    - Sets isActive to false
 
 6. **getStats()** - Get role statistics
@@ -68,7 +68,7 @@ This document describes the backend implementation of the Roles module in the Ne
 - `POST /roles` - Create a new role
 - `GET /roles/:id` - Get role by ID
 - `PATCH /roles/:id` - Update role
-- `DELETE /roles/:id` - Deactivate role
+- `DELETE /roles/:id` - Mark role inactive
 
 **Features:**
 

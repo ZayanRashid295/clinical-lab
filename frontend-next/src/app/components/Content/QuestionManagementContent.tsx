@@ -123,7 +123,6 @@ export default function QuestionManagementContent() {
   const destructive = useContentManagementDestructiveActions<Question>({
     entitySingular: "question",
     entityPlural: "questions",
-    deactivate: (id) => questionsService.delete(id),
     deletePermanent: (id) => questionsService.deletePermanent(id),
     refetch,
   });
@@ -146,7 +145,6 @@ export default function QuestionManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewQuestion}
       onEdit={handleEditQuestion}
-      onDeactivate={destructive.onDeactivate}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={QuestionFormModal}

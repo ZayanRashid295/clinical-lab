@@ -85,7 +85,7 @@ export class ProductsController {
   @Delete("subtypes/:id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate product subtype" })
+  @ApiOperation({ summary: "Mark product subtype as inactive" })
   async removeSubtype(@Param("id") id: string) {
     return this.productsService.removeSubtype(id);
   }
@@ -147,7 +147,7 @@ export class ProductsController {
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate product" })
+  @ApiOperation({ summary: "Mark product as inactive" })
   async remove(@Param("id") id: string) {
     return this.productsService.remove(id);
   }

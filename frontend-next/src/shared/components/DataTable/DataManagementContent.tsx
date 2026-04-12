@@ -42,10 +42,8 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
   onView,
   onEdit,
   onDelete,
-  onDeactivate,
   onDeletePermanent,
   onBulkDeletePermanent,
-  showDeactivateAction = true,
   FormModal,
   ViewModal,
   formModalOpen,
@@ -66,7 +64,6 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const bulkEnabled = Boolean(onBulkDeletePermanent);
-  const deactivateHandler = showDeactivateAction ? onDeactivate : undefined;
 
   // Track content height to prevent layout shift
   useEffect(() => {
@@ -342,7 +339,6 @@ function DataManagementContent<T extends { id: string }, TFilters extends Record
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onDeactivate={deactivateHandler}
                 onDeletePermanent={onDeletePermanent}
                 selectionMode={bulkEnabled && selectionMode}
                 selectedIds={selectedIds}

@@ -28,7 +28,7 @@ This document describes the implementation of Role Management functionality in t
 - `getRole(id)` - Get a specific role by ID
 - `createRole(data)` - Create a new role
 - `updateRole(id, data)` - Update an existing role
-- `deactivateRole(id)` - Deactivate a role
+- `delete(id)` (inherited) - Soft-delete / mark role inactive
 - `getRoleStats()` - Get role statistics
 
 ### 3. Hooks
@@ -107,7 +107,7 @@ This document describes the implementation of Role Management functionality in t
   - Create Role
   - View Role Details
   - Edit Role
-  - Deactivate Role
+  - Set inactive via edit (isActive)
   - Refresh Data
 
 ## Features Implemented
@@ -149,7 +149,7 @@ This document describes the implementation of Role Management functionality in t
 - Create new roles with permissions
 - View role details
 - Edit existing roles
-- Deactivate roles (placeholder)
+- Mark roles inactive via edit (isActive)
 
 ### ✅ Loading States
 

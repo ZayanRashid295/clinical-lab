@@ -37,7 +37,6 @@ export default function SubtopicManagementContent() {
   const destructive = useContentManagementDestructiveActions<Subtopic>({
     entitySingular: "subtopic",
     entityPlural: "subtopics",
-    deactivate: (id) => subtopicsService.delete(id),
     deletePermanent: (id) => subtopicsService.deletePermanent(id),
     refetch,
   });
@@ -46,7 +45,7 @@ export default function SubtopicManagementContent() {
     <DataManagementContent config={configWithHandlers} data={subtopics} loading={loading} error={error} pagination={pagination} filters={filters}
       onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange}
       onSortChange={handleSortChange} onRefresh={handleRefresh} onView={handleView} onEdit={handleEdit}
-      onDeactivate={destructive.onDeactivate} onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
+      onDeletePermanent={destructive.onDeletePermanent} onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={SubtopicFormModal} ViewModal={SubtopicViewModal} formModalOpen={formModalOpen} viewModalOpen={viewModalOpen}
       selectedItem={selectedSubtopic} formMode={formMode} onCloseFormModal={handleCloseFormModal} onCloseViewModal={handleCloseViewModal}
       onItemSaved={handleItemSaved} getFormModalProps={getFormModalProps} getViewModalProps={getViewModalProps} />

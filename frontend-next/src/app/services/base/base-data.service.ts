@@ -31,7 +31,7 @@ export interface IBaseDataService<T, TQueryParams extends Record<string, any> = 
   update(id: string, data: TUpdateDto): Promise<UpdateResponse | T>;
 
   /**
-   * Delete/deactivate an item
+   * Soft delete (typically sets inactive / isActive false)
    */
   delete(id: string): Promise<{ message: string }>;
 
@@ -80,7 +80,7 @@ export abstract class BaseDataService<T, TQueryParams extends Record<string, any
   }
 
   /**
-   * Delete/deactivate an item
+   * Soft delete (typically sets inactive / isActive false)
    */
   async delete(id: string): Promise<{ message: string }> {
     return super.delete(`${this.endpoint}/${id}`);

@@ -46,10 +46,6 @@ export class CategoriesService extends BaseDataService<
     return this.update(id, data);
   }
 
-  async deactivateCategory(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
   async getCategoryStats(): Promise<{
     total: number;
     active: number;

@@ -122,7 +122,6 @@ export default function ProductSubtypeManagementContent() {
   const destructive = useContentManagementDestructiveActions<ProductSubtype>({
     entitySingular: "product subtype",
     entityPlural: "product subtypes",
-    deactivate: (id) => subtypesService.delete(id),
     deletePermanent: (id) => subtypesService.deletePermanent(id),
     refetch,
   });
@@ -145,7 +144,6 @@ export default function ProductSubtypeManagementContent() {
       onRefresh={handleRefresh}
       onView={handleViewSubtype}
       onEdit={handleEditSubtype}
-      onDeactivate={destructive.onDeactivate}
       onDeletePermanent={destructive.onDeletePermanent}
       onBulkDeletePermanent={destructive.onBulkDeletePermanent}
       FormModal={ProductSubtypeFormModal}

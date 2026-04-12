@@ -287,10 +287,10 @@ export class AssessmentsController {
   @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Deactivate question paper" })
+  @ApiOperation({ summary: "Mark question paper as inactive" })
   @ApiResponse({
     status: 200,
-    description: "Question paper deactivated successfully",
+    description: "Question paper marked inactive successfully",
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })

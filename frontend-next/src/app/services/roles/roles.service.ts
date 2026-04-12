@@ -44,13 +44,6 @@ export class RolesService extends BaseDataService<Role, RoleQueryParams, CreateR
   }
 
   /**
-   * Deactivate a role (soft delete)
-   */
-  async deactivateRole(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get role statistics
    */
   async getRoleStats(): Promise<{

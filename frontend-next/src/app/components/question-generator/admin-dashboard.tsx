@@ -1274,7 +1274,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
 
     try {
       setError(null)
-      await questionsService.deactivateQuestion(id)
+      await questionsService.delete(id)
       await loadQuestions() // Reload to reflect deletion
     } catch (err: any) {
       console.error("Failed to delete question:", err)
@@ -1301,7 +1301,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
     try {
       setError(null)
-      await Promise.all(ids.map((id) => questionsService.deactivateQuestion(id)))
+      await Promise.all(ids.map((id) => questionsService.delete(id)))
       await loadQuestions()
       setSelectedQuestionIds([])
       setIsSelectMode(false)

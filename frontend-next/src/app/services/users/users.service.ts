@@ -44,13 +44,6 @@ export class UsersService extends BaseDataService<User, UserQueryParams, CreateU
   }
 
   /**
-   * Deactivate a user (soft delete)
-   */
-  async deactivateUser(id: string): Promise<{ message: string }> {
-    return this.delete(id);
-  }
-
-  /**
    * Get user statistics
    */
   async getUserStats(): Promise<{
