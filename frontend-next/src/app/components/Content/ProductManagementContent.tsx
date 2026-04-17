@@ -35,6 +35,7 @@ export default function ProductManagementContent() {
     stats,
     loading: statsLoading,
     error: statsError,
+    refetch: refetchStats,
   } = useProductStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -67,6 +68,7 @@ export default function ProductManagementContent() {
 
   const handleRefresh = () => {
     refetch();
+    void refetchStats();
   };
 
   const handleViewProduct = (product: Product) => {
@@ -92,6 +94,7 @@ export default function ProductManagementContent() {
 
   const handleProductSaved = () => {
     refetch();
+    void refetchStats();
     handleCloseFormModal();
   };
 
@@ -123,6 +126,7 @@ export default function ProductManagementContent() {
     entityPlural: "products",
     deletePermanent: (id) => productsService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

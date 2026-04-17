@@ -18,6 +18,14 @@ import { QuestionChoicesService } from "../../services/questions/question-choice
 import { QuestionsService } from "../../services/questions/questions.service";
 import { Question } from "../../types/question";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface QuestionChoiceFormModalProps {
   isOpen: boolean;
@@ -55,7 +63,7 @@ export default function QuestionChoiceFormModal({
       // Load questions
       setLoadingQuestions(true);
       questionsService
-        .getQuestions({ status: "ACTIVE" })
+        .getQuestions({ status: "ACTIVE", listAll: true })
         .then((response) => {
           if (Array.isArray(response)) {
             setQuestions(response);
@@ -109,7 +117,7 @@ export default function QuestionChoiceFormModal({
   }, [isOpen, onClose]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -274,22 +282,34 @@ export default function QuestionChoiceFormModal({
                   Loading questions...
                 </div>
               ) : (
-                <select
-                  name="questionId"
-                  value={formData.questionId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
+                <Select
+                  value={formData.questionId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      questionId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
                   disabled={!isCreateMode}
                 >
-                  <option value="">Select a question</option>
-                  {questions.map((question) => (
-                    <option key={question.id} value={question.id}>
-                      {question.question.substring(0, 80)}
-                      {question.question.length > 80 ? "..." : ""}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select a question" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a question
+                    </SelectItem>
+                    {questions.map((question) => {
+                      const q = question.question || "";
+                      const label = q.length > 80 ? `${q.substring(0, 80)}...` : q;
+                      return (
+                        <SelectItem key={question.id} value={question.id}>
+                          {label}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 

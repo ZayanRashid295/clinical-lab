@@ -36,6 +36,7 @@ export default function QuestionChoiceManagementContent() {
   const {
     stats,
     loading: statsLoading,
+    refetch: refetchStats,
   } = useQuestionChoiceStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -68,6 +69,7 @@ export default function QuestionChoiceManagementContent() {
 
   const handleRefresh = () => {
     refetch();
+    void refetchStats();
   };
 
   const handleViewQuestionChoice = (questionChoice: QuestionChoice) => {
@@ -127,6 +129,7 @@ export default function QuestionChoiceManagementContent() {
     entityPlural: "question choices",
     deletePermanent: (id) => choicesService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

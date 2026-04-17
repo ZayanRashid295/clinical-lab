@@ -32,6 +32,7 @@ export default function QuestionManagementContent() {
   const {
     stats,
     loading: statsLoading,
+    refetch: refetchStats,
   } = useQuestionStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -66,6 +67,7 @@ export default function QuestionManagementContent() {
 
   const handleRefresh = () => {
     refetch();
+    void refetchStats();
   };
 
   const handleViewQuestion = (question: Question) => {
@@ -91,6 +93,7 @@ export default function QuestionManagementContent() {
 
   const handleQuestionSaved = () => {
     refetch();
+    void refetchStats();
     handleCloseFormModal();
   };
 
@@ -125,6 +128,7 @@ export default function QuestionManagementContent() {
     entityPlural: "questions",
     deletePermanent: (id) => questionsService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

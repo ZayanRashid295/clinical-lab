@@ -4,6 +4,14 @@ import { Topic, System, CreateTopicDto, UpdateTopicDto } from "../../types/conte
 import { TopicsService } from "../../services/content/topics.service";
 import { SystemsService } from "../../services/systems/systems.service";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface TopicFormModalProps {
   isOpen: boolean;
@@ -29,7 +37,7 @@ export default function TopicFormModal({ isOpen, onClose, topic, onTopicSaved, m
   useEffect(() => {
     if (isOpen) {
       setLoadingSystems(true);
-      systemsService.getSystems({ status: "ACTIVE" } as any)
+      systemsService.getSystems({ status: "ACTIVE", listAll: true })
         .then((response) => { setSystems(Array.isArray(response) ? response : response.data || []); })
         .catch(() => setSystems([]))
         .finally(() => setLoadingSystems(false));
@@ -46,7 +54,7 @@ export default function TopicFormModal({ isOpen, onClose, topic, onTopicSaved, m
     return () => { document.removeEventListener("keydown", handleEscape); document.body.style.overflow = "unset"; };
   }, [isOpen, onClose]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : type === "number" ? parseInt(value) || 0 : value }));
   };
@@ -93,10 +101,30 @@ export default function TopicFormModal({ isOpen, onClose, topic, onTopicSaved, m
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">System *</label>
               {loadingSystems ? (<div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">Loading systems...</div>) : (
-                <select name="systemId" value={formData.systemId} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
-                  <option value="">Select a system</option>
-                  {systems.map((sys) => (<option key={sys.id} value={sys.id}>{sys.name} {sys.product && `(${sys.product.name})`}</option>))}
-                </select>
+                <Select
+                  value={formData.systemId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      systemId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-green-500">
+                    <SelectValue placeholder="Select a system" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a system
+                    </SelectItem>
+                    {systems.map((sys) => (
+                      <SelectItem key={sys.id} value={sys.id}>
+                        {sys.name}
+                        {sys.product ? ` (${sys.product.name})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Topic Name *</label><input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required /></div>

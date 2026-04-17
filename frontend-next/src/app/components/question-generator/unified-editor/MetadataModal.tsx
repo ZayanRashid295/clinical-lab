@@ -7,6 +7,14 @@ import { Label } from "@/shared/ui/label"
 import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
 import { SubtopicsService } from "@/app/services/content/subtopics.service"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select"
 
 interface MetadataModalProps {
   isOpen: boolean
@@ -133,60 +141,82 @@ export default function MetadataModal({ isOpen, onClose, onSave, initialMetadata
         <div className="space-y-4 py-4">
           <div>
             <Label className="text-sm font-semibold">System *</Label>
-            <select
-              value={systemId}
-              onChange={(e) => {
-                setSystemId(e.target.value)
+            <Select
+              value={systemId || SELECT_EMPTY_VALUE}
+              onValueChange={(v) => {
+                const next = v === SELECT_EMPTY_VALUE ? "" : v
+                setSystemId(next)
                 setTopicId("")
                 setSubtopicId("")
               }}
-              className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               disabled={loadingChapters}
             >
-              <option value="">Select System...</option>
-              {systems.map((system) => (
-                <option key={system.id} value={system.id}>
-                  {system.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="mt-1 h-9 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none [&>span]:line-clamp-1">
+                <SelectValue placeholder="Select System..." />
+              </SelectTrigger>
+              <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                  Select System...
+                </SelectItem>
+                {systems.map((system) => (
+                  <SelectItem key={system.id} value={system.id}>
+                    {system.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
             <Label className="text-sm font-semibold">Topic *</Label>
-            <select
-              value={topicId}
-              onChange={(e) => {
-                setTopicId(e.target.value)
+            <Select
+              value={topicId || SELECT_EMPTY_VALUE}
+              onValueChange={(v) => {
+                const next = v === SELECT_EMPTY_VALUE ? "" : v
+                setTopicId(next)
                 setSubtopicId("")
               }}
-              className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               disabled={loadingTopics || !systemId}
             >
-              <option value="">Select Topic...</option>
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="mt-1 h-9 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none [&>span]:line-clamp-1">
+                <SelectValue placeholder="Select Topic..." />
+              </SelectTrigger>
+              <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                  Select Topic...
+                </SelectItem>
+                {topics.map((topic) => (
+                  <SelectItem key={topic.id} value={topic.id}>
+                    {topic.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
             <Label className="text-sm font-semibold">Subtopic *</Label>
-            <select
-              value={subtopicId}
-              onChange={(e) => setSubtopicId(e.target.value)}
-              className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            <Select
+              value={subtopicId || SELECT_EMPTY_VALUE}
+              onValueChange={(v) =>
+                setSubtopicId(v === SELECT_EMPTY_VALUE ? "" : v)
+              }
               disabled={loadingSubtopics || !topicId}
             >
-              <option value="">Select Subtopic...</option>
-              {subtopics.map((subtopic) => (
-                <option key={subtopic.id} value={subtopic.id}>
-                  {subtopic.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="mt-1 h-9 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none [&>span]:line-clamp-1">
+                <SelectValue placeholder="Select Subtopic..." />
+              </SelectTrigger>
+              <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                  Select Subtopic...
+                </SelectItem>
+                {subtopics.map((subtopic) => (
+                  <SelectItem key={subtopic.id} value={subtopic.id}>
+                    {subtopic.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

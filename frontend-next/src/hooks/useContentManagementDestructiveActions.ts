@@ -7,6 +7,8 @@ export interface ContentDestructiveOptions<T extends { id: string }> {
   entityPlural: string;
   deletePermanent: (id: string) => Promise<unknown>;
   refetch: () => void | Promise<void>;
+  /** When set, called after list refetch (e.g. summary stat cards). */
+  refetchStats?: () => void | Promise<void>;
 }
 
 /**
@@ -19,7 +21,8 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
   const { confirm } = useConfirm();
   const { toast } = useToast();
 
-  const { entitySingular, entityPlural, deletePermanent, refetch } = options;
+  const { entitySingular, entityPlural, deletePermanent, refetch, refetchStats } =
+    options;
 
   const onDeletePermanent = useCallback(
     async (item: T) => {
@@ -37,6 +40,7 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
           description: `The ${entitySingular} was permanently removed.`,
         });
         await refetch();
+        if (refetchStats) await refetchStats();
       } catch (e) {
         toast({
           variant: "destructive",
@@ -45,7 +49,7 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
         });
       }
     },
-    [confirm, toast, deletePermanent, refetch, entitySingular]
+    [confirm, toast, deletePermanent, refetch, refetchStats, entitySingular]
   );
 
   const onBulkDeletePermanent = useCallback(
@@ -79,8 +83,9 @@ export function useContentManagementDestructiveActions<T extends { id: string }>
         });
       }
       await refetch();
+      if (refetchStats) await refetchStats();
     },
-    [confirm, toast, deletePermanent, refetch, entitySingular, entityPlural]
+    [confirm, toast, deletePermanent, refetch, refetchStats, entitySingular, entityPlural]
   );
 
   return useMemo(

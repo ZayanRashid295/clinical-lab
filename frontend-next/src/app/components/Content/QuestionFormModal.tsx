@@ -18,6 +18,14 @@ import { QuestionsService } from "../../services/questions/questions.service";
 import { SubtopicsService } from "../../services/content/subtopics.service";
 import { Subtopic } from "../../types/content";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface QuestionFormModalProps {
   isOpen: boolean;
@@ -115,9 +123,7 @@ export default function QuestionFormModal({
   }, [isOpen, onClose]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -287,21 +293,30 @@ export default function QuestionFormModal({
                   Loading subtopics...
                 </div>
               ) : (
-                <select
-                  name="subtopicId"
-                  value={formData.subtopicId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
+                <Select
+                  value={formData.subtopicId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      subtopicId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
                 >
-                  <option value="">Select a subtopic</option>
-                  {subtopics.map((subtopic) => (
-                    <option key={subtopic.id} value={subtopic.id}>
-                      {subtopic.name}
-                      {subtopic.topic?.name && ` (${subtopic.topic.name})`}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-purple-500">
+                    <SelectValue placeholder="Select a subtopic" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a subtopic
+                    </SelectItem>
+                    {subtopics.map((subtopic) => (
+                      <SelectItem key={subtopic.id} value={subtopic.id}>
+                        {subtopic.name}
+                        {subtopic.topic?.name ? ` (${subtopic.topic.name})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 
@@ -337,16 +352,24 @@ export default function QuestionFormModal({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Difficulty
                 </label>
-                <select
-                  name="difficulty"
+                <Select
                   value={formData.difficulty}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      difficulty: v as CreateQuestionDto["difficulty"],
+                    }))
+                  }
                 >
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-purple-500">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value="easy">Easy</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

@@ -18,6 +18,14 @@ import { ProductsService } from "../../services/products/products.service";
 import { CategoriesService } from "../../services/categories/categories.service";
 import { Category } from "../../types/category";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -52,7 +60,7 @@ export default function ProductFormModal({
   useEffect(() => {
     if (isOpen) {
       // Load categories
-      categoriesService.getCategories()
+      categoriesService.getCategories({ status: "ACTIVE", listAll: true })
         .then((response) => {
           if (Array.isArray(response)) {
             setCategories(response);
@@ -276,19 +284,30 @@ export default function ProductFormModal({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category
               </label>
-              <select
-                name="categoryId"
-                value={formData.categoryId || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <Select
+                value={formData.categoryId || SELECT_EMPTY_VALUE}
+                onValueChange={(v) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    categoryId: v === SELECT_EMPTY_VALUE ? "" : v,
+                  }))
+                }
               >
-                <option value="">No Category / Unassigned</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon ? `${cat.icon} ` : ""}{cat.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-blue-500">
+                  <SelectValue placeholder="No Category / Unassigned" />
+                </SelectTrigger>
+                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                    No Category / Unassigned
+                  </SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.icon ? `${cat.icon} ` : ""}
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
 

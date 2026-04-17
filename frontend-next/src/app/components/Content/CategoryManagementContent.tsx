@@ -36,6 +36,7 @@ export default function CategoryManagementContent() {
     stats,
     loading: statsLoading,
     error: statsError,
+    refetch: refetchStats,
   } = useCategoryStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -68,6 +69,7 @@ export default function CategoryManagementContent() {
 
   const handleRefresh = () => {
     refetch();
+    void refetchStats();
   };
 
   const handleView = (item: Category) => {
@@ -93,6 +95,7 @@ export default function CategoryManagementContent() {
 
   const handleItemSaved = () => {
     refetch();
+    void refetchStats();
     handleCloseFormModal();
   };
 
@@ -123,6 +126,7 @@ export default function CategoryManagementContent() {
     entityPlural: "categories",
     deletePermanent: (id) => categoriesService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

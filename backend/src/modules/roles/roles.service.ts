@@ -30,9 +30,9 @@ export class RolesService {
       // Search filter
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { displayName: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search } },
+          { displayName: { contains: search } },
+          { description: { contains: search } },
         ];
       }
 

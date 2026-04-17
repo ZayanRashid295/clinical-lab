@@ -35,8 +35,8 @@ export class SubscriptionsService {
       // Search filter
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search } },
+          { description: { contains: search } },
         ];
       }
 
@@ -332,9 +332,9 @@ export class SubscriptionsService {
       if (search) {
         where.user = {
           OR: [
-            { email: { contains: search, mode: "insensitive" } },
-            { firstName: { contains: search, mode: "insensitive" } },
-            { lastName: { contains: search, mode: "insensitive" } },
+            { email: { contains: search } },
+            { firstName: { contains: search } },
+            { lastName: { contains: search } },
           ],
         };
       }
@@ -904,8 +904,8 @@ export class SubscriptionsService {
       // Search filter
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search } },
+          { description: { contains: search } },
         ];
       }
 

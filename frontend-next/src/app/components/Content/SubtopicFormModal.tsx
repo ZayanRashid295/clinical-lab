@@ -3,6 +3,14 @@ import { X, FileText, Save, AlertCircle, CheckCircle, Loader2 } from "lucide-rea
 import { Subtopic, CreateSubtopicDto } from "../../types/content";
 import { SubtopicsService } from "../../services/content/subtopics.service";
 import { TopicsService } from "../../services/content/topics.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface SubtopicFormModalProps {
   isOpen: boolean;
@@ -53,7 +61,7 @@ export default function SubtopicFormModal({ isOpen, onClose, subtopic, onSubtopi
     return () => { document.removeEventListener("keydown", handleEscape); document.body.style.overflow = "unset"; };
   }, [isOpen, onClose]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : name === "order" ? parseInt(value) || 0 : value }));
   };
@@ -89,12 +97,29 @@ export default function SubtopicFormModal({ isOpen, onClose, subtopic, onSubtopi
               {loadingTopics ? (
                 <div className="flex items-center gap-2 text-sm text-gray-500 py-2"><Loader2 className="h-4 w-4 animate-spin" />Loading topics...</div>
               ) : (
-                <select name="topicId" value={formData.topicId} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                  <option value="">Select a Topic...</option>
-                  {topics.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
+                <Select
+                  value={formData.topicId || SELECT_EMPTY_VALUE}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      topicId: value === SELECT_EMPTY_VALUE ? "" : value,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select a Topic..." />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a Topic...
+                    </SelectItem>
+                    {topics.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., History & Presentation" required /></div>

@@ -444,22 +444,22 @@ export class PaymentsService {
     if (queryParams?.search) {
       where.OR = [
         {
-          transactionId: { contains: queryParams.search, mode: "insensitive" },
+          transactionId: { contains: queryParams.search },
         },
-        { description: { contains: queryParams.search, mode: "insensitive" } },
+        { description: { contains: queryParams.search } },
         {
           user: {
-            email: { contains: queryParams.search, mode: "insensitive" },
+            email: { contains: queryParams.search },
           },
         },
         {
           user: {
-            firstName: { contains: queryParams.search, mode: "insensitive" },
+            firstName: { contains: queryParams.search },
           },
         },
         {
           user: {
-            lastName: { contains: queryParams.search, mode: "insensitive" },
+            lastName: { contains: queryParams.search },
           },
         },
       ];

@@ -17,6 +17,14 @@ import { QuestionPapersService } from "../../services/assessments/question-paper
 import { UsersService } from "../../services/users/users.service";
 import { User } from "../../types/user";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface QuestionPaperFormModalProps {
   isOpen: boolean;
@@ -57,7 +65,7 @@ export default function QuestionPaperFormModal({
       // Load users
       setLoadingUsers(true);
       usersService
-        .getUsers({ status: "ACTIVE" })
+        .getUsers({ status: "ACTIVE", listAll: true })
         .then((response) => {
           if (Array.isArray(response)) {
             setUsers(response);
@@ -117,9 +125,7 @@ export default function QuestionPaperFormModal({
   }, [isOpen, onClose]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -295,20 +301,29 @@ export default function QuestionPaperFormModal({
                   Loading users...
                 </div>
               ) : (
-                <select
-                  name="userId"
-                  value={formData.userId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
+                <Select
+                  value={formData.userId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      userId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
                 >
-                  <option value="">Select a user</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.firstName} {user.lastName} ({user.email})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select a user" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a user
+                    </SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 
@@ -343,16 +358,24 @@ export default function QuestionPaperFormModal({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type
               </label>
-              <select
-                name="type"
+              <Select
                 value={formData.type}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                onValueChange={(v) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    type: v as CreateQuestionPaperDto["type"],
+                  }))
+                }
               >
-                <option value="practice">Practice</option>
-                <option value="mock">Mock</option>
-                <option value="assessment">Assessment</option>
-              </select>
+                <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                  <SelectItem value="practice">Practice</SelectItem>
+                  <SelectItem value="mock">Mock</SelectItem>
+                  <SelectItem value="assessment">Assessment</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

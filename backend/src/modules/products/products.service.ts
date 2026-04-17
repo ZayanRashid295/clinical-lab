@@ -30,8 +30,8 @@ export class ProductsService {
       const where: any = {};
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search } },
+          { description: { contains: search } },
         ];
       }
       if (status) where.isActive = status === "ACTIVE";
@@ -376,8 +376,8 @@ export class ProductsService {
       const where: any = {};
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search } },
+          { description: { contains: search } },
         ];
       }
       if (status) where.isActive = status === "ACTIVE";

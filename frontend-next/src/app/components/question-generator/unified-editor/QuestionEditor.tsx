@@ -39,6 +39,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select"
 
 interface QuestionEditorProps {
   initialData?: Partial<QuestionCreatorData>
@@ -1543,7 +1551,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                   const target = e.target as HTMLElement
                   if (target.closest('[data-explanation-block]')) return
                   if (target.closest('[data-metadata]')) return
-                  if (target.closest('button') || target.closest('input') || target.closest('select') || target.closest('[contenteditable]')) return
+                  if (
+                    target.closest("button") ||
+                    target.closest("input") ||
+                    target.closest("select") ||
+                    target.closest('[data-slot="select-trigger"]') ||
+                    target.closest("[contenteditable]")
+                  )
+                    return
                   setActiveSection("explanation")
                   if (mainExplanationBlocks.length > 0) {
                     const firstBlock = mainExplanationBlocks[0]
@@ -1607,21 +1622,34 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             Category
                           </div>
                           <div className="flex gap-2 mb-1">
-                            <select
-                              value={
-                                metadata.categoryId || metadata.productTagId || (metadata.productTagIds && metadata.productTagIds[0]) || ""
-                              }
-                              onChange={(e) => handleTagSelect(e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingCategories}
-                            >
-                              <option value="">Select Category...</option>
-                              {categories.map((tag) => (
-                                <option key={tag.id} value={tag.id}>
-                                  {tag.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="min-w-0 flex-1">
+                              <Select
+                                value={
+                                  metadata.categoryId ||
+                                  metadata.productTagId ||
+                                  (metadata.productTagIds && metadata.productTagIds[0]) ||
+                                  SELECT_EMPTY_VALUE
+                                }
+                                onValueChange={(v) =>
+                                  handleTagSelect(v === SELECT_EMPTY_VALUE ? "" : v)
+                                }
+                                disabled={loadingCategories}
+                              >
+                                <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
+                                  <SelectValue placeholder="Select Category..." />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                                    Select Category...
+                                  </SelectItem>
+                                  {categories.map((tag) => (
+                                    <SelectItem key={tag.id} value={tag.id}>
+                                      {tag.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               type="button"
                               variant="outline"
@@ -1661,21 +1689,32 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             Product
                           </div>
                           <div className="flex gap-2 mb-1">
-                            <select
-                              value={metadata.productId || ""}
-                              onChange={(e) =>
-                                setMetadata((prev) => ({ ...prev, productId: e.target.value || undefined }))
-                              }
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingProducts}
-                            >
-                              <option value="">Select Product...</option>
-                              {products.map((p: any) => (
-                                <option key={p.id} value={p.id}>
-                                  {p.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="min-w-0 flex-1">
+                              <Select
+                                value={metadata.productId || SELECT_EMPTY_VALUE}
+                                onValueChange={(v) =>
+                                  setMetadata((prev) => ({
+                                    ...prev,
+                                    productId: v === SELECT_EMPTY_VALUE ? undefined : v,
+                                  }))
+                                }
+                                disabled={loadingProducts}
+                              >
+                                <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
+                                  <SelectValue placeholder="Select Product..." />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                                    Select Product...
+                                  </SelectItem>
+                                  {products.map((p: any) => (
+                                    <SelectItem key={p.id} value={p.id}>
+                                      {p.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               type="button"
                               variant="outline"
@@ -1714,19 +1753,29 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             System
                           </div>
                           <div className="flex gap-2 mb-1">
-                            <select
-                              value={metadata.systemId || ""}
-                              onChange={(e) => handleSystemChange(e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingSystems}
-                            >
-                              <option value="">Select System...</option>
-                              {chapters.map((chapter) => (
-                                <option key={chapter.id} value={chapter.id}>
-                                  {chapter.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="min-w-0 flex-1">
+                              <Select
+                                value={metadata.systemId || SELECT_EMPTY_VALUE}
+                                onValueChange={(v) =>
+                                  handleSystemChange(v === SELECT_EMPTY_VALUE ? "" : v)
+                                }
+                                disabled={loadingSystems}
+                              >
+                                <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
+                                  <SelectValue placeholder="Select System..." />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                                    Select System...
+                                  </SelectItem>
+                                  {chapters.map((chapter) => (
+                                    <SelectItem key={chapter.id} value={chapter.id}>
+                                      {chapter.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               type="button"
                               variant="outline"
@@ -1766,19 +1815,29 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             Topic
                           </div>
                           <div className="flex gap-2 mb-1">
-                            <select
-                              value={metadata.topicId || ""}
-                              onChange={(e) => handleTopicChange(e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingTopics || !metadata.systemId}
-                            >
-                              <option value="">Select Topic...</option>
-                              {topics.map((topic) => (
-                                <option key={topic.id} value={topic.id}>
-                                  {topic.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="min-w-0 flex-1">
+                              <Select
+                                value={metadata.topicId || SELECT_EMPTY_VALUE}
+                                onValueChange={(v) =>
+                                  handleTopicChange(v === SELECT_EMPTY_VALUE ? "" : v)
+                                }
+                                disabled={loadingTopics || !metadata.systemId}
+                              >
+                                <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
+                                  <SelectValue placeholder="Select Topic..." />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                                    Select Topic...
+                                  </SelectItem>
+                                  {topics.map((topic) => (
+                                    <SelectItem key={topic.id} value={topic.id}>
+                                      {topic.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               type="button"
                               variant="outline"
@@ -1823,19 +1882,29 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                             Subtopic
                           </div>
                           <div className="flex gap-2 mb-1">
-                            <select
-                              value={metadata.subtopicId || ""}
-                              onChange={(e) => handleSubtopicChange(e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-lg border border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              disabled={loadingSubtopics || !metadata.topicId}
-                            >
-                              <option value="">Select Subtopic...</option>
-                              {subtopics.map((s: any) => (
-                                <option key={s.id} value={s.id}>
-                                  {s.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="min-w-0 flex-1">
+                              <Select
+                                value={metadata.subtopicId || SELECT_EMPTY_VALUE}
+                                onValueChange={(v) =>
+                                  handleSubtopicChange(v === SELECT_EMPTY_VALUE ? "" : v)
+                                }
+                                disabled={loadingSubtopics || !metadata.topicId}
+                              >
+                                <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
+                                  <SelectValue placeholder="Select Subtopic..." />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                                  <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
+                                    Select Subtopic...
+                                  </SelectItem>
+                                  {subtopics.map((s: any) => (
+                                    <SelectItem key={s.id} value={s.id}>
+                                      {s.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               type="button"
                               variant="outline"

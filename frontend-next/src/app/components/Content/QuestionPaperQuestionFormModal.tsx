@@ -17,6 +17,14 @@ import {
 import { QuestionPapersService } from "../../services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "../../services/assessments/question-paper-questions.service";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface QuestionPaperQuestionFormModalProps {
   isOpen: boolean;
@@ -112,9 +120,7 @@ export default function QuestionPaperQuestionFormModal({
     };
   }, [isOpen, onClose]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -277,21 +283,30 @@ export default function QuestionPaperQuestionFormModal({
                   Loading question papers...
                 </div>
               ) : (
-                <select
-                  name="questionPaperId"
-                  value={formData.questionPaperId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
+                <Select
+                  value={formData.questionPaperId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      questionPaperId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
                   disabled={!isCreateMode}
                 >
-                  <option value="">Select a question paper</option>
-                  {questionPapers.map((paper: any) => (
-                    <option key={paper.id} value={paper.id}>
-                      {paper.name} ({paper.type})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select a question paper" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a question paper
+                    </SelectItem>
+                    {questionPapers.map((paper: any) => (
+                      <SelectItem key={paper.id} value={paper.id}>
+                        {paper.name} ({paper.type})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 

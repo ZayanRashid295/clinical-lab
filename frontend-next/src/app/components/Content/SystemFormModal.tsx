@@ -3,6 +3,14 @@ import { X, Layers, Save, AlertCircle, CheckCircle, Loader2 } from "lucide-react
 import { System, CreateSystemDto } from "../../types/content";
 import { SystemsService } from "../../services/systems/systems.service";
 import { ProductsService } from "../../services/products/products.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface SystemFormModalProps {
   isOpen: boolean;
@@ -29,7 +37,7 @@ export default function SystemFormModal({ isOpen, onClose, system, onSystemSaved
     if (isOpen) {
       setLoadingProducts(true);
       productsService
-        .getProducts({ status: "ACTIVE" })
+        .getProducts({ status: "ACTIVE", listAll: true })
         .then((response) => {
           const data = Array.isArray(response) ? response : (response as any)?.data || [];
           setProducts(data);
@@ -53,7 +61,7 @@ export default function SystemFormModal({ isOpen, onClose, system, onSystemSaved
     return () => { document.removeEventListener("keydown", handleEscape); document.body.style.overflow = "unset"; };
   }, [isOpen, onClose]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : name === "order" ? parseInt(value) || 0 : value }));
   };
@@ -89,12 +97,29 @@ export default function SystemFormModal({ isOpen, onClose, system, onSystemSaved
               {loadingProducts ? (
                 <div className="flex items-center gap-2 text-sm text-gray-500 py-2"><Loader2 className="h-4 w-4 animate-spin" />Loading products...</div>
               ) : (
-                <select name="productId" value={formData.productId} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                  <option value="">Select a Product...</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
+                <Select
+                  value={formData.productId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      productId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select a Product..." />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a Product...
+                    </SelectItem>
+                    {products.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Cardiovascular System" required /></div>

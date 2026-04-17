@@ -35,6 +35,7 @@ export default function ProductSubtypeManagementContent() {
   const {
     stats,
     loading: statsLoading,
+    refetch: refetchStats,
   } = useProductSubtypeStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -68,6 +69,7 @@ export default function ProductSubtypeManagementContent() {
 
   const handleRefresh = () => {
     refetch();
+    void refetchStats();
   };
 
   const handleViewSubtype = (subtype: ProductSubtype) => {
@@ -93,6 +95,7 @@ export default function ProductSubtypeManagementContent() {
 
   const handleSubtypeSaved = () => {
     refetch();
+    void refetchStats();
     handleCloseFormModal();
   };
 
@@ -124,6 +127,7 @@ export default function ProductSubtypeManagementContent() {
     entityPlural: "product subtypes",
     deletePermanent: (id) => subtypesService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

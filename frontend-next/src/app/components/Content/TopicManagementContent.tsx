@@ -32,6 +32,7 @@ export default function TopicManagementContent() {
   const {
     stats,
     loading: statsLoading,
+    refetch: refetchStats,
   } = useTopicStats();
 
   const handleFiltersChange = (newFilters: Partial<any>) => {
@@ -90,6 +91,7 @@ export default function TopicManagementContent() {
 
   const handleTopicSaved = () => {
     refetch();
+    void refetchStats();
     handleCloseFormModal();
   };
 
@@ -121,6 +123,7 @@ export default function TopicManagementContent() {
     entityPlural: "topics",
     deletePermanent: (id) => topicsService.deletePermanent(id),
     refetch,
+    refetchStats,
   });
 
   return (

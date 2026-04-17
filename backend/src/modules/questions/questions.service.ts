@@ -85,8 +85,8 @@ export class QuestionsService {
       // Search filter
       if (search) {
         where.OR = [
-          { question: { contains: search, mode: "insensitive" } },
-          { explanation: { contains: search, mode: "insensitive" } },
+          { question: { contains: search } },
+          { explanation: { contains: search } },
         ];
       }
 

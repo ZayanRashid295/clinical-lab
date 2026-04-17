@@ -17,6 +17,14 @@ import { ProductSubtypesService } from "../../services/products/product-subtypes
 import { ProductsService } from "../../services/products/products.service";
 import { Product } from "../../types/product";
 import { CreateResponse } from "../../services/base/api-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
 interface ProductSubtypeFormModalProps {
   isOpen: boolean;
@@ -54,7 +62,7 @@ export default function ProductSubtypeFormModal({
       // Load products
       setLoadingProducts(true);
       productsService
-        .getProducts({ status: "ACTIVE" })
+        .getProducts({ status: "ACTIVE", listAll: true })
         .then((response) => {
           if (Array.isArray(response)) {
             setProducts(response);
@@ -108,9 +116,7 @@ export default function ProductSubtypeFormModal({
   }, [isOpen, onClose]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -266,20 +272,29 @@ export default function ProductSubtypeFormModal({
                   Loading products...
                 </div>
               ) : (
-                <select
-                  name="productId"
-                  value={formData.productId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
+                <Select
+                  value={formData.productId || SELECT_EMPTY_VALUE}
+                  onValueChange={(v) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      productId: v === SELECT_EMPTY_VALUE ? "" : v,
+                    }))
+                  }
                 >
-                  <option value="">Select a product</option>
-                  {products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full border-gray-300 focus:ring-2 focus:ring-orange-500">
+                    <SelectValue placeholder="Select a product" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
+                    <SelectItem value={SELECT_EMPTY_VALUE} className="text-gray-500">
+                      Select a product
+                    </SelectItem>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        {product.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 
