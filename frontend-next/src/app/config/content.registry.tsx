@@ -34,10 +34,9 @@ import NotesPage from "../components/Study/NotesPage";
 
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
+import PerformanceDashboardPage from "../components/test-creation/PerformanceDashboardPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
-import EnhancedQuestionBuilder from "../components/test-creation/EnhancedQuestionBuilder";
-import NewQuestionBuilder from "../components/test-creation/NewQuestionBuilder";
 
 // Import test session components
 import TestSessionPage from "../components/test-session/TestSessionPage";
@@ -127,80 +126,9 @@ export const transportationContentRegistry: ContentRegistry = {
     // Test creation routes
     "/test-creation": () => <TestCreationPage />,
     "/test-creation/new": () => <TestCreationPage />,
+    "/performance": () => <PerformanceDashboardPage />,
     "/test-creation/study-create": () => <StudyCreateTestPage />,
     "/previous-tests": () => <PreviousTestsPage />,
-    "/test-creation/templates": () => (
-      <UnderConstruction
-        menuTitle="Test Templates"
-        menuIcon="📋"
-        description="Pre-built test templates for quick test creation with customizable questions and formats."
-        estimatedCompletion="2 weeks"
-        features={[
-          "Template library with medical categories",
-          "Customizable question sets",
-          "Difficulty level adjustments",
-          "Product-specific templates",
-          "One-click test generation",
-        ]}
-      />
-    ),
-    "/test-creation/builder": () => (
-      <div className="p-6">
-        <EnhancedQuestionBuilder
-          onQuestionCreated={(question) => {
-            console.log("Question created:", question);
-            // TODO: Implement API call to save question
-          }}
-        />
-      </div>
-    ),
-    "/test-creation/new-builder": () => <NewQuestionBuilder />,
-    "/test-creation/settings": () => (
-      <UnderConstruction
-        menuTitle="Test Settings"
-        menuIcon="⚙️"
-        description="Comprehensive test configuration and settings management for optimal test experience."
-        estimatedCompletion="2 weeks"
-        features={[
-          "Time limits and scheduling",
-          "Scoring and grading options",
-          "Access control and permissions",
-          "Test analytics and reporting",
-          "Mobile-responsive design",
-          "Progress tracking",
-        ]}
-      />
-    ),
-
-    // Zoom simulation routes
-    "/zoom": () => (
-      <UnderConstruction
-        menuTitle="Zoom Simulation"
-        menuIcon="📹"
-        description="Interactive zoom simulation feature for enhanced learning experience."
-        estimatedCompletion="TBD"
-        features={[
-          "Zoom interface simulation",
-          "Interactive controls",
-          "Real-time collaboration features",
-        ]}
-      />
-    ),
-
-    // Robotic routes
-    "/robotic": () => (
-      <UnderConstruction
-        menuTitle="Robot Face"
-        menuIcon="🤖"
-        description="Interactive robotic face interface for enhanced user interaction."
-        estimatedCompletion="TBD"
-        features={[
-          "Animated robot face",
-          "Interactive expressions",
-          "Voice and gesture recognition",
-        ]}
-      />
-    ),
 
     // Question generator routes
     "/question-generator": () => <QuestionGeneratorPage />,
