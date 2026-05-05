@@ -1,5 +1,6 @@
 "use client"
 
+import { Check } from "lucide-react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import { Badge } from "@/shared/ui/badge"
@@ -85,113 +86,129 @@ export default function QuestionList({
         </div>
       )}
       {questions.map((question) => (
-        <Card key={question.id} className="p-6 hover:shadow-lg transition-shadow bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+        <Card
+          key={question.id}
+          className="p-5 sm:p-6 hover:shadow-md transition-shadow bg-card dark:bg-emerald-950/25 border-border/80 dark:border-emerald-900/50"
+        >
           {(() => {
             const plainStem = toPlainText(question.stem)
-            return (
-          <div className={`flex gap-4 ${selectionMode ? "flex-row" : ""}`}>
-            {selectionMode && (
-              <div className="flex items-center flex-shrink-0 pt-1">
-                <Checkbox
-                  checked={selectedSet.has(question.id)}
-                  onCheckedChange={(c) => handleToggleOne(question.id, c === true)}
-                />
-              </div>
-            )}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-w-0">
-            {/* Question Stem Content */}
-            <div className="lg:col-span-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <h3 className="text-lg font-semibold text-foreground dark:text-gray-100 mb-2 line-clamp-2 cursor-help">
-                    {plainStem}
-                  </h3>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="start" className="max-w-[700px] whitespace-pre-wrap break-words text-sm leading-relaxed">
-                  {plainStem}
-                </TooltipContent>
-              </Tooltip>
-              <div className="space-y-1">
-                {(question.category || question.subject) && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">Category:</span> {question.category || question.subject}
+            const correct = question.options.find((o) => o.correct)?.label
+            const meta = (label: string, value: string | undefined) =>
+              value ? (
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground dark:text-emerald-400/80">
+                    {label}
                   </p>
-                )}
-                {question.product && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">Product:</span> {question.product}
+                  <p className="text-sm text-foreground dark:text-emerald-50/95 truncate" title={value}>
+                    {value}
                   </p>
-                )}
-                {(question.system || question.chapterName) && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">System:</span> {question.system || question.chapterName}
-                  </p>
-                )}
-                {question.topicName && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">Topic:</span> {question.topicName}
-                  </p>
-                )}
-                {question.subtopicName && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">
-                    <span className="font-medium">Subtopic:</span> {question.subtopicName}
-                  </p>
-                )}
-                {question.mcqTitle && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-300 line-clamp-2">
-                    <span className="font-medium">MCQ Title:</span> {question.mcqTitle}
-                  </p>
-                )}
-              </div>
-              {question.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {question.tags.filter((tag) => !tag.startsWith("__")).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs text-foreground dark:text-gray-200 border-border dark:border-gray-600">
-                      {tag}
-                    </Badge>
-                  ))}
                 </div>
-              )}
-            </div>
+              ) : null
+            return (
+              <div className={`flex gap-4 ${selectionMode ? "flex-row" : ""}`}>
+                {selectionMode && (
+                  <div className="flex items-start flex-shrink-0 pt-1">
+                    <Checkbox
+                      checked={selectedSet.has(question.id)}
+                      onCheckedChange={(c) => handleToggleOne(question.id, c === true)}
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 space-y-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-gray-50 line-clamp-3 cursor-help pr-0 sm:pr-4 flex-1 min-w-0">
+                          {plainStem}
+                        </h3>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="max-w-[700px] whitespace-pre-wrap break-words text-sm leading-relaxed"
+                      >
+                        {plainStem}
+                      </TooltipContent>
+                    </Tooltip>
+                    <div className="flex flex-wrap gap-1.5 shrink-0 sm:justify-end">
+                      {onView && (
+                        <Button
+                          type="button"
+                          onClick={() => onView(question.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-muted-foreground hover:text-foreground dark:text-emerald-200/80 dark:hover:text-white"
+                        >
+                          View
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        onClick={() => onEdit(question.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-muted-foreground hover:text-foreground dark:text-emerald-200/80 dark:hover:text-white"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => onDelete(question.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-red-600/90 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
 
-            {/* Stats */}
-            <div className="flex flex-col justify-center text-sm text-muted-foreground dark:text-gray-300">
-              <p>
-                <span className="font-semibold">{question.options.length}</span> options
-              </p>
-              <p>
-                Correct answer: <span className="font-semibold">{question.options.find((o) => o.correct)?.label}</span>
-              </p>
-            </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 text-sm border-t border-border/60 dark:border-emerald-900/50 pt-4">
+                    <div className="space-y-3 min-w-0">
+                      {meta("Product", question.product)}
+                      {meta("Topic", question.topicName)}
+                      {meta("Title", question.mcqTitle)}
+                      {(question.category || question.subject) &&
+                        meta("Category", question.category || question.subject)}
+                    </div>
+                    <div className="space-y-3 min-w-0">
+                      {meta("System", question.system || question.chapterName)}
+                      {meta("Subtopic", question.subtopicName)}
+                    </div>
+                  </div>
 
-            {/* Actions */}
-            <div className="flex gap-2 lg:justify-end items-center">
-              {onView && (
-                <Button 
-                  onClick={() => onView(question.id)} 
-                  variant="outline" 
-                  className="flex-1 lg:flex-none bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-blue-400 border-primary/30 dark:border-primary/50"
-                >
-                  View
-                </Button>
-              )}
-              <Button 
-                onClick={() => onEdit(question.id)} 
-                variant="outline" 
-                className="flex-1 lg:flex-none border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700"
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={() => onDelete(question.id)}
-                variant="outline"
-                className="flex-1 lg:flex-none text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-300 dark:border-red-800"
-              >
-                Delete
-              </Button>
-            </div>
-            </div>
-          </div>
+                  {question.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {question.tags
+                        .filter((tag) => !tag.startsWith("__"))
+                        .map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs font-normal bg-muted/80 text-muted-foreground dark:bg-emerald-950/80 dark:text-emerald-200/90 dark:border-emerald-900/60"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border/60 dark:border-emerald-900/50">
+                    <p className="text-sm text-muted-foreground dark:text-emerald-300/80">
+                      <span className="font-medium text-foreground dark:text-emerald-50">
+                        {question.options.length}
+                      </span>{" "}
+                      options
+                    </p>
+                    {correct && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm dark:bg-emerald-500">
+                        <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
+                        Answer: {correct}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             )
           })()}
         </Card>

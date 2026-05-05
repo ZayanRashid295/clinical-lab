@@ -95,7 +95,17 @@
     "billing": "बिलिंग",
     "study": "अध्ययन",
     "questionBank": "प्रश्न बैंक",
-    "studyMaterials": "अध्ययन सामग्री",
+    "studyPlanner": "अध्ययन योजनाकार",
+    "goals": "लक्ष्य",
+    "achievements": "उपलब्धियां",
+    "aiTutor": "एआई ट्यूटर",
+    "mockExams": "मॉक परीक्षा",
+    "community": "समुदाय",
+    "discussions": "चर्चाएं",
+    "studyGroups": "अध्ययन समूह",
+    "helpAndSupport": "सहायता और समर्थन",
+    "feedback": "प्रतिक्रिया",
+    "myReports": "मेरी रिपोर्ट",
     "flashcards": "फ्लैशकार्ड",
     "notes": "मेरे नोट्स",
     "testCreation": "टेस्ट निर्माण",
@@ -131,5 +141,39 @@
     "locationAnalytics": "स्थान विश्लेषण",
     "auditLogs": "ऑडिट लॉग्स",
     "paymentAnalytics": "भुगतान विश्लेषण"
+  },
+  "nav": {
+    "section": {
+      "overview": "OVERVIEW",
+      "content": "CONTENT",
+      "learning": "LEARNING",
+      "tools": "TOOLS",
+      "platform": "PLATFORM"
+    },
+    "workspace": {
+      "admin": "Admin workspace",
+      "student": "Student workspace",
+      "faculty": "Faculty workspace",
+      "default": "Workspace"
+    },
+    "badgeAi": "AI"
+  },
+  "questionGenerator": {
+    "bankTitle": "Question bank",
+    "bankSubtitle": "Manage, review, and create MCQ questions",
+    "statTotal": "Total questions",
+    "statTotalHint": "Active in bank",
+    "statSystems": "Systems",
+    "statSystemsHint": "Distinct systems",
+    "statAvgOptions": "Avg. options",
+    "statAvgOptionsHint": "Per question",
+    "statProducts": "Products",
+    "statProductsHint": "Distinct products",
+    "filterAll": "All",
+    "filterPresentation": "Presentation",
+    "searchPlaceholder": "Search by stem, category, system, topic…",
+    "showingQuestions": "Showing {count} questions",
+    "noSystemsYet": "—",
+    "noProductsYet": "—"
   }
 }

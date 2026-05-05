@@ -7,7 +7,7 @@ model Notification {
   type      NotificationType
   title     String
   message   String
-  data      Json?            // Additional data for the notification
+  data      Json? // Additional data for the notification
   isRead    Boolean          @default(false)
   isSent    Boolean          @default(false)
   sentAt    DateTime?
@@ -21,15 +21,15 @@ model Notification {
 }
 
 model NotificationTemplate {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  type        NotificationType
-  title       String
-  message     String
+  id        String           @id @default(cuid())
+  name      String           @unique
+  type      NotificationType
+  title     String
+  message   String
   // variables   String[] // Array of variable names used in the template
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive  Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   @@map("notification_templates")
 }
@@ -51,41 +51,41 @@ model NotificationPreference {
 }
 
 model NotificationQueue {
-  id        String           @id @default(cuid())
-  userId    String
-  type      NotificationType
-  title     String
-  message   String
-  data      Json?
-  channel   NotificationChannel
-  status    QueueStatus      @default(PENDING)
-  priority  Int              @default(0)
-  attempts  Int              @default(0)
-  maxAttempts Int            @default(3)
+  id          String              @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?
+  channel     NotificationChannel
+  status      QueueStatus         @default(PENDING)
+  priority    Int                 @default(0)
+  attempts    Int                 @default(0)
+  maxAttempts Int                 @default(3)
   scheduledAt DateTime?
   processedAt DateTime?
-  failedAt  DateTime?
-  error     String?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  failedAt    DateTime?
+  error       String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
   @@map("notification_queue")
 }
 
 model NotificationLog {
-  id             String           @id @default(cuid())
+  id             String              @id @default(cuid())
   notificationId String?
   userId         String
   type           NotificationType
   channel        NotificationChannel
   status         DeliveryStatus
-  provider       String?          // Email provider, SMS provider, etc.
-  providerId     String?          // External provider message ID
+  provider       String? // Email provider, SMS provider, etc.
+  providerId     String? // External provider message ID
   error          String?
   sentAt         DateTime?
   deliveredAt    DateTime?
   readAt         DateTime?
-  createdAt      DateTime         @default(now())
+  createdAt      DateTime            @default(now())
 
   @@map("notification_logs")
 }
@@ -101,6 +101,29 @@ enum NotificationType {
   SECURITY_ALERT
   SYSTEM_UPDATE
   GENERAL
+  ACHIEVEMENT_UNLOCKED
+  STREAK_MILESTONE
+  STREAK_RISK
+  STUDY_REMINDER
+  GOAL_PROGRESS
+  GOAL_COMPLETED
+  GOAL_DUE
+  DISCUSSION_REPLY
+  DISCUSSION_CREATED
+  DISCUSSION_UPVOTE
+  STUDY_GROUP_POST
+  STUDY_GROUP_JOIN
+  FEEDBACK_REPLY
+  FEEDBACK_TICKET_CREATED
+  FEEDBACK_USER_REPLY
+  QUESTION_REPORT_UPDATE
+  QUESTION_REPORT_CREATED
+  MOCK_EXAM_RESULT
+  MOCK_EXAM_PUBLISHED
+  WELCOME
+  SUBSCRIPTION_EXPIRING
+  SUBSCRIPTION_EXPIRED
+  SUBSCRIPTION_RENEWED
 }
 
 enum NotificationChannel {

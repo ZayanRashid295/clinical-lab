@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { EDUCATION_SEED_USERS } from "./education-users.seed";
 
 /**
  * Seeds three subscription packages (Basic / Standard / Premium) on a product subtype
- * and three user subscriptions (John, Jane, Mike from seed-base).
+ * and three user subscriptions (first three education seed students).
  */
 export async function seedSubscriptions(prisma: PrismaClient) {
   console.log("📋 Seeding subscriptions...");
@@ -87,11 +88,48 @@ export async function seedSubscriptions(prisma: PrismaClient) {
     packages.push(pkg);
   }
 
-  const userEmails = [
-    "john.doe@example.com",
-    "jane.smith@example.com",
-    "mike.wilson@example.com",
-  ] as const;
+  // Ensure the four canonical PackageFeatures exist and link them to packages so
+  // backend feature gates (e.g. "Qbank Access") work for paid users.
+  const featureDefs = [
+    { name: "Qbank Access", description: "Full question bank access" },
+    { name: "Flashcards", description: "Spaced-repetition flashcards" },
+    { name: "Study Planner", description: "Daily plan + tasks" },
+    { name: "Notes", description: "Personal study notes" },
+  ];
+  const features = [];
+  for (const def of featureDefs) {
+    const f = await prisma.packageFeatures.upsert({
+      where: { name: def.name },
+      update: { description: def.description, isActive: true },
+      create: {
+        name: def.name,
+        description: def.description,
+        isActive: true,
+      },
+    });
+    features.push(f);
+  }
+  for (const pkg of packages) {
+    for (const f of features) {
+      await prisma.subscriptionFeatures.upsert({
+        where: {
+          subscriptionPackageId_packageFeatureId: {
+            subscriptionPackageId: pkg.id,
+            packageFeatureId: f.id,
+          },
+        },
+        update: {},
+        create: {
+          subscriptionPackageId: pkg.id,
+          packageFeatureId: f.id,
+        },
+      });
+    }
+  }
+
+  const userEmails = EDUCATION_SEED_USERS.filter((u) => u.role === "STUDENT")
+    .slice(0, 3)
+    .map((u) => u.email);
 
   const users = await prisma.user.findMany({
     where: { email: { in: [...userEmails] } },

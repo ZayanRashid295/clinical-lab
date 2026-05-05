@@ -127,7 +127,7 @@ export function AuthScreen({
   };
 
   const fillTestCredentials = () => {
-    setEmail("admin@uber.com");
+    setEmail("admin@clinicallab.test");
     setPassword("password123");
     setError("");
   };

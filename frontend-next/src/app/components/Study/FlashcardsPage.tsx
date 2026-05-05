@@ -1,728 +1,508 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/ui/textarea";
 import { Badge } from "@/shared/ui/badge";
-import { Progress } from "@/shared/ui/progress";
 import {
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  Clock,
-  Target,
-  BookOpen,
+  Select,
+  SelectContent,
+  SELECT_EMPTY_VALUE,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+import {
   Plus,
-  Filter,
-  Shuffle,
-  Play,
-  Pause,
-  CheckCircle,
-  XCircle,
-  Eye,
-  EyeOff,
-  RotateCw,
+  Loader2,
+  RefreshCw,
+  Trash2,
+  Edit,
+  X,
+  RotateCcw,
+  ChevronRight,
+  Layers,
+  Clock,
+  Trophy,
+  Target,
+  Save,
 } from "lucide-react";
+import {
+  flashcardsService,
+  type Flashcard,
+  type FlashcardRating,
+  type FlashcardsStats,
+  type CreateFlashcardPayload,
+} from "@/app/services/student";
 
-interface Flashcard {
-  id: string;
-  front: string;
-  back: string;
-  category: string;
-  topic: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  isBookmarked: boolean;
-  lastReviewed?: string;
-  reviewCount: number;
-  correctCount: number;
-  tags: string[];
-}
-
-// Mock data for demonstration
-const mockFlashcards: Flashcard[] = [
-  {
-    id: "1",
-    front: "What is the normal range for systolic blood pressure?",
-    back: "90-120 mmHg. Normal systolic blood pressure is considered to be between 90-120 mmHg, with optimal being less than 120 mmHg.",
-    category: "cardiology",
-    topic: "vital_signs",
-    difficulty: "beginner",
-    isBookmarked: false,
-    reviewCount: 5,
-    correctCount: 4,
-    tags: ["vital_signs", "hypertension", "normal_values"],
-  },
-  {
-    id: "2",
-    front: "What are the classic symptoms of myocardial infarction?",
-    back: "Chest pain, shortness of breath, nausea, sweating, and pain radiating to the left arm, jaw, or back. These symptoms may vary between men and women.",
-    category: "cardiology",
-    topic: "myocardial_infarction",
-    difficulty: "intermediate",
-    isBookmarked: true,
-    reviewCount: 8,
-    correctCount: 6,
-    tags: ["chest_pain", "emergency", "symptoms"],
-  },
-  {
-    id: "3",
-    front: "What is the mechanism of action of ACE inhibitors?",
-    back: "ACE inhibitors block the angiotensin-converting enzyme, preventing the conversion of angiotensin I to angiotensin II, which reduces vasoconstriction and aldosterone secretion.",
-    category: "pharmacology",
-    topic: "ace_inhibitors",
-    difficulty: "advanced",
-    isBookmarked: false,
-    reviewCount: 3,
-    correctCount: 2,
-    tags: ["pharmacology", "mechanism", "cardiovascular"],
-  },
-  {
-    id: "4",
-    front: "What is the normal range for serum creatinine?",
-    back: "0.6-1.2 mg/dL for men and 0.5-1.1 mg/dL for women. Creatinine levels are used to assess kidney function.",
-    category: "nephrology",
-    topic: "kidney_function",
-    difficulty: "beginner",
-    isBookmarked: false,
-    reviewCount: 7,
-    correctCount: 7,
-    tags: ["kidney_function", "lab_values", "normal_values"],
-  },
-  {
-    id: "5",
-    front: "What are the signs of acute kidney injury?",
-    back: "Oliguria (<400ml/day), elevated BUN and creatinine, fluid overload, electrolyte imbalances, and metabolic acidosis.",
-    category: "nephrology",
-    topic: "acute_kidney_injury",
-    difficulty: "intermediate",
-    isBookmarked: true,
-    reviewCount: 4,
-    correctCount: 3,
-    tags: ["kidney_injury", "symptoms", "diagnosis"],
-  },
-];
+const blankDraft: CreateFlashcardPayload = {
+  deck: "General",
+  front: "",
+  back: "",
+  hint: "",
+  difficulty: "medium",
+};
 
 export default function FlashcardsPage() {
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [previousCardIndex, setPreviousCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [flipDirection, setFlipDirection] = useState<"forward" | "backward" | null>(null);
-  const [studyMode, setStudyMode] = useState<"review" | "practice">("review");
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [studyCards, setStudyCards] = useState<Flashcard[]>(mockFlashcards);
-  const [sessionStats, setSessionStats] = useState({
-    total: 0,
-    correct: 0,
-    incorrect: 0,
-    skipped: 0,
-  });
-  const [animationDirection, setAnimationDirection] = useState<
-    "next" | "prev" | null
-  >(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [tab, setTab] = useState<"review" | "library">("review");
+  const [cards, setCards] = useState<Flashcard[]>([]);
+  const [stats, setStats] = useState<FlashcardsStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deck, setDeck] = useState<string>("");
+  const [showEditor, setShowEditor] = useState(false);
+  const [editing, setEditing] = useState<Flashcard | null>(null);
+  const [draft, setDraft] = useState<CreateFlashcardPayload>(blankDraft);
+  const [busy, setBusy] = useState(false);
 
-  // Filter cards based on selected criteria
+  // review state
+  const [reviewIdx, setReviewIdx] = useState(0);
+  const [reveal, setReveal] = useState(false);
+
+  const loadAll = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [list, s] = await Promise.all([
+        flashcardsService.list(deck ? { deck } : undefined),
+        flashcardsService.stats(),
+      ]);
+      setCards(list);
+      setStats(s);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load flashcards");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let filtered = mockFlashcards;
+    loadAll();
+  }, [deck]);
 
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((card) => card.category === selectedCategory);
-    }
+  const dueCards = useMemo(
+    () => cards.filter((c) => new Date(c.dueAt).getTime() <= Date.now()),
+    [cards]
+  );
 
-    if (selectedDifficulty !== "all") {
-      filtered = filtered.filter(
-        (card) => card.difficulty === selectedDifficulty
-      );
-    }
+  const reviewQueue = dueCards;
+  const current = reviewQueue[reviewIdx] ?? null;
 
-    if (isShuffled) {
-      filtered = [...filtered].sort(() => Math.random() - 0.5);
-    }
+  useEffect(() => {
+    setReviewIdx(0);
+    setReveal(false);
+  }, [tab, deck]);
 
-    setStudyCards(filtered);
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
-    setFlipDirection(null);
-    setShowAnswer(false);
-  }, [selectedCategory, selectedDifficulty, isShuffled]);
-
-  const currentCard = studyCards[currentCardIndex];
-  const previousCard = studyCards[previousCardIndex];
-
-  const handleFlip = () => {
-    if (!isAnimating) {
-      const newFlipState = !isFlipped;
-      setIsFlipped(newFlipState);
-      setFlipDirection(newFlipState ? "forward" : "backward");
-      setShowAnswer(!showAnswer);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentCardIndex < studyCards.length - 1 && !isAnimating) {
-      setPreviousCardIndex(currentCardIndex);
-      setIsAnimating(true);
-      setAnimationDirection("next");
-      setCurrentCardIndex(currentCardIndex + 1);
-      setIsFlipped(false);
-      setFlipDirection(null);
-      setShowAnswer(false);
-
-      setTimeout(() => {
-        setIsAnimating(false);
-        setAnimationDirection(null);
-      }, 600);
+  const submitReview = async (rating: FlashcardRating) => {
+    if (!current) return;
+    setBusy(true);
+    try {
+      await flashcardsService.review(current.id, rating);
+      const nextIdx = reviewIdx + 1;
+      if (nextIdx >= reviewQueue.length) {
+        await loadAll();
+        setReviewIdx(0);
+      } else {
+        setReviewIdx(nextIdx);
+      }
+      setReveal(false);
+    } catch (e: any) {
+      setError(e?.message || "Could not submit review");
+    } finally {
+      setBusy(false);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentCardIndex > 0 && !isAnimating) {
-      setPreviousCardIndex(currentCardIndex);
-      setIsAnimating(true);
-      setAnimationDirection("prev");
-      setCurrentCardIndex(currentCardIndex - 1);
-      setIsFlipped(false);
-      setFlipDirection(null);
-      setShowAnswer(false);
+  const openCreate = () => {
+    setEditing(null);
+    setDraft({ ...blankDraft, deck: deck || "General" });
+    setShowEditor(true);
+  };
+  const openEdit = (c: Flashcard) => {
+    setEditing(c);
+    setDraft({
+      deck: c.deck,
+      front: c.front,
+      back: c.back,
+      hint: c.hint ?? "",
+      difficulty: c.difficulty,
+    });
+    setShowEditor(true);
+  };
 
-      setTimeout(() => {
-        setIsAnimating(false);
-        setAnimationDirection(null);
-      }, 600);
+  const save = async () => {
+    if (!draft.front.trim() || !draft.back.trim()) return;
+    setBusy(true);
+    try {
+      if (editing) {
+        await flashcardsService.update(editing.id, draft);
+      } else {
+        await flashcardsService.create(draft);
+      }
+      setShowEditor(false);
+      await loadAll();
+    } catch (e: any) {
+      setError(e?.message || "Could not save card");
+    } finally {
+      setBusy(false);
     }
   };
 
-  const handleAnswer = (isCorrect: boolean) => {
-    setSessionStats((prev) => ({
-      ...prev,
-      total: prev.total + 1,
-      correct: isCorrect ? prev.correct + 1 : prev.correct,
-      incorrect: isCorrect ? prev.incorrect : prev.incorrect + 1,
-    }));
-    handleNext();
-  };
-
-  const handleShuffle = () => {
-    setIsShuffled(!isShuffled);
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-100 text-green-800";
-      case "intermediate":
-        return "bg-yellow-100 text-yellow-800";
-      case "advanced":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const remove = async (c: Flashcard) => {
+    if (!confirm("Delete this card?")) return;
+    try {
+      await flashcardsService.remove(c.id);
+      await loadAll();
+    } catch (e: any) {
+      setError(e?.message || "Could not delete");
     }
-  };
-
-  const getProgressPercentage = () => {
-    return studyCards.length > 0
-      ? ((currentCardIndex + 1) / studyCards.length) * 100
-      : 0;
-  };
-
-  const getSuccessRate = (card: Flashcard) => {
-    return card.reviewCount > 0
-      ? (card.correctCount / card.reviewCount) * 100
-      : 0;
   };
 
   return (
-    <>
-      <style jsx global>{`
-        @keyframes zoomFadeIn {
-          0% {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes slideInFromRight {
-          0% {
-            transform: translateX(100%);
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideInFromLeft {
-          0% {
-            transform: translateX(-100%);
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideOutToLeft {
-          0% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(-100%);
-            opacity: 0.3;
-          }
-        }
-
-        @keyframes slideOutToRight {
-          0% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(100%);
-            opacity: 0.3;
-          }
-        }
-
-        @keyframes flipForward {
-          0% {
-            transform: rotateY(0deg);
-          }
-          50% {
-            transform: rotateY(90deg);
-            transform-origin: center;
-          }
-          100% {
-            transform: rotateY(180deg);
-          }
-        }
-
-        @keyframes flipBackward {
-          0% {
-            transform: rotateY(180deg);
-          }
-          50% {
-            transform: rotateY(90deg);
-            transform-origin: center;
-          }
-          100% {
-            transform: rotateY(0deg);
-          }
-        }
-
-        .flashcard-flip-container {
-          transform-style: preserve-3d;
-          will-change: transform;
-        }
-      `}</style>
-      <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Flashcards</h1>
-            <p className="text-muted-foreground mt-2">
-              Master medical concepts with spaced repetition flashcards
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Flashcard
-            </Button>
-            <Button variant="outline">
-              <BookOpen className="h-4 w-4 mr-2" />
-              My Decks
-            </Button>
-          </div>
+    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Flashcards</h1>
+          <p className="text-muted-foreground mt-2">
+            Spaced-repetition review for high-yield material
+          </p>
         </div>
+        <div className="flex items-center gap-2">
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-gray-500" />}
+          <Button variant="outline" size="sm" onClick={loadAll}>
+            <RefreshCw className="h-4 w-4 mr-2" /> Refresh
+          </Button>
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" /> New Card
+          </Button>
+        </div>
+      </div>
 
-        {/* Study Controls */}
+      {error && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatTile
+          label="Total"
+          value={stats?.total ?? cards.length}
+          icon={Layers}
+          color="text-blue-600 dark:text-blue-400"
+        />
+        <StatTile
+          label="Due now"
+          value={stats?.due ?? dueCards.length}
+          icon={Clock}
+          color="text-orange-500"
+        />
+        <StatTile
+          label="Mastered"
+          value={stats?.mastered ?? 0}
+          icon={Trophy}
+          color="text-emerald-600 dark:text-emerald-400"
+        />
+        <StatTile
+          label="Reviewed today"
+          value={stats?.reviewedToday ?? 0}
+          icon={Target}
+          color="text-purple-600 dark:text-purple-400"
+        />
+      </div>
+
+      <Card>
+        <CardContent className="p-4 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={tab === "review" ? "default" : "outline"}
+              onClick={() => setTab("review")}
+            >
+              Review
+            </Button>
+            <Button
+              size="sm"
+              variant={tab === "library" ? "default" : "outline"}
+              onClick={() => setTab("library")}
+            >
+              Library
+            </Button>
+          </div>
+          <div className="flex-1" />
+          <div className="w-56">
+            <Select
+              value={deck || SELECT_EMPTY_VALUE}
+              onValueChange={(value) =>
+                setDeck(value === SELECT_EMPTY_VALUE ? "" : value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All decks" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={SELECT_EMPTY_VALUE}>All decks</SelectItem>
+                {(stats?.decks ?? []).map((d) => (
+                  <SelectItem key={d.deck} value={d.deck}>
+                    {d.deck} · {d._count._all}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {tab === "review" ? (
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Category:</label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm"
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="cardiology">Cardiology</option>
-                    <option value="nephrology">Nephrology</option>
-                    <option value="pharmacology">Pharmacology</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Difficulty:</label>
-                  <select
-                    value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value)}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm"
-                  >
-                    <option value="all">All Levels</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
-
-                <Button
-                  variant={isShuffled ? "default" : "outline"}
-                  size="sm"
-                  onClick={handleShuffle}
-                >
-                  <Shuffle className="h-4 w-4 mr-2" />
-                  Shuffle
+            {reviewQueue.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Trophy className="mx-auto h-10 w-10 mb-3 text-emerald-500" />
+                <p className="text-lg font-medium">All caught up!</p>
+                <p className="text-sm">
+                  No cards are due right now. Add new ones or check back later.
+                </p>
+                <Button className="mt-4" onClick={openCreate}>
+                  <Plus className="h-4 w-4 mr-2" /> Create card
                 </Button>
               </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={studyMode === "review" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStudyMode("review")}
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Review
-                </Button>
-                <Button
-                  variant={studyMode === "practice" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStudyMode("practice")}
-                >
-                  <Target className="h-4 w-4 mr-2" />
-                  Practice
-                </Button>
+            ) : current ? (
+              <div className="max-w-2xl mx-auto space-y-4">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>
+                    Card {reviewIdx + 1} of {reviewQueue.length}
+                  </span>
+                  <Badge variant="outline">{current.deck}</Badge>
+                </div>
+                <Card className="bg-gray-50 dark:bg-gray-800/50 min-h-[180px]">
+                  <CardContent className="p-6 flex items-center justify-center text-center">
+                    <p className="text-xl whitespace-pre-wrap">
+                      {current.front}
+                    </p>
+                  </CardContent>
+                </Card>
+                {reveal ? (
+                  <Card className="border-emerald-300 dark:border-emerald-700 min-h-[120px]">
+                    <CardContent className="p-6 text-center">
+                      <p className="text-lg whitespace-pre-wrap">
+                        {current.back}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Button
+                    className="w-full"
+                    onClick={() => setReveal(true)}
+                    disabled={busy}
+                  >
+                    Show answer
+                  </Button>
+                )}
+                {reveal && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {(
+                      [
+                        { r: "AGAIN" as const, label: "Again", color: "bg-red-500 hover:bg-red-600" },
+                        { r: "HARD" as const, label: "Hard", color: "bg-orange-500 hover:bg-orange-600" },
+                        { r: "GOOD" as const, label: "Good", color: "bg-blue-500 hover:bg-blue-600" },
+                        { r: "EASY" as const, label: "Easy", color: "bg-emerald-500 hover:bg-emerald-600" },
+                      ] as const
+                    ).map((b) => (
+                      <Button
+                        key={b.r}
+                        className={`${b.color} text-white`}
+                        onClick={() => submitReview(b.r)}
+                        disabled={busy}
+                      >
+                        {b.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
+            ) : null}
           </CardContent>
         </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cards.map((c) => (
+            <Card key={c.id}>
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <Badge variant="outline" className="text-xs">
+                      {c.deck}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEdit(c)}
+                      aria-label="Edit"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => remove(c)}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm font-medium text-foreground line-clamp-3">
+                  Q: {c.front}
+                </p>
+                <p className="text-sm text-muted-foreground line-clamp-3">
+                  A: {c.back}
+                </p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+                  <span>Status: {c.status}</span>
+                  <span>
+                    Due {new Date(c.dueAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {!loading && cards.length === 0 && (
+            <Card className="md:col-span-2 lg:col-span-3">
+              <CardContent className="p-12 text-center">
+                <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No cards yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Build your first deck and start drilling.
+                </p>
+                <Button onClick={openCreate}>
+                  <Plus className="h-4 w-4 mr-2" /> Create card
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
-        {/* Progress and Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
+      {showEditor && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Progress</p>
-                  <p className="text-2xl font-bold">
-                    {currentCardIndex + 1} / {studyCards.length}
-                  </p>
-                </div>
-                <Target className="h-8 w-8 text-blue-600" />
+                <CardTitle>{editing ? "Edit card" : "New card"}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEditor(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <Progress value={getProgressPercentage()} className="mt-2" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Session Correct
-                  </p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {sessionStats.correct}
-                  </p>
-                </div>
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Session Incorrect
-                  </p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {sessionStats.incorrect}
-                  </p>
-                </div>
-                <XCircle className="h-8 w-8 text-red-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Success Rate</p>
-                  <p className="text-2xl font-bold">
-                    {sessionStats.total > 0
-                      ? Math.round(
-                          (sessionStats.correct / sessionStats.total) * 100
-                        )
-                      : 0}
-                    %
-                  </p>
-                </div>
-                <Star className="h-8 w-8 text-yellow-600" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                placeholder="Deck (e.g. Cardiology)"
+                value={draft.deck ?? ""}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, deck: e.target.value || "General" }))
+                }
+              />
+              <Textarea
+                placeholder="Front (question)"
+                value={draft.front}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, front: e.target.value }))
+                }
+                rows={3}
+              />
+              <Textarea
+                placeholder="Back (answer)"
+                value={draft.back}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, back: e.target.value }))
+                }
+                rows={3}
+              />
+              <Input
+                placeholder="Hint (optional)"
+                value={draft.hint ?? ""}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, hint: e.target.value }))
+                }
+              />
+              <Select
+                value={draft.difficulty ?? "medium"}
+                onValueChange={(v) =>
+                  setDraft((d) => ({ ...d, difficulty: v }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">Easy</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="hard">Hard</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditor(false)}
+                  disabled={busy}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={save} disabled={busy}>
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Save
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
+      )}
+    </div>
+  );
+}
 
-        {/* Flashcard */}
-        {currentCard && (
-          <div className="max-w-4xl mx-auto">
-            <Card className="min-h-[400px] overflow-hidden relative">
-              {/* Previous Card - Slides Out */}
-              {isAnimating && previousCard && (
-                <div
-                  key={`prev-${previousCard.id}`}
-                  className="absolute inset-0 w-full h-full"
-                  style={{
-                    animation:
-                      animationDirection === "next"
-                        ? "slideOutToLeft 0.6s ease-in-out forwards"
-                        : "slideOutToRight 0.6s ease-in-out forwards",
-                  }}
-                >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          className={getDifficultyColor(
-                            previousCard.difficulty
-                          )}
-                        >
-                          {previousCard.difficulty}
-                        </Badge>
-                        <Badge variant="outline">{previousCard.category}</Badge>
-                        <Badge variant="secondary">
-                          {previousCard.topic.replace("_", " ")}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Star className="h-4 w-4" />
-                        </Button>
-                        <div className="text-sm text-muted-foreground">
-                          {Math.round(getSuccessRate(previousCard))}% success
-                          rate
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
-                    <div className="text-center w-full">
-                      <div className="w-full max-w-2xl mx-auto">
-                        <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-8 relative">
-                          <p className="text-2xl leading-relaxed text-gray-800">
-                            {previousCard.front}
-                          </p>
-                          <div className="absolute bottom-4 right-4 text-blue-400 opacity-50">
-                            <RotateCw className="h-6 w-6" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </div>
-              )}
-
-              {/* Current Card - Slides In */}
-              <div
-                key={`current-${currentCard.id}`}
-                className="relative w-full h-full"
-                style={{
-                  animation:
-                    animationDirection === "next"
-                      ? "slideInFromRight 0.6s ease-in-out forwards"
-                      : animationDirection === "prev"
-                      ? "slideInFromLeft 0.6s ease-in-out forwards"
-                      : "none",
-                }}
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div
-                      className="flex items-center gap-2 transition-all duration-500"
-                      style={{
-                        animation:
-                          animationDirection === null && !isAnimating
-                            ? "zoomFadeIn 0.6s ease-out"
-                            : "none",
-                        opacity: animationDirection ? 0 : 1,
-                        transform: animationDirection
-                          ? "scale(0.8)"
-                          : "scale(1)",
-                      }}
-                    >
-                      <Badge
-                        className={getDifficultyColor(currentCard.difficulty)}
-                      >
-                        {currentCard.difficulty}
-                      </Badge>
-                      <Badge variant="outline">{currentCard.category}</Badge>
-                      <Badge variant="secondary">
-                        {currentCard.topic.replace("_", " ")}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Star className="h-4 w-4" />
-                      </Button>
-                      <div className="text-sm text-muted-foreground">
-                        {Math.round(getSuccessRate(currentCard))}% success rate
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col items-center justify-center p-8">
-                  <div className="text-center w-full">
-                    <div
-                      className="w-full max-w-2xl mx-auto"
-                      style={{ perspective: "1500px" }}
-                    >
-                      <div
-                        key={`flip-${currentCard.id}-${flipDirection}`}
-                        className="flashcard-flip-container relative w-full h-96 cursor-pointer"
-                        style={{
-                          animation: flipDirection === "forward"
-                            ? "flipForward 0.6s linear forwards"
-                            : flipDirection === "backward"
-                            ? "flipBackward 0.6s linear forwards"
-                            : "none",
-                        }}
-                        onClick={handleFlip}
-                      >
-                        {/* Front of Card */}
-                        <div
-                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-lg shadow-lg flex items-center justify-center p-8 hover:shadow-xl transition-shadow"
-                          style={{ backfaceVisibility: "hidden" }}
-                        >
-                          <p className="text-2xl leading-relaxed text-gray-800">
-                            {currentCard.front}
-                          </p>
-                          <div className="absolute bottom-4 right-4 text-blue-400">
-                            <RotateCw className="h-6 w-6" />
-                          </div>
-                        </div>
-
-                        {/* Back of Card */}
-                        <div
-                          className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-lg shadow-lg flex items-center justify-center p-8 hover:shadow-xl transition-shadow"
-                          style={{
-                            backfaceVisibility: "hidden",
-                            transform: "rotateY(180deg)",
-                          }}
-                        >
-                          <p className="text-2xl leading-relaxed text-gray-800">
-                            {currentCard.back}
-                          </p>
-                          <div className="absolute bottom-4 right-4 text-green-400">
-                            <RotateCw className="h-6 w-6" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {studyMode === "practice" && (
-                      <div className="mt-6 h-12 flex items-center justify-center">
-                        <div
-                          className={`flex items-center justify-center gap-4 transition-opacity duration-300 ${
-                            isFlipped ? "opacity-100" : "opacity-0 pointer-events-none"
-                          }`}
-                          aria-hidden={!isFlipped}
-                        >
-                          <Button
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAnswer(false);
-                            }}
-                            className="text-red-600 border-red-600 hover:bg-red-50"
-                          >
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Incorrect
-                          </Button>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAnswer(true);
-                            }}
-                            className="text-green-600 border-green-600 hover:bg-green-50"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Correct
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </div>
-            </Card>
-
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-6">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentCardIndex === 0}
-              >
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Previous
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentCardIndex(0)}
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Reset
-                </Button>
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={handleNext}
-                disabled={currentCardIndex === studyCards.length - 1}
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
+function StatTile({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: number;
+  icon: any;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-2xl font-bold">{value}</p>
           </div>
-        )}
-
-        {studyCards.length === 0 && (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                No flashcards found
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Try adjusting your filters or create new flashcards to get
-                started.
-              </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Flashcard
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </>
+          <Icon className={`h-8 w-8 ${color}`} />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

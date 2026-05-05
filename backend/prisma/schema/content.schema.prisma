@@ -24,7 +24,7 @@ model Topic {
 model Subtopic {
   id          String   @id @default(cuid())
   topicId     String
-  name        String   // History & Presentation, Diagnosis, Management, etc.
+  name        String // History & Presentation, Diagnosis, Management, etc.
   description String?
   order       Int      @default(0) // For ordering subtopics
   isActive    Boolean  @default(true)
@@ -40,32 +40,32 @@ model Subtopic {
 }
 
 model Question {
-  id           String   @id @default(cuid())
-  subtopicId   String
-  categoryId   String?
-  productId    String?
-  systemId     String?
-  topicId      String?
-  title        String?  @db.VarChar(500) // Short, meaningful title for the question
-  question     String   @db.Text
-  explanation  String?  @db.Text
-  tags         Json?
-  difficulty   String   @default("medium")
-  points       Int      @default(1)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  subtopicId  String
+  categoryId  String?
+  productId   String?
+  systemId    String?
+  topicId     String?
+  title       String?  @db.VarChar(500) // Short, meaningful title for the question
+  question    String   @db.Text
+  explanation String?  @db.Text
+  tags        Json?
+  difficulty  String   @default("medium")
+  points      Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  subtopic             Subtopic              @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
-  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  product              Product?              @relation(fields: [productId], references: [id], onDelete: SetNull)
-  system               System?               @relation(fields: [systemId], references: [id], onDelete: SetNull)
-  topic                Topic?                @relation(fields: [topicId], references: [id], onDelete: SetNull)
-  choices              QuestionChoice[]
-  questionStemBlocks   QuestionStemBlock[]
-  explanationBlocks    ExplanationBlock[]    @relation("QuestionExplanation")
-  perAnswerExplanations PerAnswerExplanation[]
+  subtopic               Subtopic                @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  category               Category?               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  product                Product?                @relation(fields: [productId], references: [id], onDelete: SetNull)
+  system                 System?                 @relation(fields: [systemId], references: [id], onDelete: SetNull)
+  topic                  Topic?                  @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  choices                QuestionChoice[]
+  questionStemBlocks     QuestionStemBlock[]
+  explanationBlocks      ExplanationBlock[]      @relation("QuestionExplanation")
+  perAnswerExplanations  PerAnswerExplanation[]
   questionPaperQuestions QuestionPaperQuestion[]
 
   @@map("questions")
@@ -74,7 +74,7 @@ model Question {
 model QuestionChoice {
   id         String   @id @default(cuid())
   questionId String
-  text       String   // Choice text
+  text       String // Choice text
   isCorrect  Boolean  @default(false)
   order      Int      @default(0) // For ordering choices (A, B, C, D)
   createdAt  DateTime @default(now())
@@ -89,20 +89,20 @@ model QuestionChoice {
 
 // Rich content blocks for explanations (supports text, tables, images)
 model ExplanationBlock {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   questionId  String?
   perAnswerId String?
 
-  type        ExplanationBlockType
-  order       Int      @default(0)
-  data        Json
+  type  ExplanationBlockType
+  order Int                  @default(0)
+  data  Json
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  question    Question?             @relation("QuestionExplanation", fields: [questionId], references: [id], onDelete: Cascade)
-  perAnswer   PerAnswerExplanation? @relation(fields: [perAnswerId], references: [id], onDelete: Cascade)
+  question  Question?             @relation("QuestionExplanation", fields: [questionId], references: [id], onDelete: Cascade)
+  perAnswer PerAnswerExplanation? @relation(fields: [perAnswerId], references: [id], onDelete: Cascade)
 
   @@map("explanation_blocks")
 }
@@ -115,16 +115,16 @@ enum ExplanationBlockType {
 
 // Per-answer explanations (A, B, C, D, E)
 model PerAnswerExplanation {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   questionId  String
   choiceLabel String
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  question    Question            @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  blocks      ExplanationBlock[]
+  question Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  blocks   ExplanationBlock[]
 
   @@unique([questionId, choiceLabel])
   @@map("per_answer_explanations")
@@ -132,18 +132,18 @@ model PerAnswerExplanation {
 
 // Rich content blocks for question stem (supports text, images, and tables)
 model QuestionStemBlock {
-  id          String   @id @default(cuid())
-  questionId  String
+  id         String @id @default(cuid())
+  questionId String
 
-  type        QuestionStemBlockType
-  order       Int      @default(0)
-  data        Json
+  type  QuestionStemBlockType
+  order Int                   @default(0)
+  data  Json
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  question    Question            @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@map("question_stem_blocks")
 }

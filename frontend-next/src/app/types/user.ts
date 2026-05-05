@@ -40,6 +40,14 @@ export interface Role {
   updatedAt: string;
 }
 
+/** Roles seeded for Clinical Lab (education). */
+export type AppUserRole =
+  | "SUPERADMIN"
+  | "ADMIN"
+  | "FACULTY"
+  | "STUDENT"
+  | "INSTITUTION_MANAGER";
+
 export interface UserQueryParams {
   page?: number;
   limit?: number;
@@ -54,7 +62,7 @@ export interface UserQueryParams {
   sortOrder?: "asc" | "desc";
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
-  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
+  role?: AppUserRole;
   dateFrom?: string;
   dateTo?: string;
 }
@@ -78,7 +86,7 @@ export interface UpdateUserDto {
 export interface UserFilters {
   search?: string;
   status?: "ACTIVE" | "INACTIVE";
-  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
+  role?: AppUserRole;
   dateFrom?: string;
   dateTo?: string;
   page?: number;

@@ -337,10 +337,15 @@ export class AssessmentsController {
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async submitAssessment(
+    @Request() req,
     @Param("id") id: string,
     @Body() submitAssessmentDto: SubmitAssessmentDto
   ) {
-    return this.assessmentsService.submitAssessment(id, submitAssessmentDto);
+    return this.assessmentsService.submitAssessment(
+      id,
+      submitAssessmentDto,
+      req.user?.userId
+    );
   }
 
   @Get(":id/results")

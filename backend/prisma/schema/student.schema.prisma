@@ -1,0 +1,212 @@
+// Student-facing schema: bookmarks, notes, flashcards, study plans, sessions.
+// Designed to be self-contained and to use scalar foreign-key columns so it
+// can compile with the existing modular schema layout without forcing
+// every other model to declare a back-relation.
+
+// ────────────────────────────────────────────────────────────────────────────
+// Bookmarks
+// One row = a user pinned an entity. Polymorphic on resourceType.
+// ────────────────────────────────────────────────────────────────────────────
+model Bookmark {
+  id           String       @id @default(cuid())
+  userId       String
+  resourceType BookmarkType
+  resourceId   String
+  note         String?      @db.Text
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([userId, resourceType, resourceId])
+  @@index([userId, resourceType])
+  @@map("bookmarks")
+}
+
+enum BookmarkType {
+  QUESTION
+  NOTE
+  FLASHCARD
+  TOPIC
+  SUBTOPIC
+  PRODUCT
+  MATERIAL
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Notes
+// Free-form learner notes. Optionally attached to a content node so the UI
+// can render notes per question / topic / subtopic.
+// ────────────────────────────────────────────────────────────────────────────
+model StudentNote {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  body       String   @db.Text
+  color      String? // for the cards UI (e.g. "yellow")
+  pinned     Boolean  @default(false)
+  tags       Json?
+  questionId String?
+  topicId    String?
+  subtopicId String?
+  systemId   String?
+  productId  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, pinned])
+  @@index([userId, updatedAt])
+  @@map("student_notes")
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Flashcards
+// Lightweight SRS: each card carries due date + ease tracking from reviews.
+// ────────────────────────────────────────────────────────────────────────────
+model Flashcard {
+  id             String          @id @default(cuid())
+  userId         String
+  deck           String          @default("General")
+  front          String          @db.Text
+  back           String          @db.Text
+  hint           String?         @db.Text
+  tags           Json?
+  difficulty     String          @default("medium") // easy | medium | hard
+  status         FlashcardStatus @default(NEW)
+  questionId     String?
+  topicId        String?
+  subtopicId     String?
+  systemId       String?
+  productId      String?
+  // SRS fields
+  intervalDays   Int             @default(0)
+  easeFactor     Float           @default(2.5)
+  repetitions    Int             @default(0)
+  dueAt          DateTime        @default(now())
+  lastReviewedAt DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  reviews FlashcardReview[]
+
+  @@index([userId, dueAt])
+  @@index([userId, deck])
+  @@map("flashcards")
+}
+
+enum FlashcardStatus {
+  NEW
+  LEARNING
+  REVIEW
+  MASTERED
+}
+
+model FlashcardReview {
+  id           String          @id @default(cuid())
+  flashcardId  String
+  userId       String
+  rating       FlashcardRating
+  intervalDays Int
+  easeFactor   Float
+  reviewedAt   DateTime        @default(now())
+
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+  @@index([flashcardId, reviewedAt])
+  @@map("flashcard_reviews")
+}
+
+enum FlashcardRating {
+  AGAIN
+  HARD
+  GOOD
+  EASY
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Study Plan + Tasks
+// One active plan per user (enforced in service layer); tasks scheduled by day.
+// ────────────────────────────────────────────────────────────────────────────
+model StudyPlan {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String   @default("My Study Plan")
+  description String?
+  goal        String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks StudyTask[]
+
+  @@index([userId, isActive])
+  @@map("study_plans")
+}
+
+model StudyTask {
+  id              String          @id @default(cuid())
+  studyPlanId     String
+  userId          String
+  title           String
+  description     String?         @db.Text
+  type            StudyTaskType   @default(GENERAL)
+  scheduledFor    DateTime
+  durationMinutes Int             @default(30)
+  status          StudyTaskStatus @default(PENDING)
+  completedAt     DateTime?
+  // Optional context: if this task points to a system / topic / subtopic / question paper
+  systemId        String?
+  topicId         String?
+  subtopicId      String?
+  questionPaperId String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  studyPlan StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scheduledFor])
+  @@index([userId, status])
+  @@map("study_tasks")
+}
+
+enum StudyTaskType {
+  READING
+  PRACTICE
+  REVIEW
+  FLASHCARDS
+  ASSESSMENT
+  GENERAL
+}
+
+enum StudyTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Study Sessions
+// Generic time-on-task ledger so dashboards can show streaks and time today.
+// ────────────────────────────────────────────────────────────────────────────
+model StudySession {
+  id              String           @id @default(cuid())
+  userId          String
+  type            StudySessionType @default(STUDY)
+  startedAt       DateTime         @default(now())
+  endedAt         DateTime?
+  durationSeconds Int              @default(0)
+  meta            Json?
+
+  @@index([userId, startedAt])
+  @@map("study_sessions")
+}
+
+enum StudySessionType {
+  STUDY
+  PRACTICE
+  ASSESSMENT
+  FLASHCARDS
+  REVIEW
+}

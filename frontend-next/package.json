@@ -95,6 +95,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "remark-stringify": "^11.0.0",
+    "socket.io-client": "^4.8.3",
     "sonner": "latest",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",

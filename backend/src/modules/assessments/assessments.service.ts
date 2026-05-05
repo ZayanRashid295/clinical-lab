@@ -8,10 +8,16 @@ import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
 import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
+import { AchievementsService } from "../achievements/achievements.service";
+import { GoalsService } from "../goals/goals.service";
 
 @Injectable()
 export class AssessmentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private achievements: AchievementsService,
+    private goals: GoalsService
+  ) {}
 
   // ========== QUESTION PAPERS ==========
   async findAll(query: QueryQuestionPaperDto) {
@@ -396,7 +402,11 @@ export class AssessmentsService {
     };
   }
 
-  async submitAssessment(id: string, submitAssessmentDto: SubmitAssessmentDto) {
+  async submitAssessment(
+    id: string,
+    submitAssessmentDto: SubmitAssessmentDto,
+    userId?: string
+  ) {
     const questionPaper = await this.prisma.questionPaper.findUnique({
       where: { id },
     });
@@ -451,6 +461,45 @@ export class AssessmentsService {
 
     const score =
       totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+    if (userId) {
+      const tasks: Promise<unknown>[] = [];
+      if (totalQuestions > 0) {
+        tasks.push(
+          this.achievements
+            .recordActivity(userId, "QUESTIONS_ANSWERED", totalQuestions)
+            .catch(() => undefined)
+        );
+        tasks.push(
+          this.goals
+            .recordProgress(userId, "QUESTIONS_ANSWERED", totalQuestions)
+            .catch(() => undefined)
+        );
+      }
+      if (correctAnswers > 0) {
+        tasks.push(
+          this.achievements
+            .recordActivity(userId, "CORRECT_ANSWERS", correctAnswers)
+            .catch(() => undefined)
+        );
+        tasks.push(
+          this.goals
+            .recordProgress(userId, "CORRECT_ANSWERS", correctAnswers)
+            .catch(() => undefined)
+        );
+      }
+      tasks.push(
+        this.achievements
+          .recordActivity(userId, "TESTS_COMPLETED", 1)
+          .catch(() => undefined)
+      );
+      tasks.push(
+        this.goals
+          .recordProgress(userId, "TESTS_COMPLETED", 1)
+          .catch(() => undefined)
+      );
+      await Promise.all(tasks);
+    }
 
     return {
       message: "Assessment submitted successfully",

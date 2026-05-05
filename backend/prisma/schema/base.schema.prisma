@@ -19,29 +19,26 @@ model User {
   roles        UserRole[]
 
   // Cross-module relations
-  
 
   // Chat module
-  chatParticipants    ChatParticipant[]    @relation("ChatParticipant")
-  chatMessages        ChatMessage[]        @relation("ChatMessageSender")
+  chatParticipants     ChatParticipant[]     @relation("ChatParticipant")
+  chatMessages         ChatMessage[]         @relation("ChatMessageSender")
   chatMessageReactions ChatMessageReaction[] @relation("ChatMessageReaction")
-  chatReadStatus      ChatReadStatus[]     @relation("ChatReadStatus")
+  chatReadStatus       ChatReadStatus[]      @relation("ChatReadStatus")
 
   // Payment module
-  payments           Payment[]           @relation("UserPayments")
-  paymentMethods     PaymentMethod[]     @relation("UserPaymentMethods")
-  promoCodeUsages    PromoCodeUsage[]    @relation("PromoCodeUsage")
-  wallet             Wallet?
-
+  payments        Payment[]        @relation("UserPayments")
+  paymentMethods  PaymentMethod[]  @relation("UserPaymentMethods")
+  promoCodeUsages PromoCodeUsage[] @relation("PromoCodeUsage")
+  wallet          Wallet?
 
   // Notification module
-  notifications      Notification[]      @relation("UserNotifications")
+  notifications           Notification[]          @relation("UserNotifications")
   notificationPreferences NotificationPreference?
 
-
   // LMS module
-  questionPapers     QuestionPaper[]
-  subscriptions      Subscription[]
+  questionPapers QuestionPaper[]
+  subscriptions  Subscription[]
 
   // Institution management
   institutionManager InstitutionManager?
@@ -50,12 +47,12 @@ model User {
 }
 
 model UserSettings {
-  id              String  @id @default(cuid())
-  userId          String  @unique
-  language        String  @default("en")
-  timezone        String  @default("UTC")
-  notifications   Json    @default("{}")
-  privacySettings Json    @default("{}")
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  language        String   @default("en")
+  timezone        String   @default("UTC")
+  notifications   Json     @default("{}")
+  privacySettings Json     @default("{}")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -85,8 +82,8 @@ model Permission {
   id          String   @id @default(cuid())
   name        String   @unique
   description String?
-  resource    String   // e.g., "ride", "user", "payment"
-  action      String   // e.g., "create", "read", "update", "delete"
+  resource    String // e.g., "ride", "user", "payment"
+  action      String // e.g., "create", "read", "update", "delete"
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -138,15 +135,15 @@ model RolePermission {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String?
-  action    String
-  resource  String
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String
   resourceId String?
-  details   Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 
   @@map("audit_logs")
 }

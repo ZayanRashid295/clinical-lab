@@ -95,7 +95,17 @@
     "billing": "الفواتير",
     "study": "الدراسة",
     "questionBank": "بنك الأسئلة",
-    "studyMaterials": "مواد الدراسة",
+    "studyPlanner": "مخطط الدراسة",
+    "goals": "الأهداف",
+    "achievements": "الإنجازات",
+    "aiTutor": "المعلم الذكي",
+    "mockExams": "الامتحانات التجريبية",
+    "community": "المجتمع",
+    "discussions": "المناقشات",
+    "studyGroups": "مجموعات الدراسة",
+    "helpAndSupport": "المساعدة والدعم",
+    "feedback": "ملاحظات",
+    "myReports": "تقاريري",
     "flashcards": "البطاقات التعليمية",
     "notes": "ملاحظاتي",
     "testCreation": "إنشاء الاختبارات",
@@ -131,5 +141,39 @@
     "locationAnalytics": "تحليلات المواقع",
     "auditLogs": "سجلات التدقيق",
     "paymentAnalytics": "تحليلات المدفوعات"
+  },
+  "nav": {
+    "section": {
+      "overview": "OVERVIEW",
+      "content": "CONTENT",
+      "learning": "LEARNING",
+      "tools": "TOOLS",
+      "platform": "PLATFORM"
+    },
+    "workspace": {
+      "admin": "Admin workspace",
+      "student": "Student workspace",
+      "faculty": "Faculty workspace",
+      "default": "Workspace"
+    },
+    "badgeAi": "AI"
+  },
+  "questionGenerator": {
+    "bankTitle": "Question bank",
+    "bankSubtitle": "Manage, review, and create MCQ questions",
+    "statTotal": "Total questions",
+    "statTotalHint": "Active in bank",
+    "statSystems": "Systems",
+    "statSystemsHint": "Distinct systems",
+    "statAvgOptions": "Avg. options",
+    "statAvgOptionsHint": "Per question",
+    "statProducts": "Products",
+    "statProductsHint": "Distinct products",
+    "filterAll": "All",
+    "filterPresentation": "Presentation",
+    "searchPlaceholder": "Search by stem, category, system, topic…",
+    "showingQuestions": "Showing {count} questions",
+    "noSystemsYet": "—",
+    "noProductsYet": "—"
   }
 }

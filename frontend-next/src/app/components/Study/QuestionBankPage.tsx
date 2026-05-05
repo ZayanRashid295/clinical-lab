@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -8,6 +9,7 @@ import { Label } from "@/shared/ui/label";
 import {
   Select,
   SelectContent,
+  SELECT_EMPTY_VALUE,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -23,282 +25,296 @@ import {
   Clock,
   Target,
   BookOpen,
-  TrendingUp,
-  Users,
   Star,
   Bookmark,
+  Loader2,
+  RefreshCw,
+  X,
+  Play,
 } from "lucide-react";
+import { QuestionsService } from "@/app/services/questions/questions.service";
+import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
+import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
+import { authService } from "@/shared/services/auth.service";
 import {
-  Question,
-  QuestionFilter,
-  HIERARCHY_SYSTEMS,
-  DIFFICULTY_LEVELS,
-  QUESTION_TYPES,
-} from "@/lib/test-models";
+  bookmarksService,
+  type Bookmark as BookmarkRow,
+} from "@/app/services/student";
+import ReportQuestionButton from "@/app/components/Launch/ReportQuestionButton";
 
-// Mock data for demonstration
-const mockQuestions: Question[] = [
-  {
-    id: "1",
-    content:
-      "A 65-year-old male presents with chest pain that radiates to the left arm. ECG shows ST elevation in leads II, III, and aVF. What is the most likely diagnosis?",
-    type: "multiple_choice",
-    difficulty: "intermediate",
-    system: "cardiology",
-    topic: "myocardial_infarction",
-    explanation:
-      "The patient presents with classic symptoms of inferior wall myocardial infarction. ST elevation in leads II, III, and aVF indicates inferior wall involvement.",
-    isActive: true,
-    createdBy: "user1",
-    createdAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-01-15T10:00:00Z",
-    answers: [
-      {
-        id: "a1",
-        questionId: "1",
-        content: "Anterior wall MI",
-        isCorrect: false,
-        order: 1,
-        createdAt: "2024-01-15T10:00:00Z",
-      },
-      {
-        id: "a2",
-        questionId: "1",
-        content: "Inferior wall MI",
-        isCorrect: true,
-        order: 2,
-        createdAt: "2024-01-15T10:00:00Z",
-      },
-      {
-        id: "a3",
-        questionId: "1",
-        content: "Lateral wall MI",
-        isCorrect: false,
-        order: 3,
-        createdAt: "2024-01-15T10:00:00Z",
-      },
-      {
-        id: "a4",
-        questionId: "1",
-        content: "Posterior wall MI",
-        isCorrect: false,
-        order: 4,
-        createdAt: "2024-01-15T10:00:00Z",
-      },
-    ],
-  },
-  {
-    id: "2",
-    content:
-      "Which of the following is the most common cause of acute kidney injury in hospitalized patients?",
-    type: "multiple_choice",
-    difficulty: "beginner",
-    system: "nephrology",
-    topic: "acute_kidney_injury",
-    explanation:
-      "Prerenal causes, particularly hypovolemia and decreased effective circulating volume, account for 60-70% of acute kidney injury cases in hospitalized patients.",
-    isActive: true,
-    createdBy: "user1",
-    createdAt: "2024-01-14T15:30:00Z",
-    updatedAt: "2024-01-14T15:30:00Z",
-    answers: [
-      {
-        id: "b1",
-        questionId: "2",
-        content: "Acute tubular necrosis",
-        isCorrect: false,
-        order: 1,
-        createdAt: "2024-01-14T15:30:00Z",
-      },
-      {
-        id: "b2",
-        questionId: "2",
-        content: "Prerenal causes",
-        isCorrect: true,
-        order: 2,
-        createdAt: "2024-01-14T15:30:00Z",
-      },
-      {
-        id: "b3",
-        questionId: "2",
-        content: "Postrenal obstruction",
-        isCorrect: false,
-        order: 3,
-        createdAt: "2024-01-14T15:30:00Z",
-      },
-      {
-        id: "b4",
-        questionId: "2",
-        content: "Glomerulonephritis",
-        isCorrect: false,
-        order: 4,
-        createdAt: "2024-01-14T15:30:00Z",
-      },
-    ],
-  },
-  {
-    id: "3",
-    content:
-      "A 45-year-old woman presents with progressive weakness and fatigue. Laboratory studies reveal macrocytic anemia and low vitamin B12 levels. What is the most likely underlying cause?",
-    type: "multiple_choice",
-    difficulty: "advanced",
-    system: "hematology",
-    topic: "vitamin_b12_deficiency",
-    explanation:
-      "Pernicious anemia, caused by autoimmune destruction of gastric parietal cells leading to intrinsic factor deficiency, is the most common cause of vitamin B12 deficiency in adults.",
-    isActive: true,
-    createdBy: "user1",
-    createdAt: "2024-01-13T09:15:00Z",
-    updatedAt: "2024-01-13T09:15:00Z",
-    answers: [
-      {
-        id: "c1",
-        questionId: "3",
-        content: "Dietary deficiency",
-        isCorrect: false,
-        order: 1,
-        createdAt: "2024-01-13T09:15:00Z",
-      },
-      {
-        id: "c2",
-        questionId: "3",
-        content: "Pernicious anemia",
-        isCorrect: true,
-        order: 2,
-        createdAt: "2024-01-13T09:15:00Z",
-      },
-      {
-        id: "c3",
-        questionId: "3",
-        content: "Crohn's disease",
-        isCorrect: false,
-        order: 3,
-        createdAt: "2024-01-13T09:15:00Z",
-      },
-      {
-        id: "c4",
-        questionId: "3",
-        content: "Celiac disease",
-        isCorrect: false,
-        order: 4,
-        createdAt: "2024-01-13T09:15:00Z",
-      },
-    ],
-  },
-];
+const DIFFICULTY_LEVELS = ["easy", "medium", "hard"] as const;
+const QUESTION_TYPES = [
+  "multiple_choice",
+  "true_false",
+  "short_answer",
+] as const;
+
+interface ApiQuestionChoice {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+  order: number;
+}
+
+interface ApiQuestion {
+  id: string;
+  title?: string | null;
+  question: string;
+  explanation?: string | null;
+  difficulty: string;
+  systemId?: string | null;
+  topicId?: string | null;
+  subtopicId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  system?: { id: string; name: string } | null;
+  topic?: { id: string; name: string } | null;
+  subtopic?: { id: string; name: string } | null;
+  choices?: ApiQuestionChoice[];
+}
+
+const questionsService = new QuestionsService();
+const papersService = new QuestionPapersService();
+const paperQuestionsService = new QuestionPaperQuestionsService();
 
 export default function QuestionBankPage() {
+  const router = useRouter();
+  const [questions, setQuestions] = useState<ApiQuestion[]>([]);
+  const [bookmarks, setBookmarks] = useState<BookmarkRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
-    new Set()
-  );
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<string>>(
-    new Set()
-  );
-  const [questionFilter, setQuestionFilter] = useState<QuestionFilter>({
-    systems: [],
-    topics: [],
-    subtopics: [],
-    difficulties: [],
-    questionTypes: [],
-    sortBy: "created",
-    sortOrder: "desc",
-  });
+  const [system, setSystem] = useState<string>("");
+  const [difficulty, setDifficulty] = useState<string>("");
+  const [questionType, setQuestionType] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("created");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bookmarksOnly, setBookmarksOnly] = useState(false);
 
-  // Filter questions based on current filter settings
+  // Preview modal state
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewQ, setPreviewQ] = useState<ApiQuestion | null>(null);
+  const [previewPicked, setPreviewPicked] = useState<string | null>(null);
+
+  // Practice creation state
+  const [launching, setLaunching] = useState(false);
+
+  const bookmarkedIds = useMemo(
+    () =>
+      new Set(
+        bookmarks
+          .filter((b) => b.resourceType === "QUESTION")
+          .map((b) => b.resourceId)
+      ),
+    [bookmarks]
+  );
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [qRes, bRes] = await Promise.all([
+        questionsService.getQuestions({ limit: 100 } as any),
+        bookmarksService.list("QUESTION").catch(() => []),
+      ]);
+      const list: ApiQuestion[] = Array.isArray(qRes)
+        ? (qRes as any)
+        : ((qRes as any)?.data ?? []);
+      setQuestions(list);
+      setBookmarks(bRes);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load questions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  // Honor optional ?systemId / ?bookmarks=true coming from other pages
+  useEffect(() => {
+    if (!router.isReady) return;
+    const sid = router.query?.systemId;
+    if (typeof sid === "string" && sid) setSystem(sid);
+    if (router.query?.bookmarks === "true") setBookmarksOnly(true);
+  }, [router.isReady, router.query]);
+
+  const systemNames = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const q of questions) {
+      if (q.system) map.set(q.system.id, q.system.name);
+    }
+    return Array.from(map.entries());
+  }, [questions]);
+
   const filteredQuestions = useMemo(() => {
-    return mockQuestions
-      .filter((question) => {
-        // Search term filter
+    return questions
+      .filter((q) => {
+        if (bookmarksOnly && !bookmarkedIds.has(q.id)) return false;
         if (
           searchTerm &&
-          !question.content.toLowerCase().includes(searchTerm.toLowerCase())
+          !q.question.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !(q.title || "").toLowerCase().includes(searchTerm.toLowerCase())
         ) {
           return false;
         }
-
-        // System filter
-        if (
-          questionFilter.systems.length > 0 &&
-          !questionFilter.systems.includes(question.system)
-        ) {
-          return false;
-        }
-
-        // Difficulty filter
-        if (
-          questionFilter.difficulties.length > 0 &&
-          !questionFilter.difficulties.includes(question.difficulty)
-        ) {
-          return false;
-        }
-
-        // Question type filter
-        if (
-          questionFilter.questionTypes.length > 0 &&
-          !questionFilter.questionTypes.includes(question.type)
-        ) {
-          return false;
-        }
-
-        // Topic filter
-        if (
-          questionFilter.topics.length > 0 &&
-          question.topic &&
-          !questionFilter.topics.includes(question.topic)
-        ) {
-          return false;
-        }
-
+        if (system && q.systemId !== system) return false;
+        if (difficulty && q.difficulty !== difficulty) return false;
         return true;
       })
       .sort((a, b) => {
-        const aValue = (a[questionFilter.sortBy as keyof Question] as string) || "";
-        const bValue = (b[questionFilter.sortBy as keyof Question] as string) || "";
-
-        if (questionFilter.sortOrder === "asc") {
-          return aValue.localeCompare(bValue);
-        } else {
-          return bValue.localeCompare(aValue);
+        if (sortBy === "difficulty") {
+          return a.difficulty.localeCompare(b.difficulty);
         }
+        if (sortBy === "system") {
+          return (a.system?.name || "").localeCompare(b.system?.name || "");
+        }
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       });
-  }, [questionFilter, searchTerm]);
+  }, [
+    questions,
+    searchTerm,
+    system,
+    difficulty,
+    sortBy,
+    bookmarksOnly,
+    bookmarkedIds,
+  ]);
 
-  const handleFilterChange = (field: keyof QuestionFilter, value: any) => {
-    setQuestionFilter({
-      ...questionFilter,
-      [field]: value,
-    });
+  const toggleSelect = (id: string) => {
+    const next = new Set(selected);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSelected(next);
   };
 
-  const handleQuestionSelect = (questionId: string) => {
-    const newSelected = new Set(selectedQuestions);
-    if (newSelected.has(questionId)) {
-      newSelected.delete(questionId);
-    } else {
-      newSelected.add(questionId);
+  const toggleBookmark = async (id: string) => {
+    try {
+      await bookmarksService.toggle({
+        resourceType: "QUESTION",
+        resourceId: id,
+      });
+      const refreshed = await bookmarksService.list("QUESTION");
+      setBookmarks(refreshed);
+    } catch (e) {
+      console.error("Bookmark toggle failed", e);
     }
-    setSelectedQuestions(newSelected);
   };
 
-  const handleBookmarkToggle = (questionId: string) => {
-    const newBookmarked = new Set(bookmarkedQuestions);
-    if (newBookmarked.has(questionId)) {
-      newBookmarked.delete(questionId);
-    } else {
-      newBookmarked.add(questionId);
+  const openPreview = async (q: ApiQuestion) => {
+    setPreviewId(q.id);
+    setPreviewQ(null);
+    setPreviewPicked(null);
+    setPreviewLoading(true);
+    try {
+      const full = (await questionsService.getQuestion(q.id)) as any;
+      setPreviewQ({ ...q, ...full });
+    } catch (e: any) {
+      setError(e?.message || "Could not load question detail");
+      setPreviewId(null);
+    } finally {
+      setPreviewLoading(false);
     }
-    setBookmarkedQuestions(newBookmarked);
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
+  const closePreview = () => {
+    setPreviewId(null);
+    setPreviewQ(null);
+    setPreviewPicked(null);
+  };
+
+  const launchPractice = async (questionIds: string[]) => {
+    if (questionIds.length === 0) return;
+    const user = authService.getCurrentUser();
+    if (!user?.id) {
+      setError("Please sign in to start a practice session");
+      return;
+    }
+    setLaunching(true);
+    try {
+      const selectedQuestions = questions.filter((q) => questionIds.includes(q.id));
+      const stem =
+        questions.find((q) => q.id === questionIds[0])?.question ?? "Practice";
+      const name =
+        questionIds.length === 1
+          ? `Quick Practice — ${stem.slice(0, 40)}${stem.length > 40 ? "…" : ""}`
+          : `Practice Set (${questionIds.length} questions)`;
+
+      const paper = (await papersService.createQuestionPaper({
+        userId: user.id,
+        name,
+        type: "practice",
+        totalQuestions: questionIds.length,
+        isActive: true,
+      })) as any;
+
+      const paperId = paper?.id ?? paper?.data?.id;
+      if (!paperId) throw new Error("Could not create practice session");
+
+      await Promise.all(
+        questionIds.map((qid, idx) =>
+          paperQuestionsService.createQuestionPaperQuestion({
+            questionPaperId: paperId,
+            questionId: qid,
+            order: idx + 1,
+          })
+        )
+      );
+
+      // Keep "Practice" consistent with the existing Create Test -> Question Generator flow.
+      const params = new URLSearchParams();
+      const systemIds = Array.from(
+        new Set(selectedQuestions.map((q) => q.systemId).filter(Boolean))
+      ) as string[];
+      const topicIds = Array.from(
+        new Set(selectedQuestions.map((q) => q.topicId).filter(Boolean))
+      ) as string[];
+      const subtopicIds = Array.from(
+        new Set(selectedQuestions.map((q) => q.subtopicId).filter(Boolean))
+      ) as string[];
+
+      if (systemIds.length > 0) params.set("systemIds", systemIds.join(","));
+      if (topicIds.length > 0) params.set("topicIds", topicIds.join(","));
+      if (subtopicIds.length > 0) params.set("subtopicIds", subtopicIds.join(","));
+      params.set("pool", "unused");
+      params.set("limit", String(questionIds.length));
+      params.set("mode", "tutor");
+      params.set("tutor", "true");
+      params.set("questionPaperId", paperId);
+
+      window.location.href = `/question-generator/student?${params.toString()}`;
+    } catch (e: any) {
+      setError(e?.message || "Could not start practice");
+    } finally {
+      setLaunching(false);
+    }
+  };
+
+  const addSelectedToTest = () => {
+    if (selected.size === 0) return;
+    try {
+      const ids = Array.from(selected);
+      sessionStorage.setItem("test_creation_seed_questions", JSON.stringify(ids));
+    } catch {}
+    router.push(
+      `/test-creation/study-create?seed=${encodeURIComponent(
+        Array.from(selected).join(",")
+      )}`
+    );
+  };
+
+  const getDifficultyColor = (d: string) => {
+    switch (d) {
+      case "easy":
         return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
-      case "intermediate":
+      case "medium":
         return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
-      case "advanced":
+      case "hard":
         return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
       default:
         return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
@@ -307,33 +323,44 @@ export default function QuestionBankPage() {
 
   return (
     <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Question Bank</h1>
           <p className="text-muted-foreground mt-2">
-            Browse and practice from our comprehensive medical question database
+            Browse and practice from the live medical question database
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Question
+        <div className="flex items-center gap-2">
+          {(loading || launching) && (
+            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+          )}
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
           </Button>
-          <Button variant="outline">
+          <Button
+            variant={bookmarksOnly ? "default" : "outline"}
+            size="sm"
+            onClick={() => setBookmarksOnly((v) => !v)}
+          >
             <Bookmark className="h-4 w-4 mr-2" />
-            My Bookmarks ({bookmarkedQuestions.size})
+            {bookmarksOnly ? "Showing Bookmarks" : "My Bookmarks"} (
+            {bookmarkedIds.size})
           </Button>
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {error && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">
+          {error}
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Search & Filter
+              <Search className="h-5 w-5" /> Search & Filter
             </CardTitle>
             <Button
               variant="outline"
@@ -346,92 +373,90 @@ export default function QuestionBankPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search questions by content, topic, or keywords..."
+              placeholder="Search questions by content, title, or keywords…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
 
-          {/* Filters */}
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
               <div className="space-y-2">
-                <Label>Systems</Label>
+                <Label>System</Label>
                 <Select
-                  value={questionFilter.systems[0] || ""}
+                  value={system || SELECT_EMPTY_VALUE}
                   onValueChange={(value) =>
-                    handleFilterChange("systems", value ? [value] : [])
+                    setSystem(value === SELECT_EMPTY_VALUE ? "" : value)
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All systems" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All systems</SelectItem>
-                    {HIERARCHY_SYSTEMS.map((system) => (
-                      <SelectItem key={system} value={system}>
-                        {system.replace("_", " ")}
+                    <SelectItem value={SELECT_EMPTY_VALUE}>
+                      All systems
+                    </SelectItem>
+                    {systemNames.map(([id, name]) => (
+                      <SelectItem key={id} value={id}>
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="space-y-2">
                 <Label>Difficulty</Label>
                 <Select
-                  value={questionFilter.difficulties[0] || ""}
+                  value={difficulty || SELECT_EMPTY_VALUE}
                   onValueChange={(value) =>
-                    handleFilterChange("difficulties", value ? [value] : [])
+                    setDifficulty(value === SELECT_EMPTY_VALUE ? "" : value)
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All levels" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All levels</SelectItem>
-                    {DIFFICULTY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                    <SelectItem value={SELECT_EMPTY_VALUE}>
+                      All levels
+                    </SelectItem>
+                    {DIFFICULTY_LEVELS.map((l) => (
+                      <SelectItem key={l} value={l}>
+                        {l[0].toUpperCase() + l.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="space-y-2">
-                <Label>Question Type</Label>
+                <Label>Type</Label>
                 <Select
-                  value={questionFilter.questionTypes[0] || ""}
+                  value={questionType || SELECT_EMPTY_VALUE}
                   onValueChange={(value) =>
-                    handleFilterChange("questionTypes", value ? [value] : [])
+                    setQuestionType(value === SELECT_EMPTY_VALUE ? "" : value)
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All types</SelectItem>
-                    {QUESTION_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.replace("_", " ")}
+                    <SelectItem value={SELECT_EMPTY_VALUE}>
+                      All types
+                    </SelectItem>
+                    {QUESTION_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t.replace("_", " ")}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="space-y-2">
                 <Label>Sort By</Label>
-                <Select
-                  value={questionFilter.sortBy}
-                  onValueChange={(value) => handleFilterChange("sortBy", value)}
-                >
+                <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -439,7 +464,6 @@ export default function QuestionBankPage() {
                     <SelectItem value="created">Date Created</SelectItem>
                     <SelectItem value="difficulty">Difficulty</SelectItem>
                     <SelectItem value="system">System</SelectItem>
-                    <SelectItem value="topic">Topic</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -448,14 +472,13 @@ export default function QuestionBankPage() {
         </CardContent>
       </Card>
 
-      {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Questions</p>
-                <p className="text-2xl font-bold">{mockQuestions.length}</p>
+                <p className="text-2xl font-bold">{questions.length}</p>
               </div>
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
@@ -465,9 +488,7 @@ export default function QuestionBankPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Filtered Results
-                </p>
+                <p className="text-sm text-muted-foreground">Filtered</p>
                 <p className="text-2xl font-bold">{filteredQuestions.length}</p>
               </div>
               <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -479,7 +500,7 @@ export default function QuestionBankPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Selected</p>
-                <p className="text-2xl font-bold">{selectedQuestions.size}</p>
+                <p className="text-2xl font-bold">{selected.size}</p>
               </div>
               <Check className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
@@ -490,7 +511,7 @@ export default function QuestionBankPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Bookmarked</p>
-                <p className="text-2xl font-bold">{bookmarkedQuestions.size}</p>
+                <p className="text-2xl font-bold">{bookmarkedIds.size}</p>
               </div>
               <Bookmark className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
@@ -498,13 +519,12 @@ export default function QuestionBankPage() {
         </Card>
       </div>
 
-      {/* Questions List */}
       <div className="space-y-4">
-        {filteredQuestions.map((question) => (
+        {filteredQuestions.map((q) => (
           <Card
-            key={question.id}
+            key={q.id}
             className={`transition-all duration-200 ${
-              selectedQuestions.has(question.id)
+              selected.has(q.id)
                 ? "ring-2 ring-primary bg-primary/5"
                 : "hover:shadow-md"
             }`}
@@ -513,17 +533,18 @@ export default function QuestionBankPage() {
               <div className="flex items-start gap-4">
                 <div className="flex items-center gap-2">
                   <Checkbox
-                    checked={selectedQuestions.has(question.id)}
-                    onCheckedChange={() => handleQuestionSelect(question.id)}
+                    checked={selected.has(q.id)}
+                    onCheckedChange={() => toggleSelect(q.id)}
                   />
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleBookmarkToggle(question.id)}
+                    onClick={() => toggleBookmark(q.id)}
+                    aria-label="Toggle bookmark"
                   >
                     <Star
                       className={`h-4 w-4 ${
-                        bookmarkedQuestions.has(question.id)
+                        bookmarkedIds.has(q.id)
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-gray-400"
                       }`}
@@ -533,54 +554,58 @@ export default function QuestionBankPage() {
 
                 <div className="flex-1 min-w-0 space-y-3">
                   <div className="flex items-start justify-between gap-4">
-                    <p className="text-base leading-relaxed">
-                      {question.content}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview
+                    <div className="flex-1">
+                      {q.title && (
+                        <p className="text-sm font-semibold text-foreground mb-1">
+                          {q.title}
+                        </p>
+                      )}
+                      <p className="text-base leading-relaxed text-foreground">
+                        {q.question}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ReportQuestionButton questionId={q.id} variant="outline" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openPreview(q)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" /> Preview
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        size="sm"
+                        onClick={() => launchPractice([q.id])}
+                        disabled={launching}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
                         Practice
                       </Button>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="text-xs">
-                      {question.system.replace("_", " ")}
-                    </Badge>
-                    {question.topic && (
+                    {q.system?.name && (
+                      <Badge variant="outline" className="text-xs">
+                        {q.system.name}
+                      </Badge>
+                    )}
+                    {q.topic?.name && (
                       <Badge variant="secondary" className="text-xs">
-                        {question.topic.replace("_", " ")}
+                        {q.topic.name}
                       </Badge>
                     )}
                     <Badge
-                      className={`text-xs ${getDifficultyColor(
-                        question.difficulty
-                      )}`}
+                      className={`text-xs ${getDifficultyColor(q.difficulty)}`}
                     >
-                      {question.difficulty}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {question.type.replace("_", " ")}
+                      {q.difficulty}
                     </Badge>
                   </div>
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      Created{" "}
-                      {new Date(question.createdAt).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      1,234 attempts
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" />
-                      78% success rate
+                      Added {new Date(q.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -589,47 +614,222 @@ export default function QuestionBankPage() {
           </Card>
         ))}
 
-        {filteredQuestions.length === 0 && (
+        {!loading && filteredQuestions.length === 0 && (
           <Card>
             <CardContent className="p-12 text-center">
               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No questions found</h3>
               <p className="text-muted-foreground mb-4">
-                Try adjusting your search terms or filters to find more
-                questions.
+                Try clearing your filters or refresh to fetch the latest
+                questions from your library.
               </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Question
-              </Button>
+              <div className="flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSystem("");
+                    setDifficulty("");
+                    setQuestionType("");
+                    setBookmarksOnly(false);
+                  }}
+                >
+                  Clear filters
+                </Button>
+                <Button onClick={load}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh library
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
       </div>
 
-      {/* Bulk Actions */}
-      {selectedQuestions.size > 0 && (
+      {selected.size > 0 && (
         <Card className="sticky bottom-4">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
-                {selectedQuestions.size} questions selected
+                {selected.size} questions selected
               </span>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  Add to Test
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelected(new Set())}
+                >
+                  Clear
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addSelectedToTest}
+                >
+                  Add to Test Builder
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => launchPractice(Array.from(selected))}
+                  disabled={launching}
+                >
+                  <Play className="h-4 w-4 mr-2" />
                   Practice Selected
-                </Button>
-                <Button variant="outline" size="sm">
-                  Bookmark All
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {previewId && (
+        <PreviewModal
+          loading={previewLoading}
+          question={previewQ}
+          picked={previewPicked}
+          onPick={setPreviewPicked}
+          onClose={closePreview}
+          onPractice={() => {
+            const id = previewId;
+            closePreview();
+            if (id) launchPractice([id]);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function PreviewModal({
+  loading,
+  question,
+  picked,
+  onPick,
+  onClose,
+  onPractice,
+}: {
+  loading: boolean;
+  question: ApiQuestion | null;
+  picked: string | null;
+  onPick: (id: string) => void;
+  onClose: () => void;
+  onPractice: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Question Preview</CardTitle>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {loading || !question ? (
+            <div className="py-12 text-center text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+              Loading question…
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 flex-wrap">
+                {question.system?.name && (
+                  <Badge variant="outline">{question.system.name}</Badge>
+                )}
+                {question.topic?.name && (
+                  <Badge variant="secondary">{question.topic.name}</Badge>
+                )}
+                <Badge>{question.difficulty}</Badge>
+              </div>
+
+              {question.title && (
+                <h3 className="text-lg font-semibold">{question.title}</h3>
+              )}
+              <p className="text-base whitespace-pre-wrap leading-relaxed">
+                {question.question}
+              </p>
+
+              {question.choices && question.choices.length > 0 ? (
+                <div className="space-y-2">
+                  {[...question.choices]
+                    .sort((a, b) => a.order - b.order)
+                    .map((c, idx) => {
+                      const letter = String.fromCharCode(65 + idx);
+                      const isPicked = picked === c.id;
+                      const reveal = !!picked;
+                      const correct = c.isCorrect;
+                      const tone = reveal
+                        ? correct
+                          ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
+                          : isPicked
+                          ? "border-red-400 bg-red-50 dark:bg-red-900/20"
+                          : "border-gray-200"
+                        : isPicked
+                        ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40";
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => onPick(c.id)}
+                          className={`w-full text-left flex items-start gap-3 p-3 rounded-md border transition ${tone}`}
+                        >
+                          <span className="font-semibold w-6 shrink-0">
+                            {letter}.
+                          </span>
+                          <span className="flex-1 text-sm">{c.text}</span>
+                          {reveal && correct && (
+                            <Check className="h-4 w-4 text-emerald-600" />
+                          )}
+                        </button>
+                      );
+                    })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">
+                  No answer choices stored on this question yet.
+                </p>
+              )}
+
+              {picked && question.explanation && (
+                <div className="rounded-md border bg-gray-50 dark:bg-gray-800/50 p-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                    Explanation
+                  </p>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {question.explanation}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-2 pt-2">
+                <p className="text-xs text-muted-foreground">
+                  {picked
+                    ? "Answer revealed. Start a real practice run for full timing & history."
+                    : "Tap an answer to check it instantly."}
+                </p>
+                <div className="flex items-center gap-2">
+                  {question?.id && (
+                    <ReportQuestionButton
+                      questionId={question.id}
+                      variant="outline"
+                    />
+                  )}
+                  <Button variant="outline" onClick={onClose}>
+                    Close
+                  </Button>
+                  <Button onClick={onPractice}>
+                    <Play className="h-4 w-4 mr-2" />
+                    Practice this question
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

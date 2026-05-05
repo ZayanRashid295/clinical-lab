@@ -6,10 +6,10 @@ export default function TestUserEdit() {
   const [isOpen, setIsOpen] = useState(false);
   const [testUser, setTestUser] = useState<User>({
     id: "test-1",
-    email: "john.doe@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    phone: "+1 (555) 123-4567",
+    email: "student@clinicallab.test",
+    firstName: "Alex",
+    lastName: "Student",
+    phone: "+10000000004",
     isActive: true,
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",

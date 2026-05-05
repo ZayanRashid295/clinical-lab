@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./common/prisma/prisma.module";
+import { RealtimeModule } from "./modules/realtime/realtime.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { RolesModule } from "./modules/roles/roles.module";
@@ -15,6 +16,21 @@ import { ContentModule } from "./modules/content/content.module";
 import { QuestionsModule } from "./modules/questions/questions.module";
 import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { AssessmentsModule } from "./modules/assessments/assessments.module";
+import { BookmarksModule } from "./modules/bookmarks/bookmarks.module";
+import { NotesModule } from "./modules/notes/notes.module";
+import { FlashcardsModule } from "./modules/flashcards/flashcards.module";
+import { StudyPlansModule } from "./modules/study-plans/study-plans.module";
+import { StudentStatsModule } from "./modules/student-stats/student-stats.module";
+
+// Launch modules
+import { AchievementsModule } from "./modules/achievements/achievements.module";
+import { DiscussionsModule } from "./modules/discussions/discussions.module";
+import { AiTutorModule } from "./modules/ai-tutor/ai-tutor.module";
+import { MockExamsModule } from "./modules/mock-exams/mock-exams.module";
+import { StudyGroupsModule } from "./modules/study-groups/study-groups.module";
+import { GoalsModule } from "./modules/goals/goals.module";
+import { FeedbackModule } from "./modules/feedback/feedback.module";
+import { QuestionReportsModule } from "./modules/question-reports/question-reports.module";
 
 @Module({
   imports: [
@@ -23,6 +39,7 @@ import { AssessmentsModule } from "./modules/assessments/assessments.module";
       envFilePath: ".env",
     }),
     PrismaModule,
+    RealtimeModule,
     AuthModule,
     UsersModule,
     RolesModule,
@@ -36,6 +53,20 @@ import { AssessmentsModule } from "./modules/assessments/assessments.module";
     QuestionsModule,
     SubscriptionsModule,
     AssessmentsModule,
+    BookmarksModule,
+    NotesModule,
+    FlashcardsModule,
+    StudyPlansModule,
+    StudentStatsModule,
+    // Launch modules
+    AchievementsModule,
+    DiscussionsModule,
+    AiTutorModule,
+    MockExamsModule,
+    StudyGroupsModule,
+    GoalsModule,
+    FeedbackModule,
+    QuestionReportsModule,
   ],
 })
 export class AppModule {}

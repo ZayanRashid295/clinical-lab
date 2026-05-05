@@ -95,7 +95,17 @@
     "billing": "請求",
     "study": "学習",
     "questionBank": "問題バンク",
-    "studyMaterials": "学習資料",
+    "studyPlanner": "学習プランナー",
+    "goals": "目標",
+    "achievements": "実績",
+    "aiTutor": "AI チューター",
+    "mockExams": "模擬試験",
+    "community": "コミュニティ",
+    "discussions": "ディスカッション",
+    "studyGroups": "学習グループ",
+    "helpAndSupport": "ヘルプとサポート",
+    "feedback": "フィードバック",
+    "myReports": "報告履歴",
     "flashcards": "フラッシュカード",
     "notes": "私のノート",
     "testCreation": "テスト作成",
@@ -131,5 +141,39 @@
     "locationAnalytics": "場所分析",
     "auditLogs": "監査ログ",
     "paymentAnalytics": "支払い分析"
+  },
+  "nav": {
+    "section": {
+      "overview": "OVERVIEW",
+      "content": "CONTENT",
+      "learning": "LEARNING",
+      "tools": "TOOLS",
+      "platform": "PLATFORM"
+    },
+    "workspace": {
+      "admin": "Admin workspace",
+      "student": "Student workspace",
+      "faculty": "Faculty workspace",
+      "default": "Workspace"
+    },
+    "badgeAi": "AI"
+  },
+  "questionGenerator": {
+    "bankTitle": "Question bank",
+    "bankSubtitle": "Manage, review, and create MCQ questions",
+    "statTotal": "Total questions",
+    "statTotalHint": "Active in bank",
+    "statSystems": "Systems",
+    "statSystemsHint": "Distinct systems",
+    "statAvgOptions": "Avg. options",
+    "statAvgOptionsHint": "Per question",
+    "statProducts": "Products",
+    "statProductsHint": "Distinct products",
+    "filterAll": "All",
+    "filterPresentation": "Presentation",
+    "searchPlaceholder": "Search by stem, category, system, topic…",
+    "showingQuestions": "Showing {count} questions",
+    "noSystemsYet": "—",
+    "noProductsYet": "—"
   }
 }

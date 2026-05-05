@@ -1,0 +1,93 @@
+// Achievements, badges, points and learning streaks.
+// Self-contained, scalar FKs only (relationMode = "prisma").
+
+model Achievement {
+  id          String              @id @default(cuid())
+  code        String              @unique
+  title       String
+  description String              @db.Text
+  category    AchievementCategory @default(STUDY)
+  icon        String              @default("trophy")
+  points      Int                 @default(10)
+  threshold   Int                 @default(1)
+  metric      AchievementMetric
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  unlocks UserAchievement[]
+
+  @@map("achievements")
+}
+
+enum AchievementCategory {
+  STUDY
+  STREAK
+  PROGRESS
+  COMMUNITY
+  MASTERY
+  MILESTONE
+}
+
+enum AchievementMetric {
+  QUESTIONS_ANSWERED
+  CORRECT_ANSWERS
+  TESTS_COMPLETED
+  FLASHCARDS_REVIEWED
+  NOTES_CREATED
+  STREAK_DAYS
+  STUDY_MINUTES
+  DISCUSSION_POSTS
+  GOAL_COMPLETED
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  progress      Int      @default(0)
+
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("user_achievements")
+}
+
+model UserStreak {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  lastActiveDate DateTime?
+  freezeTokens   Int       @default(0)
+  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+
+  @@map("user_streaks")
+}
+
+model UserPoints {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  total     Int      @default(0)
+  level     Int      @default(1)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("user_points")
+}
+
+model PointsLedger {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    String
+  source    String? // e.g. ACHIEVEMENT, REVIEW, PRACTICE
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("points_ledger")
+}

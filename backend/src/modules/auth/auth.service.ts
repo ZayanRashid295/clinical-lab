@@ -10,13 +10,15 @@ import * as bcrypt from "bcryptjs";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { TokenBlacklistService } from "./token-blacklist.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private tokenBlacklistService: TokenBlacklistService
+    private tokenBlacklistService: TokenBlacklistService,
+    private notifications: NotificationsService
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -89,6 +91,17 @@ export class AuthService {
         ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
       },
     });
+
+    void this.notifications
+      .emit({
+        userId: user.id,
+        type: "WELCOME",
+        title: `Welcome, ${user.firstName}!`,
+        message:
+          "Your account is ready. Start with a practice test, set a goal, or join a study group.",
+        data: { route: "/study" },
+      })
+      .catch(() => undefined);
 
     const { password, ...result } = user;
     return result;

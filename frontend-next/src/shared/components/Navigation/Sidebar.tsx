@@ -1,14 +1,15 @@
 import {
   ChevronRight,
-  Home,
   ChevronLeft,
   ChevronRight as ExpandIcon,
+  Cross,
+  Home,
 } from "lucide-react";
 import { MenuItem } from "../../../app/types/menu";
 import { iconMap } from "../Common/IconMap";
-import { useState } from "react";
-import { useTheme } from "../../../hooks/useTheme";
+import { useMemo } from "react";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { NAV_SIDEBAR_SECTIONS } from "../../../app/config/navSections.config";
 
 interface SidebarProps {
   menuItems: MenuItem[];
@@ -22,6 +23,33 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
 }
 
+function normalizeRoles(user: any): string[] {
+  const raw = user?.roles ?? [];
+  return raw
+    .map((role: any) =>
+      typeof role === "string"
+        ? role.toUpperCase()
+        : String(role?.name || role?.role?.name || "").toUpperCase()
+    )
+    .filter(Boolean);
+}
+
+function workspaceSubtitleKey(roles: string[]): string {
+  if (roles.some((r) => ["SUPERADMIN", "ADMIN"].includes(r))) {
+    return "nav.workspace.admin";
+  }
+  if (roles.includes("FACULTY")) return "nav.workspace.faculty";
+  if (roles.includes("STUDENT")) return "nav.workspace.student";
+  return "nav.workspace.default";
+}
+
+function userInitials(name: string | undefined): string {
+  if (!name?.trim()) return "U";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 const Sidebar: React.FC<SidebarProps> = ({
   menuItems,
   activeMenu,
@@ -33,9 +61,34 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse,
 }) => {
-  const { config } = useTheme();
   const { t, isRTL } = useLanguage();
   const rtldir = isRTL ? "rtl" : "ltr";
+
+  const roleStrs = useMemo(() => normalizeRoles(user), [user]);
+  const workspaceKey = useMemo(
+    () => workspaceSubtitleKey(roleStrs),
+    [roleStrs]
+  );
+  const primaryRoleLabel = roleStrs[0]
+    ? roleStrs[0].replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+    : t("common.user");
+
+  const sectionsWithItems = useMemo(
+    () =>
+      NAV_SIDEBAR_SECTIONS.map((section) => ({
+        ...section,
+        items: menuItems.filter((m) =>
+          (section.menuItemIds as readonly string[]).includes(m.id)
+        ),
+      })).filter((s) => s.items.length > 0),
+    [menuItems]
+  );
+
+  const isItemOrChildActive = (item: MenuItem) => {
+    if (activeMenu === item.id) return true;
+    return item.submenu?.some((s) => s.id === activeMenu) ?? false;
+  };
+
   return (
     <>
       <style jsx>{`
@@ -45,212 +98,222 @@ const Sidebar: React.FC<SidebarProps> = ({
         }
         .sidebar-scroll::-webkit-scrollbar-track,
         .submenu-scroll::-webkit-scrollbar-track {
-          background: #374151;
+          background: rgb(6 78 59 / 0.5);
           border-radius: 3px;
         }
         .sidebar-scroll::-webkit-scrollbar-thumb,
         .submenu-scroll::-webkit-scrollbar-thumb {
-          background: #4b5563;
+          background: rgb(16 185 129 / 0.35);
           border-radius: 3px;
         }
         .sidebar-scroll::-webkit-scrollbar-thumb:hover,
         .submenu-scroll::-webkit-scrollbar-thumb:hover {
-          background: #6b7280;
+          background: rgb(16 185 129 / 0.55);
         }
       `}</style>
       <div
-        className={`bg-primary-800 dark:bg-primary-900 text-white h-full flex flex-col transition-all duration-300 ease-in-out relative ${
+        className={`bg-emerald-950 text-emerald-50 h-full flex flex-col transition-all duration-300 ease-in-out relative border-r border-emerald-900/90 ${
           isCollapsed ? "w-16" : "w-64"
         }`}
       >
-        {/* Header */}
-        <div className="p-4 border-b border-primary-700 dark:border-primary-600 relative">
-          <div className="flex items-center justify-between">
-            <div
-              className={`transition-opacity duration-300 ${
-                !isCollapsed ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <h1 className="text-2xl font-bold whitespace-nowrap">
-                {applicationTitle}
-              </h1>
-              <p className="text-base text-gray-300 whitespace-nowrap">
-                {user?.name || "User"}
-              </p>
-              <p className="text-sm text-gray-400 whitespace-nowrap">
-                {user?.roles?.join(", ") || "No Role"}
-              </p>
+        {/* Brand header */}
+        <div className="p-4 border-b border-emerald-800/80 relative shrink-0">
+          <div
+            className={`flex items-start gap-3 ${isCollapsed ? "justify-center" : ""}`}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-400/30">
+              <Cross className="h-5 w-5" strokeWidth={2.4} aria-hidden />
             </div>
-
-            {/* Toggle button */}
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1 pr-8">
+                <h1 className="text-lg font-bold leading-tight text-white truncate">
+                  {applicationTitle}
+                </h1>
+                <p className="text-xs text-emerald-300/90 mt-0.5 truncate">
+                  {t(workspaceKey)}
+                </p>
+              </div>
+            )}
             {onToggleCollapse && (
               <button
+                type="button"
                 onClick={onToggleCollapse}
-                className={`p-1 hover:bg-gray-800 rounded transition-colors absolute ${
+                className={`p-1.5 rounded-md text-emerald-200 hover:bg-emerald-900/80 hover:text-white transition-colors absolute ${
                   !isCollapsed
-                    ? "top-4 right-4"
-                    : "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                    ? "top-3 right-3"
+                    : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 }`}
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 {isCollapsed ? (
-                  <ExpandIcon size={25} />
+                  <ExpandIcon size={22} />
                 ) : (
-                  <ChevronLeft size={25} />
+                  <ChevronLeft size={22} />
                 )}
               </button>
             )}
           </div>
         </div>
 
-        {/* Navigation */}
         <nav
           dir={rtldir}
-          className="flex-1 py-4 pb-8 overflow-y-auto overflow-x-hidden sidebar-scroll"
+          className="flex-1 py-2 pb-4 overflow-y-auto overflow-x-hidden sidebar-scroll min-h-0"
           style={{
             scrollbarWidth: "thin",
-            scrollbarColor: "#4B5563 #374151",
+            scrollbarColor: "rgb(16 185 129 / 0.35) rgb(6 78 59 / 0.5)",
           }}
         >
-          <div
-            dir={rtldir}
-            className={!isCollapsed ? "space-y-0" : "space-y-0"}
-          >
-            {menuItems.map((item) => {
-              const IconComponent = iconMap[item.icon] || Home;
-              const hasSubmenu = item.submenu && item.submenu.length > 0;
-              const isSubmenuActive = expandedMenus.includes(item.id);
+          {sectionsWithItems.map((section) => (
+            <div key={section.id} className="mb-1">
+              {!isCollapsed && (
+                <p className="text-[10px] font-semibold tracking-[0.12em] text-emerald-400/85 px-4 pt-4 pb-1.5 uppercase">
+                  {t(section.labelKey)}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const IconComponent = iconMap[item.icon] || Home;
+                  const hasSubmenu = item.submenu && item.submenu.length > 0;
+                  const isSubmenuOpen = expandedMenus.includes(item.id);
+                  const rowActive = isItemOrChildActive(item);
 
-              return (
-                <div key={item.id} className="relative">
-                  <button
-                    onClick={() => {
-                      if (hasSubmenu) {
-                        onToggleMenu(item.id);
-                      } else {
-                        onMenuChange(item.id);
-                      }
-                    }}
-                    className={`w-full flex items-center px-4 py-2 text-left transition-all duration-200 group ${
-                      activeMenu === item.id
-                        ? "bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
-                        : "hover:bg-primary-700 dark:hover:bg-primary-800"
-                    } ${
-                      hasSubmenu && activeMenu !== item.id ? "hover:pl-5" : ""
-                    }`}
-                    title={isCollapsed ? t(item.label) : undefined}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="flex-shrink-0">
-                        <IconComponent size={20} />
-                      </div>
-                      <span
-                        className={`text-base whitespace-nowrap transition-all duration-300 ${
-                          !isCollapsed
-                            ? "opacity-100 translate-x-0"
-                            : "opacity-0 -translate-x-2"
+                  return (
+                    <div key={item.id} className="group relative px-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (hasSubmenu) {
+                            onToggleMenu(item.id);
+                          } else {
+                            onMenuChange(item.id);
+                          }
+                        }}
+                        className={`w-full flex items-center gap-2.5 text-left rounded-lg transition-colors ${
+                          isCollapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5"
+                        } ${
+                          rowActive && !hasSubmenu
+                            ? "bg-emerald-600 text-white shadow-sm"
+                            : rowActive && hasSubmenu
+                              ? "bg-emerald-800/70 text-white"
+                              : "text-emerald-100/95 hover:bg-emerald-900/70"
                         }`}
+                        title={isCollapsed ? t(item.label) : undefined}
                       >
-                        {t(item.label)}
-                      </span>
-                    </div>
-
-                    {hasSubmenu && !isCollapsed && (
-                      <div className="flex-shrink-0">
-                        {isRTL ? (
-                          <ChevronLeft
-                            size={25}
-                            className={`transition-transform duration-200 ease-in-out ${
-                              isSubmenuActive ? "-rotate-90" : "rotate-0"
-                            }`}
-                          />
-                        ) : (
-                          <ChevronRight
-                            size={25}
-                            className={`transition-transform duration-200 ease-in-out ${
-                              isSubmenuActive ? "rotate-90" : "rotate-0"
-                            }`}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </button>
-
-                  {/* Submenu */}
-                  {hasSubmenu && !isCollapsed && (
-                    <div
-                      className={`ml-8 transition-all duration-300 ease-out submenu-scroll ${
-                        isSubmenuActive
-                          ? "max-h-[600px] opacity-100 overflow-y-auto"
-                          : "max-h-0 opacity-0 overflow-hidden"
-                      }`}
-                      style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#4B5563 #374151",
-                      }}
-                    >
-                      <div className="py-0 space-y-0">
-                        {item.submenu?.map((subItem) => {
-                          const SubIconComponent =
-                            iconMap[subItem.icon] || Home;
-                          return (
-                            <button
-                              key={subItem.id}
-                              onClick={() => onMenuChange(subItem.id)}
-                              className={`w-full flex items-center gap-2 text-left px-4 py-2 text-base rounded transition-all duration-300 ease-out transform ${
-                                activeMenu === subItem.id
-                                  ? "bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white"
-                                  : "text-gray-300 hover:bg-primary-700 dark:hover:bg-primary-800 hover:text-white"
-                              } ${
-                                isSubmenuActive
-                                  ? "translate-y-0 opacity-100 scale-100"
-                                  : "translate-y-2 opacity-0 scale-95"
-                              }`}
-                              style={{
-                                transitionDelay: isSubmenuActive
-                                  ? `${
-                                      (item.submenu?.indexOf(subItem) ?? 0) * 50
-                                    }ms`
-                                  : "0ms",
-                              }}
-                            >
-                              <SubIconComponent size={16} />
-                              <span className="whitespace-nowrap">
-                                {t(subItem.label)}
+                        <span className="flex-shrink-0 opacity-95 [&_svg]:stroke-[1.75]">
+                          <IconComponent size={20} />
+                        </span>
+                        {!isCollapsed && (
+                          <>
+                            <span className="text-sm font-medium truncate flex-1 min-w-0">
+                              {t(item.label)}
+                            </span>
+                            {item.navBadge === "ai" && (
+                              <span className="shrink-0 rounded-full bg-emerald-400/25 text-[10px] font-semibold px-2 py-0.5 text-emerald-100 ring-1 ring-emerald-400/40">
+                                {t("nav.badgeAi")}
                               </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                            )}
+                            {hasSubmenu && (
+                              <span className="flex-shrink-0 text-emerald-200/80">
+                                {isRTL ? (
+                                  <ChevronLeft
+                                    size={18}
+                                    className={`transition-transform duration-200 ${
+                                      isSubmenuOpen ? "-rotate-90" : "rotate-0"
+                                    }`}
+                                  />
+                                ) : (
+                                  <ChevronRight
+                                    size={18}
+                                    className={`transition-transform duration-200 ${
+                                      isSubmenuOpen ? "rotate-90" : "rotate-0"
+                                    }`}
+                                  />
+                                )}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </button>
 
-                  {/* Tooltip for collapsed state */}
-                  {isCollapsed && (
-                    <div
-                      className={`absolute top-0 px-2 py-1 bg-primary-800 dark:bg-primary-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 ${
-                        isRTL ? "right-full mr-2" : "left-full ml-2"
-                      }`}
-                    >
-                      {t(item.label)}
-                      {hasSubmenu && item.submenu && (
-                        <div className="mt-1 space-y-1 border-t border-primary-600 dark:border-primary-500 pt-1">
-                          {item.submenu.map((subItem) => (
-                            <div
-                              key={subItem.id}
-                              className="text-xs text-gray-300"
-                            >
-                              {t(subItem.label)}
+                      {hasSubmenu && !isCollapsed && (
+                        <div
+                          className={`ml-3 pl-3 border-l border-emerald-800/80 mt-0.5 space-y-0.5 submenu-scroll overflow-y-auto transition-all duration-300 ${
+                            isSubmenuOpen
+                              ? "max-h-[480px] opacity-100 py-1"
+                              : "max-h-0 opacity-0 overflow-hidden py-0"
+                          }`}
+                          style={{
+                            scrollbarWidth: "thin",
+                            scrollbarColor:
+                              "rgb(16 185 129 / 0.35) rgb(6 78 59 / 0.5)",
+                          }}
+                        >
+                          {item.submenu?.map((subItem) => {
+                            const SubIcon = iconMap[subItem.icon] || Home;
+                            const subActive = activeMenu === subItem.id;
+                            return (
+                              <button
+                                key={subItem.id}
+                                type="button"
+                                onClick={() => onMenuChange(subItem.id)}
+                                className={`w-full flex items-center gap-2 text-left text-sm rounded-md px-2 py-2 transition-colors ${
+                                  subActive
+                                    ? "bg-emerald-600 text-white"
+                                    : "text-emerald-200/90 hover:bg-emerald-900/60 hover:text-white"
+                                }`}
+                              >
+                                <SubIcon size={16} />
+                                <span className="truncate">{t(subItem.label)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {isCollapsed && (
+                        <div
+                          className={`absolute top-0 px-2 py-1.5 bg-emerald-900 text-emerald-50 text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-emerald-700 ${
+                            isRTL ? "right-full mr-2" : "left-full ml-2"
+                          }`}
+                        >
+                          {t(item.label)}
+                          {hasSubmenu && item.submenu && (
+                            <div className="mt-1 space-y-0.5 border-t border-emerald-700 pt-1 text-emerald-300">
+                              {item.submenu.map((subItem) => (
+                                <div key={subItem.id}>{t(subItem.label)}</div>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
+
+        {/* User footer */}
+        <div className="mt-auto border-t border-emerald-800/80 p-3 shrink-0 bg-emerald-950/95">
+          <div
+            className={`flex items-center gap-3 ${isCollapsed ? "justify-center" : ""}`}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-800 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-600/50">
+              {userInitials(user?.name)}
+            </div>
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white truncate">
+                  {user?.name || t("common.user")}
+                </p>
+                <p className="text-xs text-emerald-400/90 truncate">
+                  {primaryRoleLabel}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );

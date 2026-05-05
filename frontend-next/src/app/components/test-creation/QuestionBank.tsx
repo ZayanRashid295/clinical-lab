@@ -8,6 +8,7 @@ import { Label } from "@/shared/ui/label";
 import {
   Select,
   SelectContent,
+  SELECT_EMPTY_VALUE,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -320,16 +321,19 @@ export default function QuestionBank({
                 <div className="space-y-2">
                   <Label>Subjects</Label>
                   <Select
-                    value={filter.subjects[0] || ""}
+                    value={filter.subjects[0] || SELECT_EMPTY_VALUE}
                     onValueChange={(value) =>
-                      handleFilterChange("subjects", value ? [value] : [])
+                      handleFilterChange(
+                        "subjects",
+                        value === SELECT_EMPTY_VALUE ? [] : [value]
+                      )
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All subjects" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All subjects</SelectItem>
+                      <SelectItem value={SELECT_EMPTY_VALUE}>All subjects</SelectItem>
                       {MEDICAL_SUBJECTS.map((subject) => (
                         <SelectItem key={subject} value={subject}>
                           {subject.replace("_", " ")}
@@ -342,16 +346,19 @@ export default function QuestionBank({
                 <div className="space-y-2">
                   <Label>Difficulty</Label>
                   <Select
-                    value={filter.difficulties[0] || ""}
+                    value={filter.difficulties[0] || SELECT_EMPTY_VALUE}
                     onValueChange={(value) =>
-                      handleFilterChange("difficulties", value ? [value] : [])
+                      handleFilterChange(
+                        "difficulties",
+                        value === SELECT_EMPTY_VALUE ? [] : [value]
+                      )
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All levels" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All levels</SelectItem>
+                      <SelectItem value={SELECT_EMPTY_VALUE}>All levels</SelectItem>
                       {DIFFICULTY_LEVELS.map((level) => (
                         <SelectItem key={level} value={level}>
                           {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -364,16 +371,19 @@ export default function QuestionBank({
                 <div className="space-y-2">
                   <Label>Question Type</Label>
                   <Select
-                    value={filter.questionTypes[0] || ""}
+                    value={filter.questionTypes[0] || SELECT_EMPTY_VALUE}
                     onValueChange={(value) =>
-                      handleFilterChange("questionTypes", value ? [value] : [])
+                      handleFilterChange(
+                        "questionTypes",
+                        value === SELECT_EMPTY_VALUE ? [] : [value]
+                      )
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All types</SelectItem>
+                      <SelectItem value={SELECT_EMPTY_VALUE}>All types</SelectItem>
                       {QUESTION_TYPES.map((type) => (
                         <SelectItem key={type} value={type}>
                           {type.replace("_", " ")}

@@ -95,7 +95,17 @@
     "billing": "Facturation",
     "study": "Étude",
     "questionBank": "Banque de questions",
-    "studyMaterials": "Matériel d'étude",
+    "studyPlanner": "Planificateur d'étude",
+    "goals": "Objectifs",
+    "achievements": "Succès",
+    "aiTutor": "Tuteur IA",
+    "mockExams": "Examens blancs",
+    "community": "Communauté",
+    "discussions": "Discussions",
+    "studyGroups": "Groupes d'étude",
+    "helpAndSupport": "Aide et support",
+    "feedback": "Retours",
+    "myReports": "Mes signalements",
     "flashcards": "Cartes mémoire",
     "notes": "Mes notes",
     "testCreation": "Création de tests",
@@ -131,5 +141,39 @@
     "locationAnalytics": "Analyses des Emplacements",
     "auditLogs": "Journaux d'Audit",
     "paymentAnalytics": "Analyses des Paiements"
+  },
+  "nav": {
+    "section": {
+      "overview": "OVERVIEW",
+      "content": "CONTENT",
+      "learning": "LEARNING",
+      "tools": "TOOLS",
+      "platform": "PLATFORM"
+    },
+    "workspace": {
+      "admin": "Admin workspace",
+      "student": "Student workspace",
+      "faculty": "Faculty workspace",
+      "default": "Workspace"
+    },
+    "badgeAi": "AI"
+  },
+  "questionGenerator": {
+    "bankTitle": "Question bank",
+    "bankSubtitle": "Manage, review, and create MCQ questions",
+    "statTotal": "Total questions",
+    "statTotalHint": "Active in bank",
+    "statSystems": "Systems",
+    "statSystemsHint": "Distinct systems",
+    "statAvgOptions": "Avg. options",
+    "statAvgOptionsHint": "Per question",
+    "statProducts": "Products",
+    "statProductsHint": "Distinct products",
+    "filterAll": "All",
+    "filterPresentation": "Presentation",
+    "searchPlaceholder": "Search by stem, category, system, topic…",
+    "showingQuestions": "Showing {count} questions",
+    "noSystemsYet": "—",
+    "noProductsYet": "—"
   }
 }

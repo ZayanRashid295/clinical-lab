@@ -101,6 +101,35 @@ export class QuestionPapersService extends BaseDataService<
   }
 
   /**
+   * Submit an assessment. Backend computes correctness and persists answers.
+   */
+  async submitAssessment(
+    id: string,
+    payload: {
+      userId: string;
+      answers: Array<{
+        questionPaperQuestionId: string;
+        userAnswer: string;
+        timeSpent?: number;
+        markedForReview?: boolean;
+      }>;
+      notes?: string;
+    }
+  ): Promise<{
+    message: string;
+    results: {
+      totalQuestions: number;
+      correctAnswers: number;
+      incorrectAnswers: number;
+      score: number;
+      percentage: number;
+    };
+    submittedAt: string;
+  }> {
+    return this.post(`${this.endpoint}/${id}/submit`, payload);
+  }
+
+  /**
    * Get assessment results for a question paper
    */
   async getAssessmentResults(id: string): Promise<{

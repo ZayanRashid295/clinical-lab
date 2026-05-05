@@ -14,11 +14,13 @@ import { SubscriptionGuard } from "./guards/subscription.guard";
 import { FeatureGuard } from "./guards/feature.guard";
 import { CombinedAccessGuard } from "./guards/combined-access.guard";
 import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   imports: [
     PassportModule,
     SubscriptionsModule, // Import to use SubscriptionsService in guards
+    NotificationsModule, // Welcome notification on signup
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>("JWT_SECRET"),

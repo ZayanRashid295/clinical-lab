@@ -21,6 +21,8 @@ import { QuestionsService } from "@/app/services/questions/questions.service"
 import { QuestionChoice } from "@/app/types/question"
 import { CreateQuestionDto } from "@/app/types/question"
 import { authService } from "@/shared/services/auth.service"
+import { useLanguage } from "@/shared/contexts/LanguageContext"
+import { QuestionBankListHeader } from "./QuestionBankListHeader"
 
 interface Question {
   id: string
@@ -58,6 +60,7 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange }: AdminDashboardProps) {
+  const { t } = useLanguage()
   const { toast } = useToast()
   const { confirm } = useConfirm()
   const [questions, setQuestions] = useState<Question[]>([])
@@ -69,6 +72,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [showDocxUploader, setShowDocxUploader] = useState(false)
   const [showBulkDocxUploader, setShowBulkDocxUploader] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [systemFilter, setSystemFilter] = useState<"all" | string>("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [parsedMarkdownData, setParsedMarkdownData] = useState<any>(null)
@@ -105,7 +109,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           />
           <input
             type="text"
-            placeholder="Search by stem, category, product, system, topic, subtopic, or title..."
+            placeholder={t("questionGenerator.searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-8 pr-2 py-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-md min-w-0"
@@ -114,7 +118,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         </div>
       </div>
     ))
-  }, [layoutHeader, showListSearchInHeader, searchTerm])
+  }, [layoutHeader, showListSearchInHeader, searchTerm, t])
 
   useEffect(() => {
     return () => {
@@ -1429,28 +1433,89 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       window.removeEventListener("editQuestion", handleEditQuestion as EventListener)
     }
   }, [onQuestionViewChange])
-  const filteredQuestions = questions.filter((q) => {
+  const searchFilteredQuestions = useMemo(() => {
     if (!searchTerm || searchTerm.trim() === "") {
-      return true // Show all questions if no search term
+      return questions
     }
     const searchLower = searchTerm.toLowerCase()
-    const stem = (q.stem || "").toLowerCase()
-    const category = (q.category || "").toLowerCase()
-    const product = (q.product || "").toLowerCase()
-    const system = (q.system || "").toLowerCase()
-    const topicName = (q.topicName || "").toLowerCase()
-    const subtopicName = (q.subtopicName || "").toLowerCase()
-    const mcqTitle = (q.mcqTitle || "").toLowerCase()
-    return (
-      stem.includes(searchLower) ||
-      category.includes(searchLower) ||
-      product.includes(searchLower) ||
-      system.includes(searchLower) ||
-      topicName.includes(searchLower) ||
-      subtopicName.includes(searchLower) ||
-      mcqTitle.includes(searchLower)
-    )
-  })
+    return questions.filter((q) => {
+      const stem = (q.stem || "").toLowerCase()
+      const category = (q.category || "").toLowerCase()
+      const product = (q.product || "").toLowerCase()
+      const system = (q.system || "").toLowerCase()
+      const topicName = (q.topicName || "").toLowerCase()
+      const subtopicName = (q.subtopicName || "").toLowerCase()
+      const mcqTitle = (q.mcqTitle || "").toLowerCase()
+      return (
+        stem.includes(searchLower) ||
+        category.includes(searchLower) ||
+        product.includes(searchLower) ||
+        system.includes(searchLower) ||
+        topicName.includes(searchLower) ||
+        subtopicName.includes(searchLower) ||
+        mcqTitle.includes(searchLower)
+      )
+    })
+  }, [questions, searchTerm])
+
+  const bankSystems = useMemo(() => {
+    const names = new Set<string>()
+    questions.forEach((q) => {
+      const s = (q.system || "").trim()
+      if (s) names.add(s)
+    })
+    return [...names].sort((a, b) => a.localeCompare(b))
+  }, [questions])
+
+  useEffect(() => {
+    if (systemFilter === "all") return
+    if (!bankSystems.includes(systemFilter)) {
+      setSystemFilter("all")
+    }
+  }, [bankSystems, systemFilter])
+
+  const displayedQuestions = useMemo(() => {
+    if (systemFilter === "all") return searchFilteredQuestions
+    return searchFilteredQuestions.filter((q) => (q.system || "").trim() === systemFilter)
+  }, [searchFilteredQuestions, systemFilter])
+
+  const bankStatCards = useMemo(() => {
+    const n = questions.length
+    const systems = new Set<string>()
+    const products = new Set<string>()
+    let optionSum = 0
+    questions.forEach((q) => {
+      if (q.system?.trim()) systems.add(q.system.trim())
+      if (q.product?.trim()) products.add(q.product.trim())
+      optionSum += q.options?.length ?? 0
+    })
+    const avg =
+      n === 0 ? 0 : Math.round((optionSum / n) * 10) / 10
+    return [
+      {
+        id: "total",
+        title: t("questionGenerator.statTotal"),
+        value: String(n),
+        hint: t("questionGenerator.statTotalHint"),
+      },
+      {
+        id: "systems",
+        title: t("questionGenerator.statSystems"),
+        value: String(systems.size),
+      },
+      {
+        id: "avgOptions",
+        title: t("questionGenerator.statAvgOptions"),
+        value: String(avg),
+        hint: t("questionGenerator.statAvgOptionsHint"),
+      },
+      {
+        id: "products",
+        title: t("questionGenerator.statProducts"),
+        value: String(products.size),
+      },
+    ]
+  }, [questions, t])
 
   if (loading) {
     return (
@@ -1582,14 +1647,24 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         </div>
       ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader ? (
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+          <QuestionBankListHeader
+            title={t("questionGenerator.bankTitle")}
+            subtitle={t("questionGenerator.bankSubtitle")}
+            statCards={bankStatCards}
+            systems={bankSystems}
+            systemFilter={systemFilter}
+            onSystemChange={setSystemFilter}
+            allLabel={t("questionGenerator.filterAll")}
+            presentationLabel={t("questionGenerator.filterPresentation")}
+          />
           {/* Toolbar: always show on list view so Create / Select stay available with zero questions */}
           <div className="mb-4 flex flex-nowrap items-center justify-between gap-3 min-w-0 pt-1">
             <p className="text-sm text-muted-foreground dark:text-gray-400 min-w-0 shrink">
               {questions.length === 0
                 ? "No questions yet"
-                : filteredQuestions.length === 0
-                  ? "No questions match your search"
-                  : `Showing ${filteredQuestions.length} of ${questions.length} questions`}
+                : displayedQuestions.length === 0
+                  ? "No questions match your search or system filter"
+                  : `Showing ${displayedQuestions.length} of ${questions.length} questions`}
             </p>
             <div className="flex flex-nowrap items-center gap-3 sm:gap-4 shrink-0 pl-2">
               <div className="relative isolate" ref={menuRef}>
@@ -1672,13 +1747,13 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             </div>
           </div>
 
-          {filteredQuestions.length === 0 ? (
+          {displayedQuestions.length === 0 ? (
             <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
               <div className="text-center">
                 <p className="text-muted-foreground dark:text-gray-400 mb-4">
                   {questions.length === 0
                     ? "Get started by creating a question or uploading a batch."
-                    : "Try adjusting your search."}
+                    : "Try adjusting your search or system filter."}
                 </p>
                 <Button
                   onClick={handleCreateManually}
@@ -1691,7 +1766,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             </Card>
           ) : (
             <QuestionList
-              questions={filteredQuestions}
+              questions={displayedQuestions}
               onEdit={(id: string) => {
                 setEditingId(id)
                 setViewingId(null)

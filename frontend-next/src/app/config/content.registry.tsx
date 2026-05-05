@@ -28,9 +28,10 @@ import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
 // Import study components
 import QuestionBankPage from "../components/Study/QuestionBankPage";
-import StudyMaterialsPage from "../components/Study/StudyMaterialsPage";
 import FlashcardsPage from "../components/Study/FlashcardsPage";
 import NotesPage from "../components/Study/NotesPage";
+import StudyIndexPage from "../components/Study/StudyIndexPage";
+import StudyPlannerPage from "../components/Study/StudyPlannerPage";
 
 // Import test creation components
 import TestCreationPage from "../components/test-creation/TestCreationPage";
@@ -47,6 +48,17 @@ import QuestionGeneratorStudent from "../components/question-generator/QuestionG
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
 import MySubscriptionPage from "../components/Subscriptions/MySubscriptionPage";
 import OrgChartView from "../components/OrgChart/OrgChartView";
+
+// Import launch / new-module pages
+import NotificationsPage from "../components/Launch/NotificationsPage";
+import AchievementsPage from "../components/Launch/AchievementsPage";
+import DiscussionsPage from "../components/Launch/DiscussionsPage";
+import AiTutorPage from "../components/Launch/AiTutorPage";
+import MockExamsPage from "../components/Launch/MockExamsPage";
+import StudyGroupsPage from "../components/Launch/StudyGroupsPage";
+import GoalsPage from "../components/Launch/GoalsPage";
+import FeedbackPage from "../components/Launch/FeedbackPage";
+import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -118,10 +130,11 @@ export const transportationContentRegistry: ContentRegistry = {
     ),
 
     // Study routes
+    "/study": () => <StudyIndexPage />,
     "/study/question-bank": () => <QuestionBankPage />,
-    "/study/materials": () => <StudyMaterialsPage />,
     "/study/flashcards": () => <FlashcardsPage />,
     "/study/notes": () => <NotesPage />,
+    "/study-planner": () => <StudyPlannerPage />,
 
     // Test creation routes
     "/test-creation": () => <TestCreationPage />,
@@ -179,6 +192,17 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Test session routes
     "/test-session/:id": () => <TestSessionPage />,
+
+    // Launch / new modules
+    "/notifications": () => <NotificationsPage />,
+    "/achievements": () => <AchievementsPage />,
+    "/discussions": () => <DiscussionsPage />,
+    "/ai-tutor": () => <AiTutorPage />,
+    "/mock-exams": () => <MockExamsPage />,
+    "/study-groups": () => <StudyGroupsPage />,
+    "/goals": () => <GoalsPage />,
+    "/feedback": () => <FeedbackPage />,
+    "/my-reports": () => <QuestionReportsPage />,
   },
 
   dashboards: {

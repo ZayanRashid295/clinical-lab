@@ -1,10 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { EDUCATION_SEED_USERS } from '../prisma/education-users.seed';
 
 const prisma = new PrismaClient();
 
+const superSeed = EDUCATION_SEED_USERS.find((u) => u.role === 'SUPERADMIN')!;
+
 async function createSuperAdminUser() {
-  console.log('👑 Creating SUPERADMIN user: superadmin@uber.com');
+  console.log(`👑 Creating SUPERADMIN user: ${superSeed.email}`);
 
   try {
     // Hash password
@@ -30,7 +33,7 @@ async function createSuperAdminUser() {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'superadmin@uber.com' },
+      where: { email: superSeed.email },
       include: { roles: { include: { role: true } } },
     });
 
@@ -39,7 +42,7 @@ async function createSuperAdminUser() {
       
       // Update password
       await prisma.user.update({
-        where: { email: 'superadmin@uber.com' },
+        where: { email: superSeed.email },
         data: { password: hashedPassword },
       });
 
@@ -66,7 +69,7 @@ async function createSuperAdminUser() {
       }
 
       console.log('✅ User updated successfully');
-      console.log('📧 Email: superadmin@uber.com');
+      console.log(`📧 Email: ${superSeed.email}`);
       console.log('🔑 Password: password123');
       console.log('👑 Role: SUPERADMIN');
       return;
@@ -75,10 +78,11 @@ async function createSuperAdminUser() {
     // Create user
     const user = await prisma.user.create({
       data: {
-        email: 'superadmin@uber.com',
+        email: superSeed.email,
         password: hashedPassword,
-        firstName: 'Super',
-        lastName: 'Admin',
+        firstName: superSeed.firstName,
+        lastName: superSeed.lastName,
+        phone: superSeed.phone,
         isActive: true,
       },
     });
@@ -92,7 +96,7 @@ async function createSuperAdminUser() {
     });
 
     console.log('✅ SuperAdmin user created successfully!');
-    console.log('📧 Email: superadmin@uber.com');
+    console.log(`📧 Email: ${superSeed.email}`);
     console.log('🔑 Password: password123');
     console.log('👑 Role: SUPERADMIN');
     console.log('🆔 User ID:', user.id);

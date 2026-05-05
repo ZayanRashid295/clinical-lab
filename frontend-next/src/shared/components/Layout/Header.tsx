@@ -1,7 +1,8 @@
-import { Bell, LogOut, Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { HeaderProps } from "../../../app/types/ui";
 import { typography, spacing, interactive } from "../../utils/responsive";
 import ColorPicker from "../ColorPicker";
+import NotificationBell from "./NotificationBell";
 
 const Header: React.FC<HeaderProps> = ({
   user,
@@ -41,16 +42,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Color Picker */}
           <ColorPicker variant="header" />
 
-          <button
-            className={`relative ${interactive.touch.md} flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors`}
-          >
-            <Bell size={18} className="sm:w-5 sm:h-5" />
-            <span
-              className={`absolute -top-1 -right-1 bg-red-500 text-white ${typography.caption.small} rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center`}
-            >
-              3
-            </span>
-          </button>
+          <NotificationBell />
 
           <div className={`flex items-center ${spacing.element.sm}`}>
             {/* User info - hidden on mobile, shown on tablet+ */}

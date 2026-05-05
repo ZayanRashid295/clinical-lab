@@ -87,9 +87,19 @@
     "billing": "Billing",
     "study": "Study",
     "questionBank": "Question Bank",
-    "studyMaterials": "Study Materials",
     "flashcards": "Flashcards",
     "notes": "My Notes",
+    "studyPlanner": "Study Planner",
+    "goals": "Goals",
+    "achievements": "Achievements",
+    "aiTutor": "AI Tutor",
+    "mockExams": "Mock Exams",
+    "community": "Community",
+    "discussions": "Discussions",
+    "studyGroups": "Study Groups",
+    "helpAndSupport": "Help & Support",
+    "feedback": "Feedback",
+    "myReports": "My Reports",
     "testCreation": "Test Creation",
     "createNewTest": "Create New Test",
     "studyCreateTest": "Study Create Test",
@@ -133,5 +143,37 @@
     "assessments": "Assessments",
     "questionPapers": "Question Papers",
     "questionPaperQuestions": "Question Paper Questions"
+  },
+  "nav": {
+    "section": {
+      "overview": "OVERVIEW",
+      "content": "CONTENT",
+      "learning": "LEARNING",
+      "tools": "TOOLS",
+      "platform": "PLATFORM"
+    },
+    "workspace": {
+      "admin": "Admin workspace",
+      "student": "Student workspace",
+      "faculty": "Faculty workspace",
+      "default": "Workspace"
+    },
+    "badgeAi": "AI"
+  },
+  "questionGenerator": {
+    "bankTitle": "Question bank",
+    "bankSubtitle": "Manage, review, and create MCQ questions",
+    "statTotal": "Total questions",
+    "statTotalHint": "Active in bank",
+    "statSystems": "Systems",
+    "statAvgOptions": "Avg. options",
+    "statAvgOptionsHint": "Per question",
+    "statProducts": "Products",
+    "filterAll": "All",
+    "filterPresentation": "Presentation",
+    "searchPlaceholder": "Search by stem, category, system, topic…",
+    "showingQuestions": "Showing {count} questions",
+    "noSystemsYet": "—",
+    "noProductsYet": "—"
   }
 }
