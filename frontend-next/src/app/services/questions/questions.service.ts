@@ -173,18 +173,31 @@ export class QuestionsService extends BaseDataService<
     const url = `${API_BASE_URL}${this.endpoint}/convert-docx-to-markdown`;
 
     const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000); // 2 minutes
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        htmlContent,
-        imagePlaceholders,
-      }),
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          htmlContent,
+          imagePlaceholders,
+        }),
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if ((error as Error).name === "AbortError") {
+        throw new Error("DOCX conversion timed out. Please try a smaller document.")
+      }
+      throw error
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

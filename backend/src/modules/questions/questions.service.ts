@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Express } from "express";
 import * as sharp from "sharp";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
@@ -39,7 +39,7 @@ interface RandomQuestionFilters {
 
 @Injectable()
 export class QuestionsService {
-  private openai: OpenAI | null = null;
+  private gemini: GoogleGenerativeAI | null = null;
   // Fixed demo question IDs for non-subscribed users (always the same questions)
   // These will be populated on first access
   private demoQuestionIds: string[] | null = null;
@@ -50,12 +50,9 @@ export class QuestionsService {
     private configService: ConfigService,
     private subscriptionsService: SubscriptionsService
   ) {
-    // Initialize OpenAI client if API key is available
-    const openaiApiKey = this.configService.get<string>("OPENAI_API_KEY");
-    if (openaiApiKey) {
-      this.openai = new OpenAI({
-        apiKey: openaiApiKey,
-      });
+    const googleApiKey = this.configService.get<string>("GOOGLE_API_KEY");
+    if (googleApiKey) {
+      this.gemini = new GoogleGenerativeAI(googleApiKey);
     }
     // Get demo question count from environment variable, default to 10
     this.demoQuestionCount = this.configService.get<number>("DEMO_QUESTION_COUNT") || 10;
@@ -1883,9 +1880,9 @@ export class QuestionsService {
    * expects this exact structure.
    */
   async convertDocxToMarkdown(dto: ConvertDocxDto): Promise<{ markdown: string }> {
-    if (!this.openai) {
+    if (!this.gemini) {
       throw new BadRequestException(
-        "OpenAI API key is not configured. Please set OPENAI_API_KEY in environment variables."
+        "GOOGLE_API_KEY is not configured."
       );
     }
 
@@ -2193,27 +2190,35 @@ ${imageInstructions}
 Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
     try {
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-4.1",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.2,
-        max_tokens: 4000,
+      const model = this.gemini.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        generationConfig: {
+          temperature: 0.2,
+          // Large DOCX conversions can exceed 4k tokens and get cut mid-table/section.
+          maxOutputTokens: 8192,
+        },
       });
-
-      
-      const rawMarkdown = completion.choices[0]?.message?.content?.trim() || "";
+      const result = await model.generateContent(
+        `You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.\n\n${prompt}`,
+      );
+      const finishReason = result.response?.candidates?.[0]?.finishReason;
+      const rawMarkdown = result.response.text().trim();
       if (!rawMarkdown) {
-        throw new BadRequestException("OpenAI did not return any content");
+        throw new BadRequestException("Gemini did not return any content");
+      }
+      if (finishReason === "MAX_TOKENS") {
+        throw new BadRequestException(
+          "Gemini response was truncated (MAX_TOKENS). Please simplify the source DOCX content or split it into smaller sections."
+        );
+      }
+      if (
+        !rawMarkdown.includes("## Question") ||
+        !rawMarkdown.includes("## Options and Explanations") ||
+        !rawMarkdown.includes("## Explanation")
+      ) {
+        throw new BadRequestException(
+          "Gemini returned incomplete markdown structure. Please retry conversion."
+        );
       }
 
       // Log the raw markdown so you can inspect it in the backend terminal
@@ -2241,7 +2246,7 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       
       return { markdown: processedMarkdown };
     } catch (error: any) {
-      console.error("OpenAI API error:", error);
+      console.error("Gemini API error:", error);
       throw new BadRequestException(
         `Failed to convert DOCX to Markdown: ${error.message || "Unknown error"}`
       );

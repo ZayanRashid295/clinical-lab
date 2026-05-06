@@ -1,0 +1,79 @@
+{
+  "conversations": [
+    {
+      "id": "conv_1777296090521_cvxoh2ou4",
+      "status": "COMPLETED",
+      "startedAt": "2026-04-27T13:21:30.521Z",
+      "interventionCount": 1,
+      "userId": "cmo36dmdt000mdd7xmtf008nh",
+      "caseId": "m9srq3l9o",
+      "messages": [
+        {
+          "id": "msg_1777296096586_wdj25633b",
+          "role": "STUDENT",
+          "content": "hi",
+          "isIntervention": false,
+          "createdAt": "2026-04-27T13:21:36.586Z"
+        },
+        {
+          "id": "msg_1777296102768_fbuhbg8yw",
+          "role": "DOCTOR",
+          "content": "This is a greeting, not a question designed to gather diagnostic information, narrow differentials, or demonstrate clinical reasoning. We need to move beyond social pleasantries and begin the clinical interview.",
+          "isIntervention": true,
+          "createdAt": "2026-04-27T13:21:42.773Z"
+        },
+        {
+          "id": "msg_1777296112000_3xhdb0m9m",
+          "role": "STUDENT",
+          "content": "When did these symptoms first start, and were they sudden or gradual?",
+          "isIntervention": false,
+          "createdAt": "2026-04-27T13:21:52.000Z"
+        },
+        {
+          "id": "msg_1777296127575_9rbwgodk3",
+          "role": "PATIENT",
+          "content": "Oh, doctor, it wasn't sudden at all. In fact, it's been pretty gradual, creeping up on me over the last year and a half, maybe even two years.\n\nAt first, I just thought it was stress from my graduate studies or just part of getting older. But then it became more and more noticeable. The weight gain, for instance, started insidiously, mostly around my abdomen, and it just kept piling on despite no real change in my diet or activity. Then my face started getting really full and round – almost like a moon, which my friends have even commented on. And that buffalo hump on my back... that also developed slowly over time.\n\nThe high blood pressure was actually picked up by my regular doctor during a check-up a few months ago, and it's been a concern. And the muscle weakness, that's really become a problem lately. Just getting up from a chair or climbing the stairs to my apartment feels like an enormous effort now. It's really impacting my daily life and my ability to get around campus.",
+          "isIntervention": false,
+          "createdAt": "2026-04-27T13:22:07.575Z"
+        }
+      ],
+      "completedAt": "2026-04-27T13:22:35.024Z"
+    }
+  ],
+  "diagnosisSubmissions": [
+    {
+      "id": "vgxq7dxo1",
+      "conversationId": "conv_1777296090521_cvxoh2ou4",
+      "studentId": "cmo36dmdt000mdd7xmtf008nh",
+      "submittedDiagnosis": "hi",
+      "actualDiagnosis": "Cushing's Syndrome",
+      "isCorrect": true,
+      "submittedAt": "2026-04-27T13:22:27.775Z",
+      "caseMetadata": {
+        "isRare": true,
+        "specialty": "Endocrinology",
+        "difficulty": "intermediate"
+      }
+    }
+  ],
+  "soapNotes": [
+    {
+      "id": "2a510ada-db36-4662-bcec-53c7ae4b27ac",
+      "conversationId": "conv_1777296090521_cvxoh2ou4",
+      "studentId": "cmo36dmdt000mdd7xmtf008nh",
+      "subjective": "npx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\n",
+      "objective": "npx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\n",
+      "assessment": "npx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\n",
+      "plan": "npx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\nnpx prisma migrate dev --name add_medprep_tables\n",
+      "submittedAt": "2026-04-27T13:24:28.699Z",
+      "grade": 44,
+      "feedback": "Solid structure. Continue improving depth and specificity in each section.",
+      "aiGeneratedSOAP": {
+        "subjective": "Jennifer Garcia is a 61-year-old female presenting with a gradual onset of multiple symptoms over the past 1.5 to 2 years. She initially attributed these changes to stress from graduate studies and normal aging. Her primary complaints include progressive, insidious weight gain, predominantly around her abdomen, which has occurred despite no reported changes in diet or activity level. She notes the development of a \"full and round\" face, which friends have commented resembles a \"moon face.\" She also reports a \"buffalo hump\" developing slowly on her back. High blood pressure was identified by her regular doctor a few months ago and remains a concern. Most significantly, she describes profound and progressive muscle weakness lately, particularly affecting her proximal muscles, making it an \"enormous effort\" to get up from a chair or climb stairs. This weakness is significantly impacting her daily life and ability to navigate campus.",
+        "objective": "(This section would typically be based on direct clinical observation, vital signs, and physical examination performed by the clinician. As this information was not provided in the conversation, the following describes the expected and critical findings that would be sought during a comprehensive physical exam for a patient with suspected Cushing's Syndrome based on her subjective complaints.)",
+        "assessment": "Working Diagnosis: Cushing's Syndrome. This 61-year-old female presents with a highly characteristic clinical picture strongly suggestive of hypercortisolism. The constellation of gradual-onset truncal obesity, \"moon facies,\" dorsocervical fat pad (\"buffalo hump\"), new-onset hypertension, and significant proximal muscle weakness is a classic presentation of Cushing's Syndrome. Given the insidious onset over 1.5-2 years and the absence of reported exogenous glucocorticoid use, endogenous Cushing's Syndrome is the most likely etiology.",
+        "plan": "1. Diagnostic Confirmation of Hypercortisolism:\n    a. Initial Screening Tests: Order 24-hour Urinary Free Cortisol (UFC) x 2 collections, Overnight Dexamethasone Suppression Test (1mg DST), and Late-Night Salivary Cortisol x 2 collections. These tests are highly sensitive for detecting cortisol excess.\n    b. If Hypercortisolism Confirmed: Proceed with Plasma ACTH level (early morning) to differentiate between ACTH-dependent and ACTH-independent causes.\n2. Localization Studies (Based on ACTH Results):\n    a. If ACTH is high/normal (ACTH-dependent Cushing's): Schedule MRI of the pituitary gland with contrast to rule out pituitary adenoma (Cushing's disease). If pituitary MRI is negative or equivocal, consider referral for Inferior Petrosal Sinus Sampling (IPSS).\n    b. If ACTH is low/undetectable (ACTH-independent Cushing's): Schedule CT scan of the abdomen with adrenal protocol to rule out adrenal adenoma or carcinoma.\n3. Management of Comorbidities and Symptomatic Support:\n    a. Hypertension: Continue current antihypertensive regimen; closely monitor blood pressure. May require adjustments or additional agents.\n    b. Metabolic Screening: Order fasting glucose, HbA1c, and a comprehensive metabolic panel (including electrolytes, renal function) to screen for new-onset diabetes mellitus, impaired glucose tolerance, and hypokalemia, all common in hypercortisolism.\n    c. Bone Health: Order DEXA scan to assess for osteoporosis, a significant complication of chronic cortisol excess. Consider initiation of Vitamin D and calcium supplementation.\n    d. Muscle Weakness: Physical therapy consultation for assessment and initiation of a gentle strengthening program, focusing on proximal muscle groups, and fall risk assessment.\n    e. Lipid Panel: Order a fasting lipid panel to assess for dyslipidemia.\n4. Patient Education and Counseling:\n    a. Explain the suspected diagnosis of Cushing's Syndrome and the necessity of thorough diagnostic testing to confirm and identify the underlying cause.\n    b. Discuss potential causes (e.g., pituitary tumor, adrenal tumor, ectopic source) and general treatment approaches (often surgical, but can involve medication or radiation).\n    c. Reassure the patient that Cushing's is a treatable condition and that symptom improvement is expected with successful treatment.\n    d. Emphasize the importance of adherence to diagnostic protocols and follow-up appointments.\n5. Referrals:\n    a. Endocrinology consult for expert management of the diagnostic workup and treatment planning."
+      }
+    }
+  ]
+}

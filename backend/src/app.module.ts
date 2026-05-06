@@ -15,6 +15,7 @@ import { ContentModule } from "./modules/content/content.module";
 import { QuestionsModule } from "./modules/questions/questions.module";
 import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { AssessmentsModule } from "./modules/assessments/assessments.module";
+import { MedprepAiModule } from "./modules/medprep-ai/medprep-ai.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AssessmentsModule } from "./modules/assessments/assessments.module";
     QuestionsModule,
     SubscriptionsModule,
     AssessmentsModule,
+    MedprepAiModule,
   ],
 })
 export class AppModule {}

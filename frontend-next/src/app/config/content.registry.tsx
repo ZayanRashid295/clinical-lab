@@ -48,6 +48,19 @@ import QuestionGeneratorStudent from "../components/question-generator/QuestionG
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
 import MySubscriptionPage from "../components/Subscriptions/MySubscriptionPage";
 import OrgChartView from "../components/OrgChart/OrgChartView";
+import MedPrepOverviewPage from "../components/medprep-ai/MedPrepOverviewPage";
+import { EvaluationPage } from "../components/medprep-ai/EvaluationPage";
+import { QaModePage } from "../components/medprep-ai/QaModePage";
+import { LetMeDriveModePage } from "../components/medprep-ai/LetMeDriveModePage";
+import { PracticeCasesPage } from "../components/medprep-ai/PracticeCasesPage";
+import { PracticeNurseReportPage } from "../components/medprep-ai/PracticeNurseReportPage";
+import { PracticeCaseRoutePage } from "../components/medprep-ai/PracticeCaseRoutePage";
+import { LearningCaseRoutePage } from "../components/medprep-ai/LearningCaseRoutePage";
+import { LearningModePage } from "../components/medprep-ai/LearningModePage";
+import { LearnCasesPage } from "../components/medprep-ai/LearnCasesPage";
+import { LearningNurseReportPage } from "../components/medprep-ai/LearningNurseReportPage";
+import { EvaluationModePage } from "../components/medprep-ai/EvaluationModePage";
+import { EvaluationCasesPage } from "../components/medprep-ai/EvaluationCasesPage";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -123,6 +136,35 @@ export const transportationContentRegistry: ContentRegistry = {
     "/study/materials": () => <StudyMaterialsPage />,
     "/study/flashcards": () => <FlashcardsPage />,
     "/study/notes": () => <NotesPage />,
+
+    // MedPrepAI learning modes
+    "/medprep-ai": () => <MedPrepOverviewPage />,
+    "/medprep-ai/let-me-drive": () => <LetMeDriveModePage />,
+    "/medprep-ai/practice-mode": () => <LetMeDriveModePage />,
+    "/medprep-ai/practice-cases": () => <PracticeCasesPage />,
+    "/medprep-ai/practice-nurse-report": () => <PracticeNurseReportPage />,
+    "/medprep-ai/qa": () => <QaModePage />,
+    "/medprep-ai/learning-mode": () => <LearningModePage />,
+    "/medprep-ai/learn-cases": () => <LearnCasesPage />,
+    "/medprep-ai/learning-nurse-report": () => <LearningNurseReportPage />,
+    "/medprep-ai/evaluation-mode": () => <EvaluationModePage />,
+    "/medprep-ai/evaluation-cases": () => <EvaluationCasesPage />,
+    "/medprep-ai/evaluation": () => (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <EvaluationPage initialCopilotMode={false} embedInAppShell skipExternalRedirects />
+      </div>
+    ),
+    "/medprep-ai/case": () => (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <PracticeCaseRoutePage />
+      </div>
+    ),
+    "/medprep-ai/learn": () => (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <LearningCaseRoutePage />
+      </div>
+    ),
+    "/medprep-ai/ai-evaluation": () => <EvaluationModePage />,
 
     // Test creation routes
     "/test-creation": () => <TestCreationPage />,

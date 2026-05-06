@@ -11,6 +11,9 @@ interface ContentRendererProps {
   children?: React.ReactNode;
 }
 
+const normalizePath = (p: string) =>
+  p.split("?")[0]?.split("#")[0] || "/";
+
 const ContentRenderer: React.FC<ContentRendererProps> = ({
   path,
   contentConfig,
@@ -19,19 +22,22 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   defaultContent,
   children,
 }) => {
+  const cleanPath = normalizePath(path);
+
   // Check for custom content first
-  if (customContent[path]) {
-    const CustomComponent = customContent[path];
+  if (customContent[cleanPath]) {
+    const CustomComponent = customContent[cleanPath];
     return <CustomComponent />;
   }
 
   // Check for dashboard content
-  if (dashboards[path]) {
-    return <DashboardRenderer config={dashboards[path]} />;
+  if (dashboards[cleanPath]) {
+    return <DashboardRenderer config={dashboards[cleanPath]} />;
   }
 
   // Check for configured content
-  const getContentForPath = (currentPath: string): React.ReactNode => {
+  const getContentForPath = (rawPath: string): React.ReactNode => {
+    const currentPath = normalizePath(rawPath);
     const content = contentConfig[currentPath];
 
     if (!content) {
@@ -117,7 +123,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
     );
   };
 
-  return <>{getContentForPath(path)}</>;
+  return <>{getContentForPath(cleanPath)}</>;
 };
 
 export default ContentRenderer;

@@ -1,0 +1,5 @@
+{
+  "name": "medprep-ai-backend",
+  "private": true,
+  "description": "NestJS REST module is implemented under ../../backend/src/modules/medprep-ai"
+}

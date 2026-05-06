@@ -1,0 +1,144 @@
+// MedPrep AI module schema
+// Stores clinical conversation sessions, diagnosis submissions, SOAP notes,
+// and AI hint usage telemetry for grading and analytics.
+
+model MedprepConversation {
+  id                 String                    @id @default(cuid())
+  userId             String
+  caseId             String?
+  caseInstanceId     String?
+  status             MedprepConversationStatus @default(ACTIVE)
+  interventionCount  Int                       @default(0)
+  startedAt          DateTime                  @default(now())
+  completedAt        DateTime?
+  abandonedAt        DateTime?
+  metadata           Json?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  // Relations
+  user                User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages            MedprepConversationMessage[]
+  diagnosisSubmissions MedprepDiagnosisSubmission[]
+  soapNotes           MedprepSoapNote[]
+  hintSessions        MedprepHintSession[]
+
+  @@index([userId])
+  @@index([caseId])
+  @@index([caseInstanceId])
+  @@index([status])
+  @@map("medprep_conversations")
+}
+
+model MedprepConversationMessage {
+  id              String            @id @default(cuid())
+  conversationId  String
+  role            MedprepMessageRole
+  content         String            @db.Text
+  isIntervention  Boolean           @default(false)
+  relevanceScore  Float?
+  metadata        Json?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  conversation MedprepConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([role])
+  @@map("medprep_conversation_messages")
+}
+
+model MedprepDiagnosisSubmission {
+  id                  String   @id @default(cuid())
+  conversationId      String
+  userId              String
+  caseId              String?
+  submittedDiagnosis  String   @db.Text
+  actualDiagnosis     String   @db.Text
+  isCorrect           Boolean
+  isRareCase          Boolean  @default(false)
+  specialty           String?
+  caseDifficulty      String?
+  submittedAt         DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  conversation MedprepConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([userId])
+  @@index([submittedAt])
+  @@map("medprep_diagnosis_submissions")
+}
+
+model MedprepSoapNote {
+  id                 String   @id @default(cuid())
+  conversationId     String
+  userId             String
+  subjective         String   @db.Text
+  objective          String   @db.Text
+  assessment         String   @db.Text
+  plan               String   @db.Text
+  aiSubjective       String?  @db.Text
+  aiObjective        String?  @db.Text
+  aiAssessment       String?  @db.Text
+  aiPlan             String?  @db.Text
+  grade              Float?
+  feedback           String?  @db.Text
+  submittedAt        DateTime?
+  lastSavedAt        DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  conversation MedprepConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([submittedAt])
+  @@map("medprep_soap_notes")
+}
+
+model MedprepHintSession {
+  id                  String   @id @default(cuid())
+  conversationId      String?
+  userId              String
+  caseId              String?
+  sessionKey          String
+  totalHintsUsed      Int      @default(0)
+  highImportanceHints Int      @default(0)
+  mediumImportanceHints Int    @default(0)
+  lowImportanceHints  Int      @default(0)
+  gradePenalty        Float    @default(0)
+  hintTimestamps      Json?
+  hintsByCategory     Json?
+  startedAt           DateTime @default(now())
+  endedAt             DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  conversation MedprepConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionKey])
+  @@index([userId])
+  @@index([conversationId])
+  @@map("medprep_hint_sessions")
+}
+
+enum MedprepConversationStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum MedprepMessageRole {
+  STUDENT
+  PATIENT
+  DOCTOR
+}

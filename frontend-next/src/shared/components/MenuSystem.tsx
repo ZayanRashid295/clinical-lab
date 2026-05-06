@@ -15,6 +15,17 @@ import { typography, spacing } from "../utils/responsive";
 import ContentRenderer from "./Content/ContentRenderer";
 // import { createContentRegistry } from "../../app/config/content.registry";
 import { COLOR_SCHEMES } from "../../app/config/theme.service";
+
+/** Registry keys are pathnames only. Router `routeChangeComplete` passes `?query` which would break lookups and fall back to parent paths (e.g. `/medprep-ai`). */
+function pathWithoutQueryAndHash(path: string): string {
+  if (!path) return "/";
+  let s = path;
+  const q = s.indexOf("?");
+  if (q !== -1) s = s.slice(0, q);
+  const h = s.indexOf("#");
+  if (h !== -1) s = s.slice(0, h);
+  return s || "/";
+}
 // import { ContentRegistry } from "../../app/types/dashboard";
 
 const MenuSystem: React.FC<MenuSystemProps> = ({
@@ -83,7 +94,8 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     };
 
     const syncMenuWithPath = (path?: string) => {
-      const currentPathValue = path || window.location.pathname;
+      const raw = path || window.location.pathname;
+      const currentPathValue = pathWithoutQueryAndHash(raw);
       setCurrentPath(currentPathValue);
       const menuId = findMenuIdByPath(menuItems, currentPathValue);
 
@@ -200,8 +212,11 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
 
   // Function to get the appropriate page content based on current path
   const getPageContent = useCallback(() => {
-    // Determine the effective path (use router pathname as fallback)
-    const effectivePath = currentPath || (typeof window !== "undefined" ? window.location.pathname : "/");
+    // Determine the effective path (use router pathname as fallback; never include ?query)
+    const effectivePath = pathWithoutQueryAndHash(
+      currentPath ||
+        (typeof window !== "undefined" ? window.location.pathname : "/")
+    );
     
     // Handle dashboard routes specially
     if (effectivePath === "/" || effectivePath === "/dashboard") {
@@ -234,7 +249,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
     // Use the ContentRenderer for all other paths
     return (
       <ContentRenderer
-        path={currentPath}
+        path={effectivePath}
         contentConfig={registry?.content || {}}
         dashboards={registry?.dashboards || {}}
         customContent={customContent}

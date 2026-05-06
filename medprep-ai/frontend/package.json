@@ -1,0 +1,5 @@
+{
+  "name": "medprep-ai-frontend",
+  "private": true,
+  "description": "MedPrepAI React pages live in ../../frontend-next/src/app/components/medprep-ai"
+}

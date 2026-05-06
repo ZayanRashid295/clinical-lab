@@ -138,6 +138,10 @@
     "questionChoices": "Question Choices",
     "assessments": "Assessments",
     "questionPapers": "Question Papers",
-    "questionPaperQuestions": "Question Paper Questions"
+    "questionPaperQuestions": "Question Paper Questions",
+    "medPrepAI": "MedPrepAI",
+    "medPrepPractice": "Practice Mode",
+    "medPrepLearning": "Learning Mode",
+    "medPrepAIEvaluation": "AI Evaluation Mode"
   }
 }

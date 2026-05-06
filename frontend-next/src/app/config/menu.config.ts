@@ -141,6 +141,36 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "medprep-ai",
+      label: "menu.medPrepAI",
+      icon: "🧠",
+      path: "/medprep-ai",
+      roles: ["SUPERADMIN", "ADMIN", "STUDENT", "FACULTY"],
+      submenu: [
+        {
+          id: "medprep-practice",
+          label: "menu.medPrepPractice",
+          icon: "🎯",
+          path: "/medprep-ai/let-me-drive",
+          roles: ["SUPERADMIN", "ADMIN", "STUDENT", "FACULTY"],
+        },
+        {
+          id: "medprep-learning",
+          label: "menu.medPrepLearning",
+          icon: "💬",
+          path: "/medprep-ai/qa",
+          roles: ["SUPERADMIN", "ADMIN", "STUDENT", "FACULTY"],
+        },
+        {
+          id: "medprep-ai-evaluation",
+          label: "menu.medPrepAIEvaluation",
+          icon: "📋",
+          path: "/medprep-ai/ai-evaluation",
+          roles: ["SUPERADMIN", "ADMIN", "STUDENT", "FACULTY"],
+        },
+      ],
+    },
+    {
       id: "test-creation",
       label: "menu.testCreation",
       icon: "✏️",

@@ -43,6 +43,12 @@ model User {
   questionPapers     QuestionPaper[]
   subscriptions      Subscription[]
 
+  // MedPrep AI module
+  medprepConversations      MedprepConversation[]
+  medprepDiagnosisSubmissions MedprepDiagnosisSubmission[]
+  medprepSoapNotes          MedprepSoapNote[]
+  medprepHintSessions       MedprepHintSession[]
+
   // Institution management
   institutionManager InstitutionManager?
 
