@@ -1,10 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { EDUCATION_SEED_USERS } from '../prisma/education-users.seed';
 
 const prisma = new PrismaClient();
 
+const adminSeed = EDUCATION_SEED_USERS.find((u) => u.role === 'ADMIN')!;
+
 async function createAdminUser() {
-  console.log('👤 Creating admin user: tahir@uber.com');
+  console.log(`👤 Ensuring admin user: ${adminSeed.email}`);
 
   try {
     // Hash password
@@ -12,7 +15,7 @@ async function createAdminUser() {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'tahir@uber.com' },
+      where: { email: adminSeed.email },
       include: { roles: { include: { role: true } } },
     });
 
@@ -21,7 +24,7 @@ async function createAdminUser() {
       
       // Update password
       await prisma.user.update({
-        where: { email: 'tahir@uber.com' },
+        where: { email: adminSeed.email },
         data: { password: hashedPassword },
       });
 
@@ -57,7 +60,7 @@ async function createAdminUser() {
       }
 
       console.log('✅ User updated successfully');
-      console.log('📧 Email: tahir@uber.com');
+      console.log(`📧 Email: ${adminSeed.email}`);
       console.log('🔑 Password: password123');
       console.log('👑 Role: ADMIN');
       return;
@@ -78,10 +81,11 @@ async function createAdminUser() {
     // Create user
     const user = await prisma.user.create({
       data: {
-        email: 'tahir@uber.com',
+        email: adminSeed.email,
         password: hashedPassword,
-        firstName: 'Tahir',
-        lastName: 'User',
+        firstName: adminSeed.firstName,
+        lastName: adminSeed.lastName,
+        phone: adminSeed.phone,
         isActive: true,
       },
     });
@@ -95,7 +99,7 @@ async function createAdminUser() {
     });
 
     console.log('✅ Admin user created successfully!');
-    console.log('📧 Email: tahir@uber.com');
+    console.log(`📧 Email: ${adminSeed.email}`);
     console.log('🔑 Password: password123');
     console.log('👑 Role: ADMIN');
     console.log('🆔 User ID:', user.id);

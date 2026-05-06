@@ -5,7 +5,7 @@ model Category {
   id          String   @id @default(cuid())
   name        String   @unique // Medical, Nursing, High School, etc.
   description String?
-  icon        String?  // Emoji or icon identifier for UI display
+  icon        String? // Emoji or icon identifier for UI display
   slug        String   @unique // URL-friendly name: medical, nursing, etc.
   order       Int      @default(0) // Display ordering in navbar
   isActive    Boolean  @default(true)
@@ -13,7 +13,7 @@ model Category {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  products Product[]
+  products  Product[]
   questions Question[]
 
   @@map("categories")
@@ -30,7 +30,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  category        Category?       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category        Category?        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   systems         System[]
   productSubtypes ProductSubtype[]
   questions       Question[]
@@ -60,14 +60,14 @@ model System {
 model ProductSubtype {
   id          String   @id @default(cuid())
   productId   String
-  name        String   // Qbank, Self-Assessment, Biostatistics Review
+  name        String // Qbank, Self-Assessment, Biostatistics Review
   description String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  product            Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product              Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   subscriptionPackages SubscriptionPackage[]
 
   @@unique([productId, name])

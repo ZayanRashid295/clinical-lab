@@ -13,6 +13,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 import { QuestionsService } from "@/app/services/questions/questions.service";
+import { authService } from "@/shared/services/auth.service";
 
 interface Test {
   id: string;
@@ -48,13 +49,25 @@ export default function TestSessionPage() {
   const { id } = router.query;
   const [test, setTest] = useState<Test | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [qpqIds, setQpqIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [markedQuestions, setMarkedQuestions] = useState<Set<number>>(new Set());
   const [showExplanation, setShowExplanation] = useState(false);
   const [startTime] = useState(Date.now());
+  const [questionStartTimes, setQuestionStartTimes] = useState<Record<number, number>>({});
+  const [questionTimeSpent, setQuestionTimeSpent] = useState<Record<number, number>>({});
   const [error, setError] = useState<string | null>(null);
+  const [submitResult, setSubmitResult] = useState<{
+    totalQuestions: number;
+    answeredQuestions: number;
+    correctAnswers: number;
+    incorrectAnswers: number;
+    score: number;
+    percentage: number;
+  } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const questionPapersService = new QuestionPapersService();
   const questionPaperQuestionsService = new QuestionPaperQuestionsService();
@@ -102,6 +115,7 @@ export default function TestSessionPage() {
         // Extract questions and restore answers/marked status
         if (questionPaperQuestions.length > 0) {
           const questionIds: string[] = [];
+          const orderedQpqIds: string[] = [];
           const answers: Record<string, string> = {};
           const markedQuestions: string[] = [];
 
@@ -110,6 +124,7 @@ export default function TestSessionPage() {
 
           sortedQuestions.forEach((qpq: any) => {
             questionIds.push(qpq.questionId);
+            orderedQpqIds.push(qpq.id);
             if (qpq.userAnswer) {
               answers[qpq.questionId] = qpq.userAnswer;
             }
@@ -121,6 +136,7 @@ export default function TestSessionPage() {
           testData.questions = questionIds;
           testData.answers = answers;
           testData.markedQuestions = markedQuestions;
+          setQpqIds(orderedQpqIds);
 
           // Fetch full question details using the service
           const questionPromises = questionIds.map(async (questionId: string) => {
@@ -175,6 +191,26 @@ export default function TestSessionPage() {
     fetchTest();
   }, [id]);
 
+  const recordTimeSpent = (idx: number) => {
+    const startedAt = questionStartTimes[idx];
+    if (!startedAt) return 0;
+    const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+    setQuestionTimeSpent((prev) => ({
+      ...prev,
+      [idx]: (prev[idx] || 0) + seconds,
+    }));
+    return (questionTimeSpent[idx] || 0) + seconds;
+  };
+
+  // Track when the user lands on a new question
+  useEffect(() => {
+    if (!test || questions.length === 0) return;
+    setQuestionStartTimes((prev) => ({
+      ...prev,
+      [currentQuestionIndex]: Date.now(),
+    }));
+  }, [currentQuestionIndex, test, questions.length]);
+
   const handleAnswerSelect = (answer: string) => {
     const newAnswers = {
       ...selectedAnswers,
@@ -182,26 +218,28 @@ export default function TestSessionPage() {
     };
     setSelectedAnswers(newAnswers);
 
-    // Save answer to test
     if (test && test.questions && test.questions[currentQuestionIndex]) {
       const questionId = test.questions[currentQuestionIndex];
       const updatedAnswers = {
         ...(test.answers || {}),
         [questionId]: answer,
       };
+      setTest({ ...test, answers: updatedAnswers });
 
-      // Update test state and backend
-      setTest({
-        ...test,
-        answers: updatedAnswers,
-      });
+      const qpqId = qpqIds[currentQuestionIndex];
+      const isCorrect =
+        questions[currentQuestionIndex]?.correctAnswer === answer;
 
-      // Update test in backend
-      fetch(`/api/tests/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: updatedAnswers }),
-      }).catch(console.error);
+      if (qpqId) {
+        questionPaperQuestionsService
+          .updateQuestionPaperQuestion(qpqId, {
+            userAnswer: answer,
+            isCorrect,
+          })
+          .catch((err) => {
+            console.error("Failed to persist answer:", err);
+          });
+      }
     }
 
     if (!test?.isTimed) {
@@ -211,32 +249,33 @@ export default function TestSessionPage() {
 
   const handleToggleMark = () => {
     const newMarked = new Set(markedQuestions);
-    if (newMarked.has(currentQuestionIndex)) {
-      newMarked.delete(currentQuestionIndex);
-    } else {
+    const willMark = !newMarked.has(currentQuestionIndex);
+    if (willMark) {
       newMarked.add(currentQuestionIndex);
+    } else {
+      newMarked.delete(currentQuestionIndex);
     }
     setMarkedQuestions(newMarked);
 
-    // Save marked questions to test
     if (test && test.questions) {
       const markedIds = Array.from(newMarked).map((idx) => test.questions[idx]);
-      
-      // Update test state and backend
-      setTest({
-        ...test,
-        markedQuestions: markedIds,
-      });
+      setTest({ ...test, markedQuestions: markedIds });
 
-      fetch(`/api/tests/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ markedQuestions: markedIds }),
-      }).catch(console.error);
+      const qpqId = qpqIds[currentQuestionIndex];
+      if (qpqId) {
+        questionPaperQuestionsService
+          .updateQuestionPaperQuestion(qpqId, {
+            markedForReview: willMark,
+          })
+          .catch((err) => {
+            console.error("Failed to persist mark:", err);
+          });
+      }
     }
   };
 
   const handleNext = () => {
+    recordTimeSpent(currentQuestionIndex);
     setShowExplanation(false);
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
@@ -244,6 +283,7 @@ export default function TestSessionPage() {
   };
 
   const handlePrevious = () => {
+    recordTimeSpent(currentQuestionIndex);
     setShowExplanation(false);
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
@@ -251,40 +291,50 @@ export default function TestSessionPage() {
   };
 
   const handleSubmitTest = async () => {
-    if (!test) return;
+    if (!test || !id || typeof id !== "string") return;
+    setIsSubmitting(true);
+    setError(null);
 
-    const duration = Math.floor((Date.now() - startTime) / 1000 / 60);
-    let correctCount = 0;
+    recordTimeSpent(currentQuestionIndex);
 
-    questions.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctAnswer) {
-        correctCount++;
-      }
-    });
+    const user = authService.getCurrentUser();
+    if (!user?.id) {
+      setError("You must be signed in to submit a test.");
+      setIsSubmitting(false);
+      return;
+    }
 
-    const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
+    const answersPayload = qpqIds
+      .map((qpqId, idx) => {
+        const userAnswer = selectedAnswers[idx];
+        if (!qpqId || userAnswer === undefined) return null;
+        return {
+          questionPaperQuestionId: qpqId,
+          userAnswer,
+          timeSpent: questionTimeSpent[idx] || 0,
+          markedForReview: markedQuestions.has(idx),
+        };
+      })
+      .filter(Boolean) as Array<{
+      questionPaperQuestionId: string;
+      userAnswer: string;
+      timeSpent: number;
+      markedForReview: boolean;
+    }>;
 
     try {
-      // Submit test to API
-      const response = await fetch(`/api/tests/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "completed",
-          score,
-          duration,
-          completedAt: new Date().toISOString(),
-        }),
+      const response = await questionPapersService.submitAssessment(id, {
+        userId: user.id,
+        answers: answersPayload,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit test");
-      }
-
-      // Navigate to results page
-      router.push(`/test-results/${id}`);
+      setSubmitResult({
+        ...response.results,
+        answeredQuestions: answersPayload.length,
+      });
     } catch (err: any) {
       setError(err?.message || "Failed to submit test");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -306,13 +356,112 @@ export default function TestSessionPage() {
     );
   }
 
-  if (error || !test) {
+  if (submitResult && test) {
+    const totalSeconds = Math.max(
+      0,
+      Math.floor((Date.now() - startTime) / 1000)
+    );
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return (
+      <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
+        <div className="max-w-3xl mx-auto space-y-6" data-testid="page-test-results">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl text-gray-900 dark:text-white">
+                Test Submitted
+              </CardTitle>
+              <p className="text-gray-600 dark:text-gray-400">{test.name}</p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {submitResult.percentage}%
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Score</div>
+                </div>
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    {submitResult.correctAnswers}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Correct</div>
+                </div>
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-3xl font-bold text-red-600 dark:text-red-400">
+                    {submitResult.incorrectAnswers}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Incorrect</div>
+                </div>
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {minutes}m {seconds}s
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Time</div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Answered {submitResult.answeredQuestions} of {submitResult.totalQuestions}
+                  </span>
+                </div>
+                <Progress
+                  value={
+                    submitResult.totalQuestions > 0
+                      ? (submitResult.answeredQuestions / submitResult.totalQuestions) * 100
+                      : 0
+                  }
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() => {
+                    setSubmitResult(null);
+                    setShowExplanation(true);
+                    setCurrentQuestionIndex(0);
+                  }}
+                  data-testid="button-review-answers"
+                >
+                  Review Answers
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/previous-tests")}
+                  data-testid="button-back-to-tests"
+                >
+                  Back to My Tests
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/test-creation/study-create")}
+                  data-testid="button-create-another"
+                >
+                  Create Another Test
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!test) {
     return (
       <div className="container mx-auto p-6 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Test not found</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">{error || "The test could not be loaded."}</p>
-          <Button onClick={() => router.push("/test-creation/study-create")} className="mt-4">
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {error || "The test could not be loaded."}
+          </p>
+          <Button
+            onClick={() => router.push("/test-creation/study-create")}
+            className="mt-4"
+          >
             Return to Create Test
           </Button>
         </div>
@@ -332,6 +481,22 @@ export default function TestSessionPage() {
   return (
     <div className="container mx-auto p-3 space-y-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
       <div className="space-y-4 max-w-5xl mx-auto" data-testid="page-test-session">
+        {error && (
+          <div
+            className="rounded-md border border-red-300 bg-red-50 dark:bg-red-950/40 dark:border-red-800 px-4 py-3 text-sm text-red-800 dark:text-red-200 flex items-center justify-between"
+            data-testid="test-session-error"
+          >
+            <span>{error}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setError(null)}
+              data-testid="button-dismiss-error"
+            >
+              Dismiss
+            </Button>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{test.name}</h1>
@@ -498,9 +663,10 @@ export default function TestSessionPage() {
           {currentQuestionIndex === questions.length - 1 ? (
             <Button
               onClick={handleSubmitTest}
+              disabled={isSubmitting}
               data-testid="button-submit-test"
             >
-              Submit Test
+              {isSubmitting ? "Submitting…" : "Submit Test"}
             </Button>
               ) : (
                 <Button onClick={handleNext} data-testid="button-next">

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { EDUCATION_SEED_USERS } from '../prisma/education-users.seed';
 
 const prisma = new PrismaClient();
 
@@ -6,6 +7,15 @@ async function assignLMSRoles() {
   console.log('👥 Assigning LMS roles to existing users...');
 
   try {
+    const seededCount = await prisma.user.count({
+      where: { email: { in: EDUCATION_SEED_USERS.map((u) => u.email) } },
+    });
+    if (seededCount >= EDUCATION_SEED_USERS.length) {
+      console.log(
+        '✅ Full education seed user set is present. Skipping (would strip SUPERADMIN/FACULTY). Use `npm run prisma:seed` for canonical roles.',
+      );
+      return;
+    }
     // Create/Update LMS roles
     console.log('\n📝 Creating/updating LMS roles...');
     
@@ -69,8 +79,8 @@ async function assignLMSRoles() {
       return;
     }
 
-    // First pass: Assign ADMIN to admin@uber.com specifically
-    const adminUser = allUsers.find((u) => u.email.toLowerCase() === 'admin@uber.com');
+    // First pass: Assign ADMIN to seeded org admin email
+    const adminUser = allUsers.find((u) => u.email.toLowerCase() === 'admin@clinicallab.test');
     if (adminUser) {
       // Remove any existing roles for admin user
       await prisma.userRole.deleteMany({
@@ -88,11 +98,8 @@ async function assignLMSRoles() {
 
     // Second pass: Assign INSTITUTION_MANAGER
     const institutionUser = allUsers.find(
-      (u) =>
-        u.email.toLowerCase().includes('institution') ||
-        u.email.toLowerCase().includes('manager') ||
-        u.email.toLowerCase() === 'jane.smith@example.com'
-    ) || allUsers[1]; // Fallback to second user
+      (u) => u.email.toLowerCase() === 'institution@clinicallab.test',
+    );
 
     if (institutionUser && institutionUser.id !== adminUser?.id) {
       // Remove any existing roles for institution user

@@ -2,12 +2,12 @@
 // This file contains all tables related to chat and messaging functionality
 
 model ChatRoom {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String?
-  type      ChatType    @default(DIRECT)
-  isActive  Boolean     @default(true)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  type      ChatType @default(DIRECT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   participants ChatParticipant[]
@@ -18,12 +18,12 @@ model ChatRoom {
 }
 
 model ChatParticipant {
-  id        String   @id @default(cuid())
+  id         String    @id @default(cuid())
   chatRoomId String
-  userId    String
-  role      ChatRole @default(MEMBER)
-  joinedAt  DateTime @default(now())
-  leftAt    DateTime?
+  userId     String
+  role       ChatRole  @default(MEMBER)
+  joinedAt   DateTime  @default(now())
+  leftAt     DateTime?
 
   // Relations
   chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
@@ -34,21 +34,21 @@ model ChatParticipant {
 }
 
 model ChatMessage {
-  id        String      @id @default(cuid())
+  id         String      @id @default(cuid())
   chatRoomId String
-  senderId  String
-  content   String
-  type      MessageType @default(TEXT)
-  metadata  Json?
-  isEdited  Boolean     @default(false)
-  editedAt  DateTime?
-  isDeleted Boolean     @default(false)
-  deletedAt DateTime?
-  createdAt DateTime    @default(now())
+  senderId   String
+  content    String
+  type       MessageType @default(TEXT)
+  metadata   Json?
+  isEdited   Boolean     @default(false)
+  editedAt   DateTime?
+  isDeleted  Boolean     @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime    @default(now())
 
   // Relations
-  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  sender   User     @relation("ChatMessageSender", fields: [senderId], references: [id])
+  chatRoom  ChatRoom              @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender    User                  @relation("ChatMessageSender", fields: [senderId], references: [id])
   reactions ChatMessageReaction[]
 
   @@map("chat_messages")
@@ -70,11 +70,11 @@ model ChatMessageReaction {
 }
 
 model ChatReadStatus {
-  id        String   @id @default(cuid())
-  chatRoomId String
-  userId    String
+  id                String   @id @default(cuid())
+  chatRoomId        String
+  userId            String
   lastReadMessageId String?
-  lastReadAt DateTime @default(now())
+  lastReadAt        DateTime @default(now())
 
   // Relations
   chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)

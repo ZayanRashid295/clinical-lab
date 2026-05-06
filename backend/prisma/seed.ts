@@ -8,6 +8,8 @@ import { seedPayments } from "./seed-payments";
 import { seedQuestions } from "./seed-questions";
 import { seedCategories } from "./seed-categories";
 import { seedSubscriptions } from "./seed-subscriptions";
+import { seedStudentContent } from "./seed-student-content";
+import { seedLaunch } from "./seed-launch";
 
 // Load .env file from the backend directory (parent of prisma folder)
 config({ path: resolve(process.cwd(), ".env") });
@@ -30,6 +32,12 @@ async function main() {
 
     // Subscription packages + sample user subscriptions (needs products + users)
     await seedSubscriptions(prisma);
+
+    // Demo notes / flashcards / study tasks / bookmarks for the primary student
+    await seedStudentContent(prisma);
+
+    // Launch-time seeds: achievements catalogue, mock exams, welcome discussion, public study group
+    await seedLaunch(prisma);
 
     // Seed other data
     // await seedLearningCases(prisma);

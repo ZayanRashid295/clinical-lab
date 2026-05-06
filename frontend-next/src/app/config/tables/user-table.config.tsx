@@ -69,14 +69,16 @@ const userColumns: ColumnConfig<User>[] = [
       const role = value?.[0]?.role?.name || "USER";
       const getRoleColor = (role: string) => {
         switch (role) {
+          case "SUPERADMIN":
+            return "bg-violet-100 text-violet-900";
           case "ADMIN":
             return "bg-purple-100 text-purple-800";
-          case "FLEET_MANAGER":
+          case "FACULTY":
+            return "bg-emerald-100 text-emerald-900";
+          case "STUDENT":
             return "bg-blue-100 text-blue-800";
-          case "DRIVER":
-            return "bg-green-100 text-green-800";
-          case "CUSTOMER_SUPPORT":
-            return "bg-orange-100 text-orange-800";
+          case "INSTITUTION_MANAGER":
+            return "bg-amber-100 text-amber-900";
           default:
             return "bg-gray-100 text-gray-800";
         }
@@ -148,10 +150,11 @@ const userFilterConfig: FilterConfig<UserFilters> = {
       label: "Role",
       type: "select",
       options: [
+        { value: "SUPERADMIN", label: "Super admin" },
         { value: "ADMIN", label: "Admin" },
-        { value: "FLEET_MANAGER", label: "Fleet Manager" },
-        { value: "DRIVER", label: "Driver" },
-        { value: "CUSTOMER_SUPPORT", label: "Customer Support" },
+        { value: "FACULTY", label: "Faculty" },
+        { value: "STUDENT", label: "Student" },
+        { value: "INSTITUTION_MANAGER", label: "Institution manager" },
       ],
     },
     {

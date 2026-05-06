@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   X,
   CreditCard,
@@ -6,19 +6,22 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
-  Calendar,
-  User,
-  Package,
-  RefreshCw,
 } from "lucide-react";
 import {
   Subscription,
   CreateSubscriptionDto,
   UpdateSubscriptionDto,
   SubscriptionStatus,
+  SubscriptionPackage,
 } from "../../types/subscription";
+import { User } from "../../types/user";
 import { SubscriptionsService } from "../../services/subscriptions/subscriptions.service";
+import { UsersService } from "../../services/users/users.service";
+import { SubscriptionPackagesService } from "../../services/subscriptions/subscription-packages.service";
 import { CreateResponse } from "../../services/base/api-types";
+
+type UserOption = { id: string; label: string };
+type PackageOption = { id: string; label: string };
 
 interface SubscriptionFormModalProps {
   isOpen: boolean;
@@ -46,9 +49,101 @@ export default function SubscriptionFormModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [userOptions, setUserOptions] = useState<UserOption[]>([]);
+  const [packageOptions, setPackageOptions] = useState<PackageOption[]>([]);
 
-  const subscriptionsService = new SubscriptionsService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
+  const usersService = useMemo(() => new UsersService(), []);
+  const packagesService = useMemo(() => new SubscriptionPackagesService(), []);
   const isCreateMode = mode === "create";
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const toUserLabel = (u: Pick<User, "id" | "email" | "firstName" | "lastName">) =>
+      `${u.firstName} ${u.lastName} (${u.email})`.trim();
+
+    const toPackageLabel = (p: SubscriptionPackage) => {
+      const subtype = p.productSubtype?.name;
+      return subtype ? `${p.name} — ${subtype}` : p.name;
+    };
+
+    setOptionsLoading(true);
+    Promise.all([
+      usersService.getUsers({
+        page: 1,
+        limit: 100,
+        sortBy: "lastName",
+        sortOrder: "asc",
+        status: "ACTIVE",
+      }),
+      packagesService.getPackages({
+        page: 1,
+        limit: 100,
+        sortBy: "name",
+        sortOrder: "asc",
+        status: "ACTIVE",
+      }),
+    ])
+      .then(([usersRes, packagesRes]) => {
+        const usersList: User[] = Array.isArray(usersRes)
+          ? usersRes
+          : usersRes.data || [];
+        const packagesList: SubscriptionPackage[] = Array.isArray(packagesRes)
+          ? packagesRes
+          : packagesRes.data || [];
+
+        let usersOut: UserOption[] = usersList.map((u) => ({
+          id: u.id,
+          label: toUserLabel(u),
+        }));
+
+        let packagesOut: PackageOption[] = packagesList.map((p) => ({
+          id: p.id,
+          label: toPackageLabel(p),
+        }));
+
+        if (!isCreateMode && subscription) {
+          if (
+            subscription.user &&
+            !usersOut.some((o) => o.id === subscription.userId)
+          ) {
+            usersOut = [
+              {
+                id: subscription.user.id,
+                label: toUserLabel(subscription.user),
+              },
+              ...usersOut,
+            ];
+          }
+          if (
+            subscription.subscriptionPackage &&
+            !packagesOut.some((o) => o.id === subscription.subscriptionPackageId)
+          ) {
+            const p = subscription.subscriptionPackage;
+            packagesOut = [
+              { id: p.id, label: toPackageLabel(p) },
+              ...packagesOut,
+            ];
+          }
+        }
+
+        setUserOptions(usersOut);
+        setPackageOptions(packagesOut);
+      })
+      .catch(() => {
+        setUserOptions([]);
+        setPackageOptions([]);
+      })
+      .finally(() => setOptionsLoading(false));
+  }, [
+    isOpen,
+    isCreateMode,
+    subscription,
+    usersService,
+    packagesService,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
@@ -109,10 +204,10 @@ export default function SubscriptionFormModal({
 
   const validateForm = (): string | null => {
     if (!formData.userId.trim()) {
-      return "User ID is required";
+      return "User is required";
     }
     if (!formData.subscriptionPackageId.trim()) {
-      return "Subscription Package ID is required";
+      return "Subscription package is required";
     }
     if (!formData.startDate) {
       return "Start date is required";
@@ -255,32 +350,48 @@ export default function SubscriptionFormModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                User ID *
+                User *
               </label>
-              <input
-                type="text"
+              <select
                 name="userId"
                 value={formData.userId}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-500"
                 required
-                disabled={!isCreateMode}
-              />
+                disabled={!isCreateMode || optionsLoading}
+              >
+                <option value="">
+                  {optionsLoading ? "Loading users…" : "Select a user"}
+                </option>
+                {userOptions.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Subscription Package ID *
+                Subscription package *
               </label>
-              <input
-                type="text"
+              <select
                 name="subscriptionPackageId"
                 value={formData.subscriptionPackageId}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-500"
                 required
-                disabled={!isCreateMode}
-              />
+                disabled={!isCreateMode || optionsLoading}
+              >
+                <option value="">
+                  {optionsLoading ? "Loading packages…" : "Select a package"}
+                </option>
+                {packageOptions.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

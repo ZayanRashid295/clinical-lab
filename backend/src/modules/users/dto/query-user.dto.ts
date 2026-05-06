@@ -31,14 +31,31 @@ export class QueryUserDto {
   status?: "ACTIVE" | "INACTIVE";
 
   @ApiProperty({
-    description: "Filter by user role",
-    enum: ["ADMIN", "FLEET_MANAGER", "DRIVER", "CUSTOMER_SUPPORT"],
+    description: "Filter by user role (Clinical Lab)",
+    enum: [
+      "SUPERADMIN",
+      "ADMIN",
+      "FACULTY",
+      "STUDENT",
+      "INSTITUTION_MANAGER",
+    ],
     example: "ADMIN",
     required: false,
   })
   @IsOptional()
-  @IsEnum(["ADMIN", "FLEET_MANAGER", "DRIVER", "CUSTOMER_SUPPORT"])
-  role?: "ADMIN" | "FLEET_MANAGER" | "DRIVER" | "CUSTOMER_SUPPORT";
+  @IsEnum([
+    "SUPERADMIN",
+    "ADMIN",
+    "FACULTY",
+    "STUDENT",
+    "INSTITUTION_MANAGER",
+  ])
+  role?:
+    | "SUPERADMIN"
+    | "ADMIN"
+    | "FACULTY"
+    | "STUDENT"
+    | "INSTITUTION_MANAGER";
 
   @ApiProperty({
     description: "Filter users created from this date",

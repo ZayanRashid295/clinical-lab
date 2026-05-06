@@ -2,35 +2,35 @@
 // This file contains tables for question papers and user assessments
 
 model QuestionPaper {
-  id          String   @id @default(cuid())
-  userId      String
-  name        String   // Practice Test 1, Mock Exam, etc.
-  description String?
-  type        String   @default("practice") // practice, mock, assessment
-  totalQuestions Int   @default(0)
-  timeLimit   Int?     // Time limit in minutes
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String
+  name           String // Practice Test 1, Mock Exam, etc.
+  description    String?
+  type           String   @default("practice") // practice, mock, assessment
+  totalQuestions Int      @default(0)
+  timeLimit      Int? // Time limit in minutes
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  user                    User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questionPaperQuestions  QuestionPaperQuestion[]
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionPaperQuestions QuestionPaperQuestion[]
 
   @@map("question_papers")
 }
 
 model QuestionPaperQuestion {
-  id             String   @id @default(cuid())
+  id              String   @id @default(cuid())
   questionPaperId String
-  questionId     String
-  userAnswer     String?  // User's selected answer
-  isCorrect      Boolean? // Whether user answered correctly
-  timeSpent      Int?     // Time spent on this question in seconds
-  markedForReview Boolean @default(false) // Whether question is marked for review
-  order          Int      @default(0) // Order of question in the paper
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  questionId      String
+  userAnswer      String? // User's selected answer
+  isCorrect       Boolean? // Whether user answered correctly
+  timeSpent       Int? // Time spent on this question in seconds
+  markedForReview Boolean  @default(false) // Whether question is marked for review
+  order           Int      @default(0) // Order of question in the paper
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   questionPaper QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)

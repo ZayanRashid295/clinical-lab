@@ -137,18 +137,75 @@ export class SubscriptionsController {
     return this.subscriptionsService.getStats();
   }
 
-  @Get(":id")
+  // Static paths must be registered before @Get(":id") or "features" / "user" are treated as IDs.
+  // ========== PACKAGE FEATURES ==========
+  @Get("features")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get subscription by ID" })
+  @ApiOperation({
+    summary: "Get all package features with filtering, pagination, and sorting",
+  })
+  @ApiResponse({ status: 200, description: "Features retrieved successfully" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async findAllFeatures(@Query() query: QueryPackageFeatureDto) {
+    return this.subscriptionsService.findAllFeatures(query);
+  }
+
+  @Get("features/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get package feature statistics" })
   @ApiResponse({
     status: 200,
-    description: "Subscription retrieved successfully",
+    description: "Feature statistics retrieved successfully",
   })
-  @ApiResponse({ status: 404, description: "Subscription not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  findOne(@Param("id") id: string) {
-    return this.subscriptionsService.findOne(id);
+  getFeatureStats() {
+    return this.subscriptionsService.getFeatureStats();
+  }
+
+  @Get("features/:id")
+  @ApiOperation({ summary: "Get feature by ID" })
+  @ApiResponse({ status: 200, description: "Feature retrieved successfully" })
+  @ApiResponse({ status: 404, description: "Feature not found" })
+  async getFeature(@Param("id") id: string) {
+    return this.subscriptionsService.getFeature(id);
+  }
+
+  @Post("features")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Create new package feature (Admin only)" })
+  @ApiResponse({ status: 201, description: "Feature created successfully" })
+  @ApiResponse({ status: 400, description: "Invalid input data" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async createFeature(@Body() createFeatureDto: CreatePackageFeatureDto) {
+    return this.subscriptionsService.createFeature(createFeatureDto);
+  }
+
+  @Patch("features/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update package feature (Admin only)" })
+  @ApiResponse({ status: 200, description: "Feature updated successfully" })
+  @ApiResponse({ status: 404, description: "Feature not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async updateFeature(
+    @Param("id") id: string,
+    @Body() updateFeatureDto: UpdatePackageFeatureDto
+  ) {
+    return this.subscriptionsService.updateFeature(id, updateFeatureDto);
+  }
+
+  @Delete("features/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Mark package feature as inactive (Admin only)" })
+  @ApiResponse({ status: 200, description: "Feature marked inactive successfully" })
+  @ApiResponse({ status: 404, description: "Feature not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async removeFeature(@Param("id") id: string) {
+    return this.subscriptionsService.removeFeature(id);
   }
 
   @Get("user/:userId")
@@ -166,6 +223,20 @@ export class SubscriptionsController {
     @Query("status") status?: string
   ) {
     return this.subscriptionsService.getUserSubscriptions(userId, status);
+  }
+
+  @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get subscription by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Subscription retrieved successfully",
+  })
+  @ApiResponse({ status: 404, description: "Subscription not found" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  findOne(@Param("id") id: string) {
+    return this.subscriptionsService.findOne(id);
   }
 
   @Post()
@@ -242,75 +313,5 @@ export class SubscriptionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async cleanupAllDuplicateActiveSubscriptions() {
     return this.subscriptionsService.cleanupAllDuplicateActiveSubscriptions();
-  }
-
-  // ========== PACKAGE FEATURES ==========
-  @Get("features")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: "Get all package features with filtering, pagination, and sorting",
-  })
-  @ApiResponse({ status: 200, description: "Features retrieved successfully" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async findAllFeatures(@Query() query: QueryPackageFeatureDto) {
-    return this.subscriptionsService.findAllFeatures(query);
-  }
-
-  @Get("features/stats")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Get package feature statistics" })
-  @ApiResponse({
-    status: 200,
-    description: "Feature statistics retrieved successfully",
-  })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  getFeatureStats() {
-    return this.subscriptionsService.getFeatureStats();
-  }
-
-  @Get("features/:id")
-  @ApiOperation({ summary: "Get feature by ID" })
-  @ApiResponse({ status: 200, description: "Feature retrieved successfully" })
-  @ApiResponse({ status: 404, description: "Feature not found" })
-  async getFeature(@Param("id") id: string) {
-    return this.subscriptionsService.getFeature(id);
-  }
-
-  @Post("features")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Create new package feature (Admin only)" })
-  @ApiResponse({ status: 201, description: "Feature created successfully" })
-  @ApiResponse({ status: 400, description: "Invalid input data" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async createFeature(@Body() createFeatureDto: CreatePackageFeatureDto) {
-    return this.subscriptionsService.createFeature(createFeatureDto);
-  }
-
-  @Patch("features/:id")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Update package feature (Admin only)" })
-  @ApiResponse({ status: 200, description: "Feature updated successfully" })
-  @ApiResponse({ status: 404, description: "Feature not found" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async updateFeature(
-    @Param("id") id: string,
-    @Body() updateFeatureDto: UpdatePackageFeatureDto
-  ) {
-    return this.subscriptionsService.updateFeature(id, updateFeatureDto);
-  }
-
-  @Delete("features/:id")
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Mark package feature as inactive (Admin only)" })
-  @ApiResponse({ status: 200, description: "Feature marked inactive successfully" })
-  @ApiResponse({ status: 404, description: "Feature not found" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  async removeFeature(@Param("id") id: string) {
-    return this.subscriptionsService.removeFeature(id);
   }
 }

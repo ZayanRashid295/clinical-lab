@@ -1,0 +1,38 @@
+// Question Reports: students flag bad / incorrect / unclear questions.
+
+model QuestionReport {
+  id         String               @id @default(cuid())
+  questionId String
+  reporterId String
+  reason     QuestionReportReason
+  details    String?              @db.Text
+  status     QuestionReportStatus @default(OPEN)
+  resolverId String?
+  resolution String?              @db.Text
+  resolvedAt DateTime?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  @@index([questionId])
+  @@index([status, createdAt])
+  @@index([reporterId])
+  @@map("question_reports")
+}
+
+enum QuestionReportReason {
+  INCORRECT_ANSWER
+  TYPO
+  UNCLEAR
+  OUTDATED
+  DUPLICATE
+  OFFENSIVE
+  OTHER
+}
+
+enum QuestionReportStatus {
+  OPEN
+  TRIAGED
+  ACCEPTED
+  REJECTED
+  RESOLVED
+}

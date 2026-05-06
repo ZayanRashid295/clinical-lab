@@ -1,0 +1,51 @@
+// AI Tutor conversations & messages.
+// Works with or without an OpenAI API key (graceful fallback in service).
+
+model AiTutorConversation {
+  id            String         @id @default(cuid())
+  userId        String
+  title         String         @default("New conversation")
+  context       AiTutorContext @default(GENERAL)
+  contextId     String? // Optional anchor (questionId, topicId, etc.)
+  pinned        Boolean        @default(false)
+  archivedAt    DateTime?
+  lastMessageAt DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  messages AiTutorMessage[]
+
+  @@index([userId, lastMessageAt])
+  @@map("ai_tutor_conversations")
+}
+
+enum AiTutorContext {
+  GENERAL
+  QUESTION
+  TOPIC
+  SYSTEM
+  PRODUCT
+  STUDY_PLAN
+}
+
+model AiTutorMessage {
+  id             String      @id @default(cuid())
+  conversationId String
+  role           AiTutorRole
+  content        String      @db.Text
+  tokensIn       Int?
+  tokensOut      Int?
+  model          String?
+  createdAt      DateTime    @default(now())
+
+  conversation AiTutorConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("ai_tutor_messages")
+}
+
+enum AiTutorRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}

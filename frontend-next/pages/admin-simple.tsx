@@ -64,13 +64,17 @@ const UserCard = ({ user }: { user: any }) => (
       <div className="flex items-center justify-between mb-4">
         <span
           className={`px-2 py-1 text-xs font-medium rounded-full ${
-            user.role === "ADMIN"
+            user.role === "SUPERADMIN"
+              ? "bg-violet-100 text-violet-900"
+              : user.role === "ADMIN"
               ? "bg-purple-100 text-purple-800"
-              : user.role === "FLEET_MANAGER"
+              : user.role === "FACULTY"
+              ? "bg-emerald-100 text-emerald-900"
+              : user.role === "STUDENT"
               ? "bg-blue-100 text-blue-800"
-              : user.role === "DRIVER"
-              ? "bg-green-100 text-green-800"
-              : "bg-orange-100 text-orange-800"
+              : user.role === "INSTITUTION_MANAGER"
+              ? "bg-amber-100 text-amber-900"
+              : "bg-gray-100 text-gray-800"
           }`}
         >
           {user.role.replace("_", " ")}

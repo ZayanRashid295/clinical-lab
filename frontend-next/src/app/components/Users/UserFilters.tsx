@@ -1,6 +1,9 @@
 import React from "react";
 import { Search, X } from "lucide-react";
-import { UserFilters as UserFiltersType } from "../../types/user";
+import {
+  UserFilters as UserFiltersType,
+  AppUserRole,
+} from "../../types/user";
 
 interface UserFiltersProps {
   filters: UserFiltersType;
@@ -15,12 +18,13 @@ const UserFilters: React.FC<UserFiltersProps> = ({
 }) => {
   const userStatuses: ("ACTIVE" | "INACTIVE")[] = ["ACTIVE", "INACTIVE"];
 
-  const userRoles: (
-    | "ADMIN"
-    | "FLEET_MANAGER"
-    | "DRIVER"
-    | "CUSTOMER_SUPPORT"
-  )[] = ["ADMIN", "FLEET_MANAGER", "DRIVER", "CUSTOMER_SUPPORT"];
+  const userRoles: AppUserRole[] = [
+    "SUPERADMIN",
+    "ADMIN",
+    "FACULTY",
+    "STUDENT",
+    "INSTITUTION_MANAGER",
+  ];
 
   const hasActiveFilters = Object.values(filters).some(
     (value) => value !== undefined && value !== "" && value !== null
@@ -69,12 +73,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
             value={filters.role || ""}
             onChange={(e) =>
               onFiltersChange({
-                role:
-                  (e.target.value as
-                    | "ADMIN"
-                    | "FLEET_MANAGER"
-                    | "DRIVER"
-                    | "CUSTOMER_SUPPORT") || undefined,
+                role: (e.target.value as AppUserRole) || undefined,
               })
             }
             className="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

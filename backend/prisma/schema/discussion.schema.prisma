@@ -1,0 +1,70 @@
+// Per-question / per-topic discussion threads with replies and votes.
+
+model Discussion {
+  id             String            @id @default(cuid())
+  authorId       String
+  title          String
+  body           String            @db.Text
+  context        DiscussionContext @default(GENERAL)
+  questionId     String?
+  topicId        String?
+  systemId       String?
+  productId      String?
+  pinned         Boolean           @default(false)
+  isClosed       Boolean           @default(false)
+  upvotes        Int               @default(0)
+  replyCount     Int               @default(0)
+  lastActivityAt DateTime          @default(now())
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  replies DiscussionReply[]
+  votes   DiscussionVote[]
+
+  @@index([context])
+  @@index([questionId])
+  @@index([authorId, createdAt])
+  @@index([lastActivityAt])
+  @@map("discussions")
+}
+
+enum DiscussionContext {
+  GENERAL
+  QUESTION
+  TOPIC
+  SYSTEM
+  PRODUCT
+}
+
+model DiscussionReply {
+  id           String   @id @default(cuid())
+  discussionId String
+  authorId     String
+  body         String   @db.Text
+  upvotes      Int      @default(0)
+  isAnswer     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+  @@index([discussionId, createdAt])
+  @@index([authorId])
+  @@map("discussion_replies")
+}
+
+model DiscussionVote {
+  id           String   @id @default(cuid())
+  discussionId String?
+  replyId      String?
+  userId       String
+  vote         Int // -1 or 1
+  createdAt    DateTime @default(now())
+
+  discussion Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, discussionId, replyId])
+  @@index([discussionId])
+  @@index([replyId])
+  @@map("discussion_votes")
+}

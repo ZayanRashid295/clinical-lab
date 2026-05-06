@@ -8,6 +8,8 @@ export interface MenuItem {
   roles: string[];
   submenu?: MenuItem[] | null;
   action?: string; // Custom action like "open-subscription-modal"
+  /** Optional pill next to the label in the sidebar (e.g. AI for Question Generator) */
+  navBadge?: "ai";
 }
 
 export interface MenuPermissions {

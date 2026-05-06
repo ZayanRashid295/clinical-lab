@@ -1,701 +1,463 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Badge } from "@/shared/ui/badge";
 import { Textarea } from "@/shared/ui/textarea";
+import { Badge } from "@/shared/ui/badge";
 import {
   Search,
   Plus,
   Edit,
   Trash2,
-  Bookmark,
-  Tag,
-  Calendar,
   FileText,
   Save,
   X,
-  Filter,
-  Grid,
-  List,
   Star,
   Clock,
-  Eye,
-  Share,
+  Loader2,
+  RefreshCw,
+  Pin,
+  PinOff,
 } from "lucide-react";
+import {
+  notesService,
+  type StudentNote,
+  type CreateNotePayload,
+} from "@/app/services/student";
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  system: string;
-  topic: string;
-  tags: string[];
-  isBookmarked: boolean;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-  wordCount: number;
-  lastAccessed?: string;
-}
-
-// Mock data for demonstration
-const mockNotes: Note[] = [
-  {
-    id: "1",
-    title: "Cardiology Fundamentals - Heart Anatomy",
-    content: "The heart is a four-chambered organ consisting of two atria and two ventricles. The right side pumps deoxygenated blood to the lungs, while the left side pumps oxygenated blood to the body. Key structures include the mitral valve, tricuspid valve, aortic valve, and pulmonary valve.",
-    system: "cardiology",
-    topic: "heart_anatomy",
-    tags: ["anatomy", "fundamentals", "valves"],
-    isBookmarked: true,
-    isPublic: false,
-    createdAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-01-15T10:00:00Z",
-    wordCount: 45,
-  },
-  {
-    id: "2",
-    title: "ECG Interpretation - Basic Patterns",
-    content: "ECG interpretation involves analyzing the P wave, QRS complex, and T wave. Normal intervals: PR interval 0.12-0.20s, QRS duration <0.12s, QT interval varies with heart rate. Common abnormalities include ST elevation (STEMI), ST depression (ischemia), and various arrhythmias.",
-    system: "cardiology",
-    topic: "ecg_interpretation",
-    tags: ["ecg", "diagnosis", "patterns"],
-    isBookmarked: false,
-    isPublic: true,
-    createdAt: "2024-01-14T15:30:00Z",
-    updatedAt: "2024-01-14T15:30:00Z",
-    wordCount: 52,
-  },
-  {
-    id: "3",
-    title: "Nephrology - Acute Kidney Injury",
-    content: "AKI is defined as a rapid decline in kidney function. Causes include prerenal (hypovolemia), renal (ATN), and postrenal (obstruction). Management involves fluid resuscitation, addressing underlying cause, and monitoring electrolytes. Dialysis may be required in severe cases.",
-    system: "nephrology",
-    topic: "acute_kidney_injury",
-    tags: ["kidney", "emergency", "management"],
-    isBookmarked: true,
-    isPublic: false,
-    createdAt: "2024-01-13T09:15:00Z",
-    updatedAt: "2024-01-13T09:15:00Z",
-    wordCount: 48,
-  },
-  {
-    id: "4",
-    title: "Pharmacology - ACE Inhibitors",
-    content: "ACE inhibitors block the conversion of angiotensin I to angiotensin II, reducing vasoconstriction and aldosterone secretion. Common side effects include dry cough, hyperkalemia, and angioedema. Contraindicated in pregnancy due to teratogenic effects.",
-    system: "pharmacology",
-    topic: "ace_inhibitors",
-    tags: ["pharmacology", "cardiovascular", "side_effects"],
-    isBookmarked: false,
-    isPublic: true,
-    createdAt: "2024-01-12T14:20:00Z",
-    updatedAt: "2024-01-12T14:20:00Z",
-    wordCount: 42,
-  },
-  {
-    id: "5",
-    title: "Hematology - Anemia Classification",
-    content: "Anemia can be classified by morphology (microcytic, normocytic, macrocytic) or etiology (blood loss, decreased production, increased destruction). Common causes include iron deficiency (microcytic), B12/folate deficiency (macrocytic), and chronic disease (normocytic).",
-    system: "hematology",
-    topic: "anemia",
-    tags: ["anemia", "classification", "diagnosis"],
-    isBookmarked: false,
-    isPublic: false,
-    createdAt: "2024-01-11T11:45:00Z",
-    updatedAt: "2024-01-11T11:45:00Z",
-    wordCount: 38,
-  },
+const COLOR_CHOICES = [
+  { id: "yellow", className: "bg-yellow-100 dark:bg-yellow-900/30" },
+  { id: "blue", className: "bg-blue-100 dark:bg-blue-900/30" },
+  { id: "green", className: "bg-green-100 dark:bg-green-900/30" },
+  { id: "pink", className: "bg-pink-100 dark:bg-pink-900/30" },
+  { id: "purple", className: "bg-purple-100 dark:bg-purple-900/30" },
 ];
 
+const blankNote: CreateNotePayload = {
+  title: "",
+  body: "",
+  color: "yellow",
+  pinned: false,
+  tags: [],
+};
+
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>(mockNotes);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSystem, setSelectedSystem] = useState<string>("all");
-  const [selectedTag, setSelectedTag] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingNote, setEditingNote] = useState<Note | null>(null);
-  const [newNote, setNewNote] = useState({
-    title: "",
-    content: "",
-    system: "",
-    topic: "",
-    tags: [] as string[],
-    isPublic: false,
-  });
+  const [notes, setNotes] = useState<StudentNote[]>([]);
+  const [stats, setStats] = useState<{
+    total: number;
+    pinned: number;
+    recent: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<StudentNote | null>(null);
+  const [draft, setDraft] = useState<CreateNotePayload>(blankNote);
   const [tagInput, setTagInput] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  // Auto-resize textarea
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [list, s] = await Promise.all([
+        notesService.list({ search: search || undefined }),
+        notesService.stats(),
+      ]);
+      setNotes(list);
+      setStats(s);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load notes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    }
-  }, [newNote.content, editingNote?.content]);
+    load();
+  }, []);
 
-  const filteredNotes = notes.filter((note) => {
-    const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Debounced server search so very large note libraries stay snappy
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      load();
+    }, 250);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
-    const matchesSystem = selectedSystem === "all" || note.system === selectedSystem;
-    const matchesTag = selectedTag === "all" || note.tags.includes(selectedTag);
+  const filtered = useMemo(() => {
+    if (!search) return notes;
+    const s = search.toLowerCase();
+    return notes.filter(
+      (n) =>
+        n.title.toLowerCase().includes(s) ||
+        n.body.toLowerCase().includes(s) ||
+        (n.tags ?? []).some((t) => t.toLowerCase().includes(s))
+    );
+  }, [notes, search]);
 
-    return matchesSearch && matchesSystem && matchesTag;
-  });
-
-  const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
-
-  const handleCreateNote = () => {
-    if (newNote.title.trim() && newNote.content.trim()) {
-      const note: Note = {
-        id: Date.now().toString(),
-        title: newNote.title,
-        content: newNote.content,
-        system: newNote.system,
-        topic: newNote.topic,
-        tags: newNote.tags,
-        isBookmarked: false,
-        isPublic: newNote.isPublic,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        wordCount: newNote.content.split(/\s+/).length,
-      };
-
-      setNotes([note, ...notes]);
-      setNewNote({
-        title: "",
-        content: "",
-        system: "",
-        topic: "",
-        tags: [],
-        isPublic: false,
-      });
-      setIsCreating(false);
-    }
+  const openCreate = () => {
+    setEditing(null);
+    setDraft(blankNote);
+    setTagInput("");
+    setShowEditor(true);
   };
 
-  const handleEditNote = (note: Note) => {
-    setEditingNote(note);
-  };
-
-  const handleSaveEdit = () => {
-    if (editingNote) {
-      setNotes(notes.map(note =>
-        note.id === editingNote.id
-          ? {
-              ...editingNote,
-              updatedAt: new Date().toISOString(),
-              wordCount: editingNote.content.split(/\s+/).length,
-            }
-          : note
-      ));
-      setEditingNote(null);
-    }
-  };
-
-  const handleDeleteNote = (noteId: string) => {
-    setNotes(notes.filter(note => note.id !== noteId));
-  };
-
-  const handleBookmarkToggle = (noteId: string) => {
-    setNotes(notes.map(note =>
-      note.id === noteId
-        ? { ...note, isBookmarked: !note.isBookmarked }
-        : note
-    ));
-  };
-
-  const handleAddTag = () => {
-    if (tagInput.trim() && !newNote.tags.includes(tagInput.trim())) {
-      setNewNote({
-        ...newNote,
-        tags: [...newNote.tags, tagInput.trim()],
-      });
-      setTagInput("");
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setNewNote({
-      ...newNote,
-      tags: newNote.tags.filter(tag => tag !== tagToRemove),
+  const openEdit = (n: StudentNote) => {
+    setEditing(n);
+    setDraft({
+      title: n.title,
+      body: n.body,
+      color: n.color || "yellow",
+      pinned: n.pinned,
+      tags: n.tags ?? [],
     });
+    setTagInput("");
+    setShowEditor(true);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const save = async () => {
+    if (!draft.title.trim() || !draft.body.trim()) return;
+    setBusy(true);
+    try {
+      if (editing) {
+        await notesService.update(editing.id, draft);
+      } else {
+        await notesService.create(draft);
+      }
+      setShowEditor(false);
+      await load();
+    } catch (e: any) {
+      setError(e?.message || "Could not save note");
+    } finally {
+      setBusy(false);
+    }
   };
+
+  const togglePin = async (n: StudentNote) => {
+    try {
+      await notesService.update(n.id, { pinned: !n.pinned });
+      await load();
+    } catch (e: any) {
+      setError(e?.message || "Failed to toggle pin");
+    }
+  };
+
+  const remove = async (n: StudentNote) => {
+    if (!confirm(`Delete note "${n.title}"?`)) return;
+    try {
+      await notesService.remove(n.id);
+      await load();
+    } catch (e: any) {
+      setError(e?.message || "Failed to delete note");
+    }
+  };
+
+  const addTag = () => {
+    if (!tagInput.trim()) return;
+    setDraft((d) => ({
+      ...d,
+      tags: Array.from(new Set([...(d.tags ?? []), tagInput.trim()])),
+    }));
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    setDraft((d) => ({ ...d, tags: (d.tags ?? []).filter((t) => t !== tag) }));
+  };
+
+  const colorClass = (c?: string | null) =>
+    COLOR_CHOICES.find((x) => x.id === c)?.className ??
+    "bg-white dark:bg-gray-800/50";
 
   return (
     <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">My Notes</h1>
+          <h1 className="text-3xl font-bold text-foreground">Notes</h1>
           <p className="text-muted-foreground mt-2">
-            Organize and manage your medical study notes
+            Capture pearls, mnemonics and review pieces in one place
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Button onClick={() => setIsCreating(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Note
+        <div className="flex items-center gap-2">
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-gray-500" />}
+          <Button variant="outline" size="sm" onClick={load}>
+            <RefreshCw className="h-4 w-4 mr-2" /> Refresh
           </Button>
-          <Button variant="outline">
-            <Bookmark className="h-4 w-4 mr-2" />
-            Bookmarked ({notes.filter(n => n.isBookmarked).length})
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" /> New Note
           </Button>
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {error && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatTile
+          label="Total notes"
+          value={stats?.total ?? notes.length}
+          icon={FileText}
+          color="text-blue-600 dark:text-blue-400"
+        />
+        <StatTile
+          label="Pinned"
+          value={stats?.pinned ?? notes.filter((n) => n.pinned).length}
+          icon={Star}
+          color="text-yellow-500"
+        />
+        <StatTile
+          label="Updated this week"
+          value={stats?.recent ?? 0}
+          icon={Clock}
+          color="text-emerald-600 dark:text-emerald-400"
+        />
+      </div>
+
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search Bar */}
-            <div className="flex-1 relative">
+        <CardContent className="p-4">
+          <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search notes by title, content, or tags..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search title, body, tag…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
               />
-            </div>
-
-            {/* Filters */}
-            <div className="flex gap-4">
-              <select
-                value={selectedSystem}
-                onChange={(e) => setSelectedSystem(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md bg-white"
-              >
-                <option value="all">All Systems</option>
-                <option value="cardiology">Cardiology</option>
-                <option value="nephrology">Nephrology</option>
-                <option value="pharmacology">Pharmacology</option>
-                <option value="hematology">Hematology</option>
-              </select>
-
-              <select
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md bg-white"
-              >
-                <option value="all">All Tags</option>
-                {allTags.map((tag) => (
-                  <option key={tag} value={tag}>
-                    {tag}
-                  </option>
-                ))}
-              </select>
-
-              {/* View Mode Toggle */}
-              <div className="flex border border-gray-300 rounded-md">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="rounded-r-none"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="rounded-l-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Notes</p>
-                <p className="text-2xl font-bold">{notes.length}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filtered.map((n) => (
+          <Card
+            key={n.id}
+            className={`${colorClass(n.color)} border border-gray-200 dark:border-gray-700`}
+          >
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white line-clamp-2">
+                  {n.title}
+                </CardTitle>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => togglePin(n)}
+                    aria-label="Toggle pin"
+                  >
+                    {n.pinned ? (
+                      <Pin className="h-4 w-4 fill-yellow-400 text-yellow-500" />
+                    ) : (
+                      <PinOff className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEdit(n)}
+                    aria-label="Edit note"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => remove(n)}
+                    aria-label="Delete note"
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+            </div>
               </div>
-              <FileText className="h-8 w-8 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap line-clamp-6">
+                {n.body}
+              </p>
+              {(n.tags ?? []).length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {(n.tags ?? []).map((t) => (
+                    <Badge key={t} variant="secondary" className="text-xs">
+                      {t}
+                    </Badge>
+                  ))}
+              </div>
+              )}
+              <div className="mt-3 text-xs text-gray-500">
+                Updated {new Date(n.updatedAt).toLocaleDateString()}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Bookmarked</p>
-                <p className="text-2xl font-bold">
-                  {notes.filter(n => n.isBookmarked).length}
-                </p>
-              </div>
-              <Bookmark className="h-8 w-8 text-orange-600" />
-            </div>
+        ))}
+        {!loading && filtered.length === 0 && (
+          <Card className="md:col-span-2 lg:col-span-3">
+            <CardContent className="p-12 text-center">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No notes yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Capture quick pearls or detailed write-ups so you can come back
+                to them while practicing.
+              </p>
+              <Button onClick={openCreate}>
+                <Plus className="h-4 w-4 mr-2" /> Create your first note
+              </Button>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Public Notes</p>
-                <p className="text-2xl font-bold">
-                  {notes.filter(n => n.isPublic).length}
-                </p>
-              </div>
-              <Share className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Words</p>
-                <p className="text-2xl font-bold">
-                  {notes.reduce((sum, note) => sum + note.wordCount, 0)}
-                </p>
-              </div>
-              <FileText className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
+      )}
       </div>
 
-      {/* Create Note Modal */}
-      {isCreating && (
-        <Card>
+      {showEditor && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Create New Note</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>
+                <CardTitle>{editing ? "Edit note" : "New note"}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEditor(false)}
+                >
                 <X className="h-4 w-4" />
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <Input
-              placeholder="Note title..."
-              value={newNote.title}
-              onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                placeholder="System..."
-                value={newNote.system}
-                onChange={(e) => setNewNote({ ...newNote, system: e.target.value })}
+                placeholder="Title"
+                value={draft.title}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, title: e.target.value }))
+                }
               />
-              <Input
-                placeholder="Topic..."
-                value={newNote.topic}
-                onChange={(e) => setNewNote({ ...newNote, topic: e.target.value })}
+              <Textarea
+                placeholder="Write your note…"
+                value={draft.body}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, body: e.target.value }))
+                }
+                rows={8}
               />
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Color</p>
+                <div className="flex gap-2">
+                  {COLOR_CHOICES.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setDraft((d) => ({ ...d, color: c.id }))}
+                      className={`w-8 h-8 rounded-full ${c.className} border ${
+                        draft.color === c.id
+                          ? "ring-2 ring-primary border-transparent"
+                          : "border-gray-300"
+                      }`}
+                      aria-label={`Color ${c.id}`}
+                    />
+              ))}
             </div>
-
-            <Textarea
-              ref={textareaRef}
-              placeholder="Write your note here..."
-              value={newNote.content}
-              onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-              className="min-h-[200px] resize-none"
-            />
-
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder="Add tag..."
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
-              />
-              <Button onClick={handleAddTag} size="sm">
-                <Tag className="h-4 w-4" />
-              </Button>
             </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              {newNote.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                  {tag}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Tags</p>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add tag and press Enter"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addTag();
+                      }
+                    }}
                   />
-                </Badge>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={newNote.isPublic}
-                  onChange={(e) => setNewNote({ ...newNote, isPublic: e.target.checked })}
-                />
-                <span className="text-sm">Make public</span>
-              </label>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsCreating(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreateNote}>
-                <Save className="h-4 w-4 mr-2" />
-                Save Note
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Edit Note Modal */}
-      {editingNote && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Edit Note</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setEditingNote(null)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              value={editingNote.title}
-              onChange={(e) => setEditingNote({ ...editingNote, title: e.target.value })}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                value={editingNote.system}
-                onChange={(e) => setEditingNote({ ...editingNote, system: e.target.value })}
-              />
-              <Input
-                value={editingNote.topic}
-                onChange={(e) => setEditingNote({ ...editingNote, topic: e.target.value })}
-              />
-            </div>
-
-            <Textarea
-              value={editingNote.content}
-              onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
-              className="min-h-[200px] resize-none"
-            />
-
-            <div className="flex items-center gap-2 flex-wrap">
-              {editingNote.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditingNote(null)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveEdit}>
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Notes Grid/List */}
-      {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNotes.map((note) => (
-            <Card key={note.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg line-clamp-2 mb-2">
-                       {note.title}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
-                      <span>{formatDate(note.updatedAt)}</span>
-                      <span>•</span>
-                      <span>{note.wordCount} words</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleBookmarkToggle(note.id)}
+                  <Button type="button" variant="outline" onClick={addTag}>
+                    Add
+                    </Button>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {(draft.tags ?? []).map((t) => (
+                    <Badge
+                      key={t}
+                      variant="secondary"
+                      className="text-xs cursor-pointer"
+                      onClick={() => removeTag(t)}
                     >
-                      <Star
-                        className={`h-4 w-4 ${
-                          note.isBookmarked
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-400"
-                        }`}
-                      />
-                    </Button>
-                    {note.isPublic && (
-                      <Badge variant="outline" className="text-xs">
-                        Public
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {note.content}
-                </p>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className="text-xs">
-                    {note.system}
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs">
-                    {note.topic.replace("_", " ")}
-                  </Badge>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {note.tags.slice(0, 2).map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {note.tags.length > 2 && (
-                      <span className="text-xs text-muted-foreground">
-                        +{note.tags.length - 2} more
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleEditNote(note)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteNote(note.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredNotes.map((note) => (
-            <Card key={note.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
-                        <p className="text-muted-foreground line-clamp-2 mb-3">
-                          {note.content}
-                        </p>
-
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Updated {formatDate(note.updatedAt)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3" />
-                            <span>{note.wordCount} words</span>
-                          </div>
-                          {note.isPublic && (
-                            <Badge variant="outline" className="text-xs">
-                              Public
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge variant="outline" className="text-xs">
-                            {note.system}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {note.topic.replace("_", " ")}
-                          </Badge>
-                          {note.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
+                      {t} <X className="inline ml-1 h-3 w-3" />
                             </Badge>
                           ))}
                         </div>
                       </div>
-
                       <div className="flex items-center gap-2">
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleBookmarkToggle(note.id)}
-                        >
-                          <Star
-                            className={`h-4 w-4 ${
-                              note.isBookmarked
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-gray-400"
-                            }`}
-                          />
+                  variant={draft.pinned ? "default" : "outline"}
+                  onClick={() => setDraft((d) => ({ ...d, pinned: !d.pinned }))}
+                >
+                  {draft.pinned ? (
+                    <Pin className="h-4 w-4 mr-2" />
+                  ) : (
+                    <PinOff className="h-4 w-4 mr-2" />
+                  )}
+                  {draft.pinned ? "Pinned" : "Pin"}
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditNote(note)}>
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
+                <div className="flex-1" />
                         <Button
                           variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteNote(note.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
+                  onClick={() => setShowEditor(false)}
+                  disabled={busy}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={save} disabled={busy}>
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Save
                         </Button>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
         </div>
       )}
-
-      {filteredNotes.length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No notes found</h3>
-            <p className="text-muted-foreground mb-4">
-              Try adjusting your search terms or filters, or create your first note.
-            </p>
-            <Button onClick={() => setIsCreating(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create New Note
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: number;
+  icon: any;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-2xl font-bold">{value}</p>
+          </div>
+          <Icon className={`h-8 w-8 ${color}`} />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

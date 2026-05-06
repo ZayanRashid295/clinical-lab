@@ -1,0 +1,60 @@
+// Peer study groups. Messaging can use the existing chat module via roomId.
+
+model StudyGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  category    String   @default("General")
+  icon        String   @default("users")
+  color       String   @default("emerald")
+  isPrivate   Boolean  @default(false)
+  inviteCode  String?  @unique
+  ownerId     String
+  chatRoomId  String? // Optional FK to existing ChatRoom (string only; relation managed by service)
+  memberCount Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members StudyGroupMember[]
+  posts   StudyGroupPost[]
+
+  @@index([category])
+  @@index([ownerId])
+  @@map("study_groups")
+}
+
+model StudyGroupMember {
+  id       String         @id @default(cuid())
+  groupId  String
+  userId   String
+  role     StudyGroupRole @default(MEMBER)
+  joinedAt DateTime       @default(now())
+
+  group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@map("study_group_members")
+}
+
+enum StudyGroupRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model StudyGroupPost {
+  id            String   @id @default(cuid())
+  groupId       String
+  authorId      String
+  body          String   @db.Text
+  attachmentUrl String?
+  pinned        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt])
+  @@map("study_group_posts")
+}

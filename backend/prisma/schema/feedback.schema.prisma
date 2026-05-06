@@ -1,0 +1,62 @@
+// In-app feedback / support tickets.
+
+model FeedbackTicket {
+  id            String           @id @default(cuid())
+  userId        String
+  subject       String
+  body          String           @db.Text
+  category      FeedbackCategory @default(GENERAL)
+  priority      FeedbackPriority @default(NORMAL)
+  status        FeedbackStatus   @default(OPEN)
+  attachmentUrl String?
+  assigneeId    String?
+  closedAt      DateTime?
+  lastReplyAt   DateTime         @default(now())
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  replies FeedbackReply[]
+
+  @@index([userId, status])
+  @@index([status, lastReplyAt])
+  @@map("feedback_tickets")
+}
+
+enum FeedbackCategory {
+  GENERAL
+  BUG
+  FEATURE_REQUEST
+  CONTENT
+  BILLING
+  ACCOUNT
+}
+
+enum FeedbackPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum FeedbackStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}
+
+model FeedbackReply {
+  id            String   @id @default(cuid())
+  ticketId      String
+  authorId      String
+  isStaff       Boolean  @default(false)
+  body          String   @db.Text
+  attachmentUrl String?
+  createdAt     DateTime @default(now())
+
+  ticket FeedbackTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("feedback_replies")
+}

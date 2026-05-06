@@ -10,16 +10,16 @@ import {
 export class CreateUserDto {
   @ApiProperty({
     description: "User email address",
-    example: "john.doe@example.com",
+    example: "student@clinicallab.test",
   })
   @IsEmail({}, { message: "Please provide a valid email address" })
   email: string;
 
-  @ApiProperty({ description: "User first name", example: "John" })
+  @ApiProperty({ description: "User first name", example: "Alex" })
   @IsString({ message: "First name must be a string" })
   firstName: string;
 
-  @ApiProperty({ description: "User last name", example: "Doe" })
+  @ApiProperty({ description: "User last name", example: "Student" })
   @IsString({ message: "Last name must be a string" })
   lastName: string;
 
