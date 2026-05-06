@@ -30,6 +30,9 @@ export class DiscussionsService {
         ...dto,
         authorId,
       } as any,
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
     this.achievements
       .recordActivity(authorId, "DISCUSSION_POSTS" as any)
@@ -71,6 +74,9 @@ export class DiscussionsService {
       where,
       orderBy: [{ pinned: "desc" }, { lastActivityAt: "desc" }],
       take: 100,
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 
@@ -78,7 +84,13 @@ export class DiscussionsService {
     const discussion = await this.prisma.discussion.findUnique({
       where: { id },
       include: {
-        replies: { orderBy: { createdAt: "asc" } },
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        replies: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+          },
+        },
       },
     });
     if (!discussion) throw new NotFoundException("Discussion not found");
@@ -122,6 +134,9 @@ export class DiscussionsService {
         authorId: userId,
         body: dto.body,
         isAnswer: dto.isAnswer ?? false,
+      },
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
       },
     });
 

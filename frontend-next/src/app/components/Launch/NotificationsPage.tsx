@@ -10,11 +10,28 @@ import {
 } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
-import { Bell, BellOff, Check, CheckCheck, Trash2, Loader2 } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  Check,
+  CheckCheck,
+  Trash2,
+  Loader2,
+  MessageSquare,
+  Users,
+  LifeBuoy,
+  Flag,
+  Sparkles,
+  Target,
+  Trophy,
+  CreditCard,
+  ShieldAlert,
+} from "lucide-react";
 import {
   launchNotificationsService,
   type AppNotification,
 } from "@/app/services/launch";
+import { useRealtimeEvent } from "@/app/services/realtime/use-realtime-room";
 
 function timeAgo(iso: string): string {
   const d = new Date(iso);
@@ -54,6 +71,17 @@ export default function NotificationsPage() {
     load(filter === "unread");
   }, [filter]);
 
+  // Live updates from socket.io (notifications are emitted to user room)
+  useRealtimeEvent<AppNotification>("notification", (n) => {
+    if (!n?.id) return;
+    // If we're filtering unread-only and this arrives as read, ignore.
+    if (filter === "unread" && n.isRead) return;
+    setItems((prev) => {
+      if (prev.some((x) => x.id === n.id)) return prev;
+      return [n, ...prev].slice(0, 200);
+    });
+  });
+
   const onMarkAll = async () => {
     setActing(true);
     try {
@@ -83,19 +111,25 @@ export default function NotificationsPage() {
       router.push(`/study-groups/${data.groupId}`);
     } else if (n.type === "FEEDBACK_REPLY" && data.ticketId) {
       router.push(`/feedback/${data.ticketId}`);
+    } else if (n.type === "FEEDBACK_TICKET_CREATED" && data.ticketId) {
+      router.push(`/feedback/${data.ticketId}`);
     } else if (n.type === "MOCK_EXAM_RESULT") {
       router.push(`/mock-exams`);
     } else if (n.type === "GOAL_COMPLETED" || n.type === "GOAL_PROGRESS") {
       router.push(`/goals`);
     } else if (n.type === "ACHIEVEMENT_UNLOCKED" || n.type === "STREAK_MILESTONE") {
       router.push(`/achievements`);
+    } else if (n.type === "QUESTION_REPORT_UPDATE" || n.type === "QUESTION_REPORT_CREATED") {
+      router.push(`/my-reports`);
+    } else if (n.type === "SUBSCRIPTION_EXPIRING" || n.type === "SUBSCRIPTION_EXPIRED") {
+      router.push(`/subscriptions`);
     }
   };
 
   const unread = items.filter((n) => !n.isRead).length;
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -131,11 +165,12 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Inbox</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-base">Inbox</CardTitle>
+          </CardHeader>
+          <CardContent>
           {loading ? (
             <div className="flex items-center justify-center p-12 text-muted-foreground">
               <Loader2 className="animate-spin mr-2" /> Loading…
@@ -159,11 +194,36 @@ export default function NotificationsPage() {
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`mt-1.5 w-2.5 h-2.5 rounded-full ${
-                        n.isRead ? "bg-transparent" : "bg-emerald-500"
-                      }`}
-                    />
+                    <div className="mt-0.5">
+                      <div
+                        className={
+                          "w-9 h-9 rounded-lg flex items-center justify-center border " +
+                          (n.isRead
+                            ? "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+                            : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800")
+                        }
+                      >
+                        {(() => {
+                          const t = n.type;
+                          const cls = "h-4 w-4";
+                          if (t.startsWith("DISCUSSION")) return <MessageSquare className={cls} />;
+                          if (t.startsWith("STUDY_GROUP")) return <Users className={cls} />;
+                          if (t.startsWith("FEEDBACK")) return <LifeBuoy className={cls} />;
+                          if (t.startsWith("QUESTION_REPORT")) return <Flag className={cls} />;
+                          if (t.startsWith("ACHIEVEMENT") || t.startsWith("STREAK"))
+                            return <Trophy className={cls} />;
+                          if (t.startsWith("GOAL")) return <Target className={cls} />;
+                          if (t.startsWith("SUBSCRIPTION")) return <CreditCard className={cls} />;
+                          if (t.includes("SECURITY")) return <ShieldAlert className={cls} />;
+                          return <Sparkles className={cls} />;
+                        })()}
+                      </div>
+                      {!n.isRead ? (
+                        <div className="mt-2 flex justify-center">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        </div>
+                      ) : null}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-medium text-sm text-foreground">
@@ -211,8 +271,30 @@ export default function NotificationsPage() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4 lg:sticky lg:top-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Unread</span>
+                <span className="font-semibold">{unread}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total loaded</span>
+                <span className="font-semibold">{items.length}</span>
+              </div>
+              <div className="pt-2 border-t text-xs text-muted-foreground">
+                Updates arrive live in real time via WebSocket.
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

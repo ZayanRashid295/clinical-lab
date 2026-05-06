@@ -76,6 +76,8 @@ model UserPoints {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("user_points")
 }
 

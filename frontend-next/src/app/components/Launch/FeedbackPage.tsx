@@ -40,6 +40,8 @@ import {
 } from "@/app/services/launch";
 import { authService } from "@/shared";
 import { useRealtimeRoom } from "@/app/services/realtime/use-realtime-room";
+import { UserIdentity } from "@/shared/components/Common/UserIdentity";
+import { MessageBubble } from "@/shared/components/Common/MessageBubble";
 
 const CATEGORIES: { value: FeedbackCategory; label: string; Icon: any }[] = [
   { value: "GENERAL", label: "General", Icon: Sparkles },
@@ -176,7 +178,7 @@ function TicketList() {
   }, [items]);
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -200,24 +202,26 @@ function TicketList() {
         )}
       </div>
 
-      {isStaff && (
-        <div className="flex flex-wrap gap-1.5">
-          {(["ALL", ...STATUSES] as const).map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={statusFilter === s ? "default" : "outline"}
-              onClick={() => setStatusFilter(s as any)}
-              className="gap-1"
-            >
-              {s.replace("_", " ")}
-              {counts[s] !== undefined && (
-                <span className="ml-1 text-xs opacity-70">({counts[s]})</span>
-              )}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
+        <div className="space-y-4 min-w-0">
+          {isStaff && (
+            <div className="flex flex-wrap gap-1.5">
+              {(["ALL", ...STATUSES] as const).map((s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={statusFilter === s ? "default" : "outline"}
+                  onClick={() => setStatusFilter(s as any)}
+                  className="gap-1"
+                >
+                  {s.replace("_", " ")}
+                  {counts[s] !== undefined && (
+                    <span className="ml-1 text-xs opacity-70">({counts[s]})</span>
+                  )}
+                </Button>
+              ))}
+            </div>
+          )}
 
       {loading ? (
         <div className="flex items-center justify-center p-12 text-muted-foreground">
@@ -255,9 +259,15 @@ function TicketList() {
                     <Badge variant="outline">{t.category}</Badge>
                     <Badge variant="outline">{t.priority}</Badge>
                     {isStaff && (
-                      <Badge variant="outline" className="font-mono">
-                        user: {t.userId.slice(0, 8)}…
-                      </Badge>
+                      <div className="ml-auto">
+                        <UserIdentity
+                          user={(t as any).user}
+                          fallbackId={t.userId}
+                          avatarClassName="size-6"
+                          nameClassName="text-xs font-semibold"
+                          subtitle="Filed by"
+                        />
+                      </div>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
@@ -272,6 +282,28 @@ function TicketList() {
           ))}
         </div>
       )}
+        </div>
+
+        <div className="space-y-4 lg:sticky lg:top-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total</span>
+                <span className="font-semibold">{counts.ALL ?? 0}</span>
+              </div>
+              {STATUSES.map((s) => (
+                <div key={s} className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{s.replace("_", " ")}</span>
+                  <span className="font-semibold">{counts[s] ?? 0}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {showNew && !isStaff && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
@@ -366,6 +398,7 @@ function TicketDetail({ id }: { id: string }) {
   const [reply, setReply] = useState("");
   const [posting, setPosting] = useState(false);
   const [savingMeta, setSavingMeta] = useState(false);
+  const meId = authService.getCurrentUser?.()?.id as string | undefined;
 
   const load = async () => {
     setLoading(true);
@@ -449,7 +482,7 @@ function TicketDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4 max-w-4xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <Button
         variant="ghost"
         size="sm"
@@ -471,7 +504,8 @@ function TicketDetail({ id }: { id: string }) {
         </Card>
       ) : (
         <>
-          <Card>
+          <div className="h-[calc(100dvh-140px)] overflow-hidden flex flex-col gap-4">
+          <Card className="shrink-0">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 flex-wrap mb-2">
                 <Badge className={STATUS_COLORS[t.status]}>
@@ -480,9 +514,13 @@ function TicketDetail({ id }: { id: string }) {
                 <Badge variant="outline">{t.category}</Badge>
                 <Badge variant="outline">Priority: {t.priority}</Badge>
                 {isStaff && (
-                  <Badge variant="outline" className="font-mono">
-                    Filed by: {t.userId.slice(0, 12)}…
-                  </Badge>
+                  <UserIdentity
+                    user={(t as any).user}
+                    fallbackId={t.userId}
+                    avatarClassName="size-6"
+                    nameClassName="text-xs font-semibold"
+                    subtitle="Filed by"
+                  />
                 )}
               </div>
               <h1 className="text-2xl font-bold">{t.subject}</h1>
@@ -496,7 +534,7 @@ function TicketDetail({ id }: { id: string }) {
           </Card>
 
           {isStaff && (
-            <Card className="border-emerald-200 bg-emerald-50/40 dark:bg-emerald-900/10">
+            <Card className="border-emerald-200 bg-emerald-50/40 dark:bg-emerald-900/10 shrink-0">
               <CardContent className="p-4 flex flex-wrap items-center gap-3">
                 <ShieldCheck className="h-4 w-4 text-emerald-700" />
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">
@@ -538,47 +576,42 @@ function TicketDetail({ id }: { id: string }) {
             </Card>
           )}
 
-          <h2 className="text-lg font-semibold mt-4">Conversation</h2>
+          <h2 className="text-lg font-semibold mt-4 shrink-0">Conversation</h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2 flex-1 overflow-y-auto pr-2">
             {t.replies.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">
                 No replies yet.
               </p>
             ) : (
               t.replies.map((r) => (
-                <Card
+                <MessageBubble
                   key={r.id}
-                  className={
-                    r.isStaff
-                      ? "border-emerald-300 bg-emerald-50/40 dark:bg-emerald-900/10"
-                      : ""
+                  mine={!!meId && r.authorId === meId}
+                  user={(r as any).author}
+                  fallbackUserId={r.authorId}
+                  roleBadge={
+                    <span
+                      className={
+                        "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold " +
+                        (r.isStaff
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-gray-100 text-gray-700")
+                      }
+                    >
+                      {r.isStaff ? "Support" : "Student"}
+                    </span>
                   }
+                  timestamp={new Date(r.createdAt).toLocaleString()}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge
-                        className={
-                          r.isStaff
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-gray-100 text-gray-700"
-                        }
-                      >
-                        {r.isStaff ? "Support" : isStaff ? "Student" : "You"}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(r.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm whitespace-pre-line">{r.body}</p>
-                  </CardContent>
-                </Card>
+                  {r.body}
+                </MessageBubble>
               ))
             )}
           </div>
 
           {t.status !== "CLOSED" && (
-            <Card>
+            <Card className="shrink-0">
               <CardContent className="p-4 space-y-2">
                 <Textarea
                   rows={4}
@@ -607,6 +640,7 @@ function TicketDetail({ id }: { id: string }) {
               </CardContent>
             </Card>
           )}
+          </div>
         </>
       )}
     </div>

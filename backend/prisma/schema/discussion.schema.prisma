@@ -18,6 +18,7 @@ model Discussion {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
+  author  User @relation("DiscussionAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   replies DiscussionReply[]
   votes   DiscussionVote[]
 
@@ -47,6 +48,7 @@ model DiscussionReply {
   updatedAt    DateTime @updatedAt
 
   discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  author     User       @relation("DiscussionReplyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([discussionId, createdAt])
   @@index([authorId])

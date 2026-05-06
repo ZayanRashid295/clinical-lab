@@ -110,6 +110,19 @@ export const MENU_CONFIG = {
       roles: ["STUDENT", "INSTITUTION_MANAGER"],
     },
     {
+      id: "achievements",
+      label: "menu.achievements",
+      icon: "🏆",
+      path: "/achievements",
+      roles: [
+        "SUPERADMIN",
+        "ADMIN",
+        "STUDENT",
+        "FACULTY",
+        "INSTITUTION_MANAGER",
+      ],
+    },
+    {
       id: "study",
       label: "menu.study",
       icon: "📚",
@@ -179,19 +192,6 @@ export const MENU_CONFIG = {
           label: "menu.goals",
           icon: "🎯",
           path: "/goals",
-          roles: [
-            "SUPERADMIN",
-            "ADMIN",
-            "STUDENT",
-            "FACULTY",
-            "INSTITUTION_MANAGER",
-          ],
-        },
-        {
-          id: "achievements",
-          label: "menu.achievements",
-          icon: "🏆",
-          path: "/achievements",
           roles: [
             "SUPERADMIN",
             "ADMIN",

@@ -15,6 +15,8 @@ model FeedbackTicket {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
+  user     User  @relation("FeedbackTicketUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignee User? @relation("FeedbackTicketAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   replies FeedbackReply[]
 
   @@index([userId, status])
@@ -56,6 +58,7 @@ model FeedbackReply {
   createdAt     DateTime @default(now())
 
   ticket FeedbackTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User           @relation("FeedbackReplyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([ticketId, createdAt])
   @@map("feedback_replies")

@@ -43,6 +43,24 @@ model User {
   // Institution management
   institutionManager InstitutionManager?
 
+  // Launch modules (community + support)
+  discussionsAuthored Discussion[]      @relation("DiscussionAuthor")
+  discussionReplies   DiscussionReply[] @relation("DiscussionReplyAuthor")
+
+  studyGroupsOwned       StudyGroup[]       @relation("StudyGroupOwner")
+  studyGroupMemberships  StudyGroupMember[] @relation("StudyGroupMemberUser")
+  studyGroupPosts        StudyGroupPost[]   @relation("StudyGroupPostAuthor")
+
+  feedbackTickets        FeedbackTicket[] @relation("FeedbackTicketUser")
+  feedbackAssignedTickets FeedbackTicket[] @relation("FeedbackTicketAssignee")
+  feedbackReplies        FeedbackReply[]  @relation("FeedbackReplyAuthor")
+
+  questionReports        QuestionReport[] @relation("QuestionReportReporter")
+  questionReportsResolved QuestionReport[] @relation("QuestionReportResolver")
+
+  // Achievements / points
+  points UserPoints?
+
   @@map("users")
 }
 

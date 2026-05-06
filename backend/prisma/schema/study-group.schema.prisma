@@ -15,6 +15,7 @@ model StudyGroup {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  owner   User @relation("StudyGroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members StudyGroupMember[]
   posts   StudyGroupPost[]
 
@@ -31,6 +32,7 @@ model StudyGroupMember {
   joinedAt DateTime       @default(now())
 
   group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User      @relation("StudyGroupMemberUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
   @@index([userId])
@@ -53,7 +55,8 @@ model StudyGroupPost {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group  StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  author User      @relation("StudyGroupPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([groupId, createdAt])
   @@map("study_group_posts")

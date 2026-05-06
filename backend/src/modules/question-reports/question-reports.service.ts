@@ -49,6 +49,10 @@ export class QuestionReportsService {
       where: { reporterId: userId },
       orderBy: { createdAt: "desc" },
       take: 100,
+      include: {
+        reporter: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        resolver: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 
@@ -60,12 +64,20 @@ export class QuestionReportsService {
       },
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       take: 200,
+      include: {
+        reporter: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        resolver: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 
   async findOne(id: string) {
     const report = await this.prisma.questionReport.findUnique({
       where: { id },
+      include: {
+        reporter: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        resolver: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
     if (!report) throw new NotFoundException("Report not found");
     return report;
@@ -94,6 +106,10 @@ export class QuestionReportsService {
     const updated = await this.prisma.questionReport.update({
       where: { id },
       data,
+      include: {
+        reporter: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        resolver: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
 
     if (

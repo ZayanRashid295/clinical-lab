@@ -325,6 +325,9 @@ export class AchievementsService {
     return this.prisma.userPoints.findMany({
       orderBy: { total: "desc" },
       take: limit,
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 

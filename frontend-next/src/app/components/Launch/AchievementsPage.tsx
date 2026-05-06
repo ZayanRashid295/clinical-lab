@@ -27,6 +27,8 @@ import {
   type AchievementsOverview,
   type AchievementWithProgress,
 } from "@/app/services/launch";
+import type { LeaderboardEntry } from "@/app/services/launch/types";
+import { UserIdentity } from "@/shared/components/Common/UserIdentity";
 
 const CATEGORY_COLORS: Record<string, string> = {
   STUDY: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
@@ -39,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function AchievementsPage() {
   const [overview, setOverview] = useState<AchievementsOverview | null>(null);
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unlocked" | "locked">("all");
 
@@ -51,7 +53,7 @@ export default function AchievementsPage() {
         achievementsService.leaderboard(10),
       ]);
       setOverview(o);
-      setLeaderboard(Array.isArray(l) ? l : []);
+      setLeaderboard(Array.isArray(l) ? (l as LeaderboardEntry[]) : []);
     } catch {
       setOverview(null);
     } finally {
@@ -254,9 +256,13 @@ export default function AchievementsPage() {
                     {idx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-mono text-muted-foreground truncate">
-                      {row.userId?.slice(0, 10)}…
-                    </p>
+                    <UserIdentity
+                      user={row.user}
+                      fallbackId={row.userId}
+                      avatarClassName="size-7"
+                      nameClassName="text-sm"
+                      subtitle={`Level ${row.level}`}
+                    />
                   </div>
                   <p className="font-semibold text-sm">{row.total}</p>
                 </div>
