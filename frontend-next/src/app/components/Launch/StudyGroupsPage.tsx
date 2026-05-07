@@ -13,6 +13,16 @@ import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
 import { Badge } from "@/shared/ui/badge";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
+import {
   Users,
   Plus,
   ArrowLeft,
@@ -35,6 +45,9 @@ import {
   type CreateStudyGroupPayload,
 } from "@/app/services/launch";
 import { useRealtimeRoom } from "@/app/services/realtime/use-realtime-room";
+import { UserIdentity } from "@/shared/components/Common/UserIdentity";
+import { MessageBubble } from "@/shared/components/Common/MessageBubble";
+import { authService } from "@/shared";
 
 const COLORS = [
   "bg-emerald-500",
@@ -145,7 +158,7 @@ function GroupList() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -351,6 +364,9 @@ function GroupDetail({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState("");
   const [posting, setPosting] = useState(false);
+  const meId = authService.getCurrentUser?.()?.id as string | undefined;
+  const [leaveOpen, setLeaveOpen] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -408,18 +424,23 @@ function GroupDetail({ id }: { id: string }) {
   };
 
   const onLeave = async () => {
-    if (!confirm("Leave this group?")) return;
-    await studyGroupsService.leave(id);
-    router.push("/study-groups");
+    setLeaving(true);
+    try {
+      await studyGroupsService.leave(id);
+      router.push("/study-groups");
+    } finally {
+      setLeaving(false);
+      setLeaveOpen(false);
+    }
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4 max-w-5xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 pb-6 pt-6 w-full max-w-none h-[calc(100dvh-80px)] overflow-hidden flex flex-col gap-4">
       <Button
         variant="ghost"
         size="sm"
         onClick={() => router.push("/study-groups")}
-        className="gap-2"
+        className="gap-2 shrink-0 self-start"
       >
         <ArrowLeft className="h-4 w-4" /> Back to groups
       </Button>
@@ -436,7 +457,7 @@ function GroupDetail({ id }: { id: string }) {
         </Card>
       ) : (
         <>
-          <Card>
+          <Card className="shrink-0">
             <CardContent className="p-6 flex items-start gap-4 flex-wrap">
               <div
                 className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl text-white shrink-0 ${g.color}`}
@@ -469,15 +490,48 @@ function GroupDetail({ id }: { id: string }) {
                   </div>
                 )}
               </div>
-              <Button variant="outline" onClick={onLeave} className="gap-2">
-                <LogOut className="h-4 w-4" /> Leave
-              </Button>
+              <AlertDialog open={leaveOpen} onOpenChange={setLeaveOpen}>
+                <Button
+                  variant="outline"
+                  onClick={() => setLeaveOpen(true)}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" /> Leave
+                </Button>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Leave this group?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You’ll stop receiving new posts and notifications from{" "}
+                      <span className="font-semibold">{g.name}</span>. You can
+                      re-join later if the group is public (or via invite code
+                      if it’s private).
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={leaving}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={onLeave}
+                      disabled={leaving}
+                      className="bg-rose-600 hover:bg-rose-700"
+                    >
+                      {leaving ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" /> Leaving…
+                        </span>
+                      ) : (
+                        "Leave group"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
-            <div className="space-y-3">
-              <Card>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 flex-1 overflow-hidden items-stretch">
+            <div className="space-y-3 flex flex-col min-w-0 h-full overflow-hidden">
+              <Card className="shrink-0">
                 <CardContent className="p-4 space-y-2">
                   <Textarea
                     placeholder="Share something with the group…"
@@ -502,47 +556,59 @@ function GroupDetail({ id }: { id: string }) {
                 </CardContent>
               </Card>
 
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1 overflow-y-auto pr-2">
                 {g.posts.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-6">
                     No posts yet.
                   </p>
                 ) : (
                   g.posts.map((p) => (
-                    <Card key={p.id} className={p.pinned ? "border-amber-300" : ""}>
-                      <CardContent className="p-3">
-                        {p.pinned && (
-                          <Badge className="bg-amber-100 text-amber-700 mb-1">
+                    <div key={p.id} className={p.pinned ? "pt-2" : ""}>
+                      {p.pinned && (
+                        <div className="mb-2 flex justify-center">
+                          <Badge className="bg-amber-100 text-amber-700">
                             <Pin className="h-3 w-3 mr-1" /> Pinned
                           </Badge>
-                        )}
-                        <p className="text-sm whitespace-pre-line">{p.body}</p>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          {new Date(p.createdAt).toLocaleString()}
-                        </p>
-                      </CardContent>
-                    </Card>
+                        </div>
+                      )}
+                      <MessageBubble
+                        mine={!!meId && p.authorId === meId}
+                        user={(p as any).author}
+                        fallbackUserId={p.authorId}
+                        timestamp={new Date(p.createdAt).toLocaleString()}
+                      >
+                        {p.body}
+                      </MessageBubble>
+                    </div>
                   ))
                 )}
               </div>
             </div>
 
-            <Card>
+            <Card className="h-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-base">Members</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1">
+              <CardContent className="space-y-1 h-full overflow-y-auto pr-2">
                 {g.members.map((m) => (
                   <div
                     key={m.id}
                     className="flex items-center gap-2 text-sm py-1"
                   >
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold">
-                      {m.userId.slice(0, 2).toUpperCase()}
-                    </div>
-                    <span className="font-mono text-xs truncate flex-1">
-                      {m.userId.slice(0, 12)}…
-                    </span>
+                    <UserIdentity
+                      user={(m as any).user}
+                      fallbackId={m.userId}
+                      avatarClassName="size-7"
+                      nameClassName="text-sm"
+                      subtitle={
+                        m.role === "OWNER"
+                          ? "Owner"
+                          : m.role === "ADMIN"
+                            ? "Admin"
+                            : "Member"
+                      }
+                      className="flex-1"
+                    />
                     <Badge
                       variant="outline"
                       className={

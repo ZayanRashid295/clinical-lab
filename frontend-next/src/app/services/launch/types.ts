@@ -63,6 +63,22 @@ export interface AchievementsOverview {
   }>;
 }
 
+export interface LeaderboardEntry {
+  userId: string;
+  total: number;
+  level: number;
+  user?: UserLite;
+}
+
+// ─── Shared user shape (for display) ─────────────────────────────────────────
+export interface UserLite {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string | null;
+  avatar?: string | null;
+}
+
 // ─── Discussions ────────────────────────────────────────────────────────────
 export type DiscussionContext =
   | "GENERAL"
@@ -74,6 +90,7 @@ export type DiscussionContext =
 export interface Discussion {
   id: string;
   authorId: string;
+  author?: UserLite;
   title: string;
   body: string;
   context: DiscussionContext;
@@ -94,6 +111,7 @@ export interface DiscussionReply {
   id: string;
   discussionId: string;
   authorId: string;
+  author?: UserLite;
   body: string;
   upvotes: number;
   isAnswer: boolean;
@@ -184,6 +202,7 @@ export interface StudyGroup {
   isPrivate: boolean;
   inviteCode?: string | null;
   ownerId: string;
+  owner?: UserLite;
   memberCount: number;
   createdAt: string;
 }
@@ -192,6 +211,7 @@ export interface StudyGroupMember {
   id: string;
   groupId: string;
   userId: string;
+  user?: UserLite;
   role: "OWNER" | "ADMIN" | "MEMBER";
   joinedAt: string;
 }
@@ -200,6 +220,7 @@ export interface StudyGroupPost {
   id: string;
   groupId: string;
   authorId: string;
+  author?: UserLite;
   body: string;
   attachmentUrl?: string | null;
   pinned: boolean;
@@ -279,6 +300,7 @@ export type FeedbackStatus =
 export interface FeedbackTicket {
   id: string;
   userId: string;
+  user?: UserLite;
   subject: string;
   body: string;
   category: FeedbackCategory;
@@ -286,6 +308,7 @@ export interface FeedbackTicket {
   status: FeedbackStatus;
   attachmentUrl?: string | null;
   assigneeId?: string | null;
+  assignee?: UserLite | null;
   closedAt?: string | null;
   lastReplyAt: string;
   createdAt: string;
@@ -295,6 +318,7 @@ export interface FeedbackReply {
   id: string;
   ticketId: string;
   authorId: string;
+  author?: UserLite;
   isStaff: boolean;
   body: string;
   attachmentUrl?: string | null;
@@ -326,10 +350,12 @@ export interface QuestionReport {
   id: string;
   questionId: string;
   reporterId: string;
+  reporter?: UserLite;
   reason: QuestionReportReason;
   details?: string | null;
   status: QuestionReportStatus;
   resolverId?: string | null;
+  resolver?: UserLite | null;
   resolution?: string | null;
   resolvedAt?: string | null;
   createdAt: string;

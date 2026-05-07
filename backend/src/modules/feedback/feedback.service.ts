@@ -54,6 +54,10 @@ export class FeedbackService {
       where: { userId },
       orderBy: { lastReplyAt: "desc" },
       take: 100,
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        assignee: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 
@@ -62,13 +66,26 @@ export class FeedbackService {
       where: opts.status ? { status: opts.status as any } : {},
       orderBy: [{ priority: "desc" }, { lastReplyAt: "desc" }],
       take: 200,
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        assignee: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
   }
 
   async findOne(userId: string, id: string, isStaff = false) {
     const ticket = await this.prisma.feedbackTicket.findUnique({
       where: { id },
-      include: { replies: { orderBy: { createdAt: "asc" } } },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        assignee: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        replies: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+          },
+        },
+      },
     });
     if (!ticket) throw new NotFoundException("Ticket not found");
     if (!isStaff && ticket.userId !== userId) {
@@ -138,6 +155,9 @@ export class FeedbackService {
         isStaff,
         body: dto.body,
         attachmentUrl: dto.attachmentUrl,
+      },
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
       },
     });
     await this.prisma.feedbackTicket.update({

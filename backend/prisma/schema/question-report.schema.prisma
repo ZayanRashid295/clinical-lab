@@ -13,6 +13,9 @@ model QuestionReport {
   createdAt  DateTime             @default(now())
   updatedAt  DateTime             @updatedAt
 
+  reporter User  @relation("QuestionReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  resolver User? @relation("QuestionReportResolver", fields: [resolverId], references: [id], onDelete: SetNull)
+
   @@index([questionId])
   @@index([status, createdAt])
   @@index([reporterId])

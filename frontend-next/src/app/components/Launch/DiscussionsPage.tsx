@@ -35,6 +35,9 @@ import {
   type DiscussionContext,
 } from "@/app/services/launch";
 import { useRealtimeRoom } from "@/app/services/realtime/use-realtime-room";
+import { UserIdentity } from "@/shared/components/Common/UserIdentity";
+import { MessageBubble } from "@/shared/components/Common/MessageBubble";
+import { authService } from "@/shared";
 
 const CONTEXT_OPTIONS: DiscussionContext[] = [
   "GENERAL",
@@ -116,7 +119,7 @@ function DiscussionList() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -178,7 +181,7 @@ function DiscussionList() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2 w-full">
           {items.map((d) => (
             <Card
               key={d.id}
@@ -205,6 +208,16 @@ function DiscussionList() {
                   </p>
                   <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground flex-wrap">
                     <Badge variant="outline">{d.context}</Badge>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-2">
+                      <UserIdentity
+                        user={(d as any).author}
+                        fallbackId={d.authorId}
+                        className="gap-2"
+                        avatarClassName="size-5"
+                        nameClassName="text-xs font-medium"
+                      />
+                    </span>
                     <span>•</span>
                     <span>{d.replyCount} replies</span>
                     <span>•</span>
@@ -284,6 +297,7 @@ function DiscussionDetail({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
   const [posting, setPosting] = useState(false);
+  const meId = authService.getCurrentUser?.()?.id as string | undefined;
 
   const load = async () => {
     setLoading(true);
@@ -353,7 +367,7 @@ function DiscussionDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4 max-w-4xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <Button
         variant="ghost"
         size="sm"
@@ -375,104 +389,171 @@ function DiscussionDetail({ id }: { id: string }) {
         </Card>
       ) : (
         <>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex flex-col items-center gap-1 min-w-[44px]">
-                  <button
-                    onClick={() => onVote(1)}
-                    className="p-1.5 rounded hover:bg-emerald-100 text-emerald-600"
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                  </button>
-                  <span className="font-bold">{d.upvotes}</span>
-                  <button
-                    onClick={() => onVote(-1)}
-                    className="p-1.5 rounded hover:bg-red-100 text-red-500"
-                  >
-                    <ThumbsDown className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap mb-2">
-                    {d.pinned && (
-                      <Badge className="bg-amber-100 text-amber-800">
-                        <Pin className="h-3 w-3 mr-1" /> Pinned
-                      </Badge>
-                    )}
-                    {d.isClosed && (
-                      <Badge variant="outline">
-                        <Lock className="h-3 w-3 mr-1" /> Closed
-                      </Badge>
-                    )}
-                    <Badge variant="outline">{d.context}</Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-stretch h-[calc(100dvh-140px)] overflow-hidden">
+            <div className="space-y-4 min-w-0 flex flex-col h-full overflow-hidden">
+              <Card className="w-full shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-5">
+                    <div className="flex flex-col items-center gap-1 min-w-[52px]">
+                      <button
+                        onClick={() => onVote(1)}
+                        className="p-2 rounded-md hover:bg-emerald-100 text-emerald-700"
+                        aria-label="Upvote"
+                      >
+                        <ThumbsUp className="h-4 w-4" />
+                      </button>
+                      <span className="font-bold text-base">{d.upvotes}</span>
+                      <button
+                        onClick={() => onVote(-1)}
+                        className="p-2 rounded-md hover:bg-red-100 text-red-600"
+                        aria-label="Downvote"
+                      >
+                        <ThumbsDown className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-2">
+                        {d.pinned && (
+                          <Badge className="bg-amber-100 text-amber-800">
+                            <Pin className="h-3 w-3 mr-1" /> Pinned
+                          </Badge>
+                        )}
+                        {d.isClosed && (
+                          <Badge variant="outline">
+                            <Lock className="h-3 w-3 mr-1" /> Closed
+                          </Badge>
+                        )}
+                        <Badge variant="outline">{d.context}</Badge>
+                      </div>
+
+                      <h1 className="text-2xl lg:text-3xl font-bold leading-tight">
+                        {d.title}
+                      </h1>
+
+                      <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+                        <UserIdentity
+                          user={(d as any).author}
+                          fallbackId={d.authorId}
+                          avatarClassName="size-8"
+                          nameClassName="text-sm"
+                          subtitle={`Posted ${timeAgo(d.createdAt)} • ${d.replyCount} replies`}
+                        />
+                      </div>
+
+                      <div className="mt-4 rounded-xl border bg-muted/30 p-4">
+                        <p className="whitespace-pre-line text-sm leading-relaxed">
+                          {d.body}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <h1 className="text-2xl font-bold">{d.title}</h1>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Posted {timeAgo(d.createdAt)} • {d.replyCount} replies
-                  </p>
-                  <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">
-                    {d.body}
-                  </p>
-                </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex items-center justify-between gap-3 flex-wrap shrink-0">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Reply className="h-4 w-4" /> Replies ({d.replies.length})
+                </h2>
               </div>
-            </CardContent>
-          </Card>
 
-          <h2 className="text-lg font-semibold flex items-center gap-2 mt-4">
-            <Reply className="h-4 w-4" /> Replies ({d.replies.length})
-          </h2>
+              <div className="space-y-3 w-full flex-1 overflow-y-auto pr-2">
+                {d.replies.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-10 text-center text-muted-foreground">
+                      No replies yet — be the first.
+                    </CardContent>
+                  </Card>
+                ) : (
+                  d.replies.map((r) => (
+                    <div key={r.id} className={r.isAnswer ? "pt-2" : ""}>
+                      {r.isAnswer && (
+                        <div className="mb-2 flex justify-center">
+                          <Badge className="bg-emerald-100 text-emerald-700">
+                            <CheckCircle2 className="h-3 w-3 mr-1" /> Marked
+                            answer
+                          </Badge>
+                        </div>
+                      )}
+                      <MessageBubble
+                        mine={!!meId && r.authorId === meId}
+                        user={(r as any).author}
+                        fallbackUserId={r.authorId}
+                        timestamp={timeAgo(r.createdAt)}
+                      >
+                        {r.body}
+                      </MessageBubble>
+                    </div>
+                  ))
+                )}
+              </div>
 
-          <div className="space-y-2">
-            {d.replies.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">
-                No replies yet — be the first.
-              </p>
-            ) : (
-              d.replies.map((r) => (
-                <Card key={r.id} className={r.isAnswer ? "border-emerald-400" : ""}>
-                  <CardContent className="p-4">
-                    {r.isAnswer && (
-                      <Badge className="bg-emerald-100 text-emerald-700 mb-2">
-                        <CheckCircle2 className="h-3 w-3 mr-1" /> Marked answer
-                      </Badge>
-                    )}
-                    <p className="text-sm whitespace-pre-line">{r.body}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {timeAgo(r.createdAt)}
-                    </p>
+              {!d.isClosed && (
+                <Card className="w-full shrink-0">
+                  <CardContent className="p-4 space-y-2">
+                    <Textarea
+                      rows={4}
+                      placeholder="Write a reply…"
+                      value={reply}
+                      onChange={(e) => setReply(e.target.value)}
+                    />
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={onReply}
+                        disabled={!reply.trim() || posting}
+                        className="gap-2"
+                      >
+                        {posting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
+                        Post reply
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
-          </div>
+              )}
+            </div>
 
-          {!d.isClosed && (
-            <Card>
-              <CardContent className="p-4 space-y-2">
-                <Textarea
-                  rows={4}
-                  placeholder="Write a reply…"
-                  value={reply}
-                  onChange={(e) => setReply(e.target.value)}
-                />
-                <div className="flex justify-end">
-                  <Button
-                    onClick={onReply}
-                    disabled={!reply.trim() || posting}
-                    className="gap-2"
-                  >
-                    {posting ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                    Post reply
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+            <div className="space-y-4 h-full overflow-y-auto pr-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">About</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Context</span>
+                    <Badge variant="outline">{d.context}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Replies</span>
+                    <span className="font-semibold">{d.replyCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Upvotes</span>
+                    <span className="font-semibold">{d.upvotes}</span>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <UserIdentity
+                      user={(d as any).author}
+                      fallbackId={d.authorId}
+                      avatarClassName="size-9"
+                      nameClassName="text-sm"
+                      subtitle="Thread author"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-indigo-200 bg-indigo-50/40 dark:bg-indigo-900/10">
+                <CardContent className="p-4 text-sm text-indigo-900/90 dark:text-indigo-200/90">
+                  Tip: Use replies to refine the question, and mark the best
+                  answer to help others.
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </>
       )}
     </div>

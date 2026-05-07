@@ -75,8 +75,20 @@ export class StudyGroupsService {
     const group = await this.prisma.studyGroup.findUnique({
       where: { id },
       include: {
-        members: { orderBy: { joinedAt: "asc" } },
-        posts: { orderBy: { createdAt: "desc" }, take: 50 },
+        owner: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+        members: {
+          orderBy: { joinedAt: "asc" },
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+          },
+        },
+        posts: {
+          orderBy: { createdAt: "desc" },
+          take: 50,
+          include: {
+            author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+          },
+        },
       },
     });
     if (!group) throw new NotFoundException("Study group not found");
@@ -132,6 +144,9 @@ export class StudyGroupsService {
     if (existing) return existing;
     const m = await this.prisma.studyGroupMember.create({
       data: { groupId, userId, role: "MEMBER" },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
+      },
     });
     const group = await this.prisma.studyGroup.update({
       where: { id: groupId },
@@ -193,6 +208,9 @@ export class StudyGroupsService {
         body: dto.body,
         attachmentUrl: dto.attachmentUrl,
         pinned: dto.pinned ?? false,
+      },
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
       },
     });
 

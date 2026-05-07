@@ -27,6 +27,7 @@ import {
   type QuestionReportStatus,
 } from "@/app/services/launch";
 import { authService } from "@/shared";
+import { UserIdentity } from "@/shared/components/Common/UserIdentity";
 
 const STATUSES: QuestionReportStatus[] = [
   "OPEN",
@@ -126,7 +127,7 @@ export default function QuestionReportsPage() {
   }, [items]);
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           {isStaff ? (
@@ -161,52 +162,80 @@ export default function QuestionReportsPage() {
         </Card>
       )}
 
-      {isStaff && (
-        <div className="flex flex-wrap gap-1.5">
-          {(["ALL", ...STATUSES] as const).map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={statusFilter === s ? "default" : "outline"}
-              onClick={() => setStatusFilter(s as any)}
-              className="gap-1"
-            >
-              {s}
-              {counts[s] !== undefined && (
-                <span className="ml-1 text-xs opacity-70">({counts[s]})</span>
-              )}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
+        <div className="space-y-4 min-w-0">
+          {isStaff && (
+            <div className="flex flex-wrap gap-1.5">
+              {(["ALL", ...STATUSES] as const).map((s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={statusFilter === s ? "default" : "outline"}
+                  onClick={() => setStatusFilter(s as any)}
+                  className="gap-1"
+                >
+                  {s}
+                  {counts[s] !== undefined && (
+                    <span className="ml-1 text-xs opacity-70">({counts[s]})</span>
+                  )}
+                </Button>
+              ))}
+            </div>
+          )}
 
-      {loading ? (
-        <div className="flex items-center justify-center p-12 text-muted-foreground">
-          <Loader2 className="animate-spin mr-2" /> Loading…
+          {loading ? (
+            <div className="flex items-center justify-center p-12 text-muted-foreground">
+              <Loader2 className="animate-spin mr-2" /> Loading…
+            </div>
+          ) : items.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center text-muted-foreground">
+                <Flag className="mx-auto mb-3 text-gray-300" size={42} />
+                <p className="font-medium">
+                  {isStaff
+                    ? "No reports to triage."
+                    : "You haven't reported any questions yet."}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-2">
+              {items.map((r) => (
+                <ReportRow
+                  key={r.id}
+                  report={r}
+                  isStaff={isStaff}
+                  onUpdated={load}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      ) : items.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center text-muted-foreground">
-            <Flag className="mx-auto mb-3 text-gray-300" size={42} />
-            <p className="font-medium">
-              {isStaff
-                ? "No reports to triage."
-                : "You haven't reported any questions yet."}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-2">
-          {items.map((r) => (
-            <ReportRow
-              key={r.id}
-              report={r}
-              isStaff={isStaff}
-              onUpdated={load}
-            />
-          ))}
-        </div>
-      )}
+
+        {isStaff ? (
+          <div className="space-y-4 lg:sticky lg:top-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Total</span>
+                  <span className="font-semibold">{counts.ALL ?? 0}</span>
+                </div>
+                {STATUSES.map((s) => (
+                  <div key={s} className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{s}</span>
+                    <span className="font-semibold">{counts[s] ?? 0}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="hidden lg:block" />
+        )}
+      </div>
     </div>
   );
 }
@@ -253,9 +282,15 @@ function ReportRow({
               Q: {report.questionId.slice(0, 12)}…
             </span>
             {isStaff && (
-              <span className="text-xs text-muted-foreground font-mono truncate">
-                Reporter: {report.reporterId.slice(0, 8)}…
-              </span>
+              <div className="ml-auto">
+                <UserIdentity
+                  user={(report as any).reporter}
+                  fallbackId={report.reporterId}
+                  avatarClassName="size-6"
+                  nameClassName="text-xs font-semibold"
+                  subtitle="Reporter"
+                />
+              </div>
             )}
           </div>
           {report.details && (
