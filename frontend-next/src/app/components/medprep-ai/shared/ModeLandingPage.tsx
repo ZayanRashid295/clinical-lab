@@ -40,6 +40,18 @@ interface ModeLandingConfig {
 export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   const router = useRouter()
   const [isNavigating, setIsNavigating] = useState(false)
+  const themedBackground = {
+    background:
+      "linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 55%, var(--color-primary-200) 100%)",
+  } as const
+  const themedOverlay = {
+    background:
+      "linear-gradient(90deg, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.12) 0%, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.24) 100%)",
+  } as const
+  const themedCircle = {
+    background:
+      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+  } as const
 
   useEffect(() => {
     if (!router.isReady) return
@@ -78,21 +90,21 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   }, [config, router])
 
   return (
-    <div className={`h-screen overflow-hidden ${config.accent.pageGradient}`}>
+    <div className="h-screen overflow-hidden" style={themedBackground}>
       <div className="relative h-full">
-        <div className={`absolute inset-0 ${config.accent.overlayGradient}`} />
+        <div className="absolute inset-0" style={themedOverlay} />
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="relative">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl animate-pulse ${config.accent.iconGradient}`}>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl animate-pulse" style={themedCircle}>
                   <BookOpen className="h-8 w-8 text-white" />
                 </div>
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">{config.title}</h1>
                 <div className="flex items-center justify-center gap-2 text-base text-gray-600">
-                  <GraduationCap className={`h-4 w-4 ${config.accent.subtitleText}`} />
+                  <GraduationCap className="h-4 w-4 text-primary" />
                   <span>{config.subtitle}</span>
                 </div>
               </div>
@@ -102,8 +114,8 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
 
             <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
               <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${config.accent.h1Bg}`}>
-                  <Brain className={`h-4 w-4 ${config.accent.h1Text}`} />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10">
+                  <Brain className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm">{config.highlight1Title}</h3>
@@ -111,8 +123,8 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${config.accent.h2Bg}`}>
-                  <Users className={`h-4 w-4 ${config.accent.h2Text}`} />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/20">
+                  <Users className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm">{config.highlight2Title}</h3>
@@ -120,8 +132,8 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${config.accent.h3Bg}`}>
-                  <Target className={`h-4 w-4 ${config.accent.h3Text}`} />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/30">
+                  <Target className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm">{config.highlight3Title}</h3>
@@ -138,7 +150,8 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                 }}
                 disabled={isNavigating}
                 size="lg"
-                className={`${config.accent.buttonGradient} ${config.accent.buttonHoverGradient} text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg font-semibold px-8 py-4 disabled:opacity-70`}
+                style={themedCircle}
+                className="text-white shadow-xl hover:shadow-2xl hover:opacity-90 transition-all duration-300 text-lg font-semibold px-8 py-4 disabled:opacity-70"
               >
                 {isNavigating ? (
                   <>

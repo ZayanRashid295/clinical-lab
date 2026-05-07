@@ -36,6 +36,7 @@ export const NAV_SIDEBAR_SECTIONS: readonly NavSidebarSectionDef[] = [
       "study",
       "test-creation",
       "ai-tutor",
+      "medprep-ai",
       "community",
       "assessments",
     ],

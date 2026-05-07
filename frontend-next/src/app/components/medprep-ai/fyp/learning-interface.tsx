@@ -1335,17 +1335,17 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
         {/* Right Sidebar - Nurse Report */}
         <div className="w-96 bg-white border-l border-gray-200 flex flex-col" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
           <Card className="flex-1 rounded-none border-0 shadow-none">
-            <CardHeader className="pb-2 bg-gradient-to-r from-green-50 to-teal-50 border-b">
+            <CardHeader className="pb-2 border-b bg-primary/5">
                 <CardTitle className="flex items-center justify-between text-sm text-foreground">
                   <div className="flex items-center">
-                    <Stethoscope className="h-5 w-5 text-green-600 mr-2" />
+                    <Stethoscope className="h-5 w-5 text-primary mr-2" />
                     Nurse Report
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowAllNurseReport(!showAllNurseReport)}
-                    className="text-xs px-2 py-1 h-6 bg-green-100 hover:bg-green-200 text-green-700 border border-green-200"
+                    className="text-xs px-2 py-1 h-6 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20"
                   >
                     {showAllNurseReport ? "Hide All" : "Show All"}
                   </Button>
@@ -1361,7 +1361,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('chiefComplaint')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'chiefComplaint'
-                      ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1372,7 +1372,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('presentingSymptoms')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'presentingSymptoms'
-                      ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1383,7 +1383,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('vitalSigns')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'vitalSigns'
-                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1394,7 +1394,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('clinicalNotes')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalNotes'
-                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1405,7 +1405,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('initialAssessment')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'initialAssessment'
-                      ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1416,7 +1416,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('learningGuidelines')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'learningGuidelines'
-                      ? 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1427,7 +1427,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('clinicalTips')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalTips'
-                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1438,7 +1438,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('keyAreas')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'keyAreas'
-                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1449,7 +1449,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('redFlags')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'redFlags'
-                      ? 'bg-red-100 text-red-800 border border-red-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1460,7 +1460,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   onClick={() => handleNurseReportSectionChange('sessionProgress')}
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'sessionProgress'
-                      ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                      ? 'bg-primary/15 text-primary border border-primary/25'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1471,33 +1471,33 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   )}
               {/* Chief Complaint */}
               {(showAllNurseReport || activeNurseReportSection === 'chiefComplaint') && (
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-2 mb-2">
+              <div className="bg-primary/5 rounded-lg p-2 mb-2 border border-primary/10">
                 <button
                   onClick={() => toggleSection('chiefComplaint')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-orange-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-bold text-orange-900 flex items-center gap-2">
+                  <h4 className="font-bold text-primary flex items-center gap-2">
                   <Target className="h-5 w-5" />
                   Chief Complaint
                 </h4>
                   {collapsedSections.chiefComplaint ? (
-                    <ChevronDown className="h-4 w-4 text-orange-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-orange-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.chiefComplaint && (
                   <>
                     {/* Tab Navigation */}
-                    <div className="flex space-x-1 mb-2 bg-orange-100 rounded-lg p-1">
+                    <div className="flex space-x-1 mb-2 bg-primary/10 rounded-lg p-1">
                       {['overview', 'analysis', 'guidelines'].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => handleTabChange('chiefComplaint', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.chiefComplaint === tab
-                              ? 'bg-white text-orange-900 shadow-sm'
-                              : 'text-orange-600 hover:text-orange-900'
+                              ? 'bg-white text-primary shadow-sm'
+                              : 'text-primary/80 hover:text-primary'
                           }`}
                         >
                           {tab === 'overview' ? 'Overview' : tab === 'analysis' ? 'Analysis' : 'Guidelines'}
@@ -1507,14 +1507,14 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
                     {/* Tab Content */}
                     {activeTabs.chiefComplaint === 'overview' && (
-                      <div className="bg-white rounded-lg p-2 border border-orange-200 max-w-full overflow-hidden">
-                        <div className="text-orange-800 font-medium text-sm prose prose-sm max-w-full break-words overflow-hidden">
+                      <div className="bg-white rounded-lg p-2 border border-primary/20 max-w-full overflow-hidden">
+                        <div className="text-primary font-medium text-sm prose prose-sm max-w-full break-words overflow-hidden">
                           <ReactMarkdown
                             components={{
                               p: ({ children }) => <p className="mb-0 break-words text-sm">{children}</p>,
                               strong: ({ children }) => <strong className="font-medium break-words text-sm">{children}</strong>,
                               em: ({ children }) => <em className="italic break-words text-sm">{children}</em>,
-                              code: ({ children }) => <code className="bg-orange-100 px-1 py-0.5 rounded text-xs font-mono break-words">{children}</code>
+                              code: ({ children }) => <code className="bg-primary/10 px-1 py-0.5 rounded text-xs font-mono break-words">{children}</code>
                             }}
                           >
                     {medicalCase?.symptoms?.[0] || session.disease || "Abdominal pain"}
@@ -1525,17 +1525,17 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
                     {activeTabs.chiefComplaint === 'analysis' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg p-2 border border-orange-200">
-                          <h5 className="font-semibold text-orange-800 mb-1">Chief Complaint Analysis</h5>
-                          <p className="text-orange-700 text-xs leading-relaxed">
+                        <div className="bg-white rounded-lg p-2 border border-primary/20">
+                          <h5 className="font-semibold text-primary mb-1">Chief Complaint Analysis</h5>
+                          <p className="text-primary/90 text-xs leading-relaxed">
                             The chief complaint is the primary reason for the patient's visit. It should be 
                             documented in the patient's own words and provides the foundation for the 
                             clinical assessment and differential diagnosis.
                           </p>
               </div>
-                        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
-                          <h5 className="font-semibold text-yellow-800 mb-2">Clinical Significance</h5>
-                          <ul className="text-yellow-700 text-xs space-y-1">
+                        <div className="bg-primary/5 rounded-lg p-3 border border-primary/20">
+                          <h5 className="font-semibold text-primary mb-2">Clinical Significance</h5>
+                          <ul className="text-primary/90 text-xs space-y-1">
                             <li>• Guides the history-taking process</li>
                             <li>• Helps prioritize differential diagnoses</li>
                             <li>• Determines urgency of care needed</li>
@@ -1547,9 +1547,9 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
                     {activeTabs.chiefComplaint === 'guidelines' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                          <h5 className="font-semibold text-green-800 mb-2">Learning Guidelines</h5>
-                          <ul className="text-green-700 text-xs space-y-1">
+                        <div className="bg-primary/5 rounded-lg p-3 border border-primary/20">
+                          <h5 className="font-semibold text-primary mb-2">Learning Guidelines</h5>
+                          <ul className="text-primary/90 text-xs space-y-1">
                             <li>• Always document the chief complaint in patient's own words</li>
                             <li>• Use open-ended questions to explore the complaint</li>
                             <li>• Consider the duration and severity of symptoms</li>
@@ -1565,32 +1565,32 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
               {/* Presenting Symptoms */}
               {(showAllNurseReport || activeNurseReportSection === 'presentingSymptoms') && (
-              <div className="bg-orange-50 rounded-lg p-3" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
                 <button
                   onClick={() => toggleSection('presentingSymptoms')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-orange-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-orange-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-primary flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   Presenting Symptoms
                 </h4>
                   {collapsedSections.presentingSymptoms ? (
-                    <ChevronDown className="h-4 w-4 text-orange-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-orange-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.presentingSymptoms && (
                   <div className="space-y-2" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
                     <div className="text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
-                      <span className="text-orange-700 font-medium">Primary Complaint:</span>
-                      <div className="text-orange-900 font-medium prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
+                      <span className="text-primary/85 font-medium">Primary Complaint:</span>
+                      <div className="text-primary font-medium prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                         <ReactMarkdown
                           components={{
                             p: ({ children }) => <p className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</p>,
                             strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
                             em: ({ children }) => <em className="italic text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</em>,
-                            code: ({ children }) => <code className="bg-orange-100 px-1 py-0.5 rounded text-xs font-mono" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</code>
+                            code: ({ children }) => <code className="bg-primary/10 px-1 py-0.5 rounded text-xs font-mono" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</code>
                           }}
                         >
                         {medicalCase?.symptoms?.[0] || session.disease || "Abdominal pain"}
@@ -1598,10 +1598,10 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                     </div>
                     </div>
                     <div className="text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
-                      <span className="text-orange-700 font-medium">Additional Symptoms:</span>
+                      <span className="text-primary/85 font-medium">Additional Symptoms:</span>
                     <div className="flex flex-col gap-1 mt-1" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
                         {medicalCase?.symptoms?.slice(1).map((symptom: string, index: number) => (
-                          <Badge key={index} variant="outline" className="text-sm bg-orange-100 text-orange-800 border-orange-200" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
+                          <Badge key={index} variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                             <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <ReactMarkdown
                                 components={{
@@ -1616,7 +1616,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                         </Badge>
                         )) || (
                           <>
-                            <Badge variant="outline" className="text-sm bg-orange-100 text-orange-800 border-orange-200" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
+                            <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
                                   components={{
@@ -1629,7 +1629,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                                 </ReactMarkdown>
                               </div>
                             </Badge>
-                            <Badge variant="outline" className="text-sm bg-orange-100 text-orange-800 border-orange-200" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
+                            <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
                                   components={{
@@ -1642,7 +1642,7 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                                 </ReactMarkdown>
                               </div>
                             </Badge>
-                            <Badge variant="outline" className="text-sm bg-orange-100 text-orange-800 border-orange-200" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
+                            <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
                                   components={{
@@ -1666,45 +1666,45 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
                   
               {/* Vital Signs */}
               {(showAllNurseReport || activeNurseReportSection === 'vitalSigns') && (
-              <div className="bg-blue-50 rounded-lg p-3">
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
                 <button
                   onClick={() => toggleSection('vitalSigns')}
-                  className="w-full flex items-center justify-between mb-3 hover:bg-blue-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-3 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-primary flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   Vital Signs
                 </h4>
                   {collapsedSections.vitalSigns ? (
-                    <ChevronDown className="h-4 w-4 text-blue-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-blue-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.vitalSigns && (
                   <>
                     {isLoadingVitalSigns ? (
                       <div className="flex items-center justify-center py-4">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                         <span className="ml-2 text-sm text-gray-600">Generating vital signs...</span>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-blue-100">
-                          <span className="text-blue-700 font-medium">BP:</span> 
-                          <span className="text-blue-900 font-bold ml-1">{vitalSigns?.bloodPressure || "120/80"}</span>
+                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                          <span className="text-primary/85 font-medium">BP:</span> 
+                          <span className="text-primary font-bold ml-1">{vitalSigns?.bloodPressure || "120/80"}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-blue-100">
-                          <span className="text-blue-700 font-medium">HR:</span> 
-                          <span className="text-blue-900 font-bold ml-1">{vitalSigns?.heartRate || 72}</span>
+                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                          <span className="text-primary/85 font-medium">HR:</span> 
+                          <span className="text-primary font-bold ml-1">{vitalSigns?.heartRate || 72}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-blue-100">
-                          <span className="text-blue-700 font-medium">Temp:</span> 
-                          <span className="text-blue-900 font-bold ml-1">{vitalSigns?.temperature || "98.6°F"}</span>
+                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                          <span className="text-primary/85 font-medium">Temp:</span> 
+                          <span className="text-primary font-bold ml-1">{vitalSigns?.temperature || "98.6°F"}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-blue-100">
-                          <span className="text-blue-700 font-medium">RR:</span> 
-                          <span className="text-blue-900 font-bold ml-1">{vitalSigns?.respiratoryRate || 16}</span>
+                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                          <span className="text-primary/85 font-medium">RR:</span> 
+                          <span className="text-primary font-bold ml-1">{vitalSigns?.respiratoryRate || 16}</span>
                         </div>
                       </div>
                     )}
@@ -1715,29 +1715,29 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
               {/* Clinical Notes */}
               {(showAllNurseReport || activeNurseReportSection === 'clinicalNotes') && (
-              <div className="bg-green-50 rounded-lg p-3">
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
                 <button
                   onClick={() => toggleSection('clinicalNotes')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-green-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-green-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-primary flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
                   Clinical Notes
                 </h4>
                   {collapsedSections.clinicalNotes ? (
-                    <ChevronDown className="h-4 w-4 text-green-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-green-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.clinicalNotes && (
-                <div className="text-sm text-green-800 space-y-1 prose prose-sm max-w-none">
+                <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                   <ReactMarkdown
                     components={{
                       p: ({ children }) => <p className="mb-1">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                       em: ({ children }) => <em className="italic">{children}</em>,
-                      code: ({ children }) => <code className="bg-green-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                      code: ({ children }) => <code className="bg-primary/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
                       ul: ({ children }) => <ul className="list-disc list-inside ml-2">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal list-inside ml-2">{children}</ol>,
                       li: ({ children }) => <li className="mb-1">{children}</li>
@@ -1757,29 +1757,29 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
               {/* Initial Assessment */}
               {(showAllNurseReport || activeNurseReportSection === 'initialAssessment') && (
-              <div className="bg-purple-50 rounded-lg p-3">
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
                 <button
                   onClick={() => toggleSection('initialAssessment')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-purple-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-purple-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-primary flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   Initial Assessment
                 </h4>
                   {collapsedSections.initialAssessment ? (
-                    <ChevronDown className="h-4 w-4 text-purple-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-purple-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.initialAssessment && (
-                  <div className="text-sm text-purple-800 space-y-1 prose prose-sm max-w-none">
+                  <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                     <ReactMarkdown
                       components={{
                         p: ({ children }) => <p className="mb-1">{children}</p>,
                         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                         em: ({ children }) => <em className="italic">{children}</em>,
-                        code: ({ children }) => <code className="bg-purple-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                        code: ({ children }) => <code className="bg-primary/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
                         ul: ({ children }) => <ul className="list-disc list-inside ml-2">{children}</ul>,
                         ol: ({ children }) => <ol className="list-decimal list-inside ml-2">{children}</ol>,
                         li: ({ children }) => <li className="mb-1">{children}</li>
@@ -1799,29 +1799,29 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
               {/* Learning Mode Specific Notes */}
               {(showAllNurseReport || activeNurseReportSection === 'learningGuidelines') && (
-              <div className="bg-indigo-50 rounded-lg p-3">
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
                 <button
                   onClick={() => toggleSection('learningGuidelines')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-indigo-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-primary/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-indigo-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-primary flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
                   Learning Guidelines
                 </h4>
                   {collapsedSections.learningGuidelines ? (
-                    <ChevronDown className="h-4 w-4 text-indigo-600" />
+                    <ChevronDown className="h-4 w-4 text-primary" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-indigo-600" />
+                    <ChevronUp className="h-4 w-4 text-primary" />
                   )}
                 </button>
                 {!collapsedSections.learningGuidelines && (
-                <div className="text-sm text-indigo-800 space-y-1 prose prose-sm max-w-none">
+                <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                   <ReactMarkdown
                     components={{
                       p: ({ children }) => <p className="mb-1">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                       em: ({ children }) => <em className="italic">{children}</em>,
-                      code: ({ children }) => <code className="bg-indigo-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                      code: ({ children }) => <code className="bg-primary/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
                       ul: ({ children }) => <ul className="list-disc list-inside ml-2">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal list-inside ml-2">{children}</ol>,
                       li: ({ children }) => <li className="mb-1">{children}</li>

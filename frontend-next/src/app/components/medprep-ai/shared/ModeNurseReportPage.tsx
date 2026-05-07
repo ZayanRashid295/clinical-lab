@@ -71,6 +71,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isStartingSession, setIsStartingSession] = useState(false)
+  const themedGradient = {
+    background:
+      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+  } as const
+  const themedSoftGradient = {
+    background:
+      "linear-gradient(90deg, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.08) 0%, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.18) 100%)",
+  } as const
 
   const queryCaseId = useMemo(
     () => (typeof router.query.caseId === "string" ? router.query.caseId : null),
@@ -139,7 +147,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${config.accent.spinnerBorder}`} />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-gray-600">Loading nurse report...</p>
         </div>
       </div>
@@ -183,26 +191,26 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               <p className="text-sm text-gray-600">Initial Patient Assessment</p>
             </div>
           </div>
-          <Badge variant="outline" className={`${config.accent.modeBadgeBg} ${config.accent.modeBadgeText} ${config.accent.modeBadgeBorder}`}>
+          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
             {config.modeLabel}
           </Badge>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card className="shadow-lg">
-          <CardHeader className={`${config.accent.headerGradient} border-b`}>
+        <Card className="shadow-xl border border-white/50 rounded-2xl overflow-hidden">
+          <CardHeader className="border-b" style={themedSoftGradient}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${config.accent.headerIconBg}`}>
-                  <FileText className={`h-6 w-6 ${config.accent.headerIconText}`} />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary/15">
+                  <FileText className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <CardTitle className="text-2xl text-gray-900">{medicalCase.title}</CardTitle>
                   <CardDescription className="text-gray-600">{config.cardSubtitle}</CardDescription>
                 </div>
               </div>
-              <Badge variant="outline" className={`bg-white ${config.accent.headerCaseBadgeText} ${config.accent.headerCaseBadgeBorder}`}>
+              <Badge variant="outline" className="bg-white text-primary border-primary/20">
                 {medicalCase.difficulty}
               </Badge>
             </div>
@@ -211,7 +219,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
           <CardContent className="p-6 space-y-6">
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Stethoscope className={`h-5 w-5 ${config.accent.overviewIconText}`} />
+                <Stethoscope className="h-5 w-5 text-primary" />
                 Case Overview
               </h3>
               <div className="grid grid-cols-2 gap-6 text-sm">
@@ -227,18 +235,18 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               </div>
             </div>
 
-            <div className={`rounded-lg p-6 ${config.accent.patientSectionBg}`}>
-              <h3 className={`font-semibold mb-4 flex items-center gap-2 ${config.accent.patientTitleText}`}><User className="h-5 w-5" />Patient Profile</h3>
+            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><User className="h-5 w-5" />Patient Profile</h3>
               <div className="grid grid-cols-2 gap-6 text-sm">
-                <div><span className={config.accent.patientLabelText}>Name:</span><p className={`font-medium ${config.accent.patientValueText}`}>{medicalCase.patientProfile.name}</p></div>
-                <div><span className={config.accent.patientLabelText}>Age:</span><p className={`font-medium ${config.accent.patientValueText}`}>{medicalCase.patientProfile.age} years old</p></div>
-                <div><span className={config.accent.patientLabelText}>Gender:</span><p className={`font-medium ${config.accent.patientValueText}`}>{medicalCase.patientProfile.gender}</p></div>
-                <div><span className={config.accent.patientLabelText}>Occupation:</span><p className={`font-medium ${config.accent.patientValueText}`}>{medicalCase.patientProfile.occupation}</p></div>
+                <div><span className="text-primary/80">Name:</span><p className="font-medium text-primary">{medicalCase.patientProfile.name}</p></div>
+                <div><span className="text-primary/80">Age:</span><p className="font-medium text-primary">{medicalCase.patientProfile.age} years old</p></div>
+                <div><span className="text-primary/80">Gender:</span><p className="font-medium text-primary">{medicalCase.patientProfile.gender}</p></div>
+                <div><span className="text-primary/80">Occupation:</span><p className="font-medium text-primary">{medicalCase.patientProfile.occupation}</p></div>
               </div>
             </div>
 
             <div className="bg-orange-50 rounded-lg p-6">
-              <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2"><Target className="h-5 w-5" />Presenting Symptoms</h3>
+              <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" />Presenting Symptoms</h3>
               <div className="space-y-3">
                 <div className="text-sm"><span className="text-orange-700">Primary Complaint:</span><div className="font-medium text-orange-900 prose prose-sm max-w-none mt-1 break-words"><ReactMarkdown>{medicalCase.symptoms[0]}</ReactMarkdown></div></div>
                 <div className="text-sm">
@@ -256,9 +264,9 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               </div>
             </div>
 
-            <div className={`rounded-lg p-6 ${config.accent.notesSectionBg}`}>
-              <h3 className={`font-semibold mb-4 flex items-center gap-2 ${config.accent.notesTitleText}`}><AlertTriangle className="h-5 w-5" />Clinical Notes</h3>
-              <div className={`text-sm space-y-1 ${config.accent.notesBodyText}`}>
+            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><AlertTriangle className="h-5 w-5" />Clinical Notes</h3>
+              <div className="text-sm space-y-1 text-primary/90">
                 {formatTextWithLineBreaks(`• Patient arrived via ${medicalCase.caseType === "emergency" ? "emergency department" : "outpatient clinic"}
 • Initial assessment completed by nursing staff
 • Patient is alert and oriented x3 (person, place, time)
@@ -269,9 +277,9 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               </div>
             </div>
 
-            <div className={`rounded-lg p-6 ${config.accent.assessmentSectionBg}`}>
-              <h3 className={`font-semibold mb-4 flex items-center gap-2 ${config.accent.assessmentTitleText}`}><Activity className="h-5 w-5" />Initial Assessment</h3>
-              <div className={`text-sm space-y-1 ${config.accent.assessmentBodyText}`}>
+            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><Activity className="h-5 w-5" />Initial Assessment</h3>
+              <div className="text-sm space-y-1 text-primary/90">
                 {formatTextWithLineBreaks(`• Patient reports ${medicalCase.symptoms[0].toLowerCase()}
 • Onset: ${medicalCase.difficulty === "beginner" ? "Gradual" : medicalCase.difficulty === "intermediate" ? "Subacute" : "Variable"} presentation
 • Severity: ${medicalCase.difficulty === "beginner" ? "Mild to moderate" : medicalCase.difficulty === "intermediate" ? "Moderate" : "Moderate to severe"}
@@ -281,18 +289,18 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               </div>
             </div>
 
-            <div className={`rounded-lg p-6 ${config.accent.guidelinesSectionBg}`}>
-              <h3 className={`font-semibold mb-4 flex items-center gap-2 ${config.accent.guidelinesTitleText}`}>
+            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary">
                 {"Learning".includes(config.modeLabel) ? <BookOpen className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 {config.guidelinesTitle}
               </h3>
-              <div className={`text-sm space-y-1 ${config.accent.guidelinesBodyText}`}>
+              <div className="text-sm space-y-1 text-primary/90">
                 {formatTextWithLineBreaks(config.guidelinesLines.join("\n")).split("\n").map((line, index) => <div key={index}>{line}</div>)}
               </div>
             </div>
 
             <div className="pt-6 border-t">
-              <Button onClick={handleStartCase} disabled={isStartingSession} className={`w-full text-white py-4 text-lg disabled:opacity-70 ${config.accent.buttonGradient} ${config.accent.buttonHoverGradient}`}>
+              <Button onClick={handleStartCase} disabled={isStartingSession} style={themedGradient} className="w-full text-white py-4 text-lg disabled:opacity-70 hover:opacity-90">
                 {isStartingSession ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

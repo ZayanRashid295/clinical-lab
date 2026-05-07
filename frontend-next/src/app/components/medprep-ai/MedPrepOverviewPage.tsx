@@ -3,6 +3,11 @@ import Link from "next/link";
 import { MEDPREP_MODES } from "./modes";
 
 export default function MedPrepOverviewPage() {
+  const themedButton = {
+    background:
+      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+  } as const
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -16,7 +21,7 @@ export default function MedPrepOverviewPage() {
         </div>
         <Link
           href="/"
-          className="text-sm font-medium text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
+          className="text-sm font-medium text-primary hover:opacity-80 whitespace-nowrap"
         >
           Back to Dashboard
         </Link>
@@ -29,7 +34,7 @@ export default function MedPrepOverviewPage() {
             className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
           >
             <h2 className="text-xl font-bold text-gray-900">{mode.title}</h2>
-            <p className="text-sm font-semibold text-indigo-700 mt-2">
+            <p className="text-sm font-semibold text-primary mt-2">
               {mode.heroHeadline}
             </p>
             <p className="text-sm text-gray-600 leading-relaxed mt-3 flex-1">
@@ -52,7 +57,8 @@ export default function MedPrepOverviewPage() {
             <div className="mt-6 flex flex-col gap-2">
               <Link
                 href={`/medprep-ai/${mode.id}`}
-                className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 text-center"
+                style={themedButton}
+                className="inline-flex justify-center rounded-md px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 text-center transition-opacity"
               >
                 {mode.ctaLabel}
               </Link>

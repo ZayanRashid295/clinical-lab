@@ -17,12 +17,17 @@ export interface MedPrepModePageProps {
 }
 
 export default function MedPrepModePage({ modeId }: MedPrepModePageProps) {
+  const themedButton = {
+    background:
+      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+  } as const
+
   const mode = getModeById(modeId);
   if (!mode) {
     return (
       <div className="p-6 max-w-3xl">
         <p className="text-gray-600">Unknown mode.</p>
-        <Link href="/medprep-ai" className="text-blue-600 mt-4 inline-block">
+        <Link href="/medprep-ai" className="text-primary mt-4 inline-block">
           Back to MedPrepAI
         </Link>
       </div>
@@ -45,7 +50,7 @@ export default function MedPrepModePage({ modeId }: MedPrepModePageProps) {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{mode.title}</h1>
-        <p className="text-sm font-semibold text-indigo-700 mt-2">
+        <p className="text-sm font-semibold text-primary mt-2">
           {mode.heroHeadline}
         </p>
         <p className="text-gray-700 mt-3 leading-relaxed">{mode.summary}</p>
@@ -68,7 +73,8 @@ export default function MedPrepModePage({ modeId }: MedPrepModePageProps) {
           href={standalone}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          style={themedButton}
+          className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
         >
           Open related screen in standalone app
           <ExternalLink className="h-4 w-4" />

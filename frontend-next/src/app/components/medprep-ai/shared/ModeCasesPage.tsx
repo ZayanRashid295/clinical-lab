@@ -81,6 +81,22 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
     rareCase: false,
     caseType: "any",
   })
+  const themedBackground = {
+    background:
+      "linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 55%, var(--color-primary-200) 100%)",
+  } as const
+  const themedOverlay = {
+    background:
+      "linear-gradient(90deg, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.08) 0%, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.2) 100%)",
+  } as const
+  const themedGradient = {
+    background:
+      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+  } as const
+  const themedSoftGradient = {
+    background:
+      "linear-gradient(135deg, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.05) 0%, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.14) 100%)",
+  } as const
 
   const persistGeneratedCase = (caseData: unknown): boolean => {
     const serialized = JSON.stringify(caseData)
@@ -181,19 +197,19 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   return (
     <>
       {currentStep === "landing" && (
-        <div className={`h-screen overflow-hidden ${config.accent.pageGradient}`}>
+        <div className="h-screen overflow-hidden" style={themedBackground}>
           <div className="relative h-full">
-            <div className={`absolute inset-0 ${config.accent.overlayGradient}`} />
+            <div className="absolute inset-0" style={themedOverlay} />
             <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
               <div className="text-center mb-8">
                 <div className="flex items-center justify-center gap-4 mb-6">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-xl ${config.accent.iconGradient}`}>
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl" style={themedGradient}>
                     <BookOpen className="h-8 w-8 text-white" />
                   </div>
                   <div>
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">{config.modeTitle}</h1>
                     <div className="flex items-center justify-center gap-2 text-base text-gray-600">
-                      <GraduationCap className={`h-4 w-4 ${config.accent.subtitleText}`} />
+                      <GraduationCap className="h-4 w-4 text-primary" />
                       <span>{config.chooseCaseSubtitle}</span>
                     </div>
                   </div>
@@ -202,11 +218,11 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
 
               <div className="container mx-auto px-4">
                 <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                  <Card className="group hover:shadow-2xl transition-all duration-500 cursor-pointer border-0 bg-white/90 backdrop-blur-sm overflow-hidden" onClick={() => setCurrentStep("generate")}>
+                  <Card className="group hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer border border-white/40 bg-white/85 backdrop-blur-sm overflow-hidden rounded-2xl" onClick={() => setCurrentStep("generate")}>
                     <div className="relative">
-                      <div className={`absolute inset-0 ${config.accent.genOverlay}`} />
+                      <div className="absolute inset-0" style={themedSoftGradient} />
                       <CardHeader className="relative text-center pb-4">
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-xl ${config.accent.genIcon}`}>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-xl" style={themedGradient}>
                           <Sparkles className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-2xl text-gray-900 mb-2">Generate New Case</CardTitle>
@@ -215,17 +231,17 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                       <CardContent className="relative space-y-4">
                         <div className="space-y-3">
                           <h4 className="font-semibold text-gray-900 text-base flex items-center gap-2">
-                            <Lightbulb className="h-4 w-4 text-yellow-500" />
+                            <Lightbulb className="h-4 w-4 text-primary" />
                             Customization Features
                           </h4>
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature1Bg}`}><Stethoscope className={`h-3 w-3 ${config.accent.feature1Text}`} /></div><span className="text-xs text-gray-700">Specialty Selection</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature2Bg}`}><TrendingUp className={`h-3 w-3 ${config.accent.feature2Text}`} /></div><span className="text-xs text-gray-700">Difficulty Levels</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature3Bg}`}><Heart className={`h-3 w-3 ${config.accent.feature3Text}`} /></div><span className="text-xs text-gray-700">Rare Diseases</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature4Bg}`}><Shield className={`h-3 w-3 ${config.accent.feature4Text}`} /></div><span className="text-xs text-gray-700">Case Types</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/10"><Stethoscope className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Specialty Selection</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/15"><TrendingUp className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Difficulty Levels</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/20"><Heart className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Rare Diseases</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/25"><Shield className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Case Types</span></div>
                           </div>
                         </div>
-                        <Button className={`w-full text-white py-3 text-base font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${config.accent.ctaGenerate} ${config.accent.ctaGenerateHover}`}>
+                        <Button style={themedGradient} className="w-full text-white py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:opacity-90 transform hover:scale-[1.02] transition-all duration-300">
                           <Sparkles className="h-4 w-4 mr-2" />
                           Create Custom Case
                         </Button>
@@ -233,11 +249,11 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     </div>
                   </Card>
 
-                  <Card className="group hover:shadow-2xl transition-all duration-500 cursor-pointer border-0 bg-white/90 backdrop-blur-sm overflow-hidden" onClick={() => setCurrentStep("select")}>
+                  <Card className="group hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer border border-white/40 bg-white/85 backdrop-blur-sm overflow-hidden rounded-2xl" onClick={() => setCurrentStep("select")}>
                     <div className="relative">
-                      <div className={`absolute inset-0 ${config.accent.browseOverlay}`} />
+                      <div className="absolute inset-0" style={themedSoftGradient} />
                       <CardHeader className="relative text-center pb-4">
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-xl ${config.accent.browseIcon}`}>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-xl" style={themedGradient}>
                           <FileText className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-2xl text-gray-900 mb-2">Browse Cases</CardTitle>
@@ -245,15 +261,15 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                       </CardHeader>
                       <CardContent className="relative space-y-4">
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-gray-900 text-base flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" />Case Library</h4>
+                          <h4 className="font-semibold text-gray-900 text-base flex items-center gap-2"><CheckCircle className="h-4 w-4 text-primary" />Case Library</h4>
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature1Bg}`}><span className={`text-xs font-bold ${config.accent.feature1Text}`}>{sampleCases.length}</span></div><span className="text-xs text-gray-700">Pre-built Cases</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature2Bg}`}><Activity className={`h-3 w-3 ${config.accent.feature2Text}`} /></div><span className="text-xs text-gray-700">Multiple Specialties</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature3Bg}`}><Zap className={`h-3 w-3 ${config.accent.feature3Text}`} /></div><span className="text-xs text-gray-700">All Difficulty Levels</span></div>
-                            <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.accent.feature4Bg}`}><Star className={`h-3 w-3 ${config.accent.feature4Text}`} /></div><span className="text-xs text-gray-700">Rare & Common</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/10"><span className="text-xs font-bold text-primary">{sampleCases.length}</span></div><span className="text-xs text-gray-700">Pre-built Cases</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/15"><Activity className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Multiple Specialties</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/20"><Zap className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">All Difficulty Levels</span></div>
+                            <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/25"><Star className="h-3 w-3 text-primary" /></div><span className="text-xs text-gray-700">Rare & Common</span></div>
                           </div>
                         </div>
-                        <Button className={`w-full text-white py-3 text-base font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${config.accent.ctaBrowse} ${config.accent.ctaBrowseHover}`}>
+                        <Button style={themedGradient} className="w-full text-white py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:opacity-90 transform hover:scale-[1.02] transition-all duration-300">
                           <FileText className="h-4 w-4 mr-2" />
                           Explore Case Library
                         </Button>
@@ -277,12 +293,12 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       )}
 
       {currentStep === "generate" && (
-        <div className={`min-h-screen relative ${config.accent.pageGradient}`}>
+        <div className="min-h-screen relative" style={themedBackground}>
           {isGeneratingCase && (
             <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
               <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 border border-gray-200">
                 <div className="text-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl ${config.accent.iconGradient}`}>
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl" style={themedGradient}>
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Generating Case</h3>
@@ -345,7 +361,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   </div>
                   <div className="flex gap-3 pt-4 border-t">
                     <Button variant="outline" onClick={() => setCurrentStep("landing")} className="flex-1">Cancel</Button>
-                    <Button onClick={handleGenerateCase} disabled={isGeneratingCase} className={`flex-1 text-white ${config.accent.ctaGenerate} ${config.accent.ctaGenerateHover}`}>
+                    <Button onClick={handleGenerateCase} disabled={isGeneratingCase} style={themedGradient} className="flex-1 text-white hover:opacity-90">
                       {isGeneratingCase ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />Generating Case...</> : <><Sparkles className="h-4 w-4 mr-2" />Generate Case</>}
                     </Button>
                   </div>
@@ -358,12 +374,12 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       )}
 
       {currentStep === "select" && (
-        <div className={`min-h-screen relative ${config.accent.pageGradient}`}>
+        <div className="min-h-screen relative" style={themedBackground}>
           {isGeneratingCase && (
             <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
               <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 border border-gray-200">
                 <div className="text-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl ${config.accent.iconGradient}`}>
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl" style={themedGradient}>
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Loading Case</h3>
@@ -378,15 +394,15 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 <Button variant="outline" onClick={() => setCurrentStep("landing")} className="flex items-center gap-2"><ArrowLeft className="h-4 w-4" />Back</Button>
                 <div><h1 className="text-3xl font-bold text-gray-900">Select Case</h1><p className="text-gray-600">Choose a case for {config.casePurpose}</p></div>
               </div>
-              <Badge variant="outline" className={`${config.accent.modeBadgeBg} ${config.accent.modeBadgeText} ${config.accent.modeBadgeBorder}`}>{config.modeTitle}</Badge>
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">{config.modeTitle}</Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sampleCases.map((caseItem) => (
-                <Card key={caseItem.id} className={`hover:shadow-lg transition-all duration-300 cursor-pointer group relative ${isGeneratingCase ? "opacity-50 pointer-events-none" : ""}`} onClick={() => handleCaseSelection(caseItem.id)}>
+                <Card key={caseItem.id} className={`hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative rounded-2xl border border-white/50 bg-white/90 ${isGeneratingCase ? "opacity-50 pointer-events-none" : ""}`} onClick={() => handleCaseSelection(caseItem.id)}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className={`text-lg transition-colors ${config.accent.hoverTitleText}`}>{caseItem.title}</CardTitle>
+                      <CardTitle className="text-lg transition-colors group-hover:text-primary">{caseItem.title}</CardTitle>
                       <Badge variant="outline" className={caseItem.difficulty === "beginner" ? "bg-green-100 text-green-800 border-green-200" : caseItem.difficulty === "intermediate" ? "bg-yellow-100 text-yellow-800 border-yellow-200" : "bg-red-100 text-red-800 border-red-200"}>{caseItem.difficulty}</Badge>
                     </div>
                     <CardDescription className="line-clamp-2">{caseItem.description}</CardDescription>
