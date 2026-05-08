@@ -1,9 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import {
-  newMedprepId,
-  type MedprepMessageRole,
-} from "@/lib/fyp/medprep-conversation-memory-store"
-import { getConversationById, upsertConversation } from "@/lib/fyp/server-medprep-db"
+import { type MedprepMessageRole } from "@/lib/fyp/medprep-conversation-memory-store"
+import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const conversationId = req.query.conversationId
@@ -16,10 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ success: false, error: `Method ${req.method} not allowed` })
   }
 
-  const conv = await getConversationById(conversationId)
-  if (!conv) {
-    return res.status(404).json({ success: false, error: "Conversation not found" })
-  }
+  const userId =
+    typeof req.query.userId === "string"
+      ? req.query.userId
+      : typeof req.headers["x-user-id"] === "string"
+        ? req.headers["x-user-id"]
+        : undefined
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
@@ -35,21 +34,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const normalizedRole = String(role).toUpperCase() as MedprepMessageRole
-    const msgId = newMedprepId("msg")
-    const createdAt = new Date().toISOString()
-    const message = {
-      id: msgId,
-      role: normalizedRole,
-      content,
-      isIntervention: Boolean(isIntervention),
-      relevanceScore,
-      createdAt,
+    if (!userId) {
+      return res.status(400).json({ success: false, error: "userId is required" })
     }
-    conv.messages.push(message)
-    if (normalizedRole === "DOCTOR" && isIntervention) {
-      conv.interventionCount += 1
-    }
-    await upsertConversation(conv)
+    const message = await medprepBackendRequest<any>(
+      `/medprep-ai/sessions/${conversationId}/messages`,
+      {
+        method: "POST",
+        userId,
+        body: {
+          role: normalizedRole,
+          content,
+          isIntervention: Boolean(isIntervention),
+          relevanceScore,
+        },
+      }
+    )
 
     return res.status(200).json({ success: true, message })
   } catch (e) {

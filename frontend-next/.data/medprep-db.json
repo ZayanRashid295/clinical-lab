@@ -1,732 +1,273 @@
 {
   "conversations": [
     {
-      "id": "conv_1778080763920_zpxnjba9z",
+      "id": "conv_1778244436393_mq2fprxy0",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:23.920Z",
+      "startedAt": "2026-05-08T12:47:16.393Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080763937_92m0vd2jm",
+      "id": "conv_1778244436880_ihib2xoj9",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:23.937Z",
+      "startedAt": "2026-05-08T12:47:16.880Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080763940_5ft318vgc",
+      "id": "conv_1778244436897_kz03yb0y3",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:23.940Z",
+      "startedAt": "2026-05-08T12:47:16.897Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080763943_f449swa1i",
+      "id": "conv_1778244437784_csen1s0eq",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:23.943Z",
+      "startedAt": "2026-05-08T12:47:17.784Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080763947_7a1v5alsp",
+      "id": "conv_1778244437801_rvqp06foa",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:23.947Z",
+      "startedAt": "2026-05-08T12:47:17.801Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080764403_6kgbq10od",
+      "id": "conv_1778244438784_h5wl6u3ji",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:24.403Z",
+      "startedAt": "2026-05-08T12:47:18.784Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080764421_89drq1p4f",
+      "id": "conv_1778244438799_rmwdrmcod",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:24.421Z",
+      "startedAt": "2026-05-08T12:47:18.799Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080765995_4h4tvzdtq",
+      "id": "conv_1778244439801_5nzxworzs",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:25.995Z",
+      "startedAt": "2026-05-08T12:47:19.801Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766020_lll9ry1gz",
+      "id": "conv_1778244439821_hc8adfxor",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.020Z",
+      "startedAt": "2026-05-08T12:47:19.821Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766038_o7zk965or",
+      "id": "conv_1778244440537_j4fj9l4qu",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.038Z",
+      "startedAt": "2026-05-08T12:47:20.537Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766053_dqeqcvjoh",
+      "id": "conv_1778244440553_igm5scj02",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.053Z",
+      "startedAt": "2026-05-08T12:47:20.553Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766361_91qg9ynz5",
+      "id": "conv_1778244441054_gr1cd7t9r",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.361Z",
+      "startedAt": "2026-05-08T12:47:21.054Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766402_h9gxf52cs",
+      "id": "conv_1778244441144_iqmk0btvq",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.402Z",
+      "startedAt": "2026-05-08T12:47:21.144Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766883_vi4l5niuo",
+      "id": "conv_1778244441587_lsf6oypii",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.883Z",
+      "startedAt": "2026-05-08T12:47:21.587Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080766911_pk9zfk87m",
+      "id": "conv_1778244441600_s4xllo1s9",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:26.911Z",
+      "startedAt": "2026-05-08T12:47:21.600Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080767412_l9icbhtae",
+      "id": "conv_1778244442105_zh4lclpsk",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:27.412Z",
+      "startedAt": "2026-05-08T12:47:22.105Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080767444_xhw91vpg3",
+      "id": "conv_1778244442118_yiax26yxe",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:27.444Z",
+      "startedAt": "2026-05-08T12:47:22.118Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080767943_nuk6cfaow",
+      "id": "conv_1778244442615_tvficzg44",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:27.943Z",
+      "startedAt": "2026-05-08T12:47:22.615Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080767949_9814qb32l",
+      "id": "conv_1778244442636_ctfjzf21b",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:27.949Z",
+      "startedAt": "2026-05-08T12:47:22.636Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080768454_fx7mxt8bf",
+      "id": "conv_1778244443140_zzsbkqway",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:28.454Z",
+      "startedAt": "2026-05-08T12:47:23.140Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080768477_sani6stow",
+      "id": "conv_1778244443167_7i5y1qgbi",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:28.477Z",
+      "startedAt": "2026-05-08T12:47:23.167Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080768982_v3xox5u33",
+      "id": "conv_1778244443659_kerdubyxh",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:28.982Z",
+      "startedAt": "2026-05-08T12:47:23.659Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080769020_xipyakqhl",
+      "id": "conv_1778244443683_0xykd8k4w",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:29.020Z",
+      "startedAt": "2026-05-08T12:47:23.683Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080769523_cb1nahmnb",
+      "id": "conv_1778244444044_ldia81xbo",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:29.523Z",
+      "startedAt": "2026-05-08T12:47:24.044Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080769536_nqzr6iyso",
+      "id": "conv_1778244444076_h120whxro",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:29.536Z",
+      "startedAt": "2026-05-08T12:47:24.076Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080770036_tq4mve2xm",
+      "id": "conv_1778244444107_tvfjfi9n2",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.036Z",
+      "startedAt": "2026-05-08T12:47:24.107Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778080770056_q55u9x0bc",
+      "id": "conv_1778244449936_0lm6j1r0l",
       "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.056Z",
+      "startedAt": "2026-05-08T12:47:29.936Z",
       "interventionCount": 0,
       "userId": "anonymous",
       "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080770559_rqtqckxie",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.559Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080770583_nkajy1bkg",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.583Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080770854_ftt1pti0j",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.854Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080770895_l35y58rmy",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.895Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080770914_81qyi815b",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:30.914Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778080772506_aghh7lxpm",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-06T15:19:32.506Z",
-      "interventionCount": 0,
-      "userId": "anonymous",
-      "caseId": "1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778146478892_41wy1a46r",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:34:38.892Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "iy32bgkor",
       "messages": [
         {
-          "id": "msg_1778146486262_mzlvzam5b",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:34:46.262Z"
-        },
-        {
-          "id": "msg_1778146491717_kgeqy07v6",
+          "id": "msg_1778244449946_85ux4hqp4",
           "role": "DOCTOR",
-          "content": "⚠️ Unable to connect to AI service. Please check your internet connection and API key configuration.",
+          "content": "\"Hello John, thank you for coming in. You've mentioned experiencing chest pain, shortness of breath, sweating, and nausea. Could you please tell me when these symptoms first started, and how long they have been going on?\"",
           "isIntervention": false,
-          "createdAt": "2026-05-07T09:34:51.717Z"
+          "createdAt": "2026-05-08T12:47:29.946Z"
         }
       ]
     },
     {
-      "id": "conv_1778146590847_cdq2tc3ln",
+      "id": "conv_1778244450066_fc6tte4ig",
       "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:36:30.847Z",
+      "startedAt": "2026-05-08T12:47:30.066Z",
       "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "iy32bgkor",
-      "messages": [
-        {
-          "id": "msg_1778146648500_52d62tysq",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:37:28.500Z"
-        },
-        {
-          "id": "msg_1778146654387_oqj6otlph",
-          "role": "DOCTOR",
-          "content": "⚠️ Unable to connect to AI service. Please check your internet connection and API key configuration.",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:37:34.387Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778146671293_inwnjtiny",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:37:51.293Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "iy32bgkor",
-      "messages": []
-    },
-    {
-      "id": "conv_1778146682145_xltpdklni",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:38:02.147Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "iy32bgkor",
-      "messages": []
-    },
-    {
-      "id": "conv_1778146781578_kky2ammu4",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:39:41.578Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "5k553felz",
-      "messages": [
-        {
-          "id": "msg_1778146786237_ojz8v50ox",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:39:46.238Z"
-        },
-        {
-          "id": "msg_1778146787786_t9sf2zux3",
-          "role": "DOCTOR",
-          "content": "⚠️ Unable to connect to AI service. Please check your internet connection and API key configuration.",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:39:47.786Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778146868086_tb7imms4j",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:41:08.086Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "5k553felz",
-      "messages": [
-        {
-          "id": "msg_1778146934970_24txatbwa",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:42:14.970Z"
-        },
-        {
-          "id": "msg_1778146940252_eh3jy89dg",
-          "role": "PATIENT",
-          "content": "I am having trouble responding right now, doctor. Could you please repeat or ask your question in a different way?",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:42:20.252Z"
-        },
-        {
-          "id": "msg_1778146951914_drl1vgmba",
-          "role": "STUDENT",
-          "content": "When did these symptoms first start, and were they sudden or gradual?",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:42:31.914Z"
-        },
-        {
-          "id": "msg_1778146954808_yv4723lio",
-          "role": "PATIENT",
-          "content": "I am having trouble responding right now, doctor. Could you please repeat or ask your question in a different way?",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:42:34.808Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778147223072_wm6761w93",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:47:03.072Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "76k327b10",
-      "messages": [
-        {
-          "id": "msg_1778147227020_4m45jauxr",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:47:07.020Z"
-        },
-        {
-          "id": "msg_1778147235670_vvz8ols4g",
-          "role": "PATIENT",
-          "content": "I am having trouble responding right now, doctor. Could you please repeat or ask your question in a different way?",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:47:15.670Z"
-        },
-        {
-          "id": "msg_1778147404064_xprppw23c",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:50:04.064Z"
-        },
-        {
-          "id": "msg_1778147406111_fu9l70aq9",
-          "role": "PATIENT",
-          "content": "I am having trouble responding right now, doctor. Could you please repeat or ask your question in a different way?",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:50:06.111Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778147603287_m4o33tkzt",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T09:53:23.287Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "76k327b10",
-      "messages": [
-        {
-          "id": "msg_1778147648646_xunkyckk1",
-          "role": "STUDENT",
-          "content": "hello",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:54:08.646Z"
-        },
-        {
-          "id": "msg_1778147653627_ilo3c211r",
-          "role": "DOCTOR",
-          "content": "⚠️ Failed to evaluate question (500): Failed to evaluate student question: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [403 Forbidden] Your project has been denied access. Please contact support.",
-          "isIntervention": false,
-          "createdAt": "2026-05-07T09:54:13.627Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778151170176_46ehwnf8l",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-07T10:52:50.178Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "76k327b10",
-      "messages": []
-    },
-    {
-      "id": "conv_1778225707707_msa1slesu",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T07:35:07.707Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "nkx0hbv05",
-      "messages": []
-    },
-    {
-      "id": "conv_1778226709576_oai3fayuv",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T07:51:49.576Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "nkx0hbv05",
-      "messages": []
-    },
-    {
-      "id": "conv_1778226810296_cg2hx64jp",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T07:53:30.297Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "nkx0hbv05",
-      "messages": []
-    },
-    {
-      "id": "conv_1778235386655_uz87vw3x3",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T10:16:26.655Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "ohx4myrrk",
-      "messages": [
-        {
-          "id": "msg_1778235400559_jo3nd8y0a",
-          "role": "STUDENT",
-          "content": "hi",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T10:16:40.559Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778235472823_l5wu14wyh",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T10:17:52.823Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "ohx4myrrk",
-      "messages": []
-    },
-    {
-      "id": "conv_1778235481212_c301bps9b",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T10:18:01.212Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "ohx4myrrk",
-      "messages": []
-    },
-    {
-      "id": "conv_1778237410343_m2w8dlthe",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T10:50:10.343Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "czk0h10hi",
-      "messages": []
-    },
-    {
-      "id": "conv_1778237413528_yrvj532ge",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T10:50:13.528Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "czk0h10hi",
-      "messages": []
-    },
-    {
-      "id": "conv_1778240668318_f8dspctfh",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T11:44:28.318Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
+      "userId": "anonymous",
       "caseId": "1",
       "messages": []
     },
     {
-      "id": "conv_1778242448402_y7vlcnheo",
+      "id": "conv_1778244451043_b1514owa6",
       "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:14:08.402Z",
+      "startedAt": "2026-05-08T12:47:31.043Z",
       "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
+      "userId": "anonymous",
+      "caseId": "1",
       "messages": []
-    },
-    {
-      "id": "conv_1778242454241_j6iljz65w",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:14:14.245Z",
-      "interventionCount": 1,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": [
-        {
-          "id": "msg_1778242468435_vncz1p4g7",
-          "role": "STUDENT",
-          "content": "hi",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T12:14:28.435Z"
-        },
-        {
-          "id": "msg_1778242474578_ep7vq1253",
-          "role": "DOCTOR",
-          "content": "This is a greeting, not a question aimed at gathering diagnostic information. While politeness is important, a medical interview needs to quickly transition into history-taking or specific inquiries.",
-          "isIntervention": true,
-          "createdAt": "2026-05-08T12:14:34.578Z"
-        },
-        {
-          "id": "msg_1778242490620_xiooa2592",
-          "role": "STUDENT",
-          "content": "When did these symptoms first start, and were they sudden or gradual?",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T12:14:50.620Z"
-        },
-        {
-          "id": "msg_1778242506606_cnb4qi5pj",
-          "role": "PATIENT",
-          "content": "Well, doctor, that's a really good question, and it's not a simple answer. It's not like these symptoms just appeared overnight. Honestly, it feels like I've been dealing with aspects of this my whole life, though they've certainly gotten worse and more noticeable over time.\n\nWhen I was a kid, everyone just thought I was incredibly flexible – \"double-jointed\" they'd call me. I could bend my fingers and thumbs back in ways other kids couldn't, and I was always doing the splits in gym class without much effort. My skin, I remember, always felt a bit... stretchy, even then. And I bruised incredibly easily; my shins always looked like a war zone, even from minor bumps. So, those initial signs, like the flexibility and bruising, they were definitely there from childhood.\n\nThe joint dislocations, those started becoming more noticeable in my teens and early twenties. My shoulders and knees were the main culprits. They'd just pop out of place sometimes, doing something as simple as reaching for something or stepping awkwardly. At first, it was just an occasional annoyance, but they've definitely become more frequent over the years.\n\nAnd the pain... that's been a more gradual escalation. It wasn't until my late twenties, early thirties, that it truly became a *chronic* issue. Before that, it was just aches and stiffness after a lot of activity. But now, it's a persistent, deep ache in my hips, knees, shoulders, and back almost daily. It's definitely gotten steadily worse over the past two decades. So, the underlying tendencies were always there, but the severity and the constant pain have certainly developed and intensified gradually over many, many years.",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T12:15:06.606Z"
-        }
-      ]
-    },
-    {
-      "id": "conv_1778243203744_agnxg5i9n",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:26:43.744Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243208548_j5t3oypc6",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:26:48.548Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243214618_5w66o58jp",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:26:54.618Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243216343_hsmfy1rhb",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:26:56.343Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243226855_3kjw04q08",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:27:06.855Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243235253_mb5927x26",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:27:15.253Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243247940_t55npau9l",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:27:27.940Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243256897_giqza2c09",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:27:36.897Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": []
-    },
-    {
-      "id": "conv_1778243267635_sehq0f7tr",
-      "status": "ACTIVE",
-      "startedAt": "2026-05-08T12:27:47.635Z",
-      "interventionCount": 0,
-      "userId": "cmou2hem8000xfvx8yorgd0w8",
-      "caseId": "398zp2pr1",
-      "messages": [
-        {
-          "id": "msg_1778243489000_88f75z7uc",
-          "role": "STUDENT",
-          "content": "When did these symptoms first start, and were they sudden or gradual?",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T12:31:29.000Z"
-        },
-        {
-          "id": "msg_1778243500763_e6pxhfvwx",
-          "role": "PATIENT",
-          "content": "Oh, that's a tough question to pinpoint an exact start, doctor. It wasn't sudden at all. It feels like these things have been with me for as long as I can remember, really.\n\nEven as a kid, I was always known as the \"clumsy\" one, or the \"double-jointed\" kid at school. My joints, especially my knees and shoulders, would pop out of place sometimes, and I'd bruise just from leaning against a desk or bumping into something lightly. My skin always felt... different, too; remarkably stretchy, almost fragile, my mother used to say.\n\nBut it’s definitely gotten worse with age. In my 20s and 30s, the dislocations became much more frequent and painful, and that constant, nagging pain in my joints really started to set in. Now, at 51, it’s a daily struggle to manage. So, to answer your question, it's been a very gradual progression, starting in childhood, and it's just slowly compounded over the decades.",
-          "isIntervention": false,
-          "createdAt": "2026-05-08T12:31:40.763Z"
-        }
-      ]
     }
   ],
   "diagnosisSubmissions": [],

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { diagnosisService } from "@/lib/fyp/diagnosis-service"
 import { sampleCases, type DiagnosisSubmission, type MedicalCase } from "@/lib/fyp/data-models"
-import { appendDiagnosisSubmission, listDiagnosisSubmissions } from "@/lib/fyp/server-medprep-db"
+import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
 
 type SubmitDiagnosisRequest = {
   conversationId: string
@@ -36,13 +36,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: "Case not found" })
       }
 
-      const submission = diagnosisService.submitDiagnosis(
+      const localSubmission = diagnosisService.submitDiagnosis(
         conversationId,
         studentId,
         submittedDiagnosis,
         medicalCase
       )
-      await appendDiagnosisSubmission(submission)
+      const submission = await medprepBackendRequest<any>(
+        `/medprep-ai/sessions/${conversationId}/diagnosis`,
+        {
+          method: "POST",
+          userId: studentId,
+          body: {
+            userId: studentId,
+            submittedDiagnosis,
+            actualDiagnosis: localSubmission.actualDiagnosis,
+            isCorrect: localSubmission.isCorrect,
+            caseId,
+            isRareCase: localSubmission.caseMetadata.isRare,
+            specialty: localSubmission.caseMetadata.specialty,
+            caseDifficulty: localSubmission.caseMetadata.difficulty,
+          },
+        }
+      )
 
       return res.status(200).json({
         submission,
@@ -69,7 +85,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const conversationId =
         typeof req.query.conversationId === "string" ? req.query.conversationId : undefined
 
-      const submissions = await listDiagnosisSubmissions()
+      const submissions = await medprepBackendRequest<any[]>(`/medprep-ai/sessions`, {
+        userId: studentId || "system",
+      })
+      const diagnosisRows = submissions.flatMap((session) => session.diagnosisSubmissions || [])
 
       const computeStats = (items: DiagnosisSubmission[]) => {
         const totalSubmissions = items.length
@@ -86,9 +105,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (studentId) {
         const studentSubmissions = submissions.filter((item) => item.studentId === studentId)
-        const base = computeStats(studentSubmissions)
+        const normalizedStudentSubmissions = diagnosisRows
+          .filter((item) => item.userId === studentId)
+          .map((item) => ({
+            id: item.id,
+            conversationId: item.conversationId,
+            studentId: item.userId,
+            submittedDiagnosis: item.submittedDiagnosis,
+            actualDiagnosis: item.actualDiagnosis,
+            isCorrect: item.isCorrect,
+            submittedAt: item.submittedAt,
+            caseMetadata: {
+              isRare: item.isRareCase || false,
+              specialty: item.specialty || "General Medicine",
+              difficulty: item.caseDifficulty || "intermediate",
+            },
+          }))
+        const base = computeStats(normalizedStudentSubmissions as DiagnosisSubmission[])
         const specialtyBreakdown: Record<string, { total: number; correct: number; accuracy: number }> = {}
-        studentSubmissions.forEach((item) => {
+        normalizedStudentSubmissions.forEach((item) => {
           const key = item.caseMetadata.specialty
           if (!specialtyBreakdown[key]) specialtyBreakdown[key] = { total: 0, correct: 0, accuracy: 0 }
           specialtyBreakdown[key].total += 1
@@ -98,16 +133,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const stat = specialtyBreakdown[key]
           stat.accuracy = stat.total > 0 ? (stat.correct / stat.total) * 100 : 0
         })
-        return res.status(200).json({ submissions: studentSubmissions, stats: { ...base, specialtyBreakdown } })
+        return res
+          .status(200)
+          .json({ submissions: normalizedStudentSubmissions, stats: { ...base, specialtyBreakdown } })
       }
 
       if (conversationId) {
-        return res.status(200).json({ submissions: submissions.filter((item) => item.conversationId === conversationId) })
+        const filtered = diagnosisRows
+          .filter((item) => item.conversationId === conversationId)
+          .map((item) => ({
+            id: item.id,
+            conversationId: item.conversationId,
+            studentId: item.userId,
+            submittedDiagnosis: item.submittedDiagnosis,
+            actualDiagnosis: item.actualDiagnosis,
+            isCorrect: item.isCorrect,
+            submittedAt: item.submittedAt,
+            caseMetadata: {
+              isRare: item.isRareCase || false,
+              specialty: item.specialty || "General Medicine",
+              difficulty: item.caseDifficulty || "intermediate",
+            },
+          }))
+        return res.status(200).json({ submissions: filtered })
       }
 
-      const globalBase = computeStats(submissions)
+      const normalizedAll = diagnosisRows.map((item) => ({
+        id: item.id,
+        conversationId: item.conversationId,
+        studentId: item.userId,
+        submittedDiagnosis: item.submittedDiagnosis,
+        actualDiagnosis: item.actualDiagnosis,
+        isCorrect: item.isCorrect,
+        submittedAt: item.submittedAt,
+        caseMetadata: {
+          isRare: item.isRareCase || false,
+          specialty: item.specialty || "General Medicine",
+          difficulty: item.caseDifficulty || "intermediate",
+        },
+      }))
+      const globalBase = computeStats(normalizedAll as DiagnosisSubmission[])
       const specialtyMap: Record<string, { total: number; correct: number }> = {}
-      submissions.forEach((item) => {
+      normalizedAll.forEach((item) => {
         const key = item.caseMetadata.specialty
         if (!specialtyMap[key]) specialtyMap[key] = { total: 0, correct: 0 }
         specialtyMap[key].total += 1

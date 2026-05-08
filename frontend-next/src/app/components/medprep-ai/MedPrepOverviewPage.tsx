@@ -1,12 +1,32 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { MEDPREP_MODES } from "./modes";
+import { authService } from "@/shared/services/auth.service";
+import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service";
 
 export default function MedPrepOverviewPage() {
+  const [sessions, setSessions] = useState<MedprepSession[]>([])
+
   const themedButton = {
     background:
       "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
   } as const
+
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    const userId = user?.id ? String(user.id) : "anonymous"
+    medprepSessionService
+      .listSessions(userId)
+      .then(setSessions)
+      .catch(() => setSessions([]))
+  }, [])
+
+  const activeSessions = useMemo(
+    () => sessions.filter((session) => session.status === "ACTIVE").slice(0, 6),
+    [sessions]
+  )
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
@@ -26,6 +46,26 @@ export default function MedPrepOverviewPage() {
           Back to Dashboard
         </Link>
       </div>
+
+      {activeSessions.length > 0 ? (
+        <div className="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900">Continue ongoing simulations</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {activeSessions.map((session) => (
+              <Link
+                key={session.id}
+                href={medprepSessionService.getContinueUrl(session)}
+                className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-3 hover:bg-emerald-50 transition-colors"
+              >
+                <p className="text-sm font-semibold text-emerald-900">
+                  {session.title || session.caseId || "Untitled case"}
+                </p>
+                <p className="text-xs text-emerald-700 mt-1">{session.mode} mode</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {MEDPREP_MODES.map((mode) => (

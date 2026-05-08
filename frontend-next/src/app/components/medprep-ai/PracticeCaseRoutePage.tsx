@@ -37,6 +37,8 @@ function CasePageInner() {
   )
   const caseId = caseIdFromPathname(pathname) || ""
   const evaluationMode = router.query.mode === "evaluation"
+  const resumeConversationId =
+    typeof router.query.conversationId === "string" ? router.query.conversationId : undefined
 
   const [medicalCase, setMedicalCase] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -159,7 +161,12 @@ function CasePageInner() {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
-      <CaseChat medicalCase={medicalCase} student={student} evaluationMode={evaluationMode} />
+      <CaseChat
+        medicalCase={medicalCase}
+        student={student}
+        evaluationMode={evaluationMode}
+        resumeConversationId={resumeConversationId}
+      />
     </div>
   )
 }

@@ -66,6 +66,7 @@ interface CaseChatProps {
   medicalCase: MedicalCase
   student: User
   evaluationMode?: boolean
+  resumeConversationId?: string
 }
 
 // Enhanced Animated Counter Component
@@ -141,7 +142,12 @@ const MetricCard = ({ title, value, suffix = '', icon: Icon, color = "blue", des
   )
 }
 
-export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseChatProps) {
+export function CaseChat({
+  medicalCase,
+  student,
+  evaluationMode = false,
+  resumeConversationId,
+}: CaseChatProps) {
   // Generate unique session ID for hint tracking (stable across renders)
   const sessionId = useRef(`practice_${medicalCase.id}_${Date.now()}`).current
   const [conversation, setConversation] = useState<any>(null)
@@ -247,17 +253,28 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
       console.log("📋 Full Medical Case:", medicalCase)
       
       try {
-        // For practice mode, we don't need case instances - just create conversation directly
-        console.log("💬 Creating conversation directly for practice mode")
-        const newConversation = await databaseConversationService.createConversation(
-          student.id,
-          medicalCase.id,
-          medicalCase?.patientProfile?.name,
-          medicalCase?.title
-        )
-        console.log("✅ Created conversation object:", newConversation)
-        setConversation(newConversation)
-        setMessages(newConversation.messages)
+        if (resumeConversationId) {
+          const existingConversation =
+            await databaseConversationService.getConversation(resumeConversationId)
+          if (existingConversation) {
+            setConversation(existingConversation)
+            setMessages(existingConversation.messages)
+          } else {
+            throw new Error("Unable to load resume session conversation.")
+          }
+        } else {
+          // For practice mode, create conversation directly
+          console.log("💬 Creating conversation directly for practice mode")
+          const newConversation = await databaseConversationService.createConversation(
+            student.id,
+            medicalCase.id,
+            medicalCase?.patientProfile?.name,
+            medicalCase?.title
+          )
+          console.log("✅ Created conversation object:", newConversation)
+          setConversation(newConversation)
+          setMessages(newConversation.messages)
+        }
         
         // Initialize hint tracking session with the case ID
         const session = aiHintTrackingService.startSession(medicalCase.id, sessionId)
@@ -272,7 +289,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
     }
     
     initializeConversation()
-  }, [medicalCase, student.id])
+  }, [medicalCase, resumeConversationId, sessionId, student.id])
 
   useEffect(() => {
     // Only scroll to bottom if user is near the bottom (within 100px)

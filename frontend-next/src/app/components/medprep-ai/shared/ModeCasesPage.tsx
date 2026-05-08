@@ -22,6 +22,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { authService } from "@/shared/services/auth.service"
+import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
 
 interface ModeCasesConfig {
   modeTitle: string
@@ -67,6 +69,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   const [currentStep, setCurrentStep] = useState<"landing" | "generate" | "select">("landing")
   const [isGeneratingCase, setIsGeneratingCase] = useState(false)
   const [generationError, setGenerationError] = useState<string | null>(null)
+  const [resumeSessions, setResumeSessions] = useState<MedprepSession[]>([])
   const [caseFormData, setCaseFormData] = useState({
     specialty: "random",
     difficultyLevel: "intermediate",
@@ -146,6 +149,25 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       sessionStorage.removeItem("currentCase")
     }
   }, [config, router])
+
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    const userId = user?.id ? String(user.id) : "anonymous"
+    const mode =
+      config.casePurpose === "learning"
+        ? "LEARNING"
+        : config.casePurpose === "evaluation"
+          ? "EVALUATION"
+          : "PRACTICE"
+    medprepSessionService
+      .listSessions(userId)
+      .then((sessions) =>
+        setResumeSessions(
+          sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 3)
+        )
+      )
+      .catch(() => setResumeSessions([]))
+  }, [config.casePurpose])
 
   const handleGenerateCase = async () => {
     setGenerationError(null)
@@ -295,6 +317,22 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 Select how you want to practice today
               </p>
             </div>
+            {resumeSessions.length > 0 ? (
+              <div className="mb-8 mx-auto max-w-5xl rounded-2xl border border-emerald-100 bg-white/85 p-4">
+                <p className="text-sm font-semibold text-emerald-900 mb-3">Continue where you left off</p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {resumeSessions.map((session) => (
+                    <Link
+                      key={session.id}
+                      href={medprepSessionService.getContinueUrl(session)}
+                      className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50"
+                    >
+                      {session.title || session.caseId || "Untitled case"}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
               <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col">

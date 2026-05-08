@@ -568,22 +568,29 @@ Provide an educational response about this ${disease} case.`,
   // Database-based session management
   async saveLearningSession(session: LearningSession): Promise<void> {
     try {
-      // Save to database conversation
-      const conversationResponse = await fetch('/api/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: session.studentId || 'anonymous',
-          caseId: session.caseId
+      const userId = (session as any).studentId || "anonymous"
+      let conversationId = session.id
+      if (!conversationId.startsWith("conv_") && !conversationId.startsWith("c")) {
+        const conversationResponse = await fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            caseId: session.caseId,
+            mode: "LEARNING",
+            caseTitle: session.disease,
+          }),
         })
-      })
+        const conversationData = await conversationResponse.json()
+        if (conversationData.success) {
+          conversationId = conversationData.conversation.id
+          session.id = conversationId
+        }
+      }
 
-      const conversationData = await conversationResponse.json()
-      
-      if (conversationData.success) {
-        // Save messages to the conversation
+      if (conversationId) {
         for (const message of session.conversation) {
-          await fetch(`/api/conversations/${conversationData.conversation.id}/messages`, {
+          await fetch(`/api/conversations/${conversationId}/messages?userId=${encodeURIComponent(userId)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -594,8 +601,6 @@ Provide an educational response about this ${disease} case.`,
           })
         }
 
-        // Update session with database conversation ID
-        session.id = conversationData.conversation.id
       }
     } catch (error) {
       console.error('Error saving session to database:', error)
@@ -627,7 +632,7 @@ Provide an educational response about this ${disease} case.`,
   // New method to get session from database
   async getLearningSessionFromDatabase(sessionId: string): Promise<LearningSession | null> {
     try {
-      const response = await fetch(`/api/conversations/${sessionId}`)
+      const response = await fetch(`/api/conversations/${sessionId}?userId=anonymous`)
       const data = await response.json()
       
       if (data.success && data.conversation) {

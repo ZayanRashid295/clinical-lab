@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { BookOpen, GraduationCap, Clock, Target, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { authService } from "@/shared/services/auth.service"
+import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
 
 interface ModeLandingConfig {
   title: string
@@ -40,6 +42,7 @@ interface ModeLandingConfig {
 export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   const router = useRouter()
   const [isNavigating, setIsNavigating] = useState(false)
+  const [resumeSessions, setResumeSessions] = useState<MedprepSession[]>([])
 
   const themedBackground = {
     background:
@@ -100,6 +103,24 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
       }
     }
   }, [config, router])
+
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    const userId = user?.id ? String(user.id) : "anonymous"
+    medprepSessionService
+      .listSessions(userId)
+      .then((sessions) => {
+        const mode = config.startRoute.includes("evaluation")
+          ? "EVALUATION"
+          : config.startRoute.includes("learn") || config.startRoute.includes("qa")
+            ? "LEARNING"
+            : "PRACTICE"
+        setResumeSessions(
+          sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 2)
+        )
+      })
+      .catch(() => setResumeSessions([]))
+  }, [config.startRoute])
 
   const highlights: { title: string; subtitle: string; icon: LucideIcon }[] = [
     { title: config.highlight1Title, subtitle: config.highlight1Subtitle, icon: GraduationCap },
@@ -222,6 +243,22 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
               Back to Dashboard
             </Link>
           </div>
+          {resumeSessions.length > 0 ? (
+            <div className="mt-8 rounded-2xl border border-emerald-100 bg-white/85 p-4 text-left">
+              <p className="text-sm font-semibold text-emerald-900">Resume ongoing simulation</p>
+              <div className="mt-3 space-y-2">
+                {resumeSessions.map((session) => (
+                  <Link
+                    key={session.id}
+                    href={medprepSessionService.getContinueUrl(session)}
+                    className="block rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-sm text-emerald-800 hover:bg-emerald-50"
+                  >
+                    {session.title || session.caseId || "Untitled case"}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -1,34 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import {
-  newMedprepId,
-  type MedprepStoredConversation,
-} from "@/lib/fyp/medprep-conversation-memory-store"
-import { listConversations, upsertConversation } from "@/lib/fyp/server-medprep-db"
+import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
-      const { userId, caseId } = body as { userId?: string; caseId?: string }
+      const { userId, caseId, caseInstanceId, mode = "PRACTICE", caseTitle } = body as {
+        userId?: string
+        caseId?: string
+        caseInstanceId?: string
+        mode?: "PRACTICE" | "LEARNING" | "EVALUATION"
+        caseTitle?: string
+      }
       if (!userId || !caseId) {
         return res.status(400).json({
           success: false,
           error: "userId and caseId are required",
         })
       }
-
-      const id = newMedprepId("conv")
-      const conv: MedprepStoredConversation = {
-        id,
-        status: "ACTIVE",
-        startedAt: new Date().toISOString(),
-        interventionCount: 0,
+      const conversation = await medprepBackendRequest<any>("/medprep-ai/sessions", {
+        method: "POST",
         userId,
-        caseId,
-        messages: [],
-      }
-      await upsertConversation(conv)
-      return res.status(200).json({ success: true, conversation: conv })
+        body: {
+          userId,
+          mode,
+          caseId,
+          caseInstanceId,
+          title: caseTitle,
+        },
+      })
+      return res.status(200).json({ success: true, conversation })
     } catch (e) {
       console.error("[api/conversations] POST error", e)
       return res.status(500).json({ success: false, error: "Failed to create conversation" })
@@ -36,13 +37,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "GET") {
-    const all = await listConversations()
-    const userId = typeof req.query.userId === "string" ? req.query.userId : undefined
-    const caseId = typeof req.query.caseId === "string" ? req.query.caseId : undefined
-    let list = [...all]
-    if (userId) list = list.filter((c) => c.userId === userId)
-    if (caseId) list = list.filter((c) => c.caseId === caseId || c.caseInstanceId === caseId)
-    return res.status(200).json({ success: true, conversations: list })
+    try {
+      const userId = typeof req.query.userId === "string" ? req.query.userId : undefined
+      const caseId = typeof req.query.caseId === "string" ? req.query.caseId : undefined
+      if (!userId) {
+        return res.status(400).json({ success: false, error: "userId is required" })
+      }
+      const query = new URLSearchParams()
+      if (caseId) query.set("caseId", caseId)
+      const conversations = await medprepBackendRequest<any[]>(
+        `/medprep-ai/sessions${query.toString() ? `?${query.toString()}` : ""}`,
+        { userId }
+      )
+      return res.status(200).json({ success: true, conversations })
+    } catch (e) {
+      console.error("[api/conversations] GET error", e)
+      return res.status(500).json({ success: false, error: "Failed to fetch conversations" })
+    }
   }
 
   res.setHeader("Allow", "GET, POST")

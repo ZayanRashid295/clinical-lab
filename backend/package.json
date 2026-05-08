@@ -25,6 +25,7 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "migrate:indexes": "tsx scripts/add-access-control-indexes.ts",
+    "migrate:medprep-json": "tsx scripts/migrate-medprep-json-to-prisma.ts",
     "migrate:roles": "tsx scripts/assign-lms-roles.ts",
     "migrate:all": "npm run migrate:indexes && npm run migrate:roles",
     "create:admin": "tsx scripts/create-admin-user.ts",

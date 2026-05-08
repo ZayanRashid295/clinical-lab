@@ -5,8 +5,12 @@
 model MedprepConversation {
   id                 String                    @id @default(cuid())
   userId             String
+  mode               MedprepMode
   caseId             String?
   caseInstanceId     String?
+  title              String?
+  isGeneratedCase    Boolean                   @default(false)
+  score              Float?
   status             MedprepConversationStatus @default(ACTIVE)
   interventionCount  Int                       @default(0)
   startedAt          DateTime                  @default(now())
@@ -27,6 +31,8 @@ model MedprepConversation {
   @@index([caseId])
   @@index([caseInstanceId])
   @@index([status])
+  @@index([userId, status, updatedAt])
+  @@index([userId, mode, status])
   @@map("medprep_conversations")
 }
 
@@ -141,4 +147,10 @@ enum MedprepMessageRole {
   STUDENT
   PATIENT
   DOCTOR
+}
+
+enum MedprepMode {
+  PRACTICE
+  LEARNING
+  EVALUATION
 }
