@@ -5,16 +5,11 @@ import { getMenuItemsForRole, MenuItem } from "../../app/types/menu";
 import { MenuSystemProps } from "../../app/types/ui";
 import { User } from "../../app/types/core";
 import AdaptiveLayout from "./Layout/AdaptiveLayout";
-import MenuLayoutSettings from "./Settings/MenuLayoutSettings";
-import { SettingsButton } from "./Settings/SettingsButton";
 import {
   UIConfigProvider,
-  useUIConfigContext,
 } from "../contexts/UIConfigContext";
-import { typography, spacing } from "../utils/responsive";
 import ContentRenderer from "./Content/ContentRenderer";
 // import { createContentRegistry } from "../../app/config/content.registry";
-import { COLOR_SCHEMES } from "../../app/config/theme.service";
 
 /** Registry keys are pathnames only. Router `routeChangeComplete` passes `?query` which would break lookups and fall back to parent paths (e.g. `/medprep-ai`). */
 function pathWithoutQueryAndHash(path: string): string {
@@ -48,7 +43,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   const [currentPath, setCurrentPath] = useState<string>(
     typeof window !== "undefined" ? window.location.pathname : ""
   );
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
@@ -289,15 +283,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
           {renderContent()}
         </div>
       </AdaptiveLayout>
-
-      {/* Settings Panel */}
-      <MenuLayoutSettings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-
-      {/* Settings Toggle Button */}
-      <SettingsButton onClick={() => setIsSettingsOpen(true)} />
     </UIConfigProvider>
   );
 };

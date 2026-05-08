@@ -396,6 +396,19 @@ export const MENU_CONFIG = {
       ],
     },
     {
+      id: "settings",
+      label: "menu.settings",
+      icon: "⚙️",
+      path: "/settings",
+      roles: [
+        "SUPERADMIN",
+        "ADMIN",
+        "STUDENT",
+        "FACULTY",
+        "INSTITUTION_MANAGER",
+      ],
+    },
+    {
       id: "admin",
       label: "menu.admin",
       icon: "⚙️",

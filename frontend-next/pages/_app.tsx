@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 import { useEffect } from "react";
+import { Playfair_Display } from "next/font/google";
 import "../src/index.css";
 import { UIConfigService } from "../src/app/config/ui.config";
 import { ThemeService } from "../src/app/config/theme.service";
@@ -7,6 +8,13 @@ import { LanguageProvider } from "../src/shared/contexts/LanguageContext";
 import { UIConfigProvider } from "../src/shared/contexts/UIConfigContext";
 import { ConfirmProvider } from "../src/shared/contexts/ConfirmContext";
 import { Toaster } from "../src/shared/ui/toaster";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-playfair",
+  display: "swap",
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -21,7 +29,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <UIConfigProvider>
       <LanguageProvider>
         <ConfirmProvider>
-          <Component {...pageProps} />
+          <div className={playfair.variable}>
+            <Component {...pageProps} />
+          </div>
           <Toaster />
         </ConfirmProvider>
       </LanguageProvider>

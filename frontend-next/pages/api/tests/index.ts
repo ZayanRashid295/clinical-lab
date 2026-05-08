@@ -64,7 +64,7 @@ export default async function handler(
       }
 
       // Fetch questions from questions API
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (req.headers.host ? `http://${req.headers.host}` : "http://localhost:3000");
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (req.headers.host ? `http://${req.headers.host}` : "http://localhost:52941");
       const questionsResponse = await fetch(`${baseUrl}/api/questions`);
       if (!questionsResponse.ok) {
         return res.status(500).json({ error: "Failed to fetch questions" });

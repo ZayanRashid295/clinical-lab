@@ -551,15 +551,13 @@ export class ThemeService {
       Object.entries(colorScheme.primary).forEach(([key, value]) => {
         root.style.setProperty(`--color-primary-${key}`, value);
 
-        // Add RGB values for better CSS support
-        if (key === "500") {
-          const rgb = this.hexToRgb(value);
-          if (rgb) {
-            root.style.setProperty(
-              `--color-primary-500-rgb`,
-              `${rgb.r}, ${rgb.g}, ${rgb.b}`
-            );
-          }
+        // Expose RGB triplets for use in rgba(...) helpers (shadows, overlays, etc.)
+        const rgb = this.hexToRgb(value);
+        if (rgb) {
+          root.style.setProperty(
+            `--color-primary-${key}-rgb`,
+            `${rgb.r}, ${rgb.g}, ${rgb.b}`
+          );
         }
       });
 

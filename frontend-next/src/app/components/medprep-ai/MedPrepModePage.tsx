@@ -83,7 +83,7 @@ export default function MedPrepModePage({ modeId }: MedPrepModePageProps) {
         <p className="text-sm text-gray-500">
           Set <code className="bg-gray-100 px-1 rounded">NEXT_PUBLIC_FYP_APP_URL</code>{" "}
           to deep-link into your standalone deployment (e.g.{" "}
-          <code className="bg-gray-100 px-1 rounded">http://localhost:3001</code>
+          <code className="bg-gray-100 px-1 rounded">http://localhost:52941</code>
           ).
         </p>
       )}

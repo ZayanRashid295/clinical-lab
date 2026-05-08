@@ -3,7 +3,7 @@
 import { Socket, io } from "socket.io-client";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
 
 let socket: Socket | null = null;
 let lastToken: string | null = null;

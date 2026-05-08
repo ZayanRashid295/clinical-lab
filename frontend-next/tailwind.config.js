@@ -53,6 +53,23 @@ module.exports = {
           DEFAULT: "#e5e7eb",
         },
       },
+      fontFamily: {
+        serif: [
+          "var(--font-playfair)",
+          "Playfair Display",
+          "Georgia",
+          "Cambria",
+          "Times New Roman",
+          "Times",
+          "serif",
+        ],
+        display: [
+          "var(--font-playfair)",
+          "Playfair Display",
+          "Georgia",
+          "serif",
+        ],
+      },
       fontSize: {
         xs: ["0.75rem", { lineHeight: "1rem" }],
         sm: ["0.875rem", { lineHeight: "1.25rem" }],

@@ -343,6 +343,14 @@ class CaseGenerationService {
       // Neurology
       "Stroke": ["sudden weakness", "speech difficulty", "facial drooping", "confusion", "headache"],
       "Migraine": ["severe headache", "nausea", "sensitivity to light", "fatigue", "dizziness"],
+
+      // Nephrology
+      "Chronic Kidney Disease": ["fatigue", "swelling in legs", "decreased urine output", "nausea", "loss of appetite"],
+      "Acute Kidney Injury": ["decreased urine output", "fatigue", "confusion", "nausea", "shortness of breath"],
+      "Kidney Stones": ["severe flank pain", "blood in urine", "nausea", "vomiting", "painful urination"],
+      "Glomerulonephritis": ["blood in urine", "swelling in face", "high blood pressure", "fatigue", "decreased urine output"],
+      "Polycystic Kidney Disease": ["flank pain", "blood in urine", "high blood pressure", "abdominal fullness", "fatigue"],
+      "Nephrotic Syndrome": ["swelling in legs", "foamy urine", "fatigue", "weight gain", "loss of appetite"],
       
       // Rare Diseases
       "Marfan Syndrome": ["chest pain", "shortness of breath", "joint pain", "vision problems", "tall stature"],
@@ -355,7 +363,14 @@ class CaseGenerationService {
 
     const symptoms = symptomMap[diseaseName]
     if (!symptoms) {
-      throw new Error(`No symptom map found for disease: ${diseaseName}`)
+      // Keep case generation resilient for newly-added diseases.
+      return [
+        "fatigue",
+        "generalized weakness",
+        "loss of appetite",
+        "intermittent pain",
+        "difficulty with daily activities",
+      ]
     }
     return symptoms
   }

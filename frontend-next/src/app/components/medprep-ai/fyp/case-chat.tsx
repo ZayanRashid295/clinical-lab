@@ -114,27 +114,27 @@ interface MetricCardProps {
 const MetricCard = ({ title, value, suffix = '', icon: Icon, color = "blue", description = "" }: MetricCardProps) => {
   const getColorClasses = () => {
     const colors: Record<string, string> = {
-      blue: "text-blue-600 bg-blue-50 border-blue-200",
-      green: "text-green-600 bg-green-50 border-green-200",
-      yellow: "text-yellow-600 bg-yellow-50 border-yellow-200",
-      red: "text-red-600 bg-red-50 border-red-200",
-      purple: "text-purple-600 bg-purple-50 border-purple-200"
+      blue: "text-emerald-700 bg-emerald-50/80 border-emerald-200/80",
+      green: "text-green-700 bg-green-50/80 border-green-200/80",
+      yellow: "text-amber-700 bg-amber-50/80 border-amber-200/80",
+      red: "text-rose-700 bg-rose-50/80 border-rose-200/80",
+      purple: "text-teal-700 bg-teal-50/80 border-teal-200/80"
     }
     return colors[color] || colors.blue
   }
 
   return (
-    <Card className={`transform transition-all duration-300 hover:scale-105 border-l-4 ${getColorClasses()}`}>
+    <Card className={`transform transition-all duration-300 hover:-translate-y-0.5 rounded-2xl border ${getColorClasses()} shadow-[0_8px_24px_-18px_rgba(15,118,110,0.45)]`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <CardTitle className="text-xs font-medium text-slate-600">{title}</CardTitle>
+        <Icon className="h-4 w-4 opacity-80" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900 mb-1">
+        <div className="text-2xl font-bold text-slate-800 mb-1">
           <AnimatedCounter value={value} suffix={suffix} duration={1000} />
         </div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="text-xs text-slate-500">{description}</p>
         )}
       </CardContent>
     </Card>
@@ -226,7 +226,10 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
     }
 
     if (!response.ok) {
-      const apiError = payload?.error || payload?.message || rawText || fallbackError
+      const apiError =
+        payload?.details
+          ? `${payload?.error || payload?.message || fallbackError}: ${payload.details}`
+          : payload?.error || payload?.message || rawText || fallbackError
       throw new Error(`${fallbackError} (${response.status}): ${apiError}`)
     }
     return payload
@@ -449,11 +452,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
       })
 
       let doctorEvaluation: any = { shouldIntervene: false }
-      try {
-        doctorEvaluation = await parseApiJson(evaluationResponse, "Failed to evaluate question")
-      } catch (evaluationError) {
-        console.error("Question evaluation failed, continuing with patient response:", evaluationError)
-      }
+      doctorEvaluation = await parseApiJson(evaluationResponse, "Failed to evaluate question")
 
       if (doctorEvaluation.shouldIntervene) {
         // Show intervention alert
@@ -519,9 +518,11 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
       setQuestionRefreshTrigger((prev) => prev + 1)
     } catch (error) {
       console.error("Error sending message:", error)
+      const errorText =
+        error instanceof Error ? error.message : "Unable to connect to AI service."
       const errorMessage = await databaseConversationService.addMessage(currentConversation.id, {
         role: "doctor",
-        content: "⚠️ Unable to connect to AI service. Please check your internet connection and API key configuration.",
+        content: `⚠️ ${errorText}`,
       })
       setMessages((prev) => [...prev, errorMessage])
     } finally {
@@ -727,7 +728,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
       }
 
   return (
-    <div className="h-full min-h-0 flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-100/40">
+    <div className="h-full min-h-0 flex flex-col bg-[radial-gradient(circle_at_0%_0%,rgba(16,185,129,0.16)_0%,rgba(246,251,248,0)_40%),radial-gradient(circle_at_100%_100%,rgba(15,118,110,0.1)_0%,rgba(246,251,248,0)_35%)] bg-[#F6FBF8]">
       {/* Global Loading Overlay for Practice Interface Bootstrapping */}
       {isBootstrapping && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/70 backdrop-blur-sm">
@@ -744,25 +745,25 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
         </div>
       ) : null}
       {/* Enhanced Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-white/60 shadow-sm relative z-10">
+      <header className="sticky top-0 z-20 border-b border-emerald-100/90 bg-white/80 backdrop-blur-xl">
         <div className="w-full px-3 sm:px-4 lg:px-6">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+          <div className="flex min-h-[72px] flex-wrap items-center justify-between gap-3 py-2">
+            <div className="flex items-center space-x-3">
               <Link href="/">
-                <Button variant="outline" size="sm" className="bg-white border-gray-200 shadow-sm">
+                <Button variant="outline" size="sm" className="border-emerald-200 bg-white shadow-sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Dashboard
                 </Button>
               </Link>
               <div className="flex-1">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-700 to-violet-600 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent leading-tight">
                   {medicalCase.title}
                 </h1>
-                <p className="text-xs text-gray-600">Patient: {medicalCase.patientProfile.name}</p>
+                <p className="text-xs text-slate-600">Patient: {medicalCase.patientProfile.name}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-white border-gray-200 hidden md:inline-flex">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="hidden border-emerald-200 bg-emerald-50 text-emerald-700 md:inline-flex">
                 {medicalCase.difficulty}
               </Badge>
 
@@ -772,7 +773,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                   onClick={() => setAudioEnabled(prev => ({ ...prev, studentInput: !prev.studentInput }))}
                   variant="outline"
                   size="sm"
-                  className={`bg-white border-gray-200 ${audioEnabled.studentInput ? 'text-blue-600 border-blue-300' : ''}`}
+                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.studentInput ? 'border-emerald-300 text-emerald-700' : 'text-slate-500'}`}
                   title="Toggle voice input for student"
                 >
                   {audioEnabled.studentInput ? <Mic className="h-4 w-4 mr-1" /> : <MicOff className="h-4 w-4 mr-1" />}
@@ -782,7 +783,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                   onClick={() => setAudioEnabled(prev => ({ ...prev, patientResponse: !prev.patientResponse }))}
                   variant="outline"
                   size="sm"
-                  className={`bg-white border-gray-200 ${audioEnabled.patientResponse ? 'text-green-600 border-green-300' : ''}`}
+                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.patientResponse ? 'border-emerald-300 text-emerald-700' : 'text-slate-500'}`}
                   title="Toggle voice output for patient"
                 >
                   {audioEnabled.patientResponse ? <Video className="h-4 w-4 mr-1" /> : <VideoOff className="h-4 w-4 mr-1" />}
@@ -792,7 +793,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                   onClick={() => setAudioEnabled(prev => ({ ...prev, doctorResponse: !prev.doctorResponse }))}
                   variant="outline"
                   size="sm"
-                  className={`bg-white border-gray-200 ${audioEnabled.doctorResponse ? 'text-red-600 border-red-300' : ''}`}
+                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.doctorResponse ? 'border-teal-300 text-teal-700' : 'text-slate-500'}`}
                   title="Toggle voice output for doctor"
                 >
                   {audioEnabled.doctorResponse ? <Video className="h-4 w-4 mr-1" /> : <VideoOff className="h-4 w-4 mr-1" />}
@@ -814,7 +815,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
               <Button
                 onClick={handleCompleteCase} 
                 disabled={isCompletingCase}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md disabled:opacity-70"
+                className="rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_28px_-12px_rgba(5,150,105,0.65)] transition-all hover:brightness-105 disabled:opacity-70"
               >
                 {isCompletingCase ? (
                   <>
@@ -834,23 +835,23 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
       </header>
 
       {/* Main Content - Horizontal Layout */}
-      <div className="flex-1 min-h-0 p-3">
+      <div className="flex-1 min-h-0 p-3 md:p-4">
         {/* Main Container - Audio Conversation Mode */}
         <div className="h-full min-h-0">
 
           {/* Four-panel layout tuned to FYP proportions */}
-          <div className="grid h-full min-h-0 grid-cols-1 xl:grid-cols-[1.25fr_1fr_1.05fr_0.9fr] gap-3">
+          <div className="grid h-full min-h-0 grid-cols-1 xl:grid-cols-[1.35fr_1fr_1fr_0.9fr] gap-3">
             {/* Section 1 - Patient Chat */}
-            <div className="bg-white flex flex-col h-full min-w-0 rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-100 bg-white/90 flex-shrink-0">
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <UserIcon className="h-5 w-5 text-blue-600" />
+            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_16px_40px_-26px_rgba(16,185,129,0.5)] overflow-hidden backdrop-blur-md">
+            <div className="p-4 border-b border-emerald-100 bg-white/90 flex-shrink-0">
+              <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <UserIcon className="h-5 w-5 text-emerald-600" />
                 Patient Consultation
               </h2>
-              <p className="text-sm text-gray-600">Interactive conversation with AI patient</p>
+              <p className="text-sm text-slate-600">Interactive conversation with AI patient</p>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-gradient-to-b from-white to-slate-50/40">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-gradient-to-b from-white via-emerald-50/20 to-white">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 mt-20">
                   <UserIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -871,12 +872,12 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                     style={{ display: isCurrentlySpeaking ? "none" : "flex" }}
                   >
                     <div
-                      className={`max-w-[85%] rounded-lg p-3 ${
+                      className={`max-w-[85%] rounded-2xl p-3.5 ${
                         message.role === "student"
-                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm"
+                          ? "bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_26px_-14px_rgba(5,150,105,0.75)]"
                           : message.role === "patient"
-                            ? "bg-white text-gray-900 border border-gray-200 shadow-sm"
-                            : "bg-red-50 text-red-900 border border-red-200 shadow-sm"
+                            ? "bg-white text-slate-800 border border-emerald-100 shadow-[0_8px_24px_-18px_rgba(15,23,42,0.45)]"
+                            : "bg-rose-50 text-rose-900 border border-rose-200 shadow-[0_8px_24px_-18px_rgba(244,63,94,0.35)]"
                       }`}
                     >
                       <div className="flex items-center mb-1">
@@ -905,8 +906,8 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                             li: ({ children }) => <li className="text-left mb-1">{children}</li>,
                             strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                             em: ({ children }) => <em className="italic">{children}</em>,
-                            code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-                            blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-gray-300 pl-4 italic">{children}</blockquote>
+                            code: ({ children }) => <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">{children}</code>,
+                            blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-emerald-200 pl-4 italic">{children}</blockquote>
                           }}
                         >
                           {message.content}
@@ -920,7 +921,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 max-w-[90%] border border-gray-200">
+                  <div className="bg-emerald-50/70 rounded-2xl p-3 max-w-[90%] border border-emerald-100">
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
                       <span className="text-sm text-gray-600">
@@ -934,23 +935,23 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
               {/* Show current speaking text */}
               {currentSpeakingText && (
                 <div className="flex justify-start">
-                  <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-3 max-w-[90%] border border-purple-200">
+                  <div className="bg-teal-50/80 rounded-2xl p-3 max-w-[90%] border border-teal-200">
                     <div className="flex items-center mb-2">
                       <div className="animate-pulse rounded-full h-3 w-3 bg-purple-500 mr-2"></div>
-                      <span className="text-sm font-medium text-purple-700">
+                      <span className="text-sm font-medium text-teal-700">
                         {currentSpeakingText.role === "patient" ? "Patient" : "Doctor"} is speaking:
                       </span>
                       <Button
                         onClick={stopSpeaking}
                         variant="ghost"
                         size="sm"
-                        className="ml-2 h-6 w-6 p-0 text-purple-600 hover:text-purple-800"
+                        className="ml-2 h-6 w-6 p-0 text-teal-600 hover:text-teal-800"
                         title="Stop speaking"
                       >
                         <MicOff className="h-3 w-3" />
                       </Button>
                     </div>
-                    <p className="text-sm text-purple-800 italic">
+                    <p className="text-sm text-teal-800 italic">
                       "{currentSpeakingText.text}"
                     </p>
                   </div>
@@ -960,14 +961,14 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
             </div>
 
             {/* Message Input - Fixed at bottom */}
-            <div className="flex space-x-3 p-3 border-t border-gray-100 bg-white flex-shrink-0">
+            <div className="flex space-x-3 p-3 border-t border-emerald-100 bg-white/85 backdrop-blur-sm flex-shrink-0">
               <Input
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask the patient a question..."
                 disabled={isLoading}
-                className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white"
+                className="flex-1 rounded-xl border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white"
               />
               <Button
                 onClick={isListening ? stopListening : startListening}
@@ -975,14 +976,14 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                 variant={isListening ? "destructive" : "outline"}
                 size="sm"
                 title={audioEnabled.studentInput ? (isListening ? "Stop listening" : "Start voice input") : "Voice input disabled"}
-                className={`border-gray-300 ${audioEnabled.studentInput ? '' : 'opacity-50'}`}
+                className={`rounded-xl border-emerald-200 ${audioEnabled.studentInput ? '' : 'opacity-50'}`}
               >
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !currentMessage.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] hover:brightness-105 text-white"
                 size="sm"
               >
                 <Send className="h-4 w-4" />
@@ -991,9 +992,9 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
           </div>
 
             {/* Section 2 - AI Assistant & Insights */}
-            <div className="flex flex-col bg-white h-full min-w-0 rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
+            <div className="flex flex-col bg-white/90 h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.45)] overflow-hidden backdrop-blur-md">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-full">
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100/80 border border-gray-200 rounded-xl p-1 m-3 mb-0 flex-shrink-0">
+              <TabsList className="grid w-full grid-cols-2 bg-emerald-50/70 border border-emerald-100 rounded-xl p-1 m-3 mb-0 flex-shrink-0">
                 <TabsTrigger value="conversation" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm">
                   <Brain className="h-4 w-4 mr-2" />
                   AI Assistant
@@ -1005,34 +1006,34 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
               </TabsList>
               
               <TabsContent value="conversation" className="flex-1 flex flex-col m-3 mt-2 h-full">
-                <Card className="flex-1 bg-white shadow-none border border-gray-100 flex flex-col h-full">
-                  <CardHeader className="pb-3 border-b border-gray-100 bg-white flex-shrink-0">
+                <Card className="flex-1 bg-white/95 shadow-none border border-emerald-100 flex flex-col h-full">
+                  <CardHeader className="pb-3 border-b border-emerald-100 bg-white flex-shrink-0">
                     <CardTitle className="flex items-center text-base">
-                      <Brain className="h-4 w-4 mr-2 text-purple-600" />
-                      <span className="font-semibold text-gray-900">
+                      <Brain className="h-4 w-4 mr-2 text-emerald-600" />
+                      <span className="font-semibold text-slate-800">
                         AI Clinical Assistant
                       </span>
                     </CardTitle>
-                    <p className="text-xs text-gray-600">Real-time clinical guidance and suggestions</p>
+                    <p className="text-xs text-slate-600">Real-time clinical guidance and suggestions</p>
                   </CardHeader>
                   <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                     <div className="space-y-3">
-                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                        <h3 className="font-semibold text-blue-900 mb-2 flex items-center text-xs">
+                      <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
+                        <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
                           <Lightbulb className="h-3 w-3 mr-2" />
                           Clinical Tips
                         </h3>
-                        <p className="text-xs text-blue-800">
+                        <p className="text-xs text-emerald-800">
                           Focus on gathering a comprehensive history. Ask about symptom onset, duration, severity, and any associated symptoms.
                         </p>
                       </div>
                       
-                      <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                        <h3 className="font-semibold text-green-900 mb-2 flex items-center text-xs">
+                      <div className="bg-teal-50/70 rounded-2xl p-3 border border-teal-200">
+                        <h3 className="font-semibold text-teal-900 mb-2 flex items-center text-xs">
                           <Target className="h-3 w-3 mr-2" />
                           Key Areas to Explore
                         </h3>
-                        <ul className="text-xs text-green-800 space-y-1">
+                        <ul className="text-xs text-teal-800 space-y-1">
                           <li>• Symptom characteristics and timing</li>
                           <li>• Associated symptoms and triggers</li>
                           <li>• Medical history and medications</li>
@@ -1040,12 +1041,12 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                         </ul>
                       </div>
                       
-                      <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
-                        <h3 className="font-semibold text-yellow-900 mb-2 flex items-center text-xs">
+                      <div className="bg-amber-50/70 rounded-2xl p-3 border border-amber-200">
+                        <h3 className="font-semibold text-amber-900 mb-2 flex items-center text-xs">
                           <AlertTriangle className="h-3 w-3 mr-2" />
                           Red Flags to Watch For
                         </h3>
-                        <p className="text-xs text-yellow-800">
+                        <p className="text-xs text-amber-800">
                           Be alert for symptoms that suggest serious conditions requiring immediate attention.
                         </p>
                       </div>
@@ -1055,15 +1056,15 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
               </TabsContent>
               
               <TabsContent value="insights" className="flex-1 flex flex-col m-3 mt-2 h-full">
-                <Card className="flex-1 bg-white shadow-none border border-gray-100 flex flex-col h-full">
-                  <CardHeader className="pb-3 border-b border-gray-100 bg-white flex-shrink-0">
+                <Card className="flex-1 bg-white/95 shadow-none border border-emerald-100 flex flex-col h-full">
+                  <CardHeader className="pb-3 border-b border-emerald-100 bg-white flex-shrink-0">
                     <CardTitle className="flex items-center text-base">
                       <BarChart3 className="h-4 w-4 mr-2 text-emerald-600" />
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-slate-800">
                         Conversation Insights
                       </span>
                     </CardTitle>
-                    <p className="text-xs text-gray-600">Real-time performance metrics</p>
+                    <p className="text-xs text-slate-600">Real-time performance metrics</p>
                   </CardHeader>
                   <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                     <div className="grid grid-cols-2 gap-2 mb-3">
@@ -1100,15 +1101,15 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-3 border border-indigo-200">
-                        <h3 className="font-semibold text-indigo-900 mb-2 flex items-center text-xs">
+                      <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
+                        <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
                           <TrendingUp className="h-3 w-3 mr-2" />
                           Progress Tracking
                         </h3>
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs">
-                            <span className="text-indigo-700">Conversation Progress</span>
-                            <span className="text-indigo-900 font-medium">{Math.min(100, (conversationStats.questionsAsked / 10) * 100)}%</span>
+                            <span className="text-emerald-700">Conversation Progress</span>
+                            <span className="text-emerald-900 font-medium">{Math.min(100, (conversationStats.questionsAsked / 10) * 100)}%</span>
                           </div>
                           <Progress value={Math.min(100, (conversationStats.questionsAsked / 10) * 100)} className="h-2" />
                         </div>
@@ -1121,21 +1122,21 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
           </div>
 
             {/* Section 3 - Question Suggestions */}
-            <div className="flex flex-col h-full min-w-0 rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden bg-white">
-            <Card className="flex-1 bg-white shadow-none border-0 flex flex-col h-full">
-              <CardHeader className="pb-1 pt-2 border-b border-gray-100 bg-white flex-shrink-0">
+            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.35)] overflow-hidden bg-white/90 backdrop-blur-md">
+            <Card className="flex-1 bg-transparent shadow-none border-0 flex flex-col h-full">
+              <CardHeader className="pb-1 pt-2 border-b border-emerald-100 bg-white/80 flex-shrink-0">
                 <CardTitle className="flex items-center text-xs">
                   <div className="relative">
-                    <Lightbulb className="h-3 w-3 mr-1 text-orange-600" />
+                    <Lightbulb className="h-3 w-3 mr-1 text-emerald-600" />
                     <div className="absolute -top-1 -right-1">
                       <Zap className="h-2 w-2 text-yellow-500 animate-pulse" />
                     </div>
                   </div>
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-slate-800">
                     Smart Suggestions
                   </span>
                 </CardTitle>
-                <p className="text-xs text-gray-600">AI-powered question recommendations</p>
+                <p className="text-xs text-slate-600">AI-powered question recommendations</p>
               </CardHeader>
               <CardContent className="flex-1 p-2 pt-1 overflow-y-auto min-h-0">
                 <AskQuestions
@@ -1161,31 +1162,31 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
 
 
             {/* Section 4 - Case Information & Progress */}
-            <div className="flex flex-col h-full min-w-0 rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden bg-white">
-            <Card className="flex-1 bg-white shadow-none border-0 flex flex-col h-full">
-              <CardHeader className="pb-3 border-b border-gray-100 bg-white flex-shrink-0">
+            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.45)] overflow-hidden bg-white/90 backdrop-blur-md">
+            <Card className="flex-1 bg-transparent shadow-none border-0 flex flex-col h-full">
+              <CardHeader className="pb-3 border-b border-emerald-100 bg-white/80 flex-shrink-0">
                 <CardTitle className="flex items-center text-base">
                   <div className="relative">
-                    <BookOpen className="h-4 w-4 mr-2 text-indigo-600" />
+                    <BookOpen className="h-4 w-4 mr-2 text-emerald-600" />
                     <div className="absolute -top-1 -right-1">
                       <Star className="h-3 w-3 text-yellow-500 animate-pulse" />
                     </div>
                   </div>
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-slate-800">
                     Case Information
                   </span>
                 </CardTitle>
-                <p className="text-xs text-gray-600">Patient details and case progress</p>
+                <p className="text-xs text-slate-600">Patient details and case progress</p>
               </CardHeader>
               <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                 <div className="space-y-3">
                   {/* Patient Profile */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200">
-                    <h3 className="font-semibold text-blue-900 mb-2 flex items-center text-xs">
+                  <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
+                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
                       <UserIcon className="h-3 w-3 mr-2" />
                       Patient Profile
                     </h3>
-                    <div className="space-y-1 text-xs text-blue-800">
+                    <div className="space-y-1 text-xs text-emerald-800">
                       <div className="flex justify-between">
                         <span className="font-medium">Name:</span>
                         <span>{medicalCase.patientProfile.name}</span>
@@ -1206,12 +1207,12 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                   </div>
 
                   {/* Case Details */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
-                    <h3 className="font-semibold text-green-900 mb-2 flex items-center text-xs">
+                  <div className="bg-teal-50/70 rounded-2xl p-3 border border-teal-200">
+                    <h3 className="font-semibold text-teal-900 mb-2 flex items-center text-xs">
                       <Stethoscope className="h-3 w-3 mr-2" />
                       Case Details
                     </h3>
-                      <div className="space-y-1 text-xs text-green-800">
+                      <div className="space-y-1 text-xs text-teal-800">
                       {/* Hide disease name in assessment/practice UI */}
                       <div className="flex justify-between">
                         <span className="font-medium">Condition:</span>
@@ -1231,33 +1232,33 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                   </div>
 
                   {/* Session Progress */}
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
-                    <h3 className="font-semibold text-purple-900 mb-2 flex items-center text-xs">
+                  <div className="bg-white rounded-2xl p-3 border border-emerald-200">
+                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
                       <Activity className="h-3 w-3 mr-2" />
                       Session Progress
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span className="text-purple-700">Conversation Quality</span>
-                        <span className="text-purple-900 font-medium">{Math.round(conversationStats.efficiency)}%</span>
+                        <span className="text-emerald-700">Conversation Quality</span>
+                        <span className="text-emerald-900 font-medium">{Math.round(conversationStats.efficiency)}%</span>
                       </div>
                       <Progress value={conversationStats.efficiency} className="h-2" />
                       
                       <div className="flex justify-between text-xs">
-                        <span className="text-purple-700">Questions Asked</span>
-                        <span className="text-purple-900 font-medium">{conversationStats.questionsAsked}</span>
+                        <span className="text-emerald-700">Questions Asked</span>
+                        <span className="text-emerald-900 font-medium">{conversationStats.questionsAsked}</span>
                       </div>
                       
                       <div className="flex justify-between text-xs">
-                        <span className="text-purple-700">Time Spent</span>
-                        <span className="text-purple-900 font-medium">{conversationStats.timeSpent} min</span>
+                        <span className="text-emerald-700">Time Spent</span>
+                        <span className="text-emerald-900 font-medium">{conversationStats.timeSpent} min</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-3 border border-orange-200">
-                    <h3 className="font-semibold text-orange-900 mb-2 flex items-center text-xs">
+                  <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
+                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
                       <Settings className="h-3 w-3 mr-2" />
                       Quick Actions
                     </h3>
@@ -1265,7 +1266,7 @@ export function CaseChat({ medicalCase, student, evaluationMode = false }: CaseC
                       <Button 
                         onClick={handleCompleteCase} 
                         disabled={isCompletingCase}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg text-xs disabled:opacity-70"
+                        className="w-full rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_28px_-12px_rgba(5,150,105,0.65)] text-xs hover:brightness-105 disabled:opacity-70"
                         size="sm"
                       >
                         {isCompletingCase ? (

@@ -1,7 +1,6 @@
 import { LogOut, Menu } from "lucide-react";
 import { HeaderProps } from "../../../app/types/ui";
 import { typography, spacing, interactive } from "../../utils/responsive";
-import ColorPicker from "../ColorPicker";
 import NotificationBell from "./NotificationBell";
 
 const Header: React.FC<HeaderProps> = ({
@@ -38,9 +37,6 @@ const Header: React.FC<HeaderProps> = ({
 
         <div className={`flex items-center ${spacing.element.sm} shrink-0`}>
           {customActions}
-
-          {/* Color Picker */}
-          <ColorPicker variant="header" />
 
           <NotificationBell />
 

@@ -72,6 +72,7 @@ import StudyGroupsPage from "../components/Launch/StudyGroupsPage";
 import GoalsPage from "../components/Launch/GoalsPage";
 import FeedbackPage from "../components/Launch/FeedbackPage";
 import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
+import SettingsPage from "../components/Launch/SettingsPage";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -245,6 +246,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/goals": () => <GoalsPage />,
     "/feedback": () => <FeedbackPage />,
     "/my-reports": () => <QuestionReportsPage />,
+    "/settings": () => <SettingsPage />,
   },
 
   dashboards: {

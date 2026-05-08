@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import { sampleCases } from "@/lib/fyp/data-models"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { FileText, Stethoscope, User, Target, Activity, AlertTriangle, BookOpen, Play, ArrowLeft, Home } from "lucide-react"
+import { ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
 
@@ -49,35 +47,44 @@ interface ModeNurseReportConfig {
   }
 }
 
-function formatTextWithLineBreaks(text: string) {
-  return text
-    .split("\n")
-    .map((line) => {
-      if (line.trim().startsWith("•")) return line.trim()
-      return line
-        .split(".")
-        .map((sentence) => sentence.trim())
-        .filter((sentence) => sentence.length > 0)
-        .map((sentence, index, array) => (index < array.length - 1 ? `${sentence}.` : sentence))
-        .join(" ")
-    })
-    .filter((line) => line.length > 0)
-    .join("\n")
+interface MedicalCase {
+  id: string
+  title: string
+  description: string
+  difficulty: "beginner" | "intermediate" | "advanced" | string
+  specialty: string
+  caseType?: string
+  symptoms: string[]
+  patientProfile: {
+    name: string
+    age: number
+    gender: string
+    occupation: string
+  }
 }
 
 export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig }) {
   const router = useRouter()
-  const [medicalCase, setMedicalCase] = useState<any>(null)
+  const [medicalCase, setMedicalCase] = useState<MedicalCase | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isStartingSession, setIsStartingSession] = useState(false)
-  const themedGradient = {
+
+  const themedBackground = {
     background:
-      "linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)",
+      "linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 60%, var(--color-primary-50) 100%)",
   } as const
-  const themedSoftGradient = {
+
+  const decorativeCircle = {
     background:
-      "linear-gradient(90deg, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.08) 0%, rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.18) 100%)",
+      "radial-gradient(circle at center, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.18) 0%, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.08) 45%, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0) 75%)",
+  } as const
+
+  const themedSolidButton = {
+    background:
+      "linear-gradient(180deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%)",
+    boxShadow:
+      "0 12px 28px -10px rgba(var(--color-primary-700-rgb, 4, 120, 87), 0.55)",
   } as const
 
   const queryCaseId = useMemo(
@@ -94,13 +101,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
       return
     }
     void loadCase(queryCaseId, isGenerated)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, queryCaseId, isGenerated])
 
   const loadCase = async (caseId: string, generated: boolean) => {
     setIsLoading(true)
     setError(null)
     try {
-      const existingCase = sampleCases.find((c) => c.id === caseId)
+      const existingCase = sampleCases.find((c) => c.id === caseId) as MedicalCase | undefined
       if (existingCase) {
         setMedicalCase(existingCase)
         return
@@ -110,7 +118,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
         const generatedCaseData = localStorage.getItem("generatedCase")
         if (generatedCaseData) {
           try {
-            const generatedCase = JSON.parse(generatedCaseData)
+            const generatedCase = JSON.parse(generatedCaseData) as MedicalCase
             if (!generatedCase?.id || generatedCase.id === caseId) {
               setMedicalCase(generatedCase)
               return
@@ -124,7 +132,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
       const response = await fetch(`/api/cases/${caseId}`)
       if (response.ok) {
         const caseData = await response.json()
-        setMedicalCase(caseData.case ?? caseData)
+        setMedicalCase((caseData.case ?? caseData) as MedicalCase)
       } else {
         setError("Case not found")
       }
@@ -143,9 +151,23 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     }
   }
 
+  const SectionCard = ({
+    children,
+    className = "",
+  }: {
+    children: React.ReactNode
+    className?: string
+  }) => (
+    <div
+      className={`relative overflow-hidden rounded-2xl bg-white border border-black/5 shadow-[0_2px_12px_-6px_rgba(0,0,0,0.08)] ${className}`}
+    >
+      {children}
+    </div>
+  )
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={themedBackground}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-gray-600">Loading nurse report...</p>
@@ -156,17 +178,17 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
 
   if (error || !medicalCase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={themedBackground}>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Case Not Found</h1>
           <p className="text-gray-600 mb-6">{error || "The requested case could not be found."}</p>
           <div className="space-x-4">
-            <Button onClick={() => router.push(config.backRoute)} variant="outline">
+            <Button onClick={() => router.push(config.backRoute)} variant="outline" className="rounded-xl">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {config.backLabel}
             </Button>
             <Link href="/">
-              <Button>
+              <Button style={themedSolidButton} className="rounded-xl text-white">
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
               </Button>
@@ -177,145 +199,253 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     )
   }
 
+  const durationLabel =
+    medicalCase.difficulty === "beginner"
+      ? "~20 min"
+      : medicalCase.difficulty === "intermediate"
+        ? "~30 min"
+        : "~45 min"
+  const difficultyLabel =
+    medicalCase.difficulty.charAt(0).toUpperCase() + medicalCase.difficulty.slice(1)
+
+  const additionalSymptoms = medicalCase.symptoms.slice(1)
+  const primaryComplaint = medicalCase.symptoms[0] ?? ""
+
+  const clinicalNotes = [
+    `Patient arrived via ${medicalCase.caseType === "emergency" ? "emergency department" : "outpatient clinic"}`,
+    "Initial assessment completed by nursing staff",
+    "Vitals taken on admission — stable",
+  ]
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => router.push(config.backRoute)} className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              {config.backLabel}
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Nurse Report</h1>
-              <p className="text-sm text-gray-600">Initial Patient Assessment</p>
-            </div>
+    <div className="relative min-h-screen overflow-hidden" style={themedBackground}>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-48 -left-48 w-[520px] h-[520px] rounded-full opacity-60"
+        style={decorativeCircle}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-56 -right-56 w-[620px] h-[620px] rounded-full opacity-60"
+        style={decorativeCircle}
+      />
+
+      {/* Clean inline page header */}
+      <div className="bg-white">
+        <div className="container mx-auto px-8 py-6 flex items-start justify-between gap-6">
+          <div>
+            <h1 className="text-[22px] md:text-2xl font-bold text-gray-900 leading-tight">
+              Nurse Report
+            </h1>
+            <p className="text-[13px] text-gray-500 mt-1">
+              {config.cardSubtitle}
+            </p>
           </div>
-          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+          <div className="text-[13px] font-medium text-gray-700 pt-1">
             {config.modeLabel}
-          </Badge>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card className="shadow-xl border border-white/50 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b" style={themedSoftGradient}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary/15">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl text-gray-900">{medicalCase.title}</CardTitle>
-                  <CardDescription className="text-gray-600">{config.cardSubtitle}</CardDescription>
-                </div>
+      <div className="relative container mx-auto px-6 py-8 max-w-3xl">
+        {/* Case overview card */}
+        <SectionCard className="mb-5 group">
+          <span
+            aria-hidden
+            className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
+          />
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-[20px] font-bold text-gray-900 leading-tight">
+                  {medicalCase.title}
+                </h2>
+                <p className="text-[13px] text-gray-500 mt-1 line-clamp-2">
+                  {medicalCase.description}
+                </p>
               </div>
-              <Badge variant="outline" className="bg-white text-primary border-primary/20">
-                {medicalCase.difficulty}
-              </Badge>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-6 space-y-6">
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Stethoscope className="h-5 w-5 text-primary" />
-                Case Overview
-              </h3>
-              <div className="grid grid-cols-2 gap-6 text-sm">
-                <div>
-                  <span className="text-gray-600">Chief Complaint:</span>
-                  <div className="font-medium text-gray-900 mt-1 break-words prose prose-sm max-w-none">
-                    <ReactMarkdown>{medicalCase.symptoms[0]}</ReactMarkdown>
-                  </div>
-                </div>
-                <div><span className="text-gray-600">Specialty:</span><p className="font-medium text-gray-900">{medicalCase.specialty}</p></div>
-                <div><span className="text-gray-600">Case Complexity:</span><p className="font-medium text-gray-900 capitalize">{medicalCase.difficulty}</p></div>
-                <div><span className="text-gray-600">Estimated Duration:</span><p className="font-medium text-gray-900">~{medicalCase.difficulty === "beginner" ? "20" : medicalCase.difficulty === "intermediate" ? "30" : "45"} min</p></div>
-              </div>
+              <span className="shrink-0 inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-[12px] font-medium">
+                {medicalCase.specialty}
+              </span>
             </div>
 
-            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><User className="h-5 w-5" />Patient Profile</h3>
-              <div className="grid grid-cols-2 gap-6 text-sm">
-                <div><span className="text-primary/80">Name:</span><p className="font-medium text-primary">{medicalCase.patientProfile.name}</p></div>
-                <div><span className="text-primary/80">Age:</span><p className="font-medium text-primary">{medicalCase.patientProfile.age} years old</p></div>
-                <div><span className="text-primary/80">Gender:</span><p className="font-medium text-primary">{medicalCase.patientProfile.gender}</p></div>
-                <div><span className="text-primary/80">Occupation:</span><p className="font-medium text-primary">{medicalCase.patientProfile.occupation}</p></div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                  Difficulty
+                </div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {difficultyLabel}
+                </div>
               </div>
-            </div>
-
-            <div className="bg-orange-50 rounded-lg p-6">
-              <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" />Presenting Symptoms</h3>
-              <div className="space-y-3">
-                <div className="text-sm"><span className="text-orange-700">Primary Complaint:</span><div className="font-medium text-orange-900 prose prose-sm max-w-none mt-1 break-words"><ReactMarkdown>{medicalCase.symptoms[0]}</ReactMarkdown></div></div>
-                <div className="text-sm">
-                  <span className="text-orange-700">Additional Symptoms:</span>
-                  <div className="flex flex-col gap-2 mt-2">
-                    {medicalCase.symptoms.slice(1).map((symptom: string, index: number) => (
-                      <Badge key={index} variant="outline" className="text-xs bg-orange-100 text-orange-800 border-orange-200 w-full break-words">
-                        <div className="prose prose-xs max-w-none w-full">
-                          <ReactMarkdown>{symptom}</ReactMarkdown>
-                        </div>
-                      </Badge>
-                    ))}
-                  </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                  Duration
+                </div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {durationLabel}
+                </div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                  Symptoms
+                </div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {medicalCase.symptoms.length}
+                </div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                  Type
+                </div>
+                <div className="text-[14px] font-semibold text-gray-900 capitalize">
+                  {medicalCase.caseType ?? "Outpatient"}
                 </div>
               </div>
             </div>
+          </div>
+        </SectionCard>
 
-            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><AlertTriangle className="h-5 w-5" />Clinical Notes</h3>
-              <div className="text-sm space-y-1 text-primary/90">
-                {formatTextWithLineBreaks(`• Patient arrived via ${medicalCase.caseType === "emergency" ? "emergency department" : "outpatient clinic"}
-• Initial assessment completed by nursing staff
-• Patient is alert and oriented x3 (person, place, time)
-• Vital signs: BP 120/80, HR 72, RR 16, Temp 98.6°F
-• No immediate life-threatening conditions observed
-• Patient appears comfortable at rest
-• Ready for physician evaluation`).split("\n").map((line, index) => <div key={index}>{line}</div>)}
+        {/* Patient Profile card */}
+        <SectionCard className="mb-5 group">
+          <span
+            aria-hidden
+            className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
+          />
+          <div className="p-6">
+            <h3 className="text-[15px] font-bold text-gray-900 mb-4">
+              Patient Profile
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+              <div>
+                <div className="text-[12px] text-gray-400 mb-1">Name</div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {medicalCase.patientProfile.name}
+                </div>
+              </div>
+              <div>
+                <div className="text-[12px] text-gray-400 mb-1">Age</div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {medicalCase.patientProfile.age} years old
+                </div>
+              </div>
+              <div>
+                <div className="text-[12px] text-gray-400 mb-1">Gender</div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {medicalCase.patientProfile.gender}
+                </div>
+              </div>
+              <div>
+                <div className="text-[12px] text-gray-400 mb-1">Occupation</div>
+                <div className="text-[14px] font-semibold text-gray-900">
+                  {medicalCase.patientProfile.occupation}
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* Presenting Symptoms card (orange) */}
+        <div className="relative overflow-hidden rounded-2xl bg-orange-50/70 border border-orange-200/50 shadow-[0_2px_12px_-6px_rgba(251,146,60,0.18)] mb-5 group">
+          <span
+            aria-hidden
+            className="absolute top-0 left-0 h-[3px] w-0 bg-orange-500 transition-all duration-500 ease-out group-hover:w-full"
+          />
+          <div className="p-6">
+            <h3 className="text-[15px] font-bold text-orange-700 mb-4">
+              Presenting Symptoms
+            </h3>
+
+            <div className="mb-5">
+              <div className="text-[14px] font-semibold text-orange-700">
+                Primary Complaint:{" "}
+                <span className="text-orange-900">
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => <span>{children}</span>,
+                    }}
+                  >
+                    {primaryComplaint}
+                  </ReactMarkdown>
+                </span>
               </div>
             </div>
 
-            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary"><Activity className="h-5 w-5" />Initial Assessment</h3>
-              <div className="text-sm space-y-1 text-primary/90">
-                {formatTextWithLineBreaks(`• Patient reports ${medicalCase.symptoms[0].toLowerCase()}
-• Onset: ${medicalCase.difficulty === "beginner" ? "Gradual" : medicalCase.difficulty === "intermediate" ? "Subacute" : "Variable"} presentation
-• Severity: ${medicalCase.difficulty === "beginner" ? "Mild to moderate" : medicalCase.difficulty === "intermediate" ? "Moderate" : "Moderate to severe"}
-• Associated symptoms: ${medicalCase.symptoms.slice(1, 3).join(", ")}
-• No known drug allergies
-• Previous medical history: ${medicalCase.difficulty === "beginner" ? "Unremarkable" : "Requires further evaluation"}`).split("\n").map((line, index) => <div key={index}>{line}</div>)}
+            {additionalSymptoms.length > 0 && (
+              <div>
+                <div className="text-[12px] font-medium text-orange-600/80 mb-2">
+                  Additional Symptoms
+                </div>
+                <div className="space-y-2">
+                  {additionalSymptoms.map((symptom, index) => (
+                    <div
+                      key={index}
+                      className="rounded-xl bg-orange-100/70 border border-orange-200/40 px-4 py-2.5 text-[13px] text-orange-900"
+                    >
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <span>{children}</span>,
+                        }}
+                      >
+                        {symptom}
+                      </ReactMarkdown>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
-            <div className="rounded-xl p-6 bg-primary/5 border border-primary/10">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary">
-                {"Learning".includes(config.modeLabel) ? <BookOpen className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                {config.guidelinesTitle}
-              </h3>
-              <div className="text-sm space-y-1 text-primary/90">
-                {formatTextWithLineBreaks(config.guidelinesLines.join("\n")).split("\n").map((line, index) => <div key={index}>{line}</div>)}
-              </div>
-            </div>
+        {/* Clinical Notes card */}
+        <SectionCard className="mb-7 group">
+          <span
+            aria-hidden
+            className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
+          />
+          <div className="p-6">
+            <h3 className="text-[15px] font-bold text-gray-900 mb-4">
+              Clinical Notes
+            </h3>
+            <ul className="space-y-2.5">
+              {clinicalNotes.map((note, index) => (
+                <li
+                  key={index}
+                  className="flex items-start gap-2.5 text-[13px] text-gray-700 leading-relaxed"
+                >
+                  <span className="mt-[7px] w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
+                  <span>{note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </SectionCard>
 
-            <div className="pt-6 border-t">
-              <Button onClick={handleStartCase} disabled={isStartingSession} style={themedGradient} className="w-full text-white py-4 text-lg disabled:opacity-70 hover:opacity-90">
-                {isStartingSession ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                    {config.startingButtonLabel}
-                  </>
-                ) : (
-                  <>
-                    <Stethoscope className="h-5 w-5 mr-2" />
-                    {config.startButtonLabel}
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Begin Consultation Button */}
+        <Button
+          onClick={handleStartCase}
+          disabled={isStartingSession}
+          style={themedSolidButton}
+          className="w-full rounded-2xl text-white py-7 text-[15px] font-semibold hover:opacity-95 hover:brightness-105 transition-all duration-200 disabled:opacity-70"
+        >
+          {isStartingSession ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+              {config.startingButtonLabel}
+            </>
+          ) : (
+            "Begin Consultation"
+          )}
+        </Button>
+
+        <div className="text-center mt-6">
+          <Link
+            href={config.backRoute}
+            className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+          >
+            {config.backLabel}
+          </Link>
+        </div>
       </div>
     </div>
   )

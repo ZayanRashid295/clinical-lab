@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 52941",
     "build": "next build",
-    "start": "next start -p 3001",
-    "preview": "next build && next start -p 3001",
+    "start": "next start -p 52941",
+    "preview": "next build && next start -p 52941",
     "lint": "next lint",
     "data:mock": "node scripts/switch-data-source.js mock",
     "data:backend": "node scripts/switch-data-source.js backend",

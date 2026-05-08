@@ -12,7 +12,7 @@ import { getSocket } from "@/app/services/realtime/socket";
 
 const POLL_MS = 30_000;
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
 
 function timeAgo(iso: string): string {
   const d = new Date(iso);

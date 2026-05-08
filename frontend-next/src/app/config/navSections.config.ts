@@ -44,7 +44,7 @@ export const NAV_SIDEBAR_SECTIONS: readonly NavSidebarSectionDef[] = [
   {
     id: "tools",
     labelKey: "nav.section.tools",
-    menuItemIds: ["question-generator", "admin", "support"],
+    menuItemIds: ["question-generator", "admin", "support", "settings"],
   },
   {
     id: "platform",

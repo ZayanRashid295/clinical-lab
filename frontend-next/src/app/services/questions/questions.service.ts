@@ -68,7 +68,7 @@ export class QuestionsService extends BaseDataService<
     const formData = new FormData();
     formData.append("image", file);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
     const url = `${API_BASE_URL}${this.endpoint}/upload-image`;
 
     const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
@@ -169,7 +169,7 @@ export class QuestionsService extends BaseDataService<
    * Convert DOCX text content to Markdown using OpenAI (backend)
    */
   async convertDocxToMarkdown(htmlContent: string, imagePlaceholders: string[] = []): Promise<{ markdown: string }> {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
     const url = `${API_BASE_URL}${this.endpoint}/convert-docx-to-markdown`;
 
     const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;

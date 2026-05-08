@@ -13,7 +13,7 @@ const ENV_EXAMPLE_FILE = path.join(__dirname, "..", ".env.example");
 
 function createEnvFile(useMockData) {
   const envContent = `# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:43817
 
 # Data Source Configuration
 # Set to "true" to use mock data, "false" to use backend API
@@ -46,7 +46,7 @@ function switchToBackend() {
   console.log("🔗 Switched to BACKEND API");
   console.log("📝 The application will now use the backend API");
   console.log(
-    "⚠️  Make sure your backend server is running on http://localhost:3000"
+    "⚠️  Make sure your backend server is running on http://localhost:43817"
   );
   console.log('🚀 Run "npm run dev" to start the development server');
 }
@@ -92,7 +92,7 @@ Examples:
 Environment Variables:
   NEXT_PUBLIC_USE_MOCK_DATA=true   # Use mock data
   NEXT_PUBLIC_USE_MOCK_DATA=false  # Use backend API
-  NEXT_PUBLIC_API_URL=http://localhost:3000  # Backend URL
+  NEXT_PUBLIC_API_URL=http://localhost:43817  # Backend URL
 `);
 }
 
