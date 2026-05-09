@@ -10,6 +10,7 @@ import { LearningInterface } from "@/app/components/medprep-ai/fyp/learning-inte
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { authService } from "@/shared/services/auth.service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 
 function caseIdFromPathname(pathname: string): string | null {
   const m = pathname.match(/^\/medprep-ai\/learn\/([^/]+)/)
@@ -36,8 +37,13 @@ export function LearningCaseRoutePage() {
   const [hydratedFromDatabase, setHydratedFromDatabase] = useState(false)
 
   useEffect(() => {
-    const u = authService.getCurrentUser()
-    setUserId(u?.id ? String(u.id) : "anonymous")
+    const sync = () => {
+      const u = authService.getCurrentUser()
+      setUserId(getClinicalUserId(u) ?? "anonymous")
+    }
+    sync()
+    const t = window.setTimeout(sync, 400)
+    return () => clearTimeout(t)
   }, [])
 
   useEffect(() => {
@@ -105,7 +111,7 @@ export function LearningCaseRoutePage() {
 
       if (existingSession) {
         const sid = learningService.normalizeStudentId(userId)
-        const merged = { ...existingSession, studentId: sid || existingSession.studentId }
+        const merged: LearningSession = { ...existingSession, studentId: sid || existingSession.studentId }
         if (!cancelled) {
           setSession(merged)
           setHydratedFromDatabase(false)

@@ -68,16 +68,19 @@ IMPORTANT PATIENT AGENT RULES:
 3. Answer CONSISTENTLY with your condition - never contradict yourself
 4. If asked directly "what do you have?" → reply naturally (e.g., "I don't know, doctor, that's why I'm here")
 5. Provide information that a patient with ${disease} would realistically know
-6. Be descriptive about symptoms, express appropriate concern
+6. Keep responses concise and conversational, not essay-like
 7. Share relevant medical history when asked
 8. If asked about something unrelated to your condition, gently redirect to your symptoms
 9. NEVER reveal the exact diagnosis name unless specifically asked in a way a patient would know it
+10. Answer in 1-2 short sentences, usually under 35 words total
+11. Respond directly to the latest question first, then add one key detail
+12. Do not use role labels (e.g., "Patient:") or bullet points
 
 Previous conversation:
 ${conversationContext}`,
         `The medical student asks: "${studentQuestion}"
 
-Respond as the patient with ${disease}. You know your exact condition and all associated information. Be realistic, descriptive, and stay in character. Answer consistently with your condition.`,
+Respond as the patient with ${disease}. Keep it brief, natural, and to the point.`,
       )
 
       return {

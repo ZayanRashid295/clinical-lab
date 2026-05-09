@@ -8,13 +8,26 @@ export type MedprepSession = {
   updatedAt?: string
 }
 
+function normalizeSession(raw: Record<string, unknown>): MedprepSession {
+  return {
+    id: String(raw.id ?? ""),
+    userId: String(raw.userId ?? ""),
+    mode: String(raw.mode ?? "PRACTICE").toUpperCase() as MedprepSession["mode"],
+    status: String(raw.status ?? "ACTIVE").toUpperCase() as MedprepSession["status"],
+    caseId: raw.caseId != null ? String(raw.caseId) : undefined,
+    title: raw.title != null ? String(raw.title) : undefined,
+    updatedAt: raw.updatedAt != null ? String(raw.updatedAt) : undefined,
+  }
+}
+
 class MedprepSessionService {
   async listSessions(userId: string): Promise<MedprepSession[]> {
-    if (!userId) return []
+    if (!userId || userId === "anonymous") return []
     const response = await fetch(`/api/conversations?userId=${encodeURIComponent(userId)}`)
     const data = await response.json()
     if (!data.success) return []
-    return (data.conversations || []) as MedprepSession[]
+    const rows = Array.isArray(data.conversations) ? data.conversations : []
+    return rows.map((c: Record<string, unknown>) => normalizeSession(c))
   }
 
   getContinueUrl(session: MedprepSession): string {

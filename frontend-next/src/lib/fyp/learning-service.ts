@@ -103,7 +103,29 @@ function isLikelyCuid(id: string): boolean {
   return /^c[a-z0-9]{20,32}$/i.test(id)
 }
 
+/** Collapse adjacent duplicate message rows issued by concurrent client saves against the old API (same role/content/timestamp). */
+function collapseLegacyDuplicateAdjacentMessages(messages: unknown[]): unknown[] {
+  if (!Array.isArray(messages) || messages.length === 0) return messages
+  const out: unknown[] = [messages[0]]
+  for (let i = 1; i < messages.length; i++) {
+    const cur = messages[i] as any
+    const prev = out[out.length - 1] as any
+    const sameRole = String(prev?.role ?? "") === String(cur?.role ?? "")
+    const sameContent = String(prev?.content ?? "") === String(cur?.content ?? "")
+    const t1 = new Date(prev?.createdAt).getTime()
+    const t2 = new Date(cur?.createdAt).getTime()
+    const sameInstant =
+      Number.isFinite(t1) && Number.isFinite(t2) && t1 === t2
+    if (sameRole && sameContent && sameInstant) continue
+    out.push(cur)
+  }
+  return out
+}
+
 class LearningService {
+  private readonly saveQueues = new Map<string, Promise<void>>()
+  private readonly persistedMessageCounts = new Map<string, number>()
+
   /** Returns undefined for anonymous / missing — DB sync is skipped in that case. */
   normalizeStudentId(userId?: string | null): string | undefined {
     const u = typeof userId === "string" ? userId.trim() : ""
@@ -161,10 +183,14 @@ Patient Profile:
 IMPORTANT: You are investigating an unknown condition. Ask questions that help narrow down differential diagnoses and gather diagnostic information. Do not assume you know the diagnosis.
 
 Your task is to ask the next logical question to gather information for diagnosis. After each question, provide an educational explanation for students about why you asked that specific question.
+Keep the dialogue fast and focused:
+- Ask exactly one concise question.
+- Keep the question to one sentence (about 8-18 words).
+- No preamble, no multi-question bundles, no long paragraphs.
 
 Format your response as:
 QUESTION: [Your question to the patient]
-EXPLANATION: [Educational explanation for students about why this question is important for differential diagnosis]
+EXPLANATION: [1 short sentence explaining why this question matters]
 
 Previous conversation:
 ${conversationContext}`,
@@ -178,7 +204,7 @@ ${conversationContext}`,
       const question = questionLine?.replace("QUESTION:", "").trim() || text.split("EXPLANATION:")[0].trim()
       const explanation =
         explanationLine?.replace("EXPLANATION:", "").trim() ||
-        `This question helps gather important diagnostic information for differential diagnosis.`
+        `This question helps gather key diagnostic information efficiently.`
 
       return { question, explanation }
     } catch (error) {
@@ -213,15 +239,18 @@ IMPORTANT PATIENT AGENT RULES:
 3. Answer CONSISTENTLY with your condition - never contradict yourself
 4. If asked directly "what do you have?" → reply naturally (e.g., "I don't know, doctor, that's why I'm here")
 5. Provide information that a patient with ${disease} would realistically know
-6. Be descriptive about symptoms, express appropriate concern
+6. Keep responses concise and conversational
 7. Share relevant medical history when asked
 8. If asked about something unrelated to your condition, gently redirect to your symptoms
 9. NEVER reveal the exact diagnosis name unless specifically asked in a way a patient would know it
+10. Answer in 1-2 short sentences, usually under 35 words total
+11. Respond directly to the latest question first, then add one key detail
+12. Do not output role labels, bullets, or long paragraphs
 
 Respond to the doctor's questions naturally and realistically.`,
         prompt: `The doctor asks: "${doctorQuestion}"
 
-Respond as the patient with ${disease}. You know your exact condition and all associated information. Be realistic, descriptive, and stay in character. Answer consistently with your condition.`,
+Respond as the patient with ${disease}. Keep it short, clear, and natural.`,
       })
 
       return text
@@ -666,23 +695,24 @@ Provide an educational response about this ${disease} case.`,
     const disease =
       opts.medicalCase?.disease || (typeof conv.title === "string" && conv.title) || "Learning case"
 
-    const messages = Array.isArray(conv.messages) ? conv.messages : []
+    const rawMessages = Array.isArray(conv.messages) ? conv.messages : []
+    const messages = collapseLegacyDuplicateAdjacentMessages(rawMessages)
     const conversation: LearningConversationMessage[] = messages.map((msg: any) => ({
-      role: String(msg.role || "")
-        .toLowerCase()
-        .trim() as "doctor" | "patient" | "student",
-      content: String(msg.content || ""),
-      explanation:
-        msg.metadata && typeof msg.metadata === "object" && "explanation" in msg.metadata
-          ? String((msg.metadata as { explanation?: string }).explanation || "")
-          : undefined,
-      timestamp:
-        typeof msg.createdAt === "string"
-          ? msg.createdAt
-          : msg.createdAt instanceof Date
-            ? msg.createdAt.toISOString()
-            : new Date().toISOString(),
-    }))
+        role: String(msg.role || "")
+          .toLowerCase()
+          .trim() as "doctor" | "patient" | "student",
+        content: String(msg.content || ""),
+        explanation:
+          msg.metadata && typeof msg.metadata === "object" && "explanation" in msg.metadata
+            ? String((msg.metadata as { explanation?: string }).explanation || "")
+            : undefined,
+        timestamp:
+          typeof msg.createdAt === "string"
+            ? msg.createdAt
+            : msg.createdAt instanceof Date
+              ? msg.createdAt.toISOString()
+              : new Date().toISOString(),
+      }))
 
     const patientInfo =
       learningState.patientInfo && typeof learningState.patientInfo === "object"
@@ -724,6 +754,18 @@ Provide an educational response about this ${disease} case.`,
   // Database-based session management (idempotent message sync + metadata learningState)
   async saveLearningSession(session: LearningSession): Promise<void> {
     this.normalizeLocalKey(session)
+    const queueKey = session.conversationId || session.id
+    const previous = this.saveQueues.get(queueKey) || Promise.resolve()
+    const current = previous.then(() => this.saveLearningSessionInternal(session))
+    this.saveQueues.set(queueKey, current.catch(() => undefined))
+    return current
+  }
+
+  private async saveLearningSessionInternal(session: LearningSession): Promise<void> {
+    const n = session.conversation.length
+    if ((session.lastSyncedMessageCount ?? 0) > n) {
+      session.lastSyncedMessageCount = n
+    }
 
     const userId = session.studentId?.trim()
     if (!userId || userId === "anonymous") {
@@ -757,7 +799,8 @@ Provide an educational response about this ${disease} case.`,
         return
       }
 
-      const already = Math.max(0, session.lastSyncedMessageCount ?? 0)
+      const persistedCount = this.persistedMessageCounts.get(conversationId) ?? 0
+      const already = Math.max(0, session.lastSyncedMessageCount ?? 0, persistedCount)
       for (let i = already; i < session.conversation.length; i++) {
         const message = session.conversation[i]
         const role = String(message.role).toUpperCase()
@@ -784,6 +827,7 @@ Provide an educational response about this ${disease} case.`,
         }
       }
       session.lastSyncedMessageCount = session.conversation.length
+      this.persistedMessageCounts.set(conversationId, session.lastSyncedMessageCount)
 
       const learningState: LearningMetadataState = {
         patientInfo: session.patientInfo,

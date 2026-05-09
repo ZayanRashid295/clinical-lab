@@ -88,11 +88,13 @@ async function getAIPatientResponse(studentQuestion: string, context: any, model
 Respond naturally and realistically as this patient.
 
 Rules:
-- Give a complete, coherent response in 1-3 sentences.
+- Give a complete, coherent response in 1-2 short sentences.
 - Address the doctor's latest question directly first, then add one relevant symptom/detail.
 - Never repeat the doctor's words verbatim as your full response.
 - Do not output fragments, unfinished sentences, or quoted text.
 - Stay in patient voice; do not use labels like "Patient:" or meta commentary.
+- Keep total response brief (typically under 35 words).
+- Avoid long paragraphs, lists, or extra explanations.
 - Do not mention the disease name unless asked directly, and even then answer as a patient would.`,
     },
     {
@@ -110,7 +112,7 @@ Respond as the patient with ${patientDisease}.`,
     throw new Error(`Unsupported model provider: ${provider}`)
   }
 
-  const result = await callGeminiAPI(model, messages, 256, 0.7)
+  const result = await callGeminiAPI(model, messages, 768, 0.7)
   console.log("[v0] Patient response result:", result)
   return result
 }
@@ -125,7 +127,8 @@ Ask exactly one complete, natural clinical question that helps diagnosis.
 Rules:
 - Output only one question.
 - The question must be a complete sentence ending with "?".
-- Keep it specific (12-24 words), clinically focused, and non-generic.
+- Keep it specific (8-18 words), clinically focused, and non-generic.
+- Keep it concise and to the point; no long wording.
 - Do not include quotes, labels, explanations, or multiple questions.`,
     },
     {
@@ -141,7 +144,7 @@ What is the next best question to ask the patient?`,
   if (provider !== "gemini") {
     throw new Error(`Unsupported model provider: ${provider}`)
   }
-  return (await callGeminiAPI(model, messages, 96, 0.25))
+  return (await callGeminiAPI(model, messages, 512, 0.25))
     .replace(/^["'`\s]+|["'`\s]+$/g, "")
     .replace(/\s+/g, " ")
     .trim()
@@ -963,6 +966,7 @@ function EvaluationPageContent({
       {
         role: "system",
         content: `You are an expert medical educator and clinical supervisor. A medical student is asking you questions during a patient consultation. Provide BRIEF, concise responses (1-2 sentences) that guide their clinical reasoning without giving away the diagnosis directly. Be encouraging and educational but keep responses short.
+Keep responses to the point (usually <= 35 words), no long paragraphs.
 
 Current patient case: ${selectedCase?.disease || "Unknown"}
 Current conversation: ${conversation.map(m => `${m.role}: ${m.content}`).join("\n")}
@@ -983,7 +987,7 @@ Please provide guidance and educational feedback.`,
         throw new Error(`Unsupported model provider: ${provider}`)
       }
 
-      const doctorResponse = await callGeminiAPI(selectedModel, messages, 150, 0.7)
+      const doctorResponse = await callGeminiAPI(selectedModel, messages, 512, 0.7)
       setStudentDoctorChat((prev) => [
         ...prev,
         { role: "doctor", content: doctorResponse, timestamp: new Date().toISOString() },

@@ -10,6 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import type { LearningSession, LearningConversationMessage } from "@/lib/fyp/learning-service"
 import { sampleCases } from "@/lib/fyp/data-models"
 import { learningService } from "@/lib/fyp/learning-service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
+import { authService } from "@/shared/services/auth.service"
 import { databaseConversationService } from "@/lib/fyp/database-conversation-service"
 import { caseProgressService } from "@/lib/fyp/case-progress-service"
 import { 
@@ -51,7 +53,14 @@ export function LearningInterface({
   const simulationFlowLock = useRef(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [simulationError, setSimulationError] = useState<string | null>(null)
-  
+
+  // Persist learning sessions under the real user id (matches dashboard "ongoing cases").
+  useEffect(() => {
+    const uid = getClinicalUserId(authService.getCurrentUser())
+    if (!uid || session.studentId === uid) return
+    onSessionUpdate({ ...session, studentId: uid })
+  }, [session, session.studentId, onSessionUpdate])
+
   // Ask Doctor popup state
   const [isDoctorChatOpen, setIsDoctorChatOpen] = useState(false)
   const [isDoctorChatMinimized, setIsDoctorChatMinimized] = useState(false)
@@ -380,12 +389,6 @@ export function LearningInterface({
       setHasLoadedSession(true)
     }
   }, [session.id, hasLoadedSession, hydratedFromDatabase])
-
-  useEffect(() => {
-    if (hasLoadedSession) {
-      learningService.saveLearningSession(session).catch(console.error)
-    }
-  }, [session, hasLoadedSession])
 
   useEffect(() => {
     // Resume guard: clear one-time marker after resume flow.

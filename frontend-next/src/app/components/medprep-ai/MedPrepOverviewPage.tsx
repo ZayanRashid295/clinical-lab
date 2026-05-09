@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MEDPREP_MODES } from "./modes";
 import { authService } from "@/shared/services/auth.service";
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service";
+import { getClinicalUserId } from "@/lib/fyp/medprep-user";
 
 export default function MedPrepOverviewPage() {
   const [sessions, setSessions] = useState<MedprepSession[]>([])
@@ -15,12 +16,26 @@ export default function MedPrepOverviewPage() {
   } as const
 
   useEffect(() => {
-    const user = authService.getCurrentUser()
-    const userId = user?.id ? String(user.id) : "anonymous"
-    medprepSessionService
-      .listSessions(userId)
-      .then(setSessions)
-      .catch(() => setSessions([]))
+    const load = () => {
+      const user = authService.getCurrentUser()
+      const userId = getClinicalUserId(user) ?? "anonymous"
+      medprepSessionService
+        .listSessions(userId)
+        .then(setSessions)
+        .catch(() => setSessions([]))
+    }
+    load()
+    const retry = setTimeout(load, 400)
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load()
+    }
+    window.addEventListener("focus", load)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearTimeout(retry)
+      window.removeEventListener("focus", load)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [])
 
   const activeSessions = useMemo(

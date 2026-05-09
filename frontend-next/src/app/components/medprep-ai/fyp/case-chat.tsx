@@ -200,6 +200,7 @@ export function CaseChat({
   const [sessionGrade, setSessionGrade] = useState<PracticeSessionGrade | null>(null)
   const [isGeneratingGrade, setIsGeneratingGrade] = useState(false)
   const [isCompletingCase, setIsCompletingCase] = useState(false)
+  const [isTransitioningToSoap, setIsTransitioningToSoap] = useState(false)
 
   // New state for three-panel layout
   const [activeTab, setActiveTab] = useState("conversation")
@@ -1334,7 +1335,10 @@ export function CaseChat({
               onContinueToSOAP={async () => {
                 try {
                   setIsCompletingCase(true)
+                  setIsTransitioningToSoap(true)
                   await databaseConversationService.completeConversation(conversation.id, student.id)
+                  // Persist selected case snapshot so SOAP page can resolve rich context reliably.
+                  localStorage.setItem(`soap_case_${conversation.id}`, JSON.stringify(medicalCase))
                 } catch (e) {
                   console.error(e)
                 } finally {
@@ -1343,6 +1347,16 @@ export function CaseChat({
                 }
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {isTransitioningToSoap && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="rounded-2xl border border-emerald-200 bg-white px-6 py-5 text-center shadow-xl">
+            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-b-2 border-emerald-600" />
+            <p className="font-medium text-slate-800">Preparing SOAP note...</p>
+            <p className="mt-1 text-xs text-slate-500">Loading case context and your conversation</p>
           </div>
         </div>
       )}

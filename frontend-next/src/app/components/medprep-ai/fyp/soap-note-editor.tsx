@@ -112,7 +112,9 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
   useEffect(() => {
     const loadExistingSOAP = async () => {
       try {
-        const response = await fetch(`/api/soap/get?conversationId=${conversation.id}`)
+        const response = await fetch(
+          `/api/soap/get?conversationId=${conversation.id}&userId=${encodeURIComponent(student.id)}`
+        )
         const result = await response.json()
         if (result.success && result.soapNote) {
           setSubjective(result.soapNote.subjective || "")

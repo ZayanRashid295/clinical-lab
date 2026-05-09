@@ -13,15 +13,25 @@ export interface User {
   lastLogin: Date | null
 }
 
+/** Resolve backend/stored user id regardless of whether the profile uses `id`, `userId`, or JWT `sub`. */
+export function getClinicalUserId(clinicalUser: unknown): string | null {
+  if (!clinicalUser || typeof clinicalUser !== "object") return null
+  const u = clinicalUser as Record<string, unknown>
+  const raw = u.id ?? u.userId ?? u.sub
+  if (raw == null || raw === "") return null
+  return String(raw)
+}
+
 export function toMedPrepUser(
-  clinicalUser: { id: string; email: string; name: string; roles?: string[] } | null
+  clinicalUser: { id?: string; userId?: string; email?: string; name?: string; roles?: string[] } | null
 ): User | null {
-  if (!clinicalUser?.id) return null
+  const cid = getClinicalUserId(clinicalUser)
+  if (!cid) return null
   const isAdmin = clinicalUser.roles?.some((r) => /admin/i.test(String(r)))
   const role: User["role"] = isAdmin ? "ADMIN" : "STUDENT"
   const now = new Date()
   return {
-    id: String(clinicalUser.id),
+    id: cid,
     email: clinicalUser.email || "user@local",
     name: clinicalUser.name || "Student",
     role,

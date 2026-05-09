@@ -11,6 +11,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { authService } from "@/shared/services/auth.service"
 
+function buildFallbackCase(caseId: string, conversation: any): MedicalCase {
+  const title = conversation?.case?.title || conversation?.title || "Practice Case"
+  const specialty = conversation?.case?.specialty || "general"
+  const difficultyRaw = String(conversation?.case?.difficulty || "intermediate").toLowerCase()
+  const difficulty =
+    difficultyRaw === "beginner" || difficultyRaw === "advanced" ? difficultyRaw : "intermediate"
+
+  return {
+    id: caseId || "unknown-case",
+    title,
+    description: "Case details were partially unavailable. SOAP note is still available for this conversation.",
+    difficulty,
+    disease: "Undifferentiated condition",
+    diseaseName: "Undifferentiated condition",
+    specialty,
+    isRare: false,
+    symptoms: [],
+    history: [],
+    labs: {},
+    expectedQuestions: [],
+    patientProfile: {
+      name: "Patient",
+      age: 40,
+      gender: "Unknown",
+      occupation: "Unknown",
+    },
+    createdAt: new Date().toISOString(),
+  }
+}
+
 export default function SoapConversationPage() {
   const params = useParams<{ conversationId: string }>()
   const conversationId = params?.conversationId
@@ -53,6 +83,20 @@ export default function SoapConversationPage() {
         }
 
         if (!resolvedCase) {
+          const savedCase = localStorage.getItem(`soap_case_${conversationId}`)
+          if (savedCase) {
+            try {
+              const parsed = JSON.parse(savedCase)
+              if (parsed?.id) {
+                resolvedCase = parsed
+              }
+            } catch {
+              // Ignore malformed local cache and continue with other fallbacks.
+            }
+          }
+        }
+
+        if (!resolvedCase) {
           const generatedCaseData = localStorage.getItem("generatedCase")
           if (generatedCaseData) {
             const generatedCase = JSON.parse(generatedCaseData)
@@ -65,7 +109,7 @@ export default function SoapConversationPage() {
           }
         }
 
-        setMedicalCase(resolvedCase)
+        setMedicalCase(resolvedCase || buildFallbackCase(conv.caseId, conv))
       } catch (loadError) {
         console.error("Failed to load SOAP page data:", loadError)
         setError(loadError instanceof Error ? loadError.message : "Failed to load SOAP page.")

@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 
 interface ModeLandingConfig {
   title: string
@@ -105,21 +106,37 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   }, [config, router])
 
   useEffect(() => {
-    const user = authService.getCurrentUser()
-    const userId = user?.id ? String(user.id) : "anonymous"
-    medprepSessionService
-      .listSessions(userId)
-      .then((sessions) => {
-        const mode = config.startRoute.includes("evaluation")
-          ? "EVALUATION"
-          : config.startRoute.includes("learn") || config.startRoute.includes("qa")
-            ? "LEARNING"
-            : "PRACTICE"
-        setResumeSessions(
-          sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 2)
-        )
-      })
-      .catch(() => setResumeSessions([]))
+    const mode = config.startRoute.includes("evaluation")
+      ? "EVALUATION"
+      : config.startRoute.includes("learn") || config.startRoute.includes("qa") || config.startRoute.includes("learn-cases")
+        ? "LEARNING"
+        : "PRACTICE"
+
+    const loadResume = () => {
+      const user = authService.getCurrentUser()
+      const userId = getClinicalUserId(user) ?? "anonymous"
+      medprepSessionService
+        .listSessions(userId)
+        .then((sessions) => {
+          setResumeSessions(
+            sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 2)
+          )
+        })
+        .catch(() => setResumeSessions([]))
+    }
+
+    loadResume()
+    const retry = window.setTimeout(loadResume, 400)
+    const onVisible = () => {
+      if (document.visibilityState === "visible") loadResume()
+    }
+    window.addEventListener("focus", loadResume)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearTimeout(retry)
+      window.removeEventListener("focus", loadResume)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [config.startRoute])
 
   const highlights: { title: string; subtitle: string; icon: LucideIcon }[] = [

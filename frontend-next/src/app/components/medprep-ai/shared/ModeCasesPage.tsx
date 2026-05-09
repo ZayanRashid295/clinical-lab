@@ -24,6 +24,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 
 interface ModeCasesConfig {
   modeTitle: string
@@ -151,22 +152,38 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   }, [config, router])
 
   useEffect(() => {
-    const user = authService.getCurrentUser()
-    const userId = user?.id ? String(user.id) : "anonymous"
     const mode =
       config.casePurpose === "learning"
         ? "LEARNING"
         : config.casePurpose === "evaluation"
           ? "EVALUATION"
           : "PRACTICE"
-    medprepSessionService
-      .listSessions(userId)
-      .then((sessions) =>
-        setResumeSessions(
-          sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 3)
+
+    const loadResume = () => {
+      const user = authService.getCurrentUser()
+      const userId = getClinicalUserId(user) ?? "anonymous"
+      medprepSessionService
+        .listSessions(userId)
+        .then((sessions) =>
+          setResumeSessions(
+            sessions.filter((session) => session.mode === mode && session.status === "ACTIVE").slice(0, 3)
+          )
         )
-      )
-      .catch(() => setResumeSessions([]))
+        .catch(() => setResumeSessions([]))
+    }
+
+    loadResume()
+    const retry = window.setTimeout(loadResume, 400)
+    const onVisible = () => {
+      if (document.visibilityState === "visible") loadResume()
+    }
+    window.addEventListener("focus", loadResume)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearTimeout(retry)
+      window.removeEventListener("focus", loadResume)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [config.casePurpose])
 
   const handleGenerateCase = async () => {
