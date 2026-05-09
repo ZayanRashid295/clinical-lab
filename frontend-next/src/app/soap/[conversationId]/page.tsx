@@ -9,6 +9,7 @@ import { sampleCases, type MedicalCase } from "@/lib/fyp/data-models"
 import { SOAPNoteEditor } from "@/app/components/medprep-ai/fyp/soap-note-editor"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { authService } from "@/shared/services/auth.service"
 
 export default function SoapConversationPage() {
   const params = useParams<{ conversationId: string }>()
@@ -26,7 +27,9 @@ export default function SoapConversationPage() {
       setError("")
 
       try {
-        const conv = await databaseConversationService.getConversation(conversationId)
+        const user = authService.getCurrentUser()
+        const userId = user?.id ? String(user.id) : "anonymous"
+        const conv = await databaseConversationService.getConversation(conversationId, userId)
         if (!conv) {
           setError("Conversation not found.")
           setIsLoading(false)

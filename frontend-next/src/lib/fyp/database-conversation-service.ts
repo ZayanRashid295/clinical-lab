@@ -99,10 +99,17 @@ class DatabaseConversationService {
   }
 
   // Add a message to the conversation
-  async addMessage(conversationId: string, message: Omit<ChatMessage, "id" | "timestamp">): Promise<ChatMessage> {
+  async addMessage(
+    conversationId: string,
+    message: Omit<ChatMessage, "id" | "timestamp">,
+    userId?: string
+  ): Promise<ChatMessage> {
     try {
+      const resolvedUserId = userId || "anonymous"
       const baseUrl = this.getBaseUrl()
-      const response = await fetch(`${baseUrl}/api/conversations/${conversationId}/messages`, {
+      const response = await fetch(
+        `${baseUrl}/api/conversations/${conversationId}/messages?userId=${encodeURIComponent(resolvedUserId)}`,
+        {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -111,7 +118,8 @@ class DatabaseConversationService {
           isIntervention: message.isIntervention || false,
           relevanceScore: message.relevanceScore
         })
-      })
+      }
+      )
 
       const data = await response.json()
       
@@ -134,10 +142,13 @@ class DatabaseConversationService {
   }
 
   // Get conversation by ID
-  async getConversation(conversationId: string): Promise<Conversation | null> {
+  async getConversation(conversationId: string, userId?: string): Promise<Conversation | null> {
     try {
+      const resolvedUserId = userId || "anonymous"
       const baseUrl = this.getBaseUrl()
-      const response = await fetch(`${baseUrl}/api/conversations/${conversationId}`)
+      const response = await fetch(
+        `${baseUrl}/api/conversations/${conversationId}?userId=${encodeURIComponent(resolvedUserId)}`
+      )
       const data = await response.json()
       
       if (!data.success) {
@@ -155,17 +166,22 @@ class DatabaseConversationService {
   }
 
   // Complete a conversation
-  async completeConversation(conversationId: string): Promise<void> {
+  async completeConversation(conversationId: string, userId?: string): Promise<void> {
     try {
+      const resolvedUserId = userId || "anonymous"
       const baseUrl = this.getBaseUrl()
-      const response = await fetch(`${baseUrl}/api/conversations/${conversationId}`, {
+      const response = await fetch(
+        `${baseUrl}/api/conversations/${conversationId}?userId=${encodeURIComponent(resolvedUserId)}`,
+        {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: resolvedUserId,
           status: 'COMPLETED',
           completedAt: new Date().toISOString()
         })
-      })
+      }
+      )
 
       const data = await response.json()
       

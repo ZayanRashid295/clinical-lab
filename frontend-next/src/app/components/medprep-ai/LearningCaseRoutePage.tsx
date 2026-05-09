@@ -24,10 +24,16 @@ export function LearningCaseRoutePage() {
   )
   const caseId = caseIdFromPathname(pathname) || ""
 
+  const conversationIdFromQuery = useMemo(() => {
+    const q = router.query.conversationId
+    return typeof q === "string" && q.length > 0 ? q : null
+  }, [router.query.conversationId])
+
   const [userId, setUserId] = useState("anonymous")
   const [session, setSession] = useState<LearningSession | null>(null)
   const [medicalCase, setMedicalCase] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hydratedFromDatabase, setHydratedFromDatabase] = useState(false)
 
   useEffect(() => {
     const u = authService.getCurrentUser()
@@ -36,6 +42,8 @@ export function LearningCaseRoutePage() {
 
   useEffect(() => {
     if (!router.isReady || !caseId) return
+
+    let cancelled = false
 
     console.log("Loading learning case with ID:", caseId)
     let resolved = sampleCases.find((c) => c.id === caseId)
@@ -56,7 +64,6 @@ export function LearningCaseRoutePage() {
       return
     }
 
-
     const validatedCase = CaseValidationService.validateAndFixCase(resolved)
     if (validatedCase !== resolved && localStorage.getItem("generatedCase")) {
       localStorage.setItem("generatedCase", JSON.stringify(validatedCase))
@@ -64,30 +71,86 @@ export function LearningCaseRoutePage() {
     const mc = validatedCase
     setMedicalCase(mc)
 
-    const existingSession = learningService.getLearningSession(`learn_${caseId}`)
-    if (existingSession) {
-      setSession(existingSession)
-      setIsLoading(false)
-      return
+    const run = async () => {
+      setIsLoading(true)
+
+      // 1) Resume from dashboard: ?conversationId=...
+      if (conversationIdFromQuery && userId && userId !== "anonymous") {
+        try {
+          const fromDb = await learningService.getLearningSessionFromDatabase(
+            conversationIdFromQuery,
+            userId,
+            mc
+          )
+          if (!cancelled && fromDb) {
+            const sid = learningService.normalizeStudentId(userId)
+            if (sid) fromDb.studentId = sid
+            setSession(fromDb)
+            setHydratedFromDatabase(true)
+            learningService.saveLearningSession(fromDb).catch(console.error)
+            setIsLoading(false)
+            return
+          }
+        } catch (e) {
+          console.error("Learning DB hydrate failed", e)
+        }
+      }
+
+      if (cancelled) return
+
+      // 2) Local backup
+      const existingSession =
+        learningService.getLearningSession(`learn_${caseId}`) ??
+        learningService.getLearningSessionsForUser().find((s) => s.caseId === caseId)
+
+      if (existingSession) {
+        const sid = learningService.normalizeStudentId(userId)
+        const merged = { ...existingSession, studentId: sid || existingSession.studentId }
+        if (!cancelled) {
+          setSession(merged)
+          setHydratedFromDatabase(false)
+          setIsLoading(false)
+        }
+        return
+      }
+
+      const sid = learningService.normalizeStudentId(userId)
+      const newSession: LearningSession = {
+        id: `learn_${caseId}`,
+        caseId,
+        disease: mc.disease,
+        patientProfile: mc.patientProfile,
+        conversation: [],
+        isComplete: false,
+        createdAt: new Date().toISOString(),
+        studentId: sid,
+      }
+
+      if (!cancelled) {
+        setSession(newSession)
+        setHydratedFromDatabase(false)
+        void learningService.saveLearningSession(newSession)
+        setIsLoading(false)
+      }
     }
 
-    const newSession: LearningSession = {
-      id: `learn_${caseId}`,
-      caseId,
-      disease: mc.disease,
-      patientProfile: mc.patientProfile,
-      conversation: [],
-      isComplete: false,
-      createdAt: new Date().toISOString(),
+    void run()
+
+    return () => {
+      cancelled = true
     }
-    setSession(newSession)
-    learningService.saveLearningSession(newSession)
-    setIsLoading(false)
-  }, [router.isReady, caseId, userId])
+  }, [router.isReady, caseId, userId, conversationIdFromQuery])
 
   const handleSessionUpdate = (updatedSession: LearningSession) => {
-    setSession(updatedSession)
-    learningService.saveLearningSession(updatedSession)
+    const sid = learningService.normalizeStudentId(userId)
+    const next =
+      sid && updatedSession.studentId !== sid ? { ...updatedSession, studentId: sid } : updatedSession
+
+    setSession(next)
+    void (async () => {
+      await learningService.saveLearningSession(next)
+      setSession({ ...next })
+    })()
   }
 
   if (!router.isReady) {
@@ -145,7 +208,12 @@ export function LearningCaseRoutePage() {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-gray-50">
-      <LearningInterface session={session} onSessionUpdate={handleSessionUpdate} medicalCase={medicalCase} />
+      <LearningInterface
+        session={session}
+        onSessionUpdate={handleSessionUpdate}
+        medicalCase={medicalCase}
+        hydratedFromDatabase={hydratedFromDatabase}
+      />
     </div>
   )
 }

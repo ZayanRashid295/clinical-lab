@@ -255,7 +255,7 @@ export function CaseChat({
       try {
         if (resumeConversationId) {
           const existingConversation =
-            await databaseConversationService.getConversation(resumeConversationId)
+            await databaseConversationService.getConversation(resumeConversationId, student.id)
           if (existingConversation) {
             setConversation(existingConversation)
             setMessages(existingConversation.messages)
@@ -292,17 +292,11 @@ export function CaseChat({
   }, [medicalCase, resumeConversationId, sessionId, student.id])
 
   useEffect(() => {
-    // Only scroll to bottom if user is near the bottom (within 100px)
+    // Keep the latest interaction visible when messages/loading/speaking state changes.
     if (messagesEndRef.current) {
-      const container = messagesEndRef.current.parentElement
-      if (container) {
-        const isNearBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 100
-        if (isNearBottom) {
-          messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
-        }
-      }
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messages])
+  }, [messages, isLoading, currentSpeakingText])
 
   // Update conversation stats
   useEffect(() => {
@@ -434,7 +428,7 @@ export function CaseChat({
       const studentMessage = await databaseConversationService.addMessage(currentConversation.id, {
         role: "student",
         content: messageToSend,
-      })
+      }, student.id)
 
       setMessages((prev) => prev.map(m => m.id === tempId ? studentMessage : m))
 
@@ -481,7 +475,7 @@ export function CaseChat({
           role: "doctor",
           content: doctorEvaluation.content,
           isIntervention: true,
-        })
+        }, student.id)
 
         setMessages((prev) => [...prev, doctorMessage])
 
@@ -516,7 +510,7 @@ export function CaseChat({
         const patientMessage = await databaseConversationService.addMessage(currentConversation.id, {
           role: "patient",
           content: patientData.content,
-        })
+        }, student.id)
 
         setMessages((prev) => [...prev, patientMessage])
 
@@ -540,7 +534,7 @@ export function CaseChat({
       const errorMessage = await databaseConversationService.addMessage(currentConversation.id, {
         role: "doctor",
         content: `⚠️ ${errorText}`,
-      })
+      }, student.id)
       setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
@@ -949,14 +943,14 @@ export function CaseChat({
                 </div>
               )}
 
-              {/* Show current speaking text */}
+              {/* Compact speaking status (avoid large transcript block in feed) */}
               {currentSpeakingText && (
                 <div className="flex justify-start">
                   <div className="bg-teal-50/80 rounded-2xl p-3 max-w-[90%] border border-teal-200">
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center">
                       <div className="animate-pulse rounded-full h-3 w-3 bg-purple-500 mr-2"></div>
                       <span className="text-sm font-medium text-teal-700">
-                        {currentSpeakingText.role === "patient" ? "Patient" : "Doctor"} is speaking:
+                        {currentSpeakingText.role === "patient" ? "Patient is speaking..." : "Doctor is speaking..."}
                       </span>
                       <Button
                         onClick={stopSpeaking}
@@ -968,9 +962,6 @@ export function CaseChat({
                         <MicOff className="h-3 w-3" />
                       </Button>
                     </div>
-                    <p className="text-sm text-teal-800 italic">
-                      "{currentSpeakingText.text}"
-                    </p>
                   </div>
                 </div>
               )}
@@ -1343,7 +1334,7 @@ export function CaseChat({
               onContinueToSOAP={async () => {
                 try {
                   setIsCompletingCase(true)
-                  await databaseConversationService.completeConversation(conversation.id)
+                  await databaseConversationService.completeConversation(conversation.id, student.id)
                 } catch (e) {
                   console.error(e)
                 } finally {

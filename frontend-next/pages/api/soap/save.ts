@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       method: "PUT",
       userId,
       body: {
-        userId,
         subjective: soapNote.subjective,
         objective: soapNote.objective,
         assessment: soapNote.assessment,
@@ -36,12 +35,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await medprepBackendRequest(`/medprep-ai/sessions/${soapNote.conversationId}/soap/submit`, {
         method: "POST",
         userId,
-        body: { userId, grade: soapNote.grade, feedback: soapNote.feedback },
+        body: { grade: soapNote.grade, feedback: soapNote.feedback },
       })
       await medprepBackendRequest(`/medprep-ai/sessions/${soapNote.conversationId}/score`, {
         method: "POST",
         userId,
-        body: { userId, score: soapNote.grade, feedback: soapNote.feedback },
+        body: { score: soapNote.grade, feedback: soapNote.feedback },
       })
     }
     return res.status(200).json({ success: true, data: soapNote })

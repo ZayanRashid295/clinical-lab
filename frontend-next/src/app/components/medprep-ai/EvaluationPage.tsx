@@ -18,6 +18,7 @@ import { ChevronDown, Brain, User, BarChart3, Lightbulb, Mic, Send, Settings, Al
 import ReactMarkdown from "react-markdown"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { authService } from "@/shared/services/auth.service"
 
 const AVAILABLE_MODELS = [
   { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Fast Gemini model", provider: "gemini" },
@@ -483,6 +484,9 @@ function EvaluationPageContent({
   const [specialty, setSpecialty] = useState("")
   const [difficulty, setDifficulty] = useState("")
   const [selectedCase, setSelectedCase] = useState<any>(null)
+  const [evaluationSessionId, setEvaluationSessionId] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState("anonymous")
+  const [hasResumedFromSession, setHasResumedFromSession] = useState(false)
   const [conversation, setConversation] = useState<{ role: string; content: string; timestamp: string }[]>([])
   const [studentInput, setStudentInput] = useState("")
   const [isPatientResponding, setIsPatientResponding] = useState(false)
@@ -546,9 +550,15 @@ function EvaluationPageContent({
   const [currentCardIndex, setCurrentCardIndex] = useState<number>(-1)
   const [isNavigating, setIsNavigating] = useState(false)
 
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    setCurrentUserId(user?.id ? String(user.id) : "anonymous")
+  }, [])
+
   // Handle URL parameters for evaluation mode (FYP logic; Pages Router + optional MedPrep embed)
   useEffect(() => {
     if (!router.isReady) return
+    if (hasResumedFromSession) return
 
     const caseId = typeof router.query.caseId === "string" ? router.query.caseId : undefined
     const mode = typeof router.query.mode === "string" ? router.query.mode : undefined
@@ -641,6 +651,145 @@ function EvaluationPageContent({
     router.query.mode,
     router.query.generated,
     skipExternalRedirects,
+    hasResumedFromSession,
+  ])
+
+  useEffect(() => {
+    if (!router.isReady) return
+    const conversationId =
+      typeof router.query.conversationId === "string" ? router.query.conversationId : undefined
+    if (!conversationId || hasResumedFromSession) return
+
+    const hydrateFromSession = async () => {
+      try {
+        const response = await fetch(
+          `/api/conversations/${conversationId}?userId=${encodeURIComponent(currentUserId)}`
+        )
+        const data = await response.json()
+        if (!data.success || !data.conversation) return
+
+        const session = data.conversation
+        const state = session?.metadata?.evaluationState
+        if (!state) return
+
+        setEvaluationSessionId(session.id)
+        if (state.selectedCase) setSelectedCase(state.selectedCase)
+        if (Array.isArray(state.conversation)) setConversation(state.conversation)
+        if (Array.isArray(state.conversationWithRoles)) setConversationWithRoles(state.conversationWithRoles)
+        if (typeof state.studentInput === "string") setStudentInput(state.studentInput)
+        if (typeof state.differentialDiagnosis === "string") setDifferentialDiagnosis(state.differentialDiagnosis)
+        if (state.evaluation) setEvaluation(state.evaluation)
+        if (state.clinicalReasoning) setClinicalReasoning(state.clinicalReasoning)
+        if (state.learningInsights) setLearningInsights(state.learningInsights)
+        if (typeof state.activeTab === "string") setActiveTab(state.activeTab)
+        if (Array.isArray(state.structuredQuestions)) setStructuredQuestions(state.structuredQuestions)
+        if (Array.isArray(state.differentialDiagnoses)) setDifferentialDiagnoses(state.differentialDiagnoses)
+        if (Array.isArray(state.cardHistory)) setCardHistory(state.cardHistory)
+        if (typeof state.currentCardIndex === "number") setCurrentCardIndex(state.currentCardIndex)
+        if (Array.isArray(state.studentDoctorChat)) setStudentDoctorChat(state.studentDoctorChat)
+        if (typeof state.studentQuestion === "string") setStudentQuestion(state.studentQuestion)
+        if (typeof state.showNurseReport === "boolean") setShowNurseReport(state.showNurseReport)
+        if (typeof state.showCaseSelection === "boolean") setShowCaseSelection(state.showCaseSelection)
+        if (typeof state.showCaseGenerationForm === "boolean")
+          setShowCaseGenerationForm(state.showCaseGenerationForm)
+        if (typeof state.showEvaluationLanding === "boolean")
+          setShowEvaluationLanding(state.showEvaluationLanding)
+
+        setIsEvaluationMode(true)
+        setHasResumedFromSession(true)
+      } catch (error) {
+        console.error("Failed to resume evaluation session:", error)
+      }
+    }
+
+    void hydrateFromSession()
+  }, [router.isReady, router.query.conversationId, currentUserId, hasResumedFromSession])
+
+  const ensureEvaluationSession = async (caseData: any): Promise<string | null> => {
+    if (evaluationSessionId) return evaluationSessionId
+    const response = await fetch("/api/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: currentUserId,
+        caseId: caseData?.id,
+        mode: "EVALUATION",
+        caseTitle: caseData?.title,
+      }),
+    })
+    const data = await response.json()
+    if (data.success && data.conversation?.id) {
+      setEvaluationSessionId(data.conversation.id)
+      return data.conversation.id as string
+    }
+    return null
+  }
+
+  useEffect(() => {
+    if (!selectedCase) return
+    const timer = setTimeout(async () => {
+      try {
+        const sessionId = await ensureEvaluationSession(selectedCase)
+        if (!sessionId) return
+        await fetch(`/api/conversations/${sessionId}?userId=${encodeURIComponent(currentUserId)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: currentUserId,
+            status: "ACTIVE",
+            metadata: {
+              evaluationState: {
+                selectedCase,
+                conversation,
+                conversationWithRoles,
+                studentInput,
+                differentialDiagnosis,
+                evaluation,
+                clinicalReasoning,
+                learningInsights,
+                activeTab,
+                structuredQuestions,
+                differentialDiagnoses,
+                cardHistory,
+                currentCardIndex,
+                studentDoctorChat,
+                studentQuestion,
+                showNurseReport,
+                showCaseSelection,
+                showCaseGenerationForm,
+                showEvaluationLanding,
+              },
+            },
+          }),
+        })
+      } catch (error) {
+        console.error("Failed to persist evaluation state:", error)
+      }
+    }, 600)
+
+    return () => clearTimeout(timer)
+  }, [
+    selectedCase,
+    conversation,
+    conversationWithRoles,
+    studentInput,
+    differentialDiagnosis,
+    evaluation,
+    clinicalReasoning,
+    learningInsights,
+    activeTab,
+    structuredQuestions,
+    differentialDiagnoses,
+    cardHistory,
+    currentCardIndex,
+    studentDoctorChat,
+    studentQuestion,
+    showNurseReport,
+    showCaseSelection,
+    showCaseGenerationForm,
+    showEvaluationLanding,
+    currentUserId,
+    evaluationSessionId,
   ])
 
   // Function to generate a new case for evaluation mode
@@ -1285,6 +1434,24 @@ Please provide guidance and educational feedback.`,
     }
     setEvaluation(evaluationWithMetadata)
     setEvaluationHistory((prev) => [evaluationWithMetadata, ...prev])
+    if (evaluationSessionId) {
+      try {
+        await fetch(
+          `/api/conversations/${evaluationSessionId}?userId=${encodeURIComponent(currentUserId)}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: currentUserId,
+              status: "COMPLETED",
+              score: Number(result?.score) || undefined,
+            }),
+          }
+        )
+      } catch (error) {
+        console.error("Failed to complete evaluation session:", error)
+      }
+    }
     setIsEvaluating(false)
   }
 

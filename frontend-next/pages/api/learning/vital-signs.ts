@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import fs from "fs"
 import path from "path"
 import { learningService } from "@/lib/fyp/learning-service"
+import { parseNextJsonBody } from "@/lib/api/parse-json-body"
 
 function hydrateGeminiApiKeyFromBackendEnv() {
   if (
@@ -31,17 +32,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     hydrateGeminiApiKeyFromBackendEnv()
-    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
-    const { disease, specialty, patientProfile, symptoms } = body || {}
+    const parsed = parseNextJsonBody(req.body)
+    if (!parsed.ok) {
+      return res.status(400).json({ error: "INVALID_JSON", message: parsed.error })
+    }
+    const disease = parsed.data.disease as string
+    const specialty = parsed.data.specialty as string
+    const patientProfile = parsed.data.patientProfile as any
+    const symptoms = Array.isArray(parsed.data.symptoms) ? parsed.data.symptoms : []
     const result = await learningService.generateVitalSigns(
       disease,
       specialty,
       patientProfile,
-      symptoms || []
+      symptoms
     )
     return res.status(200).json(result)
-  } catch (error) {
-    const details = error instanceof Error ? error.message : "Unknown error"
-    return res.status(500).json({ error: "Failed to generate vital signs", details })
+  } catch {
+    return res.status(500).json({ error: "Failed to generate vital signs" })
   }
 }

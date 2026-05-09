@@ -21,12 +21,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         : undefined
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
-    const { role, content, isIntervention, relevanceScore } = body as {
+    let body: unknown = req.body
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body)
+      } catch {
+        return res.status(400).json({ success: false, error: "INVALID_JSON", message: "Invalid JSON body" })
+      }
+    }
+    const { role, content, isIntervention, relevanceScore, metadata } = body as {
       role?: MedprepMessageRole | string
       content?: string
       isIntervention?: boolean
       relevanceScore?: number
+      metadata?: Record<string, unknown>
     }
 
     if (!role || !content) {
@@ -47,6 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           content,
           isIntervention: Boolean(isIntervention),
           relevanceScore,
+          metadata,
         },
       }
     )

@@ -48,7 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           method: "POST",
           userId: studentId,
           body: {
-            userId: studentId,
             submittedDiagnosis,
             actualDiagnosis: localSubmission.actualDiagnosis,
             isCorrect: localSubmission.isCorrect,

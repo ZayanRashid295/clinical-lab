@@ -1,17 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
+import { parseNextJsonBody } from "@/lib/api/parse-json-body"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
-      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
-      const { userId, caseId, caseInstanceId, mode = "PRACTICE", caseTitle } = body as {
-        userId?: string
-        caseId?: string
-        caseInstanceId?: string
-        mode?: "PRACTICE" | "LEARNING" | "EVALUATION"
-        caseTitle?: string
+      const parsed = parseNextJsonBody(req.body)
+      if (!parsed.ok) {
+        return res.status(400).json({ success: false, error: "INVALID_JSON", message: parsed.error })
       }
+      const body = parsed.data
+      const userId = typeof body.userId === "string" ? body.userId : undefined
+      const caseId = typeof body.caseId === "string" ? body.caseId : undefined
+      const caseInstanceId = typeof body.caseInstanceId === "string" ? body.caseInstanceId : undefined
+      const mode = (body.mode as "PRACTICE" | "LEARNING" | "EVALUATION" | undefined) || "PRACTICE"
+      const caseTitle = typeof body.caseTitle === "string" ? body.caseTitle : undefined
       if (!userId || !caseId) {
         return res.status(400).json({
           success: false,
@@ -22,7 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         method: "POST",
         userId,
         body: {
-          userId,
           mode,
           caseId,
           caseInstanceId,

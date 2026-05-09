@@ -5,6 +5,7 @@ import { useRouter } from "next/router"
 import Link from "next/link"
 import { CaseChat } from "@/app/components/medprep-ai/fyp/case-chat"
 import { sampleCases } from "@/lib/fyp/data-models"
+import { databaseConversationService } from "@/lib/fyp/database-conversation-service"
 import type { User } from "@/lib/fyp/medprep-user"
 import { toMedPrepUser } from "@/lib/fyp/medprep-user"
 import { authService } from "@/shared/services/auth.service"
@@ -58,7 +59,21 @@ function CasePageInner() {
       setLoading(true)
       setError(null)
       try {
-        const existingCase = sampleCases.find((c) => c.id === caseId)
+        let resolvedCaseId = caseId
+        if (resumeConversationId) {
+          const resumedConversation = await databaseConversationService.getConversation(
+            resumeConversationId,
+            student.id
+          )
+          if (
+            resumedConversation?.caseId &&
+            (resolvedCaseId === "unknown" || !sampleCases.find((c) => c.id === resolvedCaseId))
+          ) {
+            resolvedCaseId = resumedConversation.caseId
+          }
+        }
+
+        const existingCase = sampleCases.find((c) => c.id === resolvedCaseId)
         if (existingCase) {
           setMedicalCase(existingCase)
           setLoading(false)
@@ -77,11 +92,22 @@ function CasePageInner() {
           }
         }
 
-        const response = await fetch(`/api/cases/${encodeURIComponent(caseId)}`)
+        const response = await fetch(`/api/cases/get?caseId=${encodeURIComponent(resolvedCaseId)}`)
         if (response.ok) {
-          const data = await response.json()
-          const payload = data.case ?? data
-          setMedicalCase(payload)
+          const rawText = await response.text()
+          let data: any
+          try {
+            data = rawText ? JSON.parse(rawText) : null
+          } catch {
+            setError("Case not found")
+            return
+          }
+          const payload = data?.caseData ?? data?.case ?? data
+          if (payload && payload.id) {
+            setMedicalCase(payload)
+          } else {
+            setError("Case not found")
+          }
         } else {
           setError("Case not found")
         }
@@ -94,7 +120,7 @@ function CasePageInner() {
     }
 
     void loadCase()
-  }, [router.isReady, caseId])
+  }, [router.isReady, caseId, resumeConversationId, student.id])
 
   if (!router.isReady) {
     return (

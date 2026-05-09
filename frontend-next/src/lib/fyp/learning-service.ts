@@ -33,9 +33,15 @@ export interface LearningSOAPNote {
 }
 
 export interface LearningSession {
+  /** Stable local key: `learn_${caseId}` (never replace with backend id). */
   id: string
   caseId: string
   disease: string
+  studentId?: string
+  /** Backend Medprep conversation id (cuid). */
+  conversationId?: string
+  /** Number of conversation messages already POSTed to the backend (idempotent sync). */
+  lastSyncedMessageCount?: number
   patientProfile: {
     name: string
     age: number
@@ -82,7 +88,29 @@ export interface LearningSession {
   }
 }
 
+/** Persisted under MedprepConversation.metadata.learningState */
+export interface LearningMetadataState {
+  patientInfo?: LearningSession["patientInfo"]
+  vitalSigns?: LearningSession["vitalSigns"]
+  uiState?: LearningSession["uiState"]
+  soapNote?: LearningSOAPNote
+  isComplete?: boolean
+}
+
+const LEARN_PREFIX = "learn_"
+
+function isLikelyCuid(id: string): boolean {
+  return /^c[a-z0-9]{20,32}$/i.test(id)
+}
+
 class LearningService {
+  /** Returns undefined for anonymous / missing — DB sync is skipped in that case. */
+  normalizeStudentId(userId?: string | null): string | undefined {
+    const u = typeof userId === "string" ? userId.trim() : ""
+    if (!u || u === "anonymous") return undefined
+    return u
+  }
+
   private checkAPIKey(): void {
     const apiKey =
       process.env.GOOGLE_API_KEY ||
@@ -565,50 +593,23 @@ Provide an educational response about this ${disease} case.`,
     }
   }
 
-  // Database-based session management
-  async saveLearningSession(session: LearningSession): Promise<void> {
-    try {
-      const userId = (session as any).studentId || "anonymous"
-      let conversationId = session.id
-      if (!conversationId.startsWith("conv_") && !conversationId.startsWith("c")) {
-        const conversationResponse = await fetch("/api/conversations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            caseId: session.caseId,
-            mode: "LEARNING",
-            caseTitle: session.disease,
-          }),
-        })
-        const conversationData = await conversationResponse.json()
-        if (conversationData.success) {
-          conversationId = conversationData.conversation.id
-          session.id = conversationId
-        }
-      }
-
-      if (conversationId) {
-        for (const message of session.conversation) {
-          await fetch(`/api/conversations/${conversationId}/messages?userId=${encodeURIComponent(userId)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              role: message.role.toUpperCase(),
-              content: message.content,
-              isIntervention: false
-            })
-          })
-        }
-
-      }
-    } catch (error) {
-      console.error('Error saving session to database:', error)
+  private normalizeLocalKey(session: LearningSession): LearningSession {
+    const localKey = `${LEARN_PREFIX}${session.caseId}`
+    if (session.id === localKey) return session
+    if (isLikelyCuid(session.id) && !session.conversationId) {
+      session.conversationId = session.id
     }
+    session.id = localKey
+    return session
+  }
 
-    // Also save to localStorage as backup
+  private persistLocal(session: LearningSession): void {
+    this.normalizeLocalKey(session)
     const sessions = this.getLearningSessionsForUser()
-    const existingIndex = sessions.findIndex((s) => s.id === session.id)
+    const key = session.id
+    const existingIndex = sessions.findIndex(
+      (s) => s.id === key || s.caseId === session.caseId || s.conversationId === session.conversationId
+    )
 
     if (existingIndex >= 0) {
       sessions[existingIndex] = session
@@ -619,6 +620,205 @@ Provide an educational response about this ${disease} case.`,
     localStorage.setItem("learning_sessions", JSON.stringify(sessions))
   }
 
+  /**
+   * Mark an active backend session abandoned so "Start fresh" can open a new ACTIVE session for the same case.
+   */
+  async abandonBackendSession(userId: string, conversationId: string): Promise<void> {
+    if (!userId || userId === "anonymous" || !conversationId) return
+    try {
+      const res = await fetch(
+        `/api/conversations/${encodeURIComponent(conversationId)}?userId=${encodeURIComponent(userId)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "ABANDONED" }),
+        }
+      )
+      if (!res.ok) {
+        const t = await res.text().catch(() => "")
+        console.warn("[learning] abandon session failed", res.status, t.slice(0, 200))
+      }
+    } catch (e) {
+      console.warn("[learning] abandon session error", e)
+    }
+  }
+
+  /**
+   * Maps a Medprep session payload (from GET /medprep-ai/sessions/:id) into a LearningSession.
+   */
+  hydrateLearningSessionFromBackend(
+    conv: any,
+    opts: { userId: string; medicalCase?: any }
+  ): LearningSession {
+    const caseId = conv.caseId || opts.medicalCase?.id || ""
+    const localKey = `${LEARN_PREFIX}${caseId}`
+    const meta = (conv.metadata || {}) as Record<string, unknown>
+    const learningState = (meta.learningState || {}) as LearningMetadataState
+    const snap = (meta.caseSnapshot || {}) as Record<string, unknown>
+    const profile =
+      opts.medicalCase?.patientProfile ||
+      (snap.patientProfile as LearningSession["patientProfile"])
+    const safeProfile =
+      profile && typeof profile === "object" && "name" in profile
+        ? (profile as LearningSession["patientProfile"])
+        : { name: "Patient", age: 40, gender: "Unknown", occupation: "Unknown" }
+
+    const disease =
+      opts.medicalCase?.disease || (typeof conv.title === "string" && conv.title) || "Learning case"
+
+    const messages = Array.isArray(conv.messages) ? conv.messages : []
+    const conversation: LearningConversationMessage[] = messages.map((msg: any) => ({
+      role: String(msg.role || "")
+        .toLowerCase()
+        .trim() as "doctor" | "patient" | "student",
+      content: String(msg.content || ""),
+      explanation:
+        msg.metadata && typeof msg.metadata === "object" && "explanation" in msg.metadata
+          ? String((msg.metadata as { explanation?: string }).explanation || "")
+          : undefined,
+      timestamp:
+        typeof msg.createdAt === "string"
+          ? msg.createdAt
+          : msg.createdAt instanceof Date
+            ? msg.createdAt.toISOString()
+            : new Date().toISOString(),
+    }))
+
+    const patientInfo =
+      learningState.patientInfo && typeof learningState.patientInfo === "object"
+        ? learningState.patientInfo
+        : undefined
+    const vitalSigns =
+      learningState.vitalSigns && typeof learningState.vitalSigns === "object"
+        ? learningState.vitalSigns
+        : undefined
+    const uiState =
+      learningState.uiState && typeof learningState.uiState === "object"
+        ? learningState.uiState
+        : undefined
+    const soapNote =
+      learningState.soapNote && typeof learningState.soapNote === "object"
+        ? (learningState.soapNote as LearningSOAPNote)
+        : undefined
+
+    const isComplete = conv.status === "COMPLETED" || Boolean(learningState.isComplete)
+
+    return {
+      id: localKey,
+      caseId,
+      disease,
+      studentId: opts.userId,
+      conversationId: conv.id,
+      lastSyncedMessageCount: conversation.length,
+      patientProfile: safeProfile,
+      conversation,
+      soapNote: soapNote || undefined,
+      isComplete,
+      createdAt: typeof conv.startedAt === "string" ? conv.startedAt : new Date().toISOString(),
+      patientInfo,
+      vitalSigns,
+      uiState,
+    }
+  }
+
+  // Database-based session management (idempotent message sync + metadata learningState)
+  async saveLearningSession(session: LearningSession): Promise<void> {
+    this.normalizeLocalKey(session)
+
+    const userId = session.studentId?.trim()
+    if (!userId || userId === "anonymous") {
+      this.persistLocal(session)
+      return
+    }
+
+    try {
+      let conversationId = session.conversationId
+
+      if (!conversationId) {
+        const conversationResponse = await fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            caseId: session.caseId,
+            mode: "LEARNING",
+            caseTitle: session.disease,
+          }),
+        })
+        const conversationData = await conversationResponse.json().catch(() => null)
+        if (conversationResponse.ok && conversationData?.success && conversationData.conversation?.id) {
+          conversationId = conversationData.conversation.id
+          session.conversationId = conversationId
+        }
+      }
+
+      if (!conversationId) {
+        this.persistLocal(session)
+        return
+      }
+
+      const already = Math.max(0, session.lastSyncedMessageCount ?? 0)
+      for (let i = already; i < session.conversation.length; i++) {
+        const message = session.conversation[i]
+        const role = String(message.role).toUpperCase()
+        const body: Record<string, unknown> = {
+          role,
+          content: message.content,
+          isIntervention: false,
+        }
+        if (message.explanation) {
+          body.metadata = { explanation: message.explanation }
+        }
+        const msgRes = await fetch(
+          `/api/conversations/${encodeURIComponent(conversationId)}/messages?userId=${encodeURIComponent(userId)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }
+        )
+        if (!msgRes.ok) {
+          const errText = await msgRes.text().catch(() => "")
+          console.error("[learning] add message failed", msgRes.status, errText.slice(0, 300))
+          break
+        }
+      }
+      session.lastSyncedMessageCount = session.conversation.length
+
+      const learningState: LearningMetadataState = {
+        patientInfo: session.patientInfo,
+        vitalSigns: session.vitalSigns,
+        uiState: session.uiState,
+        soapNote: session.soapNote,
+        isComplete: session.isComplete,
+      }
+
+      const patchBody: Record<string, unknown> = {
+        metadata: { learningState },
+      }
+      if (session.isComplete) {
+        patchBody.status = "COMPLETED"
+      }
+
+      const patchRes = await fetch(
+        `/api/conversations/${encodeURIComponent(conversationId)}?userId=${encodeURIComponent(userId)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patchBody),
+        }
+      )
+      if (!patchRes.ok) {
+        const errText = await patchRes.text().catch(() => "")
+        console.error("[learning] PATCH session failed", patchRes.status, errText.slice(0, 300))
+      }
+    } catch (error) {
+      console.error("Error saving session to database:", error)
+    }
+
+    this.persistLocal(session)
+  }
+
   getLearningSessionsForUser(): LearningSession[] {
     const sessions = localStorage.getItem("learning_sessions")
     return sessions ? JSON.parse(sessions) : []
@@ -626,40 +826,41 @@ Provide an educational response about this ${disease} case.`,
 
   getLearningSession(sessionId: string): LearningSession | null {
     const sessions = this.getLearningSessionsForUser()
-    return sessions.find((s) => s.id === sessionId) || null
+    const caseIdFromKey = sessionId.startsWith(LEARN_PREFIX) ? sessionId.slice(LEARN_PREFIX.length) : sessionId
+
+    const found =
+      sessions.find((s) => s.id === sessionId) ||
+      sessions.find((s) => s.caseId === caseIdFromKey) ||
+      sessions.find((s) => s.conversationId === sessionId) ||
+      null
+
+    if (!found) return null
+    return this.normalizeLocalKey({ ...found })
   }
 
-  // New method to get session from database
-  async getLearningSessionFromDatabase(sessionId: string): Promise<LearningSession | null> {
+  async getLearningSessionFromDatabase(
+    conversationId: string,
+    userId: string,
+    medicalCase?: any
+  ): Promise<LearningSession | null> {
+    if (!conversationId || !userId || userId === "anonymous") return null
     try {
-      const response = await fetch(`/api/conversations/${sessionId}?userId=anonymous`)
-      const data = await response.json()
-      
-      if (data.success && data.conversation) {
+      const response = await fetch(
+        `/api/conversations/${encodeURIComponent(conversationId)}?userId=${encodeURIComponent(userId)}`
+      )
+      const data = await response.json().catch(() => null)
+
+      if (response.ok && data?.success && data.conversation) {
         const conv = data.conversation
-        return {
-          id: conv.id,
-          caseId: conv.caseId,
-          disease: conv.case?.title || 'Unknown',
-          patientProfile: {
-            name: 'Patient',
-            age: 45,
-            gender: 'Unknown',
-            occupation: 'Unknown'
-          },
-          conversation: conv.messages.map((msg: any) => ({
-            role: msg.role.toLowerCase() as 'doctor' | 'patient' | 'student',
-            content: msg.content,
-            timestamp: msg.createdAt
-          })),
-          isComplete: conv.status === 'COMPLETED',
-          createdAt: conv.startedAt
+        if (conv.mode && conv.mode !== "LEARNING") {
+          console.warn("[learning] conversation mode mismatch", conv.mode)
         }
+        return this.hydrateLearningSessionFromBackend(conv, { userId, medicalCase })
       }
     } catch (error) {
-      console.error('Error getting session from database:', error)
+      console.error("Error getting session from database:", error)
     }
-    
+
     return null
   }
 }

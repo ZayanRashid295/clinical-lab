@@ -26,9 +26,16 @@ interface LearningInterfaceProps {
   session: LearningSession
   onSessionUpdate: (session: LearningSession) => void
   medicalCase?: any
+  /** When true, session was loaded from the server; skip local "Continue Learning?" prompt on first paint. */
+  hydratedFromDatabase?: boolean
 }
 
-export function LearningInterface({ session, onSessionUpdate, medicalCase: propMedicalCase }: LearningInterfaceProps) {
+export function LearningInterface({
+  session,
+  onSessionUpdate,
+  medicalCase: propMedicalCase,
+  hydratedFromDatabase = false,
+}: LearningInterfaceProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [studentQuestion, setStudentQuestion] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
@@ -41,7 +48,9 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
   const [showPatientDetails, setShowPatientDetails] = useState(true)
   const [conversationSpeed, setConversationSpeed] = useState(1)
   const lastResumedSessionId = useRef<string | null>(null)
+  const simulationFlowLock = useRef(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [simulationError, setSimulationError] = useState<string | null>(null)
   
   // Ask Doctor popup state
   const [isDoctorChatOpen, setIsDoctorChatOpen] = useState(false)
@@ -318,6 +327,19 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson, session, onSessionUpdate])
 
+  const didApplyDbUiRef = useRef(false)
+  // Restore UI layout once when session was hydrated from the database
+  useEffect(() => {
+    if (!hydratedFromDatabase || !session.uiState || didApplyDbUiRef.current) return
+    didApplyDbUiRef.current = true
+    setActivePatientInfoSection(session.uiState.activePatientInfoSection || "demographics")
+    setActiveNurseReportSection(session.uiState.activeNurseReportSection || "chiefComplaint")
+    setActiveTab(session.uiState.activeTab || "conversation")
+    if (session.uiState.collapsedSections) {
+      setCollapsedSections((prev) => ({ ...prev, ...session.uiState!.collapsedSections }))
+    }
+  }, [hydratedFromDatabase, session.uiState])
+
   // Save UI state when it changes
   const saveUIState = useCallback(() => {
     const updatedSession = {
@@ -349,16 +371,15 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
   useEffect(() => {
     if (!hasLoadedSession) {
-      const savedSession = learningService.getLearningSession(session.id)
-      if (savedSession && savedSession.conversation.length > 0 && !savedSession.isComplete) {
-        setShowResumePrompt(true)
+      if (!hydratedFromDatabase) {
+        const savedSession = learningService.getLearningSession(session.id)
+        if (savedSession && savedSession.conversation.length > 0 && !savedSession.isComplete) {
+          setShowResumePrompt(true)
+        }
       }
       setHasLoadedSession(true)
-      
-      // Track case progress - mark as started
-      // Note: studentId tracking would need to be implemented in the session
     }
-  }, [session.id])
+  }, [session.id, hasLoadedSession, hydratedFromDatabase])
 
   useEffect(() => {
     if (hasLoadedSession) {
@@ -367,31 +388,11 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
   }, [session, hasLoadedSession])
 
   useEffect(() => {
-    console.log("useEffect triggered - session.caseId:", session.caseId, "session.id:", session.id, "lastResumedSessionId:", lastResumedSessionId.current)
-    
-    // Don't reset conversation if we just resumed this session
+    // Resume guard: clear one-time marker after resume flow.
     if (lastResumedSessionId.current === session.id) {
-      console.log("Skipping conversation reset - session was just resumed")
       lastResumedSessionId.current = null
-      return
     }
-    
-    // Only reset conversation if we're starting a completely new case
-    // Check if there's a saved session with conversation history
-    const savedSession = learningService.getLearningSession(session.id)
-    console.log("Saved session exists:", !!savedSession, "Saved conversation length:", savedSession?.conversation?.length || 0)
-    
-    if (session.conversation.length > 0 && (!savedSession || savedSession.conversation.length === 0)) {
-      console.log("Resetting conversation for new case")
-      const resetSession = {
-        ...session,
-        conversation: [],
-        isComplete: false,
-        soapNote: undefined,
-      }
-      onSessionUpdate(resetSession)
-    }
-  }, [session.caseId, session.id])
+  }, [session.id])
 
   useEffect(() => {
     const generateSoapForCase = async () => {
@@ -438,10 +439,12 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
   }, [activeTab])
 
   const startConversation = async () => {
-    if (session.conversation.length > 0) return
+    if (session.conversation.length > 0 || simulationFlowLock.current || session.isComplete) return
 
+    simulationFlowLock.current = true
     setIsPlaying(true)
     setIsProcessing(true)
+    setSimulationError(null)
 
     try {
       const context = {
@@ -479,15 +482,33 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
       onSessionUpdate(updatedSession)
     } catch (error) {
       console.error("Error starting conversation:", error)
+      setSimulationError(
+        error instanceof Error ? error.message : "Could not start the simulation. A default opening question was loaded."
+      )
+      // Ensure simulation can still begin even if AI endpoint fails.
+      const fallbackDoctorMessage: LearningConversationMessage = {
+        role: "doctor",
+        content: "Hello, I am your attending doctor today. Can you tell me what brings you in and when your symptoms began?",
+        explanation:
+          "We begin with an open-ended question to establish the chief complaint and symptom timeline.",
+        timestamp: new Date().toISOString(),
+      }
+      onSessionUpdate({
+        ...session,
+        conversation: [fallbackDoctorMessage],
+      })
     } finally {
       setIsProcessing(false)
+      simulationFlowLock.current = false
     }
   }
 
   const continueConversation = async () => {
-    if (session.conversation.length === 0 || session.isComplete) return
+    if (session.conversation.length === 0 || session.isComplete || simulationFlowLock.current) return
 
+    simulationFlowLock.current = true
     setIsProcessing(true)
+    setSimulationError(null)
 
     try {
       const lastMessage = session.conversation[session.conversation.length - 1]
@@ -599,11 +620,51 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
 
           onSessionUpdate(updatedSession)
         }
+      } else if (lastMessage.role === "patient") {
+        const context = {
+          caseId: session.caseId,
+          disease: session.disease,
+          symptoms: medicalCase?.symptoms || [],
+          patientProfile: session.patientProfile,
+          conversationHistory: session.conversation.map((msg) => ({
+            role: msg.role as "student" | "patient" | "doctor",
+            content: msg.content,
+            timestamp: msg.timestamp,
+          })),
+        }
+        const doctorResponse = await fetch("/api/learning/doctor-question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ context, conversation: session.conversation }),
+        })
+        if (!doctorResponse.ok) {
+          throw new Error("Failed to generate doctor question")
+        }
+        const { question, explanation } = await parseApiJson(
+          doctorResponse,
+          "Failed to generate doctor question"
+        )
+        const nextDoctorMessage: LearningConversationMessage = {
+          role: "doctor",
+          content: question,
+          explanation,
+          timestamp: new Date().toISOString(),
+        }
+        onSessionUpdate({
+          ...session,
+          conversation: [...session.conversation, nextDoctorMessage],
+        })
       }
     } catch (error) {
       console.error("Error continuing conversation:", error)
+      setSimulationError(
+        error instanceof Error
+          ? error.message
+          : "The simulation hit a network or server error. Check your connection and try Continue again."
+      )
     } finally {
       setIsProcessing(false)
+      simulationFlowLock.current = false
     }
   }
 
@@ -692,15 +753,22 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
     setShowResumePrompt(false)
   }
 
-  const handleStartOver = () => {
-    const resetSession = {
+  const handleStartOver = async () => {
+    await learningService.abandonBackendSession(
+      session.studentId || "",
+      session.conversationId || ""
+    )
+    const resetSession: LearningSession = {
       ...session,
       conversation: [],
       isComplete: false,
       soapNote: undefined,
+      conversationId: undefined,
+      lastSyncedMessageCount: 0,
     }
     onSessionUpdate(resetSession)
     setShowResumePrompt(false)
+    setSimulationError(null)
   }
 
   // Function to handle student questions to the doctor
@@ -845,6 +913,24 @@ export function LearningInterface({ session, onSessionUpdate, medicalCase: propM
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {simulationError && (
+        <div
+          role="alert"
+          className="mx-4 mt-2 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-900 sm:mx-6"
+        >
+          <span className="min-w-0 flex-1">{simulationError}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="shrink-0 text-red-800 hover:text-red-950"
+            onClick={() => setSimulationError(null)}
+          >
+            Dismiss
+          </Button>
         </div>
       )}
 
