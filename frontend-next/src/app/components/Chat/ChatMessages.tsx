@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ChatRoom, Message } from "../../types/chat";
 import { MOCK_MESSAGES } from "../../../data/mockData";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
 
 interface ChatMessagesProps {
   room: ChatRoom | null;
@@ -192,7 +193,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ room, onBack }) => {
         );
 
       default:
-        return <p className="text-sm">{message.content}</p>;
+        return (
+          <div className="text-sm text-gray-900">
+            <MarkdownContent variant="default">{message.content}</MarkdownContent>
+          </div>
+        );
     }
   };
 

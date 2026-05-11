@@ -1,7 +1,9 @@
 "use client"
 
+import type { ReactNode } from "react"
 import { Suspense, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
+import { MedPrepSlugGate } from "@/app/components/medprep-ai/MedPrepSlugGate"
 import Link from "next/link"
 import { CaseChat } from "@/app/components/medprep-ai/fyp/case-chat"
 import { sampleCases } from "@/lib/fyp/data-models"
@@ -28,6 +30,27 @@ const ANON: User = {
 function caseIdFromPathname(pathname: string): string | null {
   const m = pathname.match(/^\/medprep-ai\/case\/([^/]+)/)
   return m ? decodeURIComponent(m[1]) : null
+}
+
+/** `/medprep-ai/case` supports `?mode=evaluation` (evaluation UX on practice route) — gate by evaluation entitlement in that case. */
+function PracticeCaseEntitlementGate({ children }: { children: ReactNode }) {
+  const router = useRouter()
+  if (!router.isReady) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-8">
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-blue-600" />
+      </div>
+    )
+  }
+  const evaluationMode = router.query.mode === "evaluation"
+  return (
+    <MedPrepSlugGate
+      slug={evaluationMode ? "ai-evaluation" : "let-me-drive"}
+      modeLabel={evaluationMode ? "AI Evaluation Mode" : "Practice Mode"}
+    >
+      {children}
+    </MedPrepSlugGate>
+  )
 }
 
 function CasePageInner() {
@@ -206,14 +229,16 @@ function CasePageInner() {
 
 export function PracticeCaseRoutePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex flex-1 items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
-        </div>
-      }
-    >
-      <CasePageInner />
-    </Suspense>
+    <PracticeCaseEntitlementGate>
+      <Suspense
+        fallback={
+          <div className="flex flex-1 items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+          </div>
+        }
+      >
+        <CasePageInner />
+      </Suspense>
+    </PracticeCaseEntitlementGate>
   )
 }

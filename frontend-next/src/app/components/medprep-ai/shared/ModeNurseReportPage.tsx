@@ -6,7 +6,7 @@ import { sampleCases } from "@/lib/fyp/data-models"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 
 interface ModeNurseReportConfig {
   modeLabel: string
@@ -218,7 +218,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={themedBackground}>
+    <div
+      className="relative w-full shrink-0 overflow-x-hidden pb-5 sm:pb-6"
+      style={themedBackground}
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute -top-48 -left-48 w-[520px] h-[520px] rounded-full opacity-60"
@@ -247,7 +250,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
         </div>
       </div>
 
-      <div className="relative container mx-auto px-6 py-8 max-w-3xl">
+      <div className="relative container mx-auto max-w-3xl px-6 pt-8 pb-2">
         {/* Case overview card */}
         <SectionCard className="mb-5 group">
           <span
@@ -360,13 +363,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
               <div className="text-[14px] font-semibold text-orange-700">
                 Primary Complaint:{" "}
                 <span className="text-orange-900">
-                  <ReactMarkdown
+                  <MarkdownContent
+                    variant="primary"
                     components={{
                       p: ({ children }) => <span>{children}</span>,
                     }}
                   >
                     {primaryComplaint}
-                  </ReactMarkdown>
+                  </MarkdownContent>
                 </span>
               </div>
             </div>
@@ -382,13 +386,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
                       key={index}
                       className="rounded-xl bg-orange-100/70 border border-orange-200/40 px-4 py-2.5 text-[13px] text-orange-900"
                     >
-                      <ReactMarkdown
+                      <MarkdownContent
+                        variant="primary"
                         components={{
                           p: ({ children }) => <span>{children}</span>,
                         }}
                       >
                         {symptom}
-                      </ReactMarkdown>
+                      </MarkdownContent>
                     </div>
                   ))}
                 </div>
@@ -438,10 +443,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
           )}
         </Button>
 
-        <div className="text-center mt-6">
+        <div className="mt-5 text-center">
           <Link
             href={config.backRoute}
-            className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+            className="inline-block text-sm text-gray-500 transition-colors hover:text-gray-800"
           >
             {config.backLabel}
           </Link>

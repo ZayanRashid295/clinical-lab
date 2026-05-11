@@ -54,7 +54,7 @@ function OrgChartView() {
   // Flatten hierarchical structure for rendering
   const flatNodes = useMemo(
     () => flattenHierarchy(data.hierarchy),
-    [data.hierarchy, refreshTrigger]
+    [data.hierarchy]
   );
 
   const positions = useMemo(

@@ -29,6 +29,7 @@ import { QuestionPapersService } from "@/app/services/assessments/question-paper
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 import { authService } from "@/shared/services/auth.service";
 import { cn } from "@/shared/utils/cn";
+import type { LucideIcon } from "lucide-react";
 
 interface TestSummary {
   id: string;
@@ -116,7 +117,7 @@ function KpiCard({
   title: string;
   value: string;
   subtitle: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   accent: "slate" | "emerald" | "violet" | "amber";
 }) {
   const accents = {

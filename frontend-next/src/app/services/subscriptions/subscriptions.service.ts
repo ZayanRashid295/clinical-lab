@@ -99,5 +99,9 @@ export class SubscriptionsService extends BaseDataService<
   }> {
     return this.post(`${this.endpoint}/cleanup-duplicates/${userId}`, {});
   }
+
+  async getMyEntitlements(): Promise<Record<string, any>> {
+    return this.get(`${this.endpoint}/me/entitlements`);
+  }
 }
 

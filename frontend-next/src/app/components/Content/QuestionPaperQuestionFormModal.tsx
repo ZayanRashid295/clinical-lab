@@ -17,6 +17,7 @@ import {
 import { QuestionPapersService } from "../../services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "../../services/assessments/question-paper-questions.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -216,12 +217,8 @@ export default function QuestionPaperQuestionFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save question paper question"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save question paper question"));
     } finally {
       setLoading(false);
     }

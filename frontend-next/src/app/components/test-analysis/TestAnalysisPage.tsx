@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
+import { getQuestionHierarchyColumns } from "@/app/utils/question-hierarchy-display";
 
 interface QuestionPaperQuestion {
   id: string;
@@ -182,64 +183,94 @@ export default function TestAnalysisPage() {
       totalTimeSpent,
     });
 
-    // Calculate topic-wise stats
-    const topicMap = new Map<string, { total: number; correct: number; incorrect: number; unanswered: number; totalTime: number; questionsWithTime: number }>();
-    
-    questionsData.forEach((q) => {
-      const topic = q.question?.topic?.name || "Unknown";
-      if (!topicMap.has(topic)) {
-        topicMap.set(topic, { total: 0, correct: 0, incorrect: 0, unanswered: 0, totalTime: 0, questionsWithTime: 0 });
+    // Topic / system breakdown (Category → Product → System → Topic → Subtopic)
+    const topicMap = new Map<
+      string,
+      {
+        total: number;
+        correct: number;
+        incorrect: number;
+        unanswered: number;
+        totalTime: number;
+        questionsWithTime: number;
       }
-      const stats = topicMap.get(topic)!;
+    >();
+    const systemMap = new Map<
+      string,
+      {
+        total: number;
+        correct: number;
+        incorrect: number;
+        unanswered: number;
+        totalTime: number;
+        questionsWithTime: number;
+      }
+    >();
+
+    const bump = (
+      map: Map<
+        string,
+        {
+          total: number;
+          correct: number;
+          incorrect: number;
+          unanswered: number;
+          totalTime: number;
+          questionsWithTime: number;
+        }
+      >,
+      key: string,
+      row: QuestionPaperQuestion
+    ) => {
+      if (!map.has(key)) {
+        map.set(key, {
+          total: 0,
+          correct: 0,
+          incorrect: 0,
+          unanswered: 0,
+          totalTime: 0,
+          questionsWithTime: 0,
+        });
+      }
+      const stats = map.get(key)!;
       stats.total++;
-      if (q.timeSpent && q.timeSpent > 0) {
-        stats.totalTime += q.timeSpent;
+      if (row.timeSpent && row.timeSpent > 0) {
+        stats.totalTime += row.timeSpent;
         stats.questionsWithTime++;
       }
-      if (q.isCorrect === true) {
-        stats.correct++;
-      } else if (q.isCorrect === false) {
-        stats.incorrect++;
-      } else {
-        stats.unanswered++;
-      }
+      if (row.isCorrect === true) stats.correct++;
+      else if (row.isCorrect === false) stats.incorrect++;
+      else stats.unanswered++;
+    };
+
+    questionsData.forEach((q) => {
+      const h = getQuestionHierarchyColumns(q.question);
+      const topic =
+        h.topic !== "—" ? h.topic : "Unknown";
+      const system =
+        h.system !== "—" ? h.system : "Unknown";
+      bump(topicMap, topic, q);
+      bump(systemMap, system, q);
     });
 
-    const topicStatsArray: TopicStats[] = Array.from(topicMap.entries()).map(([name, stats]) => ({
-      name,
-      total: stats.total,
-      correct: stats.correct,
-      incorrect: stats.incorrect,
-      unanswered: stats.unanswered,
-      percentage: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
-      averageTime: stats.questionsWithTime > 0 ? Math.round(stats.totalTime / stats.questionsWithTime) : 0,
-      trend: "stable" as const, // Could be calculated based on historical data
-    })).sort((a, b) => b.total - a.total);
+    const topicStatsArray: TopicStats[] = Array.from(topicMap.entries())
+      .map(([name, stats]) => ({
+        name,
+        total: stats.total,
+        correct: stats.correct,
+        incorrect: stats.incorrect,
+        unanswered: stats.unanswered,
+        percentage:
+          stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+        averageTime:
+          stats.questionsWithTime > 0
+            ? Math.round(stats.totalTime / stats.questionsWithTime)
+            : 0,
+        trend: "stable" as const,
+      }))
+      .sort((a, b) => b.total - a.total);
 
     setTopicStats(topicStatsArray);
-
-    // Calculate system-wise stats
-    const systemMap = new Map<string, { total: number; correct: number; incorrect: number; unanswered: number; totalTime: number; questionsWithTime: number }>();
-    
-    questionsData.forEach((q) => {
-      const system = q.question?.topic?.system?.name || "Unknown";
-      if (!systemMap.has(system)) {
-        systemMap.set(system, { total: 0, correct: 0, incorrect: 0, unanswered: 0, totalTime: 0, questionsWithTime: 0 });
-      }
-      const stats = systemMap.get(system)!;
-      stats.total++;
-      if (q.timeSpent && q.timeSpent > 0) {
-        stats.totalTime += q.timeSpent;
-        stats.questionsWithTime++;
-      }
-      if (q.isCorrect === true) {
-        stats.correct++;
-      } else if (q.isCorrect === false) {
-        stats.incorrect++;
-      } else {
-        stats.unanswered++;
-      }
-    });
 
     const systemStatsArray: SystemStats[] = Array.from(systemMap.entries()).map(([name, stats]) => ({
       name,

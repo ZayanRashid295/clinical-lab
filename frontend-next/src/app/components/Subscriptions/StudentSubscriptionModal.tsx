@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   X,
   CreditCard,
@@ -11,8 +11,10 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Subscription, SubscriptionStatus } from "../../types/subscription";
+import { includedItemsForPackage } from "./includedPackageItems";
 import { SubscriptionsService } from "../../services/subscriptions/subscriptions.service";
 import { authService } from "../../../shared/services/auth.service";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import { Button } from "../../../shared/ui/button";
 import { useRouter } from "next/router";
 
@@ -29,7 +31,29 @@ export default function StudentSubscriptionModal({
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const subscriptionsService = new SubscriptionsService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
+
+  const loadSubscriptions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const user = authService.getCurrentUser();
+      if (!user?.id) {
+        setError("User not found");
+        return;
+      }
+
+      const userSubscriptions = await subscriptionsService.getUserSubscriptions(
+        user.id
+      );
+      setSubscriptions(userSubscriptions || []);
+    } catch (err) {
+      console.error("Error loading subscriptions:", err);
+      setError(getApiErrorMessage(err, "Failed to load subscriptions"));
+    } finally {
+      setLoading(false);
+    }
+  }, [subscriptionsService]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -48,29 +72,7 @@ export default function StudentSubscriptionModal({
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen]);
-
-  const loadSubscriptions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const user = authService.getCurrentUser();
-      if (!user?.id) {
-        setError("User not found");
-        return;
-      }
-
-      const userSubscriptions = await subscriptionsService.getUserSubscriptions(
-        user.id
-      );
-      setSubscriptions(userSubscriptions || []);
-    } catch (err: any) {
-      console.error("Error loading subscriptions:", err);
-      setError(err.message || "Failed to load subscriptions");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isOpen, loadSubscriptions, onClose]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -172,7 +174,10 @@ export default function StudentSubscriptionModal({
                 You don&apos;t have any active subscriptions. Subscribe now to unlock
                 full access to all features.
               </p>
-              <Button onClick={handleUpgrade} className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                onClick={handleUpgrade}
+                className="bg-primary-600 text-white shadow-sm transition-colors hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35"
+              >
                 <CreditCard className="h-4 w-4 mr-2" />
                 View Plans
               </Button>
@@ -202,7 +207,11 @@ export default function StudentSubscriptionModal({
 
               {/* Subscriptions List */}
               <div className="space-y-4">
-                {subscriptions.map((subscription) => (
+                {subscriptions.map((subscription) => {
+                  const includedItems = includedItemsForPackage(
+                    subscription.subscriptionPackage
+                  );
+                  return (
                   <div
                     key={subscription.id}
                     className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -287,29 +296,27 @@ export default function StudentSubscriptionModal({
                       </div>
                     </div>
 
-                    {/* Package Features */}
-                    {subscription.subscriptionPackage?.subscriptionFeatures &&
-                      subscription.subscriptionPackage.subscriptionFeatures.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-                            Features:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {subscription.subscriptionPackage.subscriptionFeatures.map(
-                              (feature: any, index: number) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
-                                >
-                                  {feature.packageFeature?.name || feature.name}
-                                </span>
-                              )
-                            )}
-                          </div>
+                    {/* Package Features (legacy features + entitlement definitions) */}
+                    {includedItems.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                          Features:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {includedItems.map((item) => (
+                            <span
+                              key={item.id}
+                              className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
+                            >
+                              {item.label}
+                            </span>
+                          ))}
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Action Buttons */}

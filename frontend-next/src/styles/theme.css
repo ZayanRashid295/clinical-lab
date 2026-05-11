@@ -12,6 +12,10 @@
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
 
+  /* RGB triplets for rgba(...) overlays (mirrors ThemeService hexToRgb defaults; overridden on applyTheme) */
+  --color-primary-400-rgb: 96, 165, 250;
+  --color-primary-500-rgb: 59, 130, 246;
+
   --color-secondary-50: #f8fafc;
   --color-secondary-100: #f1f5f9;
   --color-secondary-200: #e2e8f0;

@@ -33,6 +33,8 @@ export interface CategoryQueryParams {
   status?: "ACTIVE" | "INACTIVE";
   dateFrom?: string;
   dateTo?: string;
+  /** Backend returns all rows (ignores page/limit). */
+  listAll?: boolean;
 }
 
 // Create DTOs

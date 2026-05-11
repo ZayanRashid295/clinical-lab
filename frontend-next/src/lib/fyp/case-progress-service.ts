@@ -99,7 +99,7 @@ class CaseProgressService {
     if (existingProgress) {
       await this.updateCaseProgress({
         userId,
-        caseId,
+        caseInstanceId: caseId,
         status: existingProgress.status,
         score: existingProgress.score,
         timeSpent: existingProgress.timeSpent,

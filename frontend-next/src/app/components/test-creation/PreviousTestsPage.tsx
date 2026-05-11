@@ -17,6 +17,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 import { authService } from "@/shared/services/auth.service";
+import { getQuestionHierarchyColumns } from "@/app/utils/question-hierarchy-display";
 
 interface TestData {
   id: string;
@@ -110,12 +111,9 @@ export default function PreviousTestsPage() {
             const systemsSet = new Set<string>();
 
             questionsArray.forEach((qpq) => {
-              if (qpq.question?.topic?.chapter?.name) {
-                subjectsSet.add(qpq.question.topic.chapter.name);
-              }
-              if (qpq.question?.topic?.chapter?.section?.name) {
-                systemsSet.add(qpq.question.topic.chapter.section.name);
-              }
+              const h = getQuestionHierarchyColumns(qpq.question);
+              if (h.subject !== "—") subjectsSet.add(h.subject);
+              if (h.system !== "—") systemsSet.add(h.system);
             });
 
             // Determine mode - check if any question has timeSpent (indicates timed test)

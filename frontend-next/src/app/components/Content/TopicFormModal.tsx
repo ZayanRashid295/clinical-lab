@@ -12,6 +12,7 @@ import {
   SelectValue,
   SELECT_EMPTY_VALUE,
 } from "@/shared/ui/select";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface TopicFormModalProps {
   isOpen: boolean;
@@ -81,7 +82,9 @@ export default function TopicFormModal({ isOpen, onClose, topic, onTopicSaved, m
           else { topicsService.getTopic(topic.id).then((entity) => { savedCallback(entity); onClose(); }).catch(() => onClose()); }
         }, 1000);
       }
-    } catch (err: any) { setError(err?.response?.data?.message || err?.message || "Failed to save topic"); }
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save topic"));
+    }
     finally { setLoading(false); }
   };
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 import { TrendingUp, MessageCircle, FileText, Lightbulb, Award, Target, ThumbsUp, ThumbsDown, Eye } from "lucide-react"
 
 interface GradingReportProps {
@@ -40,7 +40,7 @@ const FeedbackList = ({ title, items, icon: Icon }: { title: string; items: stri
         <ul className="space-y-2">
           {items.map((item, index) => (
             <li key={index} className="text-sm prose prose-sm max-w-none">
-              <ReactMarkdown>{item}</ReactMarkdown>
+              <MarkdownContent variant="default">{item}</MarkdownContent>
             </li>
           ))}
         </ul>

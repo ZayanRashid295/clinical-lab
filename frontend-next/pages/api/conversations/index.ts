@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
+import { MedprepBackendRequestError, medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
 import { parseNextJsonBody } from "@/lib/api/parse-json-body"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -33,6 +33,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return res.status(200).json({ success: true, conversation })
     } catch (e) {
+      if (MedprepBackendRequestError.is(e)) {
+        const code =
+          e.status === 403
+            ? "FORBIDDEN"
+            : e.status === 401
+              ? "UNAUTHORIZED"
+              : "MEDPREP_BACKEND_ERROR"
+        return res.status(e.status).json({
+          success: false,
+          error: code,
+          message: e.message,
+          ...(typeof e.payload === "object" && e.payload !== null ? e.payload : {}),
+        })
+      }
       console.error("[api/conversations] POST error", e)
       return res.status(500).json({ success: false, error: "Failed to create conversation" })
     }
@@ -53,6 +67,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       )
       return res.status(200).json({ success: true, conversations })
     } catch (e) {
+      if (MedprepBackendRequestError.is(e)) {
+        return res.status(e.status).json({
+          success: false,
+          error: "MEDPREP_BACKEND_ERROR",
+          message: e.message,
+          ...(typeof e.payload === "object" && e.payload !== null ? e.payload : {}),
+        })
+      }
       console.error("[api/conversations] GET error", e)
       return res.status(500).json({ success: false, error: "Failed to fetch conversations" })
     }

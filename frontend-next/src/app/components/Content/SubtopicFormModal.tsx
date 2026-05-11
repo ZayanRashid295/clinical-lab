@@ -11,6 +11,7 @@ import {
   SelectValue,
   SELECT_EMPTY_VALUE,
 } from "@/shared/ui/select";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface SubtopicFormModalProps {
   isOpen: boolean;
@@ -75,7 +76,9 @@ export default function SubtopicFormModal({ isOpen, onClose, subtopic, onSubtopi
       const savedCallback = onItemSaved || onSubtopicSaved;
       if (isCreateMode) { const response = await service.createSubtopic(formData); setSuccess(true); setTimeout(() => { savedCallback(response as any); onClose(); }, 1000); }
       else if (subtopic) { const response = await service.updateSubtopic(subtopic.id, formData); setSuccess(true); setTimeout(() => { savedCallback(response as any); onClose(); }, 1000); }
-    } catch (err: any) { setError(err?.response?.data?.message || err?.message || "Failed to save subtopic"); }
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save subtopic"));
+    }
     finally { setLoading(false); }
   };
 

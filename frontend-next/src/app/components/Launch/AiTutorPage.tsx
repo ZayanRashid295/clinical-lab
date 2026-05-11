@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Card,
-  CardContent,
-} from "@/shared/ui/card";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Textarea } from "@/shared/ui/textarea";
-import { Badge } from "@/shared/ui/badge";
 import {
   Sparkles,
   Plus,
@@ -20,6 +16,12 @@ import {
   Pin,
   PinOff,
   Archive,
+  BookOpen,
+  Stethoscope,
+  BrainCircuit,
+  FlaskConical,
+  MessagesSquare,
+  ShieldCheck,
 } from "lucide-react";
 import {
   aiTutorService,
@@ -27,36 +29,101 @@ import {
   type AiTutorConversationDetail,
   type AiTutorMessage,
 } from "@/app/services/launch";
+import { ApiHttpError, getApiErrorMessage } from "@/app/services/base/api-http-error";
+import { Alert, AlertDescription } from "@/shared/ui/alert";
+import { useToast } from "@/shared/ui/use-toast";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
+import {
+  AiTutorQuotaModal,
+  aiTutorErrorVariant,
+  type AiTutorQuotaModalVariant,
+} from "@/app/components/Launch/AiTutorQuotaModal";
 
-const SUGGESTIONS = [
-  "Explain Bayes' theorem in clinical reasoning.",
-  "How do I distinguish stable angina from unstable angina?",
-  "Make a 5-step study plan for cardiology this week.",
-  "Quiz me on common acid-base disorders.",
+const STARTERS: Array<{
+  text: string;
+  hint: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
+  {
+    text: "Explain Bayes' theorem in clinical reasoning.",
+    hint: "Reasoning & stats",
+    icon: BrainCircuit,
+  },
+  {
+    text: "How do I distinguish stable angina from unstable angina?",
+    hint: "Cardiology pearls",
+    icon: Stethoscope,
+  },
+  {
+    text: "Make a 5-step study plan for cardiology this week.",
+    hint: "Study planning",
+    icon: BookOpen,
+  },
+  {
+    text: "Quiz me on common acid-base disorders.",
+    hint: "Quick drill",
+    icon: FlaskConical,
+  },
 ];
 
+function formatRelativeShort(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return "";
+  const diff = Date.now() - t;
+  const sec = Math.floor(diff / 1000);
+  const min = Math.floor(sec / 60);
+  if (min < 1) return "Just now";
+  if (min < 60) return `${min}m`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h`;
+  const day = Math.floor(hr / 24);
+  if (day < 7) return `${day}d`;
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
 export default function AiTutorPage() {
+  const { toast } = useToast();
   const [convos, setConvos] = useState<AiTutorConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [active, setActive] = useState<AiTutorConversationDetail | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [quotaModal, setQuotaModal] = useState<{
+    message: string;
+    variant: AiTutorQuotaModalVariant;
+  } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const loadConvos = async () => {
+  const tryOpenAiTutorQuotaModal = useCallback((e: unknown): boolean => {
+    if (!ApiHttpError.is(e) || e.status !== 403) return false;
+    const msg = (e.message || "").trim();
+    if (
+      !/ai tutor|chat limit|quota|subscription package|not included/i.test(
+        msg.toLowerCase()
+      )
+    ) {
+      return false;
+    }
+    setQuotaModal({
+      message: msg,
+      variant: aiTutorErrorVariant(msg),
+    });
+    return true;
+  }, []);
+
+  const loadConvos = useCallback(async () => {
     try {
       const list = await aiTutorService.listConversations();
       setConvos(Array.isArray(list) ? list : []);
-      if (!activeId && list.length > 0) {
-        setActiveId(list[0].id);
-      }
+      setActiveId((prev) => prev ?? (list?.[0]?.id ?? null));
     } catch {
       setConvos([]);
     }
-  };
+  }, []);
 
-  const loadActive = async () => {
+  const loadActive = useCallback(async () => {
     if (!activeId) {
       setActive(null);
       return;
@@ -66,15 +133,15 @@ export default function AiTutorPage() {
     } catch {
       setActive(null);
     }
-  };
+  }, [activeId]);
 
   useEffect(() => {
     loadConvos();
-  }, []);
+  }, [loadConvos]);
 
   useEffect(() => {
     loadActive();
-  }, [activeId]);
+  }, [loadActive]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -84,12 +151,22 @@ export default function AiTutorPage() {
 
   const onNewChat = async () => {
     setCreating(true);
+    setActionError(null);
     try {
       const c = await aiTutorService.createConversation({
         title: "New conversation",
       });
       await loadConvos();
       setActiveId(c.id);
+    } catch (e) {
+      const msg = getApiErrorMessage(e, "Could not start a new chat.");
+      if (tryOpenAiTutorQuotaModal(e)) return;
+      setActionError(msg);
+      toast({
+        variant: "destructive",
+        title: "Could not create conversation",
+        description: msg,
+      });
     } finally {
       setCreating(false);
     }
@@ -98,13 +175,27 @@ export default function AiTutorPage() {
   const onSend = async (text?: string) => {
     const content = (text ?? draft).trim();
     if (!content) return;
+    setActionError(null);
     let convoId = activeId;
-    if (!convoId) {
-      const c = await aiTutorService.createConversation({});
-      await loadConvos();
-      convoId = c.id;
-      setActiveId(c.id);
+    try {
+      if (!convoId) {
+        const c = await aiTutorService.createConversation({});
+        await loadConvos();
+        convoId = c.id;
+        setActiveId(c.id);
+      }
+    } catch (e) {
+      const msg = getApiErrorMessage(e, "Could not start a conversation.");
+      if (tryOpenAiTutorQuotaModal(e)) return;
+      setActionError(msg);
+      toast({
+        variant: "destructive",
+        title: "Chat unavailable",
+        description: msg,
+      });
+      return;
     }
+
     setDraft("");
     setSending(true);
     setActive((prev) =>
@@ -127,105 +218,244 @@ export default function AiTutorPage() {
     try {
       await aiTutorService.sendMessage(convoId!, content);
       await Promise.all([loadActive(), loadConvos()]);
-    } catch {
+    } catch (e) {
+      const msg = getApiErrorMessage(
+        e,
+        "Your message could not be sent. Please try again."
+      );
+      setDraft(content);
+      await Promise.all([loadActive(), loadConvos()]);
+      if (tryOpenAiTutorQuotaModal(e)) {
+        setActionError(null);
+        return;
+      }
+      setActionError(msg);
+      toast({
+        variant: "destructive",
+        title: "Message not sent",
+        description: msg,
+      });
     } finally {
       setSending(false);
     }
   };
 
   const onTogglePin = async (c: AiTutorConversation) => {
-    await aiTutorService.updateConversation(c.id, { pinned: !c.pinned });
-    loadConvos();
+    try {
+      await aiTutorService.updateConversation(c.id, { pinned: !c.pinned });
+      await loadConvos();
+    } catch (e) {
+      const msg = getApiErrorMessage(e, "Could not update conversation.");
+      setActionError(msg);
+      toast({ variant: "destructive", title: "Action failed", description: msg });
+    }
   };
 
   const onArchive = async (c: AiTutorConversation) => {
-    await aiTutorService.updateConversation(c.id, { archive: true });
-    if (c.id === activeId) setActiveId(null);
-    loadConvos();
+    try {
+      await aiTutorService.updateConversation(c.id, { archive: true });
+      if (c.id === activeId) setActiveId(null);
+      await loadConvos();
+    } catch (e) {
+      const msg = getApiErrorMessage(e, "Could not archive conversation.");
+      setActionError(msg);
+      toast({ variant: "destructive", title: "Action failed", description: msg });
+    }
   };
 
   const onDelete = async (c: AiTutorConversation) => {
-    await aiTutorService.deleteConversation(c.id);
-    if (c.id === activeId) setActiveId(null);
-    loadConvos();
+    try {
+      await aiTutorService.deleteConversation(c.id);
+      if (c.id === activeId) setActiveId(null);
+      await loadConvos();
+    } catch (e) {
+      const msg = getApiErrorMessage(e, "Could not delete conversation.");
+      setActionError(msg);
+      toast({ variant: "destructive", title: "Action failed", description: msg });
+    }
   };
 
-  return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Sparkles className="text-violet-600" /> AI Tutor
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Ask anything — get explanations, quizzes, and study help.
-        </p>
-      </div>
+  const activeTitle =
+    active?.title && active.title !== "New conversation"
+      ? active.title
+      : "New conversation";
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4 min-h-[60vh]">
-        <Card className="h-full">
-          <CardContent className="p-3 space-y-2">
+  return (
+    <div
+      className="flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden -m-3 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(var(--color-primary-500-rgb),0.12),transparent_55%),radial-gradient(900px_500px_at_90%_0%,rgba(var(--color-primary-400-rgb),0.1),transparent_50%),linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)] p-3 pt-4 dark:bg-gray-900 sm:gap-5 sm:p-4 lg:p-5"
+    >
+      <header className="w-full shrink-0 px-1 sm:px-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-2">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-slate-500">
+              Clinical study assistant
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-medium tracking-tight text-slate-900 sm:text-4xl">
+                AI Tutor
+              </h1>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-200/80 bg-white/90 px-2.5 py-0.5 text-xs font-normal text-primary-800 dark:border-primary-700/40 dark:bg-gray-900/80 dark:text-primary-200">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+                For education only — not medical advice
+              </span>
+            </div>
+            <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
+              Deep explanations, spaced prompts, and exam-style reasoning—structured like a
+              senior resident walking through the material with you.
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-200/70 bg-white/80 px-3 py-2 shadow-sm backdrop-blur-sm">
+            <Sparkles className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+            <div className="text-right">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                Session
+              </p>
+              <p className="text-sm font-medium text-slate-900">Interactive tutor</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {actionError && (
+        <div className="w-full shrink-0 px-1 sm:px-2">
+          <Alert className="border-amber-200/90 bg-amber-50/95 text-amber-950 shadow-sm backdrop-blur-sm dark:bg-amber-950/30 dark:text-amber-50">
+            <AlertDescription className="flex flex-wrap items-start justify-between gap-3">
+              <span className="leading-relaxed">{actionError}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 shrink-0 text-amber-900 hover:bg-amber-100/90 dark:text-amber-100 dark:hover:bg-amber-900/40"
+                onClick={() => setActionError(null)}
+              >
+                Dismiss
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      <div className="grid min-h-0 w-full min-w-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)_minmax(0,2fr)] gap-4 lg:min-h-0 lg:grid-cols-[minmax(260px,300px)_1fr] lg:grid-rows-1 lg:gap-5">
+        {/* Sidebar */}
+        <Card className="flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/85 shadow-sm shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md dark:border-slate-700 dark:bg-gray-800/90">
+          <div className="shrink-0 bg-gradient-to-br from-primary-600 via-primary-600 to-primary-800 px-3.5 py-3 text-white">
+            <div className="flex items-center gap-2">
+              <MessagesSquare className="h-4 w-4 opacity-95" />
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/75">
+                  Workspace
+                </p>
+                <p className="text-sm font-medium leading-tight">Your chats</p>
+              </div>
+            </div>
+          </div>
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-2.5 p-3">
             <Button
               onClick={onNewChat}
               disabled={creating}
-              className="w-full gap-2"
+              className="h-9 w-full shrink-0 gap-1.5 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 text-sm font-medium text-white shadow-sm shadow-primary-500/20 transition hover:from-primary-700 hover:to-primary-800"
             >
               {creating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Plus className="h-4 w-4" />
               )}
-              New chat
+              New conversation
             </Button>
-            <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain pr-0.5">
               {convos.length === 0 ? (
-                <p className="text-xs text-muted-foreground text-center py-6">
-                  No conversations yet.
-                </p>
+                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 px-4 py-10 text-center">
+                  <MessageCircle className="mx-auto mb-3 h-8 w-8 text-slate-300" />
+                  <p className="text-sm font-medium text-slate-700">No chats yet</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                    Start with a prompt below or tap{" "}
+                    <span className="font-medium text-primary-700 dark:text-primary-300">New conversation</span>.
+                  </p>
+                </div>
               ) : (
                 convos.map((c) => (
                   <div
                     key={c.id}
-                    className={`group p-2 rounded text-sm cursor-pointer flex items-center gap-2 ${
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setActiveId(c.id);
+                      }
+                    }}
+                    className={`group flex cursor-pointer items-start gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-all ${
                       c.id === activeId
-                        ? "bg-violet-100 dark:bg-violet-900/30"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800/40"
+                        ? "border-primary-200/90 bg-primary-50/80 dark:border-primary-700/45 dark:bg-primary-900/25"
+                        : "border-transparent bg-transparent hover:border-slate-200/90 hover:bg-slate-50"
                     }`}
                     onClick={() => setActiveId(c.id)}
                   >
-                    <MessageCircle className="h-4 w-4 text-violet-600 shrink-0" />
-                    <span className="flex-1 truncate">{c.title}</span>
-                    <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onTogglePin(c);
-                        }}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                      >
-                        {c.pinned ? (
-                          <PinOff className="h-3 w-3" />
-                        ) : (
-                          <Pin className="h-3 w-3" />
+                    <div
+                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
+                        c.id === activeId
+                          ? "bg-primary-600 text-white dark:bg-primary-500"
+                          : "bg-slate-100 text-slate-600 group-hover:bg-white"
+                      }`}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="line-clamp-2 text-sm font-medium leading-snug text-slate-900">
+                          {c.title}
+                        </span>
+                        <span className="shrink-0 text-[10px] font-medium tabular-nums text-slate-400">
+                          {formatRelativeShort(c.lastMessageAt)}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        {c.pinned && (
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-medium uppercase tracking-wide text-primary-600 dark:text-primary-400">
+                            <Pin className="h-3 w-3" />
+                            Pinned
+                          </span>
                         )}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onArchive(c);
-                        }}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                      >
-                        <Archive className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(c);
-                        }}
-                        className="p-1 hover:bg-red-100 rounded"
-                      >
-                        <Trash2 className="h-3 w-3 text-red-500" />
-                      </button>
+                        <div className="ml-auto flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onTogglePin(c);
+                            }}
+                            className="rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-800"
+                            aria-label={c.pinned ? "Unpin" : "Pin"}
+                          >
+                            {c.pinned ? (
+                              <PinOff className="h-3.5 w-3.5" />
+                            ) : (
+                              <Pin className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onArchive(c);
+                            }}
+                            className="rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-800"
+                            aria-label="Archive"
+                          >
+                            <Archive className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(c);
+                            }}
+                            className="rounded-md p-1.5 text-red-500 hover:bg-red-50"
+                            aria-label="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -234,95 +464,170 @@ export default function AiTutorPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col h-full">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Main thread */}
+        <Card className="relative flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/90 shadow-md shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md">
+          {active && active.messages.length > 0 && (
+            <div className="shrink-0 border-b border-slate-100/90 bg-gradient-to-r from-slate-50/80 to-white px-4 py-2.5">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-slate-500">
+                Active thread
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-sm font-medium text-slate-900">
+                {activeTitle}
+              </p>
+            </div>
+          )}
+
+          <div
+            ref={scrollRef}
+            className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6"
+          >
             {!active || active.messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-3">
-                <Bot className="h-10 w-10 text-violet-400" />
-                <p className="font-medium">How can I help you study today?</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-xl">
-                  {SUGGESTIONS.map((s) => (
-                    <Button
-                      key={s}
-                      variant="outline"
-                      className="h-auto py-2 text-left justify-start whitespace-normal"
-                      onClick={() => onSend(s)}
+              <div className="relative flex w-full flex-col items-stretch px-0 py-6">
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-full bg-gradient-to-b from-primary-400/15 to-transparent blur-3xl"
+                  aria-hidden
+                />
+                <div className="relative flex flex-col items-center text-center">
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 shadow-md shadow-primary-500/20">
+                    <Bot className="h-7 w-7 text-white" strokeWidth={1.5} />
+                  </div>
+                  <h2 className="text-xl font-medium tracking-tight text-slate-900 sm:text-2xl">
+                    Where should we focus today?
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+                    Pick a starter or type your own question. Long-form answers stay in this
+                    pane—scroll inside the chat, not the whole page.
+                  </p>
+                </div>
+
+                <div className="relative mt-8 grid w-full gap-2.5 sm:grid-cols-2">
+                  {STARTERS.map(({ text, hint, icon: Icon }) => (
+                    <button
+                      key={text}
+                      type="button"
+                      onClick={() => onSend(text)}
+                      className="group flex gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 text-left shadow-sm transition-all hover:border-primary-200/90 hover:shadow dark:hover:border-primary-700/45"
                     >
-                      {s}
-                    </Button>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition group-hover:bg-primary-100 dark:bg-primary-900/35 dark:text-primary-300 dark:group-hover:bg-primary-900/55">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[11px] font-medium uppercase tracking-wide text-primary-600/90 dark:text-primary-400/90">
+                          {hint}
+                        </span>
+                        <span className="mt-1 block text-sm font-medium leading-snug text-slate-800">
+                          {text}
+                        </span>
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>
             ) : (
-              active.messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`flex gap-3 ${
-                    m.role === "USER" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {m.role !== "USER" && (
-                    <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
-                      <Bot className="h-4 w-4 text-violet-600" />
-                    </div>
-                  )}
+              <div className="w-full space-y-4 pb-4">
+                {active.messages.map((m) => (
                   <div
-                    className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-line ${
-                      m.role === "USER"
-                        ? "bg-violet-600 text-white"
-                        : "bg-gray-100 dark:bg-gray-800"
-                    }`}
+                    key={m.id}
+                    className={`flex w-full min-w-0 gap-3 ${m.role === "USER" ? "justify-end" : "justify-start"}`}
                   >
-                    {m.content}
-                    {m.model && (
-                      <Badge
-                        variant="outline"
-                        className="ml-2 text-[9px] bg-white/10 border-white/20"
+                    {m.role !== "USER" && (
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-100 to-primary-200 text-primary-700 dark:from-primary-900/45 dark:to-primary-800/35 dark:text-primary-300">
+                        <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      </div>
+                    )}
+                    <div
+                      className={`min-w-0 rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                        m.role === "USER"
+                          ? "max-w-[min(100%,42rem)] shrink-0 rounded-tr-sm bg-primary-600 text-white shadow-sm shadow-primary-500/15"
+                          : "max-w-none flex-1 rounded-tl-sm border border-slate-100/90 bg-slate-50/90 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100"
+                      }`}
+                    >
+                      {m.role === "USER" ? (
+                        <p className="whitespace-pre-wrap">{m.content}</p>
+                      ) : (
+                        <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-2 prose-headings:my-3 [&>:first-child]:mt-0">
+                          <MarkdownContent variant="assistant">{m.content}</MarkdownContent>
+                        </div>
+                      )}
+                      <p
+                        className={`mt-2 text-[10px] font-medium tabular-nums ${
+                          m.role === "USER" ? "text-white/75" : "text-slate-400"
+                        }`}
                       >
-                        {m.model}
-                      </Badge>
+                        {formatRelativeShort(m.createdAt)}
+                      </p>
+                    </div>
+                    {m.role === "USER" && (
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-white dark:bg-slate-700">
+                        <User className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      </div>
                     )}
                   </div>
-                  {m.role === "USER" && (
-                    <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-            {sending && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Bot className="h-4 w-4 text-violet-500" />
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Thinking…
+                ))}
+                {sending && (
+                  <div className="flex items-center gap-2 pl-12 text-sm text-slate-500">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/40">
+                      <Bot className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                    </span>
+                    <Loader2 className="h-4 w-4 animate-spin text-primary-500 dark:text-primary-400" />
+                    <span className="font-medium">Thinking…</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
-          <div className="border-t p-3 flex items-end gap-2">
-            <Textarea
-              placeholder="Ask anything…"
-              rows={2}
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  onSend();
-                }
-              }}
-              className="resize-none"
-            />
-            <Button onClick={() => onSend()} disabled={sending || !draft.trim()}>
-              {sending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
+
+          <div className="shrink-0 border-t border-slate-100/90 bg-slate-50/80 p-3 backdrop-blur-sm">
+            <div className="flex w-full min-w-0 items-end gap-2.5">
+              <div className="relative min-w-0 flex-1">
+                <Textarea
+                  placeholder="Ask a mechanism, request a quiz, or paste a vignette…"
+                  rows={2}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      onSend();
+                    }
+                  }}
+                  className="min-h-[44px] resize-none rounded-lg border-slate-200/90 bg-white pr-3 text-sm shadow-inner ring-0 transition placeholder:text-slate-400 focus-visible:ring-[1.5px] focus-visible:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900/80"
+                />
+                <p className="mt-1.5 text-[11px] text-slate-500">
+                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
+                    Enter
+                  </kbd>{" "}
+                  to send ·{" "}
+                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
+                    Shift+Enter
+                  </kbd>{" "}
+                  new line
+                </p>
+              </div>
+              <Button
+                type="button"
+                size="default"
+                onClick={() => onSend()}
+                disabled={sending || !draft.trim()}
+                className="h-11 min-w-[44px] shrink-0 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-4 font-medium text-white shadow-sm shadow-primary-500/20 hover:from-primary-700 hover:to-primary-800 disabled:opacity-40"
+              >
+                {sending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
         </Card>
       </div>
+
+      <AiTutorQuotaModal
+        open={quotaModal !== null}
+        onClose={() => setQuotaModal(null)}
+        message={quotaModal?.message ?? ""}
+        variant={quotaModal?.variant ?? "generic"}
+      />
     </div>
   );
 }

@@ -26,7 +26,15 @@ export type AchievementMetric =
   | "STREAK_DAYS"
   | "STUDY_MINUTES"
   | "DISCUSSION_POSTS"
-  | "GOAL_COMPLETED";
+  | "GOAL_COMPLETED"
+  | "AI_TUTOR_MESSAGES"
+  | "STUDY_TASKS_COMPLETED"
+  | "STUDY_GROUP_POSTS"
+  | "MEDPREP_CONVERSATIONS"
+  | "QUESTION_REPORTS_SUBMITTED"
+  | "FEEDBACK_TICKETS_SUBMITTED"
+  | "MOCK_EXAMS_COMPLETED"
+  | "STUDY_GROUPS_JOINED";
 
 export interface Achievement {
   id: string;
@@ -47,8 +55,19 @@ export interface AchievementWithProgress extends Achievement {
   progress: number;
 }
 
+/** Points / level snapshot from GET /achievements/me */
 export interface AchievementsOverview {
-  points: { total: number; level: number; nextLevelAt: number };
+  points: {
+    total: number;
+    level: number;
+    /** Points earned within the current level band (0 … pointsPerLevel-1) */
+    pointsIntoLevel: number;
+    pointsPerLevel: number;
+    /** 0–100 progress toward the next level */
+    progressToNextLevel: number;
+    /** Total points required to reach the next level */
+    nextLevelTotalPoints: number;
+  };
   streak: {
     current: number;
     longest: number;
@@ -64,6 +83,7 @@ export interface AchievementsOverview {
 }
 
 export interface LeaderboardEntry {
+  id?: string;
   userId: string;
   total: number;
   level: number;

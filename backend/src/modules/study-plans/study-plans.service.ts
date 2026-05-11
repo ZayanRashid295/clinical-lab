@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { StudyTaskStatus, StudyTaskType } from "@prisma/client";
+import { AchievementsService } from "../achievements/achievements.service";
 import {
   CreateStudyPlanDto,
   CreateStudyTaskDto,
@@ -11,7 +12,10 @@ import {
 
 @Injectable()
 export class StudyPlansService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private achievements: AchievementsService
+  ) {}
 
   // ────────── plans ──────────
 
@@ -134,6 +138,7 @@ export class StudyPlansService {
     if (!task || task.userId !== userId) {
       throw new NotFoundException("Study task not found");
     }
+    const wasCompleted = task.status === StudyTaskStatus.COMPLETED;
     const data: any = {
       title: dto.title,
       description: dto.description,
@@ -145,7 +150,13 @@ export class StudyPlansService {
     if (dto.status === StudyTaskStatus.COMPLETED) data.completedAt = new Date();
     if (dto.status && dto.status !== StudyTaskStatus.COMPLETED)
       data.completedAt = null;
-    return this.prisma.studyTask.update({ where: { id }, data });
+    const updated = await this.prisma.studyTask.update({ where: { id }, data });
+    if (!wasCompleted && dto.status === StudyTaskStatus.COMPLETED) {
+      void this.achievements
+        .recordActivity(userId, "STUDY_TASKS_COMPLETED", 1)
+        .catch(() => undefined);
+    }
+    return updated;
   }
 
   async deleteTask(userId: string, id: string) {

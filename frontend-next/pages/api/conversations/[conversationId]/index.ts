@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
+import { MedprepBackendRequestError, medprepBackendRequest } from "@/lib/fyp/backend-medprep-api"
 import { parseNextJsonBody } from "@/lib/api/parse-json-body"
 
 function inferErrorStatus(err: unknown): number {
@@ -34,6 +34,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return res.status(200).json({ success: true, conversation })
     } catch (e) {
+      if (MedprepBackendRequestError.is(e)) {
+        const status = e.status
+        const clientMsg =
+          status === 404
+            ? "Conversation not found"
+            : status === 403
+              ? "Forbidden"
+              : status === 401
+                ? "Unauthorized"
+                : "Failed to load conversation"
+        return res.status(status).json({
+          success: false,
+          error: clientMsg,
+          message: e.message,
+          ...(typeof e.payload === "object" && e.payload !== null ? e.payload : {}),
+        })
+      }
       console.error("[api/conversations/:id] GET error", e)
       const status = inferErrorStatus(e)
       const clientMsg =

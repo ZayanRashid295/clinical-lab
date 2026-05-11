@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/shared/ui/use-toast"
+import { toastApiError } from "@/app/services/base/api-http-error"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -50,6 +52,7 @@ export function DiagnosisSubmission({
   onContinueToSOAP,
   medicalCase
 }: DiagnosisSubmissionProps) {
+  const { toast } = useToast()
   const [diagnosis, setDiagnosis] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
@@ -93,7 +96,7 @@ export function DiagnosisSubmission({
       }
     } catch (error) {
       console.error("Error submitting diagnosis:", error)
-      alert("Failed to submit diagnosis. Please try again.")
+      toastApiError(toast, error, "Couldn’t submit diagnosis")
     } finally {
       setIsSubmitting(false)
     }

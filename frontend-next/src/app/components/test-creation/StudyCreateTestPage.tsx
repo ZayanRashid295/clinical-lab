@@ -513,7 +513,6 @@ export default function StudyCreateTestPage() {
             selectedPool={selectedPool}
             onPoolChange={setSelectedPool}
             isMarked={isMarked}
-            refreshTrigger={refreshTrigger}
             filters={{
               systemIds: selectedTags,
               topicIds: selectedSubjects,
@@ -531,7 +530,6 @@ export default function StudyCreateTestPage() {
               onSystemToggle={handleTagToggle}
             selectedPool={selectedPool}
                     isMarked={isMarked}
-                    refreshTrigger={refreshTrigger}
             />
             {validationErrors.subjects && (
                     <div className="px-4 py-2 bg-destructive/5 dark:bg-destructive/10 border-t border-destructive/20">
@@ -553,7 +551,6 @@ export default function StudyCreateTestPage() {
                     isMarked={isMarked}
               onTopicToggle={handleSubjectToggle}
               onSubtopicToggle={handleTopicToggle}
-                    refreshTrigger={refreshTrigger}
             />
             {validationErrors.systems && (
                     <div className="px-4 py-2 bg-destructive/5 dark:bg-destructive/10 border-t border-destructive/20 dark:border-red-500/30">

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 import type { Conversation, MedicalCase, SOAPNote } from "@/lib/fyp/data-models"
 import type { SOAPGrading } from "@/lib/fyp/soap-service"
 import type { ConversationGrading } from "@/lib/fyp/ai-service"
@@ -400,7 +400,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                   {assistantSuggestions[section].length > 0 && (
                     <div className="border border-blue-200 bg-blue-50 rounded p-3 text-sm">
                       {assistantSuggestions[section].map((suggestion, index) => (
-                        <div key={index} className="prose prose-sm max-w-none"><ReactMarkdown>{suggestion}</ReactMarkdown></div>
+                        <div key={index} className="prose prose-sm max-w-none"><MarkdownContent variant="default">{suggestion}</MarkdownContent></div>
                       ))}
                     </div>
                   )}

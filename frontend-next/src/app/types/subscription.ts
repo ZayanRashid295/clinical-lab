@@ -37,6 +37,35 @@ export interface SubscriptionPackage {
     name: string;
   };
   subscriptionFeatures?: SubscriptionFeature[];
+  entitlements?: SubscriptionPackageEntitlement[];
+}
+
+export type EntitlementType = "BOOLEAN" | "SET" | "NUMBER_LIMIT" | "JSON_CONSTRAINTS";
+
+export interface EntitlementDefinition {
+  id: string;
+  key: string;
+  displayName: string;
+  description?: string;
+  productSubtypeId?: string | null;
+  type: EntitlementType;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  productSubtype?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface SubscriptionPackageEntitlement {
+  id: string;
+  subscriptionPackageId: string;
+  entitlementDefinitionId: string;
+  valueJson: any;
+  createdAt: string;
+  updatedAt: string;
+  entitlementDefinition?: EntitlementDefinition;
 }
 
 export interface PackageFeature {
@@ -92,6 +121,20 @@ export interface PackageFeatureQueryParams {
   dateFrom?: string;
   dateTo?: string;
 }
+
+export interface EntitlementDefinitionQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "createdAt" | "updatedAt" | "key" | "displayName" | "isActive";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  productSubtypeId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface EntitlementDefinitionFilters extends EntitlementDefinitionQueryParams {}
 
 // Create DTOs
 export interface CreateSubscriptionDto {

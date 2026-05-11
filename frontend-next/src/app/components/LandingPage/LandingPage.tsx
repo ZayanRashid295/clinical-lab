@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { LandingNav } from "./LandingNav";
@@ -127,7 +127,7 @@ function PricingGrid({
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
   const [loading, setLoading] = useState(true);
-  const packagesService = new SubscriptionPackagesService();
+  const packagesService = useMemo(() => new SubscriptionPackagesService(), []);
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -162,7 +162,7 @@ function PricingGrid({
     };
 
     fetchPackages();
-  }, []);
+  }, [packagesService]);
 
   if (loading) {
     return (

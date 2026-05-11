@@ -1,4 +1,5 @@
 import { ForbiddenException } from "@nestjs/common";
+import { MedprepMode } from "@prisma/client";
 import { MedprepAiService } from "./medprep-ai.service";
 
 describe("MedprepAiService", () => {
@@ -27,11 +28,22 @@ describe("MedprepAiService", () => {
     },
   };
 
+  const subscriptionsMock: any = {
+    /** Legacy-style: access only → all modes allowed */
+    getUserEntitlements: jest.fn().mockResolvedValue({
+      "medprepai.access": { enabled: true },
+    }),
+  };
+
+  const achievementsMock: any = {
+    recordActivity: jest.fn().mockResolvedValue({ unlocked: [], pointsAwarded: 0 }),
+  };
+
   let service: MedprepAiService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new MedprepAiService(prismaMock);
+    service = new MedprepAiService(prismaMock, subscriptionsMock, achievementsMock);
   });
 
   it("returns existing active session instead of creating duplicate", async () => {
@@ -59,6 +71,41 @@ describe("MedprepAiService", () => {
     await expect(service.getSession("another-user", "session-1")).rejects.toBeInstanceOf(
       ForbiddenException
     );
+  });
+
+  it("blocks starting a session when package lists modes but none are selected", async () => {
+    subscriptionsMock.getUserEntitlements.mockResolvedValueOnce({
+      "medprepai.access": { enabled: true },
+      "medprepai.modes": { items: [], limitsPerMode: {}, limitPeriod: "MONTH" },
+    });
+    prismaMock.medprepConversation.findFirst.mockResolvedValueOnce(null);
+
+    await expect(
+      service.startSession("user-1", {
+        mode: MedprepMode.PRACTICE,
+        caseId: "case-1",
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(prismaMock.medprepConversation.create).not.toHaveBeenCalled();
+  });
+
+  it("blocks LEARNING when subscription only includes Practice (let-me-drive)", async () => {
+    subscriptionsMock.getUserEntitlements.mockResolvedValueOnce({
+      "medprepai.access": { enabled: true },
+      "medprepai.modes": {
+        items: ["let-me-drive"],
+        limitsPerMode: { "let-me-drive": 2 },
+        limitPeriod: "MONTH",
+      },
+    });
+    prismaMock.medprepConversation.findFirst.mockResolvedValueOnce(null);
+
+    await expect(
+      service.startSession("user-1", {
+        mode: MedprepMode.LEARNING,
+        caseId: "case-1",
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it("records intervention count when doctor intervention message is added", async () => {

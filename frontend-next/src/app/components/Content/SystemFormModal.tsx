@@ -11,6 +11,7 @@ import {
   SelectValue,
   SELECT_EMPTY_VALUE,
 } from "@/shared/ui/select";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface SystemFormModalProps {
   isOpen: boolean;
@@ -75,7 +76,9 @@ export default function SystemFormModal({ isOpen, onClose, system, onSystemSaved
       const savedCallback = onItemSaved || onSystemSaved;
       if (isCreateMode) { const response = await service.createSystem(formData); setSuccess(true); setTimeout(() => { savedCallback(response as any); onClose(); }, 1000); }
       else if (system) { const response = await service.updateSystem(system.id, formData); setSuccess(true); setTimeout(() => { savedCallback(response as any); onClose(); }, 1000); }
-    } catch (err: any) { setError(err?.response?.data?.message || err?.message || "Failed to save system"); }
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save system"));
+    }
     finally { setLoading(false); }
   };
 

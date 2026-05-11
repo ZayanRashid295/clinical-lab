@@ -19,6 +19,7 @@ import { SubscriptionsService } from "../../services/subscriptions/subscriptions
 import { UsersService } from "../../services/users/users.service";
 import { SubscriptionPackagesService } from "../../services/subscriptions/subscription-packages.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 type UserOption = { id: string; label: string };
 type PackageOption = { id: string; label: string };
@@ -292,12 +293,8 @@ export default function SubscriptionFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save subscription"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save subscription"));
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,7 @@ import {
   CreateGroupPostDto,
   CreateStudyGroupDto,
   JoinByCodeDto,
+  TransferOwnershipDto,
   UpdateStudyGroupDto,
 } from "./dto/study-group.dto";
 
@@ -80,6 +81,20 @@ export class StudyGroupsController {
   @ApiOperation({ summary: "Leave a group" })
   leave(@Request() req, @Param("id") id: string) {
     return this.service.leave(req.user?.userId, id);
+  }
+
+  @Post(":id/transfer-ownership")
+  @ApiOperation({ summary: "Transfer group ownership to another member (owner only)" })
+  transferOwnership(
+    @Request() req,
+    @Param("id") id: string,
+    @Body() dto: TransferOwnershipDto
+  ) {
+    return this.service.transferOwnership(
+      req.user?.userId,
+      id,
+      dto.newOwnerUserId
+    );
   }
 
   @Get(":id/posts")

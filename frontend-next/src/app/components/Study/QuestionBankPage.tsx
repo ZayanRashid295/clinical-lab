@@ -41,6 +41,7 @@ import {
   type Bookmark as BookmarkRow,
 } from "@/app/services/student";
 import ReportQuestionButton from "@/app/components/Launch/ReportQuestionButton";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"] as const;
 const QUESTION_TYPES = [
@@ -125,7 +126,7 @@ export default function QuestionBankPage() {
       setQuestions(list);
       setBookmarks(bRes);
     } catch (e: any) {
-      setError(e?.message || "Failed to load questions");
+      setError(getApiErrorMessage(e, "Failed to load questions"));
     } finally {
       setLoading(false);
     }
@@ -215,7 +216,7 @@ export default function QuestionBankPage() {
       const full = (await questionsService.getQuestion(q.id)) as any;
       setPreviewQ({ ...q, ...full });
     } catch (e: any) {
-      setError(e?.message || "Could not load question detail");
+      setError(getApiErrorMessage(e, "Could not load question detail"));
       setPreviewId(null);
     } finally {
       setPreviewLoading(false);
@@ -289,7 +290,7 @@ export default function QuestionBankPage() {
 
       window.location.href = `/question-generator/student?${params.toString()}`;
     } catch (e: any) {
-      setError(e?.message || "Could not start practice");
+      setError(getApiErrorMessage(e, "Could not start practice"));
     } finally {
       setLaunching(false);
     }

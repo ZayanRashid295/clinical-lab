@@ -14,6 +14,7 @@ import {
 } from "../../types/category";
 import { CategoriesService } from "../../services/categories/categories.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface CategoryFormModalProps {
   isOpen: boolean;
@@ -177,12 +178,8 @@ export default function CategoryFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save category"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save category"));
     } finally {
       setLoading(false);
     }

@@ -13,12 +13,15 @@ import { PermissionsGuard } from "./guards/permissions.guard";
 import { SubscriptionGuard } from "./guards/subscription.guard";
 import { FeatureGuard } from "./guards/feature.guard";
 import { CombinedAccessGuard } from "./guards/combined-access.guard";
+import { EntitlementGuard } from "./guards/entitlement.guard";
 import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { UsersModule } from "../users/users.module";
 
 @Module({
   imports: [
     PassportModule,
+    UsersModule,
     SubscriptionsModule, // Import to use SubscriptionsService in guards
     NotificationsModule, // Welcome notification on signup
     JwtModule.registerAsync({
@@ -43,6 +46,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
     SubscriptionGuard,
     FeatureGuard,
     CombinedAccessGuard,
+    EntitlementGuard,
   ],
   exports: [
     AuthService,
@@ -51,6 +55,10 @@ import { NotificationsModule } from "../notifications/notifications.module";
     SubscriptionGuard,
     FeatureGuard,
     CombinedAccessGuard,
+    EntitlementGuard,
+    // Re-export so feature modules that import AuthModule can resolve
+    // EntitlementGuard → SubscriptionsService without importing SubscriptionsModule.
+    SubscriptionsModule,
   ],
 })
 export class AuthModule {}

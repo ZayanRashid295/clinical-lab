@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -42,6 +42,11 @@ import { authService } from "@/shared";
 import { useRealtimeRoom } from "@/app/services/realtime/use-realtime-room";
 import { UserIdentity } from "@/shared/components/Common/UserIdentity";
 import { MessageBubble } from "@/shared/components/Common/MessageBubble";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
+import { useToast } from "@/shared/ui/use-toast";
+import {
+  toastApiError,
+} from "@/app/services/base/api-http-error";
 
 const CATEGORIES: { value: FeedbackCategory; label: string; Icon: any }[] = [
   { value: "GENERAL", label: "General", Icon: Sparkles },
@@ -113,6 +118,7 @@ export default function FeedbackPage() {
 
 function TicketList() {
   const router = useRouter();
+  const { toast } = useToast();
   const isStaff = useIsStaff();
   const [items, setItems] = useState<FeedbackTicket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +134,7 @@ function TicketList() {
   });
   const [creating, setCreating] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const list = isStaff
@@ -137,21 +143,24 @@ function TicketList() {
           )
         : await feedbackService.listMine();
       setItems(Array.isArray(list) ? list : []);
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t load tickets");
+      setItems([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [isStaff, statusFilter, toast]);
 
   useEffect(() => {
     load();
-  }, [isStaff, statusFilter]);
+  }, [load]);
 
   // Auto-refresh on live notifications relevant to feedback tickets
   useEffect(() => {
     return onNotification((n) => {
       if (n.type === "FEEDBACK_REPLY" || (n.data as any)?.ticketId) load();
     });
-  }, [isStaff, statusFilter]);
+  }, [load]);
 
   const onCreate = async () => {
     if (!draft.subject.trim() || !draft.body.trim()) return;
@@ -166,6 +175,8 @@ function TicketList() {
         priority: "NORMAL",
       });
       router.push(`/feedback/${t.id}`);
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t create ticket");
     } finally {
       setCreating(false);
     }
@@ -392,6 +403,7 @@ function TicketList() {
 
 function TicketDetail({ id }: { id: string }) {
   const router = useRouter();
+  const { toast } = useToast();
   const isStaff = useIsStaff();
   const [t, setT] = useState<FeedbackTicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -400,7 +412,7 @@ function TicketDetail({ id }: { id: string }) {
   const [savingMeta, setSavingMeta] = useState(false);
   const meId = authService.getCurrentUser?.()?.id as string | undefined;
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       setT(await feedbackService.findOne(id));
@@ -409,11 +421,11 @@ function TicketDetail({ id }: { id: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     load();
-  }, [id]);
+  }, [load]);
 
   // Live refresh when a notification mentions this ticket
   useEffect(() => {
@@ -421,7 +433,7 @@ function TicketDetail({ id }: { id: string }) {
       const tid = (n.data as any)?.ticketId;
       if (tid && tid === id) load();
     });
-  }, [id]);
+  }, [id, load]);
 
   // Direct websocket room for replies and status updates
   useRealtimeRoom("ticket", id, {
@@ -454,6 +466,8 @@ function TicketDetail({ id }: { id: string }) {
       await feedbackService.reply(id, reply);
       setReply("");
       load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t send reply");
     } finally {
       setPosting(false);
     }
@@ -465,6 +479,8 @@ function TicketDetail({ id }: { id: string }) {
     try {
       await feedbackService.update(id, { status });
       await load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update status");
     } finally {
       setSavingMeta(false);
     }
@@ -476,6 +492,8 @@ function TicketDetail({ id }: { id: string }) {
     try {
       await feedbackService.update(id, { priority });
       await load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update priority");
     } finally {
       setSavingMeta(false);
     }
@@ -527,9 +545,9 @@ function TicketDetail({ id }: { id: string }) {
               <p className="text-xs text-muted-foreground mt-1">
                 Opened {new Date(t.createdAt).toLocaleString()}
               </p>
-              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">
-                {t.body}
-              </p>
+              <div className="mt-4 text-sm leading-relaxed">
+                <MarkdownContent variant="default">{t.body}</MarkdownContent>
+              </div>
             </CardContent>
           </Card>
 

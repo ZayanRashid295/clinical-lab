@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CreditCard,
   Calendar,
@@ -11,8 +11,13 @@ import {
   Info,
   Loader2,
   ArrowLeft,
+  Sparkles,
 } from "lucide-react";
-import { Subscription, SubscriptionStatus, SubscriptionPackage } from "../../types/subscription";
+import {
+  Subscription,
+  SubscriptionStatus,
+  SubscriptionPackage,
+} from "../../types/subscription";
 import { SubscriptionsService } from "../../services/subscriptions/subscriptions.service";
 import { SubscriptionPackagesService } from "../../services/subscriptions/subscription-packages.service";
 import { authService } from "../../../shared/services/auth.service";
@@ -30,9 +35,12 @@ import {
 } from "../../../shared/ui/alert-dialog";
 import { Switch } from "../../../shared/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../shared/ui/card";
-import { Badge } from "../../../shared/ui/badge";
 import { useToast } from "../../../shared/ui/use-toast";
 import { Alert, AlertDescription } from "../../../shared/ui/alert";
+import {
+  includedFeatureCount,
+  includedItemsForPackage,
+} from "./includedPackageItems";
 
 export default function MySubscriptionPage() {
   const { toast } = useToast();
@@ -46,19 +54,10 @@ export default function MySubscriptionPage() {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [subscriptionToCancel, setSubscriptionToCancel] = useState<Subscription | null>(null);
   const [packageToUpgrade, setPackageToUpgrade] = useState<SubscriptionPackage | null>(null);
-  const subscriptionsService = new SubscriptionsService();
-  const packagesService = new SubscriptionPackagesService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
+  const packagesService = useMemo(() => new SubscriptionPackagesService(), []);
 
-  useEffect(() => {
-    // Check authentication
-    if (!authService.isAuthenticated()) {
-      router.replace("/");
-      return;
-    }
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -82,7 +81,16 @@ export default function MySubscriptionPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [packagesService, subscriptionsService]);
+
+  useEffect(() => {
+    // Check authentication
+    if (!authService.isAuthenticated()) {
+      router.replace("/");
+      return;
+    }
+    loadData();
+  }, [loadData, router]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -102,20 +110,32 @@ export default function MySubscriptionPage() {
     });
   };
 
-  const getStatusColor = (status: SubscriptionStatus) => {
+  const getStatusPillClass = (status: SubscriptionStatus) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-      case "EXPIRED":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-      case "SUSPENDED":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+        return "text-emerald-900 dark:text-emerald-200 bg-gradient-to-r from-emerald-200/70 to-emerald-100/40 dark:from-emerald-900/40 dark:to-emerald-900/20 ring-1 ring-emerald-200/70 dark:ring-emerald-700/40";
       case "PENDING":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+        return "text-sky-900 dark:text-sky-200 bg-gradient-to-r from-sky-200/70 to-sky-100/40 dark:from-sky-900/40 dark:to-sky-900/20 ring-1 ring-sky-200/70 dark:ring-sky-700/40";
+      case "SUSPENDED":
+        return "text-amber-900 dark:text-amber-200 bg-gradient-to-r from-amber-200/70 to-amber-100/40 dark:from-amber-900/40 dark:to-amber-900/20 ring-1 ring-amber-200/70 dark:ring-amber-700/40";
+      case "CANCELLED":
+        return "text-rose-900 dark:text-rose-200 bg-gradient-to-r from-rose-200/70 to-rose-100/40 dark:from-rose-900/40 dark:to-rose-900/20 ring-1 ring-rose-200/70 dark:ring-rose-700/40";
+      case "EXPIRED":
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+        return "text-slate-800 dark:text-slate-200 bg-gradient-to-r from-slate-200/70 to-slate-100/40 dark:from-slate-800/40 dark:to-slate-800/20 ring-1 ring-slate-200/70 dark:ring-slate-700/40";
+    }
+  };
+
+  const formatMoney = (amount: number, currency?: string) => {
+    const maybeCurrency = (currency || "USD").toUpperCase();
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: maybeCurrency,
+        maximumFractionDigits: 2,
+      }).format(amount);
+    } catch {
+      return `$${amount}`;
     }
   };
 
@@ -225,8 +245,8 @@ export default function MySubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="w-full px-4 sm:px-6 lg:px-10 py-8">
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -249,7 +269,7 @@ export default function MySubscriptionPage() {
             </div>
             <Button
               onClick={() => router.push("/landing-page#pricing")}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary-600 text-white shadow-sm transition-colors hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35"
             >
               <Info className="h-4 w-4 mr-2" />
               View All Plans
@@ -278,7 +298,7 @@ export default function MySubscriptionPage() {
               </p>
               <Button
                 onClick={() => router.push("/landing-page#pricing")}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary-600 text-white shadow-sm transition-colors hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35"
               >
                 <CreditCard className="h-4 w-4 mr-2" />
                 View Plans
@@ -289,22 +309,31 @@ export default function MySubscriptionPage() {
           <>
             {/* Active Subscription Banner */}
             {hasActiveSubscription && activeSubscription && (
-              <Alert className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <AlertDescription className="flex items-center justify-between w-full">
-                  <div>
-                    <span className="font-semibold text-green-800 dark:text-green-300">
-                      Active Subscription
-                    </span>
-                    <span className="ml-3 text-sm text-green-700 dark:text-green-400">
-                      {activeSubscription.subscriptionPackage?.name} - Expires {formatDate(activeSubscription.endDate)}
-                    </span>
+              <div className="mb-6 rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-[0_10px_30px_-18px_rgba(0,0,0,0.35)] ring-1 ring-black/5 dark:ring-white/10">
+                <div className="px-4 py-3 sm:px-5 sm:py-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 flex items-center justify-center ring-1 ring-emerald-500/15 dark:ring-emerald-400/15">
+                      <CheckCircle className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        Active Subscription
+                      </p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                        {activeSubscription.subscriptionPackage?.name} · Expires {formatDate(activeSubscription.endDate)}
+                      </p>
+                    </div>
                   </div>
-                  <Badge className={getStatusColor(activeSubscription.status)}>
+                  <span
+                    className={[
+                      "shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
+                      getStatusPillClass(activeSubscription.status),
+                    ].join(" ")}
+                  >
                     {activeSubscription.status}
-                  </Badge>
-                </AlertDescription>
-              </Alert>
+                  </span>
+                </div>
+              </div>
             )}
 
             {/* Upgrade Options */}
@@ -335,9 +364,9 @@ export default function MySubscriptionPage() {
                                 /{pkg.validityDays} days
                               </span>
                             </p>
-                            {pkg.subscriptionFeatures && pkg.subscriptionFeatures.length > 0 && (
+                            {includedFeatureCount(pkg) > 0 && (
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {pkg.subscriptionFeatures.length} features included
+                                {includedFeatureCount(pkg)} features included
                               </div>
                             )}
                           </div>
@@ -373,133 +402,192 @@ export default function MySubscriptionPage() {
                 const canUpgrade = subscription.status === "ACTIVE" && betterPackages.length > 0;
                 const canCancel = subscription.status === "ACTIVE" || subscription.status === "PENDING";
                 const canRenew = subscription.status === "EXPIRED";
+                const pkg = subscription.subscriptionPackage;
+                const includedItems = includedItemsForPackage(pkg);
 
                 return (
-                  <Card key={subscription.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center flex-1">
-                          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-4">
-                            <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <Card
+                    key={subscription.id}
+                    className={[
+                      "overflow-hidden border-0 bg-white/65 dark:bg-white/5 backdrop-blur-md",
+                      "shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)]",
+                      "ring-1 ring-black/5 dark:ring-white/10",
+                      "transition-shadow hover:shadow-[0_22px_55px_-34px_rgba(15,23,42,0.65)]",
+                    ].join(" ")}
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4 min-w-0 flex-1">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-sky-500/10 dark:from-blue-400/15 dark:via-indigo-400/10 dark:to-sky-400/10 ring-1 ring-blue-500/10 dark:ring-blue-400/10 flex items-center justify-center shrink-0">
+                            <CreditCard className="h-6 w-6 text-blue-700 dark:text-blue-300" />
                           </div>
-                          <div className="flex-1">
-                            <CardTitle className="text-xl">
-                              {subscription.subscriptionPackage?.name ||
-                                "Subscription Package"}
-                            </CardTitle>
-                            <CardDescription>
-                              Subscription #{subscription.id.slice(0, 8)}
-                              {subscription.subscriptionPackage && (
-                                <span className="ml-2">
-                                  • ${subscription.subscriptionPackage.price} / {subscription.subscriptionPackage.validityDays} days
-                                </span>
-                              )}
-                            </CardDescription>
-                          </div>
-                        </div>
-                        <Badge className={getStatusColor(subscription.status)}>
-                          {subscription.status}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div className="flex items-center">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-3" />
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                              Start Date
-                            </p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                              {formatDate(subscription.startDate)}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-3" />
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                              End Date
-                            </p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                              {formatDate(subscription.endDate)}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center">
-                          <RefreshCw className="h-5 w-5 text-gray-400 mr-3" />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                  Auto Renew
-                                </p>
-                                <Badge
-                                  className={
-                                    subscription.autoRenew
-                                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                                      : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-                                  }
-                                >
-                                  {subscription.autoRenew ? "Enabled" : "Disabled"}
-                                </Badge>
-                              </div>
-                              {subscription.status === "ACTIVE" && (
-                                <div className="flex items-center space-x-2">
-                                  <Switch
-                                    checked={subscription.autoRenew}
-                                    onCheckedChange={() => handleToggleAutoRenew(subscription)}
-                                    disabled={isActionLoading}
-                                  />
-                                  {isActionLoading && (
-                                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0">
+                                <CardTitle className="text-xl text-slate-900 dark:text-slate-100">
+                                  {pkg?.name || "Subscription Package"}
+                                </CardTitle>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                  {pkg ? (
+                                    <span className="text-slate-400 dark:text-slate-500">
+                                      {pkg.validityDays} days access
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400 dark:text-slate-500">
+                                      Subscription details
+                                    </span>
                                   )}
+                                </p>
+                              </div>
+
+                              {pkg && (
+                                <div className="text-right shrink-0">
+                                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 leading-none">
+                                    {formatMoney(pkg.price, pkg.currency)}
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
+                                      /{Math.max(1, Math.round(pkg.validityDays / 365)) === 1 ? "yr" : "term"}
+                                    </span>
+                                  </div>
+                                  <div className="mt-2 flex justify-end">
+                                    <span
+                                      className={[
+                                        "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
+                                        getStatusPillClass(subscription.status),
+                                      ].join(" ")}
+                                    >
+                                      {subscription.status}
+                                    </span>
+                                  </div>
                                 </div>
                               )}
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center">
-                          <Clock className="h-5 w-5 text-gray-400 mr-3" />
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                              Created
-                            </p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                              {formatDateTime(subscription.createdAt)}
-                            </p>
+                        {!pkg && (
+                          <span
+                            className={[
+                              "shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
+                              getStatusPillClass(subscription.status),
+                            ].join(" ")}
+                          >
+                            {subscription.status}
+                          </span>
+                        )}
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                        <div className="lg:col-span-8">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="rounded-xl bg-white/55 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 px-4 py-3 shadow-[0_10px_25px_-22px_rgba(0,0,0,0.5)]">
+                              <div className="flex items-center gap-3">
+                                <Calendar className="h-5 w-5 text-slate-400" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    Start Date
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                    {formatDate(subscription.startDate)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="rounded-xl bg-white/55 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 px-4 py-3 shadow-[0_10px_25px_-22px_rgba(0,0,0,0.5)]">
+                              <div className="flex items-center gap-3">
+                                <Calendar className="h-5 w-5 text-slate-400" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    End Date
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                    {formatDate(subscription.endDate)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="rounded-xl bg-white/55 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 px-4 py-3 shadow-[0_10px_25px_-22px_rgba(0,0,0,0.5)]">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                  <RefreshCw className="h-5 w-5 text-slate-400" />
+                                  <div>
+                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                      Auto Renew
+                                    </p>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                      {subscription.autoRenew ? "Enabled" : "Disabled"}
+                                    </p>
+                                  </div>
+                                </div>
+                                {subscription.status === "ACTIVE" && (
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={subscription.autoRenew}
+                                      onCheckedChange={() => handleToggleAutoRenew(subscription)}
+                                      disabled={isActionLoading}
+                                    />
+                                    {isActionLoading && (
+                                      <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="rounded-xl bg-white/55 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 px-4 py-3 shadow-[0_10px_25px_-22px_rgba(0,0,0,0.5)]">
+                              <div className="flex items-center gap-3">
+                                <Clock className="h-5 w-5 text-slate-400" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    Created
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                    {formatDateTime(subscription.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="lg:col-span-4">
+                          <div className="h-full rounded-2xl bg-gradient-to-br from-slate-50/80 via-sky-50/50 to-indigo-50/40 dark:from-slate-900/30 dark:via-sky-950/20 dark:to-indigo-950/10 ring-1 ring-black/5 dark:ring-white/10 p-5 shadow-[0_18px_45px_-40px_rgba(0,0,0,0.55)]">
+                            <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                              <Sparkles className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
+                              <p className="text-sm font-semibold">Included Features</p>
+                            </div>
+                            {includedItems.length === 0 ? (
+                              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                                No features are associated with this plan.
+                              </p>
+                            ) : (
+                              <div className="mt-4 grid grid-cols-2 gap-2">
+                                {includedItems.map((item) => (
+                                  <div
+                                    key={item.id}
+                                    className="flex min-w-0 items-start gap-2 rounded-xl bg-white/55 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 px-2.5 py-2 shadow-[0_10px_25px_-22px_rgba(0,0,0,0.5)]"
+                                  >
+                                    <div className="mt-0.5 h-6 w-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/10 ring-1 ring-emerald-500/15 dark:ring-emerald-400/15 flex items-center justify-center shrink-0">
+                                      <CheckCircle className="h-4 w-4 text-emerald-700 dark:text-emerald-300" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                                        {item.label}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Package Features */}
-                      {subscription.subscriptionPackage?.subscriptionFeatures &&
-                        subscription.subscriptionPackage.subscriptionFeatures.length > 0 && (
-                          <div className="mb-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                              Included Features:
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {subscription.subscriptionPackage.subscriptionFeatures.map(
-                                (feature: any, index: number) => (
-                                  <Badge
-                                    key={index}
-                                    variant="outline"
-                                    className="bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700"
-                                  >
-                                    {feature.packageFeature?.name || feature.name}
-                                  </Badge>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )}
-
                       {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex flex-wrap gap-3 pt-6 border-t border-black/5 dark:border-white/10">
                         {canUpgrade && (
                           <Button
                             onClick={() => handleUpgrade(betterPackages[0])}

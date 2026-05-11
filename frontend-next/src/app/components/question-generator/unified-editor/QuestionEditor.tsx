@@ -27,6 +27,7 @@ import { blocksToHTML, blocksToHTMLAsync, htmlToBlocks } from "./content-utils"
 import { normalizeStemBlocksForDisplay } from "../stem-blocks-utils"
 import PerAnswerExplanationEditor from "./PerAnswerExplanationEditor"
 import { QuestionsService } from "@/app/services/questions/questions.service"
+import { ApiHttpError, getApiErrorMessage } from "@/app/services/base/api-http-error"
 import { Editor } from "@tiptap/react"
 import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
@@ -612,9 +613,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           setAddMetaContext(null)
         }
       }
-    } catch (e: any) {
-      const rawMessage = e?.message || e?.response?.data?.message || String(e?.response?.data) || ""
-      const status = e?.response?.status ?? e?.status
+    } catch (e: unknown) {
+      const rawMessage =
+        ApiHttpError.is(e) ? e.message : e instanceof Error ? e.message : ""
+      const status = ApiHttpError.is(e) ? e.status : undefined
       const lower = String(rawMessage).toLowerCase()
       const isDuplicate =
         lower.includes("already exists") ||
@@ -721,7 +723,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           }
         }
       } else {
-        setAddMetaError(rawMessage || "Failed to create")
+        setAddMetaError(getApiErrorMessage(e, "Failed to create"))
       }
     } finally {
       setAddMetaLoading(false)
@@ -738,10 +740,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       const list: any = await categoriesService.getCategories({ status: "ACTIVE" })
       const data = Array.isArray(list) ? list : (list as any)?.data || []
       setCategories(data)
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to update category",
+        description: getApiErrorMessage(e, "Failed to update category"),
         variant: "destructive",
       })
     }
@@ -756,10 +758,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       const list: any = await systemsService.getSystems({ status: "ACTIVE", listAll: true })
       const data = Array.isArray(list) ? list : (list as any)?.data || []
       setSystems(data)
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to update system",
+        description: getApiErrorMessage(e, "Failed to update system"),
         variant: "destructive",
       })
     }
@@ -777,10 +779,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         const data = Array.isArray(list) ? list : (list as any)?.data || []
         setTopics(data)
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to update topic",
+        description: getApiErrorMessage(e, "Failed to update topic"),
         variant: "destructive",
       })
     }
@@ -795,10 +797,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       const list: any = await productsService.getProducts({ status: "ACTIVE" })
       const data = Array.isArray(list) ? list : (list as any)?.data || []
       setProducts(data)
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to update product",
+        description: getApiErrorMessage(e, "Failed to update product"),
         variant: "destructive",
       })
     }
@@ -816,10 +818,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         const data = Array.isArray(list) ? list : (list as any)?.data || []
         setSubtopics(data)
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to update subtopic",
+        description: getApiErrorMessage(e, "Failed to update subtopic"),
         variant: "destructive",
       })
     }

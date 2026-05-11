@@ -27,6 +27,8 @@ import {
   type MockExam,
   type MockExamAttempt,
 } from "@/app/services/launch";
+import { useToast } from "@/shared/ui/use-toast";
+import { toastApiError } from "@/app/services/base/api-http-error";
 
 const DIFF_COLORS: Record<string, string> = {
   easy: "bg-green-100 text-green-700",
@@ -37,6 +39,7 @@ const DIFF_COLORS: Record<string, string> = {
 
 export default function MockExamsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [tab, setTab] = useState<"available" | "history">("available");
   const [exams, setExams] = useState<MockExam[]>([]);
   const [attempts, setAttempts] = useState<MockExamAttempt[]>([]);
@@ -71,8 +74,8 @@ export default function MockExamsPage() {
       router.push(
         `/question-generator/student?questionPaperId=${questionPaperId}&mode=tutor&tutor=true&limit=${exam.totalQuestions}`
       );
-    } catch (e: any) {
-      alert(e?.message || "Could not start exam");
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t start exam");
     } finally {
       setStarting(null);
     }

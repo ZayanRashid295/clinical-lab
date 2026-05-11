@@ -21,6 +21,12 @@ export class JoinByCodeDto {
   @ApiProperty() @IsString() inviteCode!: string;
 }
 
+export class TransferOwnershipDto {
+  @ApiProperty({ description: "User ID of an existing group member who will become owner" })
+  @IsString()
+  newOwnerUserId!: string;
+}
+
 export class CreateGroupPostDto {
   @ApiProperty() @IsString() body!: string;
   @ApiProperty({ required: false }) @IsOptional() @IsString() attachmentUrl?: string;

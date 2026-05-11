@@ -18,6 +18,7 @@ import { QuestionsService } from "../../services/questions/questions.service";
 import { SubtopicsService } from "../../services/content/subtopics.service";
 import { Subtopic } from "../../types/content";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -228,12 +229,8 @@ export default function QuestionFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save question"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save question"));
     } finally {
       setLoading(false);
     }

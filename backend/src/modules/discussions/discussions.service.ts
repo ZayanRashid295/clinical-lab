@@ -165,6 +165,10 @@ export class DiscussionsService {
       replyCount: discussion.replyCount + 1,
     });
 
+    this.achievements
+      .recordActivity(userId, "DISCUSSION_POSTS" as any)
+      .catch(() => undefined);
+
     return reply;
   }
 

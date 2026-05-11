@@ -138,10 +138,14 @@ export default function StudyCreateTest() {
             selectedPool={selectedPool}
             onPoolChange={setSelectedPool}
             filters={{
-              tagIds: selectedTags.length > 0 ? selectedTags : undefined,
-              systemIds: selectedSystems.length > 0 ? selectedSystems : undefined,
-              subjectIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-              topicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+              systemIds:
+                selectedTags.length > 0
+                  ? selectedTags
+                  : selectedSystems.length > 0
+                    ? selectedSystems
+                    : undefined,
+              topicIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
+              subtopicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
             }}
           />
         </div>

@@ -268,6 +268,39 @@
       "userId": "anonymous",
       "caseId": "1",
       "messages": []
+    },
+    {
+      "id": "conv_1778243082347_y9zsnique",
+      "status": "ACTIVE",
+      "startedAt": "2026-05-08T12:24:42.347Z",
+      "interventionCount": 0,
+      "userId": "cmo672rwf000iueh96plxmk2i",
+      "caseId": "yb6xefrzg",
+      "messages": [
+        {
+          "id": "msg_1778243089468_ccbsn9r81",
+          "role": "STUDENT",
+          "content": "hi",
+          "isIntervention": false,
+          "createdAt": "2026-05-08T12:24:49.468Z"
+        },
+        {
+          "id": "msg_1778243098848_wy6zf97o9",
+          "role": "DOCTOR",
+          "content": "⚠️ Unable to connect to AI service. Please check your internet connection and API key configuration.",
+          "isIntervention": false,
+          "createdAt": "2026-05-08T12:24:58.848Z"
+        }
+      ]
+    },
+    {
+      "id": "conv_1778247843601_oujalmigc",
+      "status": "ACTIVE",
+      "startedAt": "2026-05-08T13:44:03.602Z",
+      "interventionCount": 0,
+      "userId": "cmo672rwf000iueh96plxmk2i",
+      "caseId": "yb6xefrzg",
+      "messages": []
     }
   ],
   "diagnosisSubmissions": [],

@@ -11,7 +11,7 @@ export default function Document() {
               (function() {
                 try {
                   const UI_CONFIG_KEY = "ui-config";
-                  let theme = "dark"; // Default theme
+                  let theme = "light"; // Default theme (must match DEFAULT_UI_CONFIG.theme)
                   const storedConfig = localStorage.getItem(UI_CONFIG_KEY);
                   if (storedConfig) {
                     const parsedConfig = JSON.parse(storedConfig);
@@ -25,8 +25,6 @@ export default function Document() {
                       theme = legacyTheme;
                       // Migrate legacy theme to new config format
                       localStorage.setItem(UI_CONFIG_KEY, JSON.stringify({ theme: legacyTheme }));
-                    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                      theme = "dark";
                     }
                   }
                   // Apply theme immediately before React hydrates

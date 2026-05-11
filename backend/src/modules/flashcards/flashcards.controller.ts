@@ -12,6 +12,8 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { EntitlementGuard } from "../auth/guards/entitlement.guard";
+import { RequiredEntitlements } from "../auth/decorators/entitlements.decorator";
 import { FlashcardsService } from "./flashcards.service";
 import {
   CreateFlashcardDto,
@@ -23,7 +25,8 @@ import {
 @ApiTags("flashcards")
 @ApiBearerAuth()
 @Controller("flashcards")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, EntitlementGuard)
+@RequiredEntitlements("study.flashcards")
 export class FlashcardsController {
   constructor(private readonly service: FlashcardsService) {}
 

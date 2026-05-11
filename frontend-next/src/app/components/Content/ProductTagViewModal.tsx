@@ -45,7 +45,8 @@ export default function ProductTagViewModal({
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -53,7 +54,8 @@ export default function ProductTagViewModal({
     });
   };
 
-  const formatDateTime = (dateString: string) => {
+  const formatDateTime = (dateString: string | undefined) => {
+    if (!dateString) return "—";
     return new Date(dateString).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
@@ -78,6 +80,8 @@ export default function ProductTagViewModal({
   };
 
   if (!isOpen || !tag) return null;
+
+  const active = Boolean(tag.isActive);
 
   return (
     <div
@@ -116,13 +120,13 @@ export default function ProductTagViewModal({
                 <p className="text-gray-600 mt-1">{tag.description}</p>
               )}
               <div className="flex items-center mt-2">
-                {getStatusIcon(tag.isActive)}
+                {getStatusIcon(active)}
                 <span
                   className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                    tag.isActive
+                    active
                   )}`}
                 >
-                  {tag.isActive ? "Active" : "Inactive"}
+                  {active ? "Active" : "Inactive"}
                 </span>
               </div>
             </div>
@@ -164,15 +168,15 @@ export default function ProductTagViewModal({
                 </div>
 
                 <div className="flex items-center">
-                  {getStatusIcon(tag.isActive)}
+                  {getStatusIcon(active)}
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-500">Status</p>
                     <span
                       className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                        tag.isActive
+                        active
                       )}`}
                     >
-                      {tag.isActive ? "Active" : "Inactive"}
+                      {active ? "Active" : "Inactive"}
                     </span>
                   </div>
                 </div>

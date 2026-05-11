@@ -43,6 +43,7 @@ function formatSessionDuration(ms: number): string {
   const m = totalMin % 60
   return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
+import remarkGfm from "remark-gfm"
 
 interface LearningInterfaceProps {
   session: LearningSession
@@ -329,6 +330,52 @@ export function LearningInterface({
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson])
 
+  // Generate vital signs using LLM
+  const generateVitalSigns = useCallback(async () => {
+    if (!medicalCase || vitalSigns || isLoadingVitalSigns) {
+      console.log("Skipping vital signs generation:", { medicalCase: !!medicalCase, vitalSigns: !!vitalSigns, isLoadingVitalSigns })
+      return
+    }
+
+    console.log("Starting LLM vital signs generation for case:", medicalCase)
+    setIsLoadingVitalSigns(true)
+
+    try {
+      const response = await fetch("/api/learning/vital-signs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          disease: medicalCase.disease,
+          specialty: medicalCase.specialty,
+          patientProfile: session.patientProfile,
+          symptoms: medicalCase.symptoms,
+        }),
+      })
+      const generatedVitalSigns = await parseApiJson(response, "Failed to generate vital signs")
+      setVitalSigns(generatedVitalSigns)
+      const updatedSession = {
+        ...session,
+        vitalSigns: generatedVitalSigns,
+      }
+      onSessionUpdate(updatedSession)
+    } catch (error) {
+      console.error("Error generating vital signs:", error)
+      const defaultVitalSigns = {
+        bloodPressure: "120/80",
+        heartRate: 72,
+        temperature: "98.6°F",
+        respiratoryRate: 16,
+      }
+      setVitalSigns(defaultVitalSigns)
+      onSessionUpdate({
+        ...session,
+        vitalSigns: defaultVitalSigns,
+      })
+    } finally {
+      setIsLoadingVitalSigns(false)
+    }
+  }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson, session, onSessionUpdate])
+
   useEffect(() => {
     // Use prop medical case if available, otherwise load from sample cases or localStorage
     if (propMedicalCase) {
@@ -379,7 +426,7 @@ export function LearningInterface({
       console.log("Calling generatePatientInformation")
       generatePatientInformation()
     }
-  }, [medicalCase, patientInfo, isLoadingPatientInfo, session.patientInfo, generatePatientInformation])
+  }, [generatePatientInformation, isLoadingPatientInfo, medicalCase, patientInfo, session.patientInfo, generatePatientInformation])
 
   // Generate vital signs when medical case is loaded
   useEffect(() => {
@@ -402,6 +449,7 @@ export function LearningInterface({
       generateVitalSigns()
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, session.vitalSigns, generateVitalSigns])
+  }, [generateVitalSigns, isLoadingVitalSigns, medicalCase, session.vitalSigns, vitalSigns])
 
   const didApplyDbUiRef = useRef(false)
   // Restore UI layout once when session was hydrated from the database
@@ -478,7 +526,7 @@ export function LearningInterface({
     if (lastResumedSessionId.current === session.id) {
       lastResumedSessionId.current = null
     }
-  }, [session.id])
+  }, [hasLoadedSession, session.id])
 
   useEffect(() => {
     const fp = conversationContentKey
@@ -563,6 +611,82 @@ export function LearningInterface({
       setIsSoapRefreshing(false)
     }
   }, [activeTab, session.isComplete, conversationContentKey, parseApiJson])
+    if (hasLoadedSession) {
+      learningService.saveLearningSession(session).catch(console.error)
+    }
+  }, [session, hasLoadedSession])
+
+  useEffect(() => {
+    console.log("useEffect triggered - session.caseId:", session.caseId, "session.id:", session.id, "lastResumedSessionId:", lastResumedSessionId.current)
+    
+    // Don't reset conversation if we just resumed this session
+    if (lastResumedSessionId.current === session.id) {
+      console.log("Skipping conversation reset - session was just resumed")
+      lastResumedSessionId.current = null
+      return
+    }
+    
+    // Only reset conversation if we're starting a completely new case
+    // Check if there's a saved session with conversation history
+    const savedSession = learningService.getLearningSession(session.id)
+    console.log("Saved session exists:", !!savedSession, "Saved conversation length:", savedSession?.conversation?.length || 0)
+    
+    if (session.conversation.length > 0 && (!savedSession || savedSession.conversation.length === 0)) {
+      console.log("Resetting conversation for new case")
+      const resetSession = {
+        ...session,
+        conversation: [],
+        isComplete: false,
+        soapNote: undefined,
+      }
+      onSessionUpdate(resetSession)
+    }
+  }, [onSessionUpdate, session, session.caseId, session.id])
+
+  const generateSoapForCase = useCallback(async () => {
+      if (
+        activeTab === "soap" &&
+        (!session.soapNote || !session.soapNote.subjective) &&
+        !isProcessing
+      ) {
+        setIsProcessing(true)
+        try {
+          const context = {
+            caseId: session.caseId,
+            disease: session.disease,
+            symptoms: medicalCase?.symptoms || [],
+            patientProfile: session.patientProfile,
+            conversationHistory: [],
+          }
+          const response = await fetch("/api/learning/soap-note", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ conversation: [], context }),
+          })
+          const soapNote = await parseApiJson(response, "Failed to generate SOAP note")
+          if (
+            soapNote.subjective?.trim() ||
+            soapNote.objective?.trim() ||
+            soapNote.assessment?.trim() ||
+            soapNote.plan?.trim()
+          ) {
+            const updatedSession = {
+              ...session,
+              soapNote,
+            }
+            onSessionUpdate(updatedSession)
+          }
+        } catch (error) {
+          console.error("Error generating SOAP note:", error)
+        } finally {
+          setIsProcessing(false)
+        }
+      }
+  }, [activeTab, isProcessing, medicalCase?.symptoms, onSessionUpdate, parseApiJson, session])
+
+  useEffect(() => {
+    generateSoapForCase()
+  }, [generateSoapForCase])
 
   const startConversation = async () => {
     if (session.conversation.length > 0 || simulationFlowLock.current || session.isComplete) return
@@ -1725,6 +1849,7 @@ export function LearningInterface({
                       <div className="bg-white rounded-lg p-2 border border-primary/20 max-w-full overflow-hidden">
                         <div className="text-primary font-medium text-sm prose prose-sm max-w-full break-words overflow-hidden">
                           <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
                             components={{
                               p: ({ children }) => <p className="mb-0 break-words text-sm">{children}</p>,
                               strong: ({ children }) => <strong className="font-medium break-words text-sm">{children}</strong>,
@@ -1801,6 +1926,7 @@ export function LearningInterface({
                       <span className="text-primary/85 font-medium">Primary Complaint:</span>
                       <div className="text-primary font-medium prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                         <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
                           components={{
                             p: ({ children }) => <p className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</p>,
                             strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
@@ -1819,6 +1945,7 @@ export function LearningInterface({
                           <Badge key={index} variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                             <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
                                 components={{
                                   p: ({ children }) => <span className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</span>,
                                   strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
@@ -1834,6 +1961,7 @@ export function LearningInterface({
                             <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <span className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</span>,
                                     strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
@@ -1847,6 +1975,7 @@ export function LearningInterface({
                             <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <span className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</span>,
                                     strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
@@ -1860,6 +1989,7 @@ export function LearningInterface({
                             <Badge variant="outline" className="text-sm bg-primary/10 text-primary border-primary/20" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                               <div className="prose prose-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', overflow: 'hidden', whiteSpace: 'normal' }}>
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <span className="mb-0 text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</span>,
                                     strong: ({ children }) => <strong className="font-medium text-sm" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', whiteSpace: 'normal' }}>{children}</strong>,
@@ -1948,6 +2078,7 @@ export function LearningInterface({
                 {!collapsedSections.clinicalNotes && (
                 <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                   <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => <p className="mb-1">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -1990,6 +2121,7 @@ export function LearningInterface({
                 {!collapsedSections.initialAssessment && (
                   <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                     <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
                       components={{
                         p: ({ children }) => <p className="mb-1">{children}</p>,
                         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -2003,7 +2135,7 @@ export function LearningInterface({
                       {`• Patient reports ${medicalCase?.symptoms?.[0]?.toLowerCase() || session.disease?.toLowerCase() || "abdominal pain"}
 • Onset: ${medicalCase?.difficulty === 'beginner' ? 'Gradual' : medicalCase?.difficulty === 'intermediate' ? 'Subacute' : 'Variable'} presentation
 • Severity: ${medicalCase?.difficulty === 'beginner' ? 'Mild to moderate' : medicalCase?.difficulty === 'intermediate' ? 'Moderate' : 'Moderate to severe'}
-• Associated symptoms: ${medicalCase?.symptoms?.slice(1, 3).join(', ') || "nausea, fever, vomiting"}
+• Associated symptoms: ${medicalCase?.symptoms?.slice(1).join(", ") || "nausea, fever, vomiting"}
 • No known drug allergies
 • Previous medical history: ${medicalCase?.difficulty === 'beginner' ? 'Unremarkable' : 'Requires further evaluation'}`}
                     </ReactMarkdown>
@@ -2032,6 +2164,7 @@ export function LearningInterface({
                 {!collapsedSections.learningGuidelines && (
                 <div className="text-sm text-primary/90 space-y-1 prose prose-sm max-w-none">
                   <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => <p className="mb-1">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -2259,6 +2392,7 @@ export function LearningInterface({
                               </div>
                               <div className="text-sm leading-relaxed prose prose-sm max-w-none">
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
                                     h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
@@ -2287,6 +2421,7 @@ export function LearningInterface({
                             </div>
                               <div className="text-green-800 leading-relaxed text-sm prose prose-sm max-w-none">
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
                                     h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
@@ -2517,6 +2652,7 @@ export function LearningInterface({
                         </div>
                         <div className="text-foreground text-xs prose prose-xs max-w-none">
                           <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
                             components={{
                               p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
                               h1: ({ children }) => <h1 className="text-sm font-bold mb-1">{children}</h1>,

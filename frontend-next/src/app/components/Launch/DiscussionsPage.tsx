@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -37,7 +37,12 @@ import {
 import { useRealtimeRoom } from "@/app/services/realtime/use-realtime-room";
 import { UserIdentity } from "@/shared/components/Common/UserIdentity";
 import { MessageBubble } from "@/shared/components/Common/MessageBubble";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
 import { authService } from "@/shared";
+import { useToast } from "@/shared/ui/use-toast";
+import {
+  toastApiError,
+} from "@/app/services/base/api-http-error";
 
 const CONTEXT_OPTIONS: DiscussionContext[] = [
   "GENERAL",
@@ -76,6 +81,7 @@ export default function DiscussionsPage() {
 
 function DiscussionList() {
   const router = useRouter();
+  const { toast } = useToast();
   const [items, setItems] = useState<Discussion[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -88,7 +94,7 @@ function DiscussionList() {
   });
   const [creating, setCreating] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const list = await discussionsService.list({
@@ -96,14 +102,17 @@ function DiscussionList() {
         context: context === "ALL" ? undefined : context,
       });
       setItems(Array.isArray(list) ? list : []);
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t load discussions");
+      setItems([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [context, search, toast]);
 
   useEffect(() => {
     load();
-  }, [context]);
+  }, [load]);
 
   const onCreate = async () => {
     if (!draft.title.trim() || !draft.body.trim()) return;
@@ -113,6 +122,8 @@ function DiscussionList() {
       setShowNew(false);
       setDraft({ title: "", body: "", context: "GENERAL" });
       router.push(`/discussions/${d.id}`);
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t create discussion");
     } finally {
       setCreating(false);
     }
@@ -293,13 +304,14 @@ function DiscussionList() {
 
 function DiscussionDetail({ id }: { id: string }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [d, setD] = useState<DiscussionWithReplies | null>(null);
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
   const [posting, setPosting] = useState(false);
   const meId = authService.getCurrentUser?.()?.id as string | undefined;
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       setD(await discussionsService.findOne(id));
@@ -308,11 +320,11 @@ function DiscussionDetail({ id }: { id: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     load();
-  }, [id]);
+  }, [load]);
 
   // Live refresh on relevant push (e.g. someone replies to this thread)
   useEffect(() => {
@@ -320,7 +332,7 @@ function DiscussionDetail({ id }: { id: string }) {
       const did = (n.data as any)?.discussionId;
       if (did && did === id) load();
     });
-  }, [id]);
+  }, [id, load]);
 
   // Direct websocket room: replies and vote counts arrive instantly
   useRealtimeRoom("discussion", id, {
@@ -351,7 +363,9 @@ function DiscussionDetail({ id }: { id: string }) {
     try {
       await discussionsService.vote(id, v);
       load();
-    } catch {}
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update vote");
+    }
   };
 
   const onReply = async () => {
@@ -361,6 +375,8 @@ function DiscussionDetail({ id }: { id: string }) {
       await discussionsService.reply(id, reply);
       setReply("");
       load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t post reply");
     } finally {
       setPosting(false);
     }
@@ -441,10 +457,8 @@ function DiscussionDetail({ id }: { id: string }) {
                         />
                       </div>
 
-                      <div className="mt-4 rounded-xl border bg-muted/30 p-4">
-                        <p className="whitespace-pre-line text-sm leading-relaxed">
-                          {d.body}
-                        </p>
+                      <div className="mt-4 rounded-xl border bg-muted/30 p-4 text-sm">
+                        <MarkdownContent variant="default">{d.body}</MarkdownContent>
                       </div>
                     </div>
                   </div>

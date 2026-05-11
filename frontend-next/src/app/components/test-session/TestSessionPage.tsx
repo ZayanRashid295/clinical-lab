@@ -8,7 +8,22 @@ import { Badge } from "@/shared/ui/badge";
 import { Progress } from "@/shared/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/shared/ui/radio-group";
 import { Label } from "@/shared/ui/label";
-import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, Bookmark } from "lucide-react";
+import {
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Flag,
+  CheckCircle,
+  Bookmark,
+  ShieldAlert,
+} from "lucide-react";
+import Link from "next/link";
+import {
+  ApiHttpError,
+  getApiErrorMessage,
+  isSubscriptionUpgradeRequiredError,
+  subscriptionGateFromApiError,
+} from "@/app/services/base/api-http-error";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
@@ -59,6 +74,12 @@ export default function TestSessionPage() {
   const [questionStartTimes, setQuestionStartTimes] = useState<Record<number, number>>({});
   const [questionTimeSpent, setQuestionTimeSpent] = useState<Record<number, number>>({});
   const [error, setError] = useState<string | null>(null);
+  /** Plan / entitlement gate — show dedicated screen instead of raw ApiHttpError */
+  const [planGate, setPlanGate] = useState<{
+    title: string;
+    description: string;
+    detail?: string;
+  } | null>(null);
   const [submitResult, setSubmitResult] = useState<{
     totalQuestions: number;
     answeredQuestions: number;
@@ -138,29 +159,38 @@ export default function TestSessionPage() {
           testData.markedQuestions = markedQuestions;
           setQpqIds(orderedQpqIds);
 
-          // Fetch full question details using the service
-          const questionPromises = questionIds.map(async (questionId: string) => {
+          const fetchedQuestions: Question[] = [];
+          for (const questionId of questionIds) {
             try {
               const question = await questionsService.getQuestion(questionId);
-              // Transform backend question to frontend format
-              return {
+              fetchedQuestions.push({
                 id: question.id,
                 text: (question as any).stem || question.question,
                 options: (question.choices || []).map((c: any) => c.text),
-                correctAnswer: (question.choices || []).find((c: any) => c.isCorrect)?.text || "",
+                correctAnswer:
+                  (question.choices || []).find((c: any) => c.isCorrect)?.text || "",
                 explanation: question.explanation || "",
                 subject: (question as any).system?.name || "General",
                 system: question.topic?.name || "General",
                 difficulty: "Medium" as const,
                 imageUrl: (question as any).imageUrl,
-              };
+              });
             } catch (err) {
-              console.error(`Failed to fetch question ${questionId}:`, err);
-              throw err;
+              if (
+                ApiHttpError.is(err) &&
+                isSubscriptionUpgradeRequiredError(err)
+              ) {
+                setPlanGate(subscriptionGateFromApiError(err));
+                setIsLoading(false);
+                return;
+              }
+              setError(
+                getApiErrorMessage(err, "We couldn’t load one or more questions.")
+              );
+              setIsLoading(false);
+              return;
             }
-          });
-          
-          const fetchedQuestions = await Promise.all(questionPromises);
+          }
           setQuestions(fetchedQuestions);
 
           // Restore answers and marked questions by index
@@ -181,8 +211,15 @@ export default function TestSessionPage() {
         }
 
         setTest(testData);
-      } catch (err: any) {
-        setError(err?.message || "Failed to load test");
+      } catch (err: unknown) {
+        if (
+          ApiHttpError.is(err) &&
+          isSubscriptionUpgradeRequiredError(err)
+        ) {
+          setPlanGate(subscriptionGateFromApiError(err));
+        } else {
+          setError(getApiErrorMessage(err, "Failed to load test"));
+        }
       } finally {
         setIsLoading(false);
       }
@@ -331,8 +368,15 @@ export default function TestSessionPage() {
         ...response.results,
         answeredQuestions: answersPayload.length,
       });
-    } catch (err: any) {
-      setError(err?.message || "Failed to submit test");
+    } catch (err: unknown) {
+      if (
+        ApiHttpError.is(err) &&
+        isSubscriptionUpgradeRequiredError(err)
+      ) {
+        setPlanGate(subscriptionGateFromApiError(err));
+      } else {
+        setError(getApiErrorMessage(err, "Failed to submit test"));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -351,6 +395,56 @@ export default function TestSessionPage() {
               <Skeleton className="h-32 w-full" />
             </CardContent>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (planGate) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/90 px-4 py-12 dark:from-slate-950 dark:to-slate-900">
+        <div className="mx-auto flex max-w-lg flex-col items-center text-center">
+          <Card className="w-full overflow-hidden border-slate-200/90 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900">
+            <div className="h-1 w-full bg-gradient-to-r from-amber-400 via-emerald-500 to-teal-600" />
+            <CardHeader className="space-y-4 pb-2 pt-8">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-800 ring-1 ring-amber-200/80 dark:bg-amber-950/50 dark:text-amber-200 dark:ring-amber-900/50">
+                <ShieldAlert className="h-7 w-7" aria-hidden />
+              </div>
+              <CardTitle className="text-xl font-semibold leading-snug text-slate-900 dark:text-white">
+                {planGate.title}
+              </CardTitle>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                {planGate.description}
+              </p>
+              {planGate.detail && (
+                <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400">
+                  {planGate.detail}
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 pb-8 sm:flex-row sm:justify-center sm:gap-3">
+              <Button
+                className="w-full bg-emerald-600 hover:bg-emerald-700 sm:w-auto"
+                asChild
+              >
+                <Link href="/my-subscription">View plans and subscription</Link>
+              </Button>
+              <Button variant="outline" className="w-full sm:w-auto" asChild>
+                <Link href="/previous-tests">Back to my tests</Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full text-slate-600 sm:w-auto"
+                type="button"
+                onClick={() => router.push("/dashboard")}
+              >
+                Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+          <p className="mt-6 max-w-md text-xs leading-relaxed text-slate-500 dark:text-slate-500">
+            If you believe this is a mistake—for example you recently upgraded—try refreshing after a minute or contact support with the message above.
+          </p>
         </div>
       </div>
     );

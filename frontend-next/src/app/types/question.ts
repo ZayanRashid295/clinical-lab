@@ -58,6 +58,8 @@ export interface QuestionQueryParams {
   dateFrom?: string;
   dateTo?: string;
   _t?: string | number; // Cache buster parameter
+  /** Backend returns all rows (ignores page/limit). */
+  listAll?: boolean;
 }
 
 export interface QuestionChoiceQueryParams {

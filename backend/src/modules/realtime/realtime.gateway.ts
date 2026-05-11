@@ -92,6 +92,7 @@ export class RealtimeGateway
       client.data.userId = userId;
       client.data.roles = Array.isArray(payload?.roles) ? payload.roles : [];
       await client.join(`user:${userId}`);
+      await client.join("launch");
       client.emit("ready", { userId });
     } catch (e) {
       this.logger.warn(

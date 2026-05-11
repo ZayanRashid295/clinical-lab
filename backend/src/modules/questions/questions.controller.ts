@@ -26,8 +26,10 @@ import { Express } from "express";
 import { QuestionsService } from "./questions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { FeatureGuard } from "../auth/guards/feature.guard";
+import { EntitlementGuard } from "../auth/guards/entitlement.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { RequiredFeatures } from "../auth/decorators/features.decorator";
+import { RequiredEntitlements } from "../auth/decorators/entitlements.decorator";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
@@ -44,8 +46,9 @@ export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard, EntitlementGuard)
   @RequiredFeatures("Qbank Access")
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({
     summary: "Get all questions with filtering, pagination, and sorting",
@@ -61,8 +64,9 @@ export class QuestionsController {
   }
 
   @Get("stats")
-  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard, EntitlementGuard)
   @RequiredFeatures("Qbank Access")
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get question statistics" })
   @ApiResponse({
@@ -268,8 +272,9 @@ export class QuestionsController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard, EntitlementGuard)
   @RequiredFeatures("Qbank Access")
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get question by ID with choices" })
   @ApiResponse({ status: 200, description: "Question retrieved successfully" })

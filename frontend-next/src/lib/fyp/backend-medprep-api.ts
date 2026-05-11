@@ -5,6 +5,22 @@ const BACKEND_BASE_URL =
 
 const DEFAULT_TIMEOUT_MS = 15_000
 
+export class MedprepBackendRequestError extends Error {
+  readonly status: number;
+  readonly payload: unknown;
+
+  constructor(message: string, status: number, payload?: unknown) {
+    super(message);
+    this.name = "MedprepBackendRequestError";
+    this.status = status;
+    this.payload = payload;
+  }
+
+  static is(e: unknown): e is MedprepBackendRequestError {
+    return e instanceof MedprepBackendRequestError;
+  }
+}
+
 type RequestOptions = {
   method?: string
   userId?: string
@@ -35,9 +51,14 @@ export async function medprepBackendRequest<T>(
     const data = await response.json().catch(() => null)
     if (!response.ok) {
       const message =
-        (data && (data.message || data.error)) ||
+        (data && typeof data === "object" && data !== null && "message" in data
+          ? String((data as { message?: unknown }).message || "")
+          : "") ||
+        (data && typeof data === "object" && data !== null && "error" in data
+          ? String((data as { error?: unknown }).error || "")
+          : "") ||
         `Backend request failed (${response.status})`
-      throw new Error(message)
+      throw new MedprepBackendRequestError(message, response.status, data)
     }
 
     return data as T

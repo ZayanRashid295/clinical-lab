@@ -1,4 +1,5 @@
 import type { Conversation, ChatMessage, MedicalCase } from "./data-models"
+import { MedPrepConversationRequestError } from "./medprep-conversation-errors"
 
 interface DatabaseConversation {
   id: string
@@ -67,32 +68,64 @@ class DatabaseConversationService {
         body: JSON.stringify(requestBody)
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`HTTP ${response.status}: ${errorText}`)
-      }
-
       const responseText = await response.text()
-      
-      if (!responseText || responseText.trim() === '') {
-        throw new Error('Empty response from server')
+
+      let data: {
+        success?: boolean
+        error?: string
+        message?: string
+        conversation?: DatabaseConversation
+        [key: string]: unknown
+      } | null = null
+      try {
+        data = responseText?.trim() ? JSON.parse(responseText) : null
+      } catch {
+        if (!response.ok) {
+          throw new MedPrepConversationRequestError(
+            responseText || `Request failed (${response.status})`,
+            response.status
+          )
+        }
+        throw new MedPrepConversationRequestError('Invalid JSON response from server', response.status)
       }
 
-      let data
-      try {
-        data = JSON.parse(responseText)
-      } catch (parseError) {
-        console.error('Failed to parse response JSON:', parseError)
-        console.error('Response text was:', responseText)
-        throw new Error('Invalid JSON response from server')
+      if (!response.ok) {
+        const msg =
+          (typeof data?.message === 'string' && data.message) ||
+          (typeof data?.error === 'string' && data.error) ||
+          responseText ||
+          `Request failed (${response.status})`
+        const payload =
+          data && typeof data === 'object'
+            ? (data as Record<string, unknown>)
+            : null
+        throw new MedPrepConversationRequestError(msg, response.status, {
+          code: typeof data?.error === 'string' ? data.error : undefined,
+          payload,
+        })
       }
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create conversation')
+
+      if (!responseText?.trim()) {
+        throw new MedPrepConversationRequestError('Empty response from server', response.status)
+      }
+
+      if (!data?.success || !data.conversation) {
+        const msg =
+          (typeof data?.message === 'string' && data.message) ||
+          (typeof data?.error === 'string' && data.error) ||
+          'Failed to create conversation'
+        throw new MedPrepConversationRequestError(msg, response.status, {
+          code: typeof data?.error === 'string' ? data.error : undefined,
+          payload: data ? { ...data } : null,
+        })
       }
 
       return this.convertDatabaseConversation(data.conversation)
     } catch (error) {
+      if (MedPrepConversationRequestError.is(error)) {
+        console.warn('[databaseConversationService.createConversation]', error.status, error.message)
+        throw error
+      }
       console.error('Error creating conversation:', error)
       throw error
     }
@@ -149,6 +182,33 @@ class DatabaseConversationService {
       const response = await fetch(
         `${baseUrl}/api/conversations/${conversationId}?userId=${encodeURIComponent(resolvedUserId)}`
       )
+
+      let data: { success?: boolean; error?: string; conversation?: DatabaseConversation }
+      try {
+        data = await response.json()
+      } catch {
+        return null
+      }
+
+      if (!data.success || !data.conversation) {
+        // 401/403/404: subscription, ownership, or missing session — resume without throwing (Next dev overlay surfaces thrown Errors).
+        if ([401, 403, 404].includes(response.status)) {
+          return null
+        }
+        console.warn(
+          "[databaseConversationService.getConversation] unavailable:",
+          response.status,
+          data.error
+        )
+        return null
+      }
+
+      try {
+        return this.convertDatabaseConversation(data.conversation)
+      } catch (parseErr) {
+        console.warn("[databaseConversationService.getConversation] invalid payload:", parseErr)
+        return null
+      }
       const data = await response.json().catch(() => null)
 
       if (!data?.success) {
@@ -166,7 +226,16 @@ class DatabaseConversationService {
 
       return this.convertDatabaseConversation(data.conversation)
     } catch (error) {
-      console.error('Error getting conversation:', error)
+      const msg = error instanceof Error ? error.message : String(error)
+      const isNetwork =
+        msg.includes("Failed to fetch") ||
+        msg.includes("NetworkError") ||
+        msg.includes("Load failed")
+      if (isNetwork) {
+        console.warn("[databaseConversationService.getConversation] network:", msg)
+      } else {
+        console.warn("[databaseConversationService.getConversation]", msg)
+      }
       return null
     }
   }
@@ -243,19 +312,20 @@ class DatabaseConversationService {
   // Convert database conversation to app conversation format
   private convertDatabaseConversation(dbConv: DatabaseConversation): Conversation {
     const resolvedCaseId = dbConv.caseId || dbConv.caseInstanceId || ''
+    const rows = Array.isArray(dbConv.messages) ? dbConv.messages : []
     return {
       id: dbConv.id,
       studentId: dbConv.userId,
       caseId: resolvedCaseId,
-      messages: dbConv.messages.map(msg => ({
+      messages: rows.map(msg => ({
         id: msg.id,
-        role: msg.role.toLowerCase() as 'student' | 'patient' | 'doctor',
-        content: msg.content,
-        timestamp: msg.createdAt,
+        role: (msg.role ?? "STUDENT").toLowerCase() as 'student' | 'patient' | 'doctor',
+        content: msg.content ?? "",
+        timestamp: msg.createdAt ?? new Date().toISOString(),
         isIntervention: msg.isIntervention,
         relevanceScore: msg.relevanceScore
       })),
-      status: dbConv.status.toLowerCase() as 'active' | 'completed' | 'abandoned',
+      status: (dbConv.status ?? "ACTIVE").toLowerCase() as 'active' | 'completed' | 'abandoned',
       startedAt: dbConv.startedAt,
       completedAt: dbConv.completedAt,
       interventionCount: dbConv.interventionCount

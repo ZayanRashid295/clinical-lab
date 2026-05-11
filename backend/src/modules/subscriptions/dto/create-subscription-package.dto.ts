@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 import {
   IsString,
   IsOptional,
   IsBoolean,
   IsInt,
   Min,
-  IsDecimal,
+  IsNumber,
 } from "class-validator";
 
 export class CreateSubscriptionPackageDto {
@@ -36,7 +37,12 @@ export class CreateSubscriptionPackageDto {
     description: "Package price",
     example: 249.99,
   })
-  @IsDecimal()
+  @Type(() => Number)
+  @IsNumber(
+    { maxDecimalPlaces: 2, allowInfinity: false, allowNaN: false },
+    { message: "price must be a valid number" }
+  )
+  @Min(0.01)
   price: number;
 
   @ApiProperty({

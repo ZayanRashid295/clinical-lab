@@ -74,7 +74,8 @@ export default function TestPreview({
   const getSubjectDistribution = () => {
     const distribution: Record<string, number> = {};
     selectedQuestions.forEach((q) => {
-      distribution[q.subject] = (distribution[q.subject] || 0) + 1;
+      const key = q.system || "general";
+      distribution[key] = (distribution[key] || 0) + 1;
     });
     return distribution;
   };
@@ -232,7 +233,7 @@ export default function TestPreview({
                     {currentQuestion.difficulty}
                   </Badge>
                   <Badge variant="outline">
-                    {currentQuestion.subject.replace("_", " ")}
+                    {(currentQuestion.system || "general").replace("_", " ")}
                   </Badge>
                 </div>
               </div>

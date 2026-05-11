@@ -17,6 +17,7 @@ import { ProductSubtypesService } from "../../services/products/product-subtypes
 import { ProductsService } from "../../services/products/products.service";
 import { Product } from "../../types/product";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -207,12 +208,8 @@ export default function ProductSubtypeFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save product subtype"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save product subtype"));
     } finally {
       setLoading(false);
     }

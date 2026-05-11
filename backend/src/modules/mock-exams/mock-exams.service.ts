@@ -234,14 +234,21 @@ export class MockExamsService {
       data: { mockExamId: attempt.mockExamId, attemptId },
     });
 
-    this.achievements
-      .recordActivity(userId, "TESTS_COMPLETED" as any)
+    void this.achievements
+      .recordActivity(userId, "MOCK_EXAMS_COMPLETED" as any, 0)
       .catch(() => undefined);
-    if (correct > 0) {
-      this.achievements
-        .recordActivity(userId, "CORRECT_ANSWERS" as any, correct)
-        .catch(() => undefined);
-    }
+    void this.achievements
+      .recordActivity(userId, "QUESTIONS_ANSWERED" as any, 0)
+      .catch(() => undefined);
+    void this.achievements
+      .recordActivity(userId, "CORRECT_ANSWERS" as any, 0)
+      .catch(() => undefined);
+    void this.achievements
+      .recordActivity(userId, "TESTS_COMPLETED" as any, 0)
+      .catch(() => undefined);
+    void this.achievements
+      .recordActivity(userId, "STUDY_MINUTES" as any, 0)
+      .catch(() => undefined);
 
     return updated;
   }

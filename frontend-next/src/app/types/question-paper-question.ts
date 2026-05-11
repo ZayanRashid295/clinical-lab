@@ -1,5 +1,7 @@
 // QuestionPaperQuestion Types
 
+import type { QuestionHierarchySlice } from "@/app/utils/question-hierarchy-display";
+
 export interface QuestionPaperQuestion {
   id: string;
   questionPaperId: string;
@@ -16,9 +18,9 @@ export interface QuestionPaperQuestion {
     name: string;
     type: string;
   };
-  question?: {
+  question?: QuestionHierarchySlice & {
     id: string;
-    text: string;
+    text?: string;
     explanation?: string;
     choices?: Array<{
       id: string;
@@ -26,27 +28,6 @@ export interface QuestionPaperQuestion {
       isCorrect: boolean;
       order: number;
     }>;
-    productTag?: {
-      id: string;
-      name: string;
-      color?: string;
-    };
-    topic?: {
-      id: string;
-      name: string;
-      chapter?: {
-        id: string;
-        name: string;
-        section?: {
-          id: string;
-          name: string;
-          product?: {
-            id: string;
-            name: string;
-          };
-        };
-      };
-    };
   };
 }
 

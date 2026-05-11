@@ -42,7 +42,7 @@ export function useOrgChartJson(
         variant: "destructive",
       });
     }
-  }, [setData]);
+  }, [setData, toast]);
 
   const handleOpenJsonEditor = useCallback(() => {
     setJsonEditorValue(JSON.stringify(data, null, 2));
@@ -81,7 +81,7 @@ export function useOrgChartJson(
         variant: "destructive",
       });
     }
-  }, [jsonEditorValue, setData]);
+  }, [jsonEditorValue, setData, toast]);
 
   const handleCancelJsonEdit = useCallback(() => {
     setShowJsonEditor(false);

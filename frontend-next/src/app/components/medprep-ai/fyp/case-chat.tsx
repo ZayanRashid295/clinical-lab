@@ -9,6 +9,12 @@ import { caseInstanceService } from "@/lib/fyp/case-instance-service"
 import { aiHintTrackingService } from "@/lib/fyp/ai-hint-tracking-service"
 import { practiceGradingService, type PracticeSessionGrade } from "@/lib/fyp/practice-grading-service"
 import { PracticeGradeModal } from "./practice-grade-modal"
+import { MedPrepConversationBlockedModal } from "./MedPrepConversationBlockedModal"
+import {
+  MedPrepConversationRequestError,
+  safeMapConversationFailureToModal,
+  type ConversationBlockedModalState,
+} from "@/lib/fyp/medprep-conversation-errors"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -60,7 +66,7 @@ import { AvatarConfig } from "./avatar-config"
 import { DiagnosisSubmission } from "./diagnosis-submission"
 import Link from "next/link"
 // import HeyGenAvatar, { type HeyGenAvatarRef } from "@/components/heygen-avatar"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 
 interface CaseChatProps {
   medicalCase: MedicalCase
@@ -156,7 +162,8 @@ export function CaseChat({
   const [currentMessage, setCurrentMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isBootstrapping, setIsBootstrapping] = useState(true)
-  const [initializationError, setInitializationError] = useState<string | null>(null)
+  const [sessionBlockedModal, setSessionBlockedModal] =
+    useState<ConversationBlockedModalState | null>(null)
   const [showIntervention, setShowIntervention] = useState(false)
   const [interventionMessage, setInterventionMessage] = useState("")
   const [questionRefreshTrigger, setQuestionRefreshTrigger] = useState(0)
@@ -243,16 +250,17 @@ export function CaseChat({
   }
 
   useEffect(() => {
-    // Create new conversation when component mounts
+    let cancelled = false
+
     const initializeConversation = async () => {
-      setInitializationError(null)
+      setSessionBlockedModal(null)
       console.log("🚀 CaseChat useEffect - Creating case instance and conversation")
       console.log("👤 Student ID:", student.id)
       console.log("🏥 Medical Case ID:", medicalCase.id)
       console.log("🏥 Medical Case Title:", medicalCase.title)
       console.log("🏥 Medical Case Disease:", medicalCase.disease)
       console.log("📋 Full Medical Case:", medicalCase)
-      
+
       try {
         if (resumeConversationId) {
           const existingConversation =
@@ -261,10 +269,15 @@ export function CaseChat({
             setConversation(existingConversation)
             setMessages(existingConversation.messages)
           } else {
-            throw new Error("Unable to load resume session conversation.")
+            setSessionBlockedModal({
+              variant: "generic",
+              title: "Couldn't resume this session",
+              description:
+                "We couldn't load your saved conversation. Check your connection, or the session may have expired or been removed. Try MedPrep home and open your case again from Resume or Practice.",
+            })
+            return
           }
         } else {
-          // For practice mode, create conversation directly
           console.log("💬 Creating conversation directly for practice mode")
           const newConversation = await databaseConversationService.createConversation(
             student.id,
@@ -276,20 +289,33 @@ export function CaseChat({
           setConversation(newConversation)
           setMessages(newConversation.messages)
         }
-        
-        // Initialize hint tracking session with the case ID
+
+        if (cancelled) return
         const session = aiHintTrackingService.startSession(medicalCase.id, sessionId)
         setHintSession(session)
       } catch (error) {
-        console.error("Error initializing conversation:", error)
-        setInitializationError(error instanceof Error ? error.message : "Failed to initialize conversation.")
+        if (cancelled) return
+        if (MedPrepConversationRequestError.is(error)) {
+          console.warn("[CaseChat] conversation blocked:", error.status, error.message)
+        } else {
+          console.error("Error initializing conversation:", error)
+        }
+        setSessionBlockedModal(safeMapConversationFailureToModal(error))
       } finally {
-        // Mark interface as ready after initial setup attempts
-        setIsBootstrapping(false)
+        if (!cancelled) setIsBootstrapping(false)
       }
     }
-    
-    initializeConversation()
+
+    void initializeConversation().catch((error) => {
+      if (cancelled) return
+      console.error("[CaseChat] Unhandled conversation init rejection:", error)
+      setSessionBlockedModal(safeMapConversationFailureToModal(error))
+      setIsBootstrapping(false)
+    })
+
+    return () => {
+      cancelled = true
+    }
   }, [medicalCase, resumeConversationId, sessionId, student.id])
 
   useEffect(() => {
@@ -385,7 +411,12 @@ export function CaseChat({
         setConversation(currentConversation)
         setMessages(currentConversation.messages)
       } catch (error) {
-        console.error("Error creating conversation:", error)
+        if (MedPrepConversationRequestError.is(error)) {
+          console.warn("[CaseChat] create conversation blocked:", error.status, error.message)
+        } else {
+          console.error("Error creating conversation:", error)
+        }
+        setSessionBlockedModal(safeMapConversationFailureToModal(error))
         return
       }
     }
@@ -404,7 +435,12 @@ export function CaseChat({
         setConversation(dbConversation)
         currentConversation = dbConversation
       } catch (error) {
-        console.error("Error converting to database conversation:", error)
+        if (MedPrepConversationRequestError.is(error)) {
+          console.warn("[CaseChat] DB conversion blocked:", error.status, error.message)
+        } else {
+          console.error("Error converting to database conversation:", error)
+        }
+        setSessionBlockedModal(safeMapConversationFailureToModal(error))
         return
       }
     }
@@ -751,10 +787,12 @@ export function CaseChat({
           </div>
         </div>
       )}
-      {initializationError ? (
-        <div className="mx-4 mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {initializationError}
-        </div>
+      {sessionBlockedModal ? (
+        <MedPrepConversationBlockedModal
+          open
+          state={sessionBlockedModal}
+          onClose={() => setSessionBlockedModal(null)}
+        />
       ) : null}
       {/* Enhanced Header */}
       <header className="sticky top-0 z-20 border-b border-emerald-100/90 bg-white/80 backdrop-blur-xl">
@@ -907,23 +945,17 @@ export function CaseChat({
                         )}
                       </div>
                       <div className="text-sm text-left">
-                        <ReactMarkdown
-                          components={{
-                            p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                            h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                            ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2">{children}</ul>,
-                            ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2">{children}</ol>,
-                            li: ({ children }) => <li className="text-left mb-1">{children}</li>,
-                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                            em: ({ children }) => <em className="italic">{children}</em>,
-                            code: ({ children }) => <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-                            blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-emerald-200 pl-4 italic">{children}</blockquote>
-                          }}
+                        <MarkdownContent
+                          variant={
+                            message.role === "student"
+                              ? "bubbleMine"
+                              : message.role === "doctor"
+                                ? "bubbleDoctor"
+                                : "chatPatient"
+                          }
                         >
                           {message.content}
-                        </ReactMarkdown>
+                        </MarkdownContent>
                       </div>
                       <p className="text-xs opacity-70 mt-1">{new Date(message.timestamp).toLocaleTimeString()}</p>
                     </div>

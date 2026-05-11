@@ -7,7 +7,8 @@ export interface QuestionBankStatCard {
   id: string;
   title: string;
   value: string;
-  hint: string;
+  /** Optional secondary line under the stat. */
+  hint?: string;
 }
 
 export interface QuestionBankListHeaderProps {
@@ -59,9 +60,11 @@ export function QuestionBankListHeader({
             <p className="text-2xl font-bold text-foreground dark:text-white mt-1 tabular-nums">
               {card.value}
             </p>
-            <p className="text-xs text-muted-foreground dark:text-emerald-400/90 mt-0.5 truncate">
-              {card.hint}
-            </p>
+            {card.hint ? (
+              <p className="text-xs text-muted-foreground dark:text-emerald-400/90 mt-0.5 truncate">
+                {card.hint}
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

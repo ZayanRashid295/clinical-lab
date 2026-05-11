@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,6 +7,7 @@ import {
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { RealtimeBus } from "../realtime/realtime.bus";
+import { AchievementsService } from "../achievements/achievements.service";
 import {
   CreateGroupPostDto,
   CreateStudyGroupDto,
@@ -26,7 +28,8 @@ export class StudyGroupsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
-    private realtime: RealtimeBus
+    private realtime: RealtimeBus,
+    private achievements: AchievementsService
   ) {}
 
   async create(ownerId: string, dto: CreateStudyGroupDto) {
@@ -51,6 +54,10 @@ export class StudyGroupsService {
         role: "OWNER",
       },
     });
+
+    void this.achievements
+      .recordActivity(ownerId, "STUDY_GROUPS_JOINED", 0)
+      .catch(() => undefined);
 
     return group;
   }
@@ -171,7 +178,70 @@ export class StudyGroupsService {
       member: m,
     });
 
+    void this.achievements
+      .recordActivity(userId, "STUDY_GROUPS_JOINED", 0)
+      .catch(() => undefined);
+
     return m;
+  }
+
+  async transferOwnership(
+    userId: string,
+    id: string,
+    newOwnerUserId: string
+  ) {
+    if (!newOwnerUserId?.trim()) {
+      throw new BadRequestException("newOwnerUserId is required");
+    }
+    if (newOwnerUserId === userId) {
+      throw new BadRequestException(
+        "Choose another member — you are already the owner"
+      );
+    }
+
+    const group = await this.prisma.studyGroup.findUnique({
+      where: { id },
+      include: { members: true },
+    });
+    if (!group) throw new NotFoundException("Study group not found");
+    if (group.ownerId !== userId) {
+      throw new ForbiddenException("Only the owner can transfer ownership");
+    }
+
+    const incoming = group.members.find((m) => m.userId === newOwnerUserId);
+    if (!incoming) {
+      throw new BadRequestException(
+        "The new owner must already be a member of this group"
+      );
+    }
+
+    const currentOwnerMember = group.members.find((m) => m.userId === userId);
+    if (!currentOwnerMember) {
+      throw new BadRequestException("Owner membership record is missing");
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.studyGroup.update({
+        where: { id },
+        data: { ownerId: newOwnerUserId },
+      }),
+      this.prisma.studyGroupMember.update({
+        where: { id: currentOwnerMember.id },
+        data: { role: "MEMBER" },
+      }),
+      this.prisma.studyGroupMember.update({
+        where: { id: incoming.id },
+        data: { role: "OWNER" },
+      }),
+    ]);
+
+    this.realtime.emitToGroup(id, "group:ownership:transferred", {
+      groupId: id,
+      newOwnerId: newOwnerUserId,
+      previousOwnerId: userId,
+    });
+
+    return this.findOne(userId, id);
   }
 
   async leave(userId: string, id: string) {
@@ -213,6 +283,10 @@ export class StudyGroupsService {
         author: { select: { id: true, firstName: true, lastName: true, avatar: true, email: true } },
       },
     });
+
+    void this.achievements
+      .recordActivity(userId, "STUDY_GROUP_POSTS", 1)
+      .catch(() => undefined);
 
     // Notify other members (in-app notification rows)
     const others = await this.prisma.studyGroupMember.findMany({

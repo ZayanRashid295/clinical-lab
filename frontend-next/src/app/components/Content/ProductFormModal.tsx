@@ -18,6 +18,7 @@ import { ProductsService } from "../../services/products/products.service";
 import { CategoriesService } from "../../services/categories/categories.service";
 import { Category } from "../../types/category";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -199,12 +200,8 @@ export default function ProductFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save product"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save product"));
     } finally {
       setLoading(false);
     }
