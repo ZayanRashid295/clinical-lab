@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../src/shared";
@@ -16,7 +16,7 @@ function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAcknowledgmentModal, setShowAcknowledgmentModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const subscriptionsService = new SubscriptionsService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
   const { hasActiveSubscription, loading: accessLoading } = useAccessControl();
 
   useEffect(() => {
@@ -113,13 +113,13 @@ function DashboardContent() {
     return () => {
       window.removeEventListener("open-subscription-modal", handleOpenSubscriptionModal);
     };
-  }, [router]);
+  }, [router, subscriptionsService]);
 
   if (isLoading || accessLoading) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
@@ -160,11 +160,11 @@ function DashboardContent() {
 
       {/* Show upgrade banner if no active subscription */}
       {!hasActiveSubscription && (
-        <div className="sticky top-0 z-40 w-full border-b border-yellow-200 dark:border-yellow-800">
-          <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 rounded-none m-0">
-            <Lock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+        <div className="sticky top-0 z-40 w-full border-b border-primary-200/90 dark:border-primary-800/60">
+          <Alert className="border-primary-300/80 bg-primary-50/95 dark:bg-primary-900/20 dark:border-primary-800/50 rounded-none m-0">
+            <Lock className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             <AlertDescription className="flex items-center justify-between w-full py-2">
-              <span className="text-yellow-800 dark:text-yellow-200 text-sm flex-1">
+              <span className="text-primary-900 dark:text-primary-100 text-sm flex-1">
                 <strong>No Active Subscription:</strong> You can view the dashboard, but features require an active subscription. 
                 Upgrade to unlock full access.
               </span>
@@ -175,7 +175,7 @@ function DashboardContent() {
                 }}
                 size="sm"
                 variant="default"
-                className="ml-4 bg-yellow-600 hover:bg-yellow-700 text-white whitespace-nowrap"
+                className="ml-4 bg-primary-600 hover:bg-primary-700 text-white shadow-sm whitespace-nowrap"
               >
                 <CreditCard className="h-4 w-4 mr-1" />
                 View Plans

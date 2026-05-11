@@ -127,6 +127,131 @@ export async function seedSubscriptions(prisma: PrismaClient) {
     }
   }
 
+  // Seed new entitlement definitions + link them to packages (additive, keeps old features working).
+  const entitlementMap: Record<
+    string,
+    { key: string; displayName: string; description?: string; type?: any }
+  > = {
+    "Qbank Access": {
+      key: "qbank.access",
+      displayName: "Qbank Access",
+      description: "Access to the question bank module",
+    },
+    Flashcards: {
+      key: "study.flashcards",
+      displayName: "Flashcards",
+      description: "Spaced-repetition flashcards access",
+    },
+    "Study Planner": {
+      key: "study.planner",
+      displayName: "Study Planner",
+      description: "Study planner access",
+    },
+    Notes: {
+      key: "study.notes",
+      displayName: "Notes",
+      description: "Notes access",
+    },
+  };
+
+  // AI Tutor quota is enforced in AiTutorService (aitutor.chat entitlement). Users without
+  // this entitlement on their package use AI_TUTOR_CHAT_LIMIT_WITHOUT_ENTITLEMENT (default 0).
+  await prisma.entitlementDefinition.upsert({
+    where: { key: "aitutor.chat" },
+    update: {
+      displayName: "AI Tutor Chat",
+      description: "Chat quota for AI Tutor",
+      isActive: true,
+      type: "NUMBER_LIMIT" as any,
+    },
+    create: {
+      key: "aitutor.chat",
+      displayName: "AI Tutor Chat",
+      description: "Chat quota for AI Tutor",
+      type: "NUMBER_LIMIT" as any,
+      isActive: true,
+    },
+  });
+
+  // MedPrepAI access + modes (admin can assign these to relevant packages).
+  await prisma.entitlementDefinition.upsert({
+    where: { key: "medprepai.access" },
+    update: {
+      displayName: "MedPrepAI Access",
+      description: "Access to MedPrepAI module",
+      isActive: true,
+      type: "BOOLEAN" as any,
+    },
+    create: {
+      key: "medprepai.access",
+      displayName: "MedPrepAI Access",
+      description: "Access to MedPrepAI module",
+      type: "BOOLEAN" as any,
+      isActive: true,
+    },
+  });
+  await prisma.entitlementDefinition.upsert({
+    where: { key: "medprepai.modes" },
+    update: {
+      displayName: "MedPrepAI Modes",
+      description: "Enabled MedPrepAI modes (SET.items)",
+      isActive: true,
+      type: "SET" as any,
+    },
+    create: {
+      key: "medprepai.modes",
+      displayName: "MedPrepAI Modes",
+      description: "Enabled MedPrepAI modes (SET.items)",
+      type: "SET" as any,
+      isActive: true,
+    },
+  });
+
+  const entitlementDefs = [];
+  for (const f of features) {
+    const mapped = entitlementMap[f.name];
+    if (!mapped) continue;
+    const ent = await prisma.entitlementDefinition.upsert({
+      where: { key: mapped.key },
+      update: {
+        displayName: mapped.displayName,
+        description: mapped.description,
+        isActive: true,
+      },
+      create: {
+        key: mapped.key,
+        displayName: mapped.displayName,
+        description: mapped.description,
+        // keep these tied to the seeded Qbank product subtype for now
+        productSubtypeId: subtype.id,
+        type: "BOOLEAN" as any,
+        isActive: true,
+      },
+    });
+    entitlementDefs.push(ent);
+  }
+
+  for (const pkg of packages) {
+    for (const ent of entitlementDefs) {
+      await prisma.subscriptionPackageEntitlement.upsert({
+        where: {
+          subscriptionPackageId_entitlementDefinitionId: {
+            subscriptionPackageId: pkg.id,
+            entitlementDefinitionId: ent.id,
+          },
+        },
+        update: {
+          valueJson: { enabled: true },
+        },
+        create: {
+          subscriptionPackageId: pkg.id,
+          entitlementDefinitionId: ent.id,
+          valueJson: { enabled: true },
+        },
+      });
+    }
+  }
+
   const userEmails = EDUCATION_SEED_USERS.filter((u) => u.role === "STUDENT")
     .slice(0, 3)
     .map((u) => u.email);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -31,6 +31,7 @@ import {
   type StudentNote,
   type CreateNotePayload,
 } from "@/app/services/student";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 const COLOR_CHOICES = [
   { id: "yellow", className: "bg-yellow-100 dark:bg-yellow-900/30" },
@@ -64,7 +65,7 @@ export default function NotesPage() {
   const [showEditor, setShowEditor] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -75,15 +76,15 @@ export default function NotesPage() {
       setNotes(list);
       setStats(s);
     } catch (e: any) {
-      setError(e?.message || "Failed to load notes");
+      setError(getApiErrorMessage(e, "Failed to load notes"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   // Debounced server search so very large note libraries stay snappy
   useEffect(() => {
@@ -91,8 +92,7 @@ export default function NotesPage() {
       load();
     }, 250);
     return () => clearTimeout(handle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [load]);
 
   const filtered = useMemo(() => {
     if (!search) return notes;
@@ -137,7 +137,7 @@ export default function NotesPage() {
       setShowEditor(false);
       await load();
     } catch (e: any) {
-      setError(e?.message || "Could not save note");
+      setError(getApiErrorMessage(e, "Could not save note"));
     } finally {
       setBusy(false);
     }
@@ -148,7 +148,7 @@ export default function NotesPage() {
       await notesService.update(n.id, { pinned: !n.pinned });
       await load();
     } catch (e: any) {
-      setError(e?.message || "Failed to toggle pin");
+      setError(getApiErrorMessage(e, "Failed to toggle pin"));
     }
   };
 
@@ -158,7 +158,7 @@ export default function NotesPage() {
       await notesService.remove(n.id);
       await load();
     } catch (e: any) {
-      setError(e?.message || "Failed to delete note");
+      setError(getApiErrorMessage(e, "Failed to delete note"));
     }
   };
 

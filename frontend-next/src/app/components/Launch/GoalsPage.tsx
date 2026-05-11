@@ -33,6 +33,8 @@ import {
   type GoalWithProgress,
   type CreateGoalPayload,
 } from "@/app/services/launch";
+import { useToast } from "@/shared/ui/use-toast";
+import { toastApiError } from "@/app/services/base/api-http-error";
 
 const METRICS: { value: GoalMetric; label: string }[] = [
   { value: "QUESTIONS_ANSWERED", label: "Questions answered" },
@@ -46,6 +48,7 @@ const METRICS: { value: GoalMetric; label: string }[] = [
 const PERIODS: GoalPeriod[] = ["DAILY", "WEEKLY", "MONTHLY"];
 
 export default function GoalsPage() {
+  const { toast } = useToast();
   const [goals, setGoals] = useState<GoalWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -116,20 +119,30 @@ export default function GoalsPage() {
       }
       setShowEditor(false);
       load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t save goal");
     } finally {
       setSaving(false);
     }
   };
 
   const onToggleActive = async (g: Goal) => {
-    await goalsService.update(g.id, { isActive: !g.isActive });
-    load();
+    try {
+      await goalsService.update(g.id, { isActive: !g.isActive });
+      load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update goal");
+    }
   };
 
   const onDelete = async (g: Goal) => {
     if (!confirm(`Delete goal "${g.title}"?`)) return;
-    await goalsService.remove(g.id);
-    load();
+    try {
+      await goalsService.remove(g.id);
+      load();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t delete goal");
+    }
   };
 
   return (

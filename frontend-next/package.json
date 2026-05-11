@@ -72,6 +72,7 @@
     "cmdk": "latest",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "google": "^2.1.0",
     "gray-matter": "^4.0.3",
     "input-otp": "latest",
     "lucide-react": "^0.542.0",

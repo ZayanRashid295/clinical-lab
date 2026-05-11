@@ -30,7 +30,7 @@ export interface UIConfig {
 export const DEFAULT_UI_CONFIG: UIConfig = {
   menuLayout: "vertical",
   menuStyle: "sidebar",
-  theme: "dark",
+  theme: "light",
   colorScheme: "blue",
   fontSize: "medium",
   borderRadius: "medium",

@@ -26,7 +26,7 @@ export function toMedPrepUser(
   clinicalUser: { id?: string; userId?: string; email?: string; name?: string; roles?: string[] } | null
 ): User | null {
   const cid = getClinicalUserId(clinicalUser)
-  if (!cid) return null
+  if (!cid || !clinicalUser) return null
   const isAdmin = clinicalUser.roles?.some((r) => /admin/i.test(String(r)))
   const role: User["role"] = isAdmin ? "ADMIN" : "STUDENT"
   const now = new Date()

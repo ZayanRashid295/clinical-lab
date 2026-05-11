@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -28,6 +28,8 @@ import {
 } from "@/app/services/launch";
 import { authService } from "@/shared";
 import { UserIdentity } from "@/shared/components/Common/UserIdentity";
+import { useToast } from "@/shared/ui/use-toast";
+import { toastApiError } from "@/app/services/base/api-http-error";
 
 const STATUSES: QuestionReportStatus[] = [
   "OPEN",
@@ -93,7 +95,7 @@ export default function QuestionReportsPage() {
     }
   }, []);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const list = isStaff
@@ -107,18 +109,18 @@ export default function QuestionReportsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isStaff, statusFilter]);
 
   useEffect(() => {
     load();
-  }, [isStaff, statusFilter]);
+  }, [load]);
 
   // Live refresh on report-related notifications
   useEffect(() => {
     return onNotification((n) => {
       if (n.type === "QUESTION_REPORT_UPDATE") load();
     });
-  }, [isStaff, statusFilter]);
+  }, [load]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { ALL: items.length };
@@ -249,6 +251,7 @@ function ReportRow({
   isStaff: boolean;
   onUpdated: () => void;
 }) {
+  const { toast } = useToast();
   const meta = STATUS[report.status];
   const [editing, setEditing] = useState(false);
   const [resolution, setResolution] = useState(report.resolution ?? "");
@@ -263,6 +266,8 @@ function ReportRow({
       });
       setEditing(false);
       onUpdated();
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update report");
     } finally {
       setSaving(null);
     }

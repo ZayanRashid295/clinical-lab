@@ -31,7 +31,7 @@ import {
 } from "lucide-react"
 import type { PracticeSessionGrade } from "@/lib/fyp/practice-grading-service"
 import { HintGradeDisplay } from "./hint-grade-display"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 
 interface PracticeGradeModalProps {
   grade: PracticeSessionGrade
@@ -244,16 +244,7 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                           <div key={index} className="flex items-start space-x-2 p-2 bg-green-50 rounded border border-green-200">
                             <Star className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                             <div className="text-sm text-green-800 prose prose-sm max-w-none">
-                              <ReactMarkdown
-                                components={{
-                                  p: ({ children }) => <p className="mb-0">{children}</p>,
-                                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                  em: ({ children }) => <em className="italic">{children}</em>,
-                                  code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
-                                }}
-                              >
-                                {strength}
-                              </ReactMarkdown>
+                              <MarkdownContent variant="default">{strength}</MarkdownContent>
                             </div>
                           </div>
                         ))}
@@ -271,16 +262,7 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                           <div key={index} className="flex items-start space-x-2 p-2 bg-orange-50 rounded border border-orange-200">
                             <Target className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
                             <div className="text-sm text-orange-800 prose prose-sm max-w-none">
-                              <ReactMarkdown
-                                components={{
-                                  p: ({ children }) => <p className="mb-0">{children}</p>,
-                                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                  em: ({ children }) => <em className="italic">{children}</em>,
-                                  code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
-                                }}
-                              >
-                                {improvement}
-                              </ReactMarkdown>
+                              <MarkdownContent variant="default">{improvement}</MarkdownContent>
                             </div>
                           </div>
                         ))}
@@ -298,16 +280,7 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                           <div key={index} className="flex items-start space-x-2 p-2 bg-blue-50 rounded border border-blue-200">
                             <Lightbulb className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                             <div className="text-sm text-blue-800 prose prose-sm max-w-none">
-                              <ReactMarkdown
-                                components={{
-                                  p: ({ children }) => <p className="mb-0">{children}</p>,
-                                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                  em: ({ children }) => <em className="italic">{children}</em>,
-                                  code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
-                                }}
-                              >
-                                {recommendation}
-                              </ReactMarkdown>
+                              <MarkdownContent variant="default">{recommendation}</MarkdownContent>
                             </div>
                           </div>
                         ))}

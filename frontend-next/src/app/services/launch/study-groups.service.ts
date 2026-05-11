@@ -51,6 +51,12 @@ export class StudyGroupsService extends BaseApiService {
     return this.post(`${this.endpoint}/${id}/leave`, {});
   }
 
+  async transferOwnership(id: string, newOwnerUserId: string) {
+    return this.post(`${this.endpoint}/${id}/transfer-ownership`, {
+      newOwnerUserId,
+    });
+  }
+
   async listPosts(id: string): Promise<StudyGroupPost[]> {
     return this.get(`${this.endpoint}/${id}/posts`);
   }

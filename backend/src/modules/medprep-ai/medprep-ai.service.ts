@@ -5,11 +5,15 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { MEDPREP_MODES } from "./medprep-modes";
+import { MedprepConversationStatus, MedprepMode } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { AchievementsService } from "../achievements/achievements.service";
 import {
-  MedprepConversationStatus,
-  MedprepMode,
-} from "@prisma/client";
+  MEDPREP_ENTITLEMENT_SLUGS,
+  MEDPREP_SLUG_TO_MODE,
+  modeToSlug,
+} from "./medprep-mode-map";
 import {
   CreateMedprepMessageDto,
   StartMedprepSessionDto,
@@ -22,7 +26,11 @@ import {
 
 @Injectable()
 export class MedprepAiService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionsService: SubscriptionsService,
+    private readonly achievements: AchievementsService
+  ) {}
 
   getModes() {
     return {
@@ -51,9 +59,15 @@ export class MedprepAiService {
       include: this.sessionInclude,
     });
 
-    if (existing) return existing;
+    if (existing) {
+      await this.assertMedprepModeAllowed(userId!, existing.mode);
+      return existing;
+    }
 
-    return this.prisma.medprepConversation.create({
+    await this.assertMedprepModeAllowed(userId!, dto.mode);
+    await this.enforceDistinctCaseQuota(userId!, dto.mode);
+
+    const created = await this.prisma.medprepConversation.create({
       data: {
         userId,
         mode: dto.mode,
@@ -68,6 +82,10 @@ export class MedprepAiService {
       },
       include: this.sessionInclude,
     });
+    void this.achievements
+      .recordActivity(userId!, "MEDPREP_CONVERSATIONS", 1)
+      .catch(() => undefined);
+    return created;
   }
 
   async listSessions(
@@ -79,10 +97,25 @@ export class MedprepAiService {
     }
   ) {
     this.ensureUserId(userId);
+    const allowedEnumModes = await this.listSubscriptionAllowedModes(userId!);
+    if (allowedEnumModes !== null && allowedEnumModes.length === 0) {
+      return [];
+    }
+
+    let modeFilter: MedprepMode | { in: MedprepMode[] } | undefined;
+    if (params.mode) {
+      if (allowedEnumModes !== null && !allowedEnumModes.includes(params.mode)) {
+        return [];
+      }
+      modeFilter = params.mode;
+    } else if (allowedEnumModes !== null) {
+      modeFilter = { in: allowedEnumModes };
+    }
+
     return this.prisma.medprepConversation.findMany({
       where: {
         userId,
-        mode: params.mode,
+        mode: modeFilter,
         status: params.status,
         OR: params.caseId
           ? [{ caseId: params.caseId }, { caseInstanceId: params.caseId }]
@@ -100,6 +133,7 @@ export class MedprepAiService {
       include: this.sessionInclude,
     });
     this.assertSessionOwner(session, userId);
+    await this.assertMedprepModeAllowed(userId!, session.mode);
     return session;
   }
 
@@ -127,6 +161,7 @@ export class MedprepAiService {
 
   async getResumeSession(userId: string | undefined, mode: MedprepMode, caseId?: string) {
     this.ensureUserId(userId);
+    await this.assertMedprepModeAllowed(userId!, mode);
     return this.prisma.medprepConversation.findFirst({
       where: {
         userId,
@@ -301,5 +336,197 @@ export class MedprepAiService {
     if (!userId) {
       throw new BadRequestException("userId is required");
     }
+  }
+
+  /**
+   * Distinct cases started in the window: unique caseId per row; missing caseId counts as `sess:<id>`.
+   */
+  async countDistinctCasesSince(userId: string, mode: MedprepMode, since: Date): Promise<number> {
+    const rows = await this.prisma.medprepConversation.findMany({
+      where: { userId, mode, createdAt: { gte: since } },
+      select: { caseId: true, id: true },
+    });
+    const keys = new Set(
+      rows.map((r) => (r.caseId && String(r.caseId).length > 0 ? r.caseId : `sess:${r.id}`)),
+    );
+    return keys.size;
+  }
+
+  private windowStartForPeriod(period: "DAY" | "MONTH"): Date {
+    const now = new Date();
+    if (period === "DAY") {
+      return new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0),
+      );
+    }
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+  }
+
+  /**
+   * When `medprepai.modes` is absent → legacy behavior: any mode allowed if `medprepai.access` is on.
+   * When present (non-null object) → strict allow-list from `items` (route slugs). Empty list = no modes.
+   */
+  private resolveMedprepModesPolicy(entitlements: Record<string, any>): {
+    restrictModes: boolean;
+    allowedSlugs: Set<string>;
+    modesPack: Record<string, any> | undefined;
+  } {
+    const raw = entitlements["medprepai.modes"];
+    if (raw === undefined || raw === null) {
+      return { restrictModes: false, allowedSlugs: new Set(), modesPack: undefined };
+    }
+    if (typeof raw !== "object" || Array.isArray(raw)) {
+      return { restrictModes: false, allowedSlugs: new Set(), modesPack: undefined };
+    }
+    const itemsRaw = (raw as any).items;
+    const items = Array.isArray(itemsRaw)
+      ? itemsRaw.filter((x): x is string => typeof x === "string")
+      : [];
+    const allowedSlugs = new Set(items.filter((slug) => MEDPREP_ENTITLEMENT_SLUGS.has(slug)));
+    return {
+      restrictModes: true,
+      allowedSlugs,
+      modesPack: raw as Record<string, any>,
+    };
+  }
+
+  private medprepAccessEnabled(entitlements: Record<string, any>): boolean {
+    const access = entitlements["medprepai.access"] as any;
+    return (
+      access === true ||
+      (access &&
+        typeof access === "object" &&
+        (access.enabled === undefined || access.enabled === true))
+    );
+  }
+
+  /** null = no subscription-side filter (legacy); empty = none allowed */
+  private async listSubscriptionAllowedModes(userId: string): Promise<MedprepMode[] | null> {
+    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    const policy = this.resolveMedprepModesPolicy(entitlements);
+    if (!policy.restrictModes) return null;
+    const modes: MedprepMode[] = [];
+    for (const slug of policy.allowedSlugs) {
+      const m = MEDPREP_SLUG_TO_MODE[slug];
+      if (m) modes.push(m);
+    }
+    return modes;
+  }
+
+  private async assertMedprepModeAllowed(userId: string, mode: MedprepMode) {
+    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    if (!this.medprepAccessEnabled(entitlements)) {
+      throw new ForbiddenException(
+        "MedPrepAI is not included in your subscription. Upgrade to unlock case practice.",
+      );
+    }
+    const policy = this.resolveMedprepModesPolicy(entitlements);
+    if (!policy.restrictModes) return;
+    const slug = modeToSlug(mode);
+    if (policy.allowedSlugs.size === 0) {
+      throw new ForbiddenException(
+        "No MedPrep modes are enabled on your current subscription package.",
+      );
+    }
+    if (!policy.allowedSlugs.has(slug)) {
+      throw new ForbiddenException(
+        "This learning mode is not included in your current subscription package.",
+      );
+    }
+  }
+
+  /** Per-mode distinct-case quota (optional caps in `limitsPerMode`). */
+  private async enforceDistinctCaseQuota(userId: string, mode: MedprepMode) {
+    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    const modesPack = entitlements["medprepai.modes"] as Record<string, any> | undefined;
+    if (!modesPack || typeof modesPack !== "object") {
+      return;
+    }
+
+    const slug = modeToSlug(mode);
+    const limitsMap = modesPack.limitsPerMode as Record<string, unknown> | undefined;
+    const rawCap = limitsMap?.[slug];
+    if (rawCap === null || rawCap === undefined) {
+      return;
+    }
+    const cap = Number(rawCap);
+    if (!Number.isFinite(cap)) {
+      return;
+    }
+    if (cap <= 0) {
+      throw new ForbiddenException("No case quota for this mode on your plan.");
+    }
+
+    const periodRaw = String(modesPack.limitPeriod || "MONTH").toUpperCase();
+    const period: "DAY" | "MONTH" = periodRaw === "DAY" ? "DAY" : "MONTH";
+    const since = this.windowStartForPeriod(period);
+    const used = await this.countDistinctCasesSince(userId, mode, since);
+    if (used >= cap) {
+      throw new ForbiddenException(
+        `Case limit reached for this mode (${cap} distinct cases per ${period === "DAY" ? "day" : "month"}).`,
+      );
+    }
+  }
+
+  /** Student dashboard: limits + usage per MedPrep mode (slug = frontend route id). */
+  async getMyCaseLimitSummary(userId: string | undefined) {
+    this.ensureUserId(userId);
+    const entitlements = await this.subscriptionsService.getUserEntitlements(userId!);
+    const hasAccess = this.medprepAccessEnabled(entitlements);
+    const policy = this.resolveMedprepModesPolicy(entitlements);
+
+    const modesPack = entitlements["medprepai.modes"] as Record<string, any> | undefined;
+    const limitsMap = (modesPack?.limitsPerMode ?? {}) as Record<string, unknown>;
+    const periodRaw = String(modesPack?.limitPeriod || "MONTH").toUpperCase();
+    const period: "DAY" | "MONTH" = periodRaw === "DAY" ? "DAY" : "MONTH";
+    const since = this.windowStartForPeriod(period);
+
+    const rows = await Promise.all(
+      MEDPREP_MODES.map(async (m) => {
+        const slug = m.id;
+        const modeEnum = MEDPREP_SLUG_TO_MODE[slug];
+        if (!modeEnum) {
+          return {
+            slug,
+            mode: null,
+            title: m.title,
+            enabled: false,
+            limit: null as number | null,
+            limitPeriod: period,
+            used: 0,
+          };
+        }
+
+        const onPlan =
+          !policy.restrictModes || (policy.allowedSlugs.size > 0 && policy.allowedSlugs.has(slug));
+        const rawLim = limitsMap[slug];
+        let limit: number | null = null;
+        if (rawLim !== undefined && rawLim !== null) {
+          const n = Number(rawLim);
+          limit = Number.isFinite(n) ? n : null;
+        }
+
+        let used = 0;
+        if (hasAccess && onPlan) {
+          used = await this.countDistinctCasesSince(userId!, modeEnum, since);
+        }
+
+        return {
+          slug,
+          mode: modeEnum,
+          title: m.title,
+          enabled: hasAccess && onPlan,
+          limit,
+          limitPeriod: period,
+          used,
+        };
+      }),
+    );
+
+    return {
+      hasMedprepAccess: Boolean(hasAccess),
+      limitPeriod: period,
+      modes: rows,
+    };
   }
 }

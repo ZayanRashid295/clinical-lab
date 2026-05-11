@@ -13,6 +13,7 @@ import {
 import { Role, CreateRoleDto, UpdateRoleDto } from "../../types/user";
 import { RolesService } from "../../services/roles/roles.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface RoleFormModalProps {
   isOpen: boolean;
@@ -233,11 +234,10 @@ export default function RoleFormModal({
         err
       );
       setError(
-        err instanceof Error
-          ? err.message
-          : `Failed to ${
-              isCreateMode ? "create" : "update"
-            } role. Please try again.`
+        getApiErrorMessage(
+          err,
+          `Failed to ${isCreateMode ? "create" : "update"} role. Please try again.`
+        )
       );
     } finally {
       setLoading(false);

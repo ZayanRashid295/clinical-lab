@@ -18,6 +18,7 @@ import { QuestionChoicesService } from "../../services/questions/question-choice
 import { QuestionsService } from "../../services/questions/questions.service";
 import { Question } from "../../types/question";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -217,12 +218,8 @@ export default function QuestionChoiceFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save question choice"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save question choice"));
     } finally {
       setLoading(false);
     }

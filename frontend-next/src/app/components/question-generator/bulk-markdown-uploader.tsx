@@ -5,6 +5,7 @@ import { useState, useRef, useMemo, useEffect } from "react"
 import { Card } from "@/shared/ui/card"
 import { Button } from "@/shared/ui/button"
 import { useToast } from "@/shared/ui/use-toast"
+import { getApiErrorMessage } from "@/app/services/base/api-http-error"
 import { parseMarkdown, extractImageReferences, replaceImagePathsInBlocks, replaceImagePaths } from "./markdown-parser-utils"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { SystemsService } from "@/app/services/systems/systems.service"
@@ -1268,7 +1269,7 @@ export default function BulkMarkdownUploader({
     } catch (e: any) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to delete",
+        description: getApiErrorMessage(e, "Failed to delete"),
         variant: "destructive",
       })
     } finally {

@@ -1,4 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+} from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { QueryUserDto } from "./dto/query-user.dto";
@@ -166,6 +170,96 @@ export class UsersService {
             role: true,
           },
         },
+      },
+    });
+  }
+
+  /**
+   * Self-service profile update (any authenticated user). Restricted fields only.
+   */
+  async updateOwnProfile(
+    userId: string,
+    dto: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      phone?: string | null;
+    }
+  ) {
+    const data: Record<string, unknown> = {};
+
+    if (dto.firstName !== undefined) {
+      const t = dto.firstName.trim();
+      if (!t) throw new BadRequestException("First name cannot be empty");
+      data.firstName = t;
+    }
+    if (dto.lastName !== undefined) {
+      const t = dto.lastName.trim();
+      if (!t) throw new BadRequestException("Last name cannot be empty");
+      data.lastName = t;
+    }
+    if (dto.email !== undefined) {
+      const email = dto.email.trim().toLowerCase();
+      if (!email) throw new BadRequestException("Email cannot be empty");
+      if (!this.isValidEmail(email)) {
+        throw new BadRequestException("Invalid email format");
+      }
+      const taken = await this.prisma.user.findFirst({
+        where: { email, NOT: { id: userId } },
+      });
+      if (taken) {
+        throw new ConflictException("That email is already in use");
+      }
+      data.email = email;
+    }
+    if (dto.phone !== undefined) {
+      if (dto.phone === null || String(dto.phone).trim() === "") {
+        data.phone = null;
+      } else {
+        const phone = String(dto.phone).trim();
+        if (!this.isValidPhone(phone)) {
+          throw new BadRequestException("Invalid phone format");
+        }
+        const taken = await this.prisma.user.findFirst({
+          where: { phone, NOT: { id: userId } },
+        });
+        if (taken) {
+          throw new ConflictException("That phone number is already in use");
+        }
+        data.phone = phone;
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          avatar: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }

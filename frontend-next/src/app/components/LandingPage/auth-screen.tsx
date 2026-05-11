@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { authService } from "@/shared/services/auth.service";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import { useRouter } from "next/router";
 
 export type AuthModalView = "login" | "signup";
@@ -82,9 +83,7 @@ export function AuthScreen({
       await authService.login(email, password);
       afterAuthSuccess();
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Sign-in failed. Check your details and try again.";
-      setError(errorMessage);
+      setError(getApiErrorMessage(err, "Sign-in failed. Check your details and try again."));
     } finally {
       setIsLoading(false);
     }
@@ -118,9 +117,7 @@ export function AuthScreen({
       });
       afterAuthSuccess();
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Could not create your account. Please try again.";
-      setError(errorMessage);
+      setError(getApiErrorMessage(err, "Could not create your account. Please try again."));
     } finally {
       setIsLoading(false);
     }

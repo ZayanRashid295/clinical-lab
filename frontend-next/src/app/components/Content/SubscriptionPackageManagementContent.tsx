@@ -7,6 +7,15 @@ import SubscriptionPackageFormModal from "../Subscriptions/SubscriptionPackageFo
 import SubscriptionPackageViewModal from "../Subscriptions/SubscriptionPackageViewModal";
 import DataManagementContent from "../../../shared/components/DataTable/DataManagementContent";
 import { subscriptionPackageTableConfig } from "../../config/tables/subscription-package-table.config";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 
 export default function SubscriptionPackageManagementContent() {
   const { config } = useTheme();
@@ -14,6 +23,10 @@ export default function SubscriptionPackageManagementContent() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedPackage, setSelectedPackage] =
+    useState<SubscriptionPackage | null>(null);
+  const [packageCreatedDialogOpen, setPackageCreatedDialogOpen] =
+    useState(false);
+  const [lastCreatedPackage, setLastCreatedPackage] =
     useState<SubscriptionPackage | null>(null);
 
   // Use the custom hooks for data fetching
@@ -83,9 +96,15 @@ export default function SubscriptionPackageManagementContent() {
     setFormModalOpen(true);
   };
 
-  const handlePackageSaved = (savedPackage: SubscriptionPackage) => {
-    // Refresh the packages list to show updated data
+  const handlePackageSaved = (
+    savedPackage: SubscriptionPackage,
+    meta?: { created?: boolean }
+  ) => {
     refetch();
+    if (meta?.created) {
+      setLastCreatedPackage(savedPackage);
+      setPackageCreatedDialogOpen(true);
+    }
   };
 
   const handleCloseFormModal = () => {
@@ -122,35 +141,70 @@ export default function SubscriptionPackageManagementContent() {
   };
 
   return (
-    <DataManagementContent
-      config={configWithHandlers}
-      data={packages}
-      loading={loading}
-      error={error}
-      pagination={pagination}
-      filters={filters}
-      stats={stats}
-      statsLoading={statsLoading}
-      onFiltersChange={handleFiltersChange}
-      onClearFilters={handleClearFilters}
-      onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-      onSortChange={handleSortChange}
-      onRefresh={handleRefresh}
-      onView={handleViewPackage}
-      onEdit={handleEditPackage}
-      FormModal={SubscriptionPackageFormModal}
-      ViewModal={SubscriptionPackageViewModal}
-      formModalOpen={formModalOpen}
-      viewModalOpen={viewModalOpen}
-      selectedItem={selectedPackage}
-      formMode={formMode}
-      onCloseFormModal={handleCloseFormModal}
-      onCloseViewModal={handleCloseViewModal}
-      onItemSaved={handlePackageSaved}
-      getFormModalProps={getFormModalProps}
-      getViewModalProps={getViewModalProps}
-    />
+    <>
+      <DataManagementContent
+        config={configWithHandlers}
+        data={packages}
+        loading={loading}
+        error={error}
+        pagination={pagination}
+        filters={filters}
+        stats={stats}
+        statsLoading={statsLoading}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        onSortChange={handleSortChange}
+        onRefresh={handleRefresh}
+        onView={handleViewPackage}
+        onEdit={handleEditPackage}
+        FormModal={SubscriptionPackageFormModal}
+        ViewModal={SubscriptionPackageViewModal}
+        formModalOpen={formModalOpen}
+        viewModalOpen={viewModalOpen}
+        selectedItem={selectedPackage}
+        formMode={formMode}
+        onCloseFormModal={handleCloseFormModal}
+        onCloseViewModal={handleCloseViewModal}
+        onItemSaved={handlePackageSaved}
+        getFormModalProps={getFormModalProps}
+        getViewModalProps={getViewModalProps}
+      />
+
+      <AlertDialog
+        open={packageCreatedDialogOpen}
+        onOpenChange={(open) => {
+          setPackageCreatedDialogOpen(open);
+          if (!open) setLastCreatedPackage(null);
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Subscription package created</AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2">
+              <span className="block text-foreground">
+                <span className="font-semibold">
+                  {lastCreatedPackage?.name ?? "Package"}
+                </span>{" "}
+                has been saved and is ready to assign to students or attach to
+                checkout.
+              </span>
+              {lastCreatedPackage?.price != null && (
+                <span className="block text-sm text-muted-foreground">
+                  Price: {lastCreatedPackage.currency}{" "}
+                  {Number(lastCreatedPackage.price).toFixed(2)} · Validity:{" "}
+                  {lastCreatedPackage.validityDays} days
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="sm:w-auto w-full">OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

@@ -20,6 +20,7 @@ import {
 } from "../../types/user";
 import { UsersService } from "../../services/users/users.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -220,11 +221,10 @@ export default function UserFormModal({
         err
       );
       setError(
-        err instanceof Error
-          ? err.message
-          : `Failed to ${
-              isCreateMode ? "create" : "update"
-            } user. Please try again.`
+        getApiErrorMessage(
+          err,
+          `Failed to ${isCreateMode ? "create" : "update"} user. Please try again.`
+        )
       );
     } finally {
       setLoading(false);

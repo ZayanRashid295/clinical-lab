@@ -23,6 +23,10 @@ import { CreateQuestionDto } from "@/app/types/question"
 import { authService } from "@/shared/services/auth.service"
 import { useLanguage } from "@/shared/contexts/LanguageContext"
 import { QuestionBankListHeader } from "./QuestionBankListHeader"
+import {
+  ApiHttpError,
+  getApiErrorMessage,
+} from "@/app/services/base/api-http-error"
 
 interface Question {
   id: string
@@ -986,12 +990,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       const transformedQuestions = allQuestions.map(transformBackendToFrontend)
       
       setQuestions(transformedQuestions)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load questions:", err)
-      
-      // Handle authentication errors
-      if (err.message?.includes("Unauthorized") || err.message?.includes("401")) {
-        // Clear invalid token
+
+      if (ApiHttpError.is(err) && err.status === 401) {
         if (typeof window !== "undefined") {
           localStorage.removeItem("authToken")
           localStorage.removeItem("userData")
@@ -999,7 +1001,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         setError("Your session has expired. Please log in again to continue.")
         setQuestions([])
       } else {
-        setError(err.message || "Failed to load questions")
+        setError(getApiErrorMessage(err, "Failed to load questions"))
         setQuestions([])
       }
     } finally {
@@ -1247,17 +1249,13 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       setEditingId(null)
       setViewingId(null)
       setParsedMarkdownData(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to save question:", err)
-      console.error("Error details:", {
-        message: err.message,
-        stack: err.stack,
-      })
-      
-      setError(err.message || "Failed to save question")
+
+      setError(getApiErrorMessage(err, "Failed to save question"))
       toast({
         title: "Error",
-        description: err.message || "Unknown error during save",
+        description: getApiErrorMessage(err, "Unknown error during save"),
         variant: "destructive",
       })
     }
@@ -1280,12 +1278,12 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       setError(null)
       await questionsService.delete(id)
       await loadQuestions() // Reload to reflect deletion
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to delete question:", err)
-      setError(err.message || "Failed to delete question")
+      setError(getApiErrorMessage(err, "Failed to delete question"))
       toast({
         title: "Error",
-        description: err.message || "Failed to delete question",
+        description: getApiErrorMessage(err, "Failed to delete question"),
         variant: "destructive",
       })
     }
@@ -1309,12 +1307,12 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       await loadQuestions()
       setSelectedQuestionIds([])
       setIsSelectMode(false)
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to delete questions:", err)
-      setError(err?.message || "Failed to delete questions")
+      setError(getApiErrorMessage(err, "Failed to delete questions"))
       toast({
         title: "Bulk Delete Failed",
-        description: err?.message || "Unknown error",
+        description: getApiErrorMessage(err, "Something went wrong."),
         variant: "destructive",
       })
     }

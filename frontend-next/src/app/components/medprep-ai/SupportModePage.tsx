@@ -35,6 +35,7 @@ import {
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { EvaluationPage } from "./EvaluationPage"
+import { MedPrepSlugGate } from "./MedPrepSlugGate"
 
 function SupportLandingInner() {
   const router = useRouter()
@@ -625,9 +626,11 @@ export function SupportModePage() {
     (generated === "true" || medprepEmbed)
   ) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <EvaluationPage embedInAppShell initialCopilotMode={false} skipExternalRedirects />
-      </div>
+      <MedPrepSlugGate slug="ai-evaluation" modeLabel="AI Evaluation Mode">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <EvaluationPage embedInAppShell initialCopilotMode={false} skipExternalRedirects />
+        </div>
+      </MedPrepSlugGate>
     )
   }
   return <SupportLandingInner />

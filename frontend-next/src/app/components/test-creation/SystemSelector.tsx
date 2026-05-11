@@ -18,7 +18,6 @@ interface SystemSelectorProps {
   onSystemToggle: (systemId: string) => void;
   selectedPool?: string;
   isMarked?: boolean;
-  isMarked?: boolean;
 }
 
 export function SystemSelector({ selectedSystems, onSystemToggle, selectedPool, isMarked }: SystemSelectorProps) {

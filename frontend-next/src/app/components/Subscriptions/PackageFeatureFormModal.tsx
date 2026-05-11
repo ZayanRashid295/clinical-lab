@@ -14,6 +14,7 @@ import {
 } from "../../types/subscription";
 import { PackageFeaturesService } from "../../services/subscriptions/package-features.service";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface PackageFeatureFormModalProps {
   isOpen: boolean;
@@ -170,12 +171,8 @@ export default function PackageFeatureFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save package feature"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save package feature"));
     } finally {
       setLoading(false);
     }

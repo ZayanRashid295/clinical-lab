@@ -65,6 +65,8 @@ export interface UserQueryParams {
   role?: AppUserRole;
   dateFrom?: string;
   dateTo?: string;
+  /** Backend returns all rows (ignores page/limit). */
+  listAll?: boolean;
 }
 
 export interface CreateUserDto {

@@ -193,6 +193,40 @@ export class AuthService extends BaseApiService {
     return this.get("/auth/profile");
   }
 
+  /**
+   * PATCH /auth/profile — updates firstName, lastName, email, phone for the current user.
+   * Persists merged fields into localStorage `userData` for immediate UI refresh.
+   */
+  async updateProfile(patch: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string | null;
+  }): Promise<any> {
+    const updated = await this.patch("/auth/profile", patch);
+    if (typeof window !== "undefined" && updated && typeof updated === "object") {
+      const current = this.getCurrentUser() || {};
+      const fn =
+        typeof updated.firstName === "string"
+          ? updated.firstName
+          : current.firstName;
+      const ln =
+        typeof updated.lastName === "string"
+          ? updated.lastName
+          : current.lastName;
+      const combinedName = [fn, ln].filter(Boolean).join(" ").trim();
+      const merged = {
+        ...current,
+        ...updated,
+        name:
+          combinedName ||
+          (typeof current.name === "string" ? current.name : undefined),
+      };
+      localStorage.setItem("userData", JSON.stringify(merged));
+    }
+    return updated;
+  }
+
   async logout(): Promise<any> {
     try {
       // Make logout API call first (while we still have the token)

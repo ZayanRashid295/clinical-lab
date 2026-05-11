@@ -100,6 +100,13 @@ export const MENU_CONFIG = {
           path: "/admin/subscriptions/features",
           roles: ["SUPERADMIN", "ADMIN"],
         },
+        {
+          id: "entitlement-definitions",
+          label: "menu.entitlementDefinitions",
+          icon: "🔑",
+          path: "/admin/subscriptions/entitlements",
+          roles: ["SUPERADMIN", "ADMIN"],
+        },
       ],
     },
     {
@@ -393,6 +400,19 @@ export const MENU_CONFIG = {
             "INSTITUTION_MANAGER",
           ],
         },
+      ],
+    },
+    {
+      id: "profile",
+      label: "menu.profile",
+      icon: "👤",
+      path: "/profile",
+      roles: [
+        "SUPERADMIN",
+        "ADMIN",
+        "STUDENT",
+        "FACULTY",
+        "INSTITUTION_MANAGER",
       ],
     },
     {

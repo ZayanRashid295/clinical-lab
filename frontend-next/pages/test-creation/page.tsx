@@ -1,5 +1,5 @@
-import TestCreationPage from "../../src/app/components/test-creation/TestCreationPage";
+import StudyCreateTestPage from "../../src/app/components/test-creation/StudyCreateTestPage";
 
-export default function TestCreation() {
-  return <TestCreationPage />;
+export default function TestCreationRoutePage() {
+  return <StudyCreateTestPage />;
 }

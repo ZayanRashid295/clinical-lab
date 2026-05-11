@@ -5,6 +5,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { Card } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { useToast } from "@/shared/ui/use-toast";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import { parseMarkdown, replaceImagePaths, replaceImagePathsInBlocks } from "./markdown-parser-utils";
 import { convertDocxToMarkdown, extractDocxText } from "./docx-to-markdown-converter";
 import { QuestionsService } from "@/app/services/questions/questions.service";
@@ -1020,7 +1021,7 @@ export default function BulkDocxUploader({
     } catch (e: any) {
       toast({
         title: "Error",
-        description: e?.message || "Failed to delete",
+        description: getApiErrorMessage(e, "Failed to delete"),
         variant: "destructive",
       })
     } finally {

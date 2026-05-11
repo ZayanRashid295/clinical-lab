@@ -9,6 +9,8 @@ import {
   questionReportsService,
   type QuestionReportReason,
 } from "@/app/services/launch";
+import { useToast } from "@/shared/ui/use-toast";
+import { toastApiError } from "@/app/services/base/api-http-error";
 
 interface Props {
   questionId: string;
@@ -33,6 +35,7 @@ export default function ReportQuestionButton({
   variant = "ghost",
   className = "",
 }: Props) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<QuestionReportReason>("INCORRECT_ANSWER");
   const [details, setDetails] = useState("");
@@ -49,8 +52,8 @@ export default function ReportQuestionButton({
         setDone(false);
         setDetails("");
       }, 1200);
-    } catch (e: any) {
-      alert(e?.message || "Could not submit report");
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t submit report");
     } finally {
       setSubmitting(false);
     }

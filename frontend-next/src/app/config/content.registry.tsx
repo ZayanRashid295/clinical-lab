@@ -14,6 +14,7 @@ import SystemSettingsContent from "../components/Content/SystemSettingsContent";
 import SubscriptionManagementContent from "../components/Content/SubscriptionManagementContent";
 import SubscriptionPackageManagementContent from "../components/Content/SubscriptionPackageManagementContent";
 import PackageFeatureManagementContent from "../components/Content/PackageFeatureManagementContent";
+import EntitlementDefinitionManagementContent from "../components/Content/EntitlementDefinitionManagementContent";
 import CategoryManagementContent from "../components/Content/CategoryManagementContent";
 import ProductManagementContent from "../components/Content/ProductManagementContent";
 import SystemManagementContent from "../components/Content/SystemManagementContent";
@@ -34,7 +35,7 @@ import StudyIndexPage from "../components/Study/StudyIndexPage";
 import StudyPlannerPage from "../components/Study/StudyPlannerPage";
 
 // Import test creation components
-import TestCreationPage from "../components/test-creation/TestCreationPage";
+import StudentDashboardPage from "../components/Dashboard/StudentDashboardPage";
 import PerformanceDashboardPage from "../components/test-creation/PerformanceDashboardPage";
 import StudyCreateTestPage from "../components/test-creation/StudyCreateTestPage";
 import PreviousTestsPage from "../components/test-creation/PreviousTestsPage";
@@ -61,6 +62,7 @@ import { LearnCasesPage } from "../components/medprep-ai/LearnCasesPage";
 import { LearningNurseReportPage } from "../components/medprep-ai/LearningNurseReportPage";
 import { EvaluationModePage } from "../components/medprep-ai/EvaluationModePage";
 import { EvaluationCasesPage } from "../components/medprep-ai/EvaluationCasesPage";
+import { MedPrepSlugGate } from "../components/medprep-ai/MedPrepSlugGate";
 
 // Import launch / new-module pages
 import NotificationsPage from "../components/Launch/NotificationsPage";
@@ -73,6 +75,7 @@ import GoalsPage from "../components/Launch/GoalsPage";
 import FeedbackPage from "../components/Launch/FeedbackPage";
 import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
 import SettingsPage from "../components/Launch/SettingsPage";
+import ProfilePage from "../components/Launch/ProfilePage";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -80,9 +83,8 @@ import UnderConstruction from "../../shared/components/placeholders/under-constr
 // Transportation content registry
 export const transportationContentRegistry: ContentRegistry = {
   content: {
-    // Dashboard routes - use TestCreationPage as the main dashboard
-    "/": () => <TestCreationPage />,
-    "/dashboard": () => <TestCreationPage />,
+    "/": () => <StudentDashboardPage />,
+    "/dashboard": () => <StudentDashboardPage />,
 
     // Payment routes
     "/payments/history": () => <PaymentHistoryContent />,
@@ -119,6 +121,9 @@ export const transportationContentRegistry: ContentRegistry = {
       <SubscriptionPackageManagementContent />
     ),
     "/admin/subscriptions/features": () => <PackageFeatureManagementContent />,
+    "/admin/subscriptions/entitlements": () => (
+      <EntitlementDefinitionManagementContent />
+    ),
     "/my-subscription": () => <MySubscriptionPage />,
 
     // Product routes
@@ -163,9 +168,11 @@ export const transportationContentRegistry: ContentRegistry = {
     "/medprep-ai/evaluation-mode": () => <EvaluationModePage />,
     "/medprep-ai/evaluation-cases": () => <EvaluationCasesPage />,
     "/medprep-ai/evaluation": () => (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <EvaluationPage initialCopilotMode={false} embedInAppShell skipExternalRedirects />
-      </div>
+      <MedPrepSlugGate slug="ai-evaluation" modeLabel="AI Evaluation Mode">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <EvaluationPage initialCopilotMode={false} embedInAppShell skipExternalRedirects />
+        </div>
+      </MedPrepSlugGate>
     ),
     "/medprep-ai/case": () => (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -179,9 +186,8 @@ export const transportationContentRegistry: ContentRegistry = {
     ),
     "/medprep-ai/ai-evaluation": () => <EvaluationModePage />,
 
-    // Test creation routes
-    "/test-creation": () => <TestCreationPage />,
-    "/test-creation/new": () => <TestCreationPage />,
+    "/test-creation": () => <StudyCreateTestPage />,
+    "/test-creation/new": () => <StudyCreateTestPage />,
     "/performance": () => <PerformanceDashboardPage />,
     "/test-creation/study-create": () => <StudyCreateTestPage />,
     "/previous-tests": () => <PreviousTestsPage />,
@@ -240,12 +246,17 @@ export const transportationContentRegistry: ContentRegistry = {
     "/notifications": () => <NotificationsPage />,
     "/achievements": () => <AchievementsPage />,
     "/discussions": () => <DiscussionsPage />,
-    "/ai-tutor": () => <AiTutorPage />,
+    "/ai-tutor": () => (
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <AiTutorPage />
+      </div>
+    ),
     "/mock-exams": () => <MockExamsPage />,
     "/study-groups": () => <StudyGroupsPage />,
     "/goals": () => <GoalsPage />,
     "/feedback": () => <FeedbackPage />,
     "/my-reports": () => <QuestionReportsPage />,
+    "/profile": () => <ProfilePage />,
     "/settings": () => <SettingsPage />,
   },
 

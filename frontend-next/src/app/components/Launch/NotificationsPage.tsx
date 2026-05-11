@@ -31,7 +31,10 @@ import {
   launchNotificationsService,
   type AppNotification,
 } from "@/app/services/launch";
+import { useToast } from "@/shared/ui/use-toast";
+import { toastApiError } from "@/app/services/base/api-http-error";
 import { useRealtimeEvent } from "@/app/services/realtime/use-realtime-room";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
 
 function timeAgo(iso: string): string {
   const d = new Date(iso);
@@ -47,6 +50,7 @@ function timeAgo(iso: string): string {
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [items, setItems] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -87,19 +91,31 @@ export default function NotificationsPage() {
     try {
       await launchNotificationsService.markAllRead();
       setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t mark all read");
     } finally {
       setActing(false);
     }
   };
 
   const onMark = async (id: string) => {
-    await launchNotificationsService.markAsRead(id);
-    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    try {
+      await launchNotificationsService.markAsRead(id);
+      setItems((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t update notification");
+    }
   };
 
   const onDelete = async (id: string) => {
-    await launchNotificationsService.remove(id);
-    setItems((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await launchNotificationsService.remove(id);
+      setItems((prev) => prev.filter((n) => n.id !== id));
+    } catch (e) {
+      toastApiError(toast, e, "Couldn’t remove notification");
+    }
   };
 
   const onClick = (n: AppNotification) => {
@@ -178,7 +194,7 @@ export default function NotificationsPage() {
           ) : items.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <BellOff className="mx-auto mb-3 text-gray-300" size={36} />
-              <p className="font-medium">You're all caught up.</p>
+              <p className="font-medium">You&apos;re all caught up.</p>
               <p className="text-xs">New notifications will appear here.</p>
             </div>
           ) : (
@@ -238,9 +254,9 @@ export default function NotificationsPage() {
                           </span>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-0.5 whitespace-pre-line">
-                        {n.message}
-                      </p>
+                      <div className="text-sm text-muted-foreground mt-0.5">
+                        <MarkdownContent variant="muted">{n.message}</MarkdownContent>
+                      </div>
                     </div>
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                       {!n.isRead && (

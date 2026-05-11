@@ -1,4 +1,25 @@
+import { ApiHttpError } from "./api-http-error";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
+
+/** NestJS often returns `{ message: string | string[] }` — flatten for UI + ApiHttpError. */
+function normalizeApiErrorBodyMessage(errorData: unknown, status: number): string {
+  if (typeof errorData !== "object" || errorData === null) {
+    return `Request failed (${status})`;
+  }
+  const o = errorData as { message?: unknown; error?: unknown };
+  const raw = o.message;
+  if (typeof raw === "string" && raw.trim()) return raw.trim();
+  if (Array.isArray(raw)) {
+    const parts = raw.filter((x): x is string => typeof x === "string");
+    if (parts.length) return parts.join(". ");
+  }
+  if (typeof o.error === "string" && o.error.trim()) return o.error.trim();
+  return `Request failed (${status})`;
+}
+
+/** HTTP statuses that are normal “business rule” outcomes — avoid noisy dev logs. */
+const QUIET_HTTP_STATUSES = new Set([400, 401, 403, 404, 409, 422, 429]);
 
 export abstract class BaseApiService {
   protected baseURL: string;
@@ -37,23 +58,25 @@ export abstract class BaseApiService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `API request failed with status ${response.status}:`,
-          errorData
-        );
-        
+        const msg =
+          normalizeApiErrorBodyMessage(errorData, response.status);
+
+        if (!QUIET_HTTP_STATUSES.has(response.status)) {
+          console.error(
+            `API request failed with status ${response.status}:`,
+            errorData
+          );
+        }
+
         // Handle 401 Unauthorized - clear invalid token
         if (response.status === 401) {
           if (typeof window !== "undefined") {
             localStorage.removeItem("authToken");
             localStorage.removeItem("userData");
-            console.log("🔒 Cleared invalid auth token due to 401 error");
           }
         }
-        
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
+
+        throw new ApiHttpError(msg, response.status, errorData);
       }
 
       const text = await response.text();
@@ -72,14 +95,21 @@ export abstract class BaseApiService {
           parseError instanceof Error
             ? parseError.message
             : "Unknown parsing error";
-        throw new Error(`Invalid JSON response from server: ${errorMessage}`);
+        throw new ApiHttpError(
+          `Invalid JSON response from server: ${errorMessage}`,
+          response.status || 500
+        );
       }
     } catch (error) {
+      if (error instanceof ApiHttpError) {
+        throw error;
+      }
       console.error("API request failed:", error);
-      // If it's a network error (like connection refused), provide a more helpful message
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error(
-          `Unable to connect to API server at ${url}. Please ensure the backend is running.`
+        throw new ApiHttpError(
+          `Unable to connect to API server. Please ensure the backend is running.`,
+          0,
+          error
         );
       }
       throw error;

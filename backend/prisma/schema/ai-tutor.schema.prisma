@@ -1,5 +1,5 @@
 // AI Tutor conversations & messages.
-// Works with or without an OpenAI API key (graceful fallback in service).
+// Uses Google Gemini when GOOGLE_API_KEY is set (graceful fallback otherwise).
 
 model AiTutorConversation {
   id            String         @id @default(cuid())

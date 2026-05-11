@@ -17,6 +17,7 @@ import { QuestionPapersService } from "../../services/assessments/question-paper
 import { UsersService } from "../../services/users/users.service";
 import { User } from "../../types/user";
 import { CreateResponse } from "../../services/base/api-types";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import {
   Select,
   SelectContent,
@@ -236,12 +237,8 @@ export default function QuestionPaperFormModal({
           }
         }, 1000);
       }
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to save question paper"
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save question paper"));
     } finally {
       setLoading(false);
     }

@@ -23,6 +23,11 @@ import {
 import { CheckCircle, XCircle, Circle, ChevronLeft, TrendingUp, Activity } from "lucide-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
+import {
+  getQuestionHierarchyColumns,
+  type QuestionHierarchySlice,
+} from "@/app/utils/question-hierarchy-display";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 interface QuestionPaperQuestion {
   id: string;
@@ -32,25 +37,7 @@ interface QuestionPaperQuestion {
   isCorrect?: boolean;
   timeSpent?: number;
   markedForReview: boolean;
-  question?: {
-    id: string;
-    topic?: {
-      id: string;
-      name: string;
-      chapter?: {
-        id: string;
-        name: string;
-        section?: {
-          id: string;
-          name: string;
-        };
-      };
-    };
-    productTag?: {
-      id: string;
-      name: string;
-    };
-  };
+  question?: QuestionHierarchySlice & { id: string };
 }
 
 interface AssessmentResults {
@@ -91,9 +78,9 @@ export default function TestResultsPage() {
         const data = await questionPapersService.getAssessmentResults(id);
         // Backend returns a compatible shape but TS types differ slightly, so cast for now
         setResults(data as any);
-      } catch (err: any) {
+      } catch (err) {
         console.error("Failed to fetch results:", err);
-        setError(err?.message || "Failed to load test results");
+        setError(getApiErrorMessage(err, "Failed to load test results"));
       } finally {
         setIsLoading(false);
       }
@@ -301,10 +288,18 @@ export default function TestResultsPage() {
                   <TableRow className="border-border dark:border-gray-700 hover:bg-transparent dark:hover:bg-transparent">
                     <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Status</TableHead>
                     <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">ID</TableHead>
-                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Subject</TableHead>
-                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">System</TableHead>
-                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Category</TableHead>
-                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Topic</TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400" title="Product / exam (e.g. USMLE)">
+                      Subject
+                    </TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400" title="Organ system">
+                      System
+                    </TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400" title="Discipline category">
+                      Category
+                    </TableHead>
+                    <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400" title="Topic · subtopic">
+                      Topic
+                    </TableHead>
                     <TableHead className="h-10 px-4 text-xs font-medium text-muted-foreground dark:text-gray-400">Time</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -318,10 +313,7 @@ export default function TestResultsPage() {
                   ) : (
                     filteredQuestions.map((q, index) => {
                       const question = q.question;
-                      const subject = question?.topic?.chapter?.name || "—";
-                      const system = question?.topic?.chapter?.section?.name || "—";
-                      const category = question?.productTag?.name || "—";
-                      const topic = question?.topic?.name || "—";
+                      const cols = getQuestionHierarchyColumns(question);
                       const questionId = `${index + 1}-${question?.id?.slice(-4) || "XXXX"}`;
 
                       return (
@@ -335,13 +327,13 @@ export default function TestResultsPage() {
                         >
                           <TableCell className="px-4 py-3 text-foreground dark:text-white">{getStatusIcon(q)}</TableCell>
                           <TableCell className="px-4 py-3 font-mono text-sm text-foreground dark:text-white">{questionId}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{subject}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{system}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{category}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{cols.subject}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{cols.system}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-foreground dark:text-white">{cols.category}</TableCell>
                           <TableCell className="px-4 py-3">
-                            {topic !== "—" ? (
+                            {cols.topic !== "—" ? (
                               <Badge variant="outline" className="text-xs font-normal text-foreground dark:text-white border-border dark:border-gray-600">
-                                {topic}
+                                {cols.topic}
                               </Badge>
                             ) : (
                               <span className="text-sm text-muted-foreground dark:text-gray-400">—</span>

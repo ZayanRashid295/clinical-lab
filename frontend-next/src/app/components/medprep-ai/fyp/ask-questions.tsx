@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -53,30 +53,46 @@ interface AskQuestionsProps {
 }
 
 // Enhanced Animated Counter Component
-const AnimatedCounter = ({ value, duration = 1000, suffix = '', prefix = '' }) => {
-  const [count, setCount] = useState(0)
+const AnimatedCounter = ({
+  value,
+  duration = 1000,
+  suffix = "",
+  prefix = "",
+}: {
+  value: number;
+  duration?: number;
+  suffix?: string;
+  prefix?: string;
+}) => {
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    let startTime
-    let animationFrame
+    let startTime: number | undefined;
+    let animationFrame: number;
 
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp
-      const progress = Math.min((timestamp - startTime) / duration, 1)
-      
-      setCount(Math.floor(progress * value))
-      
+    const animate = (timestamp: number) => {
+      if (startTime === undefined) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+
+      setCount(Math.floor(progress * value));
+
       if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate)
+        animationFrame = requestAnimationFrame(animate);
       }
-    }
+    };
 
-    animationFrame = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationFrame)
-  }, [value, duration])
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [value, duration]);
 
-  return <span>{prefix}{count}{suffix}</span>
-}
+  return (
+    <span>
+      {prefix}
+      {count}
+      {suffix}
+    </span>
+  );
+};
 
 export function AskQuestions({ context, onQuestionSelect, isLoading = false, triggerRefresh = 0, sessionId, onHintUsed }: AskQuestionsProps) {
   const [suggestedQuestions, setSuggestedQuestions] = useState<SuggestedQuestion[]>([])
@@ -88,7 +104,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const [animationKey, setAnimationKey] = useState(0)
   const [hintUsageCount, setHintUsageCount] = useState(0)
 
-  const fetchSuggestedQuestions = async () => {
+  const fetchSuggestedQuestions = useCallback(async () => {
     if (context.conversationHistory.length === 0) return
     
     setIsLoadingQuestions(true)
@@ -117,7 +133,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
     } finally {
       setIsLoadingQuestions(false)
     }
-  }
+  }, [context])
 
   const generateFallbackQuestions = (disease: string): SuggestedQuestion[] => {
     const commonQuestions = [
@@ -184,7 +200,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
     if (triggerRefresh > 0) {
       fetchSuggestedQuestions()
     }
-  }, [triggerRefresh])
+  }, [triggerRefresh, fetchSuggestedQuestions])
 
   // Update hint usage count when session changes
   useEffect(() => {

@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Progress } from "@/components/ui/progress"
 import { ChevronDown, Brain, User, BarChart3, Lightbulb, Mic, Send, Settings, AlertTriangle, Heart, Stethoscope, BookOpen, Target, Clock, TrendingUp, Home, FileText, Activity, Thermometer, Calendar, Users, Briefcase, MessageCircle, ArrowLeft, Sparkles } from "lucide-react"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
@@ -26,6 +26,10 @@ const AVAILABLE_MODELS = [
 ]
 
 const GRADING_MODEL = "gemini-2.5-flash"
+
+/** Display name for this flow; aligned with EvaluationModePage landing copy. */
+const EVALUATION_MODE_TITLE = "AI Evaluation Mode"
+const EVALUATION_MODE_TAGLINE = "Master Clinical Skills Through AI-Powered Assessment"
 
 const getModelProvider = (model: string) => {
   const modelInfo = AVAILABLE_MODELS.find((m) => m.id === model)
@@ -483,7 +487,8 @@ function EvaluationPageContent({
   embedInAppShell?: boolean
 }) {
   const router = useRouter()
-  const [selectedModel, setSelectedModel] = useState("gemini-2.5-flash")
+  /** Fixed inference model for evaluation flows (not shown in UI). */
+  const selectedModel = GRADING_MODEL
   const [specialty, setSpecialty] = useState("")
   const [difficulty, setDifficulty] = useState("")
   const [selectedCase, setSelectedCase] = useState<any>(null)
@@ -1500,8 +1505,8 @@ Please provide guidance and educational feedback.`,
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-900">MedSim Pro</h1>
-              <p className="text-sm text-gray-600">AI-Powered Medical Simulation Platform</p>
+              <h1 className="text-2xl font-bold text-gray-900">{EVALUATION_MODE_TITLE}</h1>
+              <p className="text-sm text-gray-600">{EVALUATION_MODE_TAGLINE}</p>
             </div>
             <Badge variant="outline" className={`${isEvaluationMode ? 'bg-red-50 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
               {isEvaluationMode ? "Evaluation Mode" : (selectedCase?.disease || "Internal Medicine")}
@@ -1556,24 +1561,20 @@ Please provide guidance and educational feedback.`,
                 Copilot Mode
               </Label>
             </div>
-            
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>{selectedModel.toUpperCase()}</span>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content - Three Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - MedSim Pro */}
+        {/* Left panel — case context & tools (AI Evaluation Mode) */}
         <div className="w-1/3 border-r bg-white flex flex-col">
           <div className="p-4 border-b bg-blue-50">
             <h2 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
               <Stethoscope className="h-5 w-5" />
-              MedSim Pro
+              {EVALUATION_MODE_TITLE}
             </h2>
-            <p className="text-sm text-blue-700">AI-Powered Medical Simulation</p>
+            <p className="text-sm text-blue-700">{EVALUATION_MODE_TAGLINE}</p>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -1700,23 +1701,7 @@ Please provide guidance and educational feedback.`,
                         </span>
                       </div>
                       <div className="text-gray-800 text-left">
-                        <ReactMarkdown
-                          components={{
-                            p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                            h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                            ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2">{children}</ul>,
-                            ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2">{children}</ol>,
-                            li: ({ children }) => <li className="text-left mb-1">{children}</li>,
-                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                            em: ({ children }) => <em className="italic">{children}</em>,
-                            code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-                            blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-gray-300 pl-4 italic">{children}</blockquote>
-                          }}
-                        >
-                          {msg.content}
-                        </ReactMarkdown>
+                        <MarkdownContent variant="chatPatient">{msg.content}</MarkdownContent>
                       </div>
                     </div>
                   )}
@@ -1737,23 +1722,7 @@ Please provide guidance and educational feedback.`,
                           </span>
                         </div>
                         <div className="text-sm text-left">
-                          <ReactMarkdown
-                            components={{
-                              p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                              h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                              ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2">{children}</ul>,
-                              ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2">{children}</ol>,
-                              li: ({ children }) => <li className="text-left mb-1">{children}</li>,
-                              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                              em: ({ children }) => <em className="italic">{children}</em>,
-                              code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-                              blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-gray-300 pl-4 italic">{children}</blockquote>
-                            }}
-                          >
-                            {msg.content}
-                          </ReactMarkdown>
+                          <MarkdownContent variant="chatAccent">{msg.content}</MarkdownContent>
                         </div>
                       </div>
                     </div>
@@ -1842,19 +1811,19 @@ Please provide guidance and educational feedback.`,
                       <div>
                         <h4 className="font-medium text-gray-900">Differential Diagnoses:</h4>
                         <div className="text-gray-700">
-                          <ReactMarkdown>{diagnosticHelp.differentialDiagnoses}</ReactMarkdown>
+                          <MarkdownContent variant="default">{diagnosticHelp.differentialDiagnoses}</MarkdownContent>
                         </div>
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">Clinical Reasoning:</h4>
                         <div className="text-gray-700">
-                          <ReactMarkdown>{diagnosticHelp.reasoning}</ReactMarkdown>
+                          <MarkdownContent variant="default">{diagnosticHelp.reasoning}</MarkdownContent>
                         </div>
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">Next Questions:</h4>
                         <div className="text-gray-700">
-                          <ReactMarkdown>{diagnosticHelp.nextQuestions}</ReactMarkdown>
+                          <MarkdownContent variant="default">{diagnosticHelp.nextQuestions}</MarkdownContent>
                         </div>
                       </div>
                     </div>
@@ -1900,7 +1869,7 @@ Please provide guidance and educational feedback.`,
                     Clinical Assessment
                   </h3>
                   <div className="text-sm text-blue-800">
-                    <ReactMarkdown>{clinicalReasoning.clinicalAssessment}</ReactMarkdown>
+                    <MarkdownContent variant="default">{clinicalReasoning.clinicalAssessment}</MarkdownContent>
                   </div>
                 </div>
 
@@ -1911,7 +1880,7 @@ Please provide guidance and educational feedback.`,
                     Red Flags
                   </h3>
                   <div className="text-sm text-red-800">
-                    <ReactMarkdown>{clinicalReasoning.redFlags}</ReactMarkdown>
+                    <MarkdownContent variant="default">{clinicalReasoning.redFlags}</MarkdownContent>
                   </div>
                 </div>
 
@@ -1945,7 +1914,7 @@ Please provide guidance and educational feedback.`,
                     </div>
                   ) : (
                     <div className="text-sm text-blue-800">
-                      <ReactMarkdown>{clinicalReasoning.differentialDiagnoses}</ReactMarkdown>
+                      <MarkdownContent variant="default">{clinicalReasoning.differentialDiagnoses}</MarkdownContent>
                     </div>
                   )}
                 </div>
@@ -1987,7 +1956,7 @@ Please provide guidance and educational feedback.`,
                     </div>
                   ) : (
                     <div className="text-sm text-green-800">
-                      <ReactMarkdown>{clinicalReasoning.nextPriorityQuestions}</ReactMarkdown>
+                      <MarkdownContent variant="default">{clinicalReasoning.nextPriorityQuestions}</MarkdownContent>
                     </div>
                   )}
                 </div>
@@ -1999,7 +1968,7 @@ Please provide guidance and educational feedback.`,
                     Clinical Reasoning
                   </h3>
                   <div className="text-sm text-purple-800">
-                    <ReactMarkdown>{clinicalReasoning.clinicalReasoning}</ReactMarkdown>
+                    <MarkdownContent variant="default">{clinicalReasoning.clinicalReasoning}</MarkdownContent>
                   </div>
                 </div>
               </>
@@ -2154,16 +2123,11 @@ Please provide guidance and educational feedback.`,
                                   <div className="text-xs">
                                     <span className="text-orange-700 font-medium">Additional:</span>
                                     <div className="flex flex-wrap gap-1 mt-1">
-                                      {selectedCase.symptoms.slice(1, 4).map((symptom: string, index: number) => (
+                                      {selectedCase.symptoms.slice(1).map((symptom: string, index: number) => (
                                         <Badge key={index} variant="outline" className="text-xs bg-orange-100 text-orange-800 border-orange-200">
                                           {symptom}
                                         </Badge>
                                       ))}
-                                      {selectedCase.symptoms.length > 4 && (
-                                        <Badge variant="outline" className="text-xs bg-orange-100 text-orange-800 border-orange-200">
-                                          +{selectedCase.symptoms.length - 4} more
-                                        </Badge>
-                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -2294,21 +2258,21 @@ Please provide guidance and educational feedback.`,
                       <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                         <h3 className="font-semibold text-blue-900 mb-2">Key Learning Points</h3>
                         <div className="text-sm text-blue-800">
-                          <ReactMarkdown>{learningInsights.keyPoints || "No key points available yet."}</ReactMarkdown>
+                          <MarkdownContent variant="default">{learningInsights.keyPoints || "No key points available yet."}</MarkdownContent>
                         </div>
                       </div>
                       
                       <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                         <h3 className="font-semibold text-green-900 mb-2">Focus Areas</h3>
                         <div className="text-sm text-green-800">
-                          <ReactMarkdown>{learningInsights.focusAreas || "No focus areas available yet."}</ReactMarkdown>
+                          <MarkdownContent variant="default">{learningInsights.focusAreas || "No focus areas available yet."}</MarkdownContent>
                         </div>
                       </div>
                       
                       <div className="bg-red-50 rounded-lg p-4 border border-red-200">
                         <h3 className="font-semibold text-red-900 mb-2">Common Pitfalls</h3>
                         <div className="text-sm text-red-800">
-                          <ReactMarkdown>{learningInsights.commonPitfalls || "No common pitfalls identified yet."}</ReactMarkdown>
+                          <MarkdownContent variant="default">{learningInsights.commonPitfalls || "No common pitfalls identified yet."}</MarkdownContent>
                         </div>
                       </div>
                     </>
@@ -2335,7 +2299,7 @@ Please provide guidance and educational feedback.`,
                     <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
                       <h3 className="font-semibold text-yellow-900 mb-2">Clinical Guidelines</h3>
                       <div className="text-sm text-yellow-800">
-                        <ReactMarkdown>{learningInsights.clinicalGuidelines || "No clinical guidelines available yet."}</ReactMarkdown>
+                        <MarkdownContent variant="default">{learningInsights.clinicalGuidelines || "No clinical guidelines available yet."}</MarkdownContent>
                       </div>
                     </div>
                   )}
@@ -2361,7 +2325,7 @@ Please provide guidance and educational feedback.`,
                     <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                       <h3 className="font-semibold text-purple-900 mb-2">Clinical Pearls</h3>
                       <div className="text-sm text-purple-800">
-                        <ReactMarkdown>{learningInsights.clinicalPearls || "No clinical pearls available yet."}</ReactMarkdown>
+                        <MarkdownContent variant="default">{learningInsights.clinicalPearls || "No clinical pearls available yet."}</MarkdownContent>
                       </div>
                     </div>
                   )}
@@ -2466,23 +2430,7 @@ Please provide guidance and educational feedback.`,
                           <span className="text-xs font-medium text-blue-600">Doctor</span>
                         </div>
                         <div className="text-gray-800 text-left">
-                          <ReactMarkdown
-                            components={{
-                              p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                              h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                              ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2">{children}</ul>,
-                              ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2">{children}</ol>,
-                              li: ({ children }) => <li className="text-left mb-1">{children}</li>,
-                              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                              em: ({ children }) => <em className="italic">{children}</em>,
-                              code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-                              blockquote: ({ children }) => <blockquote className="text-left border-l-4 border-gray-300 pl-4 italic">{children}</blockquote>
-                            }}
-                          >
-                            {msg.content}
-                          </ReactMarkdown>
+                          <MarkdownContent variant="chatPatient">{msg.content}</MarkdownContent>
                         </div>
                       </div>
                     )}
@@ -2895,16 +2843,11 @@ Please provide guidance and educational feedback.`,
                         <div className="space-y-2">
                           <h4 className="font-semibold text-sm text-gray-900">Presenting Symptoms</h4>
                           <div className="flex flex-wrap gap-1">
-                            {caseItem.symptoms.slice(0, 3).map((symptom, index) => (
+                            {caseItem.symptoms.map((symptom, index) => (
                               <Badge key={index} variant="secondary" className="text-xs">
                                 {symptom}
                               </Badge>
                             ))}
-                            {caseItem.symptoms.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{caseItem.symptoms.length - 3} more
-                              </Badge>
-                            )}
                           </div>
                         </div>
 
@@ -3051,7 +2994,7 @@ Please provide guidance and educational feedback.`,
                   <p>• Patient reports {selectedCase.symptoms[0].toLowerCase()}</p>
                   <p>• Onset: {selectedCase.difficulty === 'beginner' ? 'Gradual' : selectedCase.difficulty === 'intermediate' ? 'Subacute' : 'Variable'} presentation</p>
                   <p>• Severity: {selectedCase.difficulty === 'beginner' ? 'Mild to moderate' : selectedCase.difficulty === 'intermediate' ? 'Moderate' : 'Moderate to severe'}</p>
-                  <p>• Associated symptoms: {selectedCase.symptoms.slice(1, 3).join(', ')}</p>
+                  <p>• Associated symptoms: {selectedCase.symptoms.slice(1).join(", ")}</p>
                   <p>• No known drug allergies</p>
                   <p>• Previous medical history: {selectedCase.difficulty === 'beginner' ? 'Unremarkable' : 'Requires further evaluation'}</p>
                 </div>

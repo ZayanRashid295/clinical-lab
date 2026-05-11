@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Patch,
   Body,
   UseGuards,
   Get,
@@ -16,11 +17,16 @@ import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { UsersService } from "../users/users.service";
+import { UpdateOwnProfileDto } from "../users/dto/update-own-profile.dto";
 
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService
+  ) {}
 
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
@@ -49,6 +55,25 @@ export class AuthController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async getProfile(@Request() req) {
     return this.authService.findUserById(req.user.userId);
+  }
+
+  @Patch("profile")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Update own profile",
+    description:
+      "Update first name, last name, email, or phone for the authenticated user.",
+  })
+  @ApiResponse({ status: 200, description: "Profile updated" })
+  @ApiResponse({ status: 400, description: "Invalid input" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 409, description: "Email or phone already in use" })
+  async updateOwnProfile(
+    @Request() req,
+    @Body() dto: UpdateOwnProfileDto
+  ) {
+    return this.usersService.updateOwnProfile(req.user.userId, dto);
   }
 
   @Post("logout")

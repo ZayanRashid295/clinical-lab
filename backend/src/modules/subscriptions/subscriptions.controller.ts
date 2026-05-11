@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -27,11 +28,33 @@ import { UpdatePackageFeatureDto } from "./dto/update-package-feature.dto";
 import { QuerySubscriptionDto } from "./dto/query-subscription.dto";
 import { QuerySubscriptionPackageDto } from "./dto/query-subscription-package.dto";
 import { QueryPackageFeatureDto } from "./dto/query-package-feature.dto";
+import { CreateEntitlementDefinitionDto } from "./dto/create-entitlement-definition.dto";
+import { UpdateEntitlementDefinitionDto } from "./dto/update-entitlement-definition.dto";
+import { QueryEntitlementDefinitionDto } from "./dto/query-entitlement-definition.dto";
+import { SetPackageEntitlementsDto } from "./dto/set-package-entitlements.dto";
+import { PricingQuoteRequestDto } from "./dto/pricing-quote.dto";
 
 @ApiTags("subscriptions")
 @Controller("subscriptions")
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
+
+  @Post("pricing/quote")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Calculate a price quote for selected entitlements (Admin)" })
+  async getPricingQuote(@Body() dto: PricingQuoteRequestDto) {
+    return this.subscriptionsService.calculatePricingQuote(dto);
+  }
+
+  @Get("me/entitlements")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get my merged entitlements (Student)" })
+  async getMyEntitlements(@Request() req: any) {
+    const userId = req.user?.userId || req.user?.id;
+    return this.subscriptionsService.getUserEntitlements(userId);
+  }
 
   // ========== SUBSCRIPTION PACKAGES ==========
   @Get("packages")
@@ -70,6 +93,25 @@ export class SubscriptionsController {
   @ApiResponse({ status: 404, description: "Package not found" })
   async getPackageFeatures(@Param("id") id: string) {
     return this.subscriptionsService.getPackageFeatures(id);
+  }
+
+  @Get("packages/:id/entitlements")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get entitlements assigned to a package (Admin)" })
+  async getPackageEntitlements(@Param("id") id: string) {
+    return this.subscriptionsService.getPackageEntitlements(id);
+  }
+
+  @Post("packages/:id/entitlements")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Replace entitlements for a package (Admin)" })
+  async setPackageEntitlements(
+    @Param("id") id: string,
+    @Body() dto: SetPackageEntitlementsDto
+  ) {
+    return this.subscriptionsService.setPackageEntitlements(id, dto.entitlements);
   }
 
   @Post("packages")
@@ -206,6 +248,58 @@ export class SubscriptionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async removeFeature(@Param("id") id: string) {
     return this.subscriptionsService.removeFeature(id);
+  }
+
+  // ========== ENTITLEMENT DEFINITIONS (new system) ==========
+  @Get("entitlements/definitions")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "List entitlement definitions (Admin)" })
+  async listEntitlementDefinitions(@Query() query: QueryEntitlementDefinitionDto) {
+    return this.subscriptionsService.findAllEntitlementDefinitions(query);
+  }
+
+  @Get("entitlements/definitions/stats")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get entitlement definition statistics (Admin)" })
+  async getEntitlementDefinitionStats() {
+    return this.subscriptionsService.getEntitlementDefinitionStats();
+  }
+
+  @Get("entitlements/definitions/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get entitlement definition by id (Admin)" })
+  async getEntitlementDefinition(@Param("id") id: string) {
+    return this.subscriptionsService.getEntitlementDefinition(id);
+  }
+
+  @Post("entitlements/definitions")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Create entitlement definition (Admin)" })
+  async createEntitlementDefinition(@Body() dto: CreateEntitlementDefinitionDto) {
+    return this.subscriptionsService.createEntitlementDefinition(dto);
+  }
+
+  @Patch("entitlements/definitions/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update entitlement definition (Admin)" })
+  async updateEntitlementDefinition(
+    @Param("id") id: string,
+    @Body() dto: UpdateEntitlementDefinitionDto
+  ) {
+    return this.subscriptionsService.updateEntitlementDefinition(id, dto);
+  }
+
+  @Delete("entitlements/definitions/:id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Deactivate entitlement definition (Admin)" })
+  async removeEntitlementDefinition(@Param("id") id: string) {
+    return this.subscriptionsService.removeEntitlementDefinition(id);
   }
 
   @Get("user/:userId")

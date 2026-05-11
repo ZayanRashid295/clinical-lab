@@ -13,9 +13,9 @@ interface StatCardProps {
 
 export function StatCard({ title, value, subtitle, icon: Icon, progress, color = "primary" }: StatCardProps) {
   const colorClasses = {
-    primary: "text-blue-600 dark:text-blue-400",
-    success: "text-green-600 dark:text-green-400",
-    warning: "text-yellow-600 dark:text-yellow-400",
+    primary: "text-primary-600 dark:text-primary-400",
+    success: "text-primary-700 dark:text-primary-300",
+    warning: "text-primary-500 dark:text-primary-400",
   };
 
   return (

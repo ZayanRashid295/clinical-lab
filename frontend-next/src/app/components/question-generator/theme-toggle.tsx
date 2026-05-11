@@ -13,7 +13,7 @@ export function ThemeToggle() {
 
   // Fallback to direct service if context is not available (e.g., outside provider)
   const themeService = uiConfigContext ? null : UIConfigService.getInstance()
-  const currentTheme = uiConfigContext?.config.theme || themeService?.getConfig().theme || "dark"
+  const currentTheme = uiConfigContext?.config.theme || themeService?.getConfig().theme || "light"
 
   useEffect(() => {
     setMounted(true)

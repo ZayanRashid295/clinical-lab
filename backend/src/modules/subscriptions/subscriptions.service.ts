@@ -9,10 +9,160 @@ import { UpdatePackageFeatureDto } from "./dto/update-package-feature.dto";
 import { QuerySubscriptionDto } from "./dto/query-subscription.dto";
 import { QuerySubscriptionPackageDto } from "./dto/query-subscription-package.dto";
 import { QueryPackageFeatureDto } from "./dto/query-package-feature.dto";
+import {
+  CreateEntitlementDefinitionDto,
+  EntitlementType,
+} from "./dto/create-entitlement-definition.dto";
+import { UpdateEntitlementDefinitionDto } from "./dto/update-entitlement-definition.dto";
+import { QueryEntitlementDefinitionDto } from "./dto/query-entitlement-definition.dto";
+
+/** Merge per-mode caps when user has multiple subscriptions (best allowance wins; null = unlimited). */
+function mergeLimitsPerModeRecord(
+  prev: Record<string, unknown> | undefined,
+  inc: Record<string, unknown> | undefined,
+): Record<string, number | null> | undefined {
+  const keys = new Set([...Object.keys(prev ?? {}), ...Object.keys(inc ?? {})]);
+  if (keys.size === 0) return undefined;
+  const out: Record<string, number | null> = {};
+  for (const k of keys) {
+    const a = prev?.[k];
+    const b = inc?.[k];
+    if (a === null || b === null) {
+      out[k] = null;
+      continue;
+    }
+    const hasA = a !== undefined;
+    const hasB = b !== undefined;
+    if (!hasA && !hasB) continue;
+    if (!hasA) {
+      const n = Number(b);
+      out[k] = Number.isFinite(n) ? n : null;
+      continue;
+    }
+    if (!hasB) {
+      const n = Number(a);
+      out[k] = Number.isFinite(n) ? n : null;
+      continue;
+    }
+    const na = Number(a);
+    const nb = Number(b);
+    if (!Number.isFinite(na) || !Number.isFinite(nb)) {
+      out[k] = null;
+    } else {
+      out[k] = Math.max(na, nb);
+    }
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+function mergeMedprepLimitPeriod(prev?: unknown, inc?: unknown): string {
+  const p = typeof prev === "string" ? prev.toUpperCase() : "MONTH";
+  const i = typeof inc === "string" ? inc.toUpperCase() : "MONTH";
+  if (p === "DAY" || i === "DAY") return "DAY";
+  return "MONTH";
+}
 
 @Injectable()
 export class SubscriptionsService {
   constructor(private prisma: PrismaService) {}
+
+  // ========== PRICING CATALOG (initial implementation) ==========
+  // This is a server-side quote calculator so admin can compose packages and get
+  // consistent pricing. You can refine these numbers/rules any time without DB migrations.
+  //
+  // Currency handling: currently assumes USD-like pricing; for production multi-currency,
+  // add FX conversion or per-currency catalogs.
+
+  async calculatePricingQuote(dto: {
+    validityDays: number;
+    currency?: string;
+    entitlements: Array<{ key: string; valueJson?: any }>;
+  }) {
+    const currency = (dto.currency || "USD").toUpperCase();
+    const days = Number(dto.validityDays);
+
+    const monthlyFactor = days / 30;
+
+    // Base unit prices per 30 days
+    const unitPrices: Record<string, number> = {
+      "qbank.access": 20,
+      "medprepai.access": 25,
+      "aitutor.chat": 5, // per 100 chats/month above free (see below)
+      "study.flashcards": 0,
+      "study.planner": 0,
+      "study.notes": 0,
+    };
+
+    const lineItems: Array<{ key: string; label: string; amount: number }> = [];
+    let subtotal = 0;
+
+    for (const e of dto.entitlements || []) {
+      const key = e.key;
+      const value: any = e.valueJson ?? { enabled: true };
+      const enabled = typeof value === "object" && "enabled" in value ? Boolean(value.enabled) : true;
+      if (!enabled) continue;
+
+      if (key === "aitutor.chat") {
+        // Pricing is based on quota. Free is 20/day baseline; only charge above that.
+        const limit = typeof value.limit === "number" ? value.limit : 20;
+        const period = typeof value.period === "string" ? String(value.period).toUpperCase() : "DAY";
+        // Convert to approx monthly chats:
+        const monthlyChats = period === "MONTH" ? limit : limit * 30;
+        const freeMonthlyChats = 20 * 30;
+        const billable = Math.max(0, monthlyChats - freeMonthlyChats);
+        const blocks = Math.ceil(billable / 100);
+        const unit = unitPrices[key] || 0;
+        const amount = blocks * unit * monthlyFactor;
+        if (amount > 0) {
+          subtotal += amount;
+          lineItems.push({
+            key,
+            label: `AI Tutor chat quota (${monthlyChats}/mo)`,
+            amount,
+          });
+        }
+        continue;
+      }
+
+      if (key === "medprepai.modes") {
+        // Each enabled mode adds a fixed monthly amount.
+        const modes = Array.isArray(value.items) ? value.items : [];
+        const perMode = 10;
+        const amount = modes.length * perMode * monthlyFactor;
+        if (amount > 0) {
+          subtotal += amount;
+          lineItems.push({
+            key,
+            label: `MedPrepAI modes (${modes.length})`,
+            amount,
+          });
+        }
+        continue;
+      }
+
+      const unit = unitPrices[key] ?? 0;
+      if (unit <= 0) continue;
+      const amount = unit * monthlyFactor;
+      subtotal += amount;
+      lineItems.push({ key, label: key, amount });
+    }
+
+    // Basic rounding + simple long-term discount
+    let discount = 0;
+    if (days >= 365) discount = subtotal * 0.15;
+    else if (days >= 180) discount = subtotal * 0.08;
+
+    const total = Math.max(0, subtotal - discount);
+
+    return {
+      currency,
+      validityDays: days,
+      subtotal: Number(subtotal.toFixed(2)),
+      discount: Number(discount.toFixed(2)),
+      total: Number(total.toFixed(2)),
+      lineItems: lineItems.map((li) => ({ ...li, amount: Number(li.amount.toFixed(2)) })),
+    };
+  }
 
   // ========== SUBSCRIPTION PACKAGES ==========
   async findAllPackages(query: QuerySubscriptionPackageDto) {
@@ -86,6 +236,11 @@ export class SubscriptionsService {
               packageFeature: true,
             },
           },
+          entitlements: {
+            include: {
+              entitlementDefinition: true,
+            },
+          },
         },
         skip,
         take: limit,
@@ -138,6 +293,11 @@ export class SubscriptionsService {
             packageFeature: true,
           },
         },
+        entitlements: {
+          include: {
+            entitlementDefinition: true,
+          },
+        },
         _count: {
           select: {
             subscriptions: true,
@@ -183,6 +343,11 @@ export class SubscriptionsService {
         subscriptionFeatures: {
           include: {
             packageFeature: true,
+          },
+        },
+        entitlements: {
+          include: {
+            entitlementDefinition: true,
           },
         },
         subscriptions: {
@@ -236,6 +401,55 @@ export class SubscriptionsService {
     });
   }
 
+  async getPackageEntitlements(id: string) {
+    const package_ = await this.prisma.subscriptionPackage.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!package_) {
+      throw new NotFoundException(`Package with ID ${id} not found`);
+    }
+
+    return this.prisma.subscriptionPackageEntitlement.findMany({
+      where: { subscriptionPackageId: id },
+      include: { entitlementDefinition: true },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async setPackageEntitlements(
+    packageId: string,
+    entitlements: Array<{ entitlementDefinitionId: string; valueJson?: any }>
+  ) {
+    const package_ = await this.prisma.subscriptionPackage.findUnique({
+      where: { id: packageId },
+      select: { id: true },
+    });
+
+    if (!package_) {
+      throw new NotFoundException(`Package with ID ${packageId} not found`);
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.subscriptionPackageEntitlement.deleteMany({
+        where: { subscriptionPackageId: packageId },
+      });
+
+      if (entitlements.length > 0) {
+        await tx.subscriptionPackageEntitlement.createMany({
+          data: entitlements.map((e) => ({
+            subscriptionPackageId: packageId,
+            entitlementDefinitionId: e.entitlementDefinitionId,
+            valueJson: e.valueJson ?? { enabled: true },
+          })),
+        });
+      }
+    });
+
+    return this.getPackageEntitlements(packageId);
+  }
+
   async createPackage(createPackageDto: CreateSubscriptionPackageDto) {
     return this.prisma.subscriptionPackage.create({
       data: createPackageDto,
@@ -253,6 +467,11 @@ export class SubscriptionsService {
         subscriptionFeatures: {
           include: {
             packageFeature: true,
+          },
+        },
+        entitlements: {
+          include: {
+            entitlementDefinition: true,
           },
         },
       },
@@ -288,6 +507,11 @@ export class SubscriptionsService {
         subscriptionFeatures: {
           include: {
             packageFeature: true,
+          },
+        },
+        entitlements: {
+          include: {
+            entitlementDefinition: true,
           },
         },
       },
@@ -484,6 +708,11 @@ export class SubscriptionsService {
                 packageFeature: true,
               },
             },
+            entitlements: {
+              include: {
+                entitlementDefinition: true,
+              },
+            },
           },
         },
         payments: {
@@ -523,6 +752,129 @@ export class SubscriptionsService {
     }
 
     return Array.from(featureSet);
+  }
+
+  /**
+   * Get merged entitlements for a user based on ACTIVE subscriptions.
+   * Returns a map keyed by EntitlementDefinition.key -> valueJson payload.
+   */
+  async getUserEntitlements(userId: string): Promise<Record<string, any>> {
+    const activeSubscriptions = await this.getUserSubscriptions(userId, "ACTIVE");
+
+    if (!activeSubscriptions || activeSubscriptions.length === 0) {
+      return {};
+    }
+
+    const merged: Record<string, any> = {};
+
+    for (const subscription of activeSubscriptions) {
+      const ents = subscription.subscriptionPackage?.entitlements || [];
+      for (const pe of ents) {
+        const key = pe.entitlementDefinition?.key;
+        if (!key) continue;
+
+        const incoming: any = (pe.valueJson ?? { enabled: true }) as any;
+        const prev: any = merged[key];
+
+        // Merge strategy (safe defaults; can be refined as products expand):
+        // - BOOLEAN: enabled if any says enabled
+        // - SET: union arrays under `items`
+        // - NUMBER_LIMIT: take max `limit`
+        // - JSON_CONSTRAINTS: shallow merge (last write wins for conflicts)
+        const type = pe.entitlementDefinition?.type;
+
+        if (!prev || typeof prev !== "object") {
+          merged[key] = incoming;
+          continue;
+        }
+
+        if (type === "BOOLEAN") {
+          merged[key] = {
+            ...(prev as any),
+            ...(typeof incoming === "object" ? incoming : {}),
+            enabled:
+              Boolean((prev as any).enabled) ||
+              Boolean(typeof incoming === "object" ? (incoming as any).enabled : false),
+          };
+          continue;
+        }
+
+        if (type === "SET") {
+          const prevItems = Array.isArray((prev as any).items) ? (prev as any).items : [];
+          const incItems =
+            typeof incoming === "object" && Array.isArray((incoming as any).items)
+              ? (incoming as any).items
+              : [];
+          const baseMerged = {
+            ...(prev as any),
+            ...(typeof incoming === "object" ? incoming : {}),
+            items: Array.from(new Set([...prevItems, ...incItems])),
+          };
+
+          if (key === "medprepai.modes") {
+            const mergedLimits = mergeLimitsPerModeRecord(
+              (prev as any)?.limitsPerMode as Record<string, unknown> | undefined,
+              (incoming as any)?.limitsPerMode as Record<string, unknown> | undefined,
+            );
+            const limitPeriod = mergeMedprepLimitPeriod(
+              (prev as any)?.limitPeriod,
+              (incoming as any)?.limitPeriod,
+            );
+            merged[key] = {
+              ...baseMerged,
+              ...(mergedLimits ? { limitsPerMode: mergedLimits } : {}),
+              limitPeriod,
+            };
+          } else {
+            merged[key] = baseMerged;
+          }
+          continue;
+        }
+
+        if (type === "NUMBER_LIMIT") {
+          const prevLimit = typeof (prev as any).limit === "number" ? (prev as any).limit : 0;
+          const incLimit =
+            typeof incoming === "object" && typeof (incoming as any).limit === "number"
+              ? (incoming as any).limit
+              : 0;
+          merged[key] = {
+            ...(prev as any),
+            ...(typeof incoming === "object" ? incoming : {}),
+            limit: Math.max(prevLimit, incLimit),
+            enabled:
+              typeof incoming === "object" && "enabled" in incoming
+                ? (incoming as any).enabled
+                : (prev as any).enabled ?? true,
+          };
+          continue;
+        }
+
+        // JSON_CONSTRAINTS or unknown: shallow merge
+        merged[key] = {
+          ...(prev as any),
+          ...(typeof incoming === "object" ? incoming : {}),
+        };
+      }
+    }
+
+    return merged;
+  }
+
+  async getUserEntitlementKeys(userId: string): Promise<string[]> {
+    const map = await this.getUserEntitlements(userId);
+    return Object.keys(map).filter((k) => {
+      const v = map[k];
+      // If payload has enabled=false, treat as disabled
+      if (v && typeof v === "object" && "enabled" in v) {
+        return Boolean((v as any).enabled);
+      }
+      return true;
+    });
+  }
+
+  async userHasEntitlement(userId: string, entitlementKey: string): Promise<boolean> {
+    const keys = await this.getUserEntitlementKeys(userId);
+    return keys.includes(entitlementKey);
   }
 
   /**
@@ -1076,6 +1428,148 @@ export class SubscriptionsService {
     }
 
     return this.prisma.packageFeatures.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+
+  // ========== ENTITLEMENT DEFINITIONS (new system) ==========
+  async findAllEntitlementDefinitions(query: QueryEntitlementDefinitionDto) {
+    const {
+      search,
+      status,
+      productSubtypeId,
+      page = 1,
+      limit = 50,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = query as any;
+
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { key: { contains: search } },
+        { displayName: { contains: search } },
+      ];
+    }
+    if (status) {
+      where.isActive = status === "ACTIVE";
+    }
+    if (productSubtypeId) {
+      where.productSubtypeId = productSubtypeId;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
+    const total = await this.prisma.entitlementDefinition.count({ where });
+
+    const orderBy: any = {};
+    orderBy[sortBy] = sortOrder;
+
+    const defs = await this.prisma.entitlementDefinition.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        productSubtype: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    return {
+      data: defs,
+      pagination: {
+        page: Number(page),
+        limit: take,
+        total,
+        totalPages: Math.ceil(total / take),
+      },
+    };
+  }
+
+  async getEntitlementDefinitionStats() {
+    const total = await this.prisma.entitlementDefinition.count();
+    const active = await this.prisma.entitlementDefinition.count({
+      where: { isActive: true },
+    });
+    const inactive = await this.prisma.entitlementDefinition.count({
+      where: { isActive: false },
+    });
+
+    return { total, active, inactive };
+  }
+
+  async getEntitlementDefinition(id: string) {
+    const def = await this.prisma.entitlementDefinition.findUnique({
+      where: { id },
+      include: { productSubtype: { select: { id: true, name: true } } },
+    });
+
+    if (!def) {
+      throw new NotFoundException(
+        `Entitlement definition with ID ${id} not found`
+      );
+    }
+
+    return def;
+  }
+
+  async createEntitlementDefinition(dto: CreateEntitlementDefinitionDto) {
+    return this.prisma.entitlementDefinition.create({
+      data: {
+        key: dto.key,
+        displayName: dto.displayName,
+        description: dto.description,
+        productSubtypeId: dto.productSubtypeId,
+        type: (dto.type || EntitlementType.BOOLEAN) as any,
+        isActive: dto.isActive ?? true,
+      },
+    });
+  }
+
+  async updateEntitlementDefinition(
+    id: string,
+    dto: UpdateEntitlementDefinitionDto
+  ) {
+    const existing = await this.prisma.entitlementDefinition.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(
+        `Entitlement definition with ID ${id} not found`
+      );
+    }
+
+    return this.prisma.entitlementDefinition.update({
+      where: { id },
+      data: {
+        key: dto.key,
+        displayName: dto.displayName,
+        description: dto.description,
+        productSubtypeId: dto.productSubtypeId,
+        type: dto.type as any,
+        isActive: dto.isActive,
+      },
+    });
+  }
+
+  async removeEntitlementDefinition(id: string) {
+    const existing = await this.prisma.entitlementDefinition.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(
+        `Entitlement definition with ID ${id} not found`
+      );
+    }
+
+    return this.prisma.entitlementDefinition.update({
       where: { id },
       data: { isActive: false },
     });

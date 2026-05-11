@@ -21,6 +21,22 @@ export interface Product {
   };
 }
 
+/** Product tag for tagging / categorization (admin UI). */
+export interface ProductTag {
+  id: string;
+  name: string;
+  slug?: string;
+  color?: string;
+  description?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  _count?: {
+    products?: number;
+    questions?: number;
+  };
+}
+
 export interface ProductSubtype {
   id: string;
   productId: string;
@@ -62,6 +78,8 @@ export interface ProductSubtypeQueryParams {
   productId?: string;
   dateFrom?: string;
   dateTo?: string;
+  /** Backend returns all rows (ignores page/limit); avoids pagination max (100). */
+  listAll?: boolean;
 }
 
 // Create DTOs

@@ -64,5 +64,27 @@ export class SubscriptionPackagesService extends BaseDataService<
   }> {
     return this.get(`${this.endpoint}/stats`);
   }
+
+  async getPackageEntitlements(packageId: string) {
+    return this.get(`${this.endpoint}/${packageId}/entitlements`);
+  }
+
+  async setPackageEntitlements(
+    packageId: string,
+    entitlements: Array<{
+      entitlementDefinitionId: string;
+      valueJson?: any;
+    }>
+  ) {
+    return this.post(`${this.endpoint}/${packageId}/entitlements`, { entitlements });
+  }
+
+  async getPricingQuote(input: {
+    validityDays: number;
+    currency?: string;
+    entitlements: Array<{ key: string; valueJson?: any }>;
+  }) {
+    return this.post(`/subscriptions/pricing/quote`, input);
+  }
 }
 

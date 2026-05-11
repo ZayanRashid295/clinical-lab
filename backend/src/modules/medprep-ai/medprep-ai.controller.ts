@@ -45,6 +45,14 @@ export class MedprepAiController {
     return this.medprepAiService.getModes();
   }
 
+  @Get("me/case-limits")
+  @ApiOperation({
+    summary: "Subscription case quotas vs usage per MedPrep mode",
+  })
+  getMyCaseLimits(@Request() req: any) {
+    return this.medprepAiService.getMyCaseLimitSummary(this.resolveUserId(req));
+  }
+
   @Post("sessions")
   @ApiOperation({ summary: "Start or resume an active session" })
   startSession(@Request() req, @Body() dto: StartMedprepSessionDto) {

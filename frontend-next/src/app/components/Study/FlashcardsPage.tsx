@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -41,6 +41,7 @@ import {
   type FlashcardsStats,
   type CreateFlashcardPayload,
 } from "@/app/services/student";
+import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 
 const blankDraft: CreateFlashcardPayload = {
   deck: "General",
@@ -66,7 +67,7 @@ export default function FlashcardsPage() {
   const [reviewIdx, setReviewIdx] = useState(0);
   const [reveal, setReveal] = useState(false);
 
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -76,16 +77,16 @@ export default function FlashcardsPage() {
       ]);
       setCards(list);
       setStats(s);
-    } catch (e: any) {
-      setError(e?.message || "Failed to load flashcards");
+    } catch (e) {
+      setError(getApiErrorMessage(e, "Failed to load flashcards"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [deck]);
 
   useEffect(() => {
     loadAll();
-  }, [deck]);
+  }, [loadAll]);
 
   const dueCards = useMemo(
     () => cards.filter((c) => new Date(c.dueAt).getTime() <= Date.now()),
@@ -113,8 +114,8 @@ export default function FlashcardsPage() {
         setReviewIdx(nextIdx);
       }
       setReveal(false);
-    } catch (e: any) {
-      setError(e?.message || "Could not submit review");
+    } catch (e) {
+      setError(getApiErrorMessage(e, "Could not submit review"));
     } finally {
       setBusy(false);
     }
@@ -148,8 +149,8 @@ export default function FlashcardsPage() {
       }
       setShowEditor(false);
       await loadAll();
-    } catch (e: any) {
-      setError(e?.message || "Could not save card");
+    } catch (e) {
+      setError(getApiErrorMessage(e, "Could not save card"));
     } finally {
       setBusy(false);
     }
@@ -160,8 +161,8 @@ export default function FlashcardsPage() {
     try {
       await flashcardsService.remove(c.id);
       await loadAll();
-    } catch (e: any) {
-      setError(e?.message || "Could not delete");
+    } catch (e) {
+      setError(getApiErrorMessage(e, "Could not delete"));
     }
   };
 

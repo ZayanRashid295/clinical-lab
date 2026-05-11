@@ -39,6 +39,7 @@ model User {
   // LMS module
   questionPapers QuestionPaper[]
   subscriptions  Subscription[]
+  entitlementUsages EntitlementUsage[]
 
   // MedPrep AI module
   medprepConversations      MedprepConversation[]

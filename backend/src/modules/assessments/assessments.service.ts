@@ -464,12 +464,21 @@ export class AssessmentsService {
 
     if (userId) {
       const tasks: Promise<unknown>[] = [];
+      tasks.push(
+        this.achievements
+          .recordActivity(userId, "QUESTIONS_ANSWERED", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(userId, "CORRECT_ANSWERS", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(userId, "TESTS_COMPLETED", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(userId, "STUDY_MINUTES", 0)
+          .catch(() => undefined)
+      );
       if (totalQuestions > 0) {
-        tasks.push(
-          this.achievements
-            .recordActivity(userId, "QUESTIONS_ANSWERED", totalQuestions)
-            .catch(() => undefined)
-        );
         tasks.push(
           this.goals
             .recordProgress(userId, "QUESTIONS_ANSWERED", totalQuestions)
@@ -478,21 +487,11 @@ export class AssessmentsService {
       }
       if (correctAnswers > 0) {
         tasks.push(
-          this.achievements
-            .recordActivity(userId, "CORRECT_ANSWERS", correctAnswers)
-            .catch(() => undefined)
-        );
-        tasks.push(
           this.goals
             .recordProgress(userId, "CORRECT_ANSWERS", correctAnswers)
             .catch(() => undefined)
         );
       }
-      tasks.push(
-        this.achievements
-          .recordActivity(userId, "TESTS_COMPLETED", 1)
-          .catch(() => undefined)
-      );
       tasks.push(
         this.goals
           .recordProgress(userId, "TESTS_COMPLETED", 1)
@@ -536,15 +535,35 @@ export class AssessmentsService {
                   order: "asc",
                 },
               },
-              system: {
-                  select: {
-                    id: true,
-                    name: true,
-                    product: { select: { id: true, name: true } }
-                  }
+              category: { select: { id: true, name: true } },
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  category: { select: { id: true, name: true } },
                 },
-                topic: { select: { id: true, name: true } },
-                subtopic: { select: { id: true, name: true } },
+              },
+              system: {
+                select: {
+                  id: true,
+                  name: true,
+                  product: {
+                    select: {
+                      id: true,
+                      name: true,
+                      category: { select: { id: true, name: true } },
+                    },
+                  },
+                },
+              },
+              topic: {
+                select: {
+                  id: true,
+                  name: true,
+                  system: { select: { id: true, name: true } },
+                },
+              },
+              subtopic: { select: { id: true, name: true } },
             },
           },
         },
@@ -588,7 +607,7 @@ export class AssessmentsService {
       questions: questionPaperQuestions.map((qpq) => ({
         id: qpq.id,
         order: qpq.order,
-        question: qpq.questionId as any, // Cast to avoid inference issues in complex includes
+        question: qpq.question,
         userAnswer: qpq.userAnswer,
         isCorrect: qpq.isCorrect,
         timeSpent: qpq.timeSpent,
@@ -679,14 +698,34 @@ export class AssessmentsService {
                     order: "asc",
                   },
                 },
+                category: { select: { id: true, name: true } },
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    category: { select: { id: true, name: true } },
+                  },
+                },
                 system: {
                   select: {
                     id: true,
                     name: true,
-                    product: { select: { id: true, name: true } }
-                  }
+                    product: {
+                      select: {
+                        id: true,
+                        name: true,
+                        category: { select: { id: true, name: true } },
+                      },
+                    },
+                  },
                 },
-                topic: { select: { id: true, name: true } },
+                topic: {
+                  select: {
+                    id: true,
+                    name: true,
+                    system: { select: { id: true, name: true } },
+                  },
+                },
                 subtopic: { select: { id: true, name: true } },
               },
             },
@@ -933,6 +972,7 @@ export class AssessmentsService {
     const questionPaperQuestion =
       await this.prisma.questionPaperQuestion.findUnique({
         where: { id: questionPaperQuestionId },
+        include: { questionPaper: { select: { userId: true } } },
       });
 
     if (!questionPaperQuestion) {
@@ -960,6 +1000,29 @@ export class AssessmentsService {
         },
       },
     });
+
+    const ownerId = questionPaperQuestion.questionPaper.userId;
+    if (
+      ownerId &&
+      (updateData.userAnswer !== undefined ||
+        updateData.isCorrect !== undefined ||
+        updateData.timeSpent !== undefined)
+    ) {
+      void Promise.all([
+        this.achievements
+          .recordActivity(ownerId, "QUESTIONS_ANSWERED", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(ownerId, "CORRECT_ANSWERS", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(ownerId, "TESTS_COMPLETED", 0)
+          .catch(() => undefined),
+        this.achievements
+          .recordActivity(ownerId, "STUDY_MINUTES", 0)
+          .catch(() => undefined),
+      ]);
+    }
 
     return updated;
   }

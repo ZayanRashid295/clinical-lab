@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { AchievementsService } from "../achievements/achievements.service";
 import {
   CreateQuestionReportDto,
   UpdateQuestionReportDto,
@@ -10,7 +11,8 @@ import {
 export class QuestionReportsService {
   constructor(
     private prisma: PrismaService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private achievements: AchievementsService
   ) {}
 
   async create(userId: string, dto: CreateQuestionReportDto) {
@@ -39,6 +41,10 @@ export class QuestionReportsService {
         },
         userId
       )
+      .catch(() => undefined);
+
+    void this.achievements
+      .recordActivity(userId, "QUESTION_REPORTS_SUBMITTED", 0)
       .catch(() => undefined);
 
     return report;

@@ -1,4 +1,4 @@
-import type { ConversationContext } from "./ai-service"
+import type { ConversationContext } from "./data-models"
 import { BEST_GEMINI_MODEL, runNewGemini } from "./llm-gemini"
 
 async function generateText({

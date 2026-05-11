@@ -9,6 +9,7 @@ import { parseKeywordBlock, extractSystemFirstSegment } from "./parse-metadata-u
  */
 export interface StructuredQuestionData {
   questionId?: string;
+  productId?: string;
   subject?: string;
   system?: string;
   topic?: string;
@@ -338,6 +339,7 @@ export function convertStructuredToParsedQuestion(
     stem: structured.stem || "",
     options: structured.options || [],
     correctAnswer: structured.correctAnswer || "",
+    productId: structured.productId || "",
     subject: structured.subject || "General",
     system: structured.system || "General",
     topic: structured.topic,

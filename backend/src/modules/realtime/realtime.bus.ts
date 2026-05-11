@@ -58,4 +58,13 @@ export class RealtimeBus {
     if (!this.server) return;
     this.server.emit(event, payload);
   }
+
+  /**
+   * All authenticated sockets join `launch` — use for cross-feature updates
+   * (e.g. achievements leaderboard) without per-resource rooms.
+   */
+  emitToLaunch(event: string, payload: unknown) {
+    if (!this.server) return;
+    this.server.to("launch").emit(event, payload);
+  }
 }

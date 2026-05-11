@@ -23,7 +23,7 @@ import {
   BarChart3
 } from "lucide-react"
 import type { HintGradeImpact } from "@/lib/fyp/ai-hint-tracking-service"
-import ReactMarkdown from "react-markdown"
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 
 interface HintGradeDisplayProps {
   gradeImpact: HintGradeImpact
@@ -200,19 +200,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
                 <div key={index} className="flex items-start space-x-2 p-2 bg-white/80 rounded border border-green-200">
                   <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-gray-700 prose prose-sm max-w-none">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <p className="mb-0">{children}</p>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                        em: ({ children }) => <em className="italic">{children}</em>,
-                        code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                        ul: ({ children }) => <ul className="list-disc list-inside ml-2">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal list-inside ml-2">{children}</ol>,
-                        li: ({ children }) => <li className="mb-1">{children}</li>
-                      }}
-                    >
-                      {recommendation}
-                    </ReactMarkdown>
+                    <MarkdownContent variant="default">{recommendation}</MarkdownContent>
                   </div>
                 </div>
               ))}
@@ -244,30 +232,16 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
                 <div className="flex items-center space-x-2 p-2 bg-blue-100 rounded border border-blue-200">
                   <BookOpen className="h-4 w-4 text-blue-600" />
                   <div className="text-sm text-blue-800 prose prose-sm max-w-none">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <p className="mb-0">{children}</p>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                        em: ({ children }) => <em className="italic">{children}</em>
-                      }}
-                    >
-                      You used {penaltyBreakdown.totalHints} AI hints during this session.
-                    </ReactMarkdown>
+                    <MarkdownContent variant="default">{`You used ${penaltyBreakdown.totalHints} AI hints during this session.`}</MarkdownContent>
                   </div>
                 </div>
                 {penaltyBreakdown.highImportancePenalty > 0 && (
                   <div className="flex items-center space-x-2 p-2 bg-red-100 rounded border border-red-200">
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                     <div className="text-sm text-red-800 prose prose-sm max-w-none">
-                      <ReactMarkdown
-                        components={{
-                          p: ({ children }) => <p className="mb-0">{children}</p>,
-                          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                          em: ({ children }) => <em className="italic">{children}</em>
-                        }}
-                      >
+                      <MarkdownContent variant="default">
                         Consider reviewing fundamental concepts to reduce reliance on critical hints.
-                      </ReactMarkdown>
+                      </MarkdownContent>
                     </div>
                   </div>
                 )}

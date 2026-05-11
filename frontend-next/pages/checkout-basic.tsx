@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -16,6 +16,7 @@ import { authService } from "@/shared/services/auth.service";
 import { SubscriptionsService } from "@/app/services/subscriptions/subscriptions.service";
 import { SubscriptionPackagesService } from "@/app/services/subscriptions/subscription-packages.service";
 import { ExistingSubscriptionModal } from "@/app/components/ExistingSubscriptionModal";
+import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
 import { Subscription } from "@/app/types/subscription";
 
 // IMPORTANT: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in frontend-next/.env.local
@@ -39,6 +40,19 @@ interface CheckoutState {
   success: boolean;
   subscriptionId: string | null;
   paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | null;
+}
+
+function formatMoney(amount: number, currency?: string) {
+  const maybeCurrency = (currency || "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: maybeCurrency,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `$${amount.toFixed(2)}`;
+  }
 }
 
 function CheckoutForm({
@@ -224,8 +238,8 @@ function CheckoutForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="border rounded-md p-4 bg-white">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="rounded-2xl bg-white/60 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 p-4 shadow-[0_18px_45px_-40px_rgba(0,0,0,0.6)]">
         <CardElement
           options={{
             style: {
@@ -247,8 +261,10 @@ function CheckoutForm({
           <AlertDescription>
             <div className="font-semibold mb-2">❌ {state.error.split('\n')[0]}</div>
             {state.error.includes('\n') && (
-              <div className="text-sm mt-2 whitespace-pre-line">
-                {state.error.split('\n').slice(1).join('\n')}
+              <div className="text-sm mt-2">
+                <MarkdownContent variant="default">
+                  {state.error.split('\n').slice(1).join('\n')}
+                </MarkdownContent>
               </div>
             )}
             {state.error.includes("test mode") && (
@@ -316,7 +332,7 @@ function CheckoutForm({
 
 export default function BasicCheckoutPage() {
   const router = useRouter();
-  const subscriptionsService = new SubscriptionsService();
+  const subscriptionsService = useMemo(() => new SubscriptionsService(), []);
   const [state, setState] = useState<CheckoutState>({
     clientSecret: null,
     paymentId: null,
@@ -422,9 +438,10 @@ export default function BasicCheckoutPage() {
         // hasInitialized is already set at the start of initPayment
 
         // Fetch package information first to display details
+        let pkg: any = null;
         try {
           const packagesService = new SubscriptionPackagesService();
-          const pkg = await packagesService.getPackage(packageId);
+          pkg = await packagesService.getPackage(packageId);
           setPackageInfo(pkg);
         } catch (pkgError) {
           // Continue without package info
@@ -459,8 +476,8 @@ export default function BasicCheckoutPage() {
         }
 
         // Use package info if available, otherwise use payment response
-        const finalAmount = amount || (packageInfo?.price ? Number(packageInfo.price) : null);
-        const finalCurrency = currency || (packageInfo?.currency || "USD");
+        const finalAmount = amount || (pkg?.price ? Number(pkg.price) : null);
+        const finalCurrency = currency || (pkg?.currency || "USD");
 
         setState((prev) => ({
           ...prev,
@@ -500,7 +517,7 @@ export default function BasicCheckoutPage() {
 
     // Call initPayment
     initPayment();
-  }, [router.isReady, router.query.packageId, shouldProceedWithPayment]);
+  }, [router, router.isReady, router.query.packageId, shouldProceedWithPayment, state.clientSecret, subscriptionsService]);
 
   const handleCancelAndCreate = () => {
     setShowExistingSubscriptionModal(false);
@@ -571,107 +588,130 @@ export default function BasicCheckoutPage() {
         existingSubscription={existingSubscription}
       />
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 space-y-4">
-        {state.success && (
-          <Alert variant="default" className="bg-green-50 border-green-400 border-2 mb-4">
-            <AlertDescription className="text-green-900">
-              <div className="flex items-center gap-3">
-                <svg className="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <div className="font-bold text-lg mb-1">🎉 Subscription Activated Successfully!</div>
-                  <div className="text-sm font-medium">
-                    Your payment was successful and your subscription is now active. Enjoy full access to all premium features!
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                {state.success ? "Subscription Complete" : "Checkout"}
+              </h1>
+              <p className="mt-2 text-slate-600 dark:text-slate-400">
+                Secure payment powered by Stripe. Your subscription will activate immediately after payment.
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => router.push("/landing-page")}>
+              Back
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left: plan summary */}
+            <div className="lg:col-span-5">
+              <div className="rounded-3xl bg-white/70 dark:bg-white/5 backdrop-blur-xl shadow-[0_22px_60px_-45px_rgba(15,23,42,0.65)] ring-1 ring-black/5 dark:ring-white/10 p-6">
+                <p className="text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
+                  PLAN SUMMARY
+                </p>
+                <div className="mt-2">
+                  <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                    {packageInfo?.name || "Subscription"}
+                  </p>
+                  {packageInfo?.description && (
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                      {packageInfo.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-white/60 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 p-4">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      Access
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      {packageInfo?.validityDays ? `${packageInfo.validityDays} days` : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white/60 dark:bg-white/5 ring-1 ring-black/5 dark:ring-white/10 p-4">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      Total
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      {state.amount && state.currency ? formatMoney(Number(state.amount), state.currency) : "—"}
+                    </p>
                   </div>
                 </div>
+
+                {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.includes("pk_test_") && (
+                  <div className="mt-5 rounded-2xl bg-sky-50/70 dark:bg-sky-950/20 ring-1 ring-sky-200/70 dark:ring-sky-800/40 p-4">
+                    <p className="text-sm font-semibold text-sky-950 dark:text-sky-100">
+                      Test mode
+                    </p>
+                    <p className="mt-1 text-sm text-sky-900/80 dark:text-sky-200/80">
+                      Use test card{" "}
+                      <code className="bg-sky-100 dark:bg-sky-900/40 px-1.5 py-0.5 rounded">
+                        4242 4242 4242 4242
+                      </code>
+                      .
+                    </p>
+                    <p className="mt-1 text-xs text-sky-900/70 dark:text-sky-200/70">
+                      Expiry: any future date · CVC: any 3 digits · ZIP: any 5 digits
+                    </p>
+                  </div>
+                )}
               </div>
-            </AlertDescription>
-          </Alert>
-        )}
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {state.success ? "Subscription Complete" : (packageInfo?.name || "Subscription") + " Checkout"}
-        </h1>
-        {packageInfo?.description && (
-          <p className="text-gray-600 mb-2">
-            {packageInfo.description}
-          </p>
-        )}
-        {packageInfo?.validityDays && (
-          <p className="text-gray-600 mb-4">
-            <strong>{packageInfo.validityDays} days</strong> of access
-          </p>
-        )}
-        {state.amount && state.currency && (
-          <p className="text-lg font-semibold mb-4">
-            Amount: <strong>${Number(state.amount).toFixed(2)}</strong> {state.currency}
-          </p>
-        )}
+            </div>
 
-        {/* Test Mode Notice */}
-        {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.includes("pk_test_") && (
-          <Alert variant="default" className="bg-blue-50 border-blue-200 mb-4">
-            <AlertDescription className="text-blue-800 text-sm">
-              <div className="font-semibold mb-1">🧪 Test Mode</div>
-              <div>Use Stripe test card: <code className="bg-blue-100 px-1 rounded">4242 4242 4242 4242</code></div>
-              <div className="text-xs mt-1">Expiry: Any future date | CVC: Any 3 digits | ZIP: Any 5 digits</div>
-            </AlertDescription>
-          </Alert>
-        )}
+            {/* Right: payment */}
+            <div className="lg:col-span-7">
+              <div className="rounded-3xl bg-white/70 dark:bg-white/5 backdrop-blur-xl shadow-[0_22px_60px_-45px_rgba(15,23,42,0.65)] ring-1 ring-black/5 dark:ring-white/10 p-6">
+                {state.success && (
+                  <div className="mb-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/20 ring-1 ring-emerald-200/70 dark:ring-emerald-800/40 p-4">
+                    <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-100">
+                      Subscription activated
+                    </p>
+                    <p className="mt-1 text-sm text-emerald-900/80 dark:text-emerald-200/80">
+                      Your payment was successful and your subscription is now active.
+                    </p>
+                  </div>
+                )}
 
-        {!state.success && state.clientSecret && state.clientSecret.length > 0 && (
-          <Elements
-            stripe={stripePromise}
-            options={{ clientSecret: state.clientSecret }}
-          >
-            <CheckoutForm state={state} setState={setState} router={router} />
-          </Elements>
-        )}
+                {!state.success && state.clientSecret && state.clientSecret.length > 0 && (
+                  <Elements stripe={stripePromise} options={{ clientSecret: state.clientSecret }}>
+                    <CheckoutForm state={state} setState={setState} router={router} />
+                  </Elements>
+                )}
 
-        {!state.success && (!state.clientSecret || state.clientSecret.length === 0) && !state.loading && (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Preparing checkout form...</p>
+                {!state.success && (!state.clientSecret || state.clientSecret.length === 0) && !state.loading && (
+                  <div className="text-center py-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-slate-600 dark:text-slate-400">Preparing checkout form...</p>
+                  </div>
+                )}
+
+                {state.success && (
+                  <div className="space-y-3 mt-6">
+                    <Button className="w-full" onClick={() => router.push("/dashboard?subscriptionSuccess=true")}>
+                      Go to Dashboard
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => router.push("/my-subscription")}>
+                      See My Subscription
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => router.push("/landing-page")}>
+                      Back to Home
+                    </Button>
+                  </div>
+                )}
+
+                {!state.success && (
+                  <div className="mt-6">
+                    <Button variant="outline" className="w-full" onClick={() => router.push("/landing-page")}>
+                      Cancel and return
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        )}
-
-        {state.success && (
-          <div className="space-y-3 mt-4">
-            <Button
-              className="w-full"
-              onClick={() => router.push("/dashboard?subscriptionSuccess=true")}
-            >
-              Go to Dashboard
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => router.push("/landing-page")}
-            >
-              Back to Home
-            </Button>
-            {state.subscriptionId && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push("/admin/subscriptions")}
-              >
-                See My Subscription
-              </Button>
-            )}
-          </div>
-        )}
-
-        {!state.success && (
-          <Button
-            variant="outline"
-            className="w-full mt-2"
-            onClick={() => router.push("/landing-page")}
-          >
-            Back to Home
-          </Button>
-        )}
         </div>
       </div>
     </>

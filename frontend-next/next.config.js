@@ -1,3 +1,5 @@
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -17,7 +19,8 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: false,
   },
-  outputFileTracingRoot: '/Volumes/workdrive/work/GENERATORS/code-templates/multi-file-schema/frontend-next',
+  // Monorepo: Next detected yarn.lock at repo root (clinical-lab); align tracing with that root.
+  outputFileTracingRoot: path.join(__dirname, ".."),
 }
 
 module.exports = nextConfig

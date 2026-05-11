@@ -42,6 +42,11 @@ import {
   type StudyTaskStatus,
   type StudyTaskType,
 } from "@/app/services/student";
+import {
+  getApiErrorMessage,
+  isSubscriptionUpgradeRequiredError,
+} from "@/app/services/base/api-http-error";
+import { SubscriptionUpgradeModal } from "@/shared/components/SubscriptionUpgradeModal";
 
 const TYPES: StudyTaskType[] = [
   "READING",
@@ -88,6 +93,7 @@ export default function StudyPlannerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   const [showTaskEditor, setShowTaskEditor] = useState(false);
   const [editingTask, setEditingTask] = useState<StudyTask | null>(null);
@@ -100,16 +106,40 @@ export default function StudyPlannerPage() {
     setLoading(true);
     setError(null);
     try {
-      const [p, prog, t] = await Promise.all([
+      const settled = await Promise.allSettled([
         studyPlansService.getActive(),
         studyPlansService.progress(),
         studyPlansService.listTasks(),
       ]);
-      setPlan(p);
-      setProgress(prog);
-      setTasks(t);
-    } catch (e: any) {
-      setError(e?.message || "Failed to load study plan");
+      let blocked = false;
+      const messages: string[] = [];
+
+      const noteFailure = (reason: unknown, fallback: string) => {
+        if (isSubscriptionUpgradeRequiredError(reason)) {
+          blocked = true;
+          return;
+        }
+        messages.push(getApiErrorMessage(reason, fallback));
+      };
+
+      if (settled[0].status === "fulfilled") setPlan(settled[0].value);
+      else noteFailure(settled[0].reason, "Could not load your study plan.");
+
+      if (settled[1].status === "fulfilled") setProgress(settled[1].value);
+      else noteFailure(settled[1].reason, "Could not load study plan progress.");
+
+      if (settled[2].status === "fulfilled") setTasks(settled[2].value);
+      else noteFailure(settled[2].reason, "Could not load tasks.");
+
+      if (blocked) {
+        setPlan(null);
+        setProgress(null);
+        setTasks([]);
+        setSubscriptionModalOpen(true);
+        setError(null);
+      } else {
+        setError(messages.length ? messages.join(" ") : null);
+      }
     } finally {
       setLoading(false);
     }
@@ -189,8 +219,9 @@ export default function StudyPlannerPage() {
       }
       setShowTaskEditor(false);
       await load();
-    } catch (e: any) {
-      setError(e?.message || "Could not save task");
+    } catch (e: unknown) {
+      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      else setError(getApiErrorMessage(e, "Could not save task."));
     } finally {
       setBusy(false);
     }
@@ -200,16 +231,18 @@ export default function StudyPlannerPage() {
     try {
       await studyPlansService.deleteTask(t.id);
       await load();
-    } catch (e: any) {
-      setError(e?.message || "Could not delete task");
+    } catch (e: unknown) {
+      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      else setError(getApiErrorMessage(e, "Could not delete task."));
     }
   };
   const setStatus = async (t: StudyTask, status: StudyTaskStatus) => {
     try {
       await studyPlansService.updateTask(t.id, { status });
       await load();
-    } catch (e: any) {
-      setError(e?.message || "Could not update task");
+    } catch (e: unknown) {
+      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      else setError(getApiErrorMessage(e, "Could not update task."));
     }
   };
 
@@ -226,8 +259,9 @@ export default function StudyPlannerPage() {
       });
       setShowPlanEditor(false);
       await load();
-    } catch (e: any) {
-      setError(e?.message || "Could not save plan");
+    } catch (e: unknown) {
+      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      else setError(getApiErrorMessage(e, "Could not save plan."));
     } finally {
       setBusy(false);
     }
@@ -235,6 +269,11 @@ export default function StudyPlannerPage() {
 
   return (
     <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+      <SubscriptionUpgradeModal
+        open={subscriptionModalOpen}
+        onOpenChange={setSubscriptionModalOpen}
+        featureLabel="Study Planner"
+      />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Study Planner</h1>
@@ -328,7 +367,7 @@ export default function StudyPlannerPage() {
             <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
             <h3 className="text-lg font-semibold mb-1">No active plan</h3>
             <p className="text-muted-foreground mb-4">
-              Set up a study plan and we'll keep your daily tasks in line.
+              Set up a study plan and we&apos;ll keep your daily tasks in line.
             </p>
             <Button
               onClick={() => {

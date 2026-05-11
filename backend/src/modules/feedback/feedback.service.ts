@@ -6,6 +6,7 @@ import {
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { RealtimeBus } from "../realtime/realtime.bus";
+import { AchievementsService } from "../achievements/achievements.service";
 import {
   CreateFeedbackDto,
   CreateFeedbackReplyDto,
@@ -17,7 +18,8 @@ export class FeedbackService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
-    private realtime: RealtimeBus
+    private realtime: RealtimeBus,
+    private achievements: AchievementsService
   ) {}
 
   async create(userId: string, dto: CreateFeedbackDto) {
@@ -44,6 +46,10 @@ export class FeedbackService {
         },
         userId
       )
+      .catch(() => undefined);
+
+    void this.achievements
+      .recordActivity(userId, "FEEDBACK_TICKETS_SUBMITTED", 0)
       .catch(() => undefined);
 
     return ticket;
