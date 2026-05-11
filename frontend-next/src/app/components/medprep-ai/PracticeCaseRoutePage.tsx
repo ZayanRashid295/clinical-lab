@@ -59,11 +59,16 @@ function CasePageInner() {
       setLoading(true)
       setError(null)
       try {
+        // Same-tick as auth: do not use React `student` here — it can still be the default ANON
+        // from the previous render while `setStudent` from the other effect has not committed yet.
+        // Wrong userId → backend 403 Forbidden for owned learning/practice sessions.
+        const sessionUser = toMedPrepUser(authService.getCurrentUser()) || ANON
+
         let resolvedCaseId = caseId
         if (resumeConversationId) {
           const resumedConversation = await databaseConversationService.getConversation(
             resumeConversationId,
-            student.id
+            sessionUser.id
           )
           if (
             resumedConversation?.caseId &&
@@ -120,7 +125,9 @@ function CasePageInner() {
     }
 
     void loadCase()
-  }, [router.isReady, caseId, resumeConversationId, student.id])
+    // User id for resume is read inside loadCase via authService — not `student` state — to avoid a
+    // stale ANON id on the same tick as route hydration (403 Forbidden on learning resume).
+  }, [router.isReady, caseId, resumeConversationId])
 
   if (!router.isReady) {
     return (

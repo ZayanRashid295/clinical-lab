@@ -68,6 +68,78 @@ async function callGeminiAPI(model: string, messages: any[], maxTokens = 256, te
   return text
 }
 
+/**
+ * Appended to clinical-educator system prompts so the model returns plain clinical prose,
+ * not Markdown (Gemini often wraps labels in ** which breaks structured parsing and plain UI).
+ */
+const CLINICAL_AI_PLAIN_TEXT_RULES = `
+
+FORMATTING (strict):
+- Plain text only. Do not use Markdown: no ** or __ for bold/italic, no # headings, no code fences, no table syntax.
+- Write diagnosis and disease names as normal words (e.g. Asthma Exacerbation), never wrapped in asterisks or underscores.
+- The required section schemas below use simple numbered or "- " lines; do not decorate labels with * or #.
+`
+
+/** Remove common Markdown decoration from model output at the evaluation API boundary. */
+function normalizeClinicalAiPlainText(input: string): string {
+  if (input == null || typeof input !== "string") return input
+  let s = input.replace(/\r\n/g, "\n")
+  s = s.replace(/\*\*([^*]+)\*\*/g, "$1")
+  s = s.replace(/__([^_]+)__/g, "$1")
+  s = s.replace(/^#{1,6}\s+/gm, "")
+  return s
+}
+
+type ParsedDdxItem = { diagnosis: string; percentage: number; reasoning: string }
+
+/**
+ * When the model ignores the single-line numbered format and emits blocks like:
+ * **Condition Name**
+ * 50%
+ * paragraph...
+ */
+function parseLooseDifferentialDiagnoses(section: string): ParsedDdxItem[] {
+  const lines = section.replace(/\r\n/g, "\n").split("\n")
+  const out: ParsedDdxItem[] = []
+  for (let i = 0; i < lines.length; i++) {
+    const titleLine = lines[i].trim()
+    const pctLine = lines[i + 1]?.trim()
+    if (!titleLine || !pctLine || !/^\d{1,3}%$/.test(pctLine)) continue
+    if (/^\d+\.\s/.test(titleLine)) continue
+
+    const diagnosis = normalizeClinicalAiPlainText(
+      titleLine.replace(/^\*\*(.+)\*\*$/g, "$1").replace(/^\*(.+)\*$/g, "$1").trim(),
+    )
+    if (!diagnosis) continue
+
+    const percentage = Math.min(100, Math.max(0, parseInt(pctLine.replace(/%/g, ""), 10)))
+    if (!Number.isFinite(percentage)) continue
+
+    const reasonParts: string[] = []
+    let j = i + 2
+    while (j < lines.length) {
+      const t = lines[j].trim()
+      if (!t) {
+        j++
+        continue
+      }
+      if (/^\d+\.\s/.test(t)) break
+      const nxt = lines[j + 1]?.trim() ?? ""
+      if (/^\d{1,3}%$/.test(nxt)) break
+      reasonParts.push(t)
+      j++
+    }
+
+    out.push({
+      diagnosis,
+      percentage,
+      reasoning: normalizeClinicalAiPlainText(reasonParts.join(" ")),
+    })
+    i = j - 1
+  }
+  return out
+}
+
 async function getAIPatientResponse(studentQuestion: string, context: any, model: string) {
   console.log("[v0] Getting patient response with model:", model)
   console.log("[v0] Student question:", studentQuestion)
@@ -173,7 +245,8 @@ QUESTION_QUALITY: [assessment of questions asked]
 DIAGNOSTIC_REASONING: [evaluation of diagnostic approach]
 IMPROVEMENT_SUGGESTIONS: [list of suggestions]
 DIFFERENTIAL_DIAGNOSIS_FEEDBACK: [feedback on differential diagnosis]
-MISSED_OPPORTUNITIES: [important questions not asked]`,
+MISSED_OPPORTUNITIES: [important questions not asked]
+${CLINICAL_AI_PLAIN_TEXT_RULES}`,
       },
       {
         role: "user",
@@ -196,14 +269,17 @@ ${differentialDiagnosis}`,
   }
 
   return {
-    grade: parseSection("GRADE"),
-    score: parseSection("SCORE"),
-    feedback: parseSection("FEEDBACK"),
-    questionQuality: parseSection("QUESTION_QUALITY"),
-    diagnosticReasoning: parseSection("DIAGNOSTIC_REASONING"),
-    improvementSuggestions: parseSection("IMPROVEMENT_SUGGESTIONS").split("\n").filter(Boolean),
-    differentialDiagnosisFeedback: parseSection("DIFFERENTIAL_DIAGNOSIS_FEEDBACK"),
-    missedOpportunities: parseSection("MISSED_OPPORTUNITIES"),
+    grade: normalizeClinicalAiPlainText(parseSection("GRADE")),
+    score: normalizeClinicalAiPlainText(parseSection("SCORE")),
+    feedback: normalizeClinicalAiPlainText(parseSection("FEEDBACK")),
+    questionQuality: normalizeClinicalAiPlainText(parseSection("QUESTION_QUALITY")),
+    diagnosticReasoning: normalizeClinicalAiPlainText(parseSection("DIAGNOSTIC_REASONING")),
+    improvementSuggestions: parseSection("IMPROVEMENT_SUGGESTIONS")
+      .split("\n")
+      .filter(Boolean)
+      .map((s) => normalizeClinicalAiPlainText(s)),
+    differentialDiagnosisFeedback: normalizeClinicalAiPlainText(parseSection("DIFFERENTIAL_DIAGNOSIS_FEEDBACK")),
+    missedOpportunities: normalizeClinicalAiPlainText(parseSection("MISSED_OPPORTUNITIES")),
     raw: text,
   }
 }
@@ -231,7 +307,7 @@ NEXT_QUESTIONS:
 - [Focus on questions that would differentiate between the proposed diagnoses]
 - [Include questions about timing, associated symptoms, risk factors, etc.]
 
-Be specific and relevant to the actual conversation content. Do not provide generic medical advice.`,
+Be specific and relevant to the actual conversation content. Do not provide generic medical advice.${CLINICAL_AI_PLAIN_TEXT_RULES}`,
     },
     {
       role: "user",
@@ -298,9 +374,9 @@ Based on this specific conversation and patient presentation, provide differenti
   }
 
   return {
-    differentialDiagnoses,
-    reasoning,
-    nextQuestions,
+    differentialDiagnoses: normalizeClinicalAiPlainText(differentialDiagnoses),
+    reasoning: normalizeClinicalAiPlainText(reasoning),
+    nextQuestions: normalizeClinicalAiPlainText(nextQuestions),
     rawResponse: text,
   }
 }
@@ -362,7 +438,9 @@ IMPORTANT:
 - Never use generic terms like "Possible diagnosis" or "Further evaluation needed"
 - Always provide 3 specific, real medical conditions
 - Base your differentials on the ACTUAL conversation content, not generic templates
-- If the conversation mentions specific symptoms, consider diagnoses that match those symptoms`,
+- If the conversation mentions specific symptoms, consider diagnoses that match those symptoms
+- The DIFFERENTIAL_DIAGNOSES section must be exactly three single-line items in the form: number. DiagnosisName - NN% - reasoning (diagnosis names as plain words on the same line as the percent and reasoning; do not put diagnosis titles on separate lines)
+${CLINICAL_AI_PLAIN_TEXT_RULES}`,
     },
     {
       role: "user",
@@ -392,11 +470,19 @@ Provide real-time clinical reasoning analysis.`,
   }
 
   return {
-    clinicalAssessment: parseSection("CLINICAL_ASSESSMENT") || "Initial assessment pending...",
-    redFlags: parseSection("RED_FLAGS") || "No red flags identified yet.",
-    differentialDiagnoses: parseSection("DIFFERENTIAL_DIAGNOSES") || "Differential diagnoses will appear as conversation progresses.",
-    nextPriorityQuestions: parseSection("NEXT_PRIORITY_QUESTIONS") || "Start by asking about the chief complaint.",
-    clinicalReasoning: parseSection("CLINICAL_REASONING") || "Clinical reasoning will develop as you gather more information.",
+    clinicalAssessment: normalizeClinicalAiPlainText(
+      parseSection("CLINICAL_ASSESSMENT") || "Initial assessment pending...",
+    ),
+    redFlags: normalizeClinicalAiPlainText(parseSection("RED_FLAGS") || "No red flags identified yet."),
+    differentialDiagnoses: normalizeClinicalAiPlainText(
+      parseSection("DIFFERENTIAL_DIAGNOSES") || "Differential diagnoses will appear as conversation progresses.",
+    ),
+    nextPriorityQuestions: normalizeClinicalAiPlainText(
+      parseSection("NEXT_PRIORITY_QUESTIONS") || "Start by asking about the chief complaint.",
+    ),
+    clinicalReasoning: normalizeClinicalAiPlainText(
+      parseSection("CLINICAL_REASONING") || "Clinical reasoning will develop as you gather more information.",
+    ),
     rawResponse: text,
   }
 }
@@ -434,7 +520,7 @@ FOCUS_AREAS:
 
 COMMON_PITFALLS:
 - [Common mistake to avoid]
-- [Another common pitfall]`,
+- [Another common pitfall]${CLINICAL_AI_PLAIN_TEXT_RULES}`,
     },
     {
       role: "user",
@@ -464,11 +550,21 @@ Provide educational insights and learning points.`,
   }
 
   return {
-    keyPoints: parseSection("KEY_POINTS") || "Key learning points will appear as you progress through the case.",
-    clinicalGuidelines: parseSection("CLINICAL_GUIDELINES") || "Clinical guidelines will be provided based on the case presentation.",
-    clinicalPearls: parseSection("CLINICAL_PEARLS") || "Clinical pearls and important concepts will be highlighted as you learn.",
-    focusAreas: parseSection("FOCUS_AREAS") || "Focus areas will be suggested based on your interview progress.",
-    commonPitfalls: parseSection("COMMON_PITFALLS") || "Common pitfalls will be highlighted to help you avoid mistakes.",
+    keyPoints: normalizeClinicalAiPlainText(
+      parseSection("KEY_POINTS") || "Key learning points will appear as you progress through the case.",
+    ),
+    clinicalGuidelines: normalizeClinicalAiPlainText(
+      parseSection("CLINICAL_GUIDELINES") || "Clinical guidelines will be provided based on the case presentation.",
+    ),
+    clinicalPearls: normalizeClinicalAiPlainText(
+      parseSection("CLINICAL_PEARLS") || "Clinical pearls and important concepts will be highlighted as you learn.",
+    ),
+    focusAreas: normalizeClinicalAiPlainText(
+      parseSection("FOCUS_AREAS") || "Focus areas will be suggested based on your interview progress.",
+    ),
+    commonPitfalls: normalizeClinicalAiPlainText(
+      parseSection("COMMON_PITFALLS") || "Common pitfalls will be highlighted to help you avoid mistakes.",
+    ),
     rawResponse: text,
   }
 }
@@ -501,7 +597,6 @@ function EvaluationPageContent({
   // Evaluation mode state
   const [isEvaluationMode, setIsEvaluationMode] = useState(false)
   const [showNurseReport, setShowNurseReport] = useState(false)
-  const [nurseReportAnimated, setNurseReportAnimated] = useState(false)
   const [showCaseGenerationForm, setShowCaseGenerationForm] = useState(false)
   const [showCaseSelection, setShowCaseSelection] = useState(false)
   const [showEvaluationLanding, setShowEvaluationLanding] = useState(false)
@@ -832,11 +927,6 @@ function EvaluationPageContent({
         
         // Set the active tab to educational-content
         setActiveTab("educational-content")
-        
-        // Trigger animation after a brief delay
-        setTimeout(() => {
-          setNurseReportAnimated(true)
-        }, 100)
       }
     } catch (error) {
       console.error("Error generating case:", error)
@@ -858,11 +948,6 @@ function EvaluationPageContent({
       
       // Set the active tab to educational-content
       setActiveTab("educational-content")
-      
-      // Trigger animation after a brief delay
-      setTimeout(() => {
-        setNurseReportAnimated(true)
-      }, 100)
     }
   }
 
@@ -894,10 +979,6 @@ function EvaluationPageContent({
     setShowCaseGenerationForm(false)
     // Set the active tab to educational-content in Learning Insights (first tab)
     setActiveTab("educational-content")
-    // Trigger animation after a brief delay
-    setTimeout(() => {
-      setNurseReportAnimated(true)
-    }, 100)
   }
 
   const filteredCases = sampleCases.filter(
@@ -1132,8 +1213,8 @@ Please provide guidance and educational feedback.`,
             if (line.trim() && line.match(/^\d+\./)) {
               const parts = line.split('|')
               if (parts.length === 2) {
-                const questionPart = parts[0].replace(/^\d+\.\s*/, '').trim()
-                const notePart = parts[1].trim()
+                const questionPart = normalizeClinicalAiPlainText(parts[0].replace(/^\d+\.\s*/, "").trim())
+                const notePart = normalizeClinicalAiPlainText(parts[1].trim())
                 questions.push({ question: questionPart, note: notePart })
               }
             }
@@ -1148,8 +1229,8 @@ Please provide guidance and educational feedback.`,
               if (line.trim() && line.match(/^\d+\./)) {
                 const parts = line.split('|')
                 if (parts.length === 2) {
-                  const questionPart = parts[0].replace(/^\d+\.\s*/, '').trim()
-                  const notePart = parts[1].trim()
+                  const questionPart = normalizeClinicalAiPlainText(parts[0].replace(/^\d+\.\s*/, "").trim())
+                  const notePart = normalizeClinicalAiPlainText(parts[1].trim())
                   
                   // Check if this question is already in our list
                   if (!questions.some(q => q.question.toLowerCase() === questionPart.toLowerCase())) {
@@ -1215,9 +1296,9 @@ Please provide guidance and educational feedback.`,
               // Parse format: "1. Diagnosis - X% - Reasoning"
               const match = line.match(/^\d+\.\s*(.+?)\s*-\s*(\d+)%\s*-\s*(.+)$/)
               if (match) {
-                const diagnosis = match[1].trim()
-                const percentage = parseInt(match[2])
-                const reasoning = match[3].trim()
+                const diagnosis = normalizeClinicalAiPlainText(match[1].trim())
+                const percentage = parseInt(match[2], 10)
+                const reasoning = normalizeClinicalAiPlainText(match[3].trim())
                 diagnoses.push({ diagnosis, percentage, reasoning })
               }
             }
@@ -1233,9 +1314,9 @@ Please provide guidance and educational feedback.`,
               if (line.trim() && line.match(/^\d+\./)) {
                 const match = line.match(/^\d+\.\s*(.+?)\s*-\s*(\d+)%\s*-\s*(.+)$/)
                 if (match) {
-                  const diagnosis = match[1].trim()
-                  const percentage = parseInt(match[2])
-                  const reasoning = match[3].trim()
+                  const diagnosis = normalizeClinicalAiPlainText(match[1].trim())
+                  const percentage = parseInt(match[2], 10)
+                  const reasoning = normalizeClinicalAiPlainText(match[3].trim())
                   
                   // Check if this diagnosis is already in our list
                   if (!diagnoses.some(d => d.diagnosis.toLowerCase() === diagnosis.toLowerCase())) {
@@ -1243,6 +1324,28 @@ Please provide guidance and educational feedback.`,
                     if (diagnoses.length >= 3) break
                   }
                 }
+              }
+            }
+          }
+
+          // Model sometimes emits block-style differentials (title line + "50%" + paragraph) instead of one-line "1. A - n% - r"
+          if (diagnoses.length < 3) {
+            const looseFromParsed = parseLooseDifferentialDiagnoses(reasoning.differentialDiagnoses || "")
+            for (const item of looseFromParsed) {
+              if (diagnoses.length >= 3) break
+              if (!diagnoses.some((d) => d.diagnosis.toLowerCase() === item.diagnosis.toLowerCase())) {
+                diagnoses.push(item)
+              }
+            }
+          }
+          if (diagnoses.length < 3 && reasoning.rawResponse) {
+            const sectionMatch = reasoning.rawResponse.match(/DIFFERENTIAL_DIAGNOSES:\s*([\s\S]*?)(?=^[A-Z_]+:|$)/m)
+            const chunk = sectionMatch ? sectionMatch[1].trim() : ""
+            const looseFromRaw = parseLooseDifferentialDiagnoses(normalizeClinicalAiPlainText(chunk))
+            for (const item of looseFromRaw) {
+              if (diagnoses.length >= 3) break
+              if (!diagnoses.some((d) => d.diagnosis.toLowerCase() === item.diagnosis.toLowerCase())) {
+                diagnoses.push(item)
               }
             }
           }
@@ -2068,13 +2171,7 @@ Please provide guidance and educational feedback.`,
                       </div>
                     ) : (
                       <>
-                        {/* Animated Nurse Report Card */}
-                        <div className={`transition-all duration-1000 ease-out ${
-                          nurseReportAnimated 
-                            ? 'transform translate-x-0 opacity-100' 
-                            : 'transform translate-x-full opacity-0'
-                        }`}>
-                          <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+                        <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
                                 <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
@@ -2183,7 +2280,6 @@ Please provide guidance and educational feedback.`,
                               </div>
                             </CardContent>
                           </Card>
-                        </div>
 
                       </>
                     )}

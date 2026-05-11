@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -19,10 +19,30 @@ import {
   HelpCircle, Clock, CheckCircle, AlertCircle, AlertTriangle, Sparkles, BookOpen, 
   Brain, Star, GraduationCap, Heart, Activity, Target, Zap, 
   ChevronRight, Lightbulb, Award, TrendingUp, Mic, Video, 
-  Settings, Share, Download, RefreshCw, Eye, EyeOff, Send, X, Minimize2, 
+  Share, Download, RefreshCw, Eye, EyeOff, Send, X, Minimize2, 
   ChevronDown, ChevronUp
 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+
+function learningConversationSoapFingerprint(messages: LearningConversationMessage[]): string {
+  try {
+    return JSON.stringify(
+      messages.map((m) => ({ role: m.role, content: m.content, ts: m.timestamp })),
+    )
+  } catch {
+    return String(messages.length)
+  }
+}
+
+function formatSessionDuration(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) ms = 0
+  const totalMin = Math.floor(ms / 60000)
+  if (totalMin < 1) return "< 1 min"
+  if (totalMin < 60) return `${totalMin} min`
+  const h = Math.floor(totalMin / 60)
+  const m = totalMin % 60
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
+}
 
 interface LearningInterfaceProps {
   session: LearningSession
@@ -47,19 +67,68 @@ export function LearningInterface({
   const [hasLoadedSession, setHasLoadedSession] = useState(false)
   const [justResumed, setJustResumed] = useState(false)
   const [activeTab, setActiveTab] = useState<"conversation" | "soap">("conversation")
-  const [showPatientDetails, setShowPatientDetails] = useState(true)
+  /** Eye toggle in header: Learning Insight panels under doctor messages in the conversation. */
+  const [showConversationInsights, setShowConversationInsights] = useState(true)
   const [conversationSpeed, setConversationSpeed] = useState(1)
   const lastResumedSessionId = useRef<string | null>(null)
   const simulationFlowLock = useRef(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [simulationError, setSimulationError] = useState<string | null>(null)
+  /** Fingerprint of the conversation the current SOAP note was generated for (learning tab). */
+  const soapSyncedConversationFingerprintRef = useRef<string | null>(null)
+  const soapFetchAbortRef = useRef<AbortController | null>(null)
+  const sessionRef = useRef(session)
+  sessionRef.current = session
+  const onSessionUpdateRef = useRef(onSessionUpdate)
+  onSessionUpdateRef.current = onSessionUpdate
+  const [isSoapRefreshing, setIsSoapRefreshing] = useState(false)
+
+  /** Content-addressed primitive — effect deps stable across conversation array identity churn. */
+  const conversationContentKey = learningConversationSoapFingerprint(session.conversation)
+
+  /** Nurse Report → Session Progress: derive from simulated interview (doctor ↔ patient). */
+  const sessionProgressMetrics = useMemo(() => {
+    const msgs = session.conversation ?? []
+    const doctorTurns = msgs.filter((m) => m.role === "doctor").length
+    const patientTurns = msgs.filter((m) => m.role === "patient").length
+    const exchangePairs = Math.min(doctorTurns, patientTurns)
+    const conversationQuality = Math.min(100, Math.round((exchangePairs / 10) * 100))
+    return { questionsAsked: doctorTurns, conversationQuality }
+  }, [session.conversation])
+
+  const [sessionProgressClock, setSessionProgressClock] = useState(() => Date.now())
+  useEffect(() => {
+    if (session.isComplete) return
+    setSessionProgressClock(Date.now())
+  }, [session.isComplete, conversationContentKey])
+  useEffect(() => {
+    if (session.isComplete) return
+    const id = window.setInterval(() => setSessionProgressClock(Date.now()), 15000)
+    return () => window.clearInterval(id)
+  }, [session.isComplete])
+
+  const sessionProgressDurationMs = useMemo(() => {
+    const start = Date.parse(session.createdAt)
+    if (!Number.isFinite(start)) return 0
+    if (session.isComplete) {
+      let end = start
+      for (const m of session.conversation ?? []) {
+        const t = Date.parse(m.timestamp)
+        if (Number.isFinite(t) && t >= end) end = t
+      }
+      return Math.max(0, end - start)
+    }
+    return Math.max(0, sessionProgressClock - start)
+  }, [session.createdAt, session.isComplete, session.conversation, sessionProgressClock])
+
+  const sessionProgressDurationLabel = useMemo(() => formatSessionDuration(sessionProgressDurationMs), [sessionProgressDurationMs])
 
   // Persist learning sessions under the real user id (matches dashboard "ongoing cases").
   useEffect(() => {
     const uid = getClinicalUserId(authService.getCurrentUser())
     if (!uid || session.studentId === uid) return
-    onSessionUpdate({ ...session, studentId: uid })
-  }, [session, session.studentId, onSessionUpdate])
+    onSessionUpdateRef.current({ ...sessionRef.current, studentId: uid })
+  }, [session.studentId])
 
   // Ask Doctor popup state
   const [isDoctorChatOpen, setIsDoctorChatOpen] = useState(false)
@@ -146,7 +215,9 @@ export function LearningInterface({
 
   // Load medical case data - check both sample cases and localStorage for generated cases
   const [medicalCase, setMedicalCase] = useState<any>(null)
-  
+  const medicalCaseRef = useRef<any>(null)
+  medicalCaseRef.current = medicalCase
+
   // Patient information state
   const [patientInfo, setPatientInfo] = useState<{
     demographics: { maritalStatus: string; insurance: string }
@@ -199,14 +270,14 @@ export function LearningInterface({
         body: JSON.stringify({
           disease: medicalCase.disease,
           specialty: medicalCase.specialty,
-          patientProfile: session.patientProfile,
+          patientProfile: sessionRef.current.patientProfile,
           symptoms: medicalCase.symptoms,
         }),
       })
       const generatedInfo = await parseApiJson(response, "Failed to generate patient information")
       setPatientInfo(generatedInfo)
-      onSessionUpdate({
-        ...session,
+      onSessionUpdateRef.current({
+        ...sessionRef.current,
         patientInfo: generatedInfo,
       })
     } catch (error) {
@@ -214,7 +285,49 @@ export function LearningInterface({
     } finally {
       setIsLoadingPatientInfo(false)
     }
-  }, [medicalCase, patientInfo, isLoadingPatientInfo, parseApiJson, session, onSessionUpdate])
+  }, [medicalCase, patientInfo, isLoadingPatientInfo, parseApiJson])
+
+  const generateVitalSigns = useCallback(async () => {
+    if (!medicalCase || vitalSigns || isLoadingVitalSigns) {
+      return
+    }
+
+    setIsLoadingVitalSigns(true)
+
+    try {
+      const response = await fetch("/api/learning/vital-signs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          disease: medicalCase.disease,
+          specialty: medicalCase.specialty,
+          patientProfile: sessionRef.current.patientProfile,
+          symptoms: medicalCase.symptoms,
+        }),
+      })
+      const generatedVitalSigns = await parseApiJson(response, "Failed to generate vital signs")
+      setVitalSigns(generatedVitalSigns)
+      onSessionUpdateRef.current({
+        ...sessionRef.current,
+        vitalSigns: generatedVitalSigns,
+      })
+    } catch (error) {
+      console.error("Error generating vital signs:", error)
+      const defaultVitalSigns = {
+        bloodPressure: "120/80",
+        heartRate: 72,
+        temperature: "98.6°F",
+        respiratoryRate: 16,
+      }
+      setVitalSigns(defaultVitalSigns)
+      onSessionUpdateRef.current({
+        ...sessionRef.current,
+        vitalSigns: defaultVitalSigns,
+      })
+    } finally {
+      setIsLoadingVitalSigns(false)
+    }
+  }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson])
 
   useEffect(() => {
     // Use prop medical case if available, otherwise load from sample cases or localStorage
@@ -266,7 +379,7 @@ export function LearningInterface({
       console.log("Calling generatePatientInformation")
       generatePatientInformation()
     }
-  }, [medicalCase, patientInfo, isLoadingPatientInfo, session.patientInfo])
+  }, [medicalCase, patientInfo, isLoadingPatientInfo, session.patientInfo, generatePatientInformation])
 
   // Generate vital signs when medical case is loaded
   useEffect(() => {
@@ -288,53 +401,7 @@ export function LearningInterface({
       console.log("Calling generateVitalSigns")
       generateVitalSigns()
     }
-  }, [medicalCase, vitalSigns, isLoadingVitalSigns, session.vitalSigns])
-
-  // Generate vital signs using LLM
-  const generateVitalSigns = useCallback(async () => {
-    if (!medicalCase || vitalSigns || isLoadingVitalSigns) {
-      console.log("Skipping vital signs generation:", { medicalCase: !!medicalCase, vitalSigns: !!vitalSigns, isLoadingVitalSigns })
-      return
-    }
-    
-    console.log("Starting LLM vital signs generation for case:", medicalCase)
-    setIsLoadingVitalSigns(true)
-    
-    try {
-      const response = await fetch("/api/learning/vital-signs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          disease: medicalCase.disease,
-          specialty: medicalCase.specialty,
-          patientProfile: session.patientProfile,
-          symptoms: medicalCase.symptoms,
-        }),
-      })
-      const generatedVitalSigns = await parseApiJson(response, "Failed to generate vital signs")
-      setVitalSigns(generatedVitalSigns)
-      const updatedSession = {
-        ...session,
-        vitalSigns: generatedVitalSigns,
-      }
-      onSessionUpdate(updatedSession)
-    } catch (error) {
-      console.error("Error generating vital signs:", error)
-      const defaultVitalSigns = {
-        bloodPressure: "120/80",
-        heartRate: 72,
-        temperature: "98.6°F",
-        respiratoryRate: 16,
-      }
-      setVitalSigns(defaultVitalSigns)
-      onSessionUpdate({
-        ...session,
-        vitalSigns: defaultVitalSigns,
-      })
-    } finally {
-      setIsLoadingVitalSigns(false)
-    }
-  }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson, session, onSessionUpdate])
+  }, [medicalCase, vitalSigns, isLoadingVitalSigns, session.vitalSigns, generateVitalSigns])
 
   const didApplyDbUiRef = useRef(false)
   // Restore UI layout once when session was hydrated from the database
@@ -349,19 +416,31 @@ export function LearningInterface({
     }
   }, [hydratedFromDatabase, session.uiState])
 
-  // Save UI state when it changes
+  // Save UI state when it changes — merge onto latest session via ref so this callback does not
+  // thrash whenever the parent swaps the session object (avoids persistent save→re-render loops).
   const saveUIState = useCallback(() => {
-    const updatedSession = {
-      ...session,
-      uiState: {
-        activePatientInfoSection,
-        activeNurseReportSection,
-        activeTab,
-        collapsedSections
-      }
+    const s = sessionRef.current
+    const nextUi = {
+      activePatientInfoSection,
+      activeNurseReportSection,
+      activeTab,
+      collapsedSections,
     }
-    onSessionUpdate(updatedSession)
-  }, [session, activePatientInfoSection, activeNurseReportSection, activeTab, collapsedSections, onSessionUpdate])
+    const prevUi = s.uiState
+    if (
+      prevUi &&
+      prevUi.activePatientInfoSection === nextUi.activePatientInfoSection &&
+      prevUi.activeNurseReportSection === nextUi.activeNurseReportSection &&
+      prevUi.activeTab === nextUi.activeTab &&
+      JSON.stringify(prevUi.collapsedSections) === JSON.stringify(nextUi.collapsedSections)
+    ) {
+      return
+    }
+    onSessionUpdateRef.current({
+      ...s,
+      uiState: nextUi,
+    })
+  }, [activePatientInfoSection, activeNurseReportSection, activeTab, collapsedSections])
 
   // Save UI state when it changes (debounced)
   useEffect(() => {
@@ -391,6 +470,10 @@ export function LearningInterface({
   }, [session.id, hasLoadedSession, hydratedFromDatabase])
 
   useEffect(() => {
+    soapSyncedConversationFingerprintRef.current = null
+  }, [session.id])
+
+  useEffect(() => {
     // Resume guard: clear one-time marker after resume flow.
     if (lastResumedSessionId.current === session.id) {
       lastResumedSessionId.current = null
@@ -398,48 +481,88 @@ export function LearningInterface({
   }, [session.id])
 
   useEffect(() => {
-    const generateSoapForCase = async () => {
-      if (
-        activeTab === "soap" &&
-        (!session.soapNote || !session.soapNote.subjective) &&
-        !isProcessing
-      ) {
-        setIsProcessing(true)
-        try {
-          const context = {
-            caseId: session.caseId,
-            disease: session.disease,
-            symptoms: medicalCase?.symptoms || [],
-            patientProfile: session.patientProfile,
-            conversationHistory: [],
-          }
-          const response = await fetch("/api/learning/soap-note", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ conversation: [], context }),
-          })
-          const soapNote = await parseApiJson(response, "Failed to generate SOAP note")
-          if (
-            soapNote.subjective?.trim() ||
-            soapNote.objective?.trim() ||
-            soapNote.assessment?.trim() ||
-            soapNote.plan?.trim()
-          ) {
-            const updatedSession = {
-              ...session,
-              soapNote,
-            }
-            onSessionUpdate(updatedSession)
-          }
-        } catch (error) {
-          console.error("Error generating SOAP note:", error)
-        } finally {
-          setIsProcessing(false)
+    const fp = conversationContentKey
+    const conversationChangedVersusSoap =
+      soapSyncedConversationFingerprintRef.current !== null &&
+      soapSyncedConversationFingerprintRef.current !== fp
+
+    const shouldFetchSoap =
+      activeTab === "soap" &&
+      !session.isComplete &&
+      (conversationChangedVersusSoap ||
+        soapSyncedConversationFingerprintRef.current === null)
+
+    if (!shouldFetchSoap) {
+      return
+    }
+
+    soapFetchAbortRef.current?.abort()
+    const ac = new AbortController()
+    soapFetchAbortRef.current = ac
+
+    const run = async () => {
+      setIsSoapRefreshing(true)
+      const fpAtRequest = fp
+      try {
+        const ctxSession = sessionRef.current
+        const caseData = medicalCaseRef.current
+        const context = {
+          caseId: ctxSession.caseId,
+          disease: ctxSession.disease,
+          diseaseName: caseData?.diseaseName ?? caseData?.disease ?? ctxSession.disease,
+          specialty: caseData?.specialty ?? "",
+          isRare: Boolean(caseData?.isRare),
+          symptoms: caseData?.symptoms ?? [],
+          history: caseData?.history ?? [],
+          labs: caseData?.labs ?? {},
+          patientProfile: ctxSession.patientProfile,
+          conversationHistory: ctxSession.conversation.map((msg) => ({
+            role: msg.role as "student" | "patient" | "doctor",
+            content: msg.content,
+            timestamp: msg.timestamp,
+          })),
         }
+
+        const response = await fetch("/api/learning/soap-note", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            conversation: ctxSession.conversation,
+            context,
+          }),
+          signal: ac.signal,
+        })
+        const soapNote = await parseApiJson(response, "Failed to generate SOAP note")
+        if (ac.signal.aborted) return
+
+        const hasBody =
+          Boolean(soapNote.subjective?.trim()) ||
+          Boolean(soapNote.objective?.trim()) ||
+          Boolean(soapNote.assessment?.trim()) ||
+          Boolean(soapNote.plan?.trim())
+
+        if (hasBody) {
+          soapSyncedConversationFingerprintRef.current = fpAtRequest
+          onSessionUpdateRef.current({
+            ...sessionRef.current,
+            soapNote,
+          })
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") return
+        console.error("Error generating SOAP note:", error)
+      } finally {
+        setIsSoapRefreshing(false)
       }
     }
-    generateSoapForCase()
-  }, [activeTab])
+
+    void run()
+
+    return () => {
+      ac.abort()
+      setIsSoapRefreshing(false)
+    }
+  }, [activeTab, session.isComplete, conversationContentKey, parseApiJson])
 
   const startConversation = async () => {
     if (session.conversation.length > 0 || simulationFlowLock.current || session.isComplete) return
@@ -985,23 +1108,26 @@ export function LearningInterface({
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowPatientDetails(!showPatientDetails)}
-                className="text-muted-foreground hover:text-foreground hover:bg-accent"
-              >
-                {showPatientDetails ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground hover:bg-accent"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              title={
+                showConversationInsights
+                  ? "Hide Learning Insights in conversation"
+                  : "Show Learning Insights in conversation"
+              }
+              aria-pressed={showConversationInsights}
+              aria-label={
+                showConversationInsights
+                  ? "Hide Learning Insights under doctor messages"
+                  : "Show Learning Insights under doctor messages"
+              }
+              onClick={() => setShowConversationInsights((v) => !v)}
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+            >
+              {showConversationInsights ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
 
             {!session.isComplete && (
               <Button
@@ -2027,19 +2153,22 @@ export function LearningInterface({
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-purple-700">Conversation Quality</span>
-                      <span className="text-purple-800 font-medium">0%</span>
+                      <span className="text-purple-800 font-medium">{sessionProgressMetrics.conversationQuality}%</span>
                     </div>
                     <div className="w-full bg-purple-100 rounded-full h-2">
-                      <div className="bg-purple-500 h-2 rounded-full" style={{ width: '0%' }}></div>
+                      <div
+                        className="bg-purple-500 h-2 rounded-full transition-[width] duration-300 ease-out"
+                        style={{ width: `${sessionProgressMetrics.conversationQuality}%` }}
+                      />
                     </div>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-purple-700">Questions Asked</span>
-                    <span className="text-purple-800 font-medium">0</span>
+                    <span className="text-purple-800 font-medium">{sessionProgressMetrics.questionsAsked}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-purple-700">Time Spent</span>
-                    <span className="text-purple-800 font-medium">2 min</span>
+                    <span className="text-purple-800 font-medium">{sessionProgressDurationLabel}</span>
                   </div>
                 </div>
                 )}
@@ -2150,7 +2279,7 @@ export function LearningInterface({
                             </div>
                           </div>
                         </div>
-                        {message.explanation && (
+                        {showConversationInsights && message.explanation && (
                             <div className="bg-green-50 border-l-4 border-green-500 p-4 ml-13 rounded-r-lg">
                               <div className="flex items-center mb-2">
                                 <Lightbulb className="h-4 w-4 text-green-600 mr-2" />
@@ -2193,11 +2322,13 @@ export function LearningInterface({
               </ScrollArea>
             ) : (
               <div className="h-full overflow-y-auto p-6">
-                {isProcessing && !session.soapNote && (
-                  <div className="flex justify-center items-center h-64">
-                    <div className="flex items-center space-x-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full px-8 py-4 shadow-xl border border-green-200">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-                      <span className="text-sm font-semibold text-green-700">Generating SOAP Note...</span>
+                {isSoapRefreshing && (
+                  <div className="mb-6 flex justify-center">
+                    <div className="flex items-center space-x-4 rounded-full border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-4 shadow-xl">
+                      <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-green-500"></div>
+                      <span className="text-sm font-semibold text-green-700">
+                        Updating SOAP note to match your conversation…
+                      </span>
                     </div>
                   </div>
                 )}

@@ -125,6 +125,8 @@ function collapseLegacyDuplicateAdjacentMessages(messages: unknown[]): unknown[]
 class LearningService {
   private readonly saveQueues = new Map<string, Promise<void>>()
   private readonly persistedMessageCounts = new Map<string, number>()
+  /** Skips redundant session PATCH calls when queued saves replay the same snapshot. */
+  private readonly lastSyncedMetadataFingerprintByConversation = new Map<string, string>()
 
   /** Returns undefined for anonymous / missing — DB sync is skipped in that case. */
   normalizeStudentId(userId?: string | null): string | undefined {
@@ -422,15 +424,26 @@ Father: [realistic family history]`
       const { text } = await generateText({
         model: BEST_GEMINI_MODEL,
         system: isCaseOnly
-          ? `You are an experienced doctor writing an educational SOAP note for a medical student based only on the following case information (no conversation yet).`
-          : `You are an experienced doctor writing an educational SOAP note for ${disease}. Based on the patient conversation, create a comprehensive SOAP note with detailed explanations for each section to help medical students learn.`,
+          ? `You are an experienced doctor writing an educational SOAP note for a medical student based only on the following case information (no conversation yet).
+
+OUTPUT RULES — PLAIN TEXT ONLY:
+- Write normal prose only. Do not use Markdown or any Markdown-like formatting.
+- Do not use # headings, **bold**, *italic*, bullet lines starting with "-", "*" or "•", numbered lists like "1.", code fences (\`\`\`), tables, or blockquotes.
+- The ONLY structure allowed is the labeled lines below (SUBJECTIVE:, etc.), each followed by plain sentences.`
+          : `You are an experienced doctor writing an educational SOAP note for ${disease}. Based on the patient conversation, create a comprehensive SOAP note with detailed explanations for each section to help medical students learn.
+
+OUTPUT RULES — PLAIN TEXT ONLY:
+- Write normal prose only. Do not use Markdown or any Markdown-like formatting.
+- Do not use # headings, **bold**, *italic*, bullet lines starting with "-", "*" or "•", numbered lists like "1.", code fences (\`\`\`), tables, or blockquotes.
+- The ONLY structure allowed is the labeled lines below (SUBJECTIVE:, etc.), each followed by plain sentences.`,
         prompt: isCaseOnly
           ? `Patient: ${patientProfile.name}, ${patientProfile.age}-year-old ${patientProfile.gender}
 Disease: ${disease}
 Symptoms: ${symptoms.join(", ")}
 Write an educational SOAP note for this case, including explanations for each section. 
 IMPORTANT: Do NOT leave any section blank. Each section must have a detailed, relevant answer. 
-Use this format (plain text, no Markdown, no headings, no asterisks):
+
+Use EXACTLY this plain-text template (no Markdown anywhere — only plain sentences after each label line):
 
 SUBJECTIVE: [detailed subjective findings]
 SUBJECTIVE_EXPLANATION: [explanation for subjective]
@@ -445,7 +458,8 @@ Conversation:
 ${conversationContext}
 Create an educational SOAP note with explanations for this ${disease} case.
 IMPORTANT: Do NOT leave any section blank. Each section must have a detailed, relevant answer.
-Use this format (plain text, no Markdown, no headings, no asterisks):
+
+Use EXACTLY this plain-text template (no Markdown anywhere — only plain sentences after each label line):
 
 SUBJECTIVE: [detailed subjective findings]
 SUBJECTIVE_EXPLANATION: [explanation for subjective]
@@ -844,6 +858,13 @@ Provide an educational response about this ${disease} case.`,
         patchBody.status = "COMPLETED"
       }
 
+      const metadataFingerprint =
+        `${session.lastSyncedMessageCount}:${JSON.stringify(patchBody.metadata)}:${String(patchBody.status ?? "")}`
+      if (this.lastSyncedMetadataFingerprintByConversation.get(conversationId) === metadataFingerprint) {
+        this.persistLocal(session)
+        return
+      }
+
       const patchRes = await fetch(
         `/api/conversations/${encodeURIComponent(conversationId)}?userId=${encodeURIComponent(userId)}`,
         {
@@ -855,6 +876,8 @@ Provide an educational response about this ${disease} case.`,
       if (!patchRes.ok) {
         const errText = await patchRes.text().catch(() => "")
         console.error("[learning] PATCH session failed", patchRes.status, errText.slice(0, 300))
+      } else {
+        this.lastSyncedMetadataFingerprintByConversation.set(conversationId, metadataFingerprint)
       }
     } catch (error) {
       console.error("Error saving session to database:", error)

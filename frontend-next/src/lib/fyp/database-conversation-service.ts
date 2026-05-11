@@ -149,13 +149,19 @@ class DatabaseConversationService {
       const response = await fetch(
         `${baseUrl}/api/conversations/${conversationId}?userId=${encodeURIComponent(resolvedUserId)}`
       )
-      const data = await response.json()
-      
-      if (!data.success) {
-        if (response.status === 404) {
-          return null
+      const data = await response.json().catch(() => null)
+
+      if (!data?.success) {
+        // 404: missing session. 403/401: wrong or missing user id (caller may retry with correct id).
+        // Never throw: callers treat null as "unavailable" and continue (e.g. resolve case from URL).
+        if (response.status !== 404) {
+          console.warn(
+            "[getConversation] unavailable",
+            response.status,
+            data?.error || data?.message || ""
+          )
         }
-        throw new Error(data.error || 'Failed to get conversation')
+        return null
       }
 
       return this.convertDatabaseConversation(data.conversation)

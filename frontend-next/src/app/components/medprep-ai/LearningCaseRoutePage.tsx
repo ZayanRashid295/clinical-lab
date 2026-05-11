@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { learningService, type LearningSession } from "@/lib/fyp/learning-service"
@@ -147,17 +147,14 @@ export function LearningCaseRoutePage() {
     }
   }, [router.isReady, caseId, userId, conversationIdFromQuery])
 
-  const handleSessionUpdate = (updatedSession: LearningSession) => {
+  const handleSessionUpdate = useCallback((updatedSession: LearningSession) => {
     const sid = learningService.normalizeStudentId(userId)
     const next =
       sid && updatedSession.studentId !== sid ? { ...updatedSession, studentId: sid } : updatedSession
 
     setSession(next)
-    void (async () => {
-      await learningService.saveLearningSession(next)
-      setSession({ ...next })
-    })()
-  }
+    void learningService.saveLearningSession(next)
+  }, [userId])
 
   if (!router.isReady) {
     return (

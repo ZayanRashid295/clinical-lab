@@ -282,29 +282,59 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
         {isGeneratingAI && <Alert><AlertDescription>Generating AI reference SOAP note...</AlertDescription></Alert>}
 
         {isSubmitted && grading ? (
-          <Tabs defaultValue="quick" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="quick">Quick Grading</TabsTrigger>
+          <Tabs defaultValue="comprehensive" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="comprehensive">Comprehensive Report</TabsTrigger>
               <TabsTrigger value="comparison">AI Comparison</TabsTrigger>
               <TabsTrigger value="yours">Your SOAP Note</TabsTrigger>
             </TabsList>
-            <TabsContent value="quick" className="space-y-6">
+            <TabsContent value="comprehensive" className="space-y-6">
               <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2">Overall Grade <Badge>{grading.overallGrade}%</Badge></CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    SOAP summary <Badge>{grading.overallGrade}%</Badge>
+                  </CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   <Progress value={grading.overallGrade} />
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center"><p className="text-sm">Subjective</p><p className="font-bold">{grading.subjectiveGrade}%</p></div>
-                    <div className="text-center"><p className="text-sm">Objective</p><p className="font-bold">{grading.objectiveGrade}%</p></div>
-                    <div className="text-center"><p className="text-sm">Assessment</p><p className="font-bold">{grading.assessmentGrade}%</p></div>
-                    <div className="text-center"><p className="text-sm">Plan</p><p className="font-bold">{grading.planGrade}%</p></div>
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <div className="text-center">
+                      <p className="text-sm">Subjective</p>
+                      <p className="font-bold">{grading.subjectiveGrade}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm">Objective</p>
+                      <p className="font-bold">{grading.objectiveGrade}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm">Assessment</p>
+                      <p className="font-bold">{grading.assessmentGrade}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm">Plan</p>
+                      <p className="font-bold">{grading.planGrade}%</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-            <TabsContent value="comprehensive">
-              {conversationGrading ? <GradingReport soapGrading={grading} conversationGrading={conversationGrading} conversation={conversation} medicalCase={medicalCase} /> : <Card><CardContent className="py-12 text-center">{isGradingConversation ? <Loader2 className="h-8 w-8 animate-spin mx-auto" /> : "Conversation grading not available"}</CardContent></Card>}
+              {conversationGrading ? (
+                <GradingReport
+                  soapGrading={grading}
+                  conversationGrading={conversationGrading}
+                  conversation={conversation}
+                  medicalCase={medicalCase}
+                />
+              ) : (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    {isGradingConversation ? (
+                      <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+                    ) : (
+                      "Conversation grading not available"
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
             <TabsContent value="comparison">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
