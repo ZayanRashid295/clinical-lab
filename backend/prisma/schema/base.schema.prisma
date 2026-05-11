@@ -71,14 +71,26 @@ model User {
 }
 
 model UserSettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  language        String   @default("en")
-  timezone        String   @default("UTC")
-  notifications   Json     @default("{}")
-  privacySettings Json     @default("{}")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  language             String   @default("en")
+  timezone             String   @default("UTC")
+  notifications        Json     @default("{}")
+  privacySettings      Json     @default("{}")
+  /// light | dark
+  uiTheme              String   @default("light")
+  /// Accent palette key, e.g. emerald, blue
+  uiColorScheme        String   @default("emerald")
+  /// vertical | horizontal (navbar position)
+  uiMenuLayout         String   @default("vertical")
+  /// sidebar | topbar (paired with layout)
+  uiMenuStyle          String   @default("sidebar")
+  /// small | medium | large
+  uiFontSize           String   @default("medium")
+  /// system | comfort | compact
+  uiTypographyPreset   String   @default("system")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

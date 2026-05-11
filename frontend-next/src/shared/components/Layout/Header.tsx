@@ -12,7 +12,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header
-      className={`bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${spacing.container.xs}`}
+      className={`bg-[color:var(--app-surface)] shadow-sm border-b border-[color:var(--app-border)] text-[color:var(--app-text)] ${spacing.container.xs}`}
     >
       <div className="flex items-center justify-between gap-3 w-full min-w-0">
         <div
@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Mobile menu toggle */}
           <button
             onClick={onMobileMenuToggle}
-            className={`lg:hidden shrink-0 ${interactive.touch.md} flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors`}
+            className={`lg:hidden shrink-0 ${interactive.touch.md} flex items-center justify-center text-[color:var(--app-muted)] hover:text-[color:var(--app-text)] hover:bg-[color:var(--app-elevated)] rounded-md transition-colors`}
             title="Open menu"
           >
             <Menu size={20} />
@@ -44,12 +44,12 @@ const Header: React.FC<HeaderProps> = ({
             {/* User info - hidden on mobile, shown on tablet+ */}
             <div className="text-right hidden md:block">
               <p
-                className={`${typography.ui.regular} text-gray-900 dark:text-white`}
+                className={`${typography.ui.regular} text-[color:var(--app-text)]`}
               >
                 {user?.name || "User"}
               </p>
               <p
-                className={`${typography.caption.regular} text-gray-500 dark:text-gray-400`}
+                className={`${typography.caption.regular} text-[color:var(--app-muted)]`}
               >
                 {user?.roles?.join(", ") || "No Role"}
               </p>
@@ -61,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
             </div>
             <button
               onClick={onLogout}
-              className={`${interactive.touch.sm} flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors`}
+              className={`${interactive.touch.sm} flex items-center justify-center text-[color:var(--app-muted)] hover:text-[color:var(--app-text)] hover:bg-[color:var(--app-elevated)] rounded-md transition-colors`}
               title="Logout"
             >
               <LogOut size={18} className="sm:w-5 sm:h-5" />

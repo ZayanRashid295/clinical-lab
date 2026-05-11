@@ -1597,9 +1597,11 @@ Please provide guidance and educational feedback.`,
   const floatLayer = embedInAppShell ? "absolute" : "fixed"
 
   return (
-    <div className={`flex flex-col bg-gray-50 ${embedInAppShell ? "relative h-full min-h-0" : "h-screen"}`}>
+    <div
+      className={`medprep-app-shell flex flex-col ${embedInAppShell ? "relative h-full min-h-0" : "h-screen"}`}
+    >
       {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
+      <div className="medprep-app-shell-header border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">

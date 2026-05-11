@@ -1,38 +1,24 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { UIConfig, UIConfigService } from "../../app/config/ui.config";
+import {
+  UIConfig,
+  UIConfigService,
+  type UIColorScheme,
+  type TypographyPreset,
+} from "../../app/config/ui.config";
 import { ThemeService } from "../../app/config/theme.service";
+import { authService } from "../services/auth.service";
+import { applyServerPrefsToUiConfig } from "../utils/ui-preferences-sync";
 
 interface UIConfigContextType {
   config: UIConfig;
   updateConfig: (updates: Partial<UIConfig>) => void;
   setMenuLayout: (layout: "vertical" | "horizontal") => void;
   setMenuStyle: (style: "sidebar" | "topbar") => void;
+  setNavbarPosition: (position: "left" | "top") => void;
   setTheme: (theme: "light" | "dark") => void;
-  setColorScheme: (
-    colorScheme:
-      | "blue"
-      | "green"
-      | "purple"
-      | "red"
-      | "orange"
-      | "indigo"
-      | "pink"
-      | "teal"
-      | "cyan"
-      | "emerald"
-      | "violet"
-      | "rose"
-      | "amber"
-      | "lime"
-      | "slate"
-      | "zinc"
-      | "sky"
-      | "fuchsia"
-  ) => void;
+  setColorScheme: (colorScheme: UIColorScheme) => void;
   setFontSize: (fontSize: "small" | "medium" | "large") => void;
-  setBorderRadius: (
-    borderRadius: "none" | "small" | "medium" | "large"
-  ) => void;
+  setTypographyPreset: (preset: TypographyPreset) => void;
   resetConfig: () => void;
 }
 
@@ -57,7 +43,26 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
     return unsubscribe;
   }, []);
 
-  // CRITICAL: Apply theme whenever config changes to keep all pages in sync
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (typeof window === "undefined" || !authService.isAuthenticated()) {
+        return;
+      }
+      try {
+        const prefs = await authService.getUiPreferences();
+        if (!cancelled && prefs && Object.keys(prefs).length > 0) {
+          applyServerPrefsToUiConfig(prefs as Parameters<typeof applyServerPrefsToUiConfig>[0]);
+        }
+      } catch {
+        /* offline or older backend */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       themeService.current.applyTheme(config);
@@ -79,36 +84,17 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
     UIConfigService.getInstance().setMenuStyle(style);
   }, []);
 
+  const setNavbarPosition = React.useCallback((position: "left" | "top") => {
+    UIConfigService.getInstance().setNavbarPosition(position);
+  }, []);
+
   const setTheme = React.useCallback((theme: "light" | "dark") => {
     UIConfigService.getInstance().setTheme(theme);
   }, []);
 
-  const setColorScheme = React.useCallback(
-    (
-      colorScheme:
-        | "blue"
-        | "green"
-        | "purple"
-        | "red"
-        | "orange"
-        | "indigo"
-        | "pink"
-        | "teal"
-        | "cyan"
-        | "emerald"
-        | "violet"
-        | "rose"
-        | "amber"
-        | "lime"
-        | "slate"
-        | "zinc"
-        | "sky"
-        | "fuchsia"
-    ) => {
-      UIConfigService.getInstance().setColorScheme(colorScheme);
-    },
-    []
-  );
+  const setColorScheme = React.useCallback((colorScheme: UIColorScheme) => {
+    UIConfigService.getInstance().setColorScheme(colorScheme);
+  }, []);
 
   const setFontSize = React.useCallback(
     (fontSize: "small" | "medium" | "large") => {
@@ -117,9 +103,9 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
     []
   );
 
-  const setBorderRadius = React.useCallback(
-    (borderRadius: "none" | "small" | "medium" | "large") => {
-      UIConfigService.getInstance().setBorderRadius(borderRadius);
+  const setTypographyPreset = React.useCallback(
+    (preset: TypographyPreset) => {
+      UIConfigService.getInstance().setTypographyPreset(preset);
     },
     []
   );
@@ -133,10 +119,11 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
     updateConfig,
     setMenuLayout,
     setMenuStyle,
+    setNavbarPosition,
     setTheme,
     setColorScheme,
     setFontSize,
-    setBorderRadius,
+    setTypographyPreset,
     resetConfig,
   };
 

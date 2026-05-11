@@ -73,7 +73,7 @@ export default function StudyCreateTestPage() {
         htmlElement.classList.remove('dark');
       }
     }
-  }, [uiConfig.theme, uiConfig.colorScheme, uiConfig.fontSize, uiConfig.borderRadius, themeService]);
+  }, [uiConfig.theme, uiConfig.colorScheme, uiConfig.fontSize, uiConfig.typographyPreset, themeService]);
 
   // Refresh counts when page becomes visible (user returns from test)
   useEffect(() => {

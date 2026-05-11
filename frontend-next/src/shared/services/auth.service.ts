@@ -92,6 +92,25 @@ export class AuthService extends BaseApiService {
           };
 
           localStorage.setItem("userData", JSON.stringify(userWithAccess));
+          try {
+            const { applyServerPrefsToUiConfig } = await import(
+              "../utils/ui-preferences-sync"
+            );
+            const us = (profileResponse as { userSettings?: Record<string, unknown> })
+              .userSettings;
+            if (us) {
+              applyServerPrefsToUiConfig({
+                uiTheme: us.uiTheme as string,
+                uiColorScheme: us.uiColorScheme as string,
+                uiMenuLayout: us.uiMenuLayout as string,
+                uiMenuStyle: us.uiMenuStyle as string,
+                uiFontSize: us.uiFontSize as string,
+                uiTypographyPreset: us.uiTypographyPreset as string,
+              });
+            }
+          } catch {
+            /* ignore UI hydrate errors */
+          }
           resolve({ ...responseData, user: userWithAccess });
         } catch (profileError) {
           console.error("Failed to fetch user profile:", profileError);
@@ -191,6 +210,14 @@ export class AuthService extends BaseApiService {
 
   async getProfile(): Promise<any> {
     return this.get("/auth/profile");
+  }
+
+  async getUiPreferences(): Promise<Record<string, unknown>> {
+    return this.get("/auth/profile/ui-preferences");
+  }
+
+  async patchUiPreferences(body: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.patch("/auth/profile/ui-preferences", body);
   }
 
   async logout(): Promise<any> {

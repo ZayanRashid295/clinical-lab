@@ -142,8 +142,10 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
         .dropdown {
           position: fixed;
           min-width: 200px;
-          background: white;
+          background: var(--app-surface);
+          color: var(--app-text);
           border-radius: 8px;
+          border: 1px solid var(--app-border);
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
           z-index: 9999;
           opacity: 0;
@@ -166,12 +168,14 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
           display: block;
           width: 100%;
           padding: 8px 16px;
-          color: #374151;
+          color: var(--app-text);
           transition: all 0.2s ease;
-          border-bottom: 1px solid #f3f4f6;
+          border-bottom: 1px solid var(--app-border);
           text-align: left;
           background: none;
-          border: none;
+          border-left: none;
+          border-right: none;
+          border-top: none;
           cursor: pointer;
         }
 
@@ -190,8 +194,8 @@ const HorizontalMenu: React.FC<HorizontalMenuProps> = ({
         }
 
         .dropdown-item:hover {
-          background: #f3f4f6;
-          color: #1f2937;
+          background: var(--app-elevated);
+          color: var(--app-text);
         }
 
         .dropdown-item.active {

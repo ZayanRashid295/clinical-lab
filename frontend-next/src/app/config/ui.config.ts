@@ -1,28 +1,32 @@
+export type UIColorScheme =
+  | "blue"
+  | "green"
+  | "purple"
+  | "red"
+  | "orange"
+  | "indigo"
+  | "pink"
+  | "teal"
+  | "cyan"
+  | "emerald"
+  | "violet"
+  | "rose"
+  | "amber"
+  | "lime"
+  | "slate"
+  | "zinc"
+  | "sky"
+  | "fuchsia";
+
+export type TypographyPreset = "system" | "comfort" | "compact";
+
 export interface UIConfig {
   menuLayout: "vertical" | "horizontal";
   menuStyle: "sidebar" | "topbar";
   theme: "light" | "dark";
-  colorScheme:
-    | "blue"
-    | "green"
-    | "purple"
-    | "red"
-    | "orange"
-    | "indigo"
-    | "pink"
-    | "teal"
-    | "cyan"
-    | "emerald"
-    | "violet"
-    | "rose"
-    | "amber"
-    | "lime"
-    | "slate"
-    | "zinc"
-    | "sky"
-    | "fuchsia";
+  colorScheme: UIColorScheme;
   fontSize: "small" | "medium" | "large";
-  borderRadius: "none" | "small" | "medium" | "large";
+  typographyPreset: TypographyPreset;
   enableAnimations: boolean;
   enableNotifications: boolean;
 }
@@ -30,15 +34,28 @@ export interface UIConfig {
 export const DEFAULT_UI_CONFIG: UIConfig = {
   menuLayout: "vertical",
   menuStyle: "sidebar",
-  theme: "dark",
-  colorScheme: "blue",
+  theme: "light",
+  colorScheme: "emerald",
   fontSize: "medium",
-  borderRadius: "medium",
+  typographyPreset: "system",
   enableAnimations: true,
   enableNotifications: true,
 };
 
 export const UI_CONFIG_KEY = "ui-config";
+
+/** Schemes that read as neutral/dark greys — hidden in dark theme picker to keep contrast with zinc surfaces. */
+export const COLOR_SCHEMES_EXCLUDED_IN_DARK: ReadonlySet<UIColorScheme> = new Set([
+  "slate",
+  "zinc",
+]);
+
+function normalizeStoredConfig(raw: Record<string, unknown>): Partial<UIConfig> {
+  const { borderRadius: _ignored, ...rest } = raw as Record<string, unknown> & {
+    borderRadius?: unknown;
+  };
+  return rest as Partial<UIConfig>;
+}
 
 export class UIConfigService {
   private static instance: UIConfigService;
@@ -75,8 +92,8 @@ export class UIConfigService {
     try {
       const stored = localStorage.getItem(UI_CONFIG_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return { ...DEFAULT_UI_CONFIG, ...parsed };
+        const parsed = JSON.parse(stored) as Record<string, unknown>;
+        return { ...DEFAULT_UI_CONFIG, ...normalizeStoredConfig(parsed) };
       }
     } catch (error) {
       console.warn("Failed to load UI config from localStorage:", error);
@@ -103,31 +120,27 @@ export class UIConfigService {
     this.updateConfig({ menuStyle: style });
   }
 
-  public setTheme(theme: "light" | "dark"): void {
-    this.updateConfig({ theme });
+  /** Single UX control: left sidebar vs top navigation bar. */
+  public setNavbarPosition(position: "left" | "top"): void {
+    if (position === "left") {
+      this.updateConfig({ menuLayout: "vertical", menuStyle: "sidebar" });
+    } else {
+      this.updateConfig({ menuLayout: "horizontal", menuStyle: "topbar" });
+    }
   }
 
-  public setColorScheme(
-    colorScheme:
-      | "blue"
-      | "green"
-      | "purple"
-      | "red"
-      | "orange"
-      | "indigo"
-      | "pink"
-      | "teal"
-      | "cyan"
-      | "emerald"
-      | "violet"
-      | "rose"
-      | "amber"
-      | "lime"
-      | "slate"
-      | "zinc"
-      | "sky"
-      | "fuchsia"
-  ): void {
+  public setTheme(theme: "light" | "dark"): void {
+    const updates: Partial<UIConfig> = { theme };
+    if (
+      theme === "dark" &&
+      COLOR_SCHEMES_EXCLUDED_IN_DARK.has(this.config.colorScheme)
+    ) {
+      updates.colorScheme = "emerald";
+    }
+    this.updateConfig(updates);
+  }
+
+  public setColorScheme(colorScheme: UIColorScheme): void {
     this.updateConfig({ colorScheme });
   }
 
@@ -135,10 +148,8 @@ export class UIConfigService {
     this.updateConfig({ fontSize });
   }
 
-  public setBorderRadius(
-    borderRadius: "none" | "small" | "medium" | "large"
-  ): void {
-    this.updateConfig({ borderRadius });
+  public setTypographyPreset(typographyPreset: TypographyPreset): void {
+    this.updateConfig({ typographyPreset });
   }
 
   private saveConfig(): void {
@@ -186,36 +197,17 @@ export const useUIConfig = () => {
     UIConfigService.getInstance().setMenuStyle(style);
   }, []);
 
+  const setNavbarPosition = React.useCallback((position: "left" | "top") => {
+    UIConfigService.getInstance().setNavbarPosition(position);
+  }, []);
+
   const setTheme = React.useCallback((theme: "light" | "dark") => {
     UIConfigService.getInstance().setTheme(theme);
   }, []);
 
-  const setColorScheme = React.useCallback(
-    (
-      colorScheme:
-        | "blue"
-        | "green"
-        | "purple"
-        | "red"
-        | "orange"
-        | "indigo"
-        | "pink"
-        | "teal"
-        | "cyan"
-        | "emerald"
-        | "violet"
-        | "rose"
-        | "amber"
-        | "lime"
-        | "slate"
-        | "zinc"
-        | "sky"
-        | "fuchsia"
-    ) => {
-      UIConfigService.getInstance().setColorScheme(colorScheme);
-    },
-    []
-  );
+  const setColorScheme = React.useCallback((colorScheme: UIColorScheme) => {
+    UIConfigService.getInstance().setColorScheme(colorScheme);
+  }, []);
 
   const setFontSize = React.useCallback(
     (fontSize: "small" | "medium" | "large") => {
@@ -224,9 +216,9 @@ export const useUIConfig = () => {
     []
   );
 
-  const setBorderRadius = React.useCallback(
-    (borderRadius: "none" | "small" | "medium" | "large") => {
-      UIConfigService.getInstance().setBorderRadius(borderRadius);
+  const setTypographyPreset = React.useCallback(
+    (typographyPreset: TypographyPreset) => {
+      UIConfigService.getInstance().setTypographyPreset(typographyPreset);
     },
     []
   );
@@ -240,10 +232,11 @@ export const useUIConfig = () => {
     updateConfig,
     setMenuLayout,
     setMenuStyle,
+    setNavbarPosition,
     setTheme,
     setColorScheme,
     setFontSize,
-    setBorderRadius,
+    setTypographyPreset,
     resetConfig,
   };
 };

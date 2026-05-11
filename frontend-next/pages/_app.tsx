@@ -29,7 +29,15 @@ export default function App({ Component, pageProps }: AppProps) {
     <UIConfigProvider>
       <LanguageProvider>
         <ConfirmProvider>
-          <div className={playfair.variable}>
+          <div
+            className={playfair.variable}
+            style={{
+              fontFamily: "var(--font-sans-stack, system-ui, sans-serif)",
+              fontSize: "var(--base-font-size, 16px)",
+              lineHeight: "var(--app-line-height, 1.5)",
+              minHeight: "100vh",
+            }}
+          >
             <Component {...pageProps} />
           </div>
           <Toaster />

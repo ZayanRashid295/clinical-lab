@@ -7,28 +7,28 @@ export const useTheme = () => {
     config,
     setMenuLayout,
     setMenuStyle,
+    setNavbarPosition,
     setTheme,
     setColorScheme,
     setFontSize,
-    setBorderRadius,
+    setTypographyPreset,
     updateConfig,
   } = useUIConfigContext();
   const themeService = ThemeService.getInstance();
 
-  // Apply theme whenever config changes
   useEffect(() => {
     themeService.applyTheme(config);
   }, [config, themeService]);
-
 
   return {
     config,
     setMenuLayout,
     setMenuStyle,
+    setNavbarPosition,
     setTheme,
     setColorScheme,
     setFontSize,
-    setBorderRadius,
+    setTypographyPreset,
     updateConfig,
     themeService,
   };

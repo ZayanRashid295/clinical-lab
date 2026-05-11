@@ -11,6 +11,7 @@ import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { TokenBlacklistService } from "./token-blacklist.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { PatchUiPreferencesDto } from "./dto/patch-ui-preferences.dto";
 
 @Injectable()
 export class AuthService {
@@ -221,6 +222,63 @@ export class AuthService {
       return false;
     }
     return userWithAccess.roles.includes(role);
+  }
+
+  async getUiPreferences(userId: string) {
+    const row = await this.prisma.userSettings.findUnique({
+      where: { userId },
+      select: {
+        uiTheme: true,
+        uiColorScheme: true,
+        uiMenuLayout: true,
+        uiMenuStyle: true,
+        uiFontSize: true,
+        uiTypographyPreset: true,
+      },
+    });
+    return row;
+  }
+
+  async patchUiPreferences(userId: string, dto: PatchUiPreferencesDto) {
+    const updateData: Record<string, string> = {};
+    if (dto.uiTheme !== undefined) updateData.uiTheme = dto.uiTheme;
+    if (dto.uiColorScheme !== undefined) updateData.uiColorScheme = dto.uiColorScheme;
+    if (dto.uiMenuLayout !== undefined) updateData.uiMenuLayout = dto.uiMenuLayout;
+    if (dto.uiMenuStyle !== undefined) updateData.uiMenuStyle = dto.uiMenuStyle;
+    if (dto.uiFontSize !== undefined) updateData.uiFontSize = dto.uiFontSize;
+    if (dto.uiTypographyPreset !== undefined) {
+      updateData.uiTypographyPreset = dto.uiTypographyPreset;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return (await this.getUiPreferences(userId)) ?? {};
+    }
+
+    return this.prisma.userSettings.upsert({
+      where: { userId },
+      create: {
+        userId,
+        language: "en",
+        timezone: "UTC",
+        notifications: {},
+        privacySettings: {},
+        uiTheme: dto.uiTheme ?? "light",
+        uiColorScheme: dto.uiColorScheme ?? "emerald",
+        uiMenuLayout: dto.uiMenuLayout ?? "vertical",
+        uiMenuStyle: dto.uiMenuStyle ?? "sidebar",
+        uiFontSize: dto.uiFontSize ?? "medium",
+        uiTypographyPreset: dto.uiTypographyPreset ?? "system",
+      },
+      update: updateData,
+      select: {
+        uiTheme: true,
+        uiColorScheme: true,
+        uiMenuLayout: true,
+        uiMenuStyle: true,
+        uiFontSize: true,
+        uiTypographyPreset: true,
+      },
+    });
   }
 
   async logout(userId: string, token?: string) {

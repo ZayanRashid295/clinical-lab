@@ -90,7 +90,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
   if (isHorizontalLayout) {
     return (
       <LayoutHeaderLeadingContext.Provider value={headerLeadingContextValue}>
-      <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col h-screen bg-[color:var(--app-bg)] text-[color:var(--app-text)]">
         {/* Layout Switch Notification */}
         {showLayoutSwitchNotification && (
           <div className="fixed top-4 right-4 z-50 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ease-in-out">
@@ -133,7 +133,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
           )}
 
           {/* Main Content */}
-          <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-white dark:bg-gray-800">
+          <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-[color:var(--app-surface)] text-[color:var(--app-text)] border-[color:var(--app-border)]">
             {children}
           </main>
         </div>
@@ -146,7 +146,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
   return (
     <LayoutHeaderLeadingContext.Provider value={headerLeadingContextValue}>
     <div
-      className={`flex h-screen bg-gray-100 dark:bg-gray-900 ${
+      className={`flex h-screen bg-[color:var(--app-bg)] text-[color:var(--app-text)] ${
         isRTL ? "flex-row-reverse" : ""
       }`}
     >
@@ -219,7 +219,7 @@ const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
         />
 
         {/* Content Area */}
-        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-white dark:bg-gray-800">
+        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 bg-[color:var(--app-surface)] text-[color:var(--app-text)]">
           {children}
         </main>
       </div>

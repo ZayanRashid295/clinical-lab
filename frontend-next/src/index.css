@@ -129,3 +129,156 @@
 
 /* Import theme styles */
 @import "./styles/theme.css";
+
+/* Semantic surfaces for MedPrep and other large surfaces (incremental adoption). */
+.medprep-app-shell {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+.medprep-app-shell-header {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+/* Global dark-mode synchronization across legacy utility-heavy pages.
+   This normalizes neutral light classes to semantic dark surfaces while
+   preserving accent classes (blue/red/green/orange, etc.) for meaning. */
+.dark body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+.dark .bg-white,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: var(--app-surface) !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: var(--app-elevated) !important;
+}
+
+.dark .text-black,
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: var(--app-text) !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: var(--app-muted) !important;
+}
+
+.dark .border-gray-50,
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-gray-400 {
+  border-color: var(--app-border) !important;
+}
+
+.dark .shadow-sm,
+.dark .shadow,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Tables and list surfaces */
+.dark table,
+.dark thead,
+.dark tbody,
+.dark tr,
+.dark td,
+.dark th {
+  border-color: var(--app-border) !important;
+}
+
+.dark th,
+.dark thead tr {
+  background-color: var(--app-elevated) !important;
+  color: var(--app-text) !important;
+}
+
+.dark tr,
+.dark td {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+}
+
+/* Inputs/selects/textarea for forms-heavy pages */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.dark select,
+.dark textarea {
+  background-color: var(--app-elevated) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--app-muted) !important;
+}
+
+/* Common UI shells */
+.dark .card,
+.dark [role="dialog"],
+.dark .modal,
+.dark [data-radix-popper-content-wrapper] > div {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+/* Keep neutral badges dark-aware while preserving semantic accent badges */
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-zinc-50,
+.dark .bg-zinc-100 {
+  background-color: var(--app-elevated) !important;
+  color: var(--app-text) !important;
+}
+
+/* Convert pastel semantic backgrounds to subtle accent tint in dark mode */
+.dark .bg-blue-50,
+.dark .bg-blue-100,
+.dark .bg-green-50,
+.dark .bg-green-100,
+.dark .bg-purple-50,
+.dark .bg-purple-100,
+.dark .bg-red-50,
+.dark .bg-red-100,
+.dark .bg-orange-50,
+.dark .bg-orange-100,
+.dark .bg-yellow-50,
+.dark .bg-yellow-100,
+.dark .bg-indigo-50,
+.dark .bg-indigo-100,
+.dark .bg-pink-50,
+.dark .bg-pink-100 {
+  background-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.1) !important;
+  border-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.25) !important;
+}
+
+.dark .text-blue-900,
+.dark .text-blue-800,
+.dark .text-green-900,
+.dark .text-green-800,
+.dark .text-purple-900,
+.dark .text-purple-800,
+.dark .text-red-900,
+.dark .text-red-800,
+.dark .text-orange-900,
+.dark .text-orange-800,
+.dark .text-yellow-900,
+.dark .text-yellow-800,
+.dark .text-indigo-900,
+.dark .text-indigo-800,
+.dark .text-pink-900,
+.dark .text-pink-800 {
+  color: var(--app-text) !important;
+}

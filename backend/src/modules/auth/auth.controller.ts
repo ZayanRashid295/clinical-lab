@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Body,
+  Patch,
   UseGuards,
   Get,
   Request,
@@ -16,6 +17,7 @@ import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { PatchUiPreferencesDto } from "./dto/patch-ui-preferences.dto";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -49,6 +51,28 @@ export class AuthController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async getProfile(@Request() req) {
     return this.authService.findUserById(req.user.userId);
+  }
+
+  @Get("profile/ui-preferences")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get persisted UI preferences" })
+  @ApiResponse({ status: 200, description: "UI preferences" })
+  async getUiPreferences(@Request() req) {
+    const prefs = await this.authService.getUiPreferences(req.user.userId);
+    return prefs ?? {};
+  }
+
+  @Patch("profile/ui-preferences")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update persisted UI preferences" })
+  @ApiResponse({ status: 200, description: "Updated UI preferences" })
+  async patchUiPreferences(
+    @Request() req,
+    @Body() dto: PatchUiPreferencesDto,
+  ) {
+    return this.authService.patchUiPreferences(req.user.userId, dto);
   }
 
   @Post("logout")

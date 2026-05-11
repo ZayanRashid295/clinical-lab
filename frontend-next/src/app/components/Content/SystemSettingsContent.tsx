@@ -10,20 +10,24 @@ import {
   Mail,
   Smartphone,
   CreditCard,
-  Clock,
   AlertTriangle,
   CheckCircle,
   Info,
   Palette,
-  Type,
-  Square,
 } from "lucide-react";
 import { useTheme } from "../../../hooks/useTheme";
-import { COLOR_SCHEMES } from "../../config/theme.service";
+import { COLOR_SCHEMES, getColorSchemeKeysForTheme } from "../../config/theme.service";
+import type { TypographyPreset } from "../../config/ui.config";
 
 export default function SystemSettingsContent() {
-  const { config, setTheme, setColorScheme, setFontSize, setBorderRadius } =
-    useTheme();
+  const {
+    config,
+    setTheme,
+    setColorScheme,
+    setFontSize,
+    setTypographyPreset,
+    setNavbarPosition,
+  } = useTheme();
 
   const [settings, setSettings] = useState({
     // General Settings
@@ -213,7 +217,10 @@ export default function SystemSettingsContent() {
           Color Scheme
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(COLOR_SCHEMES).map(([key, scheme]) => (
+          {getColorSchemeKeysForTheme(config.theme).map((key) => {
+            const scheme = COLOR_SCHEMES[key];
+            if (!scheme) return null;
+            return (
             <div
               key={key}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
@@ -221,7 +228,7 @@ export default function SystemSettingsContent() {
                   ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
                   : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
-              onClick={() => setColorScheme(key as any)}
+              onClick={() => setColorScheme(key)}
             >
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-foreground dark:text-foreground">{scheme.name}</h4>
@@ -248,7 +255,8 @@ export default function SystemSettingsContent() {
                 />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -290,61 +298,74 @@ export default function SystemSettingsContent() {
         </div>
       </div>
 
-      {/* Border Radius */}
+      {/* Typography preset */}
       <div>
         <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
-          Border Radius
+          Font style
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[
-            { value: "none", label: "None", description: "Sharp corners" },
-            { value: "small", label: "Small", description: "Slightly rounded" },
-            {
-              value: "medium",
-              label: "Medium",
-              description: "Moderately rounded",
-            },
-            { value: "large", label: "Large", description: "Very rounded" },
-          ].map((option) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {(
+            [
+              { value: "system" as TypographyPreset, label: "System", description: "Sans UI stack" },
+              { value: "comfort" as TypographyPreset, label: "Comfort", description: "Serif reading" },
+              { value: "compact" as TypographyPreset, label: "Compact", description: "Tighter line height" },
+            ] as const
+          ).map((option) => (
             <div
               key={option.value}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                config.borderRadius === option.value
+                config.typographyPreset === option.value
                   ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
                   : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
               }`}
-              onClick={() =>
-                setBorderRadius(
-                  option.value as "none" | "small" | "medium" | "large"
-                )
-              }
+              onClick={() => setTypographyPreset(option.value)}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium text-foreground dark:text-foreground">{option.label}</h4>
                   <p className="text-sm text-muted-foreground dark:text-muted-foreground">{option.description}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
-                    config.borderRadius === option.value
+                    config.typographyPreset === option.value
                       ? "border-primary dark:border-primary bg-primary dark:bg-primary"
                       : "border-muted-foreground dark:border-muted-foreground"
                   }`}
                 />
               </div>
-              <div
-                className={`w-8 h-4 bg-gray-300 ${
-                  option.value === "none"
-                    ? "rounded-none"
-                    : option.value === "small"
-                    ? "rounded-sm"
-                    : option.value === "medium"
-                    ? "rounded-md"
-                    : "rounded-lg"
-                }`}
-              />
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Navbar layout */}
+      <div>
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+          Navbar position
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+              config.menuLayout === "vertical" && config.menuStyle === "sidebar"
+                ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
+            }`}
+            onClick={() => setNavbarPosition("left")}
+          >
+            <h4 className="font-medium text-foreground dark:text-foreground">Left sidebar</h4>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">Vertical navigation</p>
+          </div>
+          <div
+            className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+              config.menuLayout === "horizontal" && config.menuStyle === "topbar"
+                ? "border-primary dark:border-primary bg-primary/10 dark:bg-primary/20"
+                : "border-border dark:border-border hover:border-border/80 dark:hover:border-border/80 bg-card dark:bg-card"
+            }`}
+            onClick={() => setNavbarPosition("top")}
+          >
+            <h4 className="font-medium text-foreground dark:text-foreground">Top bar</h4>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">Horizontal navigation</p>
+          </div>
         </div>
       </div>
 

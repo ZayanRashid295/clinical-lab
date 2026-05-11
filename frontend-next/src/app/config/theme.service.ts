@@ -1,4 +1,18 @@
-import { UIConfig } from "./ui.config";
+import {
+  COLOR_SCHEMES_EXCLUDED_IN_DARK,
+  type UIColorScheme,
+  type UIConfig,
+  type TypographyPreset,
+} from "./ui.config";
+
+/** Color scheme keys offered in settings; excludes grey neutrals in dark theme. */
+export function getColorSchemeKeysForTheme(theme: "light" | "dark"): UIColorScheme[] {
+  const keys = Object.keys(COLOR_SCHEMES) as UIColorScheme[];
+  if (theme === "dark") {
+    return keys.filter((k) => !COLOR_SCHEMES_EXCLUDED_IN_DARK.has(k));
+  }
+  return keys;
+}
 
 export interface ColorScheme {
   name: string;
@@ -536,7 +550,6 @@ export class ThemeService {
 
     const root = document.documentElement;
 
-    // Determine if we're in dark mode
     const isDarkMode = config.theme === "dark";
     if (isDarkMode) {
       root.classList.add("dark");
@@ -544,14 +557,12 @@ export class ThemeService {
       root.classList.remove("dark");
     }
 
-    // Apply color scheme (colors remain consistent in both light and dark modes)
-    const colorScheme = COLOR_SCHEMES[config.colorScheme];
+    const colorScheme =
+      COLOR_SCHEMES[config.colorScheme as keyof typeof COLOR_SCHEMES] ??
+      COLOR_SCHEMES.emerald;
     if (colorScheme) {
-      // Apply primary colors (same in both light and dark modes)
       Object.entries(colorScheme.primary).forEach(([key, value]) => {
         root.style.setProperty(`--color-primary-${key}`, value);
-
-        // Expose RGB triplets for use in rgba(...) helpers (shadows, overlays, etc.)
         const rgb = this.hexToRgb(value);
         if (rgb) {
           root.style.setProperty(
@@ -561,31 +572,77 @@ export class ThemeService {
         }
       });
 
-      // Apply secondary colors (same in both light and dark modes)
       Object.entries(colorScheme.secondary).forEach(([key, value]) => {
         root.style.setProperty(`--color-secondary-${key}`, value);
       });
+
+      const p = colorScheme.primary;
+      root.style.setProperty("--sidebar-bg", p["900"]);
+      root.style.setProperty("--sidebar-fg", p["50"]);
+      root.style.setProperty("--sidebar-muted", p["200"]);
+      root.style.setProperty("--sidebar-border", p["800"]);
+      root.style.setProperty(
+        "--sidebar-item-hover",
+        isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.12)"
+      );
+      root.style.setProperty(
+        "--sidebar-item-active",
+        isDarkMode ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.22)"
+      );
+      root.style.setProperty("--sidebar-scrollbar-track", p["900"]);
+      root.style.setProperty("--sidebar-scrollbar-thumb", p["600"]);
     }
 
-    // Apply font size
-    const fontSizeMap = {
+    if (isDarkMode) {
+      root.style.setProperty("--app-bg", "#09090b");
+      root.style.setProperty("--app-surface", "#18181b");
+      root.style.setProperty("--app-elevated", "#27272a");
+      root.style.setProperty("--app-text", "#fafafa");
+      root.style.setProperty("--app-muted", "#a1a1aa");
+      root.style.setProperty("--app-border", "#27272a");
+    } else {
+      root.style.setProperty("--app-bg", "#f4f4f5");
+      root.style.setProperty("--app-surface", "#ffffff");
+      root.style.setProperty("--app-elevated", "#fafafa");
+      root.style.setProperty("--app-text", "#18181b");
+      root.style.setProperty("--app-muted", "#71717a");
+      root.style.setProperty("--app-border", "#e4e4e7");
+    }
+
+    const fontSizeMap: Record<UIConfig["fontSize"], string> = {
       small: "14px",
       medium: "16px",
       large: "18px",
     };
     root.style.setProperty("--base-font-size", fontSizeMap[config.fontSize]);
 
-    // Apply border radius
-    const borderRadiusMap = {
-      none: "0px",
-      small: "0.25rem",
-      medium: "0.5rem",
-      large: "1rem",
+    const preset = (config.typographyPreset || "system") as TypographyPreset;
+    const fontStacks: Record<TypographyPreset, string> = {
+      system:
+        'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      comfort:
+        'Charter, "Bitstream Charter", "Sitka Text", Cambria, "Noto Serif", Georgia, serif',
+      compact: "ui-sans-serif, system-ui, sans-serif",
+    };
+    root.style.setProperty("--font-sans-stack", fontStacks[preset] || fontStacks.system);
+
+    const presetLineHeight: Record<TypographyPreset, string> = {
+      system: "1.5",
+      comfort: "1.65",
+      compact: "1.35",
     };
     root.style.setProperty(
-      "--base-border-radius",
-      borderRadiusMap[config.borderRadius]
+      "--app-line-height",
+      presetLineHeight[preset] || presetLineHeight.system
     );
+
+    root.style.setProperty("--base-border-radius", "0.5rem");
+
+    root.style.fontFamily =
+      fontStacks[preset] || fontStacks.system;
+    root.style.fontSize = fontSizeMap[config.fontSize];
+    root.style.lineHeight =
+      presetLineHeight[preset] || presetLineHeight.system;
   }
 
   public getColorScheme(colorSchemeName: string): ColorScheme | undefined {
