@@ -28,7 +28,7 @@ export class CaseInstanceService {
       return window.location.origin
     } else {
       // Server-side: use environment variable or default
-      return process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:52941'
+      return process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3001'
     }
   }
 
