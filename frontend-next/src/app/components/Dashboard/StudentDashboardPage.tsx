@@ -309,7 +309,7 @@ export default function StudentDashboardPage() {
 
   return (
     <div
-      className="min-h-full bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(var(--color-primary-500-rgb),0.08),transparent)] dark:bg-none dark:bg-slate-950"
+      className="min-h-full bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(var(--color-primary-500-rgb),0.08),transparent)] dark:bg-gradient-to-b dark:from-gray-950 dark:via-gray-900 dark:to-gray-950"
       data-testid="page-dashboard"
     >
       <SubscriptionUpgradeModal
@@ -318,7 +318,7 @@ export default function StudentDashboardPage() {
         featureLabel="Study Planner"
       />
 
-      <div className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
         <div className="w-full max-w-none space-y-2 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
@@ -326,13 +326,13 @@ export default function StudentDashboardPage() {
             </p>
             <div className="flex shrink-0 items-center gap-2">
               {loading && (
-                <Loader2 className="h-4 w-4 animate-spin text-slate-500" aria-hidden />
+                <Loader2 className="h-4 w-4 animate-spin text-slate-500 dark:text-slate-400" aria-hidden />
               )}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                className="border-slate-200 bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10"
                 onClick={() => {
                   void loadAll();
                   void refreshMedprepSessions();
@@ -415,7 +415,7 @@ export default function StudentDashboardPage() {
         {(inProgress || lastCompleted) && (
           <section className="grid gap-4 lg:grid-cols-2">
             {inProgress && (
-              <Card className="overflow-hidden border-primary-200/80 bg-gradient-to-br from-white to-primary-50/40 shadow-sm dark:border-primary-900/35 dark:from-slate-900 dark:to-primary-900/25">
+              <Card className="overflow-hidden border-primary-200/80 bg-gradient-to-br from-white to-primary-50/40 shadow-sm dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between gap-2">
                     <Badge className="bg-primary-600 text-white hover:bg-primary-600">
@@ -426,7 +426,7 @@ export default function StudentDashboardPage() {
                   <CardTitle className="text-lg text-slate-900 dark:text-white">
                     {inProgress.name}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="dark:text-slate-400">
                     {inProgress.answered}/{inProgress.totalQuestions} answered · pick up
                     where you left off
                   </CardDescription>
@@ -445,16 +445,16 @@ export default function StudentDashboardPage() {
               </Card>
             )}
             {lastCompleted && !inProgress && (
-              <Card className="border-slate-200 dark:border-slate-800">
+              <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Last test</CardTitle>
-                  <CardDescription>{lastCompleted.name}</CardDescription>
+                  <CardTitle className="text-lg dark:text-white">Last test</CardTitle>
+                  <CardDescription className="dark:text-slate-400">{lastCompleted.name}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" className="dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10" asChild>
                     <Link href={`/test-session/${lastCompleted.id}`}>Review</Link>
                   </Button>
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" className="dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" asChild>
                     <Link href="/previous-tests">All past tests</Link>
                   </Button>
                 </CardContent>
@@ -481,7 +481,7 @@ export default function StudentDashboardPage() {
               <div className="flex items-center gap-2">
                 {medprepSessionsLoading && (
                   <Loader2
-                    className="h-4 w-4 animate-spin text-slate-400"
+                    className="h-4 w-4 animate-spin text-slate-400 dark:text-slate-500"
                     aria-hidden
                   />
                 )}
@@ -489,7 +489,7 @@ export default function StudentDashboardPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="text-slate-600 dark:text-slate-300"
+                  className="text-slate-600 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
                   onClick={() => void refreshMedprepSessions()}
                 >
                   Sync sessions
@@ -505,7 +505,7 @@ export default function StudentDashboardPage() {
                 {[0, 1, 2].map((k) => (
                   <div
                     key={k}
-                    className="h-[7.25rem] animate-pulse rounded-xl border border-slate-100 bg-slate-100/80 dark:border-slate-800 dark:bg-slate-800/60"
+                    className="h-[7.25rem] animate-pulse rounded-xl border border-slate-100 bg-slate-100/80 dark:border-white/10 dark:bg-white/10"
                   />
                 ))}
               </div>
@@ -529,7 +529,7 @@ export default function StudentDashboardPage() {
                       key={session.id}
                       href={href}
                       className={cn(
-                        "group relative flex flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm ring-1 ring-slate-950/[0.04] transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900/40",
+                        "group relative flex flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm ring-1 ring-slate-950/[0.04] transition-all hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:ring-white/5",
                         vis.cardRing
                       )}
                     >
@@ -551,7 +551,7 @@ export default function StudentDashboardPage() {
                             aria-hidden
                           />
                         </div>
-                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-primary-600 dark:group-hover:text-primary-400" />
+                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-primary-600 dark:text-slate-500 dark:group-hover:text-primary-400" />
                       </div>
                       <p className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-slate-900 dark:text-white">
                         {session.title || session.caseId || "Clinical case"}
@@ -632,7 +632,7 @@ export default function StudentDashboardPage() {
               <Card
                 key={item.title}
                 className={cn(
-                  "group relative overflow-hidden border-slate-200/90 transition-shadow hover:shadow-md dark:border-slate-800",
+                  "group relative overflow-hidden border-slate-200/90 transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md",
                   item.locked && "opacity-95"
                 )}
               >
@@ -645,18 +645,18 @@ export default function StudentDashboardPage() {
                 <CardHeader className="space-y-3">
                   <div
                     className={cn(
-                      "flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800"
+                      "flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10"
                     )}
                   >
                     <item.icon className="h-5 w-5 text-slate-700 dark:text-slate-200" />
                   </div>
-                  <CardTitle className="flex items-center gap-2 text-base">
+                  <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                     {item.title}
                     {item.locked && (
-                      <Lock className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+                      <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" aria-hidden />
                     )}
                   </CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
+                  <CardDescription className="text-xs leading-relaxed dark:text-slate-400">
                     {item.desc}
                   </CardDescription>
                 </CardHeader>
@@ -709,7 +709,7 @@ export default function StudentDashboardPage() {
               return (
                 <Card
                   key={id}
-                  className="relative overflow-hidden border-slate-200/90 dark:border-slate-800"
+                  className="relative overflow-hidden border-slate-200/90 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md"
                 >
                   <div
                     className={cn("h-1.5 w-full bg-gradient-to-r", vis.bar)}
@@ -723,8 +723,8 @@ export default function StudentDashboardPage() {
                     >
                       <Icon className={cn("h-6 w-6", vis.iconFg)} aria-hidden />
                     </div>
-                    <CardTitle className="text-base">{mode.title}</CardTitle>
-                    <CardDescription className="line-clamp-2 text-xs leading-relaxed">
+                    <CardTitle className="text-base dark:text-white">{mode.title}</CardTitle>
+                    <CardDescription className="line-clamp-2 text-xs leading-relaxed dark:text-slate-400">
                       {mode.summary}
                     </CardDescription>
                   </CardHeader>
@@ -769,11 +769,11 @@ export default function StudentDashboardPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Card className="border-slate-200 dark:border-slate-800">
+            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
               <CardHeader>
                 <FileQuestion className="mb-2 h-8 w-8 text-primary-600 dark:text-primary-400" />
-                <CardTitle className="text-base">Create a test</CardTitle>
-                <CardDescription className="text-xs">
+                <CardTitle className="text-base dark:text-white">Create a test</CardTitle>
+                <CardDescription className="text-xs dark:text-slate-400">
                   Tutor or timed, pools, systems, and topics
                 </CardDescription>
               </CardHeader>
@@ -783,30 +783,30 @@ export default function StudentDashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-            <Card className="border-slate-200 dark:border-slate-800">
+            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
               <CardHeader>
                 <ClipboardList className="mb-2 h-8 w-8 text-slate-700 dark:text-slate-300" />
-                <CardTitle className="text-base">Past tests</CardTitle>
-                <CardDescription className="text-xs">
+                <CardTitle className="text-base dark:text-white">Past tests</CardTitle>
+                <CardDescription className="text-xs dark:text-slate-400">
                   Scores, attempts, and review
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10" asChild>
                   <Link href="/previous-tests">View history</Link>
                 </Button>
               </CardContent>
             </Card>
-            <Card className="border-slate-200 dark:border-slate-800">
+            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
               <CardHeader>
                 <BarChart3 className="mb-2 h-8 w-8 text-primary-600 dark:text-primary-400" />
-                <CardTitle className="text-base">Performance</CardTitle>
-                <CardDescription className="text-xs">
+                <CardTitle className="text-base dark:text-white">Performance</CardTitle>
+                <CardDescription className="text-xs dark:text-slate-400">
                   Trends and breakdowns
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10" asChild>
                   <Link href="/performance">Open dashboard</Link>
                 </Button>
               </CardContent>
@@ -816,11 +816,11 @@ export default function StudentDashboardPage() {
 
         {/* Planner snapshot + AI tutor */}
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card className="border-slate-200 dark:border-slate-800">
+          <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
               <div>
-                <CardTitle className="text-base">Study planner snapshot</CardTitle>
-                <CardDescription className="text-xs">
+                <CardTitle className="text-base dark:text-white">Study planner snapshot</CardTitle>
+                <CardDescription className="text-xs dark:text-slate-400">
                   Upcoming work tied to your plan
                 </CardDescription>
               </div>
@@ -850,7 +850,7 @@ export default function StudentDashboardPage() {
                 <>
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-500">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-500">
                         Plan progress
                       </p>
                       <p className="font-semibold text-slate-900 dark:text-white">
@@ -859,7 +859,7 @@ export default function StudentDashboardPage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-500">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-500">
                         Days left
                       </p>
                       <p className="font-semibold text-slate-900 dark:text-white">
@@ -867,7 +867,7 @@ export default function StudentDashboardPage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-500">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-500">
                         Overdue
                       </p>
                       <p className="font-semibold text-primary-700 dark:text-primary-400">
@@ -888,12 +888,12 @@ export default function StudentDashboardPage() {
                       {upcomingPreview.map((t) => (
                         <li
                           key={t.id}
-                          className="flex justify-between gap-2 rounded-lg border border-slate-100 px-3 py-2 text-sm dark:border-slate-800"
+                          className="flex justify-between gap-2 rounded-lg border border-slate-100 px-3 py-2 text-sm dark:border-white/10 dark:bg-white/5"
                         >
-                          <span className="truncate font-medium text-slate-800 dark:text-slate-100">
+                          <span className="truncate font-medium text-slate-800 dark:text-white">
                             {t.title}
                           </span>
-                          <span className="shrink-0 text-xs text-slate-500">
+                          <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
                             {new Date(t.scheduledFor).toLocaleDateString()}
                           </span>
                         </li>
@@ -905,15 +905,15 @@ export default function StudentDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 bg-gradient-to-br from-primary-50/80 to-white dark:border-slate-800 dark:from-primary-900/25 dark:to-slate-900">
+          <Card className="border-slate-200 bg-gradient-to-br from-primary-50/80 to-white dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/45">
                   <Sparkles className="h-5 w-5 text-primary-700 dark:text-primary-300" />
                 </div>
                 <div>
-                  <CardTitle className="text-base">AI Tutor</CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardTitle className="text-base dark:text-white">AI Tutor</CardTitle>
+                  <CardDescription className="text-xs dark:text-slate-400">
                     Explanations and drills—usage follows your plan
                   </CardDescription>
                 </div>
@@ -928,14 +928,14 @@ export default function StudentDashboardPage() {
         </section>
 
         {/* Quick links — full-width strip */}
-        <section className="border-t border-slate-200/80 pt-8 dark:border-slate-800">
+        <section className="border-t border-slate-200/80 pt-8 dark:border-white/10">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Quick links
           </p>
           <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Link
               href="/achievements"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-100 dark:hover:border-primary-600/40 dark:hover:bg-primary-900/20"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-200">
                 <Trophy className="h-5 w-5" aria-hidden />
@@ -948,7 +948,7 @@ export default function StudentDashboardPage() {
             </Link>
             <Link
               href="/mock-exams"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-100 dark:hover:border-primary-600/40 dark:hover:bg-primary-900/20"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100/90 text-primary-800 dark:bg-primary-900/35 dark:text-primary-200">
                 <ClipboardCheck className="h-5 w-5" aria-hidden />
@@ -961,7 +961,7 @@ export default function StudentDashboardPage() {
             </Link>
             <Link
               href="/study-groups"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-100 dark:hover:border-primary-600/40 dark:hover:bg-primary-900/20"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200">
                 <Users className="h-5 w-5" aria-hidden />
@@ -974,9 +974,9 @@ export default function StudentDashboardPage() {
             </Link>
             <Link
               href="/settings"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-100 dark:hover:border-primary-600/40 dark:hover:bg-primary-900/20"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-200">
                 <Settings className="h-5 w-5" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">Settings</span>

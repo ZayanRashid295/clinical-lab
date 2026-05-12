@@ -33,6 +33,8 @@ import {
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
+import { APP_PAGE_SHELL } from "@/app/config/app-shell";
 
 type CaseLimitRow = {
   slug: string;
@@ -74,39 +76,50 @@ const MODE_THEME: Record<
 > = {
   "let-me-drive": {
     topBar: "from-rose-500 via-orange-500 to-amber-500",
-    iconWrap: "bg-rose-100 text-rose-700 ring-rose-200/80",
-    highlightRing: "ring-rose-100 bg-white",
-    highlightIcon: "text-rose-600",
-    cardBorder: "border-rose-100/90",
-    cardBg: "bg-gradient-to-b from-white to-rose-50/40",
+    iconWrap:
+      "bg-rose-100 text-rose-700 ring-rose-200/80 dark:bg-rose-950/50 dark:text-rose-200 dark:ring-rose-800/50",
+    highlightRing: "ring-rose-100 bg-white dark:ring-white/10 dark:bg-white/5",
+    highlightIcon: "text-rose-600 dark:text-rose-300",
+    cardBorder: "border-rose-100/90 dark:border-white/10",
+    cardBg:
+      "bg-gradient-to-b from-white to-rose-50/40 dark:from-white/[0.06] dark:to-slate-950/80",
     activeCta:
       "bg-gradient-to-r from-rose-600 to-orange-600 shadow-md shadow-rose-500/20",
     activeCtaHover: "hover:from-rose-700 hover:to-orange-700 hover:shadow-lg hover:shadow-rose-500/25",
-    resumeBadge: "bg-rose-50 text-rose-800 border-rose-100",
+    resumeBadge:
+      "bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/40 dark:text-rose-100 dark:border-rose-800/50",
   },
   qa: {
     topBar: "from-emerald-500 via-teal-500 to-cyan-500",
-    iconWrap: "bg-emerald-100 text-emerald-800 ring-emerald-200/80",
-    highlightRing: "ring-emerald-100 bg-white",
-    highlightIcon: "text-emerald-600",
-    cardBorder: "border-emerald-100/90",
-    cardBg: "bg-gradient-to-b from-white to-emerald-50/35",
+    iconWrap:
+      "bg-emerald-100 text-emerald-800 ring-emerald-200/80 dark:bg-emerald-950/45 dark:text-emerald-100 dark:ring-emerald-800/50",
+    highlightRing:
+      "ring-emerald-100 bg-white dark:ring-white/10 dark:bg-white/5",
+    highlightIcon: "text-emerald-600 dark:text-emerald-300",
+    cardBorder: "border-emerald-100/90 dark:border-white/10",
+    cardBg:
+      "bg-gradient-to-b from-white to-emerald-50/35 dark:from-white/[0.06] dark:to-slate-950/80",
     activeCta:
       "bg-gradient-to-r from-emerald-600 to-teal-600 shadow-md shadow-emerald-500/20",
     activeCtaHover: "hover:from-emerald-700 hover:to-teal-700 hover:shadow-lg hover:shadow-emerald-500/25",
-    resumeBadge: "bg-emerald-50 text-emerald-900 border-emerald-100",
+    resumeBadge:
+      "bg-emerald-50 text-emerald-900 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-100 dark:border-emerald-800/50",
   },
   "ai-evaluation": {
     topBar: "from-indigo-500 via-violet-500 to-purple-600",
-    iconWrap: "bg-indigo-100 text-indigo-800 ring-indigo-200/80",
-    highlightRing: "ring-indigo-100 bg-white",
-    highlightIcon: "text-indigo-600",
-    cardBorder: "border-indigo-100/90",
-    cardBg: "bg-gradient-to-b from-white to-indigo-50/35",
+    iconWrap:
+      "bg-indigo-100 text-indigo-800 ring-indigo-200/80 dark:bg-indigo-950/45 dark:text-indigo-100 dark:ring-indigo-800/50",
+    highlightRing:
+      "ring-indigo-100 bg-white dark:ring-white/10 dark:bg-white/5",
+    highlightIcon: "text-indigo-600 dark:text-indigo-300",
+    cardBorder: "border-indigo-100/90 dark:border-white/10",
+    cardBg:
+      "bg-gradient-to-b from-white to-indigo-50/35 dark:from-white/[0.06] dark:to-slate-950/80",
     activeCta:
       "bg-gradient-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-500/20",
     activeCtaHover: "hover:from-indigo-700 hover:to-violet-700 hover:shadow-lg hover:shadow-indigo-500/25",
-    resumeBadge: "bg-indigo-50 text-indigo-900 border-indigo-100",
+    resumeBadge:
+      "bg-indigo-50 text-indigo-900 border-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-100 dark:border-indigo-800/50",
   },
 };
 
@@ -120,7 +133,7 @@ function ModeCardIcon({ modeId }: { modeId: MedPrepModeId }) {
   const t = MODE_THEME[modeId];
   return (
     <div
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-2 ring-offset-2 ring-offset-white ${t.iconWrap}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-950 ${t.iconWrap}`}
       aria-hidden
     >
       <Icon className="h-5 w-5" strokeWidth={2} />
@@ -194,18 +207,18 @@ export default function MedPrepOverviewPage() {
   }, [sessions, entitlements, accessOk]);
 
   return (
-    <div className="min-h-full bg-slate-50/80">
-      <div className="border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+    <div className={cn(APP_PAGE_SHELL, "min-h-full w-full")}>
+      <div className="border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                 Clinical simulation
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-100">
                 MedPrep AI
               </h1>
-              <p className="text-base leading-relaxed text-slate-600">
+              <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 Pick how you want to work through cases—solo practice, guided
                 learning, or structured evaluation. Your progress and limits
                 follow your subscription.
@@ -213,9 +226,9 @@ export default function MedPrepOverviewPage() {
             </div>
             <Link
               href="/dashboard"
-              className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50"
+              className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-white/15 dark:hover:bg-white/10"
             >
-              <LayoutDashboard className="h-4 w-4 text-slate-500" />
+              <LayoutDashboard className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               Dashboard
             </Link>
           </div>
@@ -228,11 +241,11 @@ export default function MedPrepOverviewPage() {
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2
                 id="resume-heading"
-                className="text-lg font-semibold text-slate-900"
+                className="text-lg font-semibold text-slate-900 dark:text-slate-100"
               >
                 Resume a session
               </h2>
-              <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 Active simulations
               </span>
             </div>
@@ -241,18 +254,18 @@ export default function MedPrepOverviewPage() {
                 const slug = medprepSessionModeToSlug(session.mode);
                 const badge =
                   MODE_THEME[slug as MedPrepModeId]?.resumeBadge ??
-                  "bg-slate-50 text-slate-800 border-slate-200";
+                  "bg-slate-50 text-slate-800 border-slate-200 dark:bg-white/10 dark:text-slate-100 dark:border-white/10";
                 return (
                   <Link
                     key={session.id}
                     href={medprepSessionService.getContinueUrl(session)}
-                    className="group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-950/5 transition-all hover:border-emerald-200/80 hover:shadow-md"
+                    className="group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-950/5 transition-all hover:border-emerald-200/80 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:ring-white/5 dark:hover:border-emerald-500/30"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="min-w-0 text-sm font-semibold leading-snug text-slate-900 group-hover:text-emerald-800">
+                      <p className="min-w-0 text-sm font-semibold leading-snug text-slate-900 group-hover:text-emerald-800 dark:text-slate-100 dark:group-hover:text-emerald-300">
                         {session.title || session.caseId || "Untitled case"}
                       </p>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-600" />
+                      <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />
                     </div>
                     <p
                       className={`mt-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${badge}`}
@@ -271,17 +284,17 @@ export default function MedPrepOverviewPage() {
         ) : null}
 
         {!loading && !accessOk && (
-          <div className="overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 shadow-sm dark:border-amber-500/25 dark:from-amber-950/30 dark:to-orange-950/20 dark:backdrop-blur-md">
             <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div className="flex gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
                   <Lock className="h-6 w-6" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     MedPrep AI isn&apos;t on your current plan
                   </h2>
-                  <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+                  <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     Upgrade to unlock simulations, case generation, and usage
                     aligned to your package.
                   </p>
@@ -296,7 +309,7 @@ export default function MedPrepOverviewPage() {
                 </Link>
                 <Link
                   href="/my-subscription"
-                  className="text-center text-sm font-medium text-slate-700 underline-offset-4 hover:underline sm:text-right"
+                  className="text-center text-sm font-medium text-slate-700 underline-offset-4 hover:underline sm:text-right dark:text-slate-300"
                 >
                   Manage subscription
                 </Link>
@@ -309,11 +322,11 @@ export default function MedPrepOverviewPage() {
           <div className="mb-6">
             <h2
               id="modes-heading"
-              className="text-lg font-semibold text-slate-900"
+              className="text-lg font-semibold text-slate-900 dark:text-slate-100"
             >
               Modes
             </h2>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
               Included modes depend on your subscription. Locked modes can be
               unlocked by upgrading.
             </p>
@@ -346,7 +359,7 @@ export default function MedPrepOverviewPage() {
               return (
                 <article
                   key={mode.id}
-                  className={`relative flex flex-col overflow-x-hidden rounded-2xl border shadow-sm ring-1 ring-slate-950/[0.04] ${t.cardBorder} ${t.cardBg}`}
+                  className={`relative flex flex-col overflow-x-hidden rounded-2xl border shadow-sm ring-1 ring-slate-950/[0.04] backdrop-blur-sm dark:ring-white/5 ${t.cardBorder} ${t.cardBg}`}
                 >
                   <div
                     className={`h-1.5 w-full bg-gradient-to-r ${t.topBar}`}
@@ -373,13 +386,13 @@ export default function MedPrepOverviewPage() {
                       )}
                     </div>
 
-                    <h3 className="mt-5 text-xl font-semibold tracking-tight text-slate-900">
+                    <h3 className="mt-5 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
                       {mode.title}
                     </h3>
-                    <p className="mt-2 text-sm font-medium leading-snug text-slate-700">
+                    <p className="mt-2 text-sm font-medium leading-snug text-slate-700 dark:text-slate-300">
                       {mode.heroHeadline}
                     </p>
-                    <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {mode.summary}
                     </p>
 
@@ -393,15 +406,15 @@ export default function MedPrepOverviewPage() {
                             className={`flex w-full gap-3 rounded-xl p-3.5 ring-1 ${t.highlightRing}`}
                           >
                             <span
-                              className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 ${t.highlightIcon}`}
+                              className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 dark:bg-white/10 ${t.highlightIcon}`}
                             >
                               <Hi className="h-4 w-4" strokeWidth={2} />
                             </span>
                             <span className="min-w-0 flex-1 break-words">
-                              <span className="block text-sm font-semibold leading-snug text-slate-900">
+                              <span className="block text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
                                 {h.title}
                               </span>
-                              <span className="mt-1 block text-xs leading-relaxed text-slate-600">
+                              <span className="mt-1 block text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                                 {h.subtitle}
                               </span>
                             </span>
@@ -411,9 +424,9 @@ export default function MedPrepOverviewPage() {
                     </ul>
 
                     {row && accessOk && (
-                      <p className="mt-5 text-xs text-slate-600">
+                      <p className="mt-5 text-xs text-slate-600 dark:text-slate-400">
                         Cases this {periodLabel}:{" "}
-                        <span className="font-semibold tabular-nums text-slate-900">
+                        <span className="font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                           {row.used}
                         </span>
                         {row.limit !== null && row.limit !== undefined ? (

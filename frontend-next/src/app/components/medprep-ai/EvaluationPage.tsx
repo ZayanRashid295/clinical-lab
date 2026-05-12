@@ -707,7 +707,10 @@ function EvaluationPageContent({
             return
           }
 
-          setTimeout(() => setShowNurseReport(true), 1000)
+          // Nurse report is now served by /medprep-ai/evaluation-nurse-report
+          // (shared with Practice/Learning). When arriving here with a caseId we
+          // jump directly to the 3-panel evaluation interface.
+          setShowNurseReport(false)
         } else if (generated === "true") {
           const generatedCaseData = localStorage.getItem("generatedCase")
           console.log("Generated case data from localStorage:", generatedCaseData)
@@ -729,7 +732,9 @@ function EvaluationPageContent({
                 return
               }
 
-              setTimeout(() => setShowNurseReport(true), 1000)
+              // See note above: nurse report is now a dedicated page,
+              // so we jump straight to the consultation interface.
+              setShowNurseReport(false)
             } catch (error) {
               console.error("Error parsing generated case:", error)
               setShowCaseSelection(true)
@@ -966,24 +971,6 @@ function EvaluationPageContent({
   const handleNavigateToSelect = () => {
     setShowEvaluationLanding(false)
     setShowCaseSelection(true)
-  }
-
-  // Function to start case from nurse report
-  const handleStartCaseFromNurseReport = () => {
-    console.log("Starting case from nurse report, selectedCase:", selectedCase?.id)
-    console.log("Current state:", { 
-      isEvaluationMode, 
-      selectedCase: selectedCase?.id, 
-      showNurseReport, 
-      showCaseSelection, 
-      showCaseGenerationForm 
-    })
-    setShowNurseReport(false)
-    // Ensure case selection modals are hidden
-    setShowCaseSelection(false)
-    setShowCaseGenerationForm(false)
-    // Set the active tab to educational-content in Learning Insights (first tab)
-    setActiveTab("educational-content")
   }
 
   const filteredCases = sampleCases.filter(
@@ -1610,21 +1597,21 @@ Please provide guidance and educational feedback.`,
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-900">{EVALUATION_MODE_TITLE}</h1>
-              <p className="text-sm text-gray-600">{EVALUATION_MODE_TAGLINE}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{EVALUATION_MODE_TITLE}</h1>
+              <p className="text-sm text-gray-600 dark:text-slate-400">{EVALUATION_MODE_TAGLINE}</p>
             </div>
-            <Badge variant="outline" className={`${isEvaluationMode ? 'bg-red-50 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+            <Badge variant="outline" className={`${isEvaluationMode ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/25' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/25'}`}>
               {isEvaluationMode ? "Evaluation Mode" : (selectedCase?.disease || "Internal Medicine")}
             </Badge>
             {isEvaluationMode && selectedCase && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                 <span className="font-medium">{selectedCase.title}</span>
                 <span>•</span>
                 <span>A {selectedCase.patientProfile.age}-year-old patient with {selectedCase.symptoms[0].toLowerCase()}</span>
               </div>
             )}
             {selectedCase && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>{isEvaluationMode ? "Ready for evaluation" : "Consulting with patient"}</span>
               </div>
@@ -1633,7 +1620,7 @@ Please provide guidance and educational feedback.`,
           
           <div className="flex items-center gap-4">
             <Link href="/">
-              <Button variant="outline" className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 hover:from-blue-100 hover:to-purple-100 text-blue-700 hover:text-blue-800 transition-all duration-300">
+              <Button variant="outline" className="flex items-center gap-2 bg-primary-50 border-primary-200 hover:bg-primary-100 text-primary-700 hover:text-primary-800 dark:bg-primary-500/10 dark:border-primary-500/30 dark:text-primary-200 dark:hover:bg-primary-500/20 dark:hover:text-primary-100 transition-all duration-300">
                 <Home className="h-4 w-4" />
                 Dashboard
               </Button>
@@ -1673,21 +1660,21 @@ Please provide guidance and educational feedback.`,
       {/* Main Content - Three Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left panel — case context & tools (AI Evaluation Mode) */}
-        <div className="w-1/3 border-r bg-white flex flex-col">
-          <div className="p-4 border-b bg-blue-50">
-            <h2 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+        <div className="w-1/3 border-r border-gray-200 bg-white flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="p-4 border-b bg-blue-50 dark:bg-blue-500/10">
+            <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
               <Stethoscope className="h-5 w-5" />
               {EVALUATION_MODE_TITLE}
             </h2>
-            <p className="text-sm text-blue-700">{EVALUATION_MODE_TAGLINE}</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">{EVALUATION_MODE_TAGLINE}</p>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {/* Case Information Panel - Only in Evaluation Mode */}
             {isEvaluationMode && selectedCase && (
-              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 dark:from-blue-500/10 dark:to-purple-500/10 dark:border-blue-500/25">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
+                  <CardTitle className="text-lg text-blue-900 dark:text-blue-200 flex items-center gap-2">
                     <FileText className="h-5 w-5" />
                     Case Information
                   </CardTitle>
@@ -1697,15 +1684,15 @@ Please provide guidance and educational feedback.`,
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Age</span>
+                        <span className="text-gray-600 dark:text-slate-400">Age</span>
                         <span className="font-medium">{selectedCase.patientProfile.age}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Symptoms</span>
+                        <span className="text-gray-600 dark:text-slate-400">Symptoms</span>
                         <span className="font-medium">{selectedCase.symptoms.length}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Duration</span>
+                        <span className="text-gray-600 dark:text-slate-400">Duration</span>
                         <span className="font-medium">
                           ~{selectedCase.difficulty === 'beginner' ? '20' : selectedCase.difficulty === 'intermediate' ? '30' : '45'} min
                         </span>
@@ -1713,58 +1700,58 @@ Please provide guidance and educational feedback.`,
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Expected Questions</span>
+                        <span className="text-gray-600 dark:text-slate-400">Expected Questions</span>
                         <span className="font-medium">{selectedCase.expectedQuestions?.length || 5}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Difficulty</span>
+                        <span className="text-gray-600 dark:text-slate-400">Difficulty</span>
                         <Badge variant="outline" className={
                           selectedCase.difficulty === 'beginner' 
-                            ? 'bg-green-100 text-green-800' 
+                            ? 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-500/25' 
                             : selectedCase.difficulty === 'intermediate' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-200 dark:border-yellow-500/25' 
+                            : 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-200 dark:border-red-500/25'
                         }>
                           {selectedCase.difficulty}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Specialty</span>
+                        <span className="text-gray-600 dark:text-slate-400">Specialty</span>
                         <span className="font-medium">{selectedCase.specialty}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Patient Profile */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-2 text-sm">Patient Profile</h4>
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 dark:bg-white/[0.05] dark:border-white/10">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-2 text-sm">Patient Profile</h4>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3 text-gray-500" />
-                        <span className="text-gray-600">Name:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Name:</span>
                         <span className="font-medium">{selectedCase.patientProfile.name}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3 text-gray-500" />
-                        <span className="text-gray-600">Age:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Age:</span>
                         <span className="font-medium">{selectedCase.patientProfile.age} years old</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-3 w-3 text-gray-500" />
-                        <span className="text-gray-600">Gender:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Gender:</span>
                         <span className="font-medium">{selectedCase.patientProfile.gender}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Briefcase className="h-3 w-3 text-gray-500" />
-                        <span className="text-gray-600">Occupation:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Occupation:</span>
                         <span className="font-medium">{selectedCase.patientProfile.occupation}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Presenting Symptoms */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-2 text-sm">Presenting Symptoms</h4>
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 dark:bg-white/[0.05] dark:border-white/10">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-2 text-sm">Presenting Symptoms</h4>
                     <div className="flex flex-wrap gap-1">
                       {selectedCase.symptoms.map((symptom: string, index: number) => (
                         <Badge key={index} variant="secondary" className="text-xs">
@@ -1778,8 +1765,8 @@ Please provide guidance and educational feedback.`,
             )}
 
             {conversationWithRoles.length === 0 && (
-              <div className="text-center text-gray-500 mt-20">
-                <User className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="mt-20 text-center text-gray-500 dark:text-slate-400">
+                <User className="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-slate-600" />
                 <p>Start the consultation by asking the patient a question</p>
               </div>
             )}
@@ -1793,19 +1780,19 @@ Please provide guidance and educational feedback.`,
               return (
                 <div key={idx} className="space-y-2">
                   {msg.role === "patient" && (
-                    <div className={`rounded-lg p-4 shadow-sm border transition-all duration-300 ${
+                    <div className={`rounded-lg border p-4 shadow-sm transition-all duration-300 ${
                       shouldHighlight 
-                        ? "bg-yellow-50 border-yellow-300 shadow-md" 
-                        : "bg-white border-gray-200"
+                        ? "border-yellow-300 bg-yellow-50 shadow-md dark:border-yellow-400/40 dark:bg-yellow-500/10" 
+                        : "border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.05]"
                     }`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <User className="h-4 w-4 text-gray-600" />
-                        <span className="font-medium text-gray-900">Patient</span>
-                        <span className="text-xs text-gray-500 ml-auto">
+                      <div className="mb-2 flex items-center gap-2">
+                        <User className="h-4 w-4 text-gray-600 dark:text-slate-400" />
+                        <span className="font-medium text-gray-900 dark:text-slate-100">Patient</span>
+                        <span className="ml-auto text-xs text-gray-500 dark:text-slate-400">
                           {new Date(msg.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
-                      <div className="text-gray-800 text-left">
+                      <div className="text-left text-gray-800 dark:text-slate-200">
                         <MarkdownContent variant="chatPatient">{msg.content}</MarkdownContent>
                       </div>
                     </div>
@@ -1813,12 +1800,12 @@ Please provide guidance and educational feedback.`,
 
                   {msg.role === "student" && (
                     <div className="flex justify-end">
-                      <div className={`text-white rounded-lg p-3 max-w-xs transition-all duration-300 ${
+                      <div className={`max-w-xs rounded-lg p-3 text-white shadow-[0_8px_22px_-14px_rgba(var(--color-primary-700-rgb),0.45)] transition-all duration-300 ${
                         shouldHighlight 
                           ? "bg-yellow-500 shadow-md" 
-                          : "bg-blue-500"
+                          : "bg-gradient-to-br from-primary-500 to-primary-700"
                       }`}>
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="mb-1 flex items-center gap-2">
                           <Brain className="h-3 w-3" />
                           <span className="text-xs font-medium">
                             {msg.source === "manual" ? "Student" : 
@@ -1826,7 +1813,7 @@ Please provide guidance and educational feedback.`,
                              msg.source === "suggested" ? "Suggested Question" : "You"}
                           </span>
                         </div>
-                        <div className="text-sm text-left">
+                        <div className="text-left text-sm">
                           <MarkdownContent variant="chatAccent">{msg.content}</MarkdownContent>
                         </div>
                       </div>
@@ -1838,15 +1825,15 @@ Please provide guidance and educational feedback.`,
           </div>
           
           {/* Input Section */}
-          <div className="p-4 border-t bg-gray-50">
-            {interactionError ? <p className="mb-3 text-sm text-red-600">{interactionError}</p> : null}
+          <div className="p-4 border-t bg-gray-50 dark:bg-white/[0.04]">
+            {interactionError ? <p className="mb-3 text-sm text-red-600 dark:text-red-300">{interactionError}</p> : null}
             {copilotMode ? (
               /* Copilot Mode - AI Doctor Button */
               <div className="flex flex-col items-center gap-3">
                 <Button
                   onClick={handleSend}
                   disabled={isPatientResponding}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 text-lg font-medium"
+                  className="w-full bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white py-3 text-lg font-medium"
                 >
                   {isPatientResponding ? (
                     <div className="flex items-center gap-2">
@@ -1868,7 +1855,7 @@ Please provide guidance and educational feedback.`,
               /* Manual Mode - Text Input */
               <div className="flex items-center gap-2">
                 <Textarea
-                  className="flex-1 min-h-[60px] resize-none border-gray-200 focus:border-blue-300"
+                  className="flex-1 min-h-[60px] resize-none border-gray-200 focus:border-primary-300 dark:focus:border-primary-500"
                   value={studentInput}
                   onChange={(e) => setStudentInput(e.target.value)}
                   placeholder="Ask the patient a question..."
@@ -1883,7 +1870,7 @@ Please provide guidance and educational feedback.`,
                 <Button
                   onClick={handleSend}
                   disabled={isPatientResponding || !studentInput.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-4 py-2"
+                  className="bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white px-4 py-2"
                 >
                   {isPatientResponding ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -1911,22 +1898,22 @@ Please provide guidance and educational feedback.`,
                 </div>
                 
                 {diagnosticHelp && (
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 text-sm">
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 text-sm dark:bg-white/[0.05] dark:border-white/10">
                     <div className="space-y-2">
                       <div>
-                        <h4 className="font-medium text-gray-900">Differential Diagnoses:</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100">Differential Diagnoses:</h4>
                         <div className="text-gray-700">
                           <MarkdownContent variant="default">{diagnosticHelp.differentialDiagnoses}</MarkdownContent>
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">Clinical Reasoning:</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100">Clinical Reasoning:</h4>
                         <div className="text-gray-700">
                           <MarkdownContent variant="default">{diagnosticHelp.reasoning}</MarkdownContent>
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">Next Questions:</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100">Next Questions:</h4>
                         <div className="text-gray-700">
                           <MarkdownContent variant="default">{diagnosticHelp.nextQuestions}</MarkdownContent>
                         </div>
@@ -1940,24 +1927,24 @@ Please provide guidance and educational feedback.`,
         </div>
 
         {/* Middle Panel - Doctor Mind */}
-        <div className="w-1/3 border-r bg-white flex flex-col">
-          <div className="p-4 border-b bg-green-50">
-            <h2 className="text-lg font-semibold text-green-900 flex items-center gap-2">
+        <div className="w-1/3 border-r border-gray-200 bg-white flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="p-4 border-b bg-green-50 dark:bg-emerald-500/10">
+            <h2 className="text-lg font-semibold text-green-900 dark:text-emerald-200 flex items-center gap-2">
               <Brain className="h-5 w-5" />
               Doctor Mind
             </h2>
-            <p className="text-sm text-green-700">Clinical Reasoning Assistant</p>
+            <p className="text-sm text-green-700 dark:text-emerald-300">Clinical Reasoning Assistant</p>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {!selectedCase ? (
               <div className="text-center text-gray-500 mt-20">
-                <Brain className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <Brain className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                 <p>Select a patient case to begin clinical reasoning</p>
               </div>
             ) : conversation.length === 0 ? (
               <div className="text-center text-gray-500 mt-20">
-                <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                 <p>Start the conversation to see clinical reasoning</p>
               </div>
             ) : !clinicalReasoning ? (
@@ -1968,42 +1955,42 @@ Please provide guidance and educational feedback.`,
             ) : (
               <>
                 {/* Clinical Assessment */}
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 border border-blue-200 dark:border-blue-500/25">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
                     <Activity className="h-4 w-4" />
                     Clinical Assessment
                   </h3>
-                  <div className="text-sm text-blue-800">
+                  <div className="text-sm text-blue-800 dark:text-blue-200">
                     <MarkdownContent variant="default">{clinicalReasoning.clinicalAssessment}</MarkdownContent>
                   </div>
                 </div>
 
                 {/* Red Flags */}
-                <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                  <h3 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+                <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-4 border border-red-200 dark:border-red-500/25">
+                  <h3 className="font-semibold text-red-900 dark:text-red-200 mb-2 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
                     Red Flags
                   </h3>
-                  <div className="text-sm text-red-800">
+                  <div className="text-sm text-red-800 dark:text-red-200">
                     <MarkdownContent variant="default">{clinicalReasoning.redFlags}</MarkdownContent>
                   </div>
                 </div>
 
                 {/* Differential Diagnoses */}
-                <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                  <h3 className="font-semibold text-yellow-900 mb-3 flex items-center gap-2">
+                <div className="bg-yellow-50 dark:bg-yellow-500/10 rounded-lg p-4 border border-yellow-200 dark:border-yellow-500/25">
+                  <h3 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-3 flex items-center gap-2">
                     <Target className="h-4 w-4" />
                     Differential Diagnoses
                   </h3>
                   {differentialDiagnoses.length > 0 ? (
                     <div className="space-y-3">
                       {differentialDiagnoses.map((item, index) => (
-                        <div key={index} className="bg-white rounded-lg p-3 border border-yellow-200">
+                        <div key={index} className="rounded-lg border border-yellow-200 bg-white p-3 dark:border-yellow-500/25 dark:bg-white/[0.05]">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-yellow-900">
+                            <span className="text-sm font-medium text-yellow-900 dark:text-yellow-200">
                               {item.diagnosis}
                             </span>
-                            <span className="text-sm font-bold text-yellow-700">
+                            <span className="text-sm font-bold text-yellow-700 dark:text-yellow-300">
                               {item.percentage}%
                             </span>
                           </div>
@@ -2011,43 +1998,43 @@ Please provide guidance and educational feedback.`,
                             value={item.percentage} 
                             className="h-2 mb-2"
                           />
-                          <p className="text-xs text-blue-700 italic">
+                          <p className="text-xs text-blue-700 dark:text-blue-300 italic">
                             {item.reasoning}
                           </p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-sm text-blue-800">
+                    <div className="text-sm text-blue-800 dark:text-blue-200">
                       <MarkdownContent variant="default">{clinicalReasoning.differentialDiagnoses}</MarkdownContent>
                     </div>
                   )}
                 </div>
 
                 {/* Next Questions Strategy */}
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-4 border border-green-200 dark:border-emerald-500/25">
+                  <h3 className="font-semibold text-green-900 dark:text-emerald-200 mb-3 flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     Next Questions Strategy
                   </h3>
                   {structuredQuestions.length > 0 ? (
                     <div className="space-y-3">
                       {structuredQuestions.map((item, index) => (
-                        <div key={index} className="bg-white rounded-lg p-3 border border-green-200 hover:border-green-300 transition-colors">
+                        <div key={index} className="rounded-lg border border-green-200 bg-white p-3 transition-colors hover:border-green-300 dark:border-emerald-500/25 dark:bg-white/[0.05] dark:hover:border-emerald-400/40">
                           <button
                             onClick={() => handleQuestionClick(item.question)}
                             disabled={isPatientResponding}
                             className="w-full text-left group"
                           >
                             <div className="flex items-start gap-2">
-                              <div className="w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
+                              <div className="w-6 h-6 bg-green-100 dark:bg-emerald-500/15 text-green-700 dark:text-emerald-300 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
                                 {index + 1}
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-green-900 group-hover:text-green-700 transition-colors">
+                                <p className="text-sm font-medium text-green-900 group-hover:text-green-700 dark:text-emerald-200 dark:group-hover:text-emerald-300 transition-colors">
                                   {item.question}
                                 </p>
-                                <p className="text-xs text-green-600 mt-1 italic">
+                                <p className="text-xs text-green-600 dark:text-emerald-300 mt-1 italic">
                                   {item.note}
                                 </p>
                               </div>
@@ -2060,19 +2047,19 @@ Please provide guidance and educational feedback.`,
                       ))}
                     </div>
                   ) : (
-                    <div className="text-sm text-green-800">
+                    <div className="text-sm text-green-800 dark:text-emerald-200">
                       <MarkdownContent variant="default">{clinicalReasoning.nextPriorityQuestions}</MarkdownContent>
                     </div>
                   )}
                 </div>
 
                 {/* Clinical Reasoning */}
-                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                  <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-4 border border-purple-200 dark:border-purple-500/25">
+                  <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
                     Clinical Reasoning
                   </h3>
-                  <div className="text-sm text-purple-800">
+                  <div className="text-sm text-purple-800 dark:text-purple-200">
                     <MarkdownContent variant="default">{clinicalReasoning.clinicalReasoning}</MarkdownContent>
                   </div>
                 </div>
@@ -2082,15 +2069,15 @@ Please provide guidance and educational feedback.`,
         </div>
 
         {/* Right Panel - Learning Insights */}
-        <div className="w-1/3 bg-white flex flex-col">
-          <div className="p-4 border-b bg-purple-50">
+        <div className="w-1/3 border-r border-transparent bg-white flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="p-4 border-b bg-purple-50 dark:bg-purple-500/10">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-purple-900 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-purple-900 dark:text-purple-200 flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
                   Learning Insights
                 </h2>
-                <p className="text-sm text-purple-700">Educational Content</p>
+                <p className="text-sm text-purple-700 dark:text-purple-300">Educational Content</p>
               </div>
               {cardHistory.length > 0 && (
                 <div className="flex items-center gap-2">
@@ -2103,7 +2090,7 @@ Please provide guidance and educational feedback.`,
                   >
                     ←
                   </Button>
-                  <span className="text-xs text-purple-600">
+                  <span className="text-xs text-purple-600 dark:text-purple-300">
                     {currentCardIndex === -1 ? "Current" : `${currentCardIndex + 1}/${cardHistory.length}`}
                   </span>
                   <Button
@@ -2137,93 +2124,93 @@ Please provide guidance and educational feedback.`,
                   <TabsContent value="nurse-report" className="space-y-4">
                     {!selectedCase ? (
                       <div className="text-center text-gray-500 mt-20">
-                        <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                         <p>Select a patient case to view nurse report</p>
                       </div>
                     ) : (
                       <>
-                        <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+                        <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 dark:border-blue-500/25 dark:from-blue-500/10 dark:to-purple-500/10">
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
+                                <CardTitle className="text-lg text-blue-900 dark:text-blue-200 flex items-center gap-2">
                                   <FileText className="h-5 w-5" />
                                   Nurse Report
                                 </CardTitle>
-                                <Badge variant="outline" className="bg-white text-blue-700 border-blue-200">
+                                <Badge variant="outline" className="border-blue-200 bg-white text-blue-700 dark:border-blue-500/30 dark:bg-white/10 dark:text-blue-200">
                                   {selectedCase.difficulty}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-blue-700">Initial Patient Assessment - {new Date().toLocaleDateString()}</p>
+                              <p className="text-sm text-blue-700 dark:text-blue-300">Initial Patient Assessment - {new Date().toLocaleDateString()}</p>
                             </CardHeader>
                             
                             <CardContent className="space-y-4">
                               {/* Case Overview */}
-                              <div className="bg-white rounded-lg p-3 border border-blue-200">
-                                <h4 className="font-semibold text-gray-900 mb-2 text-sm">Case Overview</h4>
+                              <div className="rounded-lg border border-blue-200 bg-white p-3 dark:border-blue-500/25 dark:bg-white/[0.05]">
+                                <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-2 text-sm">Case Overview</h4>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   <div>
-                                    <span className="text-gray-600">Title:</span>
-                                    <p className="font-medium text-gray-900">{selectedCase.title}</p>
+                                    <span className="text-gray-600 dark:text-slate-400">Title:</span>
+                                    <p className="font-medium text-gray-900 dark:text-slate-100">{selectedCase.title}</p>
                                   </div>
                                   <div>
-                                    <span className="text-gray-600">Specialty:</span>
-                                    <p className="font-medium text-gray-900">{selectedCase.specialty}</p>
+                                    <span className="text-gray-600 dark:text-slate-400">Specialty:</span>
+                                    <p className="font-medium text-gray-900 dark:text-slate-100">{selectedCase.specialty}</p>
                                   </div>
                                   <div>
-                                    <span className="text-gray-600">Time:</span>
-                                    <p className="font-medium text-gray-900">
+                                    <span className="text-gray-600 dark:text-slate-400">Time:</span>
+                                    <p className="font-medium text-gray-900 dark:text-slate-100">
                                       ~{selectedCase.difficulty === 'beginner' ? '20' : selectedCase.difficulty === 'intermediate' ? '30' : '45'} min
                                     </p>
                                   </div>
                                   <div>
-                                    <span className="text-gray-600">Symptoms:</span>
-                                    <p className="font-medium text-gray-900">{selectedCase.symptoms.length}</p>
+                                    <span className="text-gray-600 dark:text-slate-400">Symptoms:</span>
+                                    <p className="font-medium text-gray-900 dark:text-slate-100">{selectedCase.symptoms.length}</p>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Patient Profile */}
-                              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                                <h4 className="font-semibold text-blue-900 mb-2 text-sm flex items-center gap-1">
+                              <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-3 border border-blue-200 dark:border-blue-500/25">
+                                <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-2 text-sm flex items-center gap-1">
                                   <User className="h-3 w-3" />
                                   Patient Profile
                                 </h4>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   <div>
-                                    <span className="text-blue-700">Name:</span>
-                                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.name}</p>
+                                    <span className="text-blue-700 dark:text-blue-300">Name:</span>
+                                    <p className="font-medium text-blue-900 dark:text-blue-200">{selectedCase.patientProfile.name}</p>
                                   </div>
                                   <div>
-                                    <span className="text-blue-700">Age:</span>
-                                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.age} years</p>
+                                    <span className="text-blue-700 dark:text-blue-300">Age:</span>
+                                    <p className="font-medium text-blue-900 dark:text-blue-200">{selectedCase.patientProfile.age} years</p>
                                   </div>
                                   <div>
-                                    <span className="text-blue-700">Gender:</span>
-                                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.gender}</p>
+                                    <span className="text-blue-700 dark:text-blue-300">Gender:</span>
+                                    <p className="font-medium text-blue-900 dark:text-blue-200">{selectedCase.patientProfile.gender}</p>
                                   </div>
                                   <div>
-                                    <span className="text-blue-700">Occupation:</span>
-                                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.occupation}</p>
+                                    <span className="text-blue-700 dark:text-blue-300">Occupation:</span>
+                                    <p className="font-medium text-blue-900 dark:text-blue-200">{selectedCase.patientProfile.occupation}</p>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Presenting Symptoms */}
-                              <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                                <h4 className="font-semibold text-orange-900 mb-2 text-sm flex items-center gap-1">
+                              <div className="bg-orange-50 dark:bg-orange-500/10 rounded-lg p-3 border border-orange-200 dark:border-orange-500/25">
+                                <h4 className="font-semibold text-orange-900 dark:text-orange-200 mb-2 text-sm flex items-center gap-1">
                                   <Target className="h-3 w-3" />
                                   Presenting Symptoms
                                 </h4>
                                 <div className="space-y-1">
                                   <div className="text-xs">
-                                    <span className="text-orange-700 font-medium">Primary:</span>
-                                    <p className="text-orange-900">{selectedCase.symptoms[0]}</p>
+                                    <span className="text-orange-700 dark:text-orange-300 font-medium">Primary:</span>
+                                    <p className="text-orange-900 dark:text-orange-200">{selectedCase.symptoms[0]}</p>
                                   </div>
                                   <div className="text-xs">
-                                    <span className="text-orange-700 font-medium">Additional:</span>
+                                    <span className="text-orange-700 dark:text-orange-300 font-medium">Additional:</span>
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {selectedCase.symptoms.slice(1).map((symptom: string, index: number) => (
-                                        <Badge key={index} variant="outline" className="text-xs bg-orange-100 text-orange-800 border-orange-200">
+                                        <Badge key={index} variant="outline" className="text-xs bg-orange-100 dark:bg-orange-500/15 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-500/25">
                                           {symptom}
                                         </Badge>
                                       ))}
@@ -2233,12 +2220,12 @@ Please provide guidance and educational feedback.`,
                               </div>
 
                               {/* Clinical Notes */}
-                              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                                <h4 className="font-semibold text-green-900 mb-2 text-sm flex items-center gap-1">
+                              <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3 border border-green-200 dark:border-emerald-500/25">
+                                <h4 className="font-semibold text-green-900 dark:text-emerald-200 mb-2 text-sm flex items-center gap-1">
                                   <AlertTriangle className="h-3 w-3" />
                                   Clinical Notes
                                 </h4>
-                                <div className="text-xs text-green-800 space-y-1">
+                                <div className="text-xs text-green-800 dark:text-emerald-200 space-y-1">
                                   <p>• Patient alert and oriented</p>
                                   <p>• Initial assessment completed</p>
                                   <p>• Ready for physician evaluation</p>
@@ -2255,18 +2242,18 @@ Please provide guidance and educational feedback.`,
                 <TabsContent value="educational-content" className="space-y-4">
                   {!selectedCase ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Select a patient case to view educational content</p>
                     </div>
                   ) : (
                     <>
                           {/* Learning Objectives */}
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <h3 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                      <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-4 border border-purple-200 dark:border-purple-500/25">
+                        <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-3 flex items-center gap-2">
                           <Target className="h-4 w-4" />
                           Learning Objectives
                         </h3>
-                        <div className="text-sm text-purple-800 space-y-2">
+                        <div className="text-sm text-purple-800 dark:text-purple-200 space-y-2">
                               <p>• Develop differential diagnosis skills for {selectedCase.specialty.toLowerCase()} cases</p>
                               <p>• Practice clinical reasoning and decision-making processes</p>
                               <p>• Learn appropriate questioning techniques for patient interviews</p>
@@ -2276,12 +2263,12 @@ Please provide guidance and educational feedback.`,
                           </div>
 
                           {/* Expected Questions */}
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                        <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                      <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 border border-blue-200 dark:border-blue-500/25">
+                        <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2">
                           <Clock className="h-4 w-4" />
                           Expected Questions ({selectedCase.expectedQuestions?.length || 5})
                         </h3>
-                        <div className="text-sm text-blue-800 space-y-2">
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
                               <p>• What brings you in today?</p>
                               <p>• When did your symptoms start?</p>
                               <p>• Can you describe your symptoms in detail?</p>
@@ -2293,12 +2280,12 @@ Please provide guidance and educational feedback.`,
                           </div>
 
                           {/* Case Complexity */}
-                          <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                        <h3 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
+                          <div className="bg-orange-50 dark:bg-orange-500/10 rounded-lg p-4 border border-orange-200 dark:border-orange-500/25">
+                        <h3 className="font-semibold text-orange-900 dark:text-orange-200 mb-3 flex items-center gap-2">
                           <Activity className="h-4 w-4" />
                           Case Complexity
                         </h3>
-                        <div className="text-sm text-orange-800 space-y-2">
+                        <div className="text-sm text-orange-800 dark:text-orange-200 space-y-2">
                           <p><span className="font-medium">Difficulty Level:</span> <span className="capitalize">{selectedCase.difficulty}</span></p>
                           <p><span className="font-medium">Estimated Duration:</span> 
                             <span className="ml-1">
@@ -2310,18 +2297,18 @@ Please provide guidance and educational feedback.`,
                           <p><span className="font-medium">Focus Areas:</span> History taking, differential diagnosis, clinical reasoning</p>
                           <p><span className="font-medium">Specialty:</span> {selectedCase.specialty}</p>
                           {selectedCase.isRare && (
-                            <p><span className="font-medium text-red-600">Note:</span> This is a rare disease case - consider subtle clues and specialized testing</p>
+                            <p><span className="font-medium text-red-600 dark:text-red-300">Note:</span> This is a rare disease case - consider subtle clues and specialized testing</p>
                           )}
                             </div>
                       </div>
 
                       {/* Clinical Skills */}
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                        <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                      <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-4 border border-green-200 dark:border-emerald-500/25">
+                        <h3 className="font-semibold text-green-900 dark:text-emerald-200 mb-3 flex items-center gap-2">
                           <Stethoscope className="h-4 w-4" />
                           Clinical Skills to Practice
                         </h3>
-                        <div className="text-sm text-green-800 space-y-2">
+                        <div className="text-sm text-green-800 dark:text-emerald-200 space-y-2">
                           <p>• Systematic history taking</p>
                           <p>• Symptom characterization (onset, duration, severity, triggers)</p>
                           <p>• Review of systems</p>
@@ -2338,12 +2325,12 @@ Please provide guidance and educational feedback.`,
                 <TabsContent value="key-points" className="space-y-4">
                   {!selectedCase ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Select a patient case to begin learning</p>
                     </div>
                   ) : conversation.length === 0 ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Start the conversation to see learning insights</p>
                     </div>
                   ) : !learningInsights ? (
@@ -2353,23 +2340,23 @@ Please provide guidance and educational feedback.`,
                     </div>
                   ) : (
                     <>
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                        <h3 className="font-semibold text-blue-900 mb-2">Key Learning Points</h3>
-                        <div className="text-sm text-blue-800">
+                      <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 border border-blue-200 dark:border-blue-500/25">
+                        <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Key Learning Points</h3>
+                        <div className="text-sm text-blue-800 dark:text-blue-200">
                           <MarkdownContent variant="default">{learningInsights.keyPoints || "No key points available yet."}</MarkdownContent>
                         </div>
                       </div>
                       
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                        <h3 className="font-semibold text-green-900 mb-2">Focus Areas</h3>
-                        <div className="text-sm text-green-800">
+                      <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-4 border border-green-200 dark:border-emerald-500/25">
+                        <h3 className="font-semibold text-green-900 dark:text-emerald-200 mb-2">Focus Areas</h3>
+                        <div className="text-sm text-green-800 dark:text-emerald-200">
                           <MarkdownContent variant="default">{learningInsights.focusAreas || "No focus areas available yet."}</MarkdownContent>
                         </div>
                       </div>
                       
-                      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                        <h3 className="font-semibold text-red-900 mb-2">Common Pitfalls</h3>
-                        <div className="text-sm text-red-800">
+                      <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-4 border border-red-200 dark:border-red-500/25">
+                        <h3 className="font-semibold text-red-900 dark:text-red-200 mb-2">Common Pitfalls</h3>
+                        <div className="text-sm text-red-800 dark:text-red-200">
                           <MarkdownContent variant="default">{learningInsights.commonPitfalls || "No common pitfalls identified yet."}</MarkdownContent>
                         </div>
                       </div>
@@ -2380,12 +2367,12 @@ Please provide guidance and educational feedback.`,
                 <TabsContent value="guidelines" className="space-y-4">
                   {!selectedCase ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Select a patient case to view guidelines</p>
                     </div>
                   ) : conversation.length === 0 ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Start the conversation to see clinical guidelines</p>
                     </div>
                   ) : !learningInsights ? (
@@ -2394,9 +2381,9 @@ Please provide guidance and educational feedback.`,
                       <p>Loading clinical guidelines...</p>
                     </div>
                   ) : (
-                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                      <h3 className="font-semibold text-yellow-900 mb-2">Clinical Guidelines</h3>
-                      <div className="text-sm text-yellow-800">
+                    <div className="bg-yellow-50 dark:bg-yellow-500/10 rounded-lg p-4 border border-yellow-200 dark:border-yellow-500/25">
+                      <h3 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Clinical Guidelines</h3>
+                      <div className="text-sm text-yellow-800 dark:text-yellow-200">
                         <MarkdownContent variant="default">{learningInsights.clinicalGuidelines || "No clinical guidelines available yet."}</MarkdownContent>
                       </div>
                     </div>
@@ -2406,12 +2393,12 @@ Please provide guidance and educational feedback.`,
                 <TabsContent value="pearls" className="space-y-4">
                   {!selectedCase ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Select a patient case to view clinical pearls</p>
                     </div>
                   ) : conversation.length === 0 ? (
                     <div className="text-center text-gray-500 mt-20">
-                      <Lightbulb className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <Lightbulb className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
                       <p>Start the conversation to see clinical pearls</p>
                     </div>
                   ) : !learningInsights ? (
@@ -2420,9 +2407,9 @@ Please provide guidance and educational feedback.`,
                       <p>Loading clinical pearls...</p>
                     </div>
                   ) : (
-                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                      <h3 className="font-semibold text-purple-900 mb-2">Clinical Pearls</h3>
-                      <div className="text-sm text-purple-800">
+                    <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-4 border border-purple-200 dark:border-purple-500/25">
+                      <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2">Clinical Pearls</h3>
+                      <div className="text-sm text-purple-800 dark:text-purple-200">
                         <MarkdownContent variant="default">{learningInsights.clinicalPearls || "No clinical pearls available yet."}</MarkdownContent>
                       </div>
                     </div>
@@ -2439,7 +2426,7 @@ Please provide guidance and educational feedback.`,
         <div className={`${embedInAppShell ? "absolute" : "fixed"} bottom-6 right-6 z-50`}>
           <Button
             onClick={() => setIsDoctorChatOpen(true)}
-            className="rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 animate-bounce"
+            className="rounded-full shadow-lg bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white px-6 py-3 animate-bounce"
             size="lg"
           >
             <Brain className="h-5 w-5 mr-2" />
@@ -2452,7 +2439,7 @@ Please provide guidance and educational feedback.`,
       {/* Enhanced Student-Doctor Chat Box - Only visible in copilot mode */}
       {copilotMode && isDoctorChatOpen && (
         <div 
-          className={`${floatLayer} w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 transition-all duration-300 ${
+          className={`${floatLayer} z-50 w-80 rounded-lg border border-gray-200 bg-white shadow-xl transition-all duration-300 dark:border-white/10 dark:bg-white/[0.06] dark:backdrop-blur-md ${
             isDoctorChatMinimized ? 'h-12' : 'h-96'
           }`}
           style={{
@@ -2463,11 +2450,11 @@ Please provide guidance and educational feedback.`,
           onMouseDown={handleChatMouseDown}
         >
           {/* Chat Header */}
-          <div className="chat-header p-3 border-b bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg cursor-move">
+          <div className="chat-header p-3 border-b bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg cursor-move dark:from-blue-500/15 dark:to-purple-500/15 dark:border-white/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Brain className="h-4 w-4 text-blue-600" />
-                <h3 className="font-semibold text-blue-900 text-sm">Ask Doctor</h3>
+                <Brain className="h-4 w-4 text-blue-600 dark:text-blue-300" />
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200 text-sm">Ask Doctor</h3>
                 {studentDoctorChat.length > 0 && (
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 )}
@@ -2477,7 +2464,7 @@ Please provide guidance and educational feedback.`,
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsDoctorChatMinimized(!isDoctorChatMinimized)}
-                  className="h-6 w-6 p-0 hover:bg-blue-100"
+                  className="h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-500/20"
                 >
                   {isDoctorChatMinimized ? '↑' : '↓'}
                 </Button>
@@ -2488,14 +2475,14 @@ Please provide guidance and educational feedback.`,
                     setIsDoctorChatOpen(false)
                     setIsDoctorChatMinimized(false)
                   }}
-                  className="h-6 w-6 p-0 hover:bg-red-100"
+                  className="h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-500/20"
                 >
                   ×
                 </Button>
               </div>
             </div>
             {!isDoctorChatMinimized && (
-              <p className="text-xs text-blue-700 mt-1">Ask questions to the AI doctor</p>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">Ask questions to the AI doctor</p>
             )}
           </div>
           
@@ -2504,10 +2491,10 @@ Please provide guidance and educational feedback.`,
             <>
               <div className="h-64 overflow-y-auto p-3 space-y-2">
                 {studentDoctorChat.length === 0 && (
-                  <div className="text-center text-gray-500 text-sm py-8">
-                    <Brain className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <div className="py-8 text-center text-sm text-gray-500 dark:text-slate-400">
+                    <Brain className="mx-auto mb-2 h-8 w-8 text-gray-300 dark:text-slate-600" />
                     <p>Ask the doctor any questions about the case</p>
-                    <p className="text-xs mt-1">Get guidance on clinical reasoning</p>
+                    <p className="mt-1 text-xs">Get guidance on clinical reasoning</p>
                   </div>
                 )}
                 
@@ -2515,19 +2502,19 @@ Please provide guidance and educational feedback.`,
                   <div key={idx} className="space-y-1">
                     {msg.role === "student" && (
                       <div className="flex justify-end">
-                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-2 max-w-xs text-sm shadow-sm">
+                        <div className="max-w-xs rounded-lg bg-gradient-to-r from-primary-500 to-primary-700 p-2 text-sm text-white shadow-sm">
                           <p>{msg.content}</p>
                         </div>
                       </div>
                     )}
                     
                     {msg.role === "doctor" && (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-2 text-sm border border-gray-200">
-                        <div className="flex items-center gap-1 mb-1">
-                          <Brain className="h-3 w-3 text-blue-600" />
-                          <span className="text-xs font-medium text-blue-600">Doctor</span>
+                        <div className="rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-2 text-sm dark:border-white/10 dark:from-white/[0.06] dark:to-white/[0.03]">
+                        <div className="mb-1 flex items-center gap-1">
+                          <Brain className="h-3 w-3 text-primary-600 dark:text-primary-300" />
+                          <span className="text-xs font-medium text-primary-700 dark:text-primary-200">Doctor</span>
                         </div>
-                        <div className="text-gray-800 text-left">
+                        <div className="text-left text-gray-800 dark:text-slate-200">
                           <MarkdownContent variant="chatPatient">{msg.content}</MarkdownContent>
                         </div>
                       </div>
@@ -2536,26 +2523,26 @@ Please provide guidance and educational feedback.`,
                 ))}
                 
                 {isDoctorResponding && (
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-2 text-sm border border-gray-200">
-                    <div className="flex items-center gap-1 mb-1">
-                      <Brain className="h-3 w-3 text-blue-600" />
-                      <span className="text-xs font-medium text-blue-600">Doctor</span>
-                      <div className="flex gap-1 ml-2">
-                        <div className="w-1 h-1 bg-blue-400 rounded-full animate-bounce"></div>
-                        <div className="w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                        <div className="w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <div className="rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-2 text-sm dark:border-white/10 dark:from-white/[0.06] dark:to-white/[0.03]">
+                    <div className="mb-1 flex items-center gap-1">
+                      <Brain className="h-3 w-3 text-primary-600 dark:text-primary-300" />
+                      <span className="text-xs font-medium text-primary-700 dark:text-primary-200">Doctor</span>
+                      <div className="ml-2 flex gap-1">
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-400"></div>
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-400" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-400" style={{ animationDelay: "0.2s" }}></div>
                       </div>
                     </div>
-                    <p className="text-gray-500">Doctor is thinking...</p>
+                    <p className="text-gray-500 dark:text-slate-400">Doctor is thinking...</p>
                   </div>
                 )}
               </div>
               
               {/* Chat Input */}
-              <div className="p-3 border-t bg-gray-50 rounded-b-lg">
+              <div className="p-3 border-t bg-gray-50 dark:bg-white/[0.04] rounded-b-lg">
                 <div className="flex items-center gap-2">
                   <Input
-                    className="flex-1 text-sm border-gray-200 focus:border-blue-300"
+                    className="flex-1 border-gray-200 text-sm focus:border-primary-300 dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-primary-500"
                     value={studentQuestion}
                     onChange={(e) => setStudentQuestion(e.target.value)}
                     placeholder="Ask the doctor..."
@@ -2568,7 +2555,7 @@ Please provide guidance and educational feedback.`,
                     onClick={handleStudentToDoctorQuestion}
                     disabled={isDoctorResponding || !studentQuestion.trim()}
                     size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    className="bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800"
                   >
                     <Send className="h-3 w-3" />
                   </Button>
@@ -2581,7 +2568,7 @@ Please provide guidance and educational feedback.`,
 
       {/* Evaluation Mode Landing Page */}
       {isEvaluationMode && showEvaluationLanding && (
-        <div className={`${overlayLayer} inset-0 bg-gradient-to-br from-red-50 via-white to-orange-50 overflow-y-auto z-50`}>
+        <div className={`${overlayLayer} inset-0 bg-gradient-to-br from-red-50 via-white to-orange-50 overflow-y-auto z-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950`}>
           <div className="min-h-screen">
             <div className="container mx-auto px-4 py-8">
               {/* Header */}
@@ -2590,13 +2577,13 @@ Please provide guidance and educational feedback.`,
                   <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-full flex items-center justify-center">
                     <Brain className="h-6 w-6 text-white" />
                   </div>
-                  <h1 className="text-4xl font-bold text-gray-900">AI Evaluation Mode</h1>
+                  <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">AI Evaluation Mode</h1>
                 </div>
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Target className="h-5 w-5 text-red-600" />
-                  <p className="text-lg text-gray-600">Master Clinical Skills Through AI-Powered Assessment</p>
+                  <Target className="h-5 w-5 text-red-600 dark:text-red-300" />
+                  <p className="text-lg text-gray-600 dark:text-slate-400">Master Clinical Skills Through AI-Powered Assessment</p>
                 </div>
-                <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
                   Transform your medical education with interactive, AI-powered evaluation experiences. 
                   Develop clinical reasoning, improve patient communication, and build confidence through realistic case scenarios.
                 </p>
@@ -2605,25 +2592,25 @@ Please provide guidance and educational feedback.`,
               {/* Skill Cards */}
               <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
                 <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Brain className="h-6 w-6 text-red-600" />
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Brain className="h-6 w-6 text-red-600 dark:text-red-300" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Clinical Reasoning</h3>
-                  <p className="text-sm text-gray-600">Develop systematic approaches</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2">Clinical Reasoning</h3>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Develop systematic approaches</p>
                 </Card>
                 <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-6 w-6 text-red-600" />
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-6 w-6 text-red-600 dark:text-red-300" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Patient Communication</h3>
-                  <p className="text-sm text-gray-600">Practice interview techniques</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2">Patient Communication</h3>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Practice interview techniques</p>
                 </Card>
                 <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Target className="h-6 w-6 text-red-600" />
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Target className="h-6 w-6 text-red-600 dark:text-red-300" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Diagnostic Skills</h3>
-                  <p className="text-sm text-gray-600">Build differential diagnosis</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2">Diagnostic Skills</h3>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Build differential diagnosis</p>
                 </Card>
               </div>
 
@@ -2632,25 +2619,25 @@ Please provide guidance and educational feedback.`,
                 {/* Generate New Case */}
                 <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer group" onClick={handleNavigateToGenerate}>
                   <CardHeader className="text-center pb-4">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                       <Sparkles className="h-8 w-8 text-white" />
                     </div>
-                    <CardTitle className="text-2xl text-gray-900">Generate New Case</CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardTitle className="text-2xl text-gray-900 dark:text-slate-100">Generate New Case</CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-slate-400">
                       Create a personalized evaluation experience tailored to your
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-900">Customization Options:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-semibold text-gray-900 dark:text-slate-100">Customization Options:</h4>
+                      <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                         <li>• Choose specialty (Cardiology, Neurology, etc.)</li>
                         <li>• Set difficulty level (Beginner to Advanced)</li>
                         <li>• Toggle rare disease cases</li>
                         <li>• Select case type (Emergency, Outpatient, Chronic)</li>
                       </ul>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white">
+                    <Button className="w-full bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Generate Case
                     </Button>
@@ -2660,25 +2647,25 @@ Please provide guidance and educational feedback.`,
                 {/* Select Existing Case */}
                 <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer group" onClick={handleNavigateToSelect}>
                   <CardHeader className="text-center pb-4">
-                    <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 bg-gradient-to-r from-primary-600 to-primary-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                       <FileText className="h-8 w-8 text-white" />
                     </div>
-                    <CardTitle className="text-2xl text-gray-900">Browse Cases</CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardTitle className="text-2xl text-gray-900 dark:text-slate-100">Browse Cases</CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-slate-400">
                       Explore our comprehensive library of carefully curated
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-900">Available Cases:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-semibold text-gray-900 dark:text-slate-100">Available Cases:</h4>
+                      <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                         <li>• {sampleCases.length} pre-built cases</li>
                         <li>• Multiple specialties covered</li>
                         <li>• Various difficulty levels</li>
                         <li>• Both common and rare diseases</li>
                       </ul>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white">
+                    <Button className="w-full bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 text-white">
                       <FileText className="h-4 w-4 mr-2" />
                       Browse Cases
                     </Button>
@@ -2703,17 +2690,17 @@ Please provide guidance and educational feedback.`,
       {/* Case Generation Form Modal */}
       {isEvaluationMode && showCaseGenerationForm && (
         <div className={`${overlayLayer} inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50`}>
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl dark:border-white/10 dark:bg-white/[0.08] dark:backdrop-blur-md">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-t-lg border-b">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-t-lg border-b dark:from-purple-500/10 dark:to-blue-500/10 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Brain className="h-5 w-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/15 rounded-full flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-purple-600 dark:text-purple-300" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Generate New Case</h2>
-                    <p className="text-sm text-gray-600">Customize your evaluation case</p>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Generate New Case</h2>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Customize your evaluation case</p>
                   </div>
                 </div>
                 <Button
@@ -2810,7 +2797,7 @@ Please provide guidance and educational feedback.`,
                 <Button
                   onClick={handleGenerateNewCase}
                   disabled={isGeneratingCase}
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+                  className="flex-1 bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white"
                 >
                   {isGeneratingCase ? (
                     <>
@@ -2832,17 +2819,17 @@ Please provide guidance and educational feedback.`,
 
       {/* Case Selection Page */}
       {isEvaluationMode && showCaseSelection && (
-        <div className={`${overlayLayer} inset-0 bg-gray-50 overflow-y-auto z-50`}>
+        <div className={`${overlayLayer} inset-0 bg-gray-50 dark:bg-gray-950/95 overflow-y-auto z-50`}>
           <div className="min-h-screen">
             {/* Header */}
-            <div className="bg-white border-b px-6 py-4">
+            <div className="border-b border-gray-200 bg-white px-6 py-4 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold text-gray-900">Evaluation Mode</h1>
-                    <p className="text-sm text-gray-600">Select a case for evaluation</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Evaluation Mode</h1>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Select a case for evaluation</p>
                   </div>
-                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                  <Badge variant="outline" className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/25">
                     Evaluation Mode
                   </Badge>
                 </div>
@@ -2867,7 +2854,7 @@ Please provide guidance and educational feedback.`,
                   </Link>
                   <Button
                     onClick={() => setShowCaseGenerationForm(true)}
-                    className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+                    className="bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white"
                   >
                     <Brain className="h-4 w-4 mr-2" />
                     Generate New Case
@@ -2883,8 +2870,8 @@ Please provide guidance and educational feedback.`,
                   <Card key={caseItem.id} className="hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={() => handleCaseSelection(caseItem.id)}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg group-hover:text-red-600 transition-colors">{caseItem.title}</CardTitle>
-                        <Badge variant="outline" className={caseItem.difficulty === 'beginner' ? 'bg-green-100 text-green-800' : caseItem.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}>
+                        <CardTitle className="text-lg group-hover:text-red-600 dark:group-hover:text-red-300 transition-colors">{caseItem.title}</CardTitle>
+                        <Badge variant="outline" className={caseItem.difficulty === 'beginner' ? 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-500/25' : caseItem.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-200 dark:border-yellow-500/25' : 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-200 dark:border-red-500/25'}>
                           {caseItem.difficulty}
                         </Badge>
                       </div>
@@ -2893,17 +2880,17 @@ Please provide guidance and educational feedback.`,
                     <CardContent>
                       <div className="space-y-4">
                         {/* Case Info Template */}
-                        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <div className="bg-gray-50 dark:bg-white/[0.04] rounded-lg p-4 space-y-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Age</span>
+                            <span className="text-gray-600 dark:text-slate-400">Age</span>
                             <span className="font-medium">{caseItem.patientProfile.age}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Symptoms</span>
+                            <span className="text-gray-600 dark:text-slate-400">Symptoms</span>
                             <span className="font-medium">{caseItem.symptoms.length}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Duration</span>
+                            <span className="text-gray-600 dark:text-slate-400">Duration</span>
                             <span className="font-medium">
                               ~{caseItem.difficulty === 'beginner' ? '20' : caseItem.difficulty === 'intermediate' ? '30' : '45'} min
                             </span>
@@ -2912,26 +2899,26 @@ Please provide guidance and educational feedback.`,
 
                         {/* Patient Profile */}
                         <div className="space-y-2">
-                          <h4 className="font-semibold text-sm text-gray-900">Patient Profile</h4>
+                          <h4 className="font-semibold text-sm text-gray-900 dark:text-slate-100">Patient Profile</h4>
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="flex items-center gap-1">
                               <User className="h-3 w-3 text-gray-500" />
-                              <span className="text-gray-600">Name:</span>
+                              <span className="text-gray-600 dark:text-slate-400">Name:</span>
                               <span className="font-medium">{caseItem.patientProfile.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3 text-gray-500" />
-                              <span className="text-gray-600">Age:</span>
+                              <span className="text-gray-600 dark:text-slate-400">Age:</span>
                               <span className="font-medium">{caseItem.patientProfile.age}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Users className="h-3 w-3 text-gray-500" />
-                              <span className="text-gray-600">Gender:</span>
+                              <span className="text-gray-600 dark:text-slate-400">Gender:</span>
                               <span className="font-medium">{caseItem.patientProfile.gender}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Briefcase className="h-3 w-3 text-gray-500" />
-                              <span className="text-gray-600">Occupation:</span>
+                              <span className="text-gray-600 dark:text-slate-400">Occupation:</span>
                               <span className="font-medium">{caseItem.patientProfile.occupation}</span>
                             </div>
                           </div>
@@ -2939,7 +2926,7 @@ Please provide guidance and educational feedback.`,
 
                         {/* Presenting Symptoms */}
                         <div className="space-y-2">
-                          <h4 className="font-semibold text-sm text-gray-900">Presenting Symptoms</h4>
+                          <h4 className="font-semibold text-sm text-gray-900 dark:text-slate-100">Presenting Symptoms</h4>
                           <div className="flex flex-wrap gap-1">
                             {caseItem.symptoms.map((symptom, index) => (
                               <Badge key={index} variant="secondary" className="text-xs">
@@ -2958,155 +2945,6 @@ Please provide guidance and educational feedback.`,
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Nurse Report Modal for Evaluation Mode */}
-      {isEvaluationMode && showNurseReport && selectedCase && (
-        <div className={`${overlayLayer} inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50`}>
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-t-lg border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">Nurse Report</h2>
-                    <p className="text-sm text-gray-600">Initial Patient Assessment</p>
-                  </div>
-                </div>
-                <Badge variant="outline" className="bg-white text-blue-700 border-blue-200">
-                  {selectedCase.difficulty}
-                </Badge>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Case Overview */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Stethoscope className="h-4 w-4 text-blue-600" />
-                  Case Overview
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-600">Chief Complaint:</span>
-                    <p className="font-medium text-gray-900">{selectedCase.symptoms[0]}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Specialty:</span>
-                    <p className="font-medium text-gray-900">{selectedCase.specialty}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Case Complexity:</span>
-                    <p className="font-medium text-gray-900 capitalize">{selectedCase.difficulty}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Estimated Duration:</span>
-                    <p className="font-medium text-gray-900">
-                      ~{selectedCase.difficulty === 'beginner' ? '20' : selectedCase.difficulty === 'intermediate' ? '30' : '45'} min
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Patient Profile */}
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Patient Profile
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-blue-700">Name:</span>
-                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.name}</p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Age:</span>
-                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.age} years old</p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Gender:</span>
-                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.gender}</p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Occupation:</span>
-                    <p className="font-medium text-blue-900">{selectedCase.patientProfile.occupation}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Presenting Symptoms */}
-              <div className="bg-orange-50 rounded-lg p-4">
-                <h3 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Presenting Symptoms
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-orange-700">Primary Complaint:</span>
-                    <span className="font-medium text-orange-900">{selectedCase.symptoms[0]}</span>
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-orange-700">Additional Symptoms:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {selectedCase.symptoms.slice(1).map((symptom: string, index: number) => (
-                        <Badge key={index} variant="outline" className="text-xs bg-orange-100 text-orange-800 border-orange-200">
-                          {symptom}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Clinical Notes */}
-              <div className="bg-green-50 rounded-lg p-4">
-                <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Clinical Notes
-                </h3>
-                <div className="text-sm text-green-800 space-y-2">
-                  <p>• Patient arrived via {selectedCase.caseType === 'emergency' ? 'emergency department' : 'outpatient clinic'}</p>
-                  <p>• Initial assessment completed by nursing staff</p>
-                  <p>• Patient is alert and oriented x3 (person, place, time)</p>
-                  <p>• Vital signs: BP 120/80, HR 72, RR 16, Temp 98.6°F</p>
-                  <p>• No immediate life-threatening conditions observed</p>
-                  <p>• Patient appears comfortable at rest</p>
-                  <p>• Ready for physician evaluation</p>
-                </div>
-              </div>
-
-              {/* Initial Assessment */}
-              <div className="bg-orange-50 rounded-lg p-4">
-                <h3 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
-                  <Activity className="h-4 w-4" />
-                  Initial Assessment
-                </h3>
-                <div className="text-sm text-orange-800 space-y-2">
-                  <p>• Patient reports {selectedCase.symptoms[0].toLowerCase()}</p>
-                  <p>• Onset: {selectedCase.difficulty === 'beginner' ? 'Gradual' : selectedCase.difficulty === 'intermediate' ? 'Subacute' : 'Variable'} presentation</p>
-                  <p>• Severity: {selectedCase.difficulty === 'beginner' ? 'Mild to moderate' : selectedCase.difficulty === 'intermediate' ? 'Moderate' : 'Moderate to severe'}</p>
-                  <p>• Associated symptoms: {selectedCase.symptoms.slice(1).join(", ")}</p>
-                  <p>• No known drug allergies</p>
-                  <p>• Previous medical history: {selectedCase.difficulty === 'beginner' ? 'Unremarkable' : 'Requires further evaluation'}</p>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <div className="pt-4 border-t">
-                <Button 
-                  onClick={handleStartCaseFromNurseReport}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 text-lg"
-                >
-                  <Stethoscope className="h-5 w-5 mr-2" />
-                  Begin Patient Interview
-                </Button>
               </div>
             </div>
           </div>

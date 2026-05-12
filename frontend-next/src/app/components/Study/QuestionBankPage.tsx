@@ -42,6 +42,8 @@ import {
 } from "@/app/services/student";
 import ReportQuestionButton from "@/app/components/Launch/ReportQuestionButton";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"] as const;
 const QUESTION_TYPES = [
@@ -323,10 +325,10 @@ export default function QuestionBankPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Question Bank</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Question Bank</h1>
           <p className="text-muted-foreground mt-2">
             Browse and practice from the live medical question database
           </p>
@@ -357,7 +359,7 @@ export default function QuestionBankPage() {
         </div>
       )}
 
-      <Card>
+      <Card className={cn(APP_GLASS_CARD)}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -474,47 +476,47 @@ export default function QuestionBankPage() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Questions</p>
                 <p className="text-2xl font-bold">{questions.length}</p>
               </div>
-              <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <BookOpen className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Filtered</p>
                 <p className="text-2xl font-bold">{filteredQuestions.length}</p>
               </div>
-              <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
+              <Target className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Selected</p>
                 <p className="text-2xl font-bold">{selected.size}</p>
               </div>
-              <Check className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              <Check className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Bookmarked</p>
                 <p className="text-2xl font-bold">{bookmarkedIds.size}</p>
               </div>
-              <Bookmark className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+              <Bookmark className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
           </CardContent>
         </Card>
@@ -524,11 +526,13 @@ export default function QuestionBankPage() {
         {filteredQuestions.map((q) => (
           <Card
             key={q.id}
-            className={`transition-all duration-200 ${
+            className={cn(
+              APP_GLASS_CARD,
+              "transition-all duration-200",
               selected.has(q.id)
                 ? "ring-2 ring-primary bg-primary/5"
                 : "hover:shadow-md"
-            }`}
+            )}
           >
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
@@ -616,7 +620,7 @@ export default function QuestionBankPage() {
         ))}
 
         {!loading && filteredQuestions.length === 0 && (
-          <Card>
+          <Card className={cn(APP_GLASS_CARD)}>
             <CardContent className="p-12 text-center">
               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No questions found</h3>
@@ -648,7 +652,7 @@ export default function QuestionBankPage() {
       </div>
 
       {selected.size > 0 && (
-        <Card className="sticky bottom-4">
+        <Card className={cn(APP_GLASS_CARD, "sticky bottom-4")}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
@@ -718,7 +722,7 @@ function PreviewModal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <Card className={cn(APP_GLASS_CARD, "w-full max-w-3xl max-h-[90vh] overflow-y-auto")}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Question Preview</CardTitle>

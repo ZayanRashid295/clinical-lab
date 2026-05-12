@@ -32,6 +32,8 @@ import {
   type CreateNotePayload,
 } from "@/app/services/student";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const COLOR_CHOICES = [
   { id: "yellow", className: "bg-yellow-100 dark:bg-yellow-900/30" },
@@ -177,13 +179,13 @@ export default function NotesPage() {
 
   const colorClass = (c?: string | null) =>
     COLOR_CHOICES.find((x) => x.id === c)?.className ??
-    "bg-white dark:bg-gray-800/50";
+    "bg-white dark:bg-white/5";
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Notes</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Notes</h1>
           <p className="text-muted-foreground mt-2">
             Capture pearls, mnemonics and review pieces in one place
           </p>
@@ -210,23 +212,23 @@ export default function NotesPage() {
           label="Total notes"
           value={stats?.total ?? notes.length}
           icon={FileText}
-          color="text-blue-600 dark:text-blue-400"
+          color="text-primary-600 dark:text-primary-400"
         />
         <StatTile
           label="Pinned"
           value={stats?.pinned ?? notes.filter((n) => n.pinned).length}
           icon={Star}
-          color="text-yellow-500"
+          color="text-primary-600 dark:text-primary-400"
         />
         <StatTile
           label="Updated this week"
           value={stats?.recent ?? 0}
           icon={Clock}
-          color="text-emerald-600 dark:text-emerald-400"
+          color="text-primary-600 dark:text-primary-400"
         />
       </div>
 
-      <Card>
+      <Card className={cn(APP_GLASS_CARD)}>
         <CardContent className="p-4">
           <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -244,7 +246,10 @@ export default function NotesPage() {
         {filtered.map((n) => (
           <Card
             key={n.id}
-            className={`${colorClass(n.color)} border border-gray-200 dark:border-gray-700`}
+            className={cn(
+              colorClass(n.color),
+              "border border-slate-200/90 shadow-sm dark:border-white/10"
+            )}
           >
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
@@ -303,7 +308,7 @@ export default function NotesPage() {
         </Card>
         ))}
         {!loading && filtered.length === 0 && (
-          <Card className="md:col-span-2 lg:col-span-3">
+          <Card className={cn(APP_GLASS_CARD, "md:col-span-2 lg:col-span-3")}>
             <CardContent className="p-12 text-center">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No notes yet</h3>
@@ -321,7 +326,7 @@ export default function NotesPage() {
 
       {showEditor && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <Card className={cn(APP_GLASS_CARD, "w-full max-w-2xl max-h-[90vh] overflow-y-auto")}>
           <CardHeader>
             <div className="flex items-center justify-between">
                 <CardTitle>{editing ? "Edit note" : "New note"}</CardTitle>
@@ -448,7 +453,7 @@ function StatTile({
   color: string;
 }) {
   return (
-    <Card>
+    <Card className={cn(APP_GLASS_CARD)}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>

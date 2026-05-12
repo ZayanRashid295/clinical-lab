@@ -135,10 +135,28 @@
   background-color: var(--app-bg);
   color: var(--app-text);
 }
+
+.dark .medprep-app-shell {
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    rgb(3 7 18),
+    rgb(17 24 39),
+    rgb(3 7 18)
+  );
+}
+
 .medprep-app-shell-header {
   background-color: var(--app-surface);
   color: var(--app-text);
   border-color: var(--app-border);
+}
+
+.dark .medprep-app-shell-header {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Global dark-mode synchronization across legacy utility-heavy pages.
@@ -149,27 +167,30 @@
   color: var(--app-text);
 }
 
+/* NOTE: these legacy overrides are intentionally NOT marked !important so that
+   explicit Tailwind `dark:` variants (e.g. dark:bg-white/5) on individual
+   elements take precedence over the fallback dark surface. */
 .dark .bg-white,
 .dark .bg-gray-50,
 .dark .bg-gray-100 {
-  background-color: var(--app-surface) !important;
+  background-color: var(--app-surface);
 }
 
 .dark .bg-gray-200 {
-  background-color: var(--app-elevated) !important;
+  background-color: var(--app-elevated);
 }
 
 .dark .text-black,
 .dark .text-gray-900,
 .dark .text-gray-800,
 .dark .text-gray-700 {
-  color: var(--app-text) !important;
+  color: var(--app-text);
 }
 
 .dark .text-gray-600,
 .dark .text-gray-500,
 .dark .text-gray-400 {
-  color: var(--app-muted) !important;
+  color: var(--app-muted);
 }
 
 .dark .border-gray-50,
@@ -177,7 +198,7 @@
 .dark .border-gray-200,
 .dark .border-gray-300,
 .dark .border-gray-400 {
-  border-color: var(--app-border) !important;
+  border-color: var(--app-border);
 }
 
 .dark .shadow-sm,
@@ -185,7 +206,7 @@
 .dark .shadow-md,
 .dark .shadow-lg,
 .dark .shadow-xl {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 /* Tables and list surfaces */
@@ -195,13 +216,13 @@
 .dark tr,
 .dark td,
 .dark th {
-  border-color: var(--app-border) !important;
+  border-color: var(--app-border);
 }
 
 .dark th,
 .dark thead tr {
-  background-color: var(--app-elevated) !important;
-  color: var(--app-text) !important;
+  background-color: var(--app-elevated);
+  color: var(--app-text);
 }
 
 .dark tr,
@@ -214,14 +235,14 @@
 .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .dark select,
 .dark textarea {
-  background-color: var(--app-elevated) !important;
-  color: var(--app-text) !important;
-  border-color: var(--app-border) !important;
+  background-color: var(--app-elevated);
+  color: var(--app-text);
+  border-color: var(--app-border);
 }
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: var(--app-muted) !important;
+  color: var(--app-muted);
 }
 
 /* Common UI shells */
@@ -229,9 +250,50 @@
 .dark [role="dialog"],
 .dark .modal,
 .dark [data-radix-popper-content-wrapper] > div {
-  background-color: var(--app-surface) !important;
-  color: var(--app-text) !important;
-  border-color: var(--app-border) !important;
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+/* shadcn token defaults are hardcoded white/light in tailwind.config.js; flip them in dark mode.
+   No !important so explicit `dark:` utilities on individual elements still win. */
+.dark .bg-card {
+  background-color: var(--app-surface);
+}
+.dark .text-card-foreground {
+  color: var(--app-text);
+}
+.dark .bg-background {
+  background-color: var(--app-bg);
+}
+.dark .text-foreground {
+  color: var(--app-text);
+}
+.dark .bg-muted {
+  background-color: var(--app-elevated);
+}
+.dark .text-muted-foreground {
+  color: var(--app-muted);
+}
+.dark .bg-secondary {
+  background-color: var(--app-elevated);
+}
+.dark .text-secondary-foreground {
+  color: var(--app-text);
+}
+.dark .bg-accent {
+  background-color: var(--app-elevated);
+}
+.dark .text-accent-foreground {
+  color: var(--app-text);
+}
+.dark .border-border {
+  border-color: var(--app-border);
+}
+.dark [data-slot="card"] {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
 }
 
 /* Keep neutral badges dark-aware while preserving semantic accent badges */
@@ -239,8 +301,8 @@
 .dark .bg-slate-100,
 .dark .bg-zinc-50,
 .dark .bg-zinc-100 {
-  background-color: var(--app-elevated) !important;
-  color: var(--app-text) !important;
+  background-color: var(--app-elevated);
+  color: var(--app-text);
 }
 
 /* Convert pastel semantic backgrounds to subtle accent tint in dark mode */
@@ -260,8 +322,8 @@
 .dark .bg-indigo-100,
 .dark .bg-pink-50,
 .dark .bg-pink-100 {
-  background-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.1) !important;
-  border-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.25) !important;
+  background-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.1);
+  border-color: rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.25);
 }
 
 .dark .text-blue-900,
@@ -280,5 +342,5 @@
 .dark .text-indigo-800,
 .dark .text-pink-900,
 .dark .text-pink-800 {
-  color: var(--app-text) !important;
+  color: var(--app-text);
 }

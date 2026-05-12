@@ -30,6 +30,12 @@ import { authService } from "@/shared";
 import { UserIdentity } from "@/shared/components/Common/UserIdentity";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import { cn } from "@/shared/utils/cn";
+import {
+  APP_GLASS_CARD,
+  APP_PAGE_PADDING,
+  APP_PAGE_SHELL,
+} from "@/app/config/app-shell";
 
 const STATUSES: QuestionReportStatus[] = [
   "OPEN",
@@ -43,24 +49,24 @@ const STATUS: Record<
   QuestionReportStatus,
   { color: string; Icon: any; label: string }
 > = {
-  OPEN: { color: "bg-blue-100 text-blue-700", Icon: AlertCircle, label: "Open" },
+  OPEN: { color: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-200", Icon: AlertCircle, label: "Open" },
   TRIAGED: {
-    color: "bg-amber-100 text-amber-700",
+    color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200",
     Icon: Clock3,
     label: "Triaged",
   },
   ACCEPTED: {
-    color: "bg-emerald-100 text-emerald-700",
+    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200",
     Icon: CheckCircle2,
     label: "Accepted",
   },
   REJECTED: {
-    color: "bg-rose-100 text-rose-700",
+    color: "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-200",
     Icon: XCircle,
     label: "Rejected",
   },
   RESOLVED: {
-    color: "bg-emerald-100 text-emerald-700",
+    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200",
     Icon: CheckCircle2,
     label: "Resolved",
   },
@@ -129,13 +135,19 @@ export default function QuestionReportsPage() {
   }, [items]);
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
+        <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
           {isStaff ? (
-            <ShieldCheck className="text-emerald-600" />
+            <ShieldCheck className="text-emerald-600 dark:text-emerald-400" />
           ) : (
-            <Flag className="text-rose-600" />
+            <Flag className="text-rose-600 dark:text-rose-400" />
           )}
           {isStaff ? "Reports Triage" : "My Question Reports"}
         </h1>
@@ -147,7 +159,7 @@ export default function QuestionReportsPage() {
       </div>
 
       {!isStaff && (
-        <Card className="border-blue-200 bg-blue-50/40 dark:bg-blue-900/10">
+        <Card className="border-blue-200 bg-blue-50/40 dark:border-blue-500/20 dark:bg-blue-950/25 dark:backdrop-blur-md">
           <CardContent className="p-4 flex items-start gap-3 text-sm">
             <ShieldQuestion className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
             <div>
@@ -190,9 +202,12 @@ export default function QuestionReportsPage() {
               <Loader2 className="animate-spin mr-2" /> Loading…
             </div>
           ) : items.length === 0 ? (
-            <Card>
+            <Card className={cn(APP_GLASS_CARD)}>
               <CardContent className="p-12 text-center text-muted-foreground">
-                <Flag className="mx-auto mb-3 text-gray-300" size={42} />
+                <Flag
+                  className="mx-auto mb-3 text-gray-300 dark:text-slate-600"
+                  size={42}
+                />
                 <p className="font-medium">
                   {isStaff
                     ? "No reports to triage."
@@ -216,7 +231,7 @@ export default function QuestionReportsPage() {
 
         {isStaff ? (
           <div className="space-y-4 lg:sticky lg:top-6">
-            <Card>
+            <Card className={cn(APP_GLASS_CARD)}>
               <CardHeader>
                 <CardTitle className="text-base">Overview</CardTitle>
               </CardHeader>
@@ -274,7 +289,7 @@ function ReportRow({
   };
 
   return (
-    <Card>
+    <Card className={cn(APP_GLASS_CARD)}>
       <CardContent className="p-4 flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">

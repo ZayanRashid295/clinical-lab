@@ -112,7 +112,7 @@ export default function StudyCreateTest() {
   };
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen p-6">
+    <div className="min-h-screen space-y-6 bg-gradient-to-b from-gray-50 via-white to-gray-50 p-6 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Test</h1>

@@ -35,6 +35,8 @@ import {
 } from "@/app/services/launch";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const METRICS: { value: GoalMetric; label: string }[] = [
   { value: "QUESTIONS_ANSWERED", label: "Questions answered" },
@@ -146,11 +148,11 @@ export default function GoalsPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Target className="text-blue-600" /> Personal Goals
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-slate-100">
+            <Target className="text-primary-600 dark:text-primary-400" /> Personal Goals
           </h1>
           <p className="text-muted-foreground mt-1">
             Set targets and stay accountable. Progress updates as you study.
@@ -166,7 +168,7 @@ export default function GoalsPage() {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : goals.length === 0 ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-12 text-center text-muted-foreground">
             <Target className="mx-auto mb-3 text-gray-300" size={42} />
             <p className="font-medium">No goals yet.</p>
@@ -180,13 +182,15 @@ export default function GoalsPage() {
             return (
               <Card
                 key={g.id}
-                className={`transition-all ${
+                className={cn(
+                  APP_GLASS_CARD,
+                  "transition-all",
                   g.achievedThisBucket
-                    ? "border-emerald-300 bg-emerald-50/40 dark:bg-emerald-900/10"
+                    ? "border-emerald-300/90 bg-emerald-50/40 dark:border-emerald-600/40 dark:bg-emerald-900/15"
                     : !g.isActive
                       ? "opacity-60"
                       : ""
-                }`}
+                )}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
@@ -254,7 +258,7 @@ export default function GoalsPage() {
 
       {showEditor && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg">
+          <Card className={cn(APP_GLASS_CARD, "w-full max-w-lg")}>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{editing ? "Edit goal" : "New goal"}</CardTitle>
               <Button

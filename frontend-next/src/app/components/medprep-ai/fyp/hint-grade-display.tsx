@@ -61,11 +61,11 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
   }
 
   const getHintUsageLevel = (totalHints: number) => {
-    if (totalHints === 0) return { level: "Perfect", color: "bg-green-100 text-green-800", icon: <CheckCircle className="h-4 w-4" /> }
-    if (totalHints <= 3) return { level: "Minimal", color: "bg-blue-100 text-blue-800", icon: <TrendingUp className="h-4 w-4" /> }
-    if (totalHints <= 7) return { level: "Moderate", color: "bg-yellow-100 text-yellow-800", icon: <Target className="h-4 w-4" /> }
-    if (totalHints <= 10) return { level: "High", color: "bg-orange-100 text-orange-800", icon: <AlertTriangle className="h-4 w-4" /> }
-    return { level: "Excessive", color: "bg-red-100 text-red-800", icon: <XCircle className="h-4 w-4" /> }
+    if (totalHints === 0) return { level: "Perfect", color: "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-200", icon: <CheckCircle className="h-4 w-4" /> }
+    if (totalHints <= 3) return { level: "Minimal", color: "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-200", icon: <TrendingUp className="h-4 w-4" /> }
+    if (totalHints <= 7) return { level: "Moderate", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-200", icon: <Target className="h-4 w-4" /> }
+    if (totalHints <= 10) return { level: "High", color: "bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-200", icon: <AlertTriangle className="h-4 w-4" /> }
+    return { level: "Excessive", color: "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-200", icon: <XCircle className="h-4 w-4" /> }
   }
 
   const hintLevel = getHintUsageLevel(penaltyBreakdown.totalHints)
@@ -73,7 +73,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Main Grade Display */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 dark:border-white/10 dark:from-blue-950/30 dark:to-purple-950/25">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -86,7 +86,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
                   </span>
                   <Badge 
                     variant="secondary" 
-                    className={`text-lg px-3 py-1 ${getGradeColor(finalGrade)} bg-white/80`}
+                    className={`text-lg px-3 py-1 ${getGradeColor(finalGrade)} bg-white/80 dark:bg-white/10`}
                   >
                     {gradeLetter}
                   </Badge>
@@ -94,16 +94,16 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600">Base Grade</p>
-              <p className="text-xl font-semibold text-gray-800">{baseGrade}%</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">Base Grade</p>
+              <p className="text-xl font-semibold text-gray-800 dark:text-slate-100">{baseGrade}%</p>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Grade Breakdown</span>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Grade Breakdown</span>
+              <span className="text-sm text-gray-600 dark:text-slate-400">
                 {baseGrade}% - {hintPenalty}% = {finalGrade}%
               </span>
             </div>
@@ -122,7 +122,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
       </Card>
 
       {/* Hint Usage Analysis */}
-      <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
+      <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 dark:border-white/10 dark:from-orange-950/25 dark:to-red-950/20">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center space-x-2">
             <Lightbulb className="h-5 w-5 text-orange-600" />
@@ -132,12 +132,12 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
         <CardContent>
           <div className="space-y-4">
             {/* Overall Hint Usage */}
-            <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg border">
+            <div className="flex items-center justify-between rounded-lg border border-gray-200/80 bg-white/80 p-3 dark:border-white/10 dark:bg-white/[0.06]">
               <div className="flex items-center space-x-3">
                 {hintLevel.icon}
                 <div>
-                  <p className="font-semibold text-gray-800">Total Hints Used</p>
-                  <p className="text-sm text-gray-600">{penaltyBreakdown.totalHints} hints</p>
+                  <p className="font-semibold text-gray-800 dark:text-slate-100">Total Hints Used</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">{penaltyBreakdown.totalHints} hints</p>
                 </div>
               </div>
               <Badge className={hintLevel.color}>
@@ -148,7 +148,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
             {/* Penalty Breakdown */}
             {showDetailed && (
               <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 flex items-center space-x-2">
+                <h4 className="flex items-center space-x-2 font-semibold text-gray-800 dark:text-slate-100">
                   <BarChart3 className="h-4 w-4" />
                   <span>Penalty Breakdown</span>
                 </h4>
@@ -187,7 +187,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+        <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 dark:border-white/10 dark:from-green-950/25 dark:to-emerald-950/20">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center space-x-2">
               <Brain className="h-5 w-5 text-green-600" />
@@ -197,9 +197,9 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
           <CardContent>
             <div className="space-y-2">
               {recommendations.map((recommendation, index) => (
-                <div key={index} className="flex items-start space-x-2 p-2 bg-white/80 rounded border border-green-200">
+                <div key={index} className="flex items-start space-x-2 rounded border border-green-200 bg-white/80 p-2 dark:border-emerald-500/25 dark:bg-white/[0.06]">
                   <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-gray-700 prose prose-sm max-w-none">
+                  <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-slate-300">
                     <MarkdownContent variant="default">{recommendation}</MarkdownContent>
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export function HintGradeDisplay({ gradeImpact, showDetailed = true, className =
       )}
 
       {/* Performance Insights */}
-      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+      <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 dark:border-white/10 dark:from-purple-950/25 dark:to-indigo-950/20">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center space-x-2">
             <MessageCircle className="h-5 w-5 text-purple-600" />

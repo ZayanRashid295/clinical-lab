@@ -104,11 +104,11 @@ export function QuestionPoolSelector({
   const totalAvailable = stats?.total ?? 0;
 
   return (
-    <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden" data-testid="card-question-pool">
-      <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50">
+    <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5" data-testid="card-question-pool">
+      <div className="border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500" />
-          <h3 className="text-sm font-medium text-foreground dark:text-gray-100">Question Pool</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100">Question Pool</h3>
         </div>
       </div>
       <div className="p-4">
@@ -128,13 +128,13 @@ export function QuestionPoolSelector({
                         : pool.id === "incorrect"
                           ? "bg-red-500 dark:bg-red-600 text-white shadow-sm"
                           : "bg-amber-500 dark:bg-amber-600 text-white shadow-sm"
-                    : "bg-muted/50 dark:bg-gray-700/30 text-muted-foreground hover:bg-muted dark:hover:bg-gray-700/50 hover:text-foreground dark:hover:text-foreground"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/15 dark:hover:text-slate-100"
                 }`}
                 data-testid={`checkbox-${pool.id}`}
               >
                 <div className={`p-1 rounded ${isSelected ? "bg-white/20" : pool.color}`}>{pool.icon}</div>
                 <span className="text-[11px] font-medium">{pool.label}</span>
-                <span className={`text-sm font-bold tabular-nums ${isSelected ? "" : "text-foreground dark:text-gray-100"}`}>
+                <span className={`text-sm font-bold tabular-nums ${isSelected ? "" : "text-gray-900 dark:text-slate-100"}`}>
                   {pool.count.toLocaleString()}
                 </span>
               </button>

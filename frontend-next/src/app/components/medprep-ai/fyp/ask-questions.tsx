@@ -32,6 +32,8 @@ import {
 } from "lucide-react"
 import type { ConversationContext } from "@/lib/fyp/data-models"
 import { aiHintTrackingService } from "@/lib/fyp/ai-hint-tracking-service"
+import { cn } from "@/shared/utils/cn"
+import { APP_GLASS_CARD } from "@/app/config/app-shell"
 
 interface SuggestedQuestion {
   id: string
@@ -215,13 +217,13 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const getImportanceColor = (importance: string) => {
     switch (importance) {
       case "high":
-        return "bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
+        return "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
       case "medium":
-        return "bg-yellow-50 text-yellow-700 border-yellow-300 hover:bg-yellow-100"
+        return "border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-500/25 dark:bg-yellow-500/10 dark:text-yellow-200 dark:hover:bg-yellow-500/20"
       case "low":
-        return "bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
+        return "border-primary-200 bg-primary-50 text-primary-800 hover:bg-primary-100 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200 dark:hover:bg-primary-500/25"
       default:
-        return "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+        return "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
     }
   }
 
@@ -245,17 +247,17 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
       case "history":
-        return "bg-blue-50 text-blue-700 border-blue-200"
+        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200"
       case "assessment":
-        return "bg-purple-50 text-purple-700 border-purple-200"
+        return "border-primary-300 bg-primary-100/80 text-primary-900 dark:border-primary-500/30 dark:bg-primary-500/20 dark:text-primary-100"
       case "examination":
-        return "bg-green-50 text-green-700 border-green-200"
+        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200"
       case "symptoms":
-        return "bg-orange-50 text-orange-700 border-orange-200"
+        return "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/25 dark:bg-orange-950/30 dark:text-orange-200"
       case "impact":
-        return "bg-pink-50 text-pink-700 border-pink-200"
+        return "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-500/25 dark:bg-pink-950/30 dark:text-pink-200"
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200"
+        return "border-gray-200 bg-gray-50 text-gray-700 dark:border-white/15 dark:bg-white/10 dark:text-slate-200"
     }
   }
 
@@ -287,18 +289,18 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
             visibility: isFlipped ? 'hidden' : 'visible'
           }}
         >
-          <Card className="h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 border-2 border-dashed border-emerald-300 hover:border-emerald-400 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
+          <Card className="relative flex h-full items-center justify-center overflow-hidden border-2 border-dashed border-primary-300 bg-gradient-to-br from-primary-50 via-primary-100/80 to-primary-100 transition-all duration-300 hover:border-primary-400 hover:shadow-xl dark:border-primary-500/40 dark:from-primary-950/25 dark:via-primary-950/15 dark:to-primary-950/25 dark:hover:border-primary-400/60">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-emerald-200 rounded-full opacity-20 animate-pulse"></div>
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-teal-200 rounded-full opacity-20 animate-pulse" style={{ animationDelay: "1s" }}></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-cyan-200 rounded-full opacity-20 animate-pulse" style={{ animationDelay: "2s" }}></div>
+              <div className="absolute -top-4 -right-4 h-24 w-24 animate-pulse rounded-full bg-primary-200/40 dark:bg-primary-500/15"></div>
+              <div className="absolute -bottom-4 -left-4 h-32 w-32 animate-pulse rounded-full bg-primary-300/30 dark:bg-primary-500/10" style={{ animationDelay: "1s" }}></div>
+              <div className="absolute top-1/2 left-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 transform animate-pulse rounded-full bg-primary-200/35 dark:bg-primary-500/10" style={{ animationDelay: "2s" }}></div>
             </div>
             
-            <CardContent className="text-center p-6 relative z-10">
+            <CardContent className="relative z-10 p-6 text-center">
               <div className="relative mb-6">
-                <div className="absolute inset-0 bg-emerald-200 rounded-full opacity-20 animate-pulse"></div>
-                <div className="relative bg-gradient-to-r from-emerald-500 to-teal-600 p-4 rounded-full shadow-lg">
+                <div className="absolute inset-0 animate-pulse rounded-full bg-primary-200/30 dark:bg-primary-500/15"></div>
+                <div className="relative rounded-full bg-gradient-to-r from-primary-500 to-primary-700 p-4 shadow-lg">
                   <HelpCircle className="h-12 w-12 text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2">
@@ -306,23 +308,23 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold text-emerald-900 mb-3">Get AI Question Hints</h3>
-              <p className="text-emerald-700 text-sm leading-relaxed mb-4 max-w-sm mx-auto">
+              <h3 className="mb-3 text-2xl font-bold text-primary-900 dark:text-primary-100">Get AI Question Hints</h3>
+              <p className="mx-auto mb-4 max-w-sm text-sm leading-relaxed text-primary-800 dark:text-primary-200/90">
                 Click to reveal intelligent question suggestions tailored to this specific case and conversation
               </p>
               
-              <div className="flex items-center justify-center space-x-3 mb-4">
-                <div className="inline-flex items-center bg-emerald-100 px-3 py-1 rounded-full">
-                  <Brain className="h-4 w-4 text-emerald-600 mr-1" />
-                  <span className="text-emerald-700 text-xs font-semibold">AI-Powered</span>
+              <div className="mb-4 flex items-center justify-center space-x-3">
+                <div className="inline-flex items-center rounded-full bg-primary-100 px-3 py-1 dark:bg-primary-500/20">
+                  <Brain className="mr-1 h-4 w-4 text-primary-600 dark:text-primary-300" />
+                  <span className="text-xs font-semibold text-primary-800 dark:text-primary-100">AI-Powered</span>
                 </div>
-                <div className="inline-flex items-center bg-teal-100 px-3 py-1 rounded-full">
-                  <Zap className="h-4 w-4 text-teal-600 mr-1" />
-                  <span className="text-teal-700 text-xs font-semibold">Smart Suggestions</span>
+                <div className="inline-flex items-center rounded-full bg-primary-100/80 px-3 py-1 dark:bg-primary-500/15">
+                  <Zap className="mr-1 h-4 w-4 text-primary-600 dark:text-primary-300" />
+                  <span className="text-xs font-semibold text-primary-800 dark:text-primary-100">Smart Suggestions</span>
                 </div>
               </div>
               
-              <div className="flex items-center justify-center text-emerald-600 text-sm">
+              <div className="flex items-center justify-center text-sm text-primary-600 dark:text-primary-300">
                 <ArrowRight className="h-4 w-4 mr-1 animate-bounce" />
                 <span className="font-medium">Click to explore</span>
                 <ArrowRight className="h-4 w-4 ml-1 animate-bounce" style={{ animationDelay: "0.5s" }} />
@@ -341,23 +343,23 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
             visibility: isFlipped ? 'visible' : 'hidden'
           }}
         >
-          <Card className="h-full bg-white/95 backdrop-blur-sm shadow-2xl border border-gray-200/50">
-            <CardHeader className="pb-2 pt-3 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50">
+          <Card className={cn(APP_GLASS_CARD, "h-full border border-gray-200/50 shadow-2xl backdrop-blur-sm dark:border-white/10")}>
+            <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-primary-50 to-primary-100/80 pb-2 pt-3 dark:border-white/10 dark:from-primary-950/30 dark:to-primary-950/20">
               <div className="flex items-center justify-between">
                 
                 {/* Hint Usage Counter */}
                 {sessionId && (
                   <div className="flex items-center space-x-1">
-                    <div className="flex items-center bg-gradient-to-r from-orange-100 to-red-100 px-2 py-1 rounded-full border border-orange-200">
-                      <Lightbulb className="h-3 w-3 text-orange-600 mr-1" />
-                      <span className="text-orange-700 text-xs font-semibold">
+                    <div className="flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-100 to-red-100 px-2 py-1 dark:border-orange-500/25 dark:from-orange-500/15 dark:to-red-500/15">
+                      <Lightbulb className="mr-1 h-3 w-3 text-orange-600 dark:text-orange-300" />
+                      <span className="text-xs font-semibold text-orange-700 dark:text-orange-200">
                         Hints: <AnimatedCounter value={hintUsageCount} />
                       </span>
                     </div>
                     {hintUsageCount > 0 && (
-                      <div className="flex items-center bg-gradient-to-r from-red-100 to-pink-100 px-2 py-1 rounded-full border border-red-200">
-                        <AlertTriangle className="h-3 w-3 text-red-600 mr-1" />
-                        <span className="text-red-700 text-xs font-medium">
+                      <div className="flex items-center rounded-full border border-red-200 bg-gradient-to-r from-red-100 to-pink-100 px-2 py-1 dark:border-red-500/25 dark:from-red-500/15 dark:to-pink-500/15">
+                        <AlertTriangle className="mr-1 h-3 w-3 text-red-600 dark:text-red-300" />
+                        <span className="text-xs font-medium text-red-700 dark:text-red-200">
                           -{Math.min(hintUsageCount * 2, 50)} pts
                         </span>
                       </div>
@@ -372,13 +374,13 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                       e.stopPropagation()
                       setShowRationale(!showRationale)
                     }}
-                    className="p-1 hover:bg-white/50"
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/10"
                     title={showRationale ? "Hide explanations" : "Show explanations"}
                   >
                     {showRationale ? (
-                      <EyeOff className="h-3 w-3 text-gray-600" />
+                      <EyeOff className="h-3 w-3 text-gray-600 dark:text-slate-300" />
                     ) : (
-                      <Eye className="h-3 w-3 text-gray-600" />
+                      <Eye className="h-3 w-3 text-gray-600 dark:text-slate-300" />
                     )}
                   </Button>
                   <Button
@@ -388,14 +390,14 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                       e.stopPropagation()
                       setIsFlipped(false)
                     }}
-                    className="p-1 hover:bg-white/50"
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/10"
                     title="Back to overview"
                   >
-                    <ChevronRight className="h-3 w-3 text-gray-600 rotate-180" />
+                    <ChevronRight className="h-3 w-3 rotate-180 text-gray-600 dark:text-slate-300" />
                   </Button>
                 </div>
               </div>
-              <p className="text-xs text-gray-600 mt-0">
+              <p className="mt-0 text-xs text-gray-600 dark:text-slate-400">
                 Click any question to use it in your conversation
               </p>
               
@@ -413,8 +415,8 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                       }}
                       className={`text-xs ${
                         selectedCategory === category 
-                          ? "bg-indigo-600 text-white" 
-                          : "bg-white/50 text-gray-600 hover:bg-indigo-50"
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-white/50 text-gray-600 hover:bg-primary/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-primary/20"
                       }`}
                     >
                       {category === "all" ? "All" : category}
@@ -429,24 +431,24 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                 {isLoadingQuestions ? (
                   <div className="space-y-4">
                     {[...Array(5)].map((_, index) => (
-                      <div key={index} className="animate-pulse bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4">
-                        <div className="flex items-center space-x-2 mb-3">
-                          <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-                          <div className="h-6 bg-gray-200 rounded-full w-12"></div>
-                          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                      <div key={index} className="animate-pulse rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 p-4 dark:from-white/[0.06] dark:to-white/[0.03]">
+                        <div className="mb-3 flex items-center space-x-2">
+                          <div className="h-6 w-16 rounded-full bg-gray-200 dark:bg-white/10"></div>
+                          <div className="h-6 w-12 rounded-full bg-gray-200 dark:bg-white/10"></div>
+                          <div className="h-6 w-20 rounded-full bg-gray-200 dark:bg-white/10"></div>
                         </div>
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-3 bg-gray-100 rounded w-3/4"></div>
+                        <div className="mb-2 h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+                        <div className="h-3 w-3/4 rounded bg-gray-100 dark:bg-white/[0.06]"></div>
                       </div>
                     ))}
                   </div>
                 ) : error ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <AlertTriangle className="h-10 w-10 text-red-500" />
+                  <div className="py-12 text-center">
+                    <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/15">
+                      <AlertTriangle className="h-10 w-10 text-red-500 dark:text-red-400" />
                     </div>
-                    <h4 className="font-semibold text-gray-700 mb-2">Unable to Load Suggestions</h4>
-                    <p className="text-sm text-gray-500 mb-3">{error}</p>
+                    <h4 className="mb-2 font-semibold text-gray-700 dark:text-slate-200">Unable to Load Suggestions</h4>
+                    <p className="mb-3 text-sm text-gray-500 dark:text-slate-400">{error}</p>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -463,7 +465,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                     {filteredQuestions.map((question, index) => (
                       <div
                         key={`${question.id}-${animationKey}`}
-                        className="group bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-indigo-200 transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-[1.02]"
+                        className="group cursor-pointer transform rounded-xl border border-gray-200 bg-gradient-to-r from-white to-gray-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-primary-200 hover:shadow-lg dark:border-white/10 dark:from-white/[0.06] dark:to-white/[0.02] dark:hover:border-primary-500/30"
                         onClick={(e) => {
                           e.stopPropagation()
                           
@@ -488,7 +490,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-primary-700 text-sm font-bold text-white shadow-lg">
                               {index + 1}
                             </div>
                             <Badge 
@@ -505,23 +507,23 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                             </Badge>
                             {question.confidence && (
                               <div className="flex items-center space-x-1">
-                                <div className="w-16 bg-gray-200 rounded-full h-2">
+                                <div className="h-2 w-16 rounded-full bg-gray-200 dark:bg-white/10">
                                   <div 
-                                    className="bg-gradient-to-r from-green-400 to-emerald-500 h-2 rounded-full transition-all duration-1000"
+                                    className="h-2 rounded-full bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-1000"
                                     style={{ width: `${question.confidence}%` }}
                                   ></div>
                                 </div>
-                                <span className="text-xs text-gray-500">{question.confidence}%</span>
+                                <span className="text-xs text-gray-500 dark:text-slate-400">{question.confidence}%</span>
                               </div>
                             )}
                           </div>
-                          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
-                            <span className="text-xs text-gray-400">Click to use</span>
-                            <ArrowRight className="h-3 w-3 text-gray-400" />
+                          <div className="flex items-center space-x-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <span className="text-xs text-gray-400 dark:text-slate-400">Click to use</span>
+                            <ArrowRight className="h-3 w-3 text-gray-400 dark:text-slate-400" />
                           </div>
                         </div>
                         
-                        <p className="text-sm font-semibold text-gray-800 mb-2 leading-relaxed group-hover:text-indigo-700 transition-colors">
+                        <p className="mb-2 text-sm font-semibold leading-relaxed text-gray-800 transition-colors group-hover:text-primary-700 dark:text-slate-100 dark:group-hover:text-primary-300">
                           {question.question}
                         </p>
                         
@@ -530,7 +532,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                             {question.tags.map((tag, tagIndex) => (
                               <span 
                                 key={tagIndex}
-                                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                                className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-white/10 dark:text-slate-300"
                               >
                                 #{tag}
                               </span>
@@ -539,10 +541,10 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                         )}
                         
                         {question.rationale && showRationale && (
-                          <div className="mt-3 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
+                          <div className="mt-3 rounded-lg border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-3 dark:border-amber-500/25 dark:from-amber-950/25 dark:to-yellow-950/20">
                             <div className="flex items-start">
-                              <Lightbulb className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                              <p className="text-xs text-amber-800 leading-relaxed">{question.rationale}</p>
+                              <Lightbulb className="mr-2 mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-300" />
+                              <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-200">{question.rationale}</p>
                             </div>
                           </div>
                         )}
@@ -550,12 +552,12 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                     ))}
                     
                     {filteredQuestions.length === 0 && !isLoadingQuestions && (
-                      <div className="text-center py-12">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <MessageCircleQuestion className="h-10 w-10 text-gray-400" />
+                      <div className="py-12 text-center">
+                        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-white/10">
+                          <MessageCircleQuestion className="h-10 w-10 text-gray-400 dark:text-slate-500" />
                         </div>
-                        <h4 className="font-semibold text-gray-700 mb-2">No suggestions yet</h4>
-                        <p className="text-sm text-gray-500">
+                        <h4 className="mb-2 font-semibold text-gray-700 dark:text-slate-200">No suggestions yet</h4>
+                        <p className="text-sm text-gray-500 dark:text-slate-400">
                           Start a conversation to get personalized question suggestions
                         </p>
                       </div>

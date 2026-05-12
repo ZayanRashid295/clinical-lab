@@ -18,6 +18,8 @@ import { QuestionPapersService } from "@/app/services/assessments/question-paper
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 import { authService } from "@/shared/services/auth.service";
 import { getQuestionHierarchyColumns } from "@/app/utils/question-hierarchy-display";
+import { APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 interface TestData {
   id: string;
@@ -160,15 +162,18 @@ export default function PreviousTestsPage() {
 
   if (isLoading) {
     return (
-      <div className="px-[50px] pb-[50px] pt-[25px] space-y-6 bg-background dark:bg-gray-900 min-h-screen" data-testid="page-previous-tests">
+      <div
+        className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}
+        data-testid="page-previous-tests"
+      >
         <div>
-          <h1 className="text-3xl font-bold text-foreground dark:text-gray-100">Previous Tests</h1>
-          <p className="text-muted-foreground dark:text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Previous Tests</h1>
+          <p className="mt-1 text-muted-foreground dark:text-slate-400">
             Review and analyze your completed tests
           </p>
         </div>
-        <Skeleton className="h-10 w-full bg-muted dark:bg-gray-800" />
-        <Skeleton className="h-64 w-full bg-muted dark:bg-gray-800" />
+        <Skeleton className="h-10 w-full bg-muted dark:bg-white/10" />
+        <Skeleton className="h-64 w-full bg-muted dark:bg-white/10" />
       </div>
     );
   }
@@ -190,38 +195,45 @@ export default function PreviousTestsPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-6 bg-background dark:bg-gray-900 min-h-screen" data-testid="page-previous-tests">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")} data-testid="page-previous-tests">
       <div>
-        <h1 className="text-3xl font-bold text-foreground dark:text-gray-100">Previous Tests</h1>
-        <p className="text-muted-foreground dark:text-gray-400 mt-1">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Previous Tests</h1>
+        <p className="mt-1 text-muted-foreground dark:text-slate-400">
           Review and analyze your completed tests
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground dark:text-slate-500" />
           <Input
             placeholder="Search tests..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-card dark:bg-gray-800 border-border dark:border-gray-700 text-foreground dark:text-gray-100"
+            className="border-slate-200/90 bg-white pl-9 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
             data-testid="input-search-tests"
           />
         </div>
         <div className="flex gap-2">
           <Select defaultValue="10">
-            <SelectTrigger className="w-[180px] bg-card dark:bg-gray-800 border-border dark:border-gray-700 text-foreground dark:text-gray-100" data-testid="select-items-per-page">
+            <SelectTrigger
+              className="w-[180px] border-slate-200/90 bg-white text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
+              data-testid="select-items-per-page"
+            >
               <SelectValue placeholder="Items per page" />
             </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-gray-800 border-border dark:border-gray-700">
-              <SelectItem value="10" className="text-foreground dark:text-gray-100">10 per page</SelectItem>
-              <SelectItem value="25" className="text-foreground dark:text-gray-100">25 per page</SelectItem>
-              <SelectItem value="50" className="text-foreground dark:text-gray-100">50 per page</SelectItem>
+            <SelectContent className="border-slate-200/90 dark:border-white/10 dark:bg-zinc-950">
+              <SelectItem value="10" className="dark:text-slate-100">10 per page</SelectItem>
+              <SelectItem value="25" className="dark:text-slate-100">25 per page</SelectItem>
+              <SelectItem value="50" className="dark:text-slate-100">50 per page</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="border-border dark:border-gray-700 text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-800" data-testid="button-columns">
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
+          <Button
+            variant="outline"
+            className="border-slate-200/90 text-gray-900 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10"
+            data-testid="button-columns"
+          >
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
             Columns
           </Button>
         </div>
@@ -235,14 +247,14 @@ export default function PreviousTestsPage() {
       />
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground dark:text-gray-400">
+        <p className="text-sm text-muted-foreground dark:text-slate-400">
           Showing {filteredTests.length} of {tests.length} tests
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled className="border-border dark:border-gray-700 text-foreground dark:text-gray-300" data-testid="button-previous">
+          <Button variant="outline" size="sm" disabled className="dark:border-white/10 dark:bg-white/5 dark:text-slate-400" data-testid="button-previous">
             Previous
           </Button>
-          <Button variant="outline" size="sm" disabled className="border-border dark:border-gray-700 text-foreground dark:text-gray-300" data-testid="button-next">
+          <Button variant="outline" size="sm" disabled className="dark:border-white/10 dark:bg-white/5 dark:text-slate-400" data-testid="button-next">
             Next
           </Button>
         </div>

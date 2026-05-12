@@ -12,6 +12,8 @@ import { ArrowLeft } from "lucide-react";
 import { authService } from "@/shared/services/auth.service";
 import { getClinicalUserId } from "@/lib/fyp/medprep-user";
 import { MedPrepSlugGate } from "@/app/components/medprep-ai/MedPrepSlugGate";
+import { cn } from "@/shared/utils/cn";
+import { APP_PAGE_SHELL } from "@/app/config/app-shell";
 
 function caseIdFromPathname(pathname: string): string | null {
   const m = pathname.match(/^\/medprep-ai\/learn\/([^/]+)/);
@@ -165,18 +167,27 @@ function LearningCaseRoutePageInner() {
 
   if (!router.isReady) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-blue-600" />
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     );
   }
 
   if (!caseId) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-gray-50 p-8">
+      <div
+        className={cn(
+          APP_PAGE_SHELL,
+          "flex flex-1 items-center justify-center p-8"
+        )}
+      >
         <div className="max-w-md text-center">
-          <h1 className="mb-2 text-xl font-bold text-gray-900">Invalid learning URL</h1>
-          <p className="mb-6 text-gray-600">Open a case from Learning (Q&amp;A) to start a session.</p>
+          <h1 className="mb-2 text-xl font-bold text-gray-900 dark:text-slate-100">
+            Invalid learning URL
+          </h1>
+          <p className="mb-6 text-gray-600 dark:text-slate-400">
+            Open a case from Learning (Q&amp;A) to start a session.
+          </p>
           <Link href="/medprep-ai/qa">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -190,10 +201,15 @@ function LearningCaseRoutePageInner() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
+      <div
+        className={cn(
+          APP_PAGE_SHELL,
+          "flex flex-1 items-center justify-center"
+        )}
+      >
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600" />
-          <p className="text-gray-600">Loading learning session...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <p className="text-gray-600 dark:text-slate-400">Loading learning session...</p>
         </div>
       </div>
     );
@@ -201,10 +217,19 @@ function LearningCaseRoutePageInner() {
 
   if (!session) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
+      <div
+        className={cn(
+          APP_PAGE_SHELL,
+          "flex flex-1 items-center justify-center"
+        )}
+      >
         <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold text-gray-900">Case Not Found</h1>
-          <p className="mb-6 text-gray-600">The requested learning case could not be found.</p>
+          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-slate-100">
+            Case Not Found
+          </h1>
+          <p className="mb-6 text-gray-600 dark:text-slate-400">
+            The requested learning case could not be found.
+          </p>
           <Link href="/medprep-ai/qa">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -217,7 +242,12 @@ function LearningCaseRoutePageInner() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-gray-50">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        "flex h-full min-h-0 flex-1 flex-col overflow-hidden"
+      )}
+    >
       <LearningInterface
         session={session}
         onSessionUpdate={handleSessionUpdate}

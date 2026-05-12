@@ -29,12 +29,14 @@ import {
 } from "@/app/services/launch";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const DIFF_COLORS: Record<string, string> = {
-  easy: "bg-green-100 text-green-700",
-  medium: "bg-amber-100 text-amber-700",
-  hard: "bg-rose-100 text-rose-700",
-  mixed: "bg-indigo-100 text-indigo-700",
+  easy: "bg-primary-100 text-primary-800 dark:bg-primary-900/35 dark:text-primary-200",
+  medium: "bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300",
+  hard: "bg-primary-200 text-primary-900 dark:bg-primary-800/40 dark:text-primary-100",
+  mixed: "bg-primary-100/80 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200",
 };
 
 export default function MockExamsPage() {
@@ -82,11 +84,11 @@ export default function MockExamsPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-4">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <ClipboardList className="text-rose-600" /> Mock Exams
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-slate-100">
+            <ClipboardList className="text-primary-600 dark:text-primary-400" /> Mock Exams
           </h1>
           <p className="text-muted-foreground mt-1">
             Take full-length, timed practice exams and track your performance.
@@ -116,7 +118,7 @@ export default function MockExamsPage() {
       ) : tab === "available" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {exams.length === 0 ? (
-            <Card className="md:col-span-2 lg:col-span-3">
+            <Card className={cn(APP_GLASS_CARD, "md:col-span-2 lg:col-span-3")}>
               <CardContent className="p-12 text-center text-muted-foreground">
                 <ClipboardList className="mx-auto mb-3 text-gray-300" size={42} />
                 <p className="font-medium">No mock exams available right now.</p>
@@ -129,7 +131,10 @@ export default function MockExamsPage() {
             exams.map((e) => (
               <Card
                 key={e.id}
-                className="hover:shadow-md transition-shadow flex flex-col"
+                className={cn(
+                  APP_GLASS_CARD,
+                  "flex flex-col transition-shadow hover:shadow-md"
+                )}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
@@ -153,11 +158,11 @@ export default function MockExamsPage() {
                 <CardContent className="flex-1 flex flex-col justify-between space-y-3">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-1.5">
-                      <ListChecks className="h-4 w-4 text-emerald-600" />
+                      <ListChecks className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       <span>{e.totalQuestions} Qs</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Timer className="h-4 w-4 text-rose-600" />
+                      <Timer className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       <span>{e.durationMinutes} min</span>
                     </div>
                   </div>
@@ -181,7 +186,7 @@ export default function MockExamsPage() {
       ) : (
         <div className="space-y-3">
           {attempts.length === 0 ? (
-            <Card>
+            <Card className={cn(APP_GLASS_CARD)}>
               <CardContent className="p-12 text-center text-muted-foreground">
                 <History className="mx-auto mb-3 text-gray-300" size={42} />
                 <p className="font-medium">No attempts yet.</p>
@@ -190,7 +195,7 @@ export default function MockExamsPage() {
             </Card>
           ) : (
             attempts.map((a) => (
-              <Card key={a.id}>
+              <Card key={a.id} className={cn(APP_GLASS_CARD)}>
                 <CardContent className="p-4 flex items-center gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate">
@@ -225,10 +230,10 @@ export default function MockExamsPage() {
                     <Badge
                       className={
                         a.status === "COMPLETED"
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-200"
                           : a.status === "IN_PROGRESS"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-gray-100 text-gray-700"
+                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/35 dark:text-amber-200"
+                            : "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300"
                       }
                     >
                       {a.status.replace("_", " ")}

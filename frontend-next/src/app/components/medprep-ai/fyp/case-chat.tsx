@@ -67,6 +67,8 @@ import { DiagnosisSubmission } from "./diagnosis-submission"
 import Link from "next/link"
 // import HeyGenAvatar, { type HeyGenAvatarRef } from "@/components/heygen-avatar"
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
+import { cn } from "@/shared/utils/cn"
+import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 interface CaseChatProps {
   medicalCase: MedicalCase
@@ -121,27 +123,27 @@ interface MetricCardProps {
 const MetricCard = ({ title, value, suffix = '', icon: Icon, color = "blue", description = "" }: MetricCardProps) => {
   const getColorClasses = () => {
     const colors: Record<string, string> = {
-      blue: "text-emerald-700 bg-emerald-50/80 border-emerald-200/80",
-      green: "text-green-700 bg-green-50/80 border-green-200/80",
-      yellow: "text-amber-700 bg-amber-50/80 border-amber-200/80",
-      red: "text-rose-700 bg-rose-50/80 border-rose-200/80",
-      purple: "text-teal-700 bg-teal-50/80 border-teal-200/80"
+      blue: "border-primary-200/80 bg-primary-50/80 text-primary-800 dark:border-primary-500/25 dark:bg-primary-950/35 dark:text-primary-200",
+      green: "border-primary-300/80 bg-primary-50/90 text-primary-800 dark:border-primary-500/25 dark:bg-primary-950/35 dark:text-primary-200",
+      yellow: "border-amber-200/80 bg-amber-50/80 text-amber-700 dark:border-amber-500/25 dark:bg-amber-950/30 dark:text-amber-200",
+      red: "border-rose-200/80 bg-rose-50/80 text-rose-700 dark:border-rose-500/25 dark:bg-rose-950/30 dark:text-rose-200",
+      purple: "border-primary-200/80 bg-primary-50/70 text-primary-800 dark:border-primary-500/25 dark:bg-primary-950/30 dark:text-primary-200"
     }
     return colors[color] || colors.blue
   }
 
   return (
-    <Card className={`transform transition-all duration-300 hover:-translate-y-0.5 rounded-2xl border ${getColorClasses()} shadow-[0_8px_24px_-18px_rgba(15,118,110,0.45)]`}>
+    <Card className={`transform transition-all duration-300 hover:-translate-y-0.5 rounded-2xl border ${getColorClasses()} shadow-[0_8px_24px_-18px_rgba(var(--color-primary-600-rgb),0.35)]`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xs font-medium text-slate-600">{title}</CardTitle>
+        <CardTitle className="text-xs font-medium text-slate-600 dark:text-slate-400">{title}</CardTitle>
         <Icon className="h-4 w-4 opacity-80" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-slate-800 mb-1">
+        <div className="mb-1 text-2xl font-bold text-slate-800 dark:text-slate-100">
           <AnimatedCounter value={value} suffix={suffix} duration={1000} />
         </div>
         {description && (
-          <p className="text-xs text-slate-500">{description}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
         )}
       </CardContent>
     </Card>
@@ -776,14 +778,14 @@ export function CaseChat({
       }
 
   return (
-    <div className="h-full min-h-0 flex flex-col bg-[radial-gradient(circle_at_0%_0%,rgba(16,185,129,0.16)_0%,rgba(246,251,248,0)_40%),radial-gradient(circle_at_100%_100%,rgba(15,118,110,0.1)_0%,rgba(246,251,248,0)_35%)] bg-[#F6FBF8]">
+    <div className={cn(APP_PAGE_SHELL, "h-full min-h-0 flex flex-col bg-[radial-gradient(circle_at_0%_0%,rgba(var(--color-primary-500-rgb),0.14)_0%,transparent_40%),radial-gradient(circle_at_100%_100%,rgba(var(--color-primary-600-rgb),0.1)_0%,transparent_35%)] bg-primary-50/50 dark:bg-none")}>
       {/* Global Loading Overlay for Practice Interface Bootstrapping */}
       {isBootstrapping && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/70 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl px-6 py-5 border border-gray-200 text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
-            <p className="text-gray-700 font-medium">Preparing practice interface...</p>
-            <p className="text-xs text-gray-500 mt-1">Loading conversation and tools</p>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/70 backdrop-blur-sm dark:bg-black/50">
+          <div className={cn(APP_GLASS_CARD, "rounded-xl px-6 py-5 text-center shadow-2xl")}>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-gray-700 font-medium dark:text-slate-200">Preparing practice interface...</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">Loading conversation and tools</p>
           </div>
         </div>
       )}
@@ -795,25 +797,25 @@ export function CaseChat({
         />
       ) : null}
       {/* Enhanced Header */}
-      <header className="sticky top-0 z-20 border-b border-emerald-100/90 bg-white/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-primary-100/90 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
         <div className="w-full px-3 sm:px-4 lg:px-6">
           <div className="flex min-h-[72px] flex-wrap items-center justify-between gap-3 py-2">
             <div className="flex items-center space-x-3">
               <Link href="/">
-                <Button variant="outline" size="sm" className="border-emerald-200 bg-white shadow-sm">
+                <Button variant="outline" size="sm" className="border-primary-200 bg-white shadow-sm dark:border-white/15 dark:bg-white/10">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Dashboard
                 </Button>
               </Link>
               <div className="flex-1">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent leading-tight">
                   {medicalCase.title}
                 </h1>
-                <p className="text-xs text-slate-600">Patient: {medicalCase.patientProfile.name}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Patient: {medicalCase.patientProfile.name}</p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="hidden border-emerald-200 bg-emerald-50 text-emerald-700 md:inline-flex">
+              <Badge variant="outline" className="hidden border-primary-200 bg-primary-50 text-primary-700 md:inline-flex dark:border-primary-500/30 dark:bg-primary-500/10 dark:text-primary-200">
                 {medicalCase.difficulty}
               </Badge>
 
@@ -823,7 +825,7 @@ export function CaseChat({
                   onClick={() => setAudioEnabled(prev => ({ ...prev, studentInput: !prev.studentInput }))}
                   variant="outline"
                   size="sm"
-                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.studentInput ? 'border-emerald-300 text-emerald-700' : 'text-slate-500'}`}
+                  className={`border-primary-200/80 bg-white/90 dark:border-white/15 dark:bg-white/10 ${audioEnabled.studentInput ? 'border-primary-400 text-primary-700 dark:text-primary-300' : 'text-slate-500'}`}
                   title="Toggle voice input for student"
                 >
                   {audioEnabled.studentInput ? <Mic className="h-4 w-4 mr-1" /> : <MicOff className="h-4 w-4 mr-1" />}
@@ -833,7 +835,7 @@ export function CaseChat({
                   onClick={() => setAudioEnabled(prev => ({ ...prev, patientResponse: !prev.patientResponse }))}
                   variant="outline"
                   size="sm"
-                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.patientResponse ? 'border-emerald-300 text-emerald-700' : 'text-slate-500'}`}
+                  className={`border-primary-200/80 bg-white/90 dark:border-white/15 dark:bg-white/10 ${audioEnabled.patientResponse ? 'border-primary-400 text-primary-700 dark:text-primary-300' : 'text-slate-500'}`}
                   title="Toggle voice output for patient"
                 >
                   {audioEnabled.patientResponse ? <Video className="h-4 w-4 mr-1" /> : <VideoOff className="h-4 w-4 mr-1" />}
@@ -843,7 +845,7 @@ export function CaseChat({
                   onClick={() => setAudioEnabled(prev => ({ ...prev, doctorResponse: !prev.doctorResponse }))}
                   variant="outline"
                   size="sm"
-                  className={`border-emerald-200/80 bg-white/90 ${audioEnabled.doctorResponse ? 'border-teal-300 text-teal-700' : 'text-slate-500'}`}
+                  className={`border-primary-200/80 bg-white/90 dark:border-white/15 dark:bg-white/10 ${audioEnabled.doctorResponse ? 'border-primary-400 text-primary-700 dark:text-primary-300' : 'text-slate-500'}`}
                   title="Toggle voice output for doctor"
                 >
                   {audioEnabled.doctorResponse ? <Video className="h-4 w-4 mr-1" /> : <VideoOff className="h-4 w-4 mr-1" />}
@@ -865,7 +867,7 @@ export function CaseChat({
               <Button
                 onClick={handleCompleteCase} 
                 disabled={isCompletingCase}
-                className="rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_28px_-12px_rgba(5,150,105,0.65)] transition-all hover:brightness-105 disabled:opacity-70"
+                className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-primary-foreground shadow-[0_10px_28px_-12px_rgba(var(--color-primary-700-rgb),0.45)] transition-all hover:brightness-105 disabled:opacity-70"
               >
                 {isCompletingCase ? (
                   <>
@@ -892,19 +894,19 @@ export function CaseChat({
           {/* Four-panel layout tuned to FYP proportions */}
           <div className="grid h-full min-h-0 grid-cols-1 xl:grid-cols-[1.35fr_1fr_1fr_0.9fr] gap-3">
             {/* Section 1 - Patient Chat */}
-            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_16px_40px_-26px_rgba(16,185,129,0.5)] overflow-hidden backdrop-blur-md">
-            <div className="p-4 border-b border-emerald-100 bg-white/90 flex-shrink-0">
-              <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <UserIcon className="h-5 w-5 text-emerald-600" />
+            <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-primary-100 bg-white/90 shadow-[0_16px_40px_-26px_rgba(var(--color-primary-500-rgb),0.45)] backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]">
+            <div className="flex-shrink-0 border-b border-primary-100 bg-white/90 p-4 dark:border-white/10 dark:bg-white/5">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
+                <UserIcon className="h-5 w-5 text-primary-600" />
                 Patient Consultation
               </h2>
-              <p className="text-sm text-slate-600">Interactive conversation with AI patient</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Interactive conversation with AI patient</p>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-gradient-to-b from-white via-emerald-50/20 to-white">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-gradient-to-b from-white via-primary-50/25 to-white p-4 dark:from-transparent dark:via-primary-950/15 dark:to-transparent">
               {messages.length === 0 && (
-                <div className="text-center text-gray-500 mt-20">
-                  <UserIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <div className="mt-20 text-center text-gray-500 dark:text-slate-400">
+                  <UserIcon className="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-slate-600" />
                   <p>Start the consultation by asking the patient a question</p>
                 </div>
               )}
@@ -924,20 +926,20 @@ export function CaseChat({
                     <div
                       className={`max-w-[85%] rounded-2xl p-3.5 ${
                         message.role === "student"
-                          ? "bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_26px_-14px_rgba(5,150,105,0.75)]"
+                          ? "bg-gradient-to-br from-primary-500 to-primary-700 text-primary-foreground shadow-[0_10px_26px_-14px_rgba(var(--color-primary-700-rgb),0.5)]"
                           : message.role === "patient"
-                            ? "bg-white text-slate-800 border border-emerald-100 shadow-[0_8px_24px_-18px_rgba(15,23,42,0.45)]"
-                            : "bg-rose-50 text-rose-900 border border-rose-200 shadow-[0_8px_24px_-18px_rgba(244,63,94,0.35)]"
+                            ? "border border-primary-100 bg-white text-slate-800 shadow-[0_8px_24px_-18px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-white/10 dark:text-slate-100"
+                            : "border border-rose-200 bg-rose-50 text-rose-900 shadow-[0_8px_24px_-18px_rgba(244,63,94,0.35)] dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-100"
                       }`}
                     >
-                      <div className="flex items-center mb-1">
-                        {message.role === "student" && <GraduationCap className="h-4 w-4 mr-2" />}
-                        {message.role === "patient" && <UserIcon className="h-4 w-4 mr-2" />}
-                        {message.role === "doctor" && <Stethoscope className="h-4 w-4 mr-2" />}
+                      <div className="mb-1 flex items-center">
+                        {message.role === "student" && <GraduationCap className="mr-2 h-4 w-4" />}
+                        {message.role === "patient" && <UserIcon className="mr-2 h-4 w-4" />}
+                        {message.role === "doctor" && <Stethoscope className="mr-2 h-4 w-4" />}
                         <span className="text-xs font-medium capitalize">
                           {message.role === "student" ? "You" : message.role}
                         </span>
-                        {message.isIntervention && <AlertTriangle className="h-3 w-3 ml-2 text-red-600" />}
+                        {message.isIntervention && <AlertTriangle className="ml-2 h-3 w-3 text-red-600 dark:text-red-300" />}
                         {message.role !== "student" && (
                           <Badge variant="outline" className="ml-2 text-xs">
                             {audioEnabled[message.role === "patient" ? "patientResponse" : "doctorResponse"] ? "🔊" : "💬"}
@@ -965,10 +967,10 @@ export function CaseChat({
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-emerald-50/70 rounded-2xl p-3 max-w-[90%] border border-emerald-100">
+                  <div className="max-w-[90%] rounded-2xl border border-primary-100 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-500/10">
                     <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                      <span className="text-sm text-gray-600">
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-primary"></div>
+                      <span className="text-sm text-gray-700 dark:text-slate-200">
                         Patient is responding...
                       </span>
                     </div>
@@ -979,17 +981,17 @@ export function CaseChat({
               {/* Compact speaking status (avoid large transcript block in feed) */}
               {currentSpeakingText && (
                 <div className="flex justify-start">
-                  <div className="bg-teal-50/80 rounded-2xl p-3 max-w-[90%] border border-teal-200">
+                  <div className="max-w-[90%] rounded-2xl border border-primary-200 bg-primary-50/80 p-3 dark:border-primary-500/25 dark:bg-primary-500/15">
                     <div className="flex items-center">
-                      <div className="animate-pulse rounded-full h-3 w-3 bg-purple-500 mr-2"></div>
-                      <span className="text-sm font-medium text-teal-700">
+                      <div className="mr-2 h-3 w-3 animate-pulse rounded-full bg-primary"></div>
+                      <span className="text-sm font-medium text-primary-800 dark:text-primary-100">
                         {currentSpeakingText.role === "patient" ? "Patient is speaking..." : "Doctor is speaking..."}
                       </span>
                       <Button
                         onClick={stopSpeaking}
                         variant="ghost"
                         size="sm"
-                        className="ml-2 h-6 w-6 p-0 text-teal-600 hover:text-teal-800"
+                        className="ml-2 h-6 w-6 p-0 text-primary-700 hover:text-primary-900 dark:text-primary-200 dark:hover:text-primary-50"
                         title="Stop speaking"
                       >
                         <MicOff className="h-3 w-3" />
@@ -1002,14 +1004,14 @@ export function CaseChat({
             </div>
 
             {/* Message Input - Fixed at bottom */}
-            <div className="flex space-x-3 p-3 border-t border-emerald-100 bg-white/85 backdrop-blur-sm flex-shrink-0">
+            <div className="flex flex-shrink-0 space-x-3 border-t border-primary-100 bg-white/85 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
               <Input
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask the patient a question..."
                 disabled={isLoading}
-                className="flex-1 rounded-xl border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white"
+                className="flex-1 rounded-xl border-primary-200 bg-white focus:border-primary focus:ring-primary dark:border-white/15 dark:bg-white/10"
               />
               <Button
                 onClick={isListening ? stopListening : startListening}
@@ -1017,14 +1019,14 @@ export function CaseChat({
                 variant={isListening ? "destructive" : "outline"}
                 size="sm"
                 title={audioEnabled.studentInput ? (isListening ? "Stop listening" : "Start voice input") : "Voice input disabled"}
-                className={`rounded-xl border-emerald-200 ${audioEnabled.studentInput ? '' : 'opacity-50'}`}
+                className={`rounded-xl border-primary-200 ${audioEnabled.studentInput ? '' : 'opacity-50'}`}
               >
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !currentMessage.trim()}
-                className="rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] hover:brightness-105 text-white"
+                className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 hover:brightness-105 text-primary-foreground"
                 size="sm"
               >
                 <Send className="h-4 w-4" />
@@ -1033,48 +1035,48 @@ export function CaseChat({
           </div>
 
             {/* Section 2 - AI Assistant & Insights */}
-            <div className="flex flex-col bg-white/90 h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.45)] overflow-hidden backdrop-blur-md">
+            <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-primary-100 bg-white/90 shadow-[0_16px_40px_-26px_rgba(var(--color-primary-500-rgb),0.4)] backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-full">
-              <TabsList className="grid w-full grid-cols-2 bg-emerald-50/70 border border-emerald-100 rounded-xl p-1 m-3 mb-0 flex-shrink-0">
-                <TabsTrigger value="conversation" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm">
+              <TabsList className="m-3 mb-0 grid w-full flex-shrink-0 grid-cols-2 rounded-xl border border-primary-100 bg-primary-50/70 p-1 dark:border-white/10 dark:bg-primary-950/30">
+                <TabsTrigger value="conversation" className="rounded-md text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground">
                   <Brain className="h-4 w-4 mr-2" />
                   AI Assistant
                 </TabsTrigger>
-                <TabsTrigger value="insights" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm">
+                <TabsTrigger value="insights" className="rounded-md text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Insights
                 </TabsTrigger>
               </TabsList>
               
               <TabsContent value="conversation" className="flex-1 flex flex-col m-3 mt-2 h-full">
-                <Card className="flex-1 bg-white/95 shadow-none border border-emerald-100 flex flex-col h-full">
-                  <CardHeader className="pb-3 border-b border-emerald-100 bg-white flex-shrink-0">
+                <Card className="flex h-full flex-1 flex-col border border-primary-100 bg-white/95 shadow-none dark:border-white/10 dark:bg-white/[0.04]">
+                  <CardHeader className="flex-shrink-0 border-b border-primary-100 bg-white pb-3 dark:border-white/10 dark:bg-white/5">
                     <CardTitle className="flex items-center text-base">
-                      <Brain className="h-4 w-4 mr-2 text-emerald-600" />
-                      <span className="font-semibold text-slate-800">
+                      <Brain className="h-4 w-4 mr-2 text-primary-600" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">
                         AI Clinical Assistant
                       </span>
                     </CardTitle>
-                    <p className="text-xs text-slate-600">Real-time clinical guidance and suggestions</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">Real-time clinical guidance and suggestions</p>
                   </CardHeader>
                   <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                     <div className="space-y-3">
-                      <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
-                        <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
+                      <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                        <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                           <Lightbulb className="h-3 w-3 mr-2" />
                           Clinical Tips
                         </h3>
-                        <p className="text-xs text-emerald-800">
+                        <p className="text-xs text-primary-800 dark:text-primary-200">
                           Focus on gathering a comprehensive history. Ask about symptom onset, duration, severity, and any associated symptoms.
                         </p>
                       </div>
                       
-                      <div className="bg-teal-50/70 rounded-2xl p-3 border border-teal-200">
-                        <h3 className="font-semibold text-teal-900 mb-2 flex items-center text-xs">
+                      <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                        <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                           <Target className="h-3 w-3 mr-2" />
                           Key Areas to Explore
                         </h3>
-                        <ul className="text-xs text-teal-800 space-y-1">
+                        <ul className="text-xs text-primary-800 dark:text-primary-200 space-y-1">
                           <li>• Symptom characteristics and timing</li>
                           <li>• Associated symptoms and triggers</li>
                           <li>• Medical history and medications</li>
@@ -1082,12 +1084,12 @@ export function CaseChat({
                         </ul>
                       </div>
                       
-                      <div className="bg-amber-50/70 rounded-2xl p-3 border border-amber-200">
-                        <h3 className="font-semibold text-amber-900 mb-2 flex items-center text-xs">
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-500/25 dark:bg-amber-950/25">
+                        <h3 className="mb-2 flex items-center text-xs font-semibold text-amber-900 dark:text-amber-200">
                           <AlertTriangle className="h-3 w-3 mr-2" />
                           Red Flags to Watch For
                         </h3>
-                        <p className="text-xs text-amber-800">
+                        <p className="text-xs text-amber-800 dark:text-amber-200/90">
                           Be alert for symptoms that suggest serious conditions requiring immediate attention.
                         </p>
                       </div>
@@ -1097,15 +1099,15 @@ export function CaseChat({
               </TabsContent>
               
               <TabsContent value="insights" className="flex-1 flex flex-col m-3 mt-2 h-full">
-                <Card className="flex-1 bg-white/95 shadow-none border border-emerald-100 flex flex-col h-full">
-                  <CardHeader className="pb-3 border-b border-emerald-100 bg-white flex-shrink-0">
+                <Card className="flex h-full flex-1 flex-col border border-primary-100 bg-white/95 shadow-none dark:border-white/10 dark:bg-white/[0.04]">
+                  <CardHeader className="flex-shrink-0 border-b border-primary-100 bg-white pb-3 dark:border-white/10 dark:bg-white/5">
                     <CardTitle className="flex items-center text-base">
-                      <BarChart3 className="h-4 w-4 mr-2 text-emerald-600" />
-                      <span className="font-semibold text-slate-800">
+                      <BarChart3 className="h-4 w-4 mr-2 text-primary-600" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">
                         Conversation Insights
                       </span>
                     </CardTitle>
-                    <p className="text-xs text-slate-600">Real-time performance metrics</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">Real-time performance metrics</p>
                   </CardHeader>
                   <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                     <div className="grid grid-cols-2 gap-2 mb-3">
@@ -1142,15 +1144,15 @@ export function CaseChat({
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
-                        <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
+                      <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                        <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                           <TrendingUp className="h-3 w-3 mr-2" />
                           Progress Tracking
                         </h3>
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs">
-                            <span className="text-emerald-700">Conversation Progress</span>
-                            <span className="text-emerald-900 font-medium">{Math.min(100, (conversationStats.questionsAsked / 10) * 100)}%</span>
+                            <span className="text-primary-700">Conversation Progress</span>
+                            <span className="text-primary-900 font-medium dark:text-primary-100">{Math.min(100, (conversationStats.questionsAsked / 10) * 100)}%</span>
                           </div>
                           <Progress value={Math.min(100, (conversationStats.questionsAsked / 10) * 100)} className="h-2" />
                         </div>
@@ -1163,21 +1165,21 @@ export function CaseChat({
           </div>
 
             {/* Section 3 - Question Suggestions */}
-            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.35)] overflow-hidden bg-white/90 backdrop-blur-md">
-            <Card className="flex-1 bg-transparent shadow-none border-0 flex flex-col h-full">
-              <CardHeader className="pb-1 pt-2 border-b border-emerald-100 bg-white/80 flex-shrink-0">
+            <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-primary-100 bg-white/90 shadow-[0_16px_40px_-26px_rgba(var(--color-primary-500-rgb),0.32)] backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]">
+            <Card className="flex h-full flex-1 flex-col border-0 bg-transparent shadow-none">
+              <CardHeader className="flex-shrink-0 border-b border-primary-100 bg-white/80 pb-1 pt-2 dark:border-white/10 dark:bg-white/5">
                 <CardTitle className="flex items-center text-xs">
                   <div className="relative">
-                    <Lightbulb className="h-3 w-3 mr-1 text-emerald-600" />
+                    <Lightbulb className="h-3 w-3 mr-1 text-primary-600" />
                     <div className="absolute -top-1 -right-1">
                       <Zap className="h-2 w-2 text-yellow-500 animate-pulse" />
                     </div>
                   </div>
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">
                     Smart Suggestions
                   </span>
                 </CardTitle>
-                <p className="text-xs text-slate-600">AI-powered question recommendations</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">AI-powered question recommendations</p>
               </CardHeader>
               <CardContent className="flex-1 p-2 pt-1 overflow-y-auto min-h-0">
                 <AskQuestions
@@ -1203,31 +1205,31 @@ export function CaseChat({
 
 
             {/* Section 4 - Case Information & Progress */}
-            <div className="flex flex-col h-full min-w-0 rounded-3xl border border-[#DCEFE5] shadow-[0_16px_40px_-26px_rgba(16,185,129,0.45)] overflow-hidden bg-white/90 backdrop-blur-md">
-            <Card className="flex-1 bg-transparent shadow-none border-0 flex flex-col h-full">
-              <CardHeader className="pb-3 border-b border-emerald-100 bg-white/80 flex-shrink-0">
+            <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-primary-100 bg-white/90 shadow-[0_16px_40px_-26px_rgba(var(--color-primary-500-rgb),0.4)] backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]">
+            <Card className="flex h-full flex-1 flex-col border-0 bg-transparent shadow-none">
+              <CardHeader className="flex-shrink-0 border-b border-primary-100 bg-white/80 pb-3 dark:border-white/10 dark:bg-white/5">
                 <CardTitle className="flex items-center text-base">
                   <div className="relative">
-                    <BookOpen className="h-4 w-4 mr-2 text-emerald-600" />
+                    <BookOpen className="h-4 w-4 mr-2 text-primary-600" />
                     <div className="absolute -top-1 -right-1">
                       <Star className="h-3 w-3 text-yellow-500 animate-pulse" />
                     </div>
                   </div>
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">
                     Case Information
                   </span>
                 </CardTitle>
-                <p className="text-xs text-slate-600">Patient details and case progress</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Patient details and case progress</p>
               </CardHeader>
               <CardContent className="flex-1 p-3 overflow-y-auto min-h-0">
                 <div className="space-y-3">
                   {/* Patient Profile */}
-                  <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
-                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
+                  <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                    <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                       <UserIcon className="h-3 w-3 mr-2" />
                       Patient Profile
                     </h3>
-                    <div className="space-y-1 text-xs text-emerald-800">
+                    <div className="space-y-1 text-xs text-primary-800 dark:text-primary-200">
                       <div className="flex justify-between">
                         <span className="font-medium">Name:</span>
                         <span>{medicalCase.patientProfile.name}</span>
@@ -1248,12 +1250,12 @@ export function CaseChat({
                   </div>
 
                   {/* Case Details */}
-                  <div className="bg-teal-50/70 rounded-2xl p-3 border border-teal-200">
-                    <h3 className="font-semibold text-teal-900 mb-2 flex items-center text-xs">
+                  <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                    <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                       <Stethoscope className="h-3 w-3 mr-2" />
                       Case Details
                     </h3>
-                      <div className="space-y-1 text-xs text-teal-800">
+                      <div className="space-y-1 text-xs text-primary-800 dark:text-primary-200">
                       {/* Hide disease name in assessment/practice UI */}
                       <div className="flex justify-between">
                         <span className="font-medium">Condition:</span>
@@ -1273,33 +1275,33 @@ export function CaseChat({
                   </div>
 
                   {/* Session Progress */}
-                  <div className="bg-white rounded-2xl p-3 border border-emerald-200">
-                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
+                  <div className="rounded-2xl border border-primary-200 bg-white p-3 dark:border-white/15 dark:bg-white/[0.06]">
+                    <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                       <Activity className="h-3 w-3 mr-2" />
                       Session Progress
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span className="text-emerald-700">Conversation Quality</span>
-                        <span className="text-emerald-900 font-medium">{Math.round(conversationStats.efficiency)}%</span>
+                        <span className="text-primary-700">Conversation Quality</span>
+                        <span className="text-primary-900 font-medium dark:text-primary-100">{Math.round(conversationStats.efficiency)}%</span>
                       </div>
                       <Progress value={conversationStats.efficiency} className="h-2" />
                       
                       <div className="flex justify-between text-xs">
-                        <span className="text-emerald-700">Questions Asked</span>
-                        <span className="text-emerald-900 font-medium">{conversationStats.questionsAsked}</span>
+                        <span className="text-primary-700">Questions Asked</span>
+                        <span className="text-primary-900 font-medium dark:text-primary-100">{conversationStats.questionsAsked}</span>
                       </div>
                       
                       <div className="flex justify-between text-xs">
-                        <span className="text-emerald-700">Time Spent</span>
-                        <span className="text-emerald-900 font-medium">{conversationStats.timeSpent} min</span>
+                        <span className="text-primary-700">Time Spent</span>
+                        <span className="text-primary-900 font-medium dark:text-primary-100">{conversationStats.timeSpent} min</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="bg-emerald-50/70 rounded-2xl p-3 border border-emerald-200">
-                    <h3 className="font-semibold text-emerald-900 mb-2 flex items-center text-xs">
+                  <div className="rounded-2xl border border-primary-200 bg-primary-50/70 p-3 dark:border-primary-500/25 dark:bg-primary-950/25">
+                    <h3 className="font-semibold text-primary-900 dark:text-primary-100 mb-2 flex items-center text-xs">
                       <Settings className="h-3 w-3 mr-2" />
                       Quick Actions
                     </h3>
@@ -1307,7 +1309,7 @@ export function CaseChat({
                       <Button 
                         onClick={handleCompleteCase} 
                         disabled={isCompletingCase}
-                        className="w-full rounded-xl bg-[linear-gradient(135deg,#10B981,#059669)] text-white shadow-[0_10px_28px_-12px_rgba(5,150,105,0.65)] text-xs hover:brightness-105 disabled:opacity-70"
+                        className="w-full rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-primary-foreground shadow-[0_10px_28px_-12px_rgba(var(--color-primary-700-rgb),0.45)] text-xs hover:brightness-105 disabled:opacity-70"
                         size="sm"
                       >
                         {isCompletingCase ? (
@@ -1335,17 +1337,17 @@ export function CaseChat({
       {/* Intervention Alert Overlay */}
       {showIntervention && (
         <div className="fixed inset-0 bg-red-500/20 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl shadow-2xl max-w-md mx-4 border border-red-200 animate-pulse">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+          <div className={cn(APP_GLASS_CARD, "animate-pulse mx-4 max-w-md rounded-xl border border-red-200/80 p-6 shadow-2xl dark:border-red-500/30")}>
+            <div className="mb-4 flex items-center">
+              <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/50">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-300" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-red-900">Doctor Intervention</h3>
-                <p className="text-sm text-red-700">Clinical guidance provided</p>
+                <h3 className="text-lg font-bold text-red-900 dark:text-red-200">Doctor Intervention</h3>
+                <p className="text-sm text-red-700 dark:text-red-300">Clinical guidance provided</p>
               </div>
             </div>
-            <p className="text-gray-800">{interventionMessage}</p>
+            <p className="text-gray-800 dark:text-slate-200">{interventionMessage}</p>
           </div>
         </div>
       )}
@@ -1384,11 +1386,11 @@ export function CaseChat({
       )}
 
       {isTransitioningToSoap && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-white/80 backdrop-blur-sm">
-          <div className="rounded-2xl border border-emerald-200 bg-white px-6 py-5 text-center shadow-xl">
-            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-b-2 border-emerald-600" />
-            <p className="font-medium text-slate-800">Preparing SOAP note...</p>
-            <p className="mt-1 text-xs text-slate-500">Loading case context and your conversation</p>
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm dark:bg-black/60">
+          <div className={cn(APP_GLASS_CARD, "rounded-2xl border border-primary-200/80 px-6 py-5 text-center shadow-xl dark:border-primary-500/25")}>
+            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
+            <p className="font-medium text-slate-800 dark:text-slate-100">Preparing SOAP note...</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Loading case context and your conversation</p>
           </div>
         </div>
       )}

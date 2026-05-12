@@ -66,7 +66,7 @@ export function SystemSelector({ selectedSystems, onSystemToggle, selectedPool, 
 
   return (
     <div className="flex flex-col h-full" data-testid="card-subjects">
-      <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50 shrink-0">
+      <div className="shrink-0 border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <label className="flex items-center cursor-pointer">
@@ -128,7 +128,7 @@ export function SystemSelector({ selectedSystems, onSystemToggle, selectedPool, 
         </div>
       </ScrollArea>
 
-      <div className="px-4 py-2.5 border-t border-border/50 dark:border-gray-700/50 shrink-0 bg-muted/30 dark:bg-gray-700/30">
+      <div className="shrink-0 border-t border-slate-200/80 bg-muted/30 px-4 py-2.5 dark:border-white/10 dark:bg-white/5">
         <p className="text-xs text-muted-foreground dark:text-gray-400">
           <span className="font-medium text-foreground dark:text-gray-100">{selectedSystems.length}</span> of {systems.length} selected
         </p>

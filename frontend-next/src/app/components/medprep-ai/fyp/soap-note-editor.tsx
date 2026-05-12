@@ -16,6 +16,8 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, Send, CheckCircle, Loader2, Lightbulb, Zap, AlertCircle, HelpCircle, Download } from "lucide-react"
+import { cn } from "@/shared/utils/cn"
+import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 interface StudentLike {
   id: string
@@ -243,10 +245,10 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
   const canSubmit = conversation.messages.some((message) => message.role === "student")
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className={cn(APP_PAGE_SHELL, "min-h-screen w-full")}>
+      <header className="border-b border-gray-200 bg-white/90 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
@@ -259,17 +261,32 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                   }
                 }}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">SOAP Note - {medicalCase.title}</h1>
-                <p className="text-sm text-gray-600">Patient: {medicalCase.patientProfile?.name}</p>
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  SOAP Note - {medicalCase.title}
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-slate-400">
+                  Patient: {medicalCase.patientProfile?.name}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              {!isSubmitted && <div className="text-sm text-gray-600">{autoSaveEnabled ? "Auto-save enabled" : "Auto-save disabled"}</div>}
-              {!isSubmitted && <div className="flex items-center gap-2"><span className="text-sm text-gray-600">{completedSections}/4 sections</span><Progress value={completionPercent} className="w-20 h-2" /></div>}
+              {!isSubmitted && (
+                <div className="text-sm text-gray-600 dark:text-slate-400">
+                  {autoSaveEnabled ? "Auto-save enabled" : "Auto-save disabled"}
+                </div>
+              )}
+              {!isSubmitted && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">
+                    {completedSections}/4 sections
+                  </span>
+                  <Progress value={completionPercent} className="h-2 w-20" />
+                </div>
+              )}
               {!isSubmitted && <Button variant="outline" size="sm" onClick={handleSaveDraft}><Save className="h-4 w-4 mr-2" />Save Draft</Button>}
               {!isSubmitted && <Button size="sm" onClick={handleSubmit} disabled={isSubmitting || !canSubmit}><Send className="h-4 w-4 mr-2" />{isSubmitting ? "Submitting..." : "Submit for Grading"}</Button>}
             </div>
@@ -348,13 +365,13 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
           </Tabs>
         ) : (
           <>
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-blue-500/20 dark:from-blue-950/30 dark:to-indigo-950/25">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div><h3 className="text-lg font-semibold text-blue-900">Writing Progress</h3><p className="text-sm text-blue-700">Track your SOAP note completion</p></div>
+                  <div><h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Writing Progress</h3><p className="text-sm text-blue-700 dark:text-blue-200/90">Track your SOAP note completion</p></div>
                   <div className="flex gap-4">
-                    <div className="text-center"><div className="text-2xl font-bold text-blue-900">{completionPercent}%</div><div className="text-xs text-blue-700">Complete</div></div>
-                    <div className="text-center"><div className="text-2xl font-bold text-blue-900">{writingClock}</div><div className="text-xs text-blue-700">Time</div></div>
+                    <div className="text-center"><div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{completionPercent}%</div><div className="text-xs text-blue-700 dark:text-blue-200/80">Complete</div></div>
+                    <div className="text-center"><div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{writingClock}</div><div className="text-xs text-blue-700 dark:text-blue-200/80">Time</div></div>
                   </div>
                 </div>
                 <Progress value={completionPercent} className="h-3" />
@@ -362,7 +379,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
             </Card>
 
             {showTips && (
-              <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+              <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50 dark:border-amber-500/20 dark:from-amber-950/25 dark:to-orange-950/20">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2"><Lightbulb className="h-5 w-5" />Writing Tips - {SECTION_META[activeSection].title}</span>
@@ -371,7 +388,14 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {TIPS[activeSection].map((tip, i) => <div key={i} className="text-sm bg-white/60 rounded p-2">{tip}</div>)}
+                    {TIPS[activeSection].map((tip, i) => (
+                      <div
+                        key={i}
+                        className="rounded bg-white/60 p-2 text-sm dark:bg-white/10 dark:text-slate-200"
+                      >
+                        {tip}
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -383,7 +407,9 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <CardTitle className="flex items-center gap-2">{SECTION_META[section].title} {completion[section] && <CheckCircle className="h-4 w-4 text-green-600" />}</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">{SECTION_META[section].description}</p>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
+                        {SECTION_META[section].description}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Badge variant="secondary">{countWords(values[section])} words</Badge>
@@ -398,7 +424,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {assistantSuggestions[section].length > 0 && (
-                    <div className="border border-blue-200 bg-blue-50 rounded p-3 text-sm">
+                    <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm dark:border-blue-500/25 dark:bg-blue-950/25 dark:text-slate-200">
                       {assistantSuggestions[section].map((suggestion, index) => (
                         <div key={index} className="prose prose-sm max-w-none"><MarkdownContent variant="default">{suggestion}</MarkdownContent></div>
                       ))}
@@ -422,7 +448,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
       {!isSubmitted && (
         <div className="fixed bottom-6 right-6 z-50">
           <div className="flex flex-col gap-2">
-            <div className="bg-white rounded-lg shadow-lg border p-2 space-y-1">
+            <div className={cn(APP_GLASS_CARD, "space-y-1 rounded-lg border p-2 shadow-lg")}>
               <Button
                 variant="ghost"
                 size="sm"

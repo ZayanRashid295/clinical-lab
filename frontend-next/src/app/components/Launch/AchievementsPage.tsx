@@ -184,9 +184,9 @@ export default function AchievementsPage() {
 
   if (!overview) {
     return (
-      <div className="w-full px-4 py-10 sm:px-6 lg:px-10">
-        <Card className="border-slate-200/80 shadow-sm dark:border-slate-800">
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
+      <div className="min-h-screen w-full px-4 py-10 sm:px-6 lg:px-10 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+          <CardContent className="p-8 text-center text-sm text-muted-foreground dark:text-slate-400">
             Couldn&apos;t load achievements. Check your connection and try again.
           </CardContent>
         </Card>
@@ -202,7 +202,7 @@ export default function AchievementsPage() {
       : 0;
 
   return (
-    <div className="w-full space-y-8 px-4 pb-12 pt-6 sm:px-6 lg:px-10">
+    <div className="min-h-screen w-full space-y-8 px-4 pb-12 pt-6 sm:px-6 lg:px-10 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -219,7 +219,7 @@ export default function AchievementsPage() {
           <Badge
             variant="outline"
             className={cn(
-              "gap-1.5 border-slate-200 font-normal dark:border-slate-700",
+              "gap-1.5 border-slate-200 font-normal dark:border-white/10 dark:bg-white/5 dark:text-slate-300",
               live && "border-primary-300/80 bg-primary-50 text-primary-900 dark:border-primary-700 dark:bg-primary-900/35 dark:text-primary-200"
             )}
           >
@@ -232,54 +232,54 @@ export default function AchievementsPage() {
       </header>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-slate-800 dark:from-slate-950 dark:to-slate-900">
+        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
           <CardContent className="p-5">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1 space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground dark:text-slate-400">
                   Points & level
                 </p>
                 <p className="text-3xl font-semibold tabular-nums text-slate-900 dark:text-white">
                   {pts.total.toLocaleString()}
-                  <span className="ml-2 text-base font-medium text-muted-foreground">
+                  <span className="ml-2 text-base font-medium text-muted-foreground dark:text-slate-400">
                     pts
                   </span>
                 </p>
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground dark:text-slate-400">
                     <span>Level {pts.level}</span>
                     <span>
                       {pts.pointsIntoLevel ?? 0} / {pts.pointsPerLevel ?? 200} to level{" "}
                       {(pts.level ?? 1) + 1}
                     </span>
                   </div>
-                  <Progress value={levelProgress} className="h-2 bg-slate-200/80 dark:bg-slate-800" />
+                  <Progress value={levelProgress} className="h-2 bg-slate-200/80 dark:bg-white/10" />
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-slate-800 dark:from-slate-950 dark:to-slate-900">
+        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
           <CardContent className="p-5">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-500/12 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
                 <Flame className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1 space-y-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground dark:text-slate-400">
                   Study streak
                 </p>
                 <p className="text-3xl font-semibold tabular-nums text-slate-900 dark:text-white">
                   {overview.streak.current}
-                  <span className="ml-1.5 text-base font-medium text-muted-foreground">
+                  <span className="ml-1.5 text-base font-medium text-muted-foreground dark:text-slate-400">
                     days
                   </span>
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground dark:text-slate-400">
                   Personal best: {overview.streak.longest} days
                 </p>
               </div>
@@ -287,24 +287,24 @@ export default function AchievementsPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-slate-800 dark:from-slate-950 dark:to-slate-900">
+        <Card className="overflow-hidden border-slate-200/90 bg-gradient-to-br from-slate-50 to-white shadow-sm dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
           <CardContent className="p-5">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
                 <Award className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1 space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground dark:text-slate-400">
                   Achievements
                 </p>
                 <p className="text-3xl font-semibold tabular-nums text-slate-900 dark:text-white">
                   {overview.counts.unlocked}
-                  <span className="text-base font-medium text-muted-foreground">
+                  <span className="text-base font-medium text-muted-foreground dark:text-slate-400">
                     {" "}
                     / {overview.counts.total}
                   </span>
                 </p>
-                <Progress value={badgePct} className="h-2 bg-slate-200/80 dark:bg-slate-800" />
+                <Progress value={badgePct} className="h-2 bg-slate-200/80 dark:bg-white/10" />
               </div>
             </div>
           </CardContent>
@@ -312,19 +312,19 @@ export default function AchievementsPage() {
       </div>
 
       {overview.recent.length > 0 ? (
-        <Card className="overflow-hidden border-slate-200/90 shadow-sm dark:border-slate-800">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/80 pb-4 dark:border-slate-800 dark:bg-slate-900/40">
+        <Card className="overflow-hidden border-slate-200/90 shadow-sm dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+          <CardHeader className="border-b border-slate-100 bg-slate-50/80 pb-4 dark:border-white/10 dark:bg-white/5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white">
                   <Medal className="h-5 w-5 text-primary-600 dark:text-primary-400" aria-hidden />
                   Recent unlocks
                 </CardTitle>
-                <CardDescription className="mt-1">
+                <CardDescription className="mt-1 dark:text-slate-400">
                   Your latest milestones, with dates and points.
                 </CardDescription>
               </div>
-              <Badge variant="outline" className="w-fit shrink-0 font-normal text-muted-foreground">
+              <Badge variant="outline" className="w-fit shrink-0 font-normal text-muted-foreground dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
                 Last {overview.recent.length}
               </Badge>
             </div>
@@ -384,12 +384,12 @@ export default function AchievementsPage() {
           </div>
 
           <Tabs value={category} onValueChange={setCategory} className="w-full">
-            <TabsList className="no-scrollbar flex h-auto w-full flex-wrap justify-start gap-1 bg-slate-100/80 p-1 dark:bg-slate-900/60">
+            <TabsList className="no-scrollbar flex h-auto w-full flex-wrap justify-start gap-1 bg-slate-100/80 p-1 dark:bg-white/10">
               {categories.map((c) => (
                 <TabsTrigger
                   key={c}
                   value={c}
-                  className="rounded-md px-3 py-1.5 text-xs data-[state=active]:shadow-sm"
+                  className="rounded-md px-3 py-1.5 text-xs data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-black dark:data-[state=active]:text-white"
                 >
                   {c === "ALL" ? "All categories" : CATEGORY_LABEL[c] ?? c}
                 </TabsTrigger>
@@ -403,8 +403,8 @@ export default function AchievementsPage() {
             ))}
           </div>
           {filteredItems.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center gap-2 py-12 text-center text-sm text-muted-foreground">
+            <Card className="border-dashed dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+              <CardContent className="flex flex-col items-center gap-2 py-12 text-center text-sm text-muted-foreground dark:text-slate-400">
                 <Target className="h-8 w-8 opacity-40" />
                 Nothing matches these filters yet—keep studying to unlock more.
               </CardContent>
@@ -412,19 +412,19 @@ export default function AchievementsPage() {
           ) : null}
         </div>
 
-        <Card className="h-fit border-slate-200/90 shadow-sm lg:sticky lg:top-24 dark:border-slate-800">
+        <Card className="h-fit border-slate-200/90 shadow-sm lg:sticky lg:top-24 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
           <CardHeader className="space-y-1 pb-3">
-            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold dark:text-white">
               <Crown className="h-4 w-4 text-primary-600 dark:text-primary-400" /> Points leaderboard
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-slate-400">
               Top learners by total points. Updates automatically when anyone earns
               credit.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-0 divide-y divide-slate-100 px-0 pb-4 dark:divide-slate-800">
+          <CardContent className="space-y-0 divide-y divide-slate-100 px-0 pb-4 dark:divide-white/10">
             {leaderboard.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-muted-foreground">
+              <p className="px-6 py-8 text-center text-sm text-muted-foreground dark:text-slate-400">
                 No rankings yet—be the first on the board.
               </p>
             ) : (
@@ -453,7 +453,7 @@ export default function AchievementsPage() {
                       <p className="text-sm font-semibold tabular-nums text-slate-900 dark:text-white">
                         {row.total.toLocaleString()}
                       </p>
-                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground dark:text-slate-500">
                         pts
                       </p>
                     </div>
@@ -491,7 +491,7 @@ function RecentUnlockCard({
         "py-1"
       )}
     >
-      <div className="flex h-full flex-col rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-colors hover:border-primary-300/70 hover:shadow-md dark:border-slate-800 dark:bg-slate-950/40 dark:hover:border-primary-700/50">
+      <div className="flex h-full flex-col rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-colors hover:border-primary-300/70 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:hover:border-primary-700/50">
         <div className="flex gap-3">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/[0.12] text-primary-700 dark:bg-primary-500/15 dark:text-primary-300"
@@ -503,13 +503,13 @@ function RecentUnlockCard({
             <p className="font-semibold leading-snug text-slate-900 dark:text-white">
               {a?.title ?? "Achievement"}
             </p>
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground dark:text-slate-400">
               {CATEGORY_LABEL[cat] ?? cat}
             </p>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
-          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-white/10">
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground dark:text-slate-400">
             <Clock className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />
             <span>{formatUnlockDate(entry.unlockedAt)}</span>
           </span>
@@ -532,7 +532,7 @@ function RankBadge({ rank }: { rank: number }) {
         ? "bg-primary-300 text-primary-900 dark:bg-primary-400 dark:text-primary-900"
         : rank === 3
           ? "bg-primary-200 text-primary-900 dark:bg-primary-600/80 dark:text-white"
-          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300";
+          : "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300";
   return (
     <div
       className={cn(
@@ -556,7 +556,7 @@ function AchievementCard({ achievement: a }: { achievement: AchievementWithProgr
   return (
     <Card
       className={cn(
-        "border-slate-200/90 transition-shadow dark:border-slate-800",
+        "border-slate-200/90 transition-shadow dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md",
         a.unlocked ? "shadow-md shadow-primary-500/10 ring-1 ring-primary-200/50 dark:ring-primary-900/40" : ""
       )}
     >
@@ -567,7 +567,7 @@ function AchievementCard({ achievement: a }: { achievement: AchievementWithProgr
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
               a.unlocked
                 ? "bg-primary-500/15 text-primary-700 dark:text-primary-300"
-                : "bg-slate-100 text-slate-400 dark:bg-slate-800"
+                : "bg-slate-100 text-slate-400 dark:bg-white/10 dark:text-slate-500"
             )}
             aria-hidden
           >
@@ -575,21 +575,21 @@ function AchievementCard({ achievement: a }: { achievement: AchievementWithProgr
           </div>
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="text-base font-semibold leading-snug">{a.title}</CardTitle>
-              <Badge variant="outline" className="font-normal text-[10px]">
+              <CardTitle className="text-base font-semibold leading-snug dark:text-white">{a.title}</CardTitle>
+              <Badge variant="outline" className="font-normal text-[10px] dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
                 {CATEGORY_LABEL[a.category] ?? a.category}
               </Badge>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">{a.description}</p>
-            <p className="text-[11px] text-muted-foreground">
-              Tracked via <span className="font-medium text-slate-700 dark:text-slate-300">{metricLabel}</span>
+            <p className="text-sm leading-relaxed text-muted-foreground dark:text-slate-400">{a.description}</p>
+            <p className="text-[11px] text-muted-foreground dark:text-slate-500">
+              Tracked via <span className="font-medium text-slate-700 dark:text-slate-200">{metricLabel}</span>
             </p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-2 pt-0">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">
+          <span className="text-muted-foreground dark:text-slate-400">
             {a.unlocked ? (
               <span className="inline-flex items-center gap-1 font-medium text-primary-600 dark:text-primary-400">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Unlocked
@@ -605,7 +605,7 @@ function AchievementCard({ achievement: a }: { achievement: AchievementWithProgr
             <Star className="h-3.5 w-3.5" /> +{a.points} pts
           </span>
         </div>
-        <Progress value={a.unlocked ? 100 : pct} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
+        <Progress value={a.unlocked ? 100 : pct} className="h-1.5 bg-slate-100 dark:bg-white/10" />
       </CardContent>
     </Card>
   );

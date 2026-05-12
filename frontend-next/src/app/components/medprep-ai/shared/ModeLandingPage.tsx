@@ -8,6 +8,8 @@ import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
 import { getClinicalUserId } from "@/lib/fyp/medprep-user"
+import { cn } from "@/shared/utils/cn"
+import { APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 interface ModeLandingConfig {
   title: string
@@ -44,11 +46,6 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   const router = useRouter()
   const [isNavigating, setIsNavigating] = useState(false)
   const [resumeSessions, setResumeSessions] = useState<MedprepSession[]>([])
-
-  const themedBackground = {
-    background:
-      "linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 60%, var(--color-primary-50) 100%)",
-  } as const
 
   const decorativeCircle = {
     background:
@@ -146,7 +143,7 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={themedBackground}>
+    <div className={cn(APP_PAGE_SHELL, "relative min-h-screen overflow-hidden")}>
       {/* Decorative ambient circles */}
       <div
         aria-hidden
@@ -189,17 +186,17 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
           </div>
 
           {/* Title */}
-          <h1 className="font-serif font-bold tracking-tight text-gray-900 text-5xl md:text-6xl leading-[1.05] mb-4">
+          <h1 className="font-serif font-bold tracking-tight text-gray-900 dark:text-slate-100 text-5xl md:text-6xl leading-[1.05] mb-4">
             {config.title}
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base md:text-[17px] text-gray-600 mb-8">
+          <p className="text-base md:text-[17px] text-gray-600 dark:text-slate-400 mb-8">
             {config.subtitle}
           </p>
 
           {/* Description */}
-          <p className="mx-auto max-w-2xl text-[15px] md:text-base text-gray-600 leading-relaxed mb-10">
+          <p className="mx-auto max-w-2xl text-[15px] md:text-base text-gray-600 dark:text-slate-400 leading-relaxed mb-10">
             {config.description}
           </p>
 
@@ -208,7 +205,7 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
             {highlights.map(({ title, subtitle, icon: Icon }) => (
               <div
                 key={title}
-                className="rounded-2xl bg-white border border-black/5 px-5 py-4 text-left shadow-[0_2px_10px_-4px_rgba(0,0,0,0.06)]"
+                className="rounded-2xl bg-white border border-black/5 px-5 py-4 text-left shadow-[0_2px_10px_-4px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md"
               >
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -219,10 +216,10 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-[15px] leading-tight">
+                    <h3 className="font-semibold text-gray-900 dark:text-slate-100 text-[15px] leading-tight">
                       {title}
                     </h3>
-                    <p className="text-[13px] text-gray-500 mt-1.5 leading-snug">
+                    <p className="text-[13px] text-gray-500 dark:text-slate-400 mt-1.5 leading-snug">
                       {subtitle}
                     </p>
                   </div>
@@ -255,20 +252,20 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
 
             <Link
               href="/"
-              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+              className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors"
             >
               Back to Dashboard
             </Link>
           </div>
           {resumeSessions.length > 0 ? (
-            <div className="mt-8 rounded-2xl border border-emerald-100 bg-white/85 p-4 text-left">
-              <p className="text-sm font-semibold text-emerald-900">Resume ongoing simulation</p>
+            <div className="mt-8 rounded-2xl border border-primary-100 bg-white/85 p-4 text-left dark:border-primary-500/20 dark:bg-white/5 dark:backdrop-blur-md">
+              <p className="text-sm font-semibold text-primary-900 dark:text-primary-100">Resume ongoing simulation</p>
               <div className="mt-3 space-y-2">
                 {resumeSessions.map((session) => (
                   <Link
                     key={session.id}
                     href={medprepSessionService.getContinueUrl(session)}
-                    className="block rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-sm text-emerald-800 hover:bg-emerald-50"
+                    className="block rounded-lg border border-primary-100 bg-primary-50/60 px-3 py-2 text-sm text-primary-800 hover:bg-primary-50 dark:border-primary-500/20 dark:bg-primary-950/30 dark:text-primary-100 dark:hover:bg-primary-950/50"
                   >
                     {session.title || session.caseId || "Untitled case"}
                   </Link>

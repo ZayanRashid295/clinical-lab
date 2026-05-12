@@ -47,6 +47,8 @@ import {
   isSubscriptionUpgradeRequiredError,
 } from "@/app/services/base/api-http-error";
 import { SubscriptionUpgradeModal } from "@/shared/components/SubscriptionUpgradeModal";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const TYPES: StudyTaskType[] = [
   "READING",
@@ -268,7 +270,7 @@ export default function StudyPlannerPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <SubscriptionUpgradeModal
         open={subscriptionModalOpen}
         onOpenChange={setSubscriptionModalOpen}
@@ -276,7 +278,7 @@ export default function StudyPlannerPage() {
       />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Study Planner</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Study Planner</h1>
           <p className="text-muted-foreground mt-2">
             Plan, schedule, and check off your prep tasks
           </p>
@@ -308,7 +310,7 @@ export default function StudyPlannerPage() {
       )}
 
       {plan ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardHeader>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -353,16 +355,16 @@ export default function StudyPlannerPage() {
                 color="text-purple-600"
               />
             </div>
-            <div className="mt-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="mt-3 w-full rounded-full bg-slate-200 dark:bg-white/10 h-2">
               <div
-                className="bg-emerald-500 h-2 rounded-full transition-all"
+                className="bg-primary-600 h-2 rounded-full transition-all dark:bg-primary-500"
                 style={{ width: `${Math.min(100, progress?.percent ?? 0)}%` }}
               />
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-8 text-center">
             <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
             <h3 className="text-lg font-semibold mb-1">No active plan</h3>
@@ -572,7 +574,7 @@ function Stat({
   color?: string;
 }) {
   return (
-    <div className="rounded-md border p-3">
+    <div className="rounded-md border border-slate-200/80 bg-white/70 p-3 dark:border-white/10 dark:bg-white/5">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className={`text-xl font-bold ${color}`}>{value}</p>
     </div>
@@ -597,24 +599,24 @@ function TaskGroup({
   onDelete: (t: StudyTask) => void;
 }) {
   if (tasks.length === 0) return null;
-  const accent =
+  const toneBorder =
     tone === "overdue"
-      ? "border-red-300"
+      ? "border-red-300/90 dark:border-red-500/35"
       : tone === "today"
-      ? "border-blue-300"
-      : tone === "completed"
-      ? "border-emerald-300"
-      : "border-gray-200";
+        ? "border-primary-300/90 dark:border-primary-600/40"
+        : tone === "completed"
+          ? "border-emerald-300/90 dark:border-emerald-600/35"
+          : "border-slate-200/90 dark:border-white/10";
   return (
-    <Card className={accent}>
+    <Card className={cn(APP_GLASS_CARD, toneBorder)}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-lg dark:text-slate-100">{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {tasks.map((t) => (
           <div
             key={t.id}
-            className="flex items-start gap-3 p-3 rounded-md border bg-gray-50 dark:bg-gray-800/50"
+            className="flex items-start gap-3 rounded-md border border-slate-200/80 bg-slate-50/90 p-3 dark:border-white/10 dark:bg-white/5"
           >
             <div className="pt-0.5">
               {tone === "overdue" ? (
@@ -622,7 +624,7 @@ function TaskGroup({
               ) : tone === "completed" ? (
                 <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               ) : (
-                <Clock className="h-5 w-5 text-blue-500" />
+                <Clock className="h-5 w-5 text-primary-600 dark:text-primary-400" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -690,7 +692,7 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <Card className={cn(APP_GLASS_CARD, "w-full max-w-lg max-h-[90vh] overflow-y-auto")}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{title}</CardTitle>

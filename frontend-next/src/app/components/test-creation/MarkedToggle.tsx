@@ -36,8 +36,8 @@ export function MarkedToggle({ isMarked, onMarkedChange, selectedPool, refreshTr
   }, [refreshTrigger]);
 
   return (
-    <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden" data-testid="card-marked-toggle">
-      <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50">
+    <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5" data-testid="card-marked-toggle">
+      <div className="border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-rose-500" />

@@ -62,6 +62,7 @@ import { LearnCasesPage } from "../components/medprep-ai/LearnCasesPage";
 import { LearningNurseReportPage } from "../components/medprep-ai/LearningNurseReportPage";
 import { EvaluationModePage } from "../components/medprep-ai/EvaluationModePage";
 import { EvaluationCasesPage } from "../components/medprep-ai/EvaluationCasesPage";
+import { EvaluationNurseReportPage } from "../components/medprep-ai/EvaluationNurseReportPage";
 import { MedPrepSlugGate } from "../components/medprep-ai/MedPrepSlugGate";
 
 // Import launch / new-module pages
@@ -167,6 +168,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/medprep-ai/learning-nurse-report": () => <LearningNurseReportPage />,
     "/medprep-ai/evaluation-mode": () => <EvaluationModePage />,
     "/medprep-ai/evaluation-cases": () => <EvaluationCasesPage />,
+    "/medprep-ai/evaluation-nurse-report": () => <EvaluationNurseReportPage />,
     "/medprep-ai/evaluation": () => (
       <MedPrepSlugGate slug="ai-evaluation" modeLabel="AI Evaluation Mode">
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">

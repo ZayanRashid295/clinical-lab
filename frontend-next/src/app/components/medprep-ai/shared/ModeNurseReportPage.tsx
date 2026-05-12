@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
+import { cn } from "@/shared/utils/cn"
+import { APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 interface ModeNurseReportConfig {
   modeLabel: string
   backLabel: string
   backRoute: string
-  startRoute: (caseId: string) => string
+  startRoute: (caseId: string, options?: { generated?: boolean }) => string
   startButtonLabel: string
   startingButtonLabel: string
   cardSubtitle: string
@@ -69,11 +71,6 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isStartingSession, setIsStartingSession] = useState(false)
-
-  const themedBackground = {
-    background:
-      "linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 60%, var(--color-primary-50) 100%)",
-  } as const
 
   const decorativeCircle = {
     background:
@@ -147,7 +144,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
   const handleStartCase = () => {
     if (medicalCase && !isStartingSession) {
       setIsStartingSession(true)
-      router.push(config.startRoute(medicalCase.id))
+      router.push(config.startRoute(medicalCase.id, { generated: isGenerated }))
     }
   }
 
@@ -159,7 +156,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     className?: string
   }) => (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-white border border-black/5 shadow-[0_2px_12px_-6px_rgba(0,0,0,0.08)] ${className}`}
+      className={cn(
+        "relative overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_2px_12px_-6px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md",
+        className
+      )}
     >
       {children}
     </div>
@@ -167,10 +167,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={themedBackground}>
+      <div className={cn(APP_PAGE_SHELL, "min-h-screen flex items-center justify-center")}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-gray-600">Loading nurse report...</p>
+          <p className="text-gray-600 dark:text-slate-400">Loading nurse report...</p>
         </div>
       </div>
     )
@@ -178,10 +178,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
 
   if (error || !medicalCase) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={themedBackground}>
+      <div className={cn(APP_PAGE_SHELL, "min-h-screen flex items-center justify-center")}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Case Not Found</h1>
-          <p className="text-gray-600 mb-6">{error || "The requested case could not be found."}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-4">Case Not Found</h1>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">{error || "The requested case could not be found."}</p>
           <div className="space-x-4">
             <Button onClick={() => router.push(config.backRoute)} variant="outline" className="rounded-xl">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -218,10 +218,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
   ]
 
   return (
-    <div
-      className="relative w-full shrink-0 overflow-x-hidden pb-5 sm:pb-6"
-      style={themedBackground}
-    >
+    <div className={cn(APP_PAGE_SHELL, "relative w-full shrink-0 overflow-x-hidden pb-5 sm:pb-6")}>
       <div
         aria-hidden
         className="pointer-events-none absolute -top-48 -left-48 w-[520px] h-[520px] rounded-full opacity-60"
@@ -234,17 +231,17 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
       />
 
       {/* Clean inline page header */}
-      <div className="bg-white">
+      <div className="border-b border-slate-200/80 bg-white dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
         <div className="container mx-auto px-8 py-6 flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-[22px] md:text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-[22px] md:text-2xl font-bold text-gray-900 dark:text-slate-100 leading-tight">
               Nurse Report
             </h1>
-            <p className="text-[13px] text-gray-500 mt-1">
+            <p className="text-[13px] text-gray-500 dark:text-slate-400 mt-1">
               {config.cardSubtitle}
             </p>
           </div>
-          <div className="text-[13px] font-medium text-gray-700 pt-1">
+          <div className="text-[13px] font-medium text-gray-700 dark:text-slate-300 pt-1">
             {config.modeLabel}
           </div>
         </div>
@@ -260,10 +257,10 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
           <div className="p-6">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
-                <h2 className="text-[20px] font-bold text-gray-900 leading-tight">
+                <h2 className="text-[20px] font-bold text-gray-900 dark:text-slate-100 leading-tight">
                   {medicalCase.title}
                 </h2>
-                <p className="text-[13px] text-gray-500 mt-1 line-clamp-2">
+                <p className="text-[13px] text-gray-500 dark:text-slate-400 mt-1 line-clamp-2">
                   {medicalCase.description}
                 </p>
               </div>
@@ -274,34 +271,34 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-1">
                   Difficulty
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {difficultyLabel}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-1">
                   Duration
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {durationLabel}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-1">
                   Symptoms
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {medicalCase.symptoms.length}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">
+                <div className="text-[11px] uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-1">
                   Type
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900 capitalize">
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100 capitalize">
                   {medicalCase.caseType ?? "Outpatient"}
                 </div>
               </div>
@@ -316,31 +313,31 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
             className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
           />
           <div className="p-6">
-            <h3 className="text-[15px] font-bold text-gray-900 mb-4">
+            <h3 className="text-[15px] font-bold text-gray-900 dark:text-slate-100 mb-4">
               Patient Profile
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
               <div>
-                <div className="text-[12px] text-gray-400 mb-1">Name</div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[12px] text-gray-400 dark:text-slate-500 mb-1">Name</div>
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {medicalCase.patientProfile.name}
                 </div>
               </div>
               <div>
-                <div className="text-[12px] text-gray-400 mb-1">Age</div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[12px] text-gray-400 dark:text-slate-500 mb-1">Age</div>
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {medicalCase.patientProfile.age} years old
                 </div>
               </div>
               <div>
-                <div className="text-[12px] text-gray-400 mb-1">Gender</div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[12px] text-gray-400 dark:text-slate-500 mb-1">Gender</div>
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {medicalCase.patientProfile.gender}
                 </div>
               </div>
               <div>
-                <div className="text-[12px] text-gray-400 mb-1">Occupation</div>
-                <div className="text-[14px] font-semibold text-gray-900">
+                <div className="text-[12px] text-gray-400 dark:text-slate-500 mb-1">Occupation</div>
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-slate-100">
                   {medicalCase.patientProfile.occupation}
                 </div>
               </div>
@@ -349,20 +346,20 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
         </SectionCard>
 
         {/* Presenting Symptoms card (orange) */}
-        <div className="relative overflow-hidden rounded-2xl bg-orange-50/70 border border-orange-200/50 shadow-[0_2px_12px_-6px_rgba(251,146,60,0.18)] mb-5 group">
+        <div className="relative overflow-hidden rounded-2xl border border-primary-200/60 bg-primary-50/70 shadow-[0_2px_12px_-6px_rgba(var(--color-primary-500-rgb),0.18)] mb-5 group dark:border-primary-500/25 dark:bg-primary-500/10">
           <span
             aria-hidden
-            className="absolute top-0 left-0 h-[3px] w-0 bg-orange-500 transition-all duration-500 ease-out group-hover:w-full"
+            className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
           />
           <div className="p-6">
-            <h3 className="text-[15px] font-bold text-orange-700 mb-4">
+            <h3 className="text-[15px] font-bold text-primary-800 mb-4 dark:text-primary-100">
               Presenting Symptoms
             </h3>
 
             <div className="mb-5">
-              <div className="text-[14px] font-semibold text-orange-700">
+              <div className="text-[14px] font-semibold text-primary-800 dark:text-primary-200">
                 Primary Complaint:{" "}
-                <span className="text-orange-900">
+                <span className="text-primary-950 dark:text-primary-50">
                   <MarkdownContent
                     variant="primary"
                     components={{
@@ -377,14 +374,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
 
             {additionalSymptoms.length > 0 && (
               <div>
-                <div className="text-[12px] font-medium text-orange-600/80 mb-2">
+                <div className="text-[12px] font-medium text-primary-700/90 dark:text-primary-300/90 mb-2">
                   Additional Symptoms
                 </div>
                 <div className="space-y-2">
                   {additionalSymptoms.map((symptom, index) => (
                     <div
                       key={index}
-                      className="rounded-xl bg-orange-100/70 border border-orange-200/40 px-4 py-2.5 text-[13px] text-orange-900"
+                      className="rounded-xl border border-primary-200/50 bg-primary-100/60 px-4 py-2.5 text-[13px] text-primary-950 dark:border-primary-500/20 dark:bg-primary-500/15 dark:text-primary-50"
                     >
                       <MarkdownContent
                         variant="primary"
@@ -409,14 +406,14 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
             className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
           />
           <div className="p-6">
-            <h3 className="text-[15px] font-bold text-gray-900 mb-4">
+            <h3 className="text-[15px] font-bold text-gray-900 dark:text-slate-100 mb-4">
               Clinical Notes
             </h3>
             <ul className="space-y-2.5">
               {clinicalNotes.map((note, index) => (
                 <li
                   key={index}
-                  className="flex items-start gap-2.5 text-[13px] text-gray-700 leading-relaxed"
+                  className="flex items-start gap-2.5 text-[13px] leading-relaxed text-gray-700 dark:text-slate-300"
                 >
                   <span className="mt-[7px] w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
                   <span>{note}</span>
@@ -446,7 +443,7 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
         <div className="mt-5 text-center">
           <Link
             href={config.backRoute}
-            className="inline-block text-sm text-gray-500 transition-colors hover:text-gray-800"
+            className="inline-block text-sm text-gray-500 dark:text-slate-400 transition-colors hover:text-gray-800 dark:hover:text-slate-200"
           >
             {config.backLabel}
           </Link>

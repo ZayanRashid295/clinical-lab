@@ -23,6 +23,8 @@ import {
   ChevronDown, ChevronUp
 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { cn } from "@/shared/utils/cn"
+import { APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 function learningConversationSoapFingerprint(messages: LearningConversationMessage[]): string {
   try {
@@ -330,52 +332,6 @@ export function LearningInterface({
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson])
 
-  // Generate vital signs using LLM
-  const generateVitalSigns = useCallback(async () => {
-    if (!medicalCase || vitalSigns || isLoadingVitalSigns) {
-      console.log("Skipping vital signs generation:", { medicalCase: !!medicalCase, vitalSigns: !!vitalSigns, isLoadingVitalSigns })
-      return
-    }
-
-    console.log("Starting LLM vital signs generation for case:", medicalCase)
-    setIsLoadingVitalSigns(true)
-
-    try {
-      const response = await fetch("/api/learning/vital-signs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          disease: medicalCase.disease,
-          specialty: medicalCase.specialty,
-          patientProfile: session.patientProfile,
-          symptoms: medicalCase.symptoms,
-        }),
-      })
-      const generatedVitalSigns = await parseApiJson(response, "Failed to generate vital signs")
-      setVitalSigns(generatedVitalSigns)
-      const updatedSession = {
-        ...session,
-        vitalSigns: generatedVitalSigns,
-      }
-      onSessionUpdate(updatedSession)
-    } catch (error) {
-      console.error("Error generating vital signs:", error)
-      const defaultVitalSigns = {
-        bloodPressure: "120/80",
-        heartRate: 72,
-        temperature: "98.6°F",
-        respiratoryRate: 16,
-      }
-      setVitalSigns(defaultVitalSigns)
-      onSessionUpdate({
-        ...session,
-        vitalSigns: defaultVitalSigns,
-      })
-    } finally {
-      setIsLoadingVitalSigns(false)
-    }
-  }, [medicalCase, vitalSigns, isLoadingVitalSigns, parseApiJson, session, onSessionUpdate])
-
   useEffect(() => {
     // Use prop medical case if available, otherwise load from sample cases or localStorage
     if (propMedicalCase) {
@@ -449,7 +405,6 @@ export function LearningInterface({
       generateVitalSigns()
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, session.vitalSigns, generateVitalSigns])
-  }, [generateVitalSigns, isLoadingVitalSigns, medicalCase, session.vitalSigns, vitalSigns])
 
   const didApplyDbUiRef = useRef(false)
   // Restore UI layout once when session was hydrated from the database
@@ -611,6 +566,8 @@ export function LearningInterface({
       setIsSoapRefreshing(false)
     }
   }, [activeTab, session.isComplete, conversationContentKey, parseApiJson])
+
+  useEffect(() => {
     if (hasLoadedSession) {
       learningService.saveLearningSession(session).catch(console.error)
     }
@@ -1133,13 +1090,13 @@ export function LearningInterface({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={cn(APP_PAGE_SHELL, "min-h-screen bg-background text-foreground")}>
       {/* Resume Modal */}
       {showResumePrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-green-900/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/70 backdrop-blur-sm">
           <div className="bg-card rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 border border-border">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+              <div className="w-20 h-20 bg-gradient-to-r from-primary-500 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
                 <BookOpen className="h-10 w-10 text-white" />
               </div>
               <h2 className="text-xl font-bold text-foreground mb-4">Continue Learning?</h2>
@@ -1157,7 +1114,7 @@ export function LearningInterface({
               </Button>
               <Button 
                 onClick={handleResume}
-                className="flex-1 h-12 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl"
+                className="flex-1 h-12 text-sm bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl"
               >
                 Continue Learning
               </Button>
@@ -1169,14 +1126,14 @@ export function LearningInterface({
       {simulationError && (
         <div
           role="alert"
-          className="mx-4 mt-2 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-900 sm:mx-6"
+          className="mx-4 mt-2 flex items-center justify-between gap-3 rounded-xl border border-red-200 dark:border-red-500/25 bg-red-50 dark:bg-red-500/10 px-4 py-2 text-sm text-red-900 dark:text-red-200 sm:mx-6"
         >
           <span className="min-w-0 flex-1">{simulationError}</span>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="shrink-0 text-red-800 hover:text-red-950"
+            className="shrink-0 text-red-800 dark:text-red-200 hover:text-red-950"
             onClick={() => setSimulationError(null)}
           >
             Dismiss
@@ -1198,7 +1155,7 @@ export function LearningInterface({
             </Button>
             
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">
                 <GraduationCap className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -1217,12 +1174,12 @@ export function LearningInterface({
               {session.isComplete ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-xs font-semibold text-green-600">Complete</span>
+                  <span className="text-xs font-semibold text-green-600 dark:text-emerald-300">Complete</span>
                 </>
               ) : session.conversation.length > 0 ? (
                 <>
                   <Clock className="h-4 w-4 text-blue-400" />
-                  <span className="text-xs font-semibold text-blue-600">In Progress</span>
+                  <span className="text-xs font-semibold text-blue-600 dark:text-blue-300">In Progress</span>
                 </>
               ) : (
                 <>
@@ -1257,7 +1214,7 @@ export function LearningInterface({
               <Button
                 onClick={session.conversation.length === 0 ? startConversation : continueConversation}
                 disabled={isProcessing}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2 rounded-lg font-semibold"
+                className="bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2 rounded-lg font-semibold"
               >
                 {isProcessing ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1274,21 +1231,21 @@ export function LearningInterface({
       </nav>
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-80px)] bg-gray-50">
+      <div className="flex h-[calc(100vh-80px)] bg-gray-50 dark:bg-transparent">
         {/* Left Sidebar - Patient Information */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-white border-r border-gray-200 flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
           <Card className="flex-1 rounded-none border-0 shadow-none">
-              <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+              <CardHeader className="pb-2 bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 border-b">
                 <CardTitle className="flex items-center justify-between text-sm text-foreground">
                   <div className="flex items-center">
-                    <User className="h-5 w-5 text-blue-600 mr-2" />
+                    <User className="h-5 w-5 text-blue-600 dark:text-blue-300 mr-2" />
                     Patient Information
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleShowAllPatientInfo}
-                    className="text-xs px-2 py-1 h-6 bg-blue-100 hover:bg-blue-200 text-blue-700 border border-blue-200"
+                    className="text-xs px-2 py-1 h-6 bg-blue-100 dark:bg-blue-500/15 hover:bg-blue-200 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/25"
                   >
                     {showAllPatientInfo ? "Hide All" : "Show All"}
                   </Button>
@@ -1298,19 +1255,19 @@ export function LearningInterface({
               <ScrollArea className="h-[calc(100vh-140px)]">
                 <div className="p-3 space-y-2">
                   {/* Patient Avatar and Basic Info */}
-                  <div className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 mb-2">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
+                  <div className="text-center bg-gradient-to-br from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-lg p-3 mb-2">
+                    <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
                         <span className="text-xl font-bold text-white">
                         {session.patientProfile.name.charAt(0)}
                       </span>
                     </div>
                     <h3 className="text-lg font-bold text-foreground mb-2">{session.patientProfile.name}</h3>
                     <div className="flex items-center justify-center space-x-2 text-xs mb-2">
-                      <span className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      <span className="flex items-center bg-blue-100 dark:bg-blue-500/15 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
                         <Clock className="h-3 w-3 mr-1" />
                         {session.patientProfile.age} years
                       </span>
-                      <span className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      <span className="flex items-center bg-green-100 dark:bg-emerald-500/15 text-green-800 dark:text-emerald-200 px-2 py-1 rounded-full">
                         <User className="h-3 w-3 mr-1" />
                         {session.patientProfile.gender}
                       </span>
@@ -1325,8 +1282,8 @@ export function LearningInterface({
                     onClick={() => handlePatientInfoSectionChange('demographics')}
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'demographics'
-                        ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-blue-100 dark:bg-blue-500/15 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-500/25'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                     }`}
                   >
                     <User className="h-3 w-3 inline mr-1" />
@@ -1336,8 +1293,8 @@ export function LearningInterface({
                     onClick={() => handlePatientInfoSectionChange('medicalHistory')}
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'medicalHistory'
-                        ? 'bg-red-100 text-red-800 border border-red-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-500/25'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                     }`}
                   >
                     <AlertCircle className="h-3 w-3 inline mr-1" />
@@ -1347,8 +1304,8 @@ export function LearningInterface({
                     onClick={() => handlePatientInfoSectionChange('socialHistory')}
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'socialHistory'
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-green-100 dark:bg-emerald-500/15 text-green-800 dark:text-emerald-200 border border-green-200 dark:border-emerald-500/25'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                     }`}
                   >
                     <Users className="h-3 w-3 inline mr-1" />
@@ -1358,8 +1315,8 @@ export function LearningInterface({
                     onClick={() => handlePatientInfoSectionChange('familyHistory')}
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'familyHistory'
-                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-purple-100 dark:bg-purple-500/15 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-500/25'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                     }`}
                   >
                     <Users className="h-3 w-3 inline mr-1" />
@@ -1370,33 +1327,33 @@ export function LearningInterface({
                 
               {/* Demographics */}
               {(showAllPatientInfo || activePatientInfoSection === 'demographics') && (
-              <div className="bg-gray-50 rounded-lg p-2">
+              <div className="bg-gray-50 dark:bg-white/5 rounded-lg p-2">
                 <button
                   onClick={() => toggleSection('demographics')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-gray-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Demographics
                 </h4>
                   {collapsedSections.demographics ? (
-                    <ChevronDown className="h-4 w-4 text-gray-600" />
+                    <ChevronDown className="h-4 w-4 text-gray-600 dark:text-slate-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-gray-600" />
+                    <ChevronUp className="h-4 w-4 text-gray-600 dark:text-slate-300" />
                   )}
                 </button>
                 {!collapsedSections.demographics && (
                   <>
                     {/* Tab Navigation */}
-                    <div className="flex space-x-1 mb-2 bg-gray-100 rounded-lg p-1">
+                    <div className="flex space-x-1 mb-2 bg-gray-100 dark:bg-white/10 rounded-lg p-1">
                       {['overview', 'details', 'guidelines'].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => handleTabChange('demographics', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.demographics === tab
-                              ? 'bg-white text-gray-900 shadow-sm'
-                              : 'text-gray-600 hover:text-gray-900'
+                              ? 'bg-white text-gray-900 shadow-sm dark:bg-white/15 dark:text-slate-100'
+                              : 'text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100'
                           }`}
                         >
                           {tab === 'overview' ? 'Overview' : tab === 'details' ? 'Details' : 'Guidelines'}
@@ -1409,22 +1366,22 @@ export function LearningInterface({
                       <>
                 {isLoadingPatientInfo ? (
                   <div className="flex items-center justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-                    <span className="ml-2 text-sm text-gray-600">Generating patient info...</span>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">Generating patient info...</span>
               </div>
                 ) : (
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date of Birth:</span>
-                      <span className="text-gray-900 font-medium">{new Date(Date.now() - session.patientProfile.age * 365 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                      <span className="text-gray-600 dark:text-slate-300">Date of Birth:</span>
+                      <span className="text-gray-900 dark:text-slate-100 font-medium">{new Date(Date.now() - session.patientProfile.age * 365 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Marital Status:</span>
-                      <span className="text-gray-900 font-medium">{patientInfo?.demographics.maritalStatus || "Single"}</span>
+                      <span className="text-gray-600 dark:text-slate-300">Marital Status:</span>
+                      <span className="text-gray-900 dark:text-slate-100 font-medium">{patientInfo?.demographics.maritalStatus || "Single"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Insurance:</span>
-                      <span className="text-gray-900 font-medium">{patientInfo?.demographics.insurance || "Private Insurance"}</span>
+                      <span className="text-gray-600 dark:text-slate-300">Insurance:</span>
+                      <span className="text-gray-900 dark:text-slate-100 font-medium">{patientInfo?.demographics.insurance || "Private Insurance"}</span>
                     </div>
                   </div>
                 )}
@@ -1433,17 +1390,17 @@ export function LearningInterface({
 
                     {activeTabs.demographics === 'details' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg p-2 border border-gray-200">
-                          <h5 className="font-semibold text-gray-800 mb-1">Demographic Analysis</h5>
-                          <p className="text-gray-700 text-xs leading-relaxed">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-gray-200 dark:border-white/10">
+                          <h5 className="font-semibold text-gray-800 dark:text-slate-100 mb-1">Demographic Analysis</h5>
+                          <p className="text-gray-700 dark:text-slate-200 text-xs leading-relaxed">
                             Patient demographics provide important context for clinical decision-making. 
                             Age, marital status, and insurance coverage can influence treatment options 
                             and social support systems.
                           </p>
               </div>
-                        <div className="bg-blue-50 rounded-lg p-2 border border-blue-200">
-                          <h5 className="font-semibold text-blue-800 mb-1">Clinical Relevance</h5>
-                          <ul className="text-blue-700 text-xs space-y-1">
+                        <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-2 border border-blue-200 dark:border-blue-500/25">
+                          <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">Clinical Relevance</h5>
+                          <ul className="text-blue-700 dark:text-blue-300 text-xs space-y-1">
                             <li>• Age affects medication dosing and disease risk</li>
                             <li>• Marital status indicates social support</li>
                             <li>• Insurance impacts treatment accessibility</li>
@@ -1454,9 +1411,9 @@ export function LearningInterface({
 
                     {activeTabs.demographics === 'guidelines' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                          <h5 className="font-semibold text-green-800 mb-2">Learning Guidelines</h5>
-                          <ul className="text-green-700 text-xs space-y-1">
+                        <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3 border border-green-200 dark:border-emerald-500/25">
+                          <h5 className="font-semibold text-green-800 dark:text-emerald-200 mb-2">Learning Guidelines</h5>
+                          <ul className="text-green-700 dark:text-emerald-300 text-xs space-y-1">
                             <li>• Always consider patient demographics in clinical reasoning</li>
                             <li>• Understand how age affects disease presentation</li>
                             <li>• Recognize social factors that impact health outcomes</li>
@@ -1472,33 +1429,33 @@ export function LearningInterface({
 
               {/* Medical History */}
               {(showAllPatientInfo || activePatientInfoSection === 'medicalHistory') && (
-              <div className="bg-red-50 rounded-lg p-2">
+              <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-2">
                 <button
                   onClick={() => toggleSection('medicalHistory')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-red-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-red-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-red-900 dark:text-red-200 flex items-center gap-2">
                   <AlertCircle className="h-4 w-4" />
                   Medical History
                 </h4>
                   {collapsedSections.medicalHistory ? (
-                    <ChevronDown className="h-4 w-4 text-red-600" />
+                    <ChevronDown className="h-4 w-4 text-red-600 dark:text-red-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-red-600" />
+                    <ChevronUp className="h-4 w-4 text-red-600 dark:text-red-300" />
                   )}
                 </button>
                 {!collapsedSections.medicalHistory && (
                   <>
                     {/* Tab Navigation */}
-                    <div className="flex space-x-1 mb-2 bg-red-100 rounded-lg p-1">
+                    <div className="flex space-x-1 mb-2 bg-red-100 dark:bg-red-500/15 rounded-lg p-1">
                       {['overview', 'details', 'guidelines'].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => handleTabChange('medicalHistory', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.medicalHistory === tab
-                              ? 'bg-white text-red-900 shadow-sm'
-                              : 'text-red-600 hover:text-red-900'
+                              ? 'bg-white text-red-900 dark:text-red-200 shadow-sm'
+                              : 'text-red-600 dark:text-red-300 hover:text-red-900'
                           }`}
                         >
                           {tab === 'overview' ? 'Overview' : tab === 'details' ? 'Details' : 'Guidelines'}
@@ -1512,26 +1469,26 @@ export function LearningInterface({
                 {isLoadingPatientInfo ? (
                   <div className="flex items-center justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-500"></div>
-                    <span className="ml-2 text-sm text-gray-600">Generating medical history...</span>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">Generating medical history...</span>
                   </div>
                 ) : (
                   <div className="space-y-2 text-sm">
                     {patientInfo?.medicalHistory && patientInfo.medicalHistory.length > 0 ? (
                       patientInfo.medicalHistory.map((historyItem: string, index: number) => (
                         <div key={index}>
-                          <span className="text-red-700 font-medium">History:</span>
-                          <p className="text-red-900 mt-1">{historyItem}</p>
+                          <span className="text-red-700 dark:text-red-300 font-medium">History:</span>
+                          <p className="text-red-900 dark:text-red-200 mt-1">{historyItem}</p>
                         </div>
                       ))
                     ) : (
                       <>
                         <div>
-                          <span className="text-red-700 font-medium">Allergies:</span>
-                          <p className="text-red-900 mt-1">No known allergies</p>
+                          <span className="text-red-700 dark:text-red-300 font-medium">Allergies:</span>
+                          <p className="text-red-900 dark:text-red-200 mt-1">No known allergies</p>
                         </div>
                         <div>
-                          <span className="text-red-700 font-medium">Current Medications:</span>
-                          <p className="text-red-900 mt-1">None</p>
+                          <span className="text-red-700 dark:text-red-300 font-medium">Current Medications:</span>
+                          <p className="text-red-900 dark:text-red-200 mt-1">None</p>
                         </div>
                       </>
                     )}
@@ -1542,17 +1499,17 @@ export function LearningInterface({
 
                     {activeTabs.medicalHistory === 'details' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg p-3 border border-red-200">
-                          <h5 className="font-semibold text-red-800 mb-2">Medical History Analysis</h5>
-                          <p className="text-red-700 text-xs leading-relaxed">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-3 border border-red-200 dark:border-red-500/25">
+                          <h5 className="font-semibold text-red-800 dark:text-red-200 mb-2">Medical History Analysis</h5>
+                          <p className="text-red-700 dark:text-red-300 text-xs leading-relaxed">
                             Understanding a patient's medical history is crucial for identifying risk factors, 
                             drug interactions, and potential complications. This information guides clinical 
                             decision-making and treatment planning.
                           </p>
               </div>
-                        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                          <h5 className="font-semibold text-orange-800 mb-2">Key Considerations</h5>
-                          <ul className="text-orange-700 text-xs space-y-1">
+                        <div className="bg-orange-50 dark:bg-orange-500/10 rounded-lg p-3 border border-orange-200 dark:border-orange-500/25">
+                          <h5 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Key Considerations</h5>
+                          <ul className="text-orange-700 dark:text-orange-300 text-xs space-y-1">
                             <li>• Previous diagnoses and their management</li>
                             <li>• Medication allergies and adverse reactions</li>
                             <li>• Surgical history and complications</li>
@@ -1564,9 +1521,9 @@ export function LearningInterface({
 
                     {activeTabs.medicalHistory === 'guidelines' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                          <h5 className="font-semibold text-green-800 mb-2">Learning Guidelines</h5>
-                          <ul className="text-green-700 text-xs space-y-1">
+                        <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3 border border-green-200 dark:border-emerald-500/25">
+                          <h5 className="font-semibold text-green-800 dark:text-emerald-200 mb-2">Learning Guidelines</h5>
+                          <ul className="text-green-700 dark:text-emerald-300 text-xs space-y-1">
                             <li>• Always ask about medication allergies first</li>
                             <li>• Document previous diagnoses chronologically</li>
                             <li>• Consider drug interactions with current medications</li>
@@ -1582,19 +1539,19 @@ export function LearningInterface({
 
               {/* Social History */}
               {(showAllPatientInfo || activePatientInfoSection === 'socialHistory') && (
-              <div className="bg-green-50 rounded-lg p-3">
+              <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('socialHistory')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-green-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-green-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-green-900 dark:text-emerald-200 flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   Social History
                 </h4>
                   {collapsedSections.socialHistory ? (
-                    <ChevronDown className="h-4 w-4 text-green-600" />
+                    <ChevronDown className="h-4 w-4 text-green-600 dark:text-emerald-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-green-600" />
+                    <ChevronUp className="h-4 w-4 text-green-600 dark:text-emerald-300" />
                   )}
                 </button>
                 {!collapsedSections.socialHistory && (
@@ -1602,21 +1559,21 @@ export function LearningInterface({
                 {isLoadingPatientInfo ? (
                   <div className="flex items-center justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-                    <span className="ml-2 text-sm text-gray-600">Generating social history...</span>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">Generating social history...</span>
                   </div>
                 ) : (
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-green-700">Smoking:</span>
-                      <span className="text-green-900 font-medium">{patientInfo?.socialHistory.smoking || "Never"}</span>
+                      <span className="text-green-700 dark:text-emerald-300">Smoking:</span>
+                      <span className="text-green-900 dark:text-emerald-200 font-medium">{patientInfo?.socialHistory.smoking || "Never"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700">Alcohol:</span>
-                      <span className="text-green-900 font-medium">{patientInfo?.socialHistory.alcohol || "Social drinking"}</span>
+                      <span className="text-green-700 dark:text-emerald-300">Alcohol:</span>
+                      <span className="text-green-900 dark:text-emerald-200 font-medium">{patientInfo?.socialHistory.alcohol || "Social drinking"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700">Exercise:</span>
-                      <span className="text-green-900 font-medium">{patientInfo?.socialHistory.exercise || "Regular"}</span>
+                      <span className="text-green-700 dark:text-emerald-300">Exercise:</span>
+                      <span className="text-green-900 dark:text-emerald-200 font-medium">{patientInfo?.socialHistory.exercise || "Regular"}</span>
                     </div>
                   </div>
                     )}
@@ -1627,19 +1584,19 @@ export function LearningInterface({
 
               {/* Family History */}
               {(showAllPatientInfo || activePatientInfoSection === 'familyHistory') && (
-              <div className="bg-purple-50 rounded-lg p-3">
+              <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('familyHistory')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-purple-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-purple-100 dark:hover:bg-purple-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-purple-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-200 flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   Family History
                 </h4>
                   {collapsedSections.familyHistory ? (
-                    <ChevronDown className="h-4 w-4 text-purple-600" />
+                    <ChevronDown className="h-4 w-4 text-purple-600 dark:text-purple-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-purple-600" />
+                    <ChevronUp className="h-4 w-4 text-purple-600 dark:text-purple-300" />
                   )}
                 </button>
                 {!collapsedSections.familyHistory && (
@@ -1647,17 +1604,17 @@ export function LearningInterface({
                 {isLoadingPatientInfo ? (
                   <div className="flex items-center justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
-                    <span className="ml-2 text-sm text-gray-600">Generating family history...</span>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">Generating family history...</span>
                   </div>
                 ) : (
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span className="text-purple-700 font-medium">Mother:</span>
-                      <p className="text-purple-900 mt-1">{patientInfo?.familyHistory.mother || "No significant family history"}</p>
+                      <span className="text-purple-700 dark:text-purple-300 font-medium">Mother:</span>
+                      <p className="text-purple-900 dark:text-purple-200 mt-1">{patientInfo?.familyHistory.mother || "No significant family history"}</p>
                     </div>
                     <div>
-                      <span className="text-purple-700 font-medium">Father:</span>
-                      <p className="text-purple-900 mt-1">{patientInfo?.familyHistory.father || "No significant family history"}</p>
+                      <span className="text-purple-700 dark:text-purple-300 font-medium">Father:</span>
+                      <p className="text-purple-900 dark:text-purple-200 mt-1">{patientInfo?.familyHistory.father || "No significant family history"}</p>
                     </div>
                   </div>
                     )}
@@ -1672,7 +1629,7 @@ export function LearningInterface({
         </div>
 
         {/* Right Sidebar - Nurse Report */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+        <div className="w-96 bg-white border-l border-gray-200 flex flex-col dark:border-white/10 dark:bg-white/[0.04]" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
           <Card className="flex-1 rounded-none border-0 shadow-none">
             <CardHeader className="pb-2 border-b bg-primary/5">
                 <CardTitle className="flex items-center justify-between text-sm text-foreground">
@@ -1701,7 +1658,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'chiefComplaint'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Target className="h-3 w-3 inline mr-1" />
@@ -1712,7 +1669,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'presentingSymptoms'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1723,7 +1680,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'vitalSigns'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1734,7 +1691,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalNotes'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <AlertTriangle className="h-3 w-3 inline mr-1" />
@@ -1745,7 +1702,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'initialAssessment'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1756,7 +1713,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'learningGuidelines'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <BookOpen className="h-3 w-3 inline mr-1" />
@@ -1767,7 +1724,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalTips'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Target className="h-3 w-3 inline mr-1" />
@@ -1778,7 +1735,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'keyAreas'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1789,7 +1746,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'redFlags'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <AlertTriangle className="h-3 w-3 inline mr-1" />
@@ -1800,7 +1757,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'sessionProgress'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                   }`}
                 >
                   <TrendingUp className="h-3 w-3 inline mr-1" />
@@ -1835,7 +1792,7 @@ export function LearningInterface({
                           onClick={() => handleTabChange('chiefComplaint', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.chiefComplaint === tab
-                              ? 'bg-white text-primary shadow-sm'
+                              ? 'bg-white text-primary shadow-sm dark:bg-white/15'
                               : 'text-primary/80 hover:text-primary'
                           }`}
                         >
@@ -1846,7 +1803,7 @@ export function LearningInterface({
 
                     {/* Tab Content */}
                     {activeTabs.chiefComplaint === 'overview' && (
-                      <div className="bg-white rounded-lg p-2 border border-primary/20 max-w-full overflow-hidden">
+                      <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-primary/20 max-w-full overflow-hidden">
                         <div className="text-primary font-medium text-sm prose prose-sm max-w-full break-words overflow-hidden">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
@@ -1865,7 +1822,7 @@ export function LearningInterface({
 
                     {activeTabs.chiefComplaint === 'analysis' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg p-2 border border-primary/20">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-primary/20">
                           <h5 className="font-semibold text-primary mb-1">Chief Complaint Analysis</h5>
                           <p className="text-primary/90 text-xs leading-relaxed">
                             The chief complaint is the primary reason for the patient's visit. It should be 
@@ -2031,23 +1988,23 @@ export function LearningInterface({
                     {isLoadingVitalSigns ? (
                       <div className="flex items-center justify-center py-4">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                        <span className="ml-2 text-sm text-gray-600">Generating vital signs...</span>
+                        <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">Generating vital signs...</span>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">BP:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.bloodPressure || "120/80"}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">HR:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.heartRate || 72}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">Temp:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.temperature || "98.6°F"}</span>
                         </div>
-                        <div className="bg-white rounded-lg px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">RR:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.respiratoryRate || 16}</span>
                         </div>
@@ -2188,23 +2145,23 @@ export function LearningInterface({
 
               {/* Clinical Guidance */}
               {(showAllNurseReport || activeNurseReportSection === 'clinicalTips') && (
-              <div className="bg-blue-50 rounded-lg p-3">
+              <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('clinicalTips')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-blue-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   Clinical Tips
                 </h4>
                   {collapsedSections.clinicalTips ? (
-                    <ChevronDown className="h-4 w-4 text-blue-600" />
+                    <ChevronDown className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-blue-600" />
+                    <ChevronUp className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                   )}
                 </button>
                 {!collapsedSections.clinicalTips && (
-                <p className="text-sm text-blue-700 leading-relaxed">
+                <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
                   Focus on gathering a comprehensive history. Ask about symptom onset, duration, severity, and any associated symptoms.
                     </p>
                 )}
@@ -2213,23 +2170,23 @@ export function LearningInterface({
 
               {/* Key Areas to Explore */}
               {(showAllNurseReport || activeNurseReportSection === 'keyAreas') && (
-              <div className="bg-green-50 rounded-lg p-3">
+              <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('keyAreas')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-green-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-green-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-green-900 dark:text-emerald-200 flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   Key Areas to Explore
                 </h4>
                   {collapsedSections.keyAreas ? (
-                    <ChevronDown className="h-4 w-4 text-green-600" />
+                    <ChevronDown className="h-4 w-4 text-green-600 dark:text-emerald-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-green-600" />
+                    <ChevronUp className="h-4 w-4 text-green-600 dark:text-emerald-300" />
                   )}
                 </button>
                 {!collapsedSections.keyAreas && (
-                <ul className="text-sm text-green-700 space-y-1">
+                <ul className="text-sm text-green-700 dark:text-emerald-300 space-y-1">
                   <li>• Symptom characteristics and timing</li>
                   <li>• Associated symptoms and triggers</li>
                   <li>• Medical history and medications</li>
@@ -2241,23 +2198,23 @@ export function LearningInterface({
 
               {/* Red Flags */}
               {(showAllNurseReport || activeNurseReportSection === 'redFlags') && (
-              <div className="bg-red-50 rounded-lg p-3">
+              <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('redFlags')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-red-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-red-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-red-900 dark:text-red-200 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
                   Red Flags to Watch For
                 </h4>
                   {collapsedSections.redFlags ? (
-                    <ChevronDown className="h-4 w-4 text-red-600" />
+                    <ChevronDown className="h-4 w-4 text-red-600 dark:text-red-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-red-600" />
+                    <ChevronUp className="h-4 w-4 text-red-600 dark:text-red-300" />
                   )}
                 </button>
                 {!collapsedSections.redFlags && (
-                <p className="text-sm text-red-700 leading-relaxed">
+                <p className="text-sm text-red-700 dark:text-red-300 leading-relaxed">
                   Be alert for symptoms that suggest serious conditions requiring immediate attention.
                 </p>
                 )}
@@ -2266,29 +2223,29 @@ export function LearningInterface({
 
               {/* Session Progress */}
               {(showAllNurseReport || activeNurseReportSection === 'sessionProgress') && (
-              <div className="bg-purple-50 rounded-lg p-3">
+              <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('sessionProgress')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-purple-100 rounded-lg p-2 -m-2 transition-colors"
+                  className="w-full flex items-center justify-between mb-2 hover:bg-purple-100 dark:hover:bg-purple-500/20 rounded-lg p-2 -m-2 transition-colors"
                 >
-                  <h4 className="font-semibold text-purple-900 flex items-center gap-2">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-200 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Session Progress
                 </h4>
                   {collapsedSections.sessionProgress ? (
-                    <ChevronDown className="h-4 w-4 text-purple-600" />
+                    <ChevronDown className="h-4 w-4 text-purple-600 dark:text-purple-300" />
                   ) : (
-                    <ChevronUp className="h-4 w-4 text-purple-600" />
+                    <ChevronUp className="h-4 w-4 text-purple-600 dark:text-purple-300" />
                   )}
                 </button>
                 {!collapsedSections.sessionProgress && (
                 <div className="space-y-2">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-purple-700">Conversation Quality</span>
-                      <span className="text-purple-800 font-medium">{sessionProgressMetrics.conversationQuality}%</span>
+                      <span className="text-purple-700 dark:text-purple-300">Conversation Quality</span>
+                      <span className="text-purple-800 dark:text-purple-200 font-medium">{sessionProgressMetrics.conversationQuality}%</span>
                     </div>
-                    <div className="w-full bg-purple-100 rounded-full h-2">
+                    <div className="w-full bg-purple-100 dark:bg-purple-500/15 rounded-full h-2">
                       <div
                         className="bg-purple-500 h-2 rounded-full transition-[width] duration-300 ease-out"
                         style={{ width: `${sessionProgressMetrics.conversationQuality}%` }}
@@ -2296,12 +2253,12 @@ export function LearningInterface({
                     </div>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-purple-700">Questions Asked</span>
-                    <span className="text-purple-800 font-medium">{sessionProgressMetrics.questionsAsked}</span>
+                    <span className="text-purple-700 dark:text-purple-300">Questions Asked</span>
+                    <span className="text-purple-800 dark:text-purple-200 font-medium">{sessionProgressMetrics.questionsAsked}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-purple-700">Time Spent</span>
-                    <span className="text-purple-800 font-medium">{sessionProgressDurationLabel}</span>
+                    <span className="text-purple-700 dark:text-purple-300">Time Spent</span>
+                    <span className="text-purple-800 dark:text-purple-200 font-medium">{sessionProgressDurationLabel}</span>
                   </div>
                 </div>
                 )}
@@ -2314,28 +2271,28 @@ export function LearningInterface({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col bg-white">
+        <div className="flex-1 flex flex-col bg-white dark:bg-white/[0.03]">
           {/* Conversation Header */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="bg-white border-b border-gray-200 px-6 py-4 dark:border-white/10 dark:bg-white/[0.04]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                   <MessageCircle className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">AI Consultation</h2>
-                  <p className="text-sm text-gray-600">Interactive doctor-patient simulation</p>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">AI Consultation</h2>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Interactive doctor-patient simulation</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
                 <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as "conversation" | "soap")}>
-                  <TabsList className="bg-gray-100 border border-gray-300">
-                    <TabsTrigger value="conversation" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+                  <TabsList className="bg-gray-100 border border-gray-300 dark:border-white/10 dark:bg-white/10">
+                    <TabsTrigger value="conversation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Conversation
                     </TabsTrigger>
-                    <TabsTrigger value="soap" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+                    <TabsTrigger value="soap" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                       <FileText className="h-4 w-4 mr-2" />
                       SOAP Note
                     </TabsTrigger>
@@ -2351,14 +2308,14 @@ export function LearningInterface({
               <ScrollArea className="h-full" ref={scrollAreaRef}>
                 <div className="p-6 space-y-6">
                   {session.conversation.length === 0 ? (
-                    <div className="text-center py-32">
-                      <div className="w-32 h-32 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                    <div className="py-32 text-center">
+                      <div className="mx-auto mb-8 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-primary-700 shadow-2xl">
                         <MessageCircle className="h-16 w-16 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Start Simulation</h3>
-                      <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">Click "Start Simulation" to begin the AI consultation and start your learning journey</p>
-                      <div className="flex items-center justify-center space-x-3 text-sm text-gray-600 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl px-8 py-4 border border-green-200 max-w-md mx-auto">
-                        <Sparkles className="h-6 w-6 text-green-600" />
+                      <h3 className="mb-4 text-2xl font-bold text-gray-800 dark:text-slate-100">Ready to Start Simulation</h3>
+                      <p className="mx-auto mb-8 max-w-md text-lg text-gray-600 dark:text-slate-300">Click &quot;Start Simulation&quot; to begin the AI consultation and start your learning journey</p>
+                      <div className="mx-auto flex max-w-md items-center justify-center space-x-3 rounded-xl border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/60 px-8 py-4 text-sm text-gray-700 dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10 dark:text-slate-200">
+                        <Sparkles className="h-6 w-6 text-primary-600 dark:text-primary-300" />
                         <span>Learn from expert clinical interactions</span>
                       </div>
                     </div>
@@ -2370,8 +2327,8 @@ export function LearningInterface({
                             <div className={`flex items-start space-x-3 max-w-2xl ${message.role === "doctor" ? "flex-row" : "flex-row-reverse"}`}>
                               <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                               message.role === "doctor" 
-                                  ? "bg-green-600" 
-                                  : "bg-blue-600"
+                                  ? "bg-primary" 
+                                  : "bg-primary/70 dark:bg-primary/60"
                             }`}>
                               {message.role === "doctor" ? (
                                   <Stethoscope className="h-5 w-5 text-white" />
@@ -2381,8 +2338,8 @@ export function LearningInterface({
                             </div>
                               <div className={`rounded-lg px-4 py-3 ${
                               message.role === "doctor"
-                                  ? "bg-gray-100 text-gray-800"
-                                  : "bg-blue-600 text-white"
+                                  ? "bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-slate-100"
+                                  : "bg-primary text-primary-foreground"
                               }`}>
                                 <div className="flex items-center mb-1">
                                   <span className="font-semibold text-sm capitalize">{message.role}</span>
@@ -2394,17 +2351,17 @@ export function LearningInterface({
                                 <ReactMarkdown
                                   remarkPlugins={[remarkGfm]}
                                   components={{
-                                    p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                                    h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                                    h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                                    h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                                    ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                    ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                                    p: ({ children }) => <p className="mb-2 text-left last:mb-0">{children}</p>,
+                                    h1: ({ children }) => <h1 className="mb-2 text-left text-lg font-bold">{children}</h1>,
+                                    h2: ({ children }) => <h2 className="mb-2 text-left text-base font-semibold">{children}</h2>,
+                                    h3: ({ children }) => <h3 className="mb-1 text-left text-sm font-semibold">{children}</h3>,
+                                    ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-left">{children}</ul>,
+                                    ol: ({ children }) => <ol className="mb-2 list-inside list-decimal space-y-1 text-left">{children}</ol>,
                                     li: ({ children }) => <li className="text-left text-sm">{children}</li>,
                                     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                                     em: ({ children }) => <em className="italic">{children}</em>,
-                                    code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-gray-300 pl-2 italic">{children}</blockquote>
+                                    code: ({ children }) => <code className="rounded bg-black/10 px-1 py-0.5 font-mono text-xs dark:bg-white/10">{children}</code>,
+                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-current/30 pl-2 italic opacity-90">{children}</blockquote>
                                   }}
                                 >
                                   {message.content}
@@ -2414,26 +2371,26 @@ export function LearningInterface({
                           </div>
                         </div>
                         {showConversationInsights && message.explanation && (
-                            <div className="bg-green-50 border-l-4 border-green-500 p-4 ml-13 rounded-r-lg">
-                              <div className="flex items-center mb-2">
-                                <Lightbulb className="h-4 w-4 text-green-600 mr-2" />
-                                <span className="font-semibold text-green-700 text-sm">Learning Insight</span>
+                            <div className="ml-13 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 p-4 dark:border-primary-400 dark:bg-primary-500/10">
+                              <div className="mb-2 flex items-center">
+                                <Lightbulb className="mr-2 h-4 w-4 text-primary-600 dark:text-primary-300" />
+                                <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">Learning Insight</span>
                             </div>
-                              <div className="text-green-800 leading-relaxed text-sm prose prose-sm max-w-none">
+                              <div className="prose prose-sm max-w-none text-sm leading-relaxed text-primary-900 dark:text-primary-100">
                                 <ReactMarkdown
                                   remarkPlugins={[remarkGfm]}
                                   components={{
-                                    p: ({ children }) => <p className="text-left mb-2 last:mb-0">{children}</p>,
-                                    h1: ({ children }) => <h1 className="text-left text-lg font-bold mb-2">{children}</h1>,
-                                    h2: ({ children }) => <h2 className="text-left text-base font-semibold mb-2">{children}</h2>,
-                                    h3: ({ children }) => <h3 className="text-left text-sm font-semibold mb-1">{children}</h3>,
-                                    ul: ({ children }) => <ul className="text-left list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                    ol: ({ children }) => <ol className="text-left list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                                    p: ({ children }) => <p className="mb-2 text-left last:mb-0">{children}</p>,
+                                    h1: ({ children }) => <h1 className="mb-2 text-left text-lg font-bold">{children}</h1>,
+                                    h2: ({ children }) => <h2 className="mb-2 text-left text-base font-semibold">{children}</h2>,
+                                    h3: ({ children }) => <h3 className="mb-1 text-left text-sm font-semibold">{children}</h3>,
+                                    ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-left">{children}</ul>,
+                                    ol: ({ children }) => <ol className="mb-2 list-inside list-decimal space-y-1 text-left">{children}</ol>,
                                     li: ({ children }) => <li className="text-left text-sm">{children}</li>,
                                     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                                     em: ({ children }) => <em className="italic">{children}</em>,
-                                    code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-gray-300 pl-2 italic">{children}</blockquote>
+                                    code: ({ children }) => <code className="rounded bg-primary-500/15 px-1 py-0.5 font-mono text-xs dark:bg-primary-500/20">{children}</code>,
+                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-primary-300 pl-2 italic dark:border-primary-500/40">{children}</blockquote>
                                   }}
                                 >
                                   {message.explanation}
@@ -2447,9 +2404,9 @@ export function LearningInterface({
                   )}
                   {isProcessing && (
                     <div className="flex justify-center py-12">
-                      <div className="flex items-center space-x-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full px-8 py-4 shadow-xl border border-green-200">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-                        <span className="text-sm font-semibold text-green-700">Generating response...</span>
+                      <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10">
+                        <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                        <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">Generating response...</span>
                       </div>
                     </div>
                   )}
@@ -2459,9 +2416,9 @@ export function LearningInterface({
               <div className="h-full overflow-y-auto p-6">
                 {isSoapRefreshing && (
                   <div className="mb-6 flex justify-center">
-                    <div className="flex items-center space-x-4 rounded-full border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-4 shadow-xl">
-                      <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-green-500"></div>
-                      <span className="text-sm font-semibold text-green-700">
+                    <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10">
+                      <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary-500"></div>
+                      <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">
                         Updating SOAP note to match your conversation…
                       </span>
                     </div>
@@ -2469,86 +2426,86 @@ export function LearningInterface({
                 )}
                 {session.soapNote && (
                   <div className="space-y-6">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 shadow-lg">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 dark:border-emerald-500/25 shadow-lg">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-700 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">S</span>
                         </div>
-                        <h3 className="text-lg font-bold text-green-800">Subjective</h3>
+                        <h3 className="text-lg font-bold text-green-800 dark:text-emerald-200">Subjective</h3>
                       </div>
-                      <div className="bg-white rounded-xl p-4 border border-green-100 mb-4">
-                        <p className="text-gray-700 leading-relaxed text-sm">{session.soapNote.subjective}</p>
+                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
+                        <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.subjective}</p>
                       </div>
                       {session.soapNote.subjectiveExplanation && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
                           <div className="flex items-center mb-2">
-                            <BookOpen className="h-4 w-4 text-blue-600 mr-2" />
-                            <span className="font-semibold text-blue-800 text-sm">Educational Note</span>
+                            <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
+                            <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
                           </div>
-                          <p className="text-blue-700 leading-relaxed text-sm">{session.soapNote.subjectiveExplanation}</p>
+                          <p className="text-primary-800 dark:text-primary-200 leading-relaxed text-sm">{session.soapNote.subjectiveExplanation}</p>
                         </div>
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl p-6 border border-teal-200 shadow-lg">
+                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-500/10 dark:to-cyan-500/10 rounded-2xl p-6 border border-teal-200 dark:border-teal-500/25 shadow-lg">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">O</span>
                         </div>
-                        <h3 className="text-lg font-bold text-teal-800">Objective</h3>
+                        <h3 className="text-lg font-bold text-teal-800 dark:text-teal-200">Objective</h3>
                       </div>
-                      <div className="bg-white rounded-xl p-4 border border-teal-100 mb-4">
-                        <p className="text-gray-700 leading-relaxed text-sm">{session.soapNote.objective}</p>
+                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-teal-100 mb-4 dark:border-teal-500/20">
+                        <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.objective}</p>
                       </div>
                       {session.soapNote.objectiveExplanation && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
                           <div className="flex items-center mb-2">
-                            <BookOpen className="h-4 w-4 text-blue-600 mr-2" />
-                            <span className="font-semibold text-blue-800 text-sm">Educational Note</span>
+                            <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
+                            <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
                           </div>
-                          <p className="text-blue-700 leading-relaxed text-sm">{session.soapNote.objectiveExplanation}</p>
+                          <p className="text-primary-800 dark:text-primary-200 leading-relaxed text-sm">{session.soapNote.objectiveExplanation}</p>
                         </div>
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200 shadow-lg">
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-500/10 dark:to-emerald-500/10 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-500/25 shadow-lg">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">A</span>
                         </div>
-                        <h3 className="text-lg font-bold text-emerald-800">Assessment</h3>
+                        <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-200">Assessment</h3>
                       </div>
-                      <div className="bg-white rounded-xl p-4 border border-emerald-100 mb-4">
-                        <p className="text-gray-700 leading-relaxed text-sm">{session.soapNote.assessment}</p>
+                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-emerald-100 mb-4 dark:border-emerald-500/20">
+                        <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.assessment}</p>
                       </div>
                       {session.soapNote.assessmentExplanation && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
                           <div className="flex items-center mb-2">
-                            <BookOpen className="h-4 w-4 text-blue-600 mr-2" />
-                            <span className="font-semibold text-blue-800 text-sm">Educational Note</span>
+                            <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
+                            <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
                           </div>
-                          <p className="text-blue-700 leading-relaxed text-sm">{session.soapNote.assessmentExplanation}</p>
+                          <p className="text-primary-800 dark:text-primary-200 leading-relaxed text-sm">{session.soapNote.assessmentExplanation}</p>
                         </div>
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6 border border-green-200 shadow-lg">
+                    <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-2xl p-6 border border-green-200 dark:border-emerald-500/25 shadow-lg">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">P</span>
                         </div>
-                        <h3 className="text-lg font-bold text-green-800">Plan</h3>
+                        <h3 className="text-lg font-bold text-green-800 dark:text-emerald-200">Plan</h3>
                       </div>
-                      <div className="bg-white rounded-xl p-4 border border-green-100 mb-4">
-                        <p className="text-gray-700 leading-relaxed text-sm">{session.soapNote.plan}</p>
+                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
+                        <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.plan}</p>
                       </div>
                       {session.soapNote.planExplanation && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
                           <div className="flex items-center mb-2">
-                            <BookOpen className="h-4 w-4 text-blue-600 mr-2" />
-                            <span className="font-semibold text-blue-800 text-sm">Educational Note</span>
+                            <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
+                            <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
                           </div>
-                          <p className="text-blue-700 leading-relaxed text-sm">{session.soapNote.planExplanation}</p>
+                          <p className="text-primary-800 dark:text-primary-200 leading-relaxed text-sm">{session.soapNote.planExplanation}</p>
                         </div>
                       )}
                     </div>
@@ -2565,7 +2522,7 @@ export function LearningInterface({
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsDoctorChatOpen(!isDoctorChatOpen)}
-          className="rounded-full shadow-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 animate-bounce"
+          className="rounded-full shadow-lg bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white px-6 py-3 animate-bounce"
           size="lg"
         >
           <Brain className="h-5 w-5 mr-2" />
@@ -2593,10 +2550,10 @@ export function LearningInterface({
           <div className="chat-header p-3 border-b bg-secondary rounded-t-lg cursor-move">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Brain className="h-4 w-4 text-green-600" />
-                <h3 className="font-semibold text-foreground text-xs">Ask Doctor</h3>
+                <Brain className="h-4 w-4 text-primary-600 dark:text-primary-300" />
+                <h3 className="text-xs font-semibold text-foreground">Ask Doctor</h3>
                 {studentDoctorChat.length > 0 && (
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-primary-500"></div>
                 )}
               </div>
               <div className="flex items-center gap-1">
@@ -2627,10 +2584,10 @@ export function LearningInterface({
             <>
               <div className="h-64 overflow-y-auto p-3 space-y-2">
                 {studentDoctorChat.length === 0 && (
-                  <div className="text-center text-muted-foreground text-xs py-8">
-                    <Brain className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <div className="py-8 text-center text-xs text-muted-foreground">
+                    <Brain className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
                     <p>Ask the doctor any questions about the case</p>
-                    <p className="text-xs mt-1">Get guidance on clinical reasoning</p>
+                    <p className="mt-1 text-xs">Get guidance on clinical reasoning</p>
                   </div>
                 )}
                 
@@ -2638,33 +2595,33 @@ export function LearningInterface({
                   <div key={idx} className="space-y-1">
                     {msg.role === "student" && (
                       <div className="flex justify-end">
-                        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg p-2 max-w-xs text-xs shadow-sm">
+                        <div className="bg-gradient-to-r from-primary-500 to-primary-700 text-white rounded-lg p-2 max-w-xs text-xs shadow-sm">
                           <p>{msg.content}</p>
                         </div>
                       </div>
                     )}
                     
                     {msg.role === "doctor" && (
-                      <div className="bg-secondary rounded-lg p-2 text-xs border border-border">
-                        <div className="flex items-center gap-1 mb-1">
-                          <Brain className="h-3 w-3 text-green-600" />
-                          <span className="text-xs font-medium text-green-600">Doctor</span>
+                      <div className="rounded-lg border border-border bg-secondary p-2 text-xs">
+                        <div className="mb-1 flex items-center gap-1">
+                          <Brain className="h-3 w-3 text-primary-600 dark:text-primary-300" />
+                          <span className="text-xs font-medium text-primary-700 dark:text-primary-200">Doctor</span>
                         </div>
-                        <div className="text-foreground text-xs prose prose-xs max-w-none">
+                        <div className="prose prose-xs max-w-none text-xs text-foreground">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
                               p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
-                              h1: ({ children }) => <h1 className="text-sm font-bold mb-1">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-xs font-semibold mb-1">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-xs font-semibold mb-1">{children}</h3>,
-                              ul: ({ children }) => <ul className="list-disc list-inside mb-1 space-y-0.5">{children}</ul>,
-                              ol: ({ children }) => <ol className="list-decimal list-inside mb-1 space-y-0.5">{children}</ol>,
+                              h1: ({ children }) => <h1 className="mb-1 text-sm font-bold">{children}</h1>,
+                              h2: ({ children }) => <h2 className="mb-1 text-xs font-semibold">{children}</h2>,
+                              h3: ({ children }) => <h3 className="mb-1 text-xs font-semibold">{children}</h3>,
+                              ul: ({ children }) => <ul className="mb-1 list-inside list-disc space-y-0.5">{children}</ul>,
+                              ol: ({ children }) => <ol className="mb-1 list-inside list-decimal space-y-0.5">{children}</ol>,
                               li: ({ children }) => <li className="text-xs">{children}</li>,
                               strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                               em: ({ children }) => <em className="italic">{children}</em>,
-                              code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                              blockquote: ({ children }) => <blockquote className="border-l-2 border-gray-300 pl-1 italic">{children}</blockquote>
+                              code: ({ children }) => <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">{children}</code>,
+                              blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-1 italic">{children}</blockquote>
                             }}
                           >
                             {msg.content}
@@ -2676,17 +2633,17 @@ export function LearningInterface({
                 ))}
                 
                 {isDoctorResponding && (
-                  <div className="bg-secondary rounded-lg p-2 text-xs border border-border">
-                    <div className="flex items-center gap-1 mb-1">
-                      <Brain className="h-3 w-3 text-green-600" />
-                      <span className="text-xs font-medium text-green-600">Doctor</span>
-                      <div className="flex gap-1 ml-2">
-                        <div className="w-1 h-1 bg-green-500 rounded-full animate-bounce"></div>
-                        <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                        <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <div className="rounded-lg border border-border bg-secondary p-2 text-xs">
+                    <div className="mb-1 flex items-center gap-1">
+                      <Brain className="h-3 w-3 text-primary-600 dark:text-primary-300" />
+                      <span className="text-xs font-medium text-primary-700 dark:text-primary-200">Doctor</span>
+                      <div className="ml-2 flex gap-1">
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-500"></div>
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-400" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="h-1 w-1 animate-bounce rounded-full bg-primary-400" style={{ animationDelay: "0.2s" }}></div>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-xs">Doctor is thinking...</p>
+                    <p className="text-xs text-muted-foreground">Doctor is thinking...</p>
                   </div>
                 )}
               </div>
@@ -2695,7 +2652,7 @@ export function LearningInterface({
               <div className="p-3 border-t bg-secondary rounded-b-lg">
                 <div className="flex items-center gap-2">
                   <Input
-                    className="flex-1 text-xs border-border focus:border-green-500"
+                    className="flex-1 text-xs border-border focus:border-primary"
                     value={studentQuestion}
                     onChange={(e) => setStudentQuestion(e.target.value)}
                     placeholder="Ask the doctor..."
@@ -2708,7 +2665,7 @@ export function LearningInterface({
                     onClick={handleStudentToDoctorQuestion}
                     disabled={isDoctorResponding || !studentQuestion.trim()}
                     size="sm"
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
+                    className="bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white"
                   >
                     <Send className="h-3 w-3" />
                   </Button>

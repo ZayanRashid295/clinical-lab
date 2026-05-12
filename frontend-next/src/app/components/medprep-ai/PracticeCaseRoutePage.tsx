@@ -14,6 +14,8 @@ import { authService } from "@/shared/services/auth.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { cn } from "@/shared/utils/cn"
+import { APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 const ANON: User = {
   id: "anonymous",
@@ -37,8 +39,8 @@ function PracticeCaseEntitlementGate({ children }: { children: ReactNode }) {
   const router = useRouter()
   if (!router.isReady) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-blue-600" />
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
@@ -154,15 +156,15 @@ function CasePageInner() {
 
   if (!router.isReady) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
 
   if (!caseId) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
         <Card>
           <CardHeader>
             <CardTitle>Invalid case URL</CardTitle>
@@ -183,11 +185,11 @@ function CasePageInner() {
 
   if (loading) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
         <Card>
-          <CardContent className="text-center p-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading case...</p>
+          <CardContent className="p-8 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+            <p className="text-gray-600 dark:text-slate-400">Loading case...</p>
           </CardContent>
         </Card>
       </div>
@@ -196,7 +198,7 @@ function CasePageInner() {
 
   if (error || !medicalCase) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
+      <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
         <Card>
           <CardHeader>
             <CardTitle>Case Not Found</CardTitle>
@@ -232,8 +234,8 @@ export function PracticeCaseRoutePage() {
     <PracticeCaseEntitlementGate>
       <Suspense
         fallback={
-          <div className="flex flex-1 items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+          <div className={cn(APP_PAGE_SHELL, "flex flex-1 items-center justify-center p-8")}>
+            <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
           </div>
         }
       >

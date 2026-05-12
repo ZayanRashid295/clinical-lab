@@ -110,13 +110,13 @@ export function DiagnosisSubmission({
 
   if (!showForm && submissionResult) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="mx-auto w-full max-w-2xl border-border">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             {submissionResult.feedback.isCorrect ? (
-              <CheckCircle className="h-6 w-6 text-green-500" />
+              <CheckCircle className="h-6 w-6 text-primary" />
             ) : (
-              <XCircle className="h-6 w-6 text-red-500" />
+              <XCircle className="h-6 w-6 text-red-500 dark:text-red-400" />
             )}
             Diagnosis Submission Result
           </CardTitle>
@@ -125,22 +125,28 @@ export function DiagnosisSubmission({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert className={submissionResult.feedback.isCorrect ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
+          <Alert
+            className={
+              submissionResult.feedback.isCorrect
+                ? "border-primary-200 bg-primary-50 dark:border-primary-500/25 dark:bg-primary-500/10"
+                : "border-red-200 bg-red-50 dark:border-red-500/25 dark:bg-red-500/10"
+            }
+          >
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
+            <AlertDescription className="text-foreground">
               {submissionResult.feedback.message}
             </AlertDescription>
           </Alert>
 
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <h4 className="font-semibold text-sm text-gray-600">Your Diagnosis:</h4>
-              <p className="text-lg">{submissionResult.feedback.submittedDiagnosis}</p>
+              <h4 className="text-sm font-semibold text-muted-foreground">Your Diagnosis:</h4>
+              <p className="text-lg text-foreground">{submissionResult.feedback.submittedDiagnosis}</p>
             </div>
             {mode !== "assessment" && (
               <div>
-                <h4 className="font-semibold text-sm text-gray-600">Actual Diagnosis:</h4>
-                <p className="text-lg">{submissionResult.feedback.actualDiagnosis}</p>
+                <h4 className="text-sm font-semibold text-muted-foreground">Actual Diagnosis:</h4>
+                <p className="text-lg text-foreground">{submissionResult.feedback.actualDiagnosis}</p>
               </div>
             )}
           </div>
@@ -183,16 +189,16 @@ export function DiagnosisSubmission({
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl border-border">
       <CardHeader>
-        <CardTitle>Submit Your Diagnosis</CardTitle>
+        <CardTitle className="text-foreground">Submit Your Diagnosis</CardTitle>
         <CardDescription>
           Based on your conversation with the patient, what do you think is the diagnosis?
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="diagnosis" className="text-sm font-medium">
+          <label htmlFor="diagnosis" className="text-sm font-medium text-foreground">
             Your Diagnosis:
           </label>
           <Input
@@ -218,9 +224,9 @@ export function DiagnosisSubmission({
         </div>
 
         {caseMetadata.isRare && (
-          <Alert>
+          <Alert className="border-amber-200 bg-amber-50 dark:border-amber-500/25 dark:bg-amber-950/25">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
+            <AlertDescription className="text-foreground">
               This is a rare disease case! Consider subtle clues, family history, 
               and specialized testing that might be needed for diagnosis.
             </AlertDescription>
@@ -230,7 +236,7 @@ export function DiagnosisSubmission({
         <Button 
           onClick={handleSubmit} 
           disabled={!diagnosis.trim() || isSubmitting}
-          className="w-full"
+          className="w-full bg-gradient-to-r from-primary-500 to-primary-700 text-primary-foreground hover:brightness-105"
         >
           {isSubmitting ? "Submitting..." : "Submit Diagnosis"}
         </Button>

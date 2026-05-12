@@ -58,19 +58,19 @@ export function TestTable({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-slate-200/90 bg-white dark:border-white/10 dark:bg-white/5">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50 dark:bg-gray-800/50">
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">SCORE</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">NAME</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">DATE</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">MODE</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">Q.POOL</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">SUBJECTS</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100">SYSTEMS</TableHead>
-            <TableHead className="font-semibold text-foreground dark:text-gray-100"># QS</TableHead>
-            <TableHead className="font-semibold text-right text-foreground dark:text-gray-100">ACTIONS</TableHead>
+          <TableRow className="bg-slate-50 dark:bg-white/5">
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">SCORE</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">NAME</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">DATE</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">MODE</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">Q.POOL</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">SUBJECTS</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100">SYSTEMS</TableHead>
+            <TableHead className="font-semibold text-gray-900 dark:text-slate-100"># QS</TableHead>
+            <TableHead className="text-right font-semibold text-gray-900 dark:text-slate-100">ACTIONS</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -78,7 +78,7 @@ export function TestTable({
             <TableRow>
               <TableCell
                 colSpan={9}
-                className="text-center py-8 text-muted-foreground dark:text-gray-400"
+                className="py-8 text-center text-muted-foreground dark:text-slate-400"
               >
                 No tests found
               </TableCell>
@@ -87,7 +87,7 @@ export function TestTable({
             tests.map((test) => (
               <TableRow
                 key={test.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                className="hover:bg-slate-50 dark:hover:bg-white/5"
                 data-testid={`row-test-${test.id}`}
               >
                 <TableCell>
@@ -99,19 +99,19 @@ export function TestTable({
                   </Badge>
                 </TableCell>
                 <TableCell
-                  className="font-medium text-foreground dark:text-gray-100"
+                  className="font-medium text-gray-900 dark:text-slate-100"
                   data-testid={`text-name-${test.id}`}
                 >
                   {test.name}
                 </TableCell>
-                <TableCell className="text-muted-foreground dark:text-gray-400">
+                <TableCell className="text-muted-foreground dark:text-slate-400">
                   {test.date}
                 </TableCell>
-                <TableCell className="text-foreground dark:text-gray-200">{test.mode}</TableCell>
-                <TableCell className="text-foreground dark:text-gray-200">{test.pool}</TableCell>
-                <TableCell className="text-foreground dark:text-gray-200">{test.subjects}</TableCell>
-                <TableCell className="text-foreground dark:text-gray-200">{test.systems}</TableCell>
-                <TableCell className="font-mono text-foreground dark:text-gray-200">
+                <TableCell className="text-gray-900 dark:text-slate-200">{test.mode}</TableCell>
+                <TableCell className="text-gray-900 dark:text-slate-200">{test.pool}</TableCell>
+                <TableCell className="text-gray-900 dark:text-slate-200">{test.subjects}</TableCell>
+                <TableCell className="text-gray-900 dark:text-slate-200">{test.systems}</TableCell>
+                <TableCell className="font-mono text-gray-900 dark:text-slate-200">
                   {test.questionCount}
                 </TableCell>
                 <TableCell className="text-right">
@@ -120,7 +120,7 @@ export function TestTable({
                       variant="ghost"
                       size="sm"
                       onClick={() => onResume?.(test.id)}
-                      className="text-foreground dark:text-gray-200 hover:bg-muted dark:hover:bg-gray-800"
+                      className="text-gray-900 hover:bg-muted dark:text-slate-200 dark:hover:bg-white/10"
                       data-testid={`button-resume-${test.id}`}
                     >
                       <Play className="h-4 w-4 mr-1" />
@@ -130,7 +130,7 @@ export function TestTable({
                       variant="ghost"
                       size="sm"
                       onClick={() => onViewResults?.(test.id)}
-                      className="text-foreground dark:text-gray-200 hover:bg-muted dark:hover:bg-gray-800"
+                      className="text-gray-900 hover:bg-muted dark:text-slate-200 dark:hover:bg-white/10"
                       data-testid={`button-results-${test.id}`}
                     >
                       <FileText className="h-4 w-4 mr-1" />
@@ -140,7 +140,7 @@ export function TestTable({
                       variant="ghost"
                       size="sm"
                       onClick={() => onViewAnalysis?.(test.id)}
-                      className="text-foreground dark:text-gray-200 hover:bg-muted dark:hover:bg-gray-800"
+                      className="text-gray-900 hover:bg-muted dark:text-slate-200 dark:hover:bg-white/10"
                       data-testid={`button-analysis-${test.id}`}
                     >
                       <BarChart3 className="h-4 w-4 mr-1" />
@@ -156,9 +156,9 @@ export function TestTable({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-card dark:bg-gray-800 border-border dark:border-gray-700">
-                        <DropdownMenuItem className="text-foreground dark:text-gray-200 hover:bg-muted dark:hover:bg-gray-700">Edit Test Mode</DropdownMenuItem>
-                        <DropdownMenuItem className="text-foreground dark:text-gray-200 hover:bg-muted dark:hover:bg-gray-700">Copy Test ID</DropdownMenuItem>
+                      <DropdownMenuContent align="end" className="border-slate-200/90 bg-white dark:border-white/10 dark:bg-white/5">
+                        <DropdownMenuItem className="text-gray-900 hover:bg-muted dark:text-slate-200 dark:hover:bg-white/10">Edit Test Mode</DropdownMenuItem>
+                        <DropdownMenuItem className="text-gray-900 hover:bg-muted dark:text-slate-200 dark:hover:bg-white/10">Copy Test ID</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive dark:text-red-400 hover:bg-destructive/10 dark:hover:bg-red-900/20">
                           Delete Test
                         </DropdownMenuItem>

@@ -23,6 +23,11 @@ import {
   Users,
   MessageSquare,
 } from "lucide-react";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
+
+const TILE_ICON = "text-primary-600 dark:text-primary-400";
+const TILE_ICON_BG = "bg-primary-500/10 dark:bg-primary-500/15";
 
 const TILES = [
   {
@@ -31,8 +36,6 @@ const TILES = [
     description:
       "Practice the live medical question library. Filter by system, topic and difficulty, and bookmark for later.",
     icon: BookOpen,
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-500/10 dark:bg-blue-500/20",
   },
   {
     href: "/study/flashcards",
@@ -40,8 +43,6 @@ const TILES = [
     description:
       "Spaced-repetition decks. Review what's due today and add your own cards for active recall.",
     icon: Layers,
-    color: "text-purple-600 dark:text-purple-400",
-    bg: "bg-purple-500/10 dark:bg-purple-500/20",
   },
   {
     href: "/study/notes",
@@ -49,8 +50,6 @@ const TILES = [
     description:
       "Pin pearls, mnemonics and full write-ups. Tag and search across everything you've captured.",
     icon: StickyNote,
-    color: "text-amber-600 dark:text-amber-400",
-    bg: "bg-amber-500/10 dark:bg-amber-500/20",
   },
   {
     href: "/study-planner",
@@ -58,8 +57,6 @@ const TILES = [
     description:
       "Plan tasks day-by-day, track time and stay accountable. Auto-generates a default plan if you don't have one.",
     icon: CalendarDays,
-    color: "text-emerald-600 dark:text-emerald-400",
-    bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
   },
   {
     href: "/goals",
@@ -67,8 +64,6 @@ const TILES = [
     description:
       "Set daily, weekly or monthly targets and watch progress update automatically as you study.",
     icon: Target,
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-500/10 dark:bg-blue-500/20",
   },
   {
     href: "/achievements",
@@ -76,8 +71,6 @@ const TILES = [
     description:
       "Earn badges, build streaks, and level up as you complete questions, decks and goals.",
     icon: Trophy,
-    color: "text-amber-600 dark:text-amber-400",
-    bg: "bg-amber-500/10 dark:bg-amber-500/20",
   },
   {
     href: "/ai-tutor",
@@ -85,8 +78,6 @@ const TILES = [
     description:
       "Ask anything — get clear explanations, quizzes and study plans tailored to you.",
     icon: Sparkles,
-    color: "text-violet-600 dark:text-violet-400",
-    bg: "bg-violet-500/10 dark:bg-violet-500/20",
   },
   {
     href: "/mock-exams",
@@ -94,8 +85,6 @@ const TILES = [
     description:
       "Take full-length, timed exams that mirror the real thing. Auto-grading and detailed history.",
     icon: ClipboardList,
-    color: "text-rose-600 dark:text-rose-400",
-    bg: "bg-rose-500/10 dark:bg-rose-500/20",
   },
   {
     href: "/discussions",
@@ -103,8 +92,6 @@ const TILES = [
     description:
       "Ask the community, answer questions, and learn from peers and faculty.",
     icon: MessageSquare,
-    color: "text-indigo-600 dark:text-indigo-400",
-    bg: "bg-indigo-500/10 dark:bg-indigo-500/20",
   },
   {
     href: "/study-groups",
@@ -112,18 +99,16 @@ const TILES = [
     description:
       "Form a private or public study circle, share posts, and stay accountable together.",
     icon: Users,
-    color: "text-teal-600 dark:text-teal-400",
-    bg: "bg-teal-500/10 dark:bg-teal-500/20",
   },
 ] as const;
 
 export default function StudyIndexPage() {
   const router = useRouter();
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Study</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Study</h1>
+        <p className="text-muted-foreground mt-2 dark:text-slate-400">
           Everything you need to study — questions, flashcards, notes and
           materials in one place.
         </p>
@@ -134,24 +119,28 @@ export default function StudyIndexPage() {
           return (
             <Card
               key={t.href}
-              className="cursor-pointer hover:shadow-md transition"
+              className={cn(
+                "cursor-pointer transition hover:shadow-md",
+                APP_GLASS_CARD
+              )}
               onClick={() => router.push(t.href)}
             >
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className={`p-3 rounded-lg ${t.bg} ${t.color}`}>
+                  <div className={cn("rounded-lg p-3", TILE_ICON_BG, TILE_ICON)}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <CardTitle>{t.title}</CardTitle>
+                  <CardTitle className="dark:text-slate-100">{t.title}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="mb-3">
+                <CardDescription className="mb-3 dark:text-slate-400">
                   {t.description}
                 </CardDescription>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(t.href);

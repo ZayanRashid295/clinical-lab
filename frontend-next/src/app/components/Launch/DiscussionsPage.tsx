@@ -43,6 +43,12 @@ import { useToast } from "@/shared/ui/use-toast";
 import {
   toastApiError,
 } from "@/app/services/base/api-http-error";
+import { cn } from "@/shared/utils/cn";
+import {
+  APP_GLASS_CARD,
+  APP_PAGE_PADDING,
+  APP_PAGE_SHELL,
+} from "@/app/config/app-shell";
 
 const CONTEXT_OPTIONS: DiscussionContext[] = [
   "GENERAL",
@@ -130,11 +136,18 @@ function DiscussionList() {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <MessageSquare className="text-indigo-600" /> Discussions
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+            <MessageSquare className="text-indigo-600 dark:text-indigo-400" />{" "}
+            Discussions
           </h1>
           <p className="text-muted-foreground mt-1">
             Ask questions, share insights and learn from the community.
@@ -145,7 +158,7 @@ function DiscussionList() {
         </Button>
       </div>
 
-      <Card>
+      <Card className={cn(APP_GLASS_CARD)}>
         <CardContent className="p-4 flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -184,9 +197,12 @@ function DiscussionList() {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : items.length === 0 ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-12 text-center text-muted-foreground">
-            <MessageSquare className="mx-auto mb-3 text-gray-300" size={42} />
+            <MessageSquare
+              className="mx-auto mb-3 text-gray-300 dark:text-slate-600"
+              size={42}
+            />
             <p className="font-medium">No discussions yet.</p>
             <p className="text-xs">Be the first to start one.</p>
           </CardContent>
@@ -196,7 +212,10 @@ function DiscussionList() {
           {items.map((d) => (
             <Card
               key={d.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className={cn(
+                APP_GLASS_CARD,
+                "hover:shadow-md transition-shadow cursor-pointer"
+              )}
               onClick={() => router.push(`/discussions/${d.id}`)}
             >
               <CardContent className="p-4 flex items-start gap-4">
@@ -243,7 +262,7 @@ function DiscussionList() {
 
       {showNew && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <Card className="w-full max-w-2xl">
+          <Card className={cn(APP_GLASS_CARD, "w-full max-w-2xl")}>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Start a discussion</CardTitle>
               <Button
@@ -383,7 +402,13 @@ function DiscussionDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <Button
         variant="ghost"
         size="sm"
@@ -398,7 +423,7 @@ function DiscussionDetail({ id }: { id: string }) {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : !d ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-6 text-sm text-muted-foreground">
             Discussion not found.
           </CardContent>
@@ -407,13 +432,13 @@ function DiscussionDetail({ id }: { id: string }) {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-stretch h-[calc(100dvh-140px)] overflow-hidden">
             <div className="space-y-4 min-w-0 flex flex-col h-full overflow-hidden">
-              <Card className="w-full shrink-0">
+              <Card className={cn(APP_GLASS_CARD, "w-full shrink-0")}>
                 <CardContent className="p-6">
                   <div className="flex items-start gap-5">
                     <div className="flex flex-col items-center gap-1 min-w-[52px]">
                       <button
                         onClick={() => onVote(1)}
-                        className="p-2 rounded-md hover:bg-emerald-100 text-emerald-700"
+                        className="p-2 rounded-md hover:bg-emerald-100 text-emerald-700 dark:hover:bg-emerald-950/50 dark:text-emerald-400"
                         aria-label="Upvote"
                       >
                         <ThumbsUp className="h-4 w-4" />
@@ -421,7 +446,7 @@ function DiscussionDetail({ id }: { id: string }) {
                       <span className="font-bold text-base">{d.upvotes}</span>
                       <button
                         onClick={() => onVote(-1)}
-                        className="p-2 rounded-md hover:bg-red-100 text-red-600"
+                        className="p-2 rounded-md hover:bg-red-100 text-red-600 dark:hover:bg-red-950/40 dark:text-red-400"
                         aria-label="Downvote"
                       >
                         <ThumbsDown className="h-4 w-4" />
@@ -443,7 +468,7 @@ function DiscussionDetail({ id }: { id: string }) {
                         <Badge variant="outline">{d.context}</Badge>
                       </div>
 
-                      <h1 className="text-2xl lg:text-3xl font-bold leading-tight">
+                      <h1 className="text-2xl lg:text-3xl font-bold leading-tight text-slate-900 dark:text-slate-100">
                         {d.title}
                       </h1>
 
@@ -457,7 +482,7 @@ function DiscussionDetail({ id }: { id: string }) {
                         />
                       </div>
 
-                      <div className="mt-4 rounded-xl border bg-muted/30 p-4 text-sm">
+                      <div className="mt-4 rounded-xl border bg-muted/30 p-4 text-sm dark:border-white/10 dark:bg-white/5">
                         <MarkdownContent variant="default">{d.body}</MarkdownContent>
                       </div>
                     </div>
@@ -466,14 +491,14 @@ function DiscussionDetail({ id }: { id: string }) {
               </Card>
 
               <div className="flex items-center justify-between gap-3 flex-wrap shrink-0">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
+                <h2 className="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-slate-100">
                   <Reply className="h-4 w-4" /> Replies ({d.replies.length})
                 </h2>
               </div>
 
               <div className="space-y-3 w-full flex-1 overflow-y-auto pr-2">
                 {d.replies.length === 0 ? (
-                  <Card>
+                  <Card className={cn(APP_GLASS_CARD)}>
                     <CardContent className="p-10 text-center text-muted-foreground">
                       No replies yet — be the first.
                     </CardContent>
@@ -503,7 +528,7 @@ function DiscussionDetail({ id }: { id: string }) {
               </div>
 
               {!d.isClosed && (
-                <Card className="w-full shrink-0">
+                <Card className={cn(APP_GLASS_CARD, "w-full shrink-0")}>
                   <CardContent className="p-4 space-y-2">
                     <Textarea
                       rows={4}
@@ -531,7 +556,7 @@ function DiscussionDetail({ id }: { id: string }) {
             </div>
 
             <div className="space-y-4 h-full overflow-y-auto pr-2">
-              <Card>
+              <Card className={cn(APP_GLASS_CARD)}>
                 <CardHeader>
                   <CardTitle className="text-base">About</CardTitle>
                 </CardHeader>
@@ -560,8 +585,8 @@ function DiscussionDetail({ id }: { id: string }) {
                 </CardContent>
               </Card>
 
-              <Card className="border-indigo-200 bg-indigo-50/40 dark:bg-indigo-900/10">
-                <CardContent className="p-4 text-sm text-indigo-900/90 dark:text-indigo-200/90">
+              <Card className="border-indigo-200 bg-indigo-50/40 dark:border-indigo-500/20 dark:bg-indigo-950/30 dark:backdrop-blur-md">
+                <CardContent className="p-4 text-sm text-indigo-900/90 dark:text-indigo-100/90">
                   Tip: Use replies to refine the question, and mark the best
                   answer to help others.
                 </CardContent>

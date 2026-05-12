@@ -39,12 +39,6 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header
       className={`bg-[color:var(--app-surface)] shadow-sm border-b border-[color:var(--app-border)] text-[color:var(--app-text)] ${spacing.container.xs}`}
-      className={`
-        sticky top-0 z-40
-        border-b border-slate-200/80 bg-white/85 backdrop-blur
-        dark:border-slate-800/70 dark:bg-slate-950/75
-        ${spacing.container.xs}
-      `}
     >
       <div className="flex items-center justify-between gap-4 w-full min-w-0">
         <div

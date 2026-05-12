@@ -47,6 +47,12 @@ import { useToast } from "@/shared/ui/use-toast";
 import {
   toastApiError,
 } from "@/app/services/base/api-http-error";
+import { cn } from "@/shared/utils/cn";
+import {
+  APP_GLASS_CARD,
+  APP_PAGE_PADDING,
+  APP_PAGE_SHELL,
+} from "@/app/config/app-shell";
 
 const CATEGORIES: { value: FeedbackCategory; label: string; Icon: any }[] = [
   { value: "GENERAL", label: "General", Icon: Sparkles },
@@ -67,11 +73,14 @@ const STATUSES: FeedbackStatus[] = [
 ];
 
 const STATUS_COLORS: Record<FeedbackStatus, string> = {
-  OPEN: "bg-blue-100 text-blue-700",
-  IN_PROGRESS: "bg-amber-100 text-amber-700",
-  WAITING_USER: "bg-purple-100 text-purple-700",
-  RESOLVED: "bg-emerald-100 text-emerald-700",
-  CLOSED: "bg-gray-100 text-gray-700",
+  OPEN: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-200",
+  IN_PROGRESS:
+    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200",
+  WAITING_USER:
+    "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-200",
+  RESOLVED:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200",
+  CLOSED: "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-slate-300",
 };
 
 function normalizeRoles(user: any): string[] {
@@ -189,14 +198,20 @@ function TicketList() {
   }, [items]);
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
             {isStaff ? (
-              <ShieldCheck className="text-emerald-600" />
+              <ShieldCheck className="text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <LifeBuoy className="text-cyan-600" />
+              <LifeBuoy className="text-cyan-600 dark:text-cyan-400" />
             )}
             {isStaff ? "Support Inbox" : "Feedback & Support"}
           </h1>
@@ -239,9 +254,12 @@ function TicketList() {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : items.length === 0 ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-12 text-center text-muted-foreground">
-            <Inbox className="mx-auto mb-3 text-gray-300" size={42} />
+            <Inbox
+              className="mx-auto mb-3 text-gray-300 dark:text-slate-600"
+              size={42}
+            />
             <p className="font-medium">
               {isStaff ? "No tickets to triage." : "No tickets yet."}
             </p>
@@ -257,7 +275,10 @@ function TicketList() {
           {items.map((t) => (
             <Card
               key={t.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className={cn(
+                APP_GLASS_CARD,
+                "hover:shadow-md transition-shadow cursor-pointer"
+              )}
               onClick={() => router.push(`/feedback/${t.id}`)}
             >
               <CardContent className="p-4 flex items-start gap-3">
@@ -296,7 +317,7 @@ function TicketList() {
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-6">
-          <Card>
+          <Card className={cn(APP_GLASS_CARD)}>
             <CardHeader>
               <CardTitle className="text-base">Overview</CardTitle>
             </CardHeader>
@@ -318,7 +339,7 @@ function TicketList() {
 
       {showNew && !isStaff && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <Card className="w-full max-w-2xl">
+          <Card className={cn(APP_GLASS_CARD, "w-full max-w-2xl")}>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>New ticket</CardTitle>
               <Button variant="ghost" size="sm" onClick={() => setShowNew(false)}>
@@ -500,7 +521,13 @@ function TicketDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <Button
         variant="ghost"
         size="sm"
@@ -515,7 +542,7 @@ function TicketDetail({ id }: { id: string }) {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : !t ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-6 text-sm text-muted-foreground">
             Ticket not found.
           </CardContent>
@@ -523,7 +550,7 @@ function TicketDetail({ id }: { id: string }) {
       ) : (
         <>
           <div className="h-[calc(100dvh-140px)] overflow-hidden flex flex-col gap-4">
-          <Card className="shrink-0">
+          <Card className={cn(APP_GLASS_CARD, "shrink-0")}>
             <CardContent className="p-6">
               <div className="flex items-center gap-2 flex-wrap mb-2">
                 <Badge className={STATUS_COLORS[t.status]}>
@@ -541,7 +568,7 @@ function TicketDetail({ id }: { id: string }) {
                   />
                 )}
               </div>
-              <h1 className="text-2xl font-bold">{t.subject}</h1>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t.subject}</h1>
               <p className="text-xs text-muted-foreground mt-1">
                 Opened {new Date(t.createdAt).toLocaleString()}
               </p>
@@ -552,7 +579,7 @@ function TicketDetail({ id }: { id: string }) {
           </Card>
 
           {isStaff && (
-            <Card className="border-emerald-200 bg-emerald-50/40 dark:bg-emerald-900/10 shrink-0">
+            <Card className="border-emerald-200 bg-emerald-50/40 dark:border-emerald-500/25 dark:bg-emerald-950/25 shrink-0 dark:backdrop-blur-md">
               <CardContent className="p-4 flex flex-wrap items-center gap-3">
                 <ShieldCheck className="h-4 w-4 text-emerald-700" />
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">
@@ -594,7 +621,9 @@ function TicketDetail({ id }: { id: string }) {
             </Card>
           )}
 
-          <h2 className="text-lg font-semibold mt-4 shrink-0">Conversation</h2>
+          <h2 className="text-lg font-semibold mt-4 shrink-0 text-slate-900 dark:text-slate-100">
+            Conversation
+          </h2>
 
           <div className="space-y-2 flex-1 overflow-y-auto pr-2">
             {t.replies.length === 0 ? (
@@ -613,8 +642,8 @@ function TicketDetail({ id }: { id: string }) {
                       className={
                         "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold " +
                         (r.isStaff
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-gray-100 text-gray-700")
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
+                          : "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-slate-300")
                       }
                     >
                       {r.isStaff ? "Support" : "Student"}
@@ -629,7 +658,7 @@ function TicketDetail({ id }: { id: string }) {
           </div>
 
           {t.status !== "CLOSED" && (
-            <Card className="shrink-0">
+            <Card className={cn(APP_GLASS_CARD, "shrink-0")}>
               <CardContent className="p-4 space-y-2">
                 <Textarea
                   rows={4}

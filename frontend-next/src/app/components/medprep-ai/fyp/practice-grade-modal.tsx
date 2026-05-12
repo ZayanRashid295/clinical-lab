@@ -32,6 +32,8 @@ import {
 import type { PracticeSessionGrade } from "@/lib/fyp/practice-grading-service"
 import { HintGradeDisplay } from "./hint-grade-display"
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
+import { cn } from "@/shared/utils/cn"
+import { APP_GLASS_CARD } from "@/app/config/app-shell"
 
 interface PracticeGradeModalProps {
   grade: PracticeSessionGrade
@@ -47,20 +49,20 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
   if (!isOpen) return null
 
   const getGradeColor = (gradeValue: number) => {
-    if (gradeValue >= 90) return "text-green-600"
-    if (gradeValue >= 80) return "text-blue-600"
-    if (gradeValue >= 70) return "text-yellow-600"
-    if (gradeValue >= 60) return "text-orange-600"
-    return "text-red-600"
+    if (gradeValue >= 90) return "text-primary-600 dark:text-primary-400"
+    if (gradeValue >= 80) return "text-primary-700 dark:text-primary-300"
+    if (gradeValue >= 70) return "text-yellow-600 dark:text-yellow-400"
+    if (gradeValue >= 60) return "text-orange-600 dark:text-orange-400"
+    return "text-red-600 dark:text-red-400"
   }
 
   const getGradeIcon = (gradeValue: number) => {
-    if (gradeValue >= 95) return <Crown className="h-8 w-8 text-yellow-500" />
-    if (gradeValue >= 90) return <Gem className="h-8 w-8 text-green-500" />
-    if (gradeValue >= 80) return <Star className="h-8 w-8 text-blue-500" />
-    if (gradeValue >= 70) return <Award className="h-8 w-8 text-yellow-500" />
-    if (gradeValue >= 60) return <Target className="h-8 w-8 text-orange-500" />
-    return <AlertTriangle className="h-8 w-8 text-red-500" />
+    if (gradeValue >= 95) return <Crown className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
+    if (gradeValue >= 90) return <Gem className="h-8 w-8 text-primary" />
+    if (gradeValue >= 80) return <Star className="h-8 w-8 text-primary" />
+    if (gradeValue >= 70) return <Award className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
+    if (gradeValue >= 60) return <Target className="h-8 w-8 text-orange-500 dark:text-orange-400" />
+    return <AlertTriangle className="h-8 w-8 text-red-500 dark:text-red-400" />
   }
 
   const getGradeMessage = (gradeValue: number) => {
@@ -73,16 +75,21 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 dark:bg-black/60">
+      <div
+        className={cn(
+          APP_GLASS_CARD,
+          "max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl"
+        )}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-800 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {getGradeIcon(grade.finalGrade)}
               <div>
                 <h2 className="text-2xl font-bold">Practice Session Complete!</h2>
-                <p className="text-blue-100">Here's your detailed performance analysis</p>
+                <p className="text-primary-100">Here's your detailed performance analysis</p>
               </div>
             </div>
             <Button
@@ -97,9 +104,9 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
         </div>
 
         {/* Main Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="max-h-[calc(90vh-120px)] overflow-y-auto p-6 dark:text-slate-100">
           {/* Grade Summary */}
-          <Card className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          <Card className="mb-6 border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/80 dark:border-primary-500/25 dark:from-primary-950/30 dark:to-primary-950/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
@@ -109,16 +116,16 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                     </div>
                     <Badge 
                       variant="secondary" 
-                      className={`text-xl px-4 py-2 mt-2 ${getGradeColor(grade.finalGrade)} bg-white/80`}
+                      className={`mt-2 bg-white/80 px-4 py-2 text-xl ${getGradeColor(grade.finalGrade)} dark:bg-white/10`}
                     >
                       {grade.gradeLetter}
                     </Badge>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-slate-100">
                       {getGradeMessage(grade.finalGrade)}
                     </h3>
-                    <div className="space-y-1 text-sm text-gray-600">
+                    <div className="space-y-1 text-sm text-gray-600 dark:text-slate-400">
                       <div className="flex items-center space-x-2">
                         <span>Base Grade:</span>
                         <span className="font-semibold">{grade.baseGrade}%</span>
@@ -135,14 +142,14 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                     value={grade.finalGrade} 
                     className="w-32 h-3 mb-2"
                   />
-                  <p className="text-sm text-gray-600">Overall Performance</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Overall Performance</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Tabs */}
-          <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
+          <div className="mb-6 flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-white/10">
             {[
               { id: "overview", label: "Overview", icon: BarChart3 },
               { id: "breakdown", label: "Breakdown", icon: Target },
@@ -152,10 +159,10 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all ${
+                className={`flex items-center space-x-2 rounded-md px-4 py-2 transition-all ${
                   activeTab === tab.id
-                    ? "bg-white shadow-sm text-blue-600"
-                    : "text-gray-600 hover:text-gray-800"
+                    ? "bg-white text-primary shadow-sm dark:bg-white/15 dark:text-primary-300"
+                    : "text-gray-600 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 <tab.icon className="h-4 w-4" />
@@ -169,19 +176,19 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Award className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="flex items-center space-x-2 text-foreground">
+                    <Award className="h-5 w-5 text-primary" />
                     <span>Performance Summary</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {Object.entries(grade.breakdown).map(([key, value]) => (
-                      <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div key={key} className="rounded-lg bg-gray-50 p-3 text-center dark:bg-white/[0.06]">
                         <div className={`text-2xl font-bold ${getGradeColor(value)}`}>
                           {value}%
                         </div>
-                        <div className="text-sm text-gray-600 capitalize">
+                        <div className="text-sm capitalize text-gray-600 dark:text-slate-400">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </div>
                       </div>
@@ -196,8 +203,8 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Target className="h-5 w-5 text-green-600" />
+                  <CardTitle className="flex items-center space-x-2 text-foreground">
+                    <Target className="h-5 w-5 text-primary" />
                     <span>Detailed Breakdown</span>
                   </CardTitle>
                 </CardHeader>
@@ -226,8 +233,8 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <MessageCircle className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="flex items-center space-x-2 text-foreground">
+                    <MessageCircle className="h-5 w-5 text-primary" />
                     <span>Detailed Feedback</span>
                   </CardTitle>
                 </CardHeader>
@@ -235,15 +242,15 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
                   <div className="space-y-6">
                     {/* Strengths */}
                     <div>
-                      <h4 className="font-semibold text-green-800 mb-3 flex items-center space-x-2">
+                      <h4 className="mb-3 flex items-center space-x-2 font-semibold text-primary-900 dark:text-primary-100">
                         <CheckCircle className="h-4 w-4" />
                         <span>Strengths</span>
                       </h4>
                       <div className="space-y-2">
                         {grade.feedback.strengths.map((strength, index) => (
-                          <div key={index} className="flex items-start space-x-2 p-2 bg-green-50 rounded border border-green-200">
-                            <Star className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <div className="text-sm text-green-800 prose prose-sm max-w-none">
+                          <div key={index} className="flex items-start space-x-2 rounded border border-primary-200 bg-primary-50/80 p-2 dark:border-primary-500/25 dark:bg-primary-950/25">
+                            <Star className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                            <div className="prose prose-sm max-w-none text-sm text-primary-900 dark:text-primary-100">
                               <MarkdownContent variant="default">{strength}</MarkdownContent>
                             </div>
                           </div>
@@ -253,15 +260,15 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
 
                     {/* Improvements */}
                     <div>
-                      <h4 className="font-semibold text-orange-800 mb-3 flex items-center space-x-2">
+                      <h4 className="mb-3 flex items-center space-x-2 font-semibold text-orange-800 dark:text-orange-200">
                         <TrendingUp className="h-4 w-4" />
                         <span>Areas for Improvement</span>
                       </h4>
                       <div className="space-y-2">
                         {grade.feedback.improvements.map((improvement, index) => (
-                          <div key={index} className="flex items-start space-x-2 p-2 bg-orange-50 rounded border border-orange-200">
-                            <Target className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                            <div className="text-sm text-orange-800 prose prose-sm max-w-none">
+                          <div key={index} className="flex items-start space-x-2 rounded border border-orange-200 bg-orange-50 p-2 dark:border-orange-500/25 dark:bg-orange-950/25">
+                            <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-600 dark:text-orange-400" />
+                            <div className="prose prose-sm max-w-none text-sm text-orange-800 dark:text-orange-200">
                               <MarkdownContent variant="default">{improvement}</MarkdownContent>
                             </div>
                           </div>
@@ -271,15 +278,15 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
 
                     {/* Recommendations */}
                     <div>
-                      <h4 className="font-semibold text-blue-800 mb-3 flex items-center space-x-2">
+                      <h4 className="mb-3 flex items-center space-x-2 font-semibold text-primary-900 dark:text-primary-100">
                         <Brain className="h-4 w-4" />
                         <span>Recommendations</span>
                       </h4>
                       <div className="space-y-2">
                         {grade.feedback.recommendations.map((recommendation, index) => (
-                          <div key={index} className="flex items-start space-x-2 p-2 bg-blue-50 rounded border border-blue-200">
-                            <Lightbulb className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                            <div className="text-sm text-blue-800 prose prose-sm max-w-none">
+                          <div key={index} className="flex items-start space-x-2 rounded border border-primary-200 bg-primary-50/80 p-2 dark:border-primary-500/25 dark:bg-primary-950/25">
+                            <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                            <div className="prose prose-sm max-w-none text-sm text-primary-900 dark:text-primary-100">
                               <MarkdownContent variant="default">{recommendation}</MarkdownContent>
                             </div>
                           </div>
@@ -298,7 +305,7 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
         </div>
 
         {/* Footer */}
-        <div className="border-t p-6 bg-gray-50">
+        <div className="border-t bg-gray-50 p-6 dark:border-white/10 dark:bg-white/[0.04]">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
@@ -323,7 +330,7 @@ export function PracticeGradeModal({ grade, isOpen, onClose, onRetry }: Practice
               )}
               <Button
                 onClick={onClose}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-primary-600 to-primary-800 text-primary-foreground hover:from-primary-700 hover:to-primary-900"
               >
                 Close
               </Button>

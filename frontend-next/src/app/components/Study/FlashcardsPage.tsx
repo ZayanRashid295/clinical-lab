@@ -42,6 +42,8 @@ import {
   type CreateFlashcardPayload,
 } from "@/app/services/student";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
+import { cn } from "@/shared/utils/cn";
 
 const blankDraft: CreateFlashcardPayload = {
   deck: "General",
@@ -167,10 +169,10 @@ export default function FlashcardsPage() {
   };
 
   return (
-    <div className="px-[50px] pb-[50px] pt-[25px] space-y-3">
+    <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Flashcards</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Flashcards</h1>
           <p className="text-muted-foreground mt-2">
             Spaced-repetition review for high-yield material
           </p>
@@ -197,29 +199,29 @@ export default function FlashcardsPage() {
           label="Total"
           value={stats?.total ?? cards.length}
           icon={Layers}
-          color="text-blue-600 dark:text-blue-400"
+          color="text-primary-600 dark:text-primary-400"
         />
         <StatTile
           label="Due now"
           value={stats?.due ?? dueCards.length}
           icon={Clock}
-          color="text-orange-500"
+          color="text-primary-600 dark:text-primary-400"
         />
         <StatTile
           label="Mastered"
           value={stats?.mastered ?? 0}
           icon={Trophy}
-          color="text-emerald-600 dark:text-emerald-400"
+          color="text-primary-600 dark:text-primary-400"
         />
         <StatTile
           label="Reviewed today"
           value={stats?.reviewedToday ?? 0}
           icon={Target}
-          color="text-purple-600 dark:text-purple-400"
+          color="text-primary-600 dark:text-primary-400"
         />
       </div>
 
-      <Card>
+      <Card className={cn(APP_GLASS_CARD)}>
         <CardContent className="p-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Button
@@ -262,7 +264,7 @@ export default function FlashcardsPage() {
       </Card>
 
       {tab === "review" ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-6">
             {reviewQueue.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
@@ -283,7 +285,7 @@ export default function FlashcardsPage() {
                   </span>
                   <Badge variant="outline">{current.deck}</Badge>
                 </div>
-                <Card className="bg-gray-50 dark:bg-gray-800/50 min-h-[180px]">
+                <Card className="min-h-[180px] border-slate-200/80 bg-slate-50 dark:border-white/10 dark:bg-white/5">
                   <CardContent className="p-6 flex items-center justify-center text-center">
                     <p className="text-xl whitespace-pre-wrap">
                       {current.front}
@@ -291,7 +293,7 @@ export default function FlashcardsPage() {
                   </CardContent>
                 </Card>
                 {reveal ? (
-                  <Card className="border-emerald-300 dark:border-emerald-700 min-h-[120px]">
+                  <Card className="min-h-[120px] border-primary-200/80 dark:border-primary-700/50 dark:bg-white/5">
                     <CardContent className="p-6 text-center">
                       <p className="text-lg whitespace-pre-wrap">
                         {current.back}
@@ -335,7 +337,7 @@ export default function FlashcardsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cards.map((c) => (
-            <Card key={c.id}>
+            <Card key={c.id} className={cn(APP_GLASS_CARD)}>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -380,7 +382,7 @@ export default function FlashcardsPage() {
             </Card>
           ))}
           {!loading && cards.length === 0 && (
-            <Card className="md:col-span-2 lg:col-span-3">
+            <Card className={cn(APP_GLASS_CARD, "md:col-span-2 lg:col-span-3")}>
               <CardContent className="p-12 text-center">
                 <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No cards yet</h3>
@@ -398,7 +400,7 @@ export default function FlashcardsPage() {
 
       {showEditor && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <Card className={cn(APP_GLASS_CARD, "w-full max-w-2xl max-h-[90vh] overflow-y-auto")}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{editing ? "Edit card" : "New card"}</CardTitle>
@@ -494,7 +496,7 @@ function StatTile({
   color: string;
 }) {
   return (
-    <Card>
+    <Card className={cn(APP_GLASS_CARD)}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>

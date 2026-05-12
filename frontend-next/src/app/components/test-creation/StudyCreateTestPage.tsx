@@ -428,19 +428,22 @@ export default function StudyCreateTestPage() {
     parseInt(questionCount, 10) <= 40;
 
   return (
-    <div className="flex h-screen bg-background dark:bg-gray-900 overflow-hidden" data-testid="page-create-test">
+    <div
+      className="flex h-screen min-h-0 w-full overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950"
+      data-testid="page-create-test"
+    >
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 border-b border-border dark:border-gray-700 bg-card/50 dark:bg-gray-800/80 flex items-center justify-between px-6 shrink-0">
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/80 px-6 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
         <div>
-            <h1 className="text-lg font-semibold text-foreground dark:text-gray-100">Create Test</h1>
-            <p className="text-xs text-muted-foreground dark:text-gray-400">Customize your learning path</p>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Create Test</h1>
+            <p className="text-xs text-muted-foreground dark:text-slate-400">Customize your learning path</p>
         </div>
           <div className="flex items-center gap-2">
         <Button
               variant="ghost"
           size="sm"
-              className="h-8 text-xs font-medium text-muted-foreground dark:text-gray-400 hover:text-foreground dark:hover:text-gray-100"
+              className="h-8 text-xs font-medium text-muted-foreground hover:text-foreground dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100"
               onClick={() => setShowQuickGuide(true)}
         >
               <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
@@ -450,7 +453,7 @@ export default function StudyCreateTestPage() {
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-auto scrollbar-thin bg-background dark:bg-gray-900">
+        <main className="flex-1 overflow-auto scrollbar-thin">
           <div className="p-6">
       {/* Demo Mode Indicator */}
       {!hasActiveSubscription && (
@@ -487,7 +490,7 @@ export default function StudyCreateTestPage() {
       {success && (
               <div className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
                 <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <div className="text-sm dark:text-gray-100">
+                <div className="text-sm dark:text-slate-100">
                   <strong className="font-medium">Success:</strong> {success}
                 </div>
         </div>
@@ -522,8 +525,8 @@ export default function StudyCreateTestPage() {
             </div>
 
             {/* Subjects & Systems */}
-            <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden mb-4">
-              <div className="grid grid-cols-[280px_1fr] divide-x divide-border dark:divide-gray-700 min-h-[500px]">
+            <div className="mb-4 overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+              <div className="grid min-h-[500px] grid-cols-[280px_1fr] divide-x divide-slate-200/80 dark:divide-white/10">
                 <div data-validation-error={!!validationErrors.subjects} className="flex flex-col">
             <SystemSelector
               selectedSystems={selectedTags}
@@ -565,12 +568,12 @@ export default function StudyCreateTestPage() {
       </div>
 
             {/* Question Count */}
-            <div className="bg-card dark:bg-gray-800 rounded-xl border border-border dark:border-gray-700 overflow-hidden">
-              <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50">
+            <div className="mb-4 overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+              <div className="border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-violet-500" />
-                  <h3 className="text-sm font-medium text-foreground dark:text-gray-100">Question Count</h3>
-                  <span className="text-xs text-muted-foreground dark:text-gray-400 ml-auto">max 40</span>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100">Question Count</h3>
+                  <span className="ml-auto text-xs text-muted-foreground dark:text-slate-400">max 40</span>
                 </div>
               </div>
               <div className="p-4">
@@ -591,7 +594,7 @@ export default function StudyCreateTestPage() {
                         }
                       }}
                 onBlur={handleQuestionCountBlur}
-                      className={`w-20 h-9 text-center bg-muted/50 dark:bg-gray-700/30 border-border dark:border-gray-700 ${
+                      className={`h-9 w-20 border-slate-200/90 bg-slate-50 text-center dark:border-white/10 dark:bg-white/10 ${
                   validationErrors.questionCount
                           ? "border-destructive focus-visible:ring-destructive"
                     : ""
@@ -602,14 +605,14 @@ export default function StudyCreateTestPage() {
               />
                   </div>
                   <div className="flex-1">
-                    <div className="h-2 bg-muted dark:bg-gray-700/50 rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
                       <div
-                        className="h-full bg-primary dark:bg-primary rounded-full transition-all duration-300"
+                        className="h-full rounded-full bg-primary-600 transition-all duration-300 dark:bg-primary-500"
                         style={{ width: `${((parseInt(questionCount) || 0) / 40) * 100}%` }}
                       />
                     </div>
                   </div>
-                  <span className="text-sm text-muted-foreground dark:text-gray-400">
+                  <span className="text-sm text-muted-foreground dark:text-slate-400">
                     {parseInt(questionCount) || 0} questions
                   </span>
                 </div>
@@ -624,29 +627,29 @@ export default function StudyCreateTestPage() {
           </div>
         </main>
 
-        <footer className="h-16 border-t border-border dark:border-gray-700 bg-card/80 dark:bg-gray-800/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
+        <footer className="flex h-16 shrink-0 items-center justify-between border-t border-slate-200/80 bg-white/80 px-6 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground dark:text-gray-400">
-                <span className="font-medium text-foreground dark:text-gray-100">{selectedTags.length + selectedSystems.length}</span> selections
+              <Layers className="h-4 w-4 text-muted-foreground dark:text-slate-500" />
+              <span className="text-sm text-muted-foreground dark:text-slate-400">
+                <span className="font-medium text-gray-900 dark:text-slate-100">{selectedTags.length + selectedSystems.length}</span> selections
               </span>
             </div>
             {selectedTags.length > 0 && (
-              <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-500 dark:text-blue-400 border border-blue-500/20 dark:border-blue-500/30">
+              <span className="rounded-full border border-primary-500/25 bg-primary-500/10 px-2 py-1 text-xs text-primary-700 dark:border-primary-500/35 dark:bg-primary-900/25 dark:text-primary-200">
                 {selectedTags.length} subjects
               </span>
             )}
             {selectedSubjects.length > 0 && (
-              <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/20 dark:border-amber-500/30">
+              <span className="rounded-full border border-primary-500/25 bg-primary-500/10 px-2 py-1 text-xs text-primary-700 dark:border-primary-500/35 dark:bg-primary-900/25 dark:text-primary-200">
                 {selectedSubjects.length} Systems
               </span>
             )}
               {availableQuestionsCount !== null && (
               <>
-                <div className="h-5 w-px bg-border mx-2" />
-                <span className="text-sm text-muted-foreground dark:text-gray-400">
-                  Available: <span className="font-medium text-foreground dark:text-gray-100">
+                <div className="mx-2 h-5 w-px bg-border dark:bg-white/10" />
+                <span className="text-sm text-muted-foreground dark:text-slate-400">
+                  Available: <span className="font-medium text-gray-900 dark:text-slate-100">
                     {loadingCount ? "..." : availableQuestionsCount === 1000 ? "1000+" : availableQuestionsCount.toLocaleString()}
                   </span>
                 </span>
@@ -701,26 +704,26 @@ export default function StudyCreateTestPage() {
 
       {/* Insufficient Questions Dialog */}
       <AlertDialog open={showInsufficientQuestionsDialog} onOpenChange={setShowInsufficientQuestionsDialog}>
-        <AlertDialogContent className="bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+        <AlertDialogContent className="border-slate-200/90 bg-white dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-foreground dark:text-gray-100">
+            <AlertDialogTitle className="flex items-center gap-2 text-gray-900 dark:text-slate-100">
               <AlertCircle className="h-5 w-5 text-destructive dark:text-red-400" />
               Not Enough Questions Available
             </AlertDialogTitle>
-            <AlertDialogDescription className="pt-2 text-muted-foreground dark:text-gray-300">
-              <p className="mb-2 dark:text-gray-200">
-                You requested <strong className="text-foreground dark:text-gray-100">{questionCount}</strong> questions, but only{" "}
-                <strong className="text-foreground dark:text-gray-100">{availableQuestionsCount}</strong> {availableQuestionsCount === 1 ? "question is" : "questions are"} available
+            <AlertDialogDescription className="pt-2 text-muted-foreground dark:text-slate-300">
+              <p className="mb-2 dark:text-slate-200">
+                You requested <strong className="text-foreground dark:text-slate-100">{questionCount}</strong> questions, but only{" "}
+                <strong className="text-foreground dark:text-slate-100">{availableQuestionsCount}</strong> {availableQuestionsCount === 1 ? "question is" : "questions are"} available
                 for the current filter settings.
               </p>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-slate-400">
                 Please adjust your question count or modify your filter selections (subjects, systems, pool type, or marked status)
                 to include more questions.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-gray-100">
+            <AlertDialogCancel className="dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white">
               Close
             </AlertDialogCancel>
             <AlertDialogAction 

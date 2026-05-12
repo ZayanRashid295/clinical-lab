@@ -18,11 +18,11 @@ export function EvaluationCasesPage() {
           backToModeLabel: "Back to Evaluation Mode",
           backToModeRoute: "/medprep-ai/evaluation-mode",
           routeForGeneratedCase: (caseId) =>
-            `/medprep-ai/evaluation?mode=evaluation&caseId=${caseId}&generated=true`,
+            `/medprep-ai/evaluation-nurse-report?caseId=${caseId}&generated=true`,
           routeForSelectedCase: (caseId) =>
-            `/medprep-ai/evaluation?mode=evaluation&caseId=${caseId}`,
+            `/medprep-ai/evaluation-nurse-report?caseId=${caseId}`,
           routeForChatbotGeneratedCase: (caseId) =>
-            `/medprep-ai/evaluation?mode=evaluation&caseId=${caseId}&generated=true`,
+            `/medprep-ai/evaluation-nurse-report?caseId=${caseId}&generated=true`,
           accent: {
             pageGradient: "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100",
             overlayGradient: "bg-gradient-to-r from-blue-400/20 to-indigo-400/20",

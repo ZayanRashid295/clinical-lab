@@ -61,6 +61,12 @@ import {
 } from "@/shared/ui/select";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import { cn } from "@/shared/utils/cn";
+import {
+  APP_GLASS_CARD,
+  APP_PAGE_PADDING,
+  APP_PAGE_SHELL,
+} from "@/app/config/app-shell";
 
 function formatPostTime(iso: string) {
   const d = new Date(iso);
@@ -185,11 +191,17 @@ function GroupList() {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-10 pb-10 pt-6 space-y-4 w-full max-w-none">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        APP_PAGE_PADDING,
+        "space-y-4 w-full max-w-none"
+      )}
+    >
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Users className="text-teal-600" /> Study Groups
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+            <Users className="text-teal-600 dark:text-teal-400" /> Study Groups
           </h1>
           <p className="text-muted-foreground mt-1">
             Connect with peers, share notes and study together.
@@ -225,9 +237,12 @@ function GroupList() {
           <Loader2 className="animate-spin mr-2" /> Loading…
         </div>
       ) : items.length === 0 ? (
-        <Card>
+        <Card className={cn(APP_GLASS_CARD)}>
           <CardContent className="p-12 text-center text-muted-foreground">
-            <Users className="mx-auto mb-3 text-gray-300" size={42} />
+            <Users
+              className="mx-auto mb-3 text-gray-300 dark:text-slate-600"
+              size={42}
+            />
             <p className="font-medium">No groups yet.</p>
             <p className="text-xs">Create one or join with an invite code.</p>
           </CardContent>
@@ -237,7 +252,10 @@ function GroupList() {
           {items.map((g) => (
             <Card
               key={g.id}
-              className="hover:shadow-md transition-shadow flex flex-col"
+              className={cn(
+                APP_GLASS_CARD,
+                "hover:shadow-md transition-shadow flex flex-col"
+              )}
             >
               <CardContent className="p-4 flex-1 flex flex-col gap-3">
                 <div className="flex items-start gap-3">
@@ -543,7 +561,12 @@ function GroupDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-80px)] w-full max-w-none flex-col overflow-hidden px-4 pb-4 pt-5 sm:px-6 lg:px-10">
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        "flex h-[calc(100dvh-80px)] w-full max-w-none flex-col overflow-hidden px-4 pb-4 pt-5 sm:px-6 lg:px-10"
+      )}
+    >
       <div className="mb-3 flex shrink-0 items-center gap-2">
         <Button
           variant="ghost"
@@ -560,14 +583,19 @@ function GroupDetail({ id }: { id: string }) {
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading…
         </div>
       ) : !g ? (
-        <Card className="max-w-lg">
+        <Card className={cn(APP_GLASS_CARD, "max-w-lg")}>
           <CardContent className="p-6 text-sm text-muted-foreground">
             Group not found or you don&apos;t have access.
           </CardContent>
         </Card>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <div className="flex shrink-0 flex-wrap items-start justify-between gap-4 rounded-xl border border-slate-200/90 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+          <div
+            className={cn(
+              APP_GLASS_CARD,
+              "flex shrink-0 flex-wrap items-start justify-between gap-4 rounded-xl bg-white/95 px-4 py-3 dark:bg-white/5"
+            )}
+          >
             <div className="flex min-w-0 flex-1 items-start gap-3">
               <div
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl text-white ${g.color}`}
@@ -579,7 +607,7 @@ function GroupDetail({ id }: { id: string }) {
                   {g.isPrivate ? (
                     <Lock className="h-3.5 w-3.5 shrink-0 text-amber-600" />
                   ) : null}
-                  <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">
+                  <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-xl">
                     {g.name}
                   </h1>
                   <Badge variant="secondary" className="font-normal">
@@ -593,7 +621,7 @@ function GroupDetail({ id }: { id: string }) {
                   {g.memberCount} member{g.memberCount === 1 ? "" : "s"}
                 </p>
                 {g.isPrivate && g.inviteCode ? (
-                  <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-slate-100 px-2 py-1 font-mono text-xs dark:bg-slate-800">
+                  <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-slate-100 px-2 py-1 font-mono text-xs dark:bg-white/10 dark:text-slate-200">
                     <Hash className="h-3 w-3" />
                     {g.inviteCode}
                     <button
@@ -793,7 +821,12 @@ function GroupDetail({ id }: { id: string }) {
           ) : null}
 
           <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[1fr_260px] lg:gap-4">
-            <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-slate-50/50 shadow-sm dark:border-slate-800 dark:bg-slate-950/40">
+            <div
+              className={cn(
+                APP_GLASS_CARD,
+                "flex min-h-0 flex-col overflow-hidden rounded-xl bg-slate-50/60 shadow-sm dark:bg-white/[0.04]"
+              )}
+            >
               <div
                 ref={scrollRef}
                 className="custom-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4 sm:px-4"
@@ -848,7 +881,7 @@ function GroupDetail({ id }: { id: string }) {
 
               <Separator />
 
-              <div className="shrink-0 bg-white px-3 py-3 dark:bg-slate-950 sm:px-4">
+              <div className="shrink-0 border-t border-slate-200/80 bg-white px-3 py-3 dark:border-white/10 dark:bg-white/[0.04] sm:px-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
                   <Textarea
                     placeholder="Message the group…"
@@ -883,7 +916,12 @@ function GroupDetail({ id }: { id: string }) {
               </div>
             </div>
 
-            <Card className="flex max-h-[min(560px,70vh)] min-h-0 flex-col overflow-hidden lg:max-h-none lg:flex-1">
+            <Card
+              className={cn(
+                APP_GLASS_CARD,
+                "flex max-h-[min(560px,70vh)] min-h-0 flex-col overflow-hidden lg:max-h-none lg:flex-1"
+              )}
+            >
               <CardHeader className="space-y-0 pb-2 pt-4">
                 <CardTitle className="text-sm font-semibold">Members</CardTitle>
                 <p className="text-xs text-muted-foreground">
@@ -946,7 +984,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
+      <Card className={cn(APP_GLASS_CARD, "w-full max-w-lg")}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{title}</CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>

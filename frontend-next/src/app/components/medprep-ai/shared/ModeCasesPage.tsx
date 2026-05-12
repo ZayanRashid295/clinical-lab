@@ -25,6 +25,8 @@ import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
 import { getClinicalUserId } from "@/lib/fyp/medprep-user"
+import { cn } from "@/shared/utils/cn"
+import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
 
 interface ModeCasesConfig {
   modeTitle: string
@@ -77,11 +79,6 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
     rareCase: false,
     caseType: "any",
   })
-
-  const themedBackground = {
-    background:
-      "radial-gradient(circle at 0% 0%, rgba(16,185,129,0.16) 0%, rgba(246,251,248,0) 45%), radial-gradient(circle at 100% 100%, rgba(15,118,110,0.10) 0%, rgba(246,251,248,0) 35%), #F6FBF8",
-  } as const
 
   const decorativeCircle = {
     background:
@@ -247,9 +244,9 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   ]
 
   const renderModePill = () => (
-    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white/85 px-3.5 py-1.5 shadow-[0_8px_20px_-16px_rgba(16,185,129,0.5)] backdrop-blur-sm">
+    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white/85 px-3.5 py-1.5 shadow-[0_8px_20px_-16px_rgba(16,185,129,0.5)] backdrop-blur-sm dark:border-emerald-500/25 dark:bg-white/10">
       <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-      <span className="text-[12px] font-medium text-slate-700 tracking-wide">
+      <span className="text-[12px] font-medium text-slate-700 tracking-wide dark:text-slate-200">
         {config.modeTitle}
       </span>
     </div>
@@ -259,13 +256,13 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   const difficultyBadgeClass = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
-        return "bg-green-50 text-green-700 border-green-200"
+        return "border-green-200 bg-green-50 text-green-700 dark:border-emerald-500/30 dark:bg-emerald-950/35 dark:text-emerald-200"
       case "intermediate":
-        return "bg-amber-50 text-amber-700 border-amber-200"
+        return "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/25 dark:bg-amber-950/35 dark:text-amber-200"
       case "advanced":
-        return "bg-rose-50 text-rose-700 border-rose-200"
+        return "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/25 dark:bg-rose-950/35 dark:text-rose-200"
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200"
+        return "border-gray-200 bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/10 dark:text-slate-300"
     }
   }
 
@@ -275,19 +272,19 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
 
   // Clean inline page header: white bar, title + subtitle left, mode label right (lighter on browse page).
   const renderPageHeader = (title: string, subtitle: string, modeLabelTone: "muted" | "default" = "default") => (
-    <div className="sticky top-0 z-20 border-b border-emerald-100 bg-white/85 backdrop-blur-xl">
+    <div className="sticky top-0 z-20 border-b border-primary-100 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
       <div className={`${pageFrameClass} py-5 md:py-6 flex items-start justify-between gap-6`}>
         <div>
-          <h1 className="text-[22px] md:text-2xl font-bold text-slate-900 leading-tight tracking-tight">
+          <h1 className="text-[22px] md:text-2xl font-bold text-slate-900 leading-tight tracking-tight dark:text-slate-100">
             {title}
           </h1>
-          <p className="text-[13px] text-slate-500 mt-1">{subtitle}</p>
+          <p className="text-[13px] text-slate-500 mt-1 dark:text-slate-400">{subtitle}</p>
         </div>
         <div
           className={
             modeLabelTone === "muted"
-              ? "text-[13px] font-medium text-gray-400 pt-1 shrink-0"
-              : "text-[13px] font-medium text-gray-700 pt-1 shrink-0"
+              ? "text-[13px] font-medium text-gray-400 pt-1 shrink-0 dark:text-slate-500"
+              : "text-[13px] font-medium text-gray-700 dark:text-slate-300 pt-1 shrink-0"
           }
         >
           {config.modeTitle}
@@ -299,7 +296,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   return (
     <>
       {currentStep === "landing" && (
-        <div className="relative min-h-screen overflow-hidden" style={themedBackground}>
+        <div className={cn(APP_PAGE_SHELL, "relative min-h-screen overflow-hidden")}>
           <div
             aria-hidden
             className="pointer-events-none absolute -top-48 -left-48 w-[520px] h-[520px] rounded-full mp-float-slow"
@@ -327,22 +324,22 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
           <div className="relative container mx-auto px-6 min-h-screen flex flex-col justify-center py-12">
             <div className="text-center mb-10">
               <div className="flex justify-center mb-6">{renderModePill()}</div>
-              <h1 className="font-serif font-bold tracking-tight text-gray-900 text-4xl md:text-5xl leading-[1.1] mb-3">
+              <h1 className="font-serif font-bold tracking-tight text-gray-900 dark:text-slate-100 text-4xl md:text-5xl leading-[1.1] mb-3">
                 {config.chooseCaseSubtitle}
               </h1>
-              <p className="text-base text-gray-600">
+              <p className="text-base text-gray-600 dark:text-slate-400">
                 Select how you want to practice today
               </p>
             </div>
             {resumeSessions.length > 0 ? (
-              <div className="mb-8 mx-auto max-w-5xl rounded-2xl border border-emerald-100 bg-white/85 p-4">
-                <p className="text-sm font-semibold text-emerald-900 mb-3">Continue where you left off</p>
+              <div className="mb-8 mx-auto max-w-5xl rounded-2xl border border-emerald-100 bg-white/85 p-4 dark:border-emerald-500/20 dark:bg-white/5 dark:backdrop-blur-md">
+                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200 mb-3">Continue where you left off</p>
                 <div className="grid gap-2 sm:grid-cols-3">
                   {resumeSessions.map((session) => (
                     <Link
                       key={session.id}
                       href={medprepSessionService.getContinueUrl(session)}
-                      className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50"
+                      className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50 dark:border-emerald-500/20 dark:bg-emerald-950/35 dark:text-emerald-100 dark:hover:bg-emerald-950/55"
                     >
                       {session.title || session.caseId || "Untitled case"}
                     </Link>
@@ -352,7 +349,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
             ) : null}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
-              <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col">
+              <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col dark:border-white/10 dark:bg-white/5">
                 <span
                   aria-hidden
                   className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
@@ -363,10 +360,10 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 >
                   <Sparkles className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-[20px] font-bold text-gray-900 mb-3">
+                <h3 className="text-[20px] font-bold text-gray-900 dark:text-slate-100 mb-3">
                   Generate New Case
                 </h3>
-                <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
+                <p className="text-[14px] text-gray-600 dark:text-slate-400 leading-relaxed mb-6">
                   Create a custom AI-generated case with your preferred
                   specialty, difficulty, and type.
                 </p>
@@ -374,7 +371,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   {generateFeatures.map(({ label, icon: Icon }) => (
                     <li
                       key={label}
-                      className="flex items-center gap-3 text-[14px] text-gray-700"
+                      className="flex items-center gap-3 text-[14px] text-gray-700 dark:text-slate-300"
                     >
                       <Icon
                         className="h-[18px] w-[18px] text-primary flex-shrink-0"
@@ -394,7 +391,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 </Button>
               </div>
 
-              <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col">
+              <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col dark:border-white/10 dark:bg-white/5">
                 <span
                   aria-hidden
                   className="absolute top-0 left-0 h-[3px] w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"
@@ -405,10 +402,10 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 >
                   <FileText className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-[20px] font-bold text-gray-900 mb-3">
+                <h3 className="text-[20px] font-bold text-gray-900 dark:text-slate-100 mb-3">
                   Browse Cases
                 </h3>
-                <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
+                <p className="text-[14px] text-gray-600 dark:text-slate-400 leading-relaxed mb-6">
                   Explore pre-built cases across multiple specialties and
                   difficulty levels.
                 </p>
@@ -416,7 +413,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   {browseFeatures.map(({ label, icon: Icon }) => (
                     <li
                       key={label}
-                      className="flex items-center gap-3 text-[14px] text-gray-700"
+                      className="flex items-center gap-3 text-[14px] text-gray-700 dark:text-slate-300"
                     >
                       <Icon
                         className="h-[18px] w-[18px] text-primary flex-shrink-0"
@@ -430,7 +427,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 <Button
                   onClick={() => setCurrentStep("select")}
                   variant="outline"
-                  className="w-full rounded-xl py-6 text-[15px] font-semibold border-2 border-primary text-primary bg-white hover:bg-primary/5 transition-all duration-200"
+                  className="w-full rounded-xl border-2 border-primary bg-white py-6 text-[15px] font-semibold text-primary transition-all duration-200 hover:bg-primary/5 dark:border-primary/40 dark:bg-white/10 dark:hover:bg-white/15"
                 >
                   Explore Case Library
                 </Button>
@@ -440,7 +437,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
             <div className="text-center mt-10">
               <Link
                 href={config.backToModeRoute}
-                className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+                className="text-sm text-gray-500 transition-colors hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 {config.backToModeLabel}
               </Link>
@@ -450,7 +447,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       )}
 
       {currentStep === "generate" && (
-        <div className="relative min-h-screen overflow-hidden" style={themedBackground}>
+        <div className={cn(APP_PAGE_SHELL, "relative min-h-screen overflow-hidden")}>
           {/* Ambient animated blobs */}
           <div
             aria-hidden
@@ -483,8 +480,13 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
           />
 
           {isGeneratingCase && (
-            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 border border-gray-200">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm dark:bg-black/60">
+              <div
+                className={cn(
+                  APP_GLASS_CARD,
+                  "mx-4 w-full max-w-sm rounded-2xl p-8 shadow-2xl"
+                )}
+              >
                 <div className="text-center">
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -492,8 +494,8 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   >
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Generating Case</h3>
-                  <p className="text-sm text-gray-600">Please wait while we create your custom case...</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-2">Generating Case</h3>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Please wait while we create your custom case...</p>
                 </div>
               </div>
             </div>
@@ -503,7 +505,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
 
           <div className={`relative py-10 md:py-12 ${pageFrameClass}`}>
             <div className="mx-auto max-w-2xl mp-fade-up">
-              <div className="relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 p-8 md:p-10 shadow-[0_24px_60px_-34px_rgba(16,185,129,0.5)] backdrop-blur-md">
+              <div className="relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 p-8 shadow-[0_24px_60px_-34px_rgba(16,185,129,0.5)] backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06] md:p-10">
                 {/* Subtle inner blob */}
                 <div
                   aria-hidden
@@ -522,24 +524,24 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   >
                     <Sparkles className="h-6 w-6 text-white" strokeWidth={2} />
                   </div>
-                  <h2 className="text-[22px] font-bold text-gray-900 mb-1.5 tracking-tight">
+                  <h2 className="text-[22px] font-bold text-gray-900 dark:text-slate-100 mb-1.5 tracking-tight">
                     Case Configuration
                   </h2>
-                  <p className="text-[13px] text-gray-500">
+                  <p className="text-[13px] text-gray-500 dark:text-slate-400">
                     Configure your case parameters. Leave fields blank for random selection.
                   </p>
                 </div>
 
                 <div className="relative space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-800">
+                    <Label className="text-[13px] font-semibold text-gray-800 dark:text-slate-200">
                       Specialty
                     </Label>
                     <Select
                       value={caseFormData.specialty}
                       onValueChange={(value) => setCaseFormData((prev) => ({ ...prev, specialty: value }))}
                     >
-                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] hover:border-emerald-300 transition-colors focus:!ring-2 focus:!ring-emerald-300 focus:!border-emerald-400 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300">
+                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] transition-colors hover:border-emerald-300 focus:!border-emerald-400 focus:!ring-2 focus:!ring-emerald-300 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-white/25">
                         <SelectValue placeholder="Select specialty (or leave blank for random)" />
                       </SelectTrigger>
                       <SelectContent>
@@ -555,18 +557,18 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                         <SelectItem value="General Medicine">General Medicine</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[12px] text-gray-400">If left blank → random specialty</p>
+                    <p className="text-[12px] text-gray-400 dark:text-slate-500">If left blank → random specialty</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-800">
+                    <Label className="text-[13px] font-semibold text-gray-800 dark:text-slate-200">
                       Difficulty Level
                     </Label>
                     <Select
                       value={caseFormData.difficultyLevel}
                       onValueChange={(value) => setCaseFormData((prev) => ({ ...prev, difficultyLevel: value }))}
                     >
-                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] hover:border-emerald-300 transition-colors focus:!ring-2 focus:!ring-emerald-300 focus:!border-emerald-400 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300">
+                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] transition-colors hover:border-emerald-300 focus:!border-emerald-400 focus:!ring-2 focus:!ring-emerald-300 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-white/25">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -582,14 +584,14 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     className={`flex items-center justify-between gap-6 rounded-2xl border px-4 py-3.5 transition-all duration-300 ${
                       caseFormData.rareCase
                         ? "bg-primary/5 border-primary/30 shadow-[0_8px_24px_-12px_rgba(var(--color-primary-700-rgb,4,120,87),0.35)]"
-                        : "bg-white border-primary/10 hover:border-primary/20"
+                        : "border-primary/10 bg-white hover:border-primary/20 dark:border-white/10 dark:bg-white/10 dark:hover:border-white/20"
                     }`}
                   >
                     <div>
-                      <Label className="text-[13px] font-semibold text-gray-800 block">
+                      <Label className="block text-[13px] font-semibold text-gray-800 dark:text-slate-200">
                         Rare Disease Case
                       </Label>
-                      <p className="text-[12px] text-gray-500 mt-0.5">
+                      <p className="mt-0.5 text-[12px] text-gray-500 dark:text-slate-400">
                         Include rare diseases like Marfan syndrome, Addison&apos;s disease, Wilson&apos;s disease
                       </p>
                     </div>
@@ -606,14 +608,14 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-800">
-                      Case Type <span className="font-normal text-gray-400">(Optional)</span>
+                    <Label className="text-[13px] font-semibold text-gray-800 dark:text-slate-200">
+                      Case Type <span className="font-normal text-gray-400 dark:text-slate-500">(Optional)</span>
                     </Label>
                     <Select
                       value={caseFormData.caseType}
                       onValueChange={(value) => setCaseFormData((prev) => ({ ...prev, caseType: value }))}
                     >
-                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] hover:border-emerald-300 transition-colors focus:!ring-2 focus:!ring-emerald-300 focus:!border-emerald-400 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300">
+                      <SelectTrigger className="h-11 rounded-xl border-emerald-200 bg-white text-[14px] transition-colors hover:border-emerald-300 focus:!border-emerald-400 focus:!ring-2 focus:!ring-emerald-300 data-[state=open]:!border-emerald-400 data-[state=open]:!ring-2 data-[state=open]:!ring-emerald-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-white/25">
                         <SelectValue placeholder="Select case type (optional)" />
                       </SelectTrigger>
                       <SelectContent>
@@ -623,14 +625,14 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                         <SelectItem value="chronic">Chronic — Follow-up care</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[12px] text-gray-400">Can be skipped if you want to keep it lean</p>
+                    <p className="text-[12px] text-gray-400 dark:text-slate-500">Can be skipped if you want to keep it lean</p>
                   </div>
 
                   <div className="flex gap-3 pt-3">
                     <Button
                       variant="outline"
                       onClick={() => setCurrentStep("landing")}
-                      className="flex-1 h-12 rounded-xl border-2 border-primary/20 bg-white text-primary hover:bg-primary/5 hover:border-primary/40 font-semibold text-[14px] transition-all"
+                      className="flex-1 h-12 rounded-xl border-2 border-primary/20 bg-white text-[14px] font-semibold text-primary transition-all hover:border-primary/40 hover:bg-primary/5 dark:border-white/15 dark:bg-white/10 dark:text-primary dark:hover:bg-white/15"
                     >
                       Cancel
                     </Button>
@@ -665,10 +667,15 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       )}
 
       {currentStep === "select" && (
-        <div className="relative min-h-screen" style={themedBackground}>
+        <div className={cn(APP_PAGE_SHELL, "relative min-h-screen")}>
           {isGeneratingCase && (
-            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 border border-gray-200">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm dark:bg-black/60">
+              <div
+                className={cn(
+                  APP_GLASS_CARD,
+                  "mx-4 w-full max-w-sm rounded-2xl p-8 shadow-2xl"
+                )}
+              >
                 <div className="text-center">
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -676,8 +683,8 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   >
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Loading Case</h3>
-                  <p className="text-sm text-gray-600">Please wait while we prepare your case...</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-2">Loading Case</h3>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Please wait while we prepare your case...</p>
                 </div>
               </div>
             </div>
@@ -705,17 +712,17 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     type="button"
                     onClick={() => handleCaseSelection(caseItem.id)}
                     disabled={isGeneratingCase}
-                    className={`group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl bg-white/90 backdrop-blur-md border border-[#DCEFE5] p-7 sm:p-8 lg:p-9 shadow-[0_20px_44px_-32px_rgba(16,185,129,0.45)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-emerald-300/60 hover:shadow-[0_28px_52px_-32px_rgba(16,185,129,0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 cursor-pointer ${isGeneratingCase ? "opacity-50 pointer-events-none" : ""}`}
+                    className={`group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl border border-primary-100 bg-white/90 p-7 shadow-[0_20px_44px_-32px_rgba(var(--color-primary-500-rgb),0.45)] backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary-300/60 hover:shadow-[0_28px_52px_-32px_rgba(var(--color-primary-500-rgb),0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/50 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-white/[0.06] dark:focus-visible:ring-offset-gray-950 sm:p-8 lg:p-9 cursor-pointer ${isGeneratingCase ? "opacity-50 pointer-events-none" : ""}`}
                   >
-                    {/* Animated forest-green top bar (L → R on hover) */}
+                    {/* Animated primary-tinted top bar (L → R on hover) */}
                     <span
                       aria-hidden
-                      className="absolute top-0 left-0 z-[1] h-[3px] w-0 bg-[#1a4d2e] transition-[width] duration-500 ease-out group-hover:w-full"
+                      className="absolute top-0 left-0 z-[1] h-[3px] w-0 bg-primary-700 transition-[width] duration-500 ease-out group-hover:w-full dark:bg-primary-400"
                     />
 
                     {/* Title row */}
                     <div className="flex items-start justify-between gap-3 mb-3 lg:mb-4">
-                      <h3 className="text-[17px] sm:text-lg lg:text-xl font-bold text-[#1A1A1A] leading-snug pr-1">
+                      <h3 className="pr-1 text-[17px] font-bold leading-snug text-slate-900 dark:text-slate-100 sm:text-lg lg:text-xl">
                         {caseItem.title}
                       </h3>
                       <span
@@ -728,55 +735,55 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     </div>
 
                     {/* Description */}
-                    <p className="text-[13px] sm:text-sm text-gray-600 leading-relaxed line-clamp-3 mb-6 lg:mb-7 flex-shrink-0">
+                    <p className="text-[13px] sm:text-sm text-gray-600 dark:text-slate-400 leading-relaxed line-clamp-3 mb-6 lg:mb-7 flex-shrink-0">
                       {caseItem.description}
                     </p>
 
                     {/* Stats row — large forest green numbers, spread across card */}
                     <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 mb-6 lg:mb-7">
                       <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] sm:text-3xl lg:text-[32px] font-bold text-[#1a4d2e] leading-none tabular-nums tracking-tight">
+                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
                           {caseItem.patientProfile.age}
                         </div>
-                        <div className="text-[11px] sm:text-xs text-gray-400 mt-2 font-medium uppercase tracking-wider">
+                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
                           Age
                         </div>
                       </div>
                       <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] sm:text-3xl lg:text-[32px] font-bold text-[#1a4d2e] leading-none tabular-nums tracking-tight">
+                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
                           {caseItem.symptoms.length}
                         </div>
-                        <div className="text-[11px] sm:text-xs text-gray-400 mt-2 font-medium uppercase tracking-wider">
+                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
                           Symptoms
                         </div>
                       </div>
                       <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] sm:text-3xl lg:text-[32px] font-bold text-[#1a4d2e] leading-none tabular-nums tracking-tight">
+                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
                           {durationLabel}
                         </div>
-                        <div className="text-[11px] sm:text-xs text-gray-400 mt-2 font-medium uppercase tracking-wider">
+                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
                           Duration
                         </div>
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 mb-6 lg:mb-7" />
+                    <div className="mb-6 border-t border-gray-100 dark:border-white/10 lg:mb-7" />
 
                     {/* Patient profile */}
-                    <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 mb-6 text-[13px] sm:text-sm text-gray-600">
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 mb-6 text-[13px] sm:text-sm text-gray-600 dark:text-slate-400">
                       <div className="min-w-0">
-                        <div className="font-semibold text-gray-800 truncate text-[14px]">
+                        <div className="truncate text-[14px] font-semibold text-gray-800 dark:text-slate-200">
                           {caseItem.patientProfile.name}
                         </div>
-                        <div className="text-[12px] sm:text-[13px] text-gray-500 mt-1 truncate">
+                        <div className="mt-1 truncate text-[12px] text-gray-500 dark:text-slate-400 sm:text-[13px]">
                           {caseItem.patientProfile.gender}
                         </div>
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-gray-800 text-[14px]">
+                        <div className="text-[14px] font-semibold text-gray-800 dark:text-slate-200">
                           Age: {caseItem.patientProfile.age}
                         </div>
-                        <div className="text-[12px] sm:text-[13px] text-gray-500 mt-1 truncate">
+                        <div className="mt-1 truncate text-[12px] text-gray-500 dark:text-slate-400 sm:text-[13px]">
                           {caseItem.patientProfile.occupation}
                         </div>
                       </div>
@@ -787,21 +794,21 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                       {visibleSymptoms.map((symptom, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#ecfdf5] text-[#14532d] text-[11px] sm:text-xs font-semibold"
+                          className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1.5 text-[11px] font-semibold text-primary-800 dark:bg-primary-500/15 dark:text-primary-100 sm:text-xs"
                         >
                           {symptom}
                         </span>
                       ))}
                       {extraCount > 0 && (
-                        <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#ecfdf5] text-[#14532d] text-[11px] sm:text-xs font-semibold">
+                        <span className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1.5 text-[11px] font-semibold text-primary-800 dark:bg-primary-500/15 dark:text-primary-100 sm:text-xs">
                           +{extraCount} more
                         </span>
                       )}
                     </div>
 
                     {/* Footer row */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-50 pt-5">
-                      <span className="inline-flex max-w-[75%] items-center px-3.5 py-1.5 rounded-full bg-[#ecfdf5] text-[#1a4d2e] text-xs sm:text-[13px] font-bold truncate">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-50 pt-5 dark:border-white/10">
+                      <span className="inline-flex max-w-[75%] items-center truncate rounded-full bg-primary-50 px-3.5 py-1.5 text-xs font-bold text-primary-700 dark:bg-primary-500/15 dark:text-primary-200 sm:text-[13px]">
                         {caseItem.specialty}
                       </span>
                       {caseItem.isRare ? (
@@ -818,7 +825,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
             <div className="text-center mt-14 pb-10 md:pb-12">
               <Link
                 href={config.backToModeRoute}
-                className="text-[14px] font-semibold text-[#2d6a4f] hover:text-[#1b4332] underline-offset-4 hover:underline transition-colors"
+                className="text-[14px] font-semibold text-primary-700 hover:text-primary-800 underline-offset-4 hover:underline transition-colors dark:text-primary-300 dark:hover:text-primary-200"
               >
                 {config.backToModeLabel}
               </Link>

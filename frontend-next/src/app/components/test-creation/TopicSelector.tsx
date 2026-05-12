@@ -278,7 +278,7 @@ export function TopicSelector({
 
   return (
     <div className="flex flex-col h-full" data-testid="card-systems">
-      <div className="px-4 py-3 border-b border-border/50 dark:border-gray-700/50 shrink-0">
+      <div className="shrink-0 border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <label className="flex items-center cursor-pointer">
@@ -320,12 +320,12 @@ export function TopicSelector({
                     <div
                       className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all border ${
                         topicDisabled
-                          ? `opacity-50 dark:opacity-60 border-transparent ${topicExpanded ? 'bg-muted/50 dark:bg-gray-700/30' : ''}`
+                          ? `opacity-50 dark:opacity-60 border-transparent ${topicExpanded ? 'bg-muted/50 dark:bg-white/10' : ''}`
                           : topicExpanded
                             ? "bg-primary/10 dark:bg-primary/20 border-primary/40 dark:border-primary/30 ring-1 ring-primary/20 dark:ring-primary/30 cursor-pointer"
                             : topicState === true
                               ? "bg-primary/5 dark:bg-primary/10 border-primary/30 dark:border-primary/20 cursor-pointer"
-                              : "bg-muted/30 dark:bg-gray-700/20 border-transparent hover:bg-muted/50 dark:hover:bg-gray-700/30 hover:border-border dark:hover:border-gray-700/50 cursor-pointer"
+                              : "cursor-pointer border-transparent bg-muted/30 hover:border-slate-200/80 hover:bg-muted/50 dark:bg-white/5 dark:hover:border-white/10 dark:hover:bg-white/10"
                       }`}
                       onClick={(e) => {
                         if (!topicDisabled) {
@@ -371,7 +371,7 @@ export function TopicSelector({
                     </div>
 
                     {topicExpanded && (
-                      <div className="ml-6 pl-4 border-l border-border dark:border-gray-700/50 space-y-0.5">
+                      <div className="ml-6 space-y-0.5 border-l border-slate-200/80 pl-4 dark:border-white/10">
                         {topic.subtopics.map((subtopic) => {
                           const subtopicDisabled = subtopic.count === 0;
                           const subtopicState = getSubtopicState(subtopic);
@@ -411,7 +411,7 @@ export function TopicSelector({
         </div>
       </ScrollArea>
 
-      <div className="px-4 py-2.5 border-t border-border/50 dark:border-gray-700/50 shrink-0 bg-muted/30 dark:bg-gray-700/30">
+      <div className="shrink-0 border-t border-slate-200/80 bg-muted/30 px-4 py-2.5 dark:border-white/10 dark:bg-white/5">
         <p className="text-xs text-muted-foreground dark:text-gray-400">
           <span className="font-medium text-foreground dark:text-gray-100">{selectedTopics.length}</span> of {allTopics.length} topics selected
           {selectedSubtopics.length > 0 && <span className="ml-2 text-primary dark:text-blue-400">({selectedSubtopics.length} subtopics)</span>}
