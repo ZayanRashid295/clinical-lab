@@ -5,6 +5,19 @@ import { useLanguage } from "../../../shared/contexts/LanguageContext";
 import { authService } from "../../../shared/services/auth.service";
 import { configToServerPatchBody } from "../../../shared/utils/ui-preferences-sync";
 import type { TypographyPreset } from "../../config/ui.config";
+import { cn } from "@/shared/utils/cn";
+
+function settingsOptionSelected(isDarkUi: boolean) {
+  return isDarkUi
+    ? "border-primary-500/55 bg-primary-900/55 text-primary-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+    : "border-primary-500 bg-primary-50 text-primary-700";
+}
+
+function settingsOptionIdle(isDarkUi: boolean) {
+  return isDarkUi
+    ? "border-gray-600 text-gray-200 hover:bg-gray-800/90"
+    : "border-gray-300 text-gray-700 hover:bg-gray-50";
+}
 
 const SettingsPage: React.FC = () => {
   const {
@@ -34,10 +47,11 @@ const SettingsPage: React.FC = () => {
 
   const colorKeys = getColorSchemeKeysForTheme(config.theme);
   const navIsLeft = config.menuLayout === "vertical" && config.menuStyle === "sidebar";
+  const isDarkUi = config.theme === "dark";
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6 p-4 sm:p-6">
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 dark:shadow-black/20">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
           {t("common.settings")}
         </h1>
@@ -46,7 +60,7 @@ const SettingsPage: React.FC = () => {
         </p>
       </div>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 dark:shadow-black/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           {t("common.theme")}
         </h2>
@@ -54,29 +68,31 @@ const SettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setTheme("light")}
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
+            className={cn(
+              "rounded-lg border px-4 py-3 text-sm font-medium transition",
               config.theme === "light"
-                ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
+                ? settingsOptionSelected(isDarkUi)
+                : settingsOptionIdle(isDarkUi)
+            )}
           >
             {t("common.light")}
           </button>
           <button
             type="button"
             onClick={() => setTheme("dark")}
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
+            className={cn(
+              "rounded-lg border px-4 py-3 text-sm font-medium transition",
               config.theme === "dark"
-                ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
+                ? settingsOptionSelected(isDarkUi)
+                : settingsOptionIdle(isDarkUi)
+            )}
           >
             {t("common.dark")}
           </button>
         </div>
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 dark:shadow-black/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           {t("common.colors")}
         </h2>
@@ -94,11 +110,12 @@ const SettingsPage: React.FC = () => {
                 type="button"
                 key={key}
                 onClick={() => setColorScheme(key)}
-                className={`rounded-lg border p-3 text-left transition ${
+                className={cn(
+                  "rounded-lg border p-3 text-left transition",
                   config.colorScheme === key
-                    ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                    : "border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
-                }`}
+                    ? settingsOptionSelected(isDarkUi)
+                    : settingsOptionIdle(isDarkUi)
+                )}
                 title={scheme.name}
               >
                 <div className="mb-2 flex gap-1">
@@ -115,7 +132,14 @@ const SettingsPage: React.FC = () => {
                     style={{ backgroundColor: scheme.primary[700] }}
                   />
                 </div>
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                <p
+                  className={cn(
+                    "text-xs font-medium",
+                    config.colorScheme === key && isDarkUi
+                      ? "text-primary-100"
+                      : "text-gray-700 dark:text-gray-200"
+                  )}
+                >
                   {scheme.name}
                 </p>
               </button>
@@ -124,7 +148,7 @@ const SettingsPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 dark:shadow-black/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Layout</h2>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
           Navbar position only (accent colors and theme stay global).
@@ -133,29 +157,27 @@ const SettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setNavbarPosition("left")}
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
-              navIsLeft
-                ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
+            className={cn(
+              "rounded-lg border px-4 py-3 text-sm font-medium transition",
+              navIsLeft ? settingsOptionSelected(isDarkUi) : settingsOptionIdle(isDarkUi)
+            )}
           >
             Navbar on the left
           </button>
           <button
             type="button"
             onClick={() => setNavbarPosition("top")}
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
-              !navIsLeft
-                ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
+            className={cn(
+              "rounded-lg border px-4 py-3 text-sm font-medium transition",
+              !navIsLeft ? settingsOptionSelected(isDarkUi) : settingsOptionIdle(isDarkUi)
+            )}
           >
             Navbar on the top
           </button>
         </div>
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 dark:shadow-black/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           {t("common.typography")}
         </h2>
@@ -170,11 +192,12 @@ const SettingsPage: React.FC = () => {
                   type="button"
                   key={size}
                   onClick={() => setFontSize(size)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-sm font-medium transition",
                     config.fontSize === size
-                      ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                  }`}
+                      ? settingsOptionSelected(isDarkUi)
+                      : settingsOptionIdle(isDarkUi)
+                  )}
                 >
                   {t(`common.${size}`)}
                 </button>
@@ -196,11 +219,12 @@ const SettingsPage: React.FC = () => {
                   type="button"
                   key={opt.id}
                   onClick={() => setTypographyPreset(opt.id)}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition ${
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-left text-sm font-medium transition",
                     config.typographyPreset === opt.id
-                      ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                  }`}
+                      ? settingsOptionSelected(isDarkUi)
+                      : settingsOptionIdle(isDarkUi)
+                  )}
                 >
                   <span className="block">{opt.label}</span>
                   <span className="block text-xs font-normal opacity-80">{opt.hint}</span>

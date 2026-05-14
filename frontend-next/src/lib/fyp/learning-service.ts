@@ -493,16 +493,7 @@ PLAN_EXPLANATION: [explanation for plan]`,
       }
     } catch (error) {
       console.error("Error generating educational SOAP note:", error)
-      return {
-        subjective: `Patient presents with symptoms consistent with ${disease}.`,
-        subjectiveExplanation: "Subjective data includes the patient's reported symptoms and history.",
-        objective: "Physical examination and vital signs would be documented here.",
-        objectiveExplanation: "Objective data includes measurable findings from examination and tests.",
-        assessment: `Working diagnosis: ${disease}`,
-        assessmentExplanation: "Assessment includes the diagnostic reasoning and differential diagnosis.",
-        plan: "Treatment plan based on diagnosis and patient factors.",
-        planExplanation: "Plan outlines the therapeutic approach and follow-up care.",
-      }
+      throw error instanceof Error ? error : new Error("Failed to generate educational SOAP note")
     }
   }
 

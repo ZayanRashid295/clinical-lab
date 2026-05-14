@@ -1620,7 +1620,10 @@ Please provide guidance and educational feedback.`,
           
           <div className="flex items-center gap-4">
             <Link href="/">
-              <Button variant="outline" className="flex items-center gap-2 bg-primary-50 border-primary-200 hover:bg-primary-100 text-primary-700 hover:text-primary-800 dark:bg-primary-500/10 dark:border-primary-500/30 dark:text-primary-200 dark:hover:bg-primary-500/20 dark:hover:text-primary-100 transition-all duration-300">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 border-primary-200 bg-primary-50 text-primary-700 transition-all duration-300 hover:bg-primary-100 hover:text-primary-800 dark:!border-white/15 dark:!bg-slate-900/90 dark:!text-slate-100 dark:hover:!bg-slate-800 dark:hover:!text-white"
+              >
                 <Home className="h-4 w-4" />
                 Dashboard
               </Button>
@@ -1658,18 +1661,10 @@ Please provide guidance and educational feedback.`,
       </div>
 
       {/* Main Content - Three Panel Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left panel — case context & tools (AI Evaluation Mode) */}
-        <div className="w-1/3 border-r border-gray-200 bg-white flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
-          <div className="p-4 border-b bg-blue-50 dark:bg-blue-500/10">
-            <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
-              <Stethoscope className="h-5 w-5" />
-              {EVALUATION_MODE_TITLE}
-            </h2>
-            <p className="text-sm text-blue-700 dark:text-blue-300">{EVALUATION_MODE_TAGLINE}</p>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex w-1/3 min-w-0 flex-col border-r border-gray-200 bg-white dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
             {/* Case Information Panel - Only in Evaluation Mode */}
             {isEvaluationMode && selectedCase && (
               <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 dark:from-blue-500/10 dark:to-purple-500/10 dark:border-blue-500/25">
@@ -2069,7 +2064,7 @@ Please provide guidance and educational feedback.`,
         </div>
 
         {/* Right Panel - Learning Insights */}
-        <div className="w-1/3 border-r border-transparent bg-white flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
+        <div className="flex w-1/3 min-w-0 flex-col border-r border-transparent bg-white dark:border-white/10 dark:bg-white/[0.04]">
           <div className="p-4 border-b bg-purple-50 dark:bg-purple-500/10">
             <div className="flex items-center justify-between">
               <div>
@@ -2107,16 +2102,46 @@ Please provide guidance and educational feedback.`,
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-              <TabsList className={`grid w-full m-4 mb-0 gap-1 ${isEvaluationMode ? 'grid-cols-5' : 'grid-cols-3'}`}>
-                <TabsTrigger value="educational-content" className="text-xs px-2 py-1">Educational Content</TabsTrigger>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-full min-h-0 flex-col">
+              <TabsList className="mx-4 mt-4 mb-0 flex h-auto min-h-0 w-auto max-w-full flex-wrap justify-start gap-1.5 rounded-lg p-1.5 sm:gap-2">
+                <TabsTrigger
+                  value="educational-content"
+                  title="Educational Content"
+                  className="min-w-0 max-w-full flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-2 py-2 text-center text-[11px] font-medium leading-tight sm:basis-[calc(33.333%-0.35rem)] sm:text-xs md:flex-1 md:basis-0 lg:px-3"
+                >
+                  Educational Content
+                </TabsTrigger>
                 {isEvaluationMode && (
-                  <TabsTrigger value="nurse-report" className="text-xs px-2 py-1">Nurse Report</TabsTrigger>
+                  <TabsTrigger
+                    value="nurse-report"
+                    title="Nurse Report"
+                    className="min-w-0 max-w-full flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-2 py-2 text-center text-[11px] font-medium leading-tight sm:basis-[calc(33.333%-0.35rem)] sm:text-xs md:flex-1 md:basis-0 lg:px-3"
+                  >
+                    Nurse Report
+                  </TabsTrigger>
                 )}
-                <TabsTrigger value="key-points" className="text-xs px-2 py-1">Key Points</TabsTrigger>
-                <TabsTrigger value="guidelines" className="text-xs px-2 py-1">Guidelines</TabsTrigger>
-                <TabsTrigger value="pearls" className="text-xs px-2 py-1">Pearls</TabsTrigger>
+                <TabsTrigger
+                  value="key-points"
+                  title="Key Points"
+                  className="min-w-0 max-w-full flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-2 py-2 text-center text-[11px] font-medium leading-tight sm:basis-[calc(33.333%-0.35rem)] sm:text-xs md:flex-1 md:basis-0 lg:px-3"
+                >
+                  Key Points
+                </TabsTrigger>
+                <TabsTrigger
+                  value="guidelines"
+                  title="Guidelines"
+                  className="min-w-0 max-w-full flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-2 py-2 text-center text-[11px] font-medium leading-tight sm:basis-[calc(33.333%-0.35rem)] sm:text-xs md:flex-1 md:basis-0 lg:px-3"
+                >
+                  Guidelines
+                </TabsTrigger>
+                <TabsTrigger
+                  value="pearls"
+                  title="Pearls"
+                  className="min-w-0 max-w-full flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-2 py-2 text-center text-[11px] font-medium leading-tight sm:basis-[calc(33.333%-0.35rem)] sm:text-xs md:flex-1 md:basis-0 lg:px-3"
+                >
+                  Pearls
+                </TabsTrigger>
               </TabsList>
               
               <div className="flex-1 overflow-y-auto p-4">
@@ -2676,7 +2701,10 @@ Please provide guidance and educational feedback.`,
               {/* Back to Dashboard */}
               <div className="text-center">
                 <Link href="/">
-                  <Button variant="outline" className="flex items-center gap-2 mx-auto">
+                  <Button
+                    variant="outline"
+                    className="mx-auto flex items-center gap-2 dark:!border-white/15 dark:!bg-slate-900/90 dark:!text-slate-100 dark:hover:!bg-slate-800"
+                  >
                     <Home className="h-4 w-4" />
                     Back to Dashboard
                   </Button>
@@ -2841,17 +2869,20 @@ Please provide guidance and educational feedback.`,
                       setShowCaseSelection(false)
                       setShowEvaluationLanding(true)
                     }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 dark:!border-white/15 dark:!bg-slate-900/90 dark:!text-slate-100 dark:hover:!bg-slate-800"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Back
                   </Button>
-                  <Link href="/">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Home className="h-4 w-4" />
-                      Dashboard
-                    </Button>
-                  </Link>
+                <Link href="/">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 dark:!border-white/15 dark:!bg-slate-900/90 dark:!text-slate-100 dark:hover:!bg-slate-800"
+                  >
+                    <Home className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
                   <Button
                     onClick={() => setShowCaseGenerationForm(true)}
                     className="bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white"

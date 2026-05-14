@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ success: true, aiSOAP })
   } catch (error) {
     const details = error instanceof Error ? error.message : "Unknown error"
+    console.error("[api/soap/generate-ai]", error)
     return res.status(500).json({ success: false, error: "Failed to generate AI SOAP note", details })
   }
 }

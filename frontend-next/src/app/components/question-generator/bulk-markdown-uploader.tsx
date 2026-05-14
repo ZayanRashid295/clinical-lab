@@ -1518,36 +1518,31 @@ export default function BulkMarkdownUploader({
     }
   }
 
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    const checkDarkMode = () => {
-      setIsDark(document.documentElement.classList.contains("dark"))
-    }
-    checkDarkMode()
-    const observer = new MutationObserver(checkDarkMode)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <div 
-      className={`p-6 shadow-lg border-2 border-dashed border-primary/30 border border-border dark:border-gray-700 rounded-xl ${isDark ? '!bg-gray-800' : ''}`}
-      style={isDark ? { backgroundColor: '#1f2937' } : {}}
-    >
-      <div className="space-y-4 min-h-0">
-        <div>
-          <h3 className="text-lg font-bold text-foreground dark:text-gray-100 mb-2">Bulk Upload Markdown Questions</h3>
-          <p className="text-sm text-muted-foreground dark:text-gray-300">
-            Upload multiple .md files or a directory containing .md files and images
-          </p>
+    <Card className="border p-6 dark:border-slate-600/35 dark:bg-slate-900/20">
+      <div className="min-w-0 space-y-6 overflow-x-hidden">
+        <div className="flex flex-wrap items-start justify-between gap-3 md:gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-bold break-words">Bulk Upload Markdown Questions</h2>
+            <p className="mt-1 break-words text-sm text-muted-foreground">
+              Upload multiple .md files or a directory containing .md files and images
+            </p>
+          </div>
+          {onCancel && (
+            <div className="flex-shrink-0">
+              <Button
+                variant="outline"
+                onClick={onCancel}
+                className="dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100 dark:hover:bg-slate-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mode Selection */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-wrap gap-3">
           <Button
             variant={uploadMode === "files" ? "default" : "outline"}
             onClick={() => setUploadMode("files")}
@@ -1571,7 +1566,7 @@ export default function BulkMarkdownUploader({
           <>
             {uploadMode === "files" ? (
               <div
-                className="relative border-2 border-dashed border-border dark:border-gray-600 rounded-lg p-8 hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors cursor-pointer dark:bg-gray-800/50"
+                className="relative cursor-pointer rounded-lg border border-dashed border-border p-8 transition-colors hover:bg-muted/30 dark:border-slate-600/40 dark:bg-slate-800/45 dark:hover:bg-slate-800/70"
                 onClick={() => !isProcessing && fileInputRef.current?.click()}
               >
                 <input
@@ -1586,16 +1581,16 @@ export default function BulkMarkdownUploader({
 
                 <div className="text-center">
                   <div className="mb-3 text-4xl">📄</div>
-                  <p className="font-semibold text-foreground dark:text-gray-100 mb-1">Drop multiple markdown files here</p>
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">or click to browse</p>
-                  <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">
+                  <p className="mb-1 font-semibold text-foreground">Drop multiple markdown files here</p>
+                  <p className="text-sm text-muted-foreground">or click to browse</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
                     Supported: .md files and image files (.jpg, .png, .gif, .webp, .svg)
                   </p>
                 </div>
               </div>
             ) : (
               <div
-                className="relative border-2 border-dashed border-border dark:border-gray-600 rounded-lg p-8 hover:bg-muted/30 dark:hover:bg-gray-700/30 transition-colors cursor-pointer dark:bg-gray-800/50"
+                className="relative cursor-pointer rounded-lg border border-dashed border-border p-8 transition-colors hover:bg-muted/30 dark:border-slate-600/40 dark:bg-slate-800/45 dark:hover:bg-slate-800/70"
                 onClick={() => !isProcessing && directoryInputRef.current?.click()}
               >
                 <input
@@ -1610,9 +1605,9 @@ export default function BulkMarkdownUploader({
 
                 <div className="text-center">
                   <div className="mb-3 text-4xl">📁</div>
-                  <p className="font-semibold text-foreground dark:text-gray-100 mb-1">Drop a directory here</p>
-                  <p className="text-sm text-muted-foreground dark:text-gray-300">or click to browse</p>
-                  <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">
+                  <p className="mb-1 font-semibold text-foreground">Drop a directory here</p>
+                  <p className="text-sm text-muted-foreground">or click to browse</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
                     Directory should contain .md files and an images/ folder with referenced images
                   </p>
                 </div>
@@ -1623,10 +1618,10 @@ export default function BulkMarkdownUploader({
 
         {/* Show upload area button when summary exists */}
         {summary && !isProcessing && (
-          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 dark:bg-gray-700/30 border border-border dark:border-gray-600">
+          <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-4 dark:border-slate-600/40 dark:bg-slate-800/35">
             <div>
-              <p className="text-sm font-medium text-foreground dark:text-gray-100">Want to upload more files?</p>
-              <p className="text-xs text-muted-foreground dark:text-gray-300">Click the button below to add more questions</p>
+              <p className="text-sm font-medium text-foreground">Want to upload more files?</p>
+              <p className="text-xs text-muted-foreground">Click the button below to add more questions</p>
             </div>
             <Button
               onClick={() => {
@@ -1650,10 +1645,10 @@ export default function BulkMarkdownUploader({
 
         {/* Processing Status */}
         {isProcessing && (
-          <div className="p-4 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 dark:border-blue-500/40">
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm font-medium">Processing files...</span>
+          <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 dark:border-blue-400/20 dark:bg-blue-500/10">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-blue-700 dark:text-blue-200">Processing files...</span>
             </div>
           </div>
         )}
@@ -1662,24 +1657,24 @@ export default function BulkMarkdownUploader({
         {/* Summary Report */}
         {summary && !isProcessing && (
           <div className="space-y-4">
-            <div className="p-4 rounded-lg dark:bg-gray-800 border border-border dark:border-gray-700" style={{ backgroundColor: isDark ? '#1f2937' : 'var(--card-bg, #ffffff)' }}>
-              <h4 className="font-semibold text-foreground dark:text-gray-100 mb-3">Processing Summary</h4>
-              <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground dark:text-gray-100">{summary.total}</div>
-                  <div className="text-xs text-muted-foreground dark:text-gray-300">Total</div>
+            <div className="rounded-lg border border-border bg-card/80 p-4 dark:border-slate-600/40 dark:bg-slate-800/40">
+              <h4 className="mb-3 font-semibold text-foreground dark:text-slate-100">Processing Summary</h4>
+              <div className="mb-4 grid min-w-0 max-w-full grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                <div className="min-w-0 rounded-md border border-border bg-muted/40 px-2 py-3 text-center dark:border-slate-600/35 dark:bg-slate-800/50">
+                  <div className="text-2xl font-bold tabular-nums text-foreground dark:text-slate-50">{summary.total}</div>
+                  <div className="text-xs text-muted-foreground dark:text-slate-400">Total</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.successful}</div>
-                  <div className="text-xs text-muted-foreground dark:text-gray-300">Successful</div>
+                <div className="min-w-0 rounded-md border border-green-500/25 bg-green-500/10 px-2 py-3 text-center dark:border-emerald-500/30 dark:bg-emerald-500/[0.1]">
+                  <div className="text-2xl font-bold tabular-nums text-green-600 dark:text-emerald-300">{summary.successful}</div>
+                  <div className="text-xs text-muted-foreground dark:text-slate-400">Successful</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.failed}</div>
-                  <div className="text-xs text-muted-foreground dark:text-gray-300">Failed</div>
+                <div className="min-w-0 rounded-md border border-red-500/25 bg-red-500/10 px-2 py-3 text-center dark:border-red-500/30 dark:bg-red-500/[0.1]">
+                  <div className="text-2xl font-bold tabular-nums text-red-600 dark:text-red-300">{summary.failed}</div>
+                  <div className="text-xs text-muted-foreground dark:text-slate-400">Failed</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{summary.skipped}</div>
-                  <div className="text-xs text-muted-foreground dark:text-gray-300">Skipped</div>
+                <div className="min-w-0 rounded-md border border-yellow-500/25 bg-yellow-500/10 px-2 py-3 text-center dark:border-amber-500/30 dark:bg-amber-500/[0.1]">
+                  <div className="text-2xl font-bold tabular-nums text-yellow-600 dark:text-amber-300">{summary.skipped}</div>
+                  <div className="text-xs text-muted-foreground dark:text-slate-400">Skipped</div>
                 </div>
               </div>
 
@@ -1696,7 +1691,7 @@ export default function BulkMarkdownUploader({
                   return (
                     <div
                       key={idx}
-                      className="border border-border dark:border-gray-600 rounded-lg p-3 bg-card dark:bg-gray-700/50"
+                      className="border border-border dark:border-slate-600/40 rounded-lg p-3 bg-card dark:bg-slate-800/35"
                     >
                       {/* Question Header */}
                       <div className="flex items-start gap-2">
@@ -1734,7 +1729,7 @@ export default function BulkMarkdownUploader({
                           
                           {result.questionId && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-muted-foreground dark:text-gray-300">Question ID: {result.questionId}</span>
+                              <span className="text-xs text-muted-foreground dark:text-slate-200">Question ID: {result.questionId}</span>
                               {onQuestionEdit && (
                                 <Button
                                   size="sm"
@@ -1771,14 +1766,14 @@ export default function BulkMarkdownUploader({
                                 Product
                               </label>
                               {result.questionData.product && (
-                                <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                                <p className="text-[11px] text-muted-foreground mb-1 break-words dark:text-slate-400">
                                   Parsed: {result.questionData.product}
                                 </p>
                               )}
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.product ? `Parsed: ${result.questionData.product}` : "Name (editable)"}
                                   value={metadata.productName || result.questionData.product || ""}
                                   onChange={(e) => updateQuestionMetadata(result.fileName, { productName: e.target.value })}
@@ -1797,7 +1792,7 @@ export default function BulkMarkdownUploader({
                                     productName: selected?.name || undefined
                                   })
                                 }}
-                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                className="w-full px-3 py-2 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                 disabled={isCreating || loadingProducts}
                               >
                                 <option value="">Select Product...</option>
@@ -1825,7 +1820,7 @@ export default function BulkMarkdownUploader({
                                   type="button"
                                   variant="outline"
                                   size="sm"
-                                  className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300"
                                   title="Delete selected product from database"
                                   disabled={!metadata.productId}
                                   onClick={() => handleDeleteProduct(result.fileName)}
@@ -1843,7 +1838,7 @@ export default function BulkMarkdownUploader({
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.category ? `Parsed: ${result.questionData.category}` : "Name (editable)"}
                                   value={
                                     metadata.categoryId
@@ -1870,7 +1865,7 @@ export default function BulkMarkdownUploader({
                                       categoryName: selectedCat?.name ?? (categoryId ? metadata.categoryName : undefined),
                                     })
                                   }}
-                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || loadingCategories}
                                 >
                                   <option value="">Select Category...</option>
@@ -1888,7 +1883,7 @@ export default function BulkMarkdownUploader({
                                 }}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected category from database" disabled={!metadata.categoryId} onClick={() => handleDeleteCategory(result.fileName)}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300" title="Delete selected category from database" disabled={!metadata.categoryId} onClick={() => handleDeleteCategory(result.fileName)}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1900,14 +1895,14 @@ export default function BulkMarkdownUploader({
                                 MCQ Title
                               </label>
                               {result.questionData.title && (
-                                <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                                <p className="text-[11px] text-muted-foreground mb-1 break-words dark:text-slate-400">
                                   Parsed: {result.questionData.title}
                                 </p>
                               )}
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.title ? `Parsed: ${result.questionData.title}` : "Name (editable)"}
                                   value={metadata.title || result.questionData.title || ""}
                                   onChange={(e) => updateQuestionMetadata(result.fileName, { title: e.target.value })}
@@ -1923,7 +1918,7 @@ export default function BulkMarkdownUploader({
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
                                   value={metadata.systemName || result.questionData.system || ""}
                                   onChange={(e) => {
@@ -1947,7 +1942,7 @@ export default function BulkMarkdownUploader({
                                       systemName: selectedSystem?.name ?? (systemId ? "" : undefined),
                                     })
                                   }}
-                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || loadingSystems}
                                 >
                                   <option value="">Select System...</option>
@@ -1970,7 +1965,7 @@ export default function BulkMarkdownUploader({
                                 <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setAddToDbContext({ type: "system", fileName: result.fileName, parsedName: (metadata.systemName || result.questionData.system || "New System").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected system from database" disabled={!metadata.systemId} onClick={() => handleDeleteSystem(result.fileName)}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300" title="Delete selected system from database" disabled={!metadata.systemId} onClick={() => handleDeleteSystem(result.fileName)}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1984,7 +1979,7 @@ export default function BulkMarkdownUploader({
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
                                   value={metadata.topicName || result.questionData.topic || ""}
                                   onChange={(e) => {
@@ -2007,7 +2002,7 @@ export default function BulkMarkdownUploader({
                                       topicName: topicId ? (selectedTopic?.name ?? (metadata as any).topicName ?? "") : undefined,
                                     })
                                   }}
-                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || isLoadingTopics || !metadata.systemId}
                                 >
                                   <option value="">Select Topic...</option>
@@ -2018,7 +2013,7 @@ export default function BulkMarkdownUploader({
                                 <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={!metadata.systemId} title={!metadata.systemId ? "Select system first" : "Add topic to database"} onClick={() => setAddToDbContext({ type: "topic", fileName: result.fileName, parsedName: ((metadata as any).topicName || result.questionData.topic || "New Topic").trim() })}>
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50" title="Delete selected topic from database" disabled={!metadata.topicId} onClick={() => handleDeleteTopic(result.fileName)}>
+                                <Button type="button" variant="outline" size="sm" className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300" title="Delete selected topic from database" disabled={!metadata.topicId} onClick={() => handleDeleteTopic(result.fileName)}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -2031,7 +2026,7 @@ export default function BulkMarkdownUploader({
                               <div className="mb-1">
                                 <input
                                   type="text"
-                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                  className="w-full px-2 py-1.5 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
                                   placeholder={result.questionData.subtopic ? `Parsed: ${result.questionData.subtopic}` : "Name (editable)"}
                                   value={metadata.subtopicName || result.questionData.subtopic || ""}
                                   onChange={(e) => {
@@ -2054,7 +2049,7 @@ export default function BulkMarkdownUploader({
                                       subtopicName: subtopicId ? (selectedSubtopic?.name ?? metadata.subtopicName ?? "") : undefined,
                                     })
                                   }}
-                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                  className="flex-1 px-3 py-2 rounded-lg border border-border dark:border-slate-600/35 bg-background dark:bg-slate-800/55 text-foreground dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                                   disabled={isCreating || isLoadingSubtopics || !metadata.topicId}
                                 >
                                   <option value="">Select Subtopic...</option>
@@ -2068,45 +2063,45 @@ export default function BulkMarkdownUploader({
                               </div>
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground dark:text-gray-400 mt-2">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping.</p>
+                          <p className="mt-2 text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping.</p>
 
                           {/* Question Preview */}
-                          <div className="space-y-3">
+                          <div className="space-y-3 rounded-md border border-border bg-background/50 p-3 dark:border-slate-600/30 dark:bg-slate-800/40">
                             {/* New hierarchy preview */}
                             {(result.questionData.category || metadata.categoryName) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">Category:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.categoryName || result.questionData.category}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.categoryName || result.questionData.category}</span>
                               </div>
                             )}
                             {(result.questionData.product || metadata.productName) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">Product:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.productName || result.questionData.product}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.productName || result.questionData.product}</span>
                               </div>
                             )}
                             {(result.questionData.system || metadata.systemName) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">System:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.systemName || result.questionData.system}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.systemName || result.questionData.system}</span>
                               </div>
                             )}
                             {(result.questionData.topic || metadata.topicName) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">Topic:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.topicName || result.questionData.topic}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.topicName || result.questionData.topic}</span>
                               </div>
                             )}
                             {(result.questionData.subtopic || metadata.subtopicName) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">Subtopic:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.subtopicName || result.questionData.subtopic}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.subtopicName || result.questionData.subtopic}</span>
                               </div>
                             )}
                             {(result.questionData.title || metadata.title) && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">MCQ Title:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">{metadata.title || result.questionData.title}</span>
+                                <span className="text-muted-foreground dark:text-slate-200">{metadata.title || result.questionData.title}</span>
                               </div>
                             )}
 
@@ -2114,7 +2109,7 @@ export default function BulkMarkdownUploader({
                             {result.questionData.tags && result.questionData.tags.length > 0 && (
                               <div className="text-sm">
                                 <span className="font-medium text-foreground dark:text-gray-100">Tags:</span>{" "}
-                                <span className="text-muted-foreground dark:text-gray-300">
+                                <span className="text-muted-foreground dark:text-slate-200">
                                   {result.questionData.tags.join(", ")}
                                 </span>
                               </div>
@@ -2123,7 +2118,7 @@ export default function BulkMarkdownUploader({
                             {/* Question Stem Preview */}
                             <div>
                               <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">Question Stem:</div>
-                              <div className="p-3 rounded bg-muted/50 dark:bg-gray-700/50 text-sm text-foreground/80 dark:text-gray-200 max-h-32 overflow-y-auto border border-border dark:border-gray-600">
+                              <div className="p-3 rounded border border-border bg-muted/50 text-sm text-foreground/80 max-h-32 overflow-y-auto dark:border-slate-600/35 dark:bg-slate-800/45 dark:text-slate-200">
                                 {result.questionData.stem ? (
                                   <div className="whitespace-pre-wrap">
                                     {result.questionData.stem.length > 200
@@ -2131,7 +2126,7 @@ export default function BulkMarkdownUploader({
                                       : result.questionData.stem}
                                   </div>
                                 ) : (
-                                  <span className="text-muted-foreground dark:text-gray-400">No stem content</span>
+                                  <span className="text-muted-foreground dark:text-slate-400">No stem content</span>
                                 )}
                               </div>
                             </div>
@@ -2147,7 +2142,7 @@ export default function BulkMarkdownUploader({
                                       className={`p-2 rounded text-sm ${
                                         opt.correct
                                           ? "bg-green-500/10 dark:bg-green-500/20 border border-green-500/30 dark:border-green-500/40"
-                                          : "bg-muted/50 dark:bg-gray-700/50"
+                                          : "bg-muted/50 dark:bg-slate-900/70"
                                       }`}
                                     >
                                       <span className="font-medium dark:text-gray-100">
@@ -2169,7 +2164,7 @@ export default function BulkMarkdownUploader({
                                   Main Explanation ({result.questionData.explanation.length} block
                                   {result.questionData.explanation.length > 1 ? "s" : ""}):
                                 </div>
-                                <div className="p-2 rounded bg-muted/30 dark:bg-gray-700/30 text-xs text-muted-foreground dark:text-gray-300">
+                                <div className="p-2 rounded bg-muted/30 text-xs text-muted-foreground dark:bg-slate-900/55 dark:text-slate-400">
                                   Explanation content parsed successfully
                                 </div>
                               </div>
@@ -2182,7 +2177,7 @@ export default function BulkMarkdownUploader({
                                   <div className="text-sm font-medium text-foreground dark:text-gray-100 mb-2">
                                     Per-Answer Explanations:
                                   </div>
-                                  <div className="text-xs text-muted-foreground dark:text-gray-300">
+                                  <div className="text-xs text-muted-foreground dark:text-slate-200">
                                     {Object.keys(result.questionData.perAnswerExplanations).length} explanation
                                     {Object.keys(result.questionData.perAnswerExplanations).length > 1 ? "s" : ""}{" "}
                                     available
@@ -2247,11 +2242,6 @@ export default function BulkMarkdownUploader({
         {/* Action Buttons */}
         {summary && !isProcessing && (
           <div className="flex gap-2">
-            {onCancel && (
-              <Button onClick={onCancel} variant="outline" className="flex-1">
-                Close
-              </Button>
-            )}
             {summary.successful > 0 && (
               <Button
                 onClick={createQuestions}
@@ -2261,7 +2251,7 @@ export default function BulkMarkdownUploader({
                     (r) => r.status === "success" && (!questionMetadata[r.fileName]?.topicId || !questionMetadata[r.fileName].topicId.trim())
                   ).length > 0
                 }
-                className="flex-1 bg-primary hover:bg-primary/90"
+                className="w-full bg-primary hover:bg-primary/90 sm:flex-1"
               >
                 {isCreating ? (
                   <>
@@ -2280,8 +2270,8 @@ export default function BulkMarkdownUploader({
       {/* Add to DB modal */}
       {addToDbContext && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-sm w-full p-4 border border-border dark:border-gray-600">
-            <h3 className="text-sm font-semibold mb-3 text-foreground dark:text-gray-100">
+          <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-slate-600/40 dark:bg-slate-800 dark:text-slate-100">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-slate-100">
               {addToDbContext.type === "category" && "Add Category to database"}
               {addToDbContext.type === "product" && "Add Product to database"}
               {addToDbContext.type === "system" && "Add System to database"}
@@ -2291,15 +2281,25 @@ export default function BulkMarkdownUploader({
             <div className="space-y-3">
               {addToDbContext.type === "system" && (
                 <div>
-                  <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Product</label>
-                  <select className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800" value={addToDbProductId} onChange={(e) => setAddToDbProductId(e.target.value)}>
+                  <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Product</label>
+                  <select
+                    className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
+                    value={addToDbProductId}
+                    onChange={(e) => setAddToDbProductId(e.target.value)}
+                  >
                     {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 </div>
               )}
               <div>
-                <label className="text-xs font-medium block mb-1 text-foreground dark:text-gray-100">Name</label>
-                <input type="text" className="w-full p-2 border rounded text-sm border-border dark:border-gray-600 bg-background dark:bg-gray-800 text-foreground dark:text-gray-100" value={addToDbName} onChange={(e) => setAddToDbName(e.target.value)} placeholder={addToDbContext.parsedName} />
+                <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Name</label>
+                <input
+                  type="text"
+                  className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
+                  value={addToDbName}
+                  onChange={(e) => setAddToDbName(e.target.value)}
+                  placeholder={addToDbContext.parsedName}
+                />
               </div>
               {addToDbError && <p className="text-xs text-red-600 dark:text-red-400">{addToDbError}</p>}
             </div>
@@ -2356,7 +2356,7 @@ export default function BulkMarkdownUploader({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  )
+    </Card>
+  );
 }
 

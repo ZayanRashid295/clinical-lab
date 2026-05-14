@@ -52,13 +52,6 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
       "radial-gradient(circle at center, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.18) 0%, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0.08) 45%, rgba(var(--color-primary-500-rgb, 16, 185, 129), 0) 75%)",
   } as const
 
-  const iconTileBg = {
-    background:
-      "linear-gradient(180deg, #ffffff 0%, var(--color-primary-50) 100%)",
-    boxShadow:
-      "0 8px 24px -8px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.6)",
-  } as const
-
   const themedButton = {
     background:
       "linear-gradient(180deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%)",
@@ -178,10 +171,18 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
           {/* Top Icon Tile */}
           <div className="flex justify-center mb-8">
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={iconTileBg}
+              className={cn(
+                "flex h-16 w-16 items-center justify-center rounded-2xl",
+                "bg-gradient-to-b from-white to-primary-50",
+                "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(255,255,255,0.6)]",
+                "dark:from-primary-900/55 dark:to-primary-900/30",
+                "dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45),inset_0_0_0_1px_rgba(255,255,255,0.1)]"
+              )}
             >
-              <BookOpen className="h-7 w-7 text-primary" strokeWidth={1.75} />
+              <BookOpen
+                className="h-7 w-7 text-primary-600 dark:text-primary-300"
+                strokeWidth={1.75}
+              />
             </div>
           </div>
 
@@ -208,9 +209,15 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                 className="rounded-2xl bg-white border border-black/5 px-5 py-4 text-left shadow-[0_2px_10px_-4px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div
+                    className={cn(
+                      "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl",
+                      "bg-primary-100/90 ring-1 ring-primary-500/15",
+                      "dark:bg-primary-500/20 dark:ring-primary-400/25"
+                    )}
+                  >
                     <Icon
-                      className="h-[18px] w-[18px] text-primary"
+                      className="h-[18px] w-[18px] text-primary-700 dark:text-primary-200"
                       strokeWidth={1.75}
                       aria-hidden
                     />
@@ -265,7 +272,7 @@ export function ModeLandingPage({ config }: { config: ModeLandingConfig }) {
                   <Link
                     key={session.id}
                     href={medprepSessionService.getContinueUrl(session)}
-                    className="block rounded-lg border border-primary-100 bg-primary-50/60 px-3 py-2 text-sm text-primary-800 hover:bg-primary-50 dark:border-primary-500/20 dark:bg-primary-950/30 dark:text-primary-100 dark:hover:bg-primary-950/50"
+                    className="block rounded-lg border border-primary-200/70 bg-primary-50/50 px-3 py-2 text-sm font-medium text-primary-900 shadow-sm transition-colors hover:border-primary-300/90 hover:bg-primary-100 hover:text-primary-950 dark:border-primary-500/30 dark:bg-primary-900/40 dark:text-primary-100 dark:hover:border-primary-400/35 dark:hover:bg-primary-800/85 dark:hover:text-primary-50"
                   >
                     {session.title || session.caseId || "Untitled case"}
                   </Link>

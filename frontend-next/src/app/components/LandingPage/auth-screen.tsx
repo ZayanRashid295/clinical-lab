@@ -132,10 +132,10 @@ export function AuthScreen({
   const isSignup = view === "signup";
 
   const fieldLabel =
-    "text-sm font-medium text-foreground/80 tracking-tight";
+    "text-sm font-medium tracking-tight text-slate-700 dark:text-slate-200";
 
   const inputClass =
-    "h-12 rounded-xl border-border/60 bg-background px-4 shadow-sm transition-[border-color,box-shadow] placeholder:text-muted-foreground/55 focus-visible:border-teal-600/50 focus-visible:ring-2 focus-visible:ring-teal-600/15 dark:focus-visible:border-teal-500/40 dark:focus-visible:ring-teal-500/10";
+    "h-12 rounded-xl border border-slate-200/90 bg-white px-4 text-slate-900 shadow-sm transition-[border-color,box-shadow] placeholder:text-slate-400/90 focus-visible:border-teal-600/50 focus-visible:ring-2 focus-visible:ring-teal-600/15 dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-teal-500/45 dark:focus-visible:ring-teal-500/15";
 
   const primaryBtn =
     "h-12 w-full rounded-xl text-[15px] font-semibold text-white shadow-lg shadow-teal-900/20 transition-all duration-200 bg-gradient-to-r from-teal-600 via-teal-600 to-emerald-700 hover:from-teal-500 hover:via-teal-600 hover:to-emerald-600 hover:shadow-xl hover:shadow-teal-900/25 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none dark:from-teal-500 dark:via-teal-600 dark:to-emerald-700 dark:shadow-teal-950/40";
@@ -153,7 +153,7 @@ export function AuthScreen({
       ];
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col overflow-hidden lg:flex-row">
+    <div className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col overflow-hidden bg-slate-50 dark:bg-slate-950 lg:flex-row">
       {/* Hero — full width on mobile, half viewport on large screens */}
       <section className="relative flex min-h-[min(44vh,400px)] flex-1 flex-col items-center justify-center px-8 py-12 sm:px-12 sm:py-16 lg:min-h-0 lg:flex-[1.08] lg:items-start lg:justify-center lg:px-16 lg:py-20 xl:px-20">
         <div
@@ -224,17 +224,17 @@ export function AuthScreen({
       {/* Form — full width below hero on mobile, half viewport on large screens */}
       <section
         className={cn(
-          "relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t border-border/50",
-          "bg-gradient-to-b from-background via-background to-muted/25 dark:from-background dark:via-background dark:to-muted/15",
-          "px-6 py-10 sm:px-10 sm:py-14 lg:min-h-0 lg:border-l lg:border-t-0 lg:px-12 lg:py-16 xl:px-16"
+          "relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t border-slate-200/80 bg-gradient-to-b from-white via-slate-50/90 to-slate-100/80",
+          "dark:border-white/10 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950",
+          "px-6 py-10 sm:px-10 sm:py-14 lg:min-h-0 lg:border-l lg:border-t-0 lg:border-slate-200/80 lg:px-12 lg:py-16 xl:px-16 dark:lg:border-white/10"
         )}
       >
         <div className="mx-auto w-full max-w-md lg:max-w-lg">
-        <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground lg:text-left">
+        <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 lg:text-left">
           {isSignup ? "Registration" : "Account access"}
         </p>
         <div
-          className="mb-8 flex rounded-2xl border border-border/40 bg-muted/30 p-1.5 shadow-inner dark:bg-muted/20"
+          className="mb-8 flex rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1.5 shadow-inner dark:border-white/10 dark:bg-slate-800/70"
           role="tablist"
           aria-label="Sign in or create account"
         >
@@ -243,10 +243,10 @@ export function AuthScreen({
             role="tab"
             aria-selected={!isSignup}
             className={cn(
-              "flex-1 rounded-xl py-3 text-sm font-semibold transition-all duration-200",
+              "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
               !isSignup
-                ? "bg-background text-foreground shadow-md shadow-black/[0.04] ring-1 ring-border/50 dark:shadow-black/20"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white text-slate-900 shadow-md shadow-black/[0.06] ring-1 ring-slate-200/80 dark:bg-slate-700/90 dark:text-slate-50 dark:shadow-black/30 dark:ring-white/10"
+                : "text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-slate-100"
             )}
             onClick={() => goToView("login")}
           >
@@ -257,10 +257,10 @@ export function AuthScreen({
             role="tab"
             aria-selected={isSignup}
             className={cn(
-              "flex-1 rounded-xl py-3 text-sm font-semibold transition-all duration-200",
+              "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
               isSignup
-                ? "bg-background text-foreground shadow-md shadow-black/[0.04] ring-1 ring-border/50 dark:shadow-black/20"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white text-slate-900 shadow-md shadow-black/[0.06] ring-1 ring-slate-200/80 dark:bg-slate-700/90 dark:text-slate-50 dark:shadow-black/30 dark:ring-white/10"
+                : "text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-slate-100"
             )}
             onClick={() => goToView("signup")}
           >
@@ -373,7 +373,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-muted-foreground hover:bg-muted/80"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -381,7 +381,7 @@ export function AuthScreen({
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <p className="text-xs leading-relaxed text-muted-foreground">{PASSWORD_HINT}</p>
+              <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{PASSWORD_HINT}</p>
             </div>
 
             <div className="space-y-2">
@@ -406,8 +406,8 @@ export function AuthScreen({
               disabled={isLoading}
               className={cn(
                 primaryBtn,
-                "mt-2 inline-flex items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25"
+                "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
+                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25 dark:focus-visible:ring-offset-slate-950"
               )}
             >
               {isLoading ? "Creating account…" : "Create account"}
@@ -465,7 +465,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-muted-foreground hover:bg-muted/80"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -480,8 +480,8 @@ export function AuthScreen({
               disabled={isLoading}
               className={cn(
                 primaryBtn,
-                "mt-2 inline-flex items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25"
+                "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
+                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25 dark:focus-visible:ring-offset-slate-950"
               )}
             >
               {isLoading ? "Signing in…" : "Sign in"}
@@ -489,11 +489,11 @@ export function AuthScreen({
           </form>
         )}
 
-        <div className="mt-8 flex gap-3.5 rounded-2xl border border-teal-600/10 bg-gradient-to-br from-teal-50/80 to-emerald-50/30 px-4 py-4 dark:border-teal-500/15 dark:from-teal-950/30 dark:to-emerald-950/20">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600/10 dark:bg-teal-400/10">
+        <div className="mt-8 flex gap-3.5 rounded-2xl border border-teal-600/10 bg-gradient-to-br from-teal-50/80 to-emerald-50/30 px-4 py-4 dark:border-teal-500/20 dark:from-teal-950/35 dark:to-emerald-950/25">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600/10 dark:bg-teal-400/15">
             <ShieldCheck className="h-4 w-4 text-teal-700 dark:text-teal-400" aria-hidden />
           </div>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             {isSignup
               ? "By continuing, you agree to use Clinical Lab responsibly. We protect your data with encryption in transit and at rest."
               : "Use a strong password and a device you trust. Never share your credentials with anyone."}
@@ -501,8 +501,8 @@ export function AuthScreen({
         </div>
 
         {isDev && !isSignup && (
-          <div className="mt-8 border-t border-border/60 pt-8">
-            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <div className="mt-8 border-t border-slate-200/80 pt-8 dark:border-white/10">
+            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
               Local development
             </p>
             <Button
@@ -511,7 +511,7 @@ export function AuthScreen({
               size="sm"
               onClick={fillTestCredentials}
               disabled={isLoading}
-              className="w-full rounded-xl border-dashed border-border/70"
+              className="w-full cursor-pointer rounded-xl border-dashed border-slate-300/90 text-slate-800 hover:bg-slate-100 dark:border-slate-500 dark:bg-slate-800/60 dark:text-slate-100 dark:hover:bg-slate-700/80"
             >
               Fill demo credentials
             </Button>
@@ -519,7 +519,7 @@ export function AuthScreen({
         )}
 
         {isSignup ? (
-          <p className="mt-8 text-center text-sm leading-relaxed text-muted-foreground lg:text-left">
+          <p className="mt-8 text-center text-sm leading-relaxed text-slate-600 dark:text-slate-400 lg:text-left">
             Already have an account?{" "}
             <button
               type="button"
@@ -531,7 +531,7 @@ export function AuthScreen({
           </p>
         ) : (
           <div className="mt-8 space-y-2 text-center lg:text-left">
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               New to Clinical Lab?{" "}
               <button
                 type="button"
@@ -541,7 +541,7 @@ export function AuthScreen({
                 Create an account
               </button>
             </p>
-            <p className="text-xs leading-relaxed text-muted-foreground/90">
+            <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-500">
               Institutional access is managed by your administrator.
             </p>
           </div>

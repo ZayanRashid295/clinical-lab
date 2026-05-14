@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { CheckCircle, XCircle, AlertTriangle } from "lucide-react"
+import { CheckCircle, XCircle, AlertTriangle, X } from "lucide-react"
 
 interface DiagnosisSubmissionProps {
   conversationId: string
@@ -23,6 +23,8 @@ interface DiagnosisSubmissionProps {
   mode?: "assessment" | "practice"
   onContinueToSOAP?: () => void
   medicalCase?: any
+  /** Dismiss the surrounding modal (e.g. overlay in case chat). */
+  onClose?: () => void
 }
 
 interface SubmissionResult {
@@ -50,7 +52,8 @@ export function DiagnosisSubmission({
   onSubmissionComplete,
   mode = "assessment",
   onContinueToSOAP,
-  medicalCase
+  medicalCase,
+  onClose,
 }: DiagnosisSubmissionProps) {
   const { toast } = useToast()
   const [diagnosis, setDiagnosis] = useState("")
@@ -112,17 +115,33 @@ export function DiagnosisSubmission({
     return (
       <Card className="mx-auto w-full max-w-2xl border-border">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            {submissionResult.feedback.isCorrect ? (
-              <CheckCircle className="h-6 w-6 text-primary" />
-            ) : (
-              <XCircle className="h-6 w-6 text-red-500 dark:text-red-400" />
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                {submissionResult.feedback.isCorrect ? (
+                  <CheckCircle className="h-6 w-6 shrink-0 text-primary" />
+                ) : (
+                  <XCircle className="h-6 w-6 shrink-0 text-red-500 dark:text-red-400" />
+                )}
+                Diagnosis Submission Result
+              </CardTitle>
+              <CardDescription>
+                {submissionResult.feedback.isCorrect ? "Correct!" : "Incorrect"}
+              </CardDescription>
+            </div>
+            {onClose && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 text-muted-foreground hover:bg-accent hover:text-foreground"
+                onClick={onClose}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             )}
-            Diagnosis Submission Result
-          </CardTitle>
-          <CardDescription>
-            {submissionResult.feedback.isCorrect ? "Correct!" : "Incorrect"}
-          </CardDescription>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert
@@ -191,10 +210,26 @@ export function DiagnosisSubmission({
   return (
     <Card className="mx-auto w-full max-w-2xl border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Submit Your Diagnosis</CardTitle>
-        <CardDescription>
-          Based on your conversation with the patient, what do you think is the diagnosis?
-        </CardDescription>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <CardTitle className="text-foreground">Submit Your Diagnosis</CardTitle>
+            <CardDescription>
+              Based on your conversation with the patient, what do you think is the diagnosis?
+            </CardDescription>
+          </div>
+          {onClose && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0 text-muted-foreground hover:bg-accent hover:text-foreground"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

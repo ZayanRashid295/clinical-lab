@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { databaseConversationService } from "@/lib/fyp/database-conversation-service"
@@ -41,10 +40,7 @@ function buildFallbackCase(caseId: string, conversation: any): MedicalCase {
   }
 }
 
-export default function SoapConversationPage() {
-  const params = useParams<{ conversationId: string }>()
-  const conversationId = params?.conversationId
-
+export function SoapConversationRoute({ conversationId }: { conversationId: string }) {
   const [isLoading, setIsLoading] = useState(true)
   const [conversation, setConversation] = useState<any>(null)
   const [medicalCase, setMedicalCase] = useState<MedicalCase | null>(null)
@@ -121,10 +117,12 @@ export default function SoapConversationPage() {
     load()
   }, [conversationId])
 
+  const centerShell = "flex min-h-[50vh] w-full flex-1 items-center justify-center py-8"
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card>
+      <div className={centerShell}>
+        <Card className="w-full max-w-md border-border shadow-sm">
           <CardHeader>
             <CardTitle>Loading SOAP Note...</CardTitle>
             <CardDescription>Please wait while we load your case conversation.</CardDescription>
@@ -136,16 +134,16 @@ export default function SoapConversationPage() {
 
   if (error || !conversation || !medicalCase) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-xl">
+      <div className={centerShell}>
+        <Card className="w-full max-w-xl border-border shadow-sm">
           <CardHeader>
             <CardTitle>SOAP Note Unavailable</CardTitle>
             <CardDescription>{error || "Unable to resolve the case for this conversation."}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/">
+            <Link href="/dashboard">
               <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
               </Button>
             </Link>

@@ -65,9 +65,10 @@ export async function runNewGemini(
   }
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const generationConfig: Record<string, unknown> = {
-    temperature,
-  };
+  const generationConfig: Record<string, unknown> = {};
+  if (typeof temperature === "number" && !Number.isNaN(temperature)) {
+    generationConfig.temperature = temperature;
+  }
 
   if (!thinkingMode) {
     generationConfig.topP = 0.9;
@@ -113,9 +114,10 @@ export async function* runNewGeminiStreaming(
   }
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const generationConfig: Record<string, unknown> = {
-    temperature,
-  };
+  const generationConfig: Record<string, unknown> = {};
+  if (typeof temperature === "number" && !Number.isNaN(temperature)) {
+    generationConfig.temperature = temperature;
+  }
 
   if (!thinkingMode) {
     generationConfig.topP = 0.9;

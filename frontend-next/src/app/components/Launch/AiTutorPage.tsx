@@ -346,7 +346,7 @@ export default function AiTutorPage() {
         <Card
           className={cn(
             APP_GLASS_CARD,
-            "flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/85 shadow-sm shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md"
+            "flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/85 shadow-sm shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md dark:bg-slate-900/70 dark:shadow-black/20 dark:ring-white/[0.06]"
           )}
         >
           <div className="shrink-0 bg-gradient-to-br from-primary-600 via-primary-600 to-primary-800 px-3.5 py-3 text-white">
@@ -460,7 +460,7 @@ export default function AiTutorPage() {
                               e.stopPropagation();
                               onDelete(c);
                             }}
-                            className="rounded-md p-1.5 text-red-500 hover:bg-red-50"
+                            className="rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50"
                             aria-label="Delete"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -479,7 +479,7 @@ export default function AiTutorPage() {
         <Card
           className={cn(
             APP_GLASS_CARD,
-            "relative flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/90 shadow-md shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md"
+            "relative flex min-h-0 flex-col overflow-hidden border-slate-200/90 bg-white/90 shadow-md shadow-slate-900/[0.04] ring-1 ring-slate-950/[0.03] backdrop-blur-md dark:bg-slate-900/75 dark:shadow-black/25 dark:ring-white/[0.06]"
           )}
         >
           {active && active.messages.length > 0 && (
@@ -522,9 +522,9 @@ export default function AiTutorPage() {
                       key={text}
                       type="button"
                       onClick={() => onSend(text)}
-                      className="group flex gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 text-left shadow-sm transition-all hover:border-primary-200/90 hover:shadow dark:border-white/10 dark:bg-white/5 dark:hover:border-primary-700/45"
+                      className="group flex gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 text-left shadow-sm transition-all hover:border-primary-200/90 hover:shadow dark:border-white/10 dark:bg-slate-900/50 dark:hover:border-primary-700/45 dark:hover:bg-slate-900/70"
                     >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition group-hover:bg-primary-100 dark:bg-primary-900/35 dark:text-primary-300 dark:group-hover:bg-primary-900/55">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition group-hover:bg-primary-100 dark:bg-primary-950/60 dark:text-primary-300 dark:ring-1 dark:ring-primary-500/20 dark:group-hover:bg-primary-900/50">
                         <Icon className="h-4 w-4" />
                       </span>
                       <span className="min-w-0">
@@ -593,7 +593,7 @@ export default function AiTutorPage() {
             )}
           </div>
 
-          <div className="shrink-0 border-t border-slate-100/90 bg-slate-50/80 p-3 backdrop-blur-sm">
+          <div className="shrink-0 border-t border-slate-100/90 bg-slate-50/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/90 dark:backdrop-blur-md">
             <div className="flex w-full min-w-0 items-end gap-2.5">
               <div className="relative min-w-0 flex-1">
                 <Textarea
@@ -607,14 +607,14 @@ export default function AiTutorPage() {
                       onSend();
                     }
                   }}
-                  className="min-h-[44px] resize-none rounded-lg border-slate-200/90 bg-white pr-3 text-sm shadow-inner ring-0 transition placeholder:text-slate-400 focus-visible:ring-[1.5px] focus-visible:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900/80"
+                  className="min-h-[44px] resize-none rounded-lg border-slate-200/90 bg-white pr-3 text-sm text-slate-900 shadow-inner ring-0 transition placeholder:text-slate-400 focus-visible:ring-[1.5px] focus-visible:ring-primary-500/30 dark:border-white/10 dark:bg-slate-900/90 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
-                <p className="mt-1.5 text-[11px] text-slate-500">
-                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
+                <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600 dark:border-white/15 dark:bg-slate-800 dark:text-slate-300">
                     Enter
                   </kbd>{" "}
                   to send ·{" "}
-                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
+                  <kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-600 dark:border-white/15 dark:bg-slate-800 dark:text-slate-300">
                     Shift+Enter
                   </kbd>{" "}
                   new line

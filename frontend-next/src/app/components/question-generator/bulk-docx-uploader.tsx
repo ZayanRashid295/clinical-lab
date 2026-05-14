@@ -1312,8 +1312,8 @@ export default function BulkDocxUploader({
   };
 
   return (
-    <Card className="p-6">
-      <div className="space-y-6 overflow-x-hidden">
+    <Card className="border p-6 dark:border-slate-600/35 dark:bg-slate-900/20">
+      <div className="min-w-0 space-y-6 overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 md:gap-4">
           <div className="min-w-0 flex-1">
@@ -1326,7 +1326,11 @@ export default function BulkDocxUploader({
           </div>
           {onCancel && (
             <div className="flex-shrink-0">
-              <Button variant="outline" onClick={onCancel}>
+              <Button
+                variant="outline"
+                onClick={onCancel}
+                className="dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100 dark:hover:bg-slate-700"
+              >
                 Cancel
               </Button>
             </div>
@@ -1388,10 +1392,10 @@ export default function BulkDocxUploader({
 
         {/* Processing Status */}
         {isProcessing && (
-          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 dark:border-blue-400/20 dark:bg-blue-500/10">
             <div className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-              <span className="text-blue-600">Converting DOCX files to Markdown, then parsing...</span>
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-blue-700 dark:text-blue-200">Converting DOCX files to Markdown, then parsing...</span>
             </div>
           </div>
         )}
@@ -1422,29 +1426,29 @@ export default function BulkDocxUploader({
 
         {/* Summary */}
         {summary && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="p-4">
-                <div className="text-2xl font-bold">{summary.total}</div>
-                <div className="text-sm text-muted-foreground">Total Files</div>
+          <div className="min-w-0 max-w-full space-y-4">
+            <div className="grid min-w-0 max-w-full grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+              <Card className="min-w-0 border p-4 dark:border-slate-600/40 dark:bg-slate-800/45 dark:text-slate-50">
+                <div className="text-2xl font-bold tabular-nums">{summary.total}</div>
+                <div className="text-sm text-muted-foreground dark:text-slate-400">Total Files</div>
               </Card>
-              <Card className="p-4 bg-green-500/10 border-green-500/30">
-                <div className="text-2xl font-bold text-green-600">{summary.successful}</div>
-                <div className="text-sm text-muted-foreground">Successful</div>
+              <Card className="min-w-0 border border-green-500/30 bg-green-500/10 p-4 dark:border-emerald-500/35 dark:bg-emerald-500/[0.12]">
+                <div className="text-2xl font-bold text-green-600 tabular-nums dark:text-emerald-300">{summary.successful}</div>
+                <div className="text-sm text-muted-foreground dark:text-slate-400">Successful</div>
               </Card>
-              <Card className="p-4 bg-red-500/10 border-red-500/30">
-                <div className="text-2xl font-bold text-red-600">{summary.failed}</div>
-                <div className="text-sm text-muted-foreground">Failed</div>
+              <Card className="min-w-0 border border-red-500/30 bg-red-500/10 p-4 dark:border-red-500/35 dark:bg-red-500/[0.12]">
+                <div className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-300">{summary.failed}</div>
+                <div className="text-sm text-muted-foreground dark:text-slate-400">Failed</div>
               </Card>
-              <Card className="p-4 bg-yellow-500/10 border-yellow-500/30">
-                <div className="text-2xl font-bold text-yellow-600">{summary.skipped}</div>
-                <div className="text-sm text-muted-foreground">Skipped</div>
+              <Card className="min-w-0 border border-yellow-500/30 bg-yellow-500/10 p-4 dark:border-amber-500/35 dark:bg-amber-500/[0.12]">
+                <div className="text-2xl font-bold text-yellow-600 tabular-nums dark:text-amber-300">{summary.skipped}</div>
+                <div className="text-sm text-muted-foreground dark:text-slate-400">Skipped</div>
               </Card>
             </div>
 
             {/* Results List */}
-            <div className="space-y-2">
-              <h3 className="font-semibold">Processed Files:</h3>
+            <div className="min-w-0 space-y-2">
+              <h3 className="font-semibold text-foreground dark:text-slate-100">Processed Files:</h3>
               {summary.results.map((result) => {
                 const fileMeta = questionMetadata[result.fileName];
                 const topicDisplay =
@@ -1452,7 +1456,7 @@ export default function BulkDocxUploader({
                     ? (fileMeta?.topicName ?? (topics[fileMeta?.systemId ?? ""] ?? []).find((t: any) => t.id === fileMeta?.topicId)?.name ?? "")
                     : "";
                 return (
-                <Card key={result.fileName} className="p-4">
+                <Card key={result.fileName} className="min-w-0 border p-4 dark:border-slate-500/45 dark:bg-slate-800/25">
                   <div className="flex flex-wrap items-start justify-between gap-2 md:gap-3">
                     <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
                       {result.status === "success" ? (
@@ -1504,21 +1508,21 @@ export default function BulkDocxUploader({
                   )}
 
                   {expandedQuestions.has(result.fileName) && result.questionData && (
-                    <div className="mt-4 space-y-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="mt-4 space-y-4 rounded-lg border border-border bg-muted/50 p-4 dark:border-slate-600/30 dark:bg-slate-800/30">
                       {/* Metadata: Parsed values from document + DB dropdowns (optional link) + Add to DB */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Product */}
                         <div className="order-[-1]">
-                          <label className="text-xs font-medium mb-1 block">Product</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Product</label>
                           {result.questionData.product && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.product}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.product ? `Parsed: ${result.questionData.product}` : "Name (editable)"}
                               value={fileMeta?.productName || result.questionData.product || ""}
                               onChange={(e) => updateQuestionMetadata(result.fileName, { productName: e.target.value })}
@@ -1526,7 +1530,7 @@ export default function BulkDocxUploader({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <select
-                              className="flex-1 p-1.5 border rounded text-sm bg-white"
+                              className="flex-1 rounded border border-input bg-background p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               value={fileMeta?.productId || ""}
                               onChange={(e) => {
                                 const productId = e.target.value || "";
@@ -1564,7 +1568,7 @@ export default function BulkDocxUploader({
                               type="button"
                               variant="outline"
                               size="sm"
-                              className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300"
                               title="Delete selected product from database"
                               disabled={!fileMeta?.productId}
                               onClick={() => handleDeleteProduct(result.fileName)}
@@ -1576,16 +1580,16 @@ export default function BulkDocxUploader({
 
                         {/* Category */}
                         <div className="order-[-2]">
-                          <label className="text-xs font-medium mb-1 block">Category</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Category</label>
                           {result.questionData.category && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.category}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.category ? `Parsed: ${result.questionData.category}` : "Name (editable)"}
                               value={fileMeta?.categoryName || ""}
                               onChange={(e) => updateQuestionMetadata(result.fileName, { categoryName: e.target.value })}
@@ -1593,7 +1597,7 @@ export default function BulkDocxUploader({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <select
-                              className="flex-1 p-1.5 border rounded text-sm bg-white"
+                              className="flex-1 rounded border border-input bg-background p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               value={fileMeta?.categoryId || ""}
                               onChange={(e) => {
                                 const categoryId = e.target.value || "";
@@ -1624,7 +1628,7 @@ export default function BulkDocxUploader({
                               type="button"
                               variant="outline"
                               size="sm"
-                              className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/45 dark:hover:text-red-300"
                               title="Delete selected category from database"
                               disabled={!fileMeta?.categoryId}
                               onClick={() => handleDeleteCategory(result.fileName)}
@@ -1638,16 +1642,16 @@ export default function BulkDocxUploader({
 
                         {/* System */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">System</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">System</label>
                           {result.questionData.system && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.system}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.system ? `Parsed: ${result.questionData.system}` : "Name (editable)"}
                               value={questionMetadata[result.fileName]?.systemName || result.questionData.system || ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
@@ -1658,7 +1662,7 @@ export default function BulkDocxUploader({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <select
-                              className="w-full max-w-md p-2 border rounded text-sm"
+                              className="w-full max-w-md rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               value={questionMetadata[result.fileName]?.systemId || ""}
                               onChange={(e) => {
                                 const systemId = e.target.value;
@@ -1696,16 +1700,16 @@ export default function BulkDocxUploader({
 
                         {/* Topic */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">Topic</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Topic</label>
                           {result.questionData.topic && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.topic}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.topic ? `Parsed: ${result.questionData.topic}` : "Name (editable)"}
                               value={questionMetadata[result.fileName]?.topicName || result.questionData.topic || ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
@@ -1716,7 +1720,7 @@ export default function BulkDocxUploader({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <select
-                              className="w-full max-w-md p-2 border rounded text-sm"
+                              className="w-full max-w-md rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               value={questionMetadata[result.fileName]?.topicId || ""}
                               onChange={(e) => {
                                 const topicId = e.target.value;
@@ -1746,16 +1750,16 @@ export default function BulkDocxUploader({
 
                         {/* Subtopic */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">Subtopic</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Subtopic</label>
                           {result.questionData.subtopic && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.subtopic}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.subtopic ? `Parsed: ${result.questionData.subtopic}` : "Name (editable)"}
                               value={questionMetadata[result.fileName]?.subtopicName || result.questionData.subtopic || ""}
                               onChange={(e) => setQuestionMetadata((prev) => ({
@@ -1766,7 +1770,7 @@ export default function BulkDocxUploader({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <select
-                              className="w-full max-w-md p-2 border rounded text-sm"
+                              className="w-full max-w-md rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               value={questionMetadata[result.fileName]?.subtopicId || ""}
                               onChange={(e) => {
                                 const subtopicId = e.target.value;
@@ -1796,16 +1800,16 @@ export default function BulkDocxUploader({
 
                         {/* MCQ Title */}
                         <div>
-                          <label className="text-xs font-medium mb-1 block">MCQ Title</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">MCQ Title</label>
                           {result.questionData.title && (
-                            <p className="text-[11px] text-muted-foreground mb-1 break-words">
+                            <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.title}
                             </p>
                           )}
                           <div className="mb-1">
                             <input
                               type="text"
-                              className="w-full p-1.5 border rounded text-xs"
+                              className="w-full rounded border border-input bg-background p-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                               placeholder={result.questionData.title ? `Parsed: ${result.questionData.title}` : "Name (editable)"}
                               value={fileMeta?.title || result.questionData.title || ""}
                               onChange={(e) => updateQuestionMetadata(result.fileName, { title: e.target.value })}
@@ -1813,12 +1817,12 @@ export default function BulkDocxUploader({
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping. Questions are saved under General Principles when no system is set.</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping. Questions are saved under General Principles when no system is set.</p>
 
                       {/* Question Preview */}
-                      <div className="mt-4">
-                        <h4 className="text-sm font-medium mb-2">Question Preview:</h4>
-                        <div className="text-xs text-muted-foreground space-y-1">
+                      <div className="mt-4 rounded-md border border-border bg-background/60 p-3 dark:border-slate-500/35 dark:bg-slate-800/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
+                        <h4 className="mb-2 text-sm font-semibold text-foreground dark:text-slate-100">Question Preview:</h4>
+                        <div className="space-y-1 text-xs text-slate-700 dark:text-slate-300">
                           <p>
                             <strong>Category:</strong> {fileMeta?.categoryName || result.questionData.category || "N/A"}
                           </p>
@@ -1879,16 +1883,16 @@ export default function BulkDocxUploader({
       {/* Add to DB modal */}
       {addToDbContext && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-slate-600/40 dark:bg-slate-800 dark:text-slate-100">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-slate-100">
               Add {addToDbContext?.type === "category" ? "Category" : addToDbContext?.type === "product" ? "Product" : addToDbContext?.type === "system" ? "System" : addToDbContext?.type === "topic" ? "Topic" : "Subtopic"} to Database
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium mb-1 block">Name</label>
+                <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Name</label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded text-sm"
+                  className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                   value={addToDbContext?.parsedName || ""}
                   onChange={(e) => setAddToDbContext(prev => prev ? { ...prev, parsedName: e.target.value } : null)}
                   placeholder="Enter name"
@@ -1896,9 +1900,9 @@ export default function BulkDocxUploader({
               </div>
               {addToDbContext?.type === "system" && (
                 <div>
-                  <label className="text-xs font-medium mb-1 block">Product</label>
+                  <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Product</label>
                   <select
-                    className="w-full p-2 border rounded text-sm"
+                    className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                     value={questionMetadata[addToDbContext.fileName]?.productId || ""}
                     onChange={(e) => updateQuestionMetadata(addToDbContext.fileName, { productId: e.target.value }, true)}
                   >
@@ -1911,9 +1915,9 @@ export default function BulkDocxUploader({
               )}
               {addToDbContext?.type === "topic" && (
                 <div>
-                  <label className="text-xs font-medium mb-1 block">System</label>
+                  <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">System</label>
                   <select
-                    className="w-full p-2 border rounded text-sm"
+                    className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                     value={questionMetadata[addToDbContext.fileName]?.systemId || ""}
                     onChange={(e) => updateQuestionMetadata(addToDbContext.fileName, { systemId: e.target.value }, true)}
                   >
@@ -1932,9 +1936,9 @@ export default function BulkDocxUploader({
               )}
               {addToDbContext?.type === "subtopic" && (
                 <div>
-                  <label className="text-xs font-medium mb-1 block">Topic</label>
+                  <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Topic</label>
                   <select
-                    className="w-full p-2 border rounded text-sm"
+                    className="w-full rounded border border-input bg-background p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-600/35 dark:bg-slate-800/55 dark:text-slate-100"
                     value={questionMetadata[addToDbContext.fileName]?.topicId || ""}
                     onChange={(e) => updateQuestionMetadata(addToDbContext.fileName, { topicId: e.target.value }, true)}
                   >

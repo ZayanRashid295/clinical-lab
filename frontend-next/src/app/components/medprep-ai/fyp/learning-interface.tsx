@@ -1090,7 +1090,12 @@ export function LearningInterface({
   }
 
   return (
-    <div className={cn(APP_PAGE_SHELL, "min-h-screen bg-background text-foreground")}>
+    <div
+      className={cn(
+        APP_PAGE_SHELL,
+        "flex h-[100dvh] max-h-[100dvh] min-h-0 flex-col overflow-hidden bg-background text-foreground"
+      )}
+    >
       {/* Resume Modal */}
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/70 backdrop-blur-sm">
@@ -1126,7 +1131,7 @@ export function LearningInterface({
       {simulationError && (
         <div
           role="alert"
-          className="mx-4 mt-2 flex items-center justify-between gap-3 rounded-xl border border-red-200 dark:border-red-500/25 bg-red-50 dark:bg-red-500/10 px-4 py-2 text-sm text-red-900 dark:text-red-200 sm:mx-6"
+          className="mx-4 mt-2 flex shrink-0 items-center justify-between gap-3 rounded-xl border border-red-200 dark:border-red-500/25 bg-red-50 dark:bg-red-500/10 px-4 py-2 text-sm text-red-900 dark:text-red-200 sm:mx-6"
         >
           <span className="min-w-0 flex-1">{simulationError}</span>
           <Button
@@ -1142,7 +1147,7 @@ export function LearningInterface({
       )}
 
       {/* Top Navigation Bar */}
-      <nav className="bg-card border-b border-border px-6 py-4">
+      <nav className="shrink-0 bg-card border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <Button 
@@ -1230,32 +1235,32 @@ export function LearningInterface({
         </div>
       </nav>
 
-      {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-80px)] bg-gray-50 dark:bg-transparent">
+      {/* Main Content Area — flex-1 + min-h-0 so sidebars scroll to the true bottom */}
+      <div className="flex min-h-0 flex-1 bg-gray-50 dark:bg-transparent">
         {/* Left Sidebar - Patient Information */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col dark:border-white/10 dark:bg-white/[0.04]">
-          <Card className="flex-1 rounded-none border-0 shadow-none">
-              <CardHeader className="pb-2 bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 border-b">
-                <CardTitle className="flex items-center justify-between text-sm text-foreground">
-                  <div className="flex items-center">
-                    <User className="h-5 w-5 text-blue-600 dark:text-blue-300 mr-2" />
-                    Patient Information
+        <div className="flex h-full min-h-0 w-80 shrink-0 flex-col border-r border-gray-200 bg-white dark:border-white/10 dark:bg-slate-950/50">
+          <Card className="flex h-full min-h-0 flex-1 flex-col gap-0 rounded-none border-0 py-0 shadow-none">
+              <CardHeader className="shrink-0 border-b border-primary-100/80 bg-gradient-to-r from-primary-50 to-primary-100/60 pt-4 dark:border-white/10 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/22 dark:!to-slate-900">
+                <CardTitle className="flex items-center justify-between gap-2 text-sm text-foreground">
+                  <div className="flex min-w-0 items-center">
+                    <User className="mr-2 h-5 w-5 shrink-0 text-primary-600 dark:text-primary-300" />
+                    <span className="truncate font-semibold">Patient Information</span>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={handleShowAllPatientInfo}
-                    className="text-xs px-2 py-1 h-6 bg-blue-100 dark:bg-blue-500/15 hover:bg-blue-200 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/25"
+                    className="h-7 shrink-0 border-border/90 bg-background/90 px-2.5 text-xs font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-white/15 dark:bg-slate-900/55 dark:text-slate-100 dark:hover:bg-slate-800/90 dark:hover:text-white"
                   >
                     {showAllPatientInfo ? "Hide All" : "Show All"}
                   </Button>
                 </CardTitle>
               </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-140px)]">
-                <div className="p-3 space-y-2">
+            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
+              <ScrollArea className="h-full min-h-0 flex-1 overflow-hidden">
+                <div className="min-w-0 space-y-2 p-3 pb-6">
                   {/* Patient Avatar and Basic Info */}
-                  <div className="text-center bg-gradient-to-br from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-lg p-3 mb-2">
+                  <div className="mb-2 rounded-lg bg-gradient-to-br from-primary-50 to-primary-100/60 p-3 text-center dark:!bg-gradient-to-br dark:!from-slate-950 dark:!via-primary-900/22 dark:!to-slate-900">
                     <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
                         <span className="text-xl font-bold text-white">
                         {session.patientProfile.name.charAt(0)}
@@ -1283,7 +1288,7 @@ export function LearningInterface({
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'demographics'
                         ? 'bg-blue-100 dark:bg-blue-500/15 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-500/25'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                     }`}
                   >
                     <User className="h-3 w-3 inline mr-1" />
@@ -1294,7 +1299,7 @@ export function LearningInterface({
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'medicalHistory'
                         ? 'bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-500/25'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                     }`}
                   >
                     <AlertCircle className="h-3 w-3 inline mr-1" />
@@ -1305,7 +1310,7 @@ export function LearningInterface({
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'socialHistory'
                         ? 'bg-green-100 dark:bg-emerald-500/15 text-green-800 dark:text-emerald-200 border border-green-200 dark:border-emerald-500/25'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                     }`}
                   >
                     <Users className="h-3 w-3 inline mr-1" />
@@ -1316,7 +1321,7 @@ export function LearningInterface({
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                       activePatientInfoSection === 'familyHistory'
                         ? 'bg-purple-100 dark:bg-purple-500/15 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-500/25'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                     }`}
                   >
                     <Users className="h-3 w-3 inline mr-1" />
@@ -1327,10 +1332,10 @@ export function LearningInterface({
                 
               {/* Demographics */}
               {(showAllPatientInfo || activePatientInfoSection === 'demographics') && (
-              <div className="bg-gray-50 dark:bg-white/5 rounded-lg p-2">
+              <div className="rounded-lg bg-gray-50 p-2 dark:!bg-slate-900/60">
                 <button
                   onClick={() => toggleSection('demographics')}
-                  className="w-full flex items-center justify-between mb-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors"
+                  className="-m-2 mb-2 flex w-full items-center justify-between rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:!bg-slate-800/70"
                 >
                   <h4 className="font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -1345,14 +1350,14 @@ export function LearningInterface({
                 {!collapsedSections.demographics && (
                   <>
                     {/* Tab Navigation */}
-                    <div className="flex space-x-1 mb-2 bg-gray-100 dark:bg-white/10 rounded-lg p-1">
+                    <div className="mb-2 flex space-x-1 rounded-lg bg-gray-100 p-1 dark:!bg-slate-950/85">
                       {['overview', 'details', 'guidelines'].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => handleTabChange('demographics', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.demographics === tab
-                              ? 'bg-white text-gray-900 shadow-sm dark:bg-white/15 dark:text-slate-100'
+                              ? 'bg-white text-gray-900 shadow-sm dark:!bg-slate-800 dark:!text-slate-50 dark:shadow-md dark:ring-1 dark:ring-white/10'
                               : 'text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100'
                           }`}
                         >
@@ -1390,7 +1395,7 @@ export function LearningInterface({
 
                     {activeTabs.demographics === 'details' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-gray-200 dark:border-white/10">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 p-2 border border-gray-200 dark:border-white/10">
                           <h5 className="font-semibold text-gray-800 dark:text-slate-100 mb-1">Demographic Analysis</h5>
                           <p className="text-gray-700 dark:text-slate-200 text-xs leading-relaxed">
                             Patient demographics provide important context for clinical decision-making. 
@@ -1398,7 +1403,7 @@ export function LearningInterface({
                             and social support systems.
                           </p>
               </div>
-                        <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-2 border border-blue-200 dark:border-blue-500/25">
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-2 dark:border-blue-500/30 dark:!bg-blue-950/45">
                           <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">Clinical Relevance</h5>
                           <ul className="text-blue-700 dark:text-blue-300 text-xs space-y-1">
                             <li>• Age affects medication dosing and disease risk</li>
@@ -1411,7 +1416,7 @@ export function LearningInterface({
 
                     {activeTabs.demographics === 'guidelines' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3 border border-green-200 dark:border-emerald-500/25">
+                        <div className="bg-green-50 dark:!bg-emerald-950/40 rounded-lg p-3 border border-green-200 dark:border-emerald-500/30">
                           <h5 className="font-semibold text-green-800 dark:text-emerald-200 mb-2">Learning Guidelines</h5>
                           <ul className="text-green-700 dark:text-emerald-300 text-xs space-y-1">
                             <li>• Always consider patient demographics in clinical reasoning</li>
@@ -1454,7 +1459,7 @@ export function LearningInterface({
                           onClick={() => handleTabChange('medicalHistory', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.medicalHistory === tab
-                              ? 'bg-white text-red-900 dark:text-red-200 shadow-sm'
+                              ? 'bg-white text-red-900 shadow-sm dark:!bg-red-950/50 dark:!text-red-50'
                               : 'text-red-600 dark:text-red-300 hover:text-red-900'
                           }`}
                         >
@@ -1499,7 +1504,7 @@ export function LearningInterface({
 
                     {activeTabs.medicalHistory === 'details' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-3 border border-red-200 dark:border-red-500/25">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 p-3 border border-red-200 dark:border-red-500/25">
                           <h5 className="font-semibold text-red-800 dark:text-red-200 mb-2">Medical History Analysis</h5>
                           <p className="text-red-700 dark:text-red-300 text-xs leading-relaxed">
                             Understanding a patient's medical history is crucial for identifying risk factors, 
@@ -1521,7 +1526,7 @@ export function LearningInterface({
 
                     {activeTabs.medicalHistory === 'guidelines' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3 border border-green-200 dark:border-emerald-500/25">
+                        <div className="bg-green-50 dark:!bg-emerald-950/40 rounded-lg p-3 border border-green-200 dark:border-emerald-500/30">
                           <h5 className="font-semibold text-green-800 dark:text-emerald-200 mb-2">Learning Guidelines</h5>
                           <ul className="text-green-700 dark:text-emerald-300 text-xs space-y-1">
                             <li>• Always ask about medication allergies first</li>
@@ -1539,7 +1544,7 @@ export function LearningInterface({
 
               {/* Social History */}
               {(showAllPatientInfo || activePatientInfoSection === 'socialHistory') && (
-              <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3">
+              <div className="bg-green-50 dark:!bg-emerald-950/35 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('socialHistory')}
                   className="w-full flex items-center justify-between mb-2 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded-lg p-2 -m-2 transition-colors"
@@ -1629,27 +1634,33 @@ export function LearningInterface({
         </div>
 
         {/* Right Sidebar - Nurse Report */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col dark:border-white/10 dark:bg-white/[0.04]" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
-          <Card className="flex-1 rounded-none border-0 shadow-none">
-            <CardHeader className="pb-2 border-b bg-primary/5">
-                <CardTitle className="flex items-center justify-between text-sm text-foreground">
-                  <div className="flex items-center">
-                    <Stethoscope className="h-5 w-5 text-primary mr-2" />
-                    Nurse Report
+        <div
+          className="flex h-full min-h-0 w-96 shrink-0 flex-col border-l border-gray-200 bg-white dark:border-white/10 dark:bg-slate-950/50"
+          style={{ wordWrap: "break-word", overflowWrap: "break-word" }}
+        >
+          <Card className="flex h-full min-h-0 flex-1 flex-col gap-0 rounded-none border-0 py-0 shadow-none">
+            <CardHeader className="shrink-0 border-b border-primary-100/80 bg-gradient-to-r from-primary-50 to-primary-100/60 pt-4 dark:border-white/10 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/22 dark:!to-slate-900">
+                <CardTitle className="flex items-center justify-between gap-2 text-sm text-foreground">
+                  <div className="flex min-w-0 items-center">
+                    <Stethoscope className="mr-2 h-5 w-5 shrink-0 text-primary-600 dark:text-primary-300" />
+                    <span className="truncate font-semibold">Nurse Report</span>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => setShowAllNurseReport(!showAllNurseReport)}
-                    className="text-xs px-2 py-1 h-6 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20"
+                    className="h-7 shrink-0 border-border/90 bg-background/90 px-2.5 text-xs font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-white/15 dark:bg-slate-900/55 dark:text-slate-100 dark:hover:bg-slate-800/90 dark:hover:text-white"
                   >
                     {showAllNurseReport ? "Hide All" : "Show All"}
                   </Button>
-                    </CardTitle>
-                  </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-140px)]">
-                <div className="p-3 space-y-2 w-full overflow-hidden" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>
+                </CardTitle>
+              </CardHeader>
+            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
+              <ScrollArea className="h-full min-h-0 flex-1 overflow-hidden">
+                <div
+                  className="min-w-0 space-y-2 break-words p-3 pb-6"
+                  style={{ wordWrap: "break-word", overflowWrap: "break-word", hyphens: "auto" }}
+                >
                   {/* Nurse Report Navigation Buttons */}
                   {!showAllNurseReport && (
                     <div className="grid grid-cols-2 gap-2 mb-3">
@@ -1658,7 +1669,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'chiefComplaint'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Target className="h-3 w-3 inline mr-1" />
@@ -1669,7 +1680,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'presentingSymptoms'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1680,7 +1691,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'vitalSigns'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1691,7 +1702,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalNotes'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <AlertTriangle className="h-3 w-3 inline mr-1" />
@@ -1702,7 +1713,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'initialAssessment'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1713,7 +1724,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'learningGuidelines'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <BookOpen className="h-3 w-3 inline mr-1" />
@@ -1724,7 +1735,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'clinicalTips'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Target className="h-3 w-3 inline mr-1" />
@@ -1735,7 +1746,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'keyAreas'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <Activity className="h-3 w-3 inline mr-1" />
@@ -1746,7 +1757,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'redFlags'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <AlertTriangle className="h-3 w-3 inline mr-1" />
@@ -1757,7 +1768,7 @@ export function LearningInterface({
                   className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
                     activeNurseReportSection === 'sessionProgress'
                       ? 'bg-primary/15 text-primary border border-primary/25'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:!bg-slate-800/50 dark:text-slate-300 dark:hover:!bg-slate-800/75'
                   }`}
                 >
                   <TrendingUp className="h-3 w-3 inline mr-1" />
@@ -1792,7 +1803,7 @@ export function LearningInterface({
                           onClick={() => handleTabChange('chiefComplaint', tab)}
                           className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                             activeTabs.chiefComplaint === tab
-                              ? 'bg-white text-primary shadow-sm dark:bg-white/15'
+                              ? 'bg-white text-primary shadow-sm dark:!bg-slate-800 dark:!text-primary-200 dark:shadow-md dark:ring-1 dark:ring-primary-500/25'
                               : 'text-primary/80 hover:text-primary'
                           }`}
                         >
@@ -1803,7 +1814,7 @@ export function LearningInterface({
 
                     {/* Tab Content */}
                     {activeTabs.chiefComplaint === 'overview' && (
-                      <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-primary/20 max-w-full overflow-hidden">
+                      <div className="bg-white rounded-lg dark:!bg-slate-900/75 p-2 border border-primary/20 max-w-full overflow-hidden">
                         <div className="text-primary font-medium text-sm prose prose-sm max-w-full break-words overflow-hidden">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
@@ -1822,7 +1833,7 @@ export function LearningInterface({
 
                     {activeTabs.chiefComplaint === 'analysis' && (
                       <div className="space-y-2 text-sm">
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] p-2 border border-primary/20">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 p-2 border border-primary/20">
                           <h5 className="font-semibold text-primary mb-1">Chief Complaint Analysis</h5>
                           <p className="text-primary/90 text-xs leading-relaxed">
                             The chief complaint is the primary reason for the patient's visit. It should be 
@@ -1992,19 +2003,19 @@ export function LearningInterface({
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">BP:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.bloodPressure || "120/80"}</span>
                         </div>
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">HR:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.heartRate || 72}</span>
                         </div>
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">Temp:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.temperature || "98.6°F"}</span>
                         </div>
-                        <div className="bg-white rounded-lg dark:bg-white/[0.06] px-3 py-2 shadow-sm border border-primary/20">
+                        <div className="bg-white rounded-lg dark:!bg-slate-900/75 px-3 py-2 shadow-sm border border-primary/20">
                           <span className="text-primary/85 font-medium">RR:</span> 
                           <span className="text-primary font-bold ml-1">{vitalSigns?.respiratoryRate || 16}</span>
                         </div>
@@ -2170,7 +2181,7 @@ export function LearningInterface({
 
               {/* Key Areas to Explore */}
               {(showAllNurseReport || activeNurseReportSection === 'keyAreas') && (
-              <div className="bg-green-50 dark:bg-emerald-500/10 rounded-lg p-3">
+              <div className="bg-green-50 dark:!bg-emerald-950/35 rounded-lg p-3">
                 <button
                   onClick={() => toggleSection('keyAreas')}
                   className="w-full flex items-center justify-between mb-2 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded-lg p-2 -m-2 transition-colors"
@@ -2271,9 +2282,9 @@ export function LearningInterface({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col bg-white dark:bg-white/[0.03]">
+        <div className="flex h-full min-h-0 flex-1 flex-col bg-white dark:bg-slate-950/35">
           {/* Conversation Header */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4 dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="border-b border-gray-200 bg-white px-6 py-4 dark:border-white/10 dark:!bg-slate-950/55">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
@@ -2287,7 +2298,7 @@ export function LearningInterface({
 
               <div className="flex items-center space-x-3">
                 <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as "conversation" | "soap")}>
-                  <TabsList className="bg-gray-100 border border-gray-300 dark:border-white/10 dark:bg-white/10">
+                  <TabsList className="border border-gray-300 bg-gray-100 dark:border-white/10 dark:!bg-slate-950/90">
                     <TabsTrigger value="conversation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Conversation
@@ -2314,7 +2325,7 @@ export function LearningInterface({
                       </div>
                       <h3 className="mb-4 text-2xl font-bold text-gray-800 dark:text-slate-100">Ready to Start Simulation</h3>
                       <p className="mx-auto mb-8 max-w-md text-lg text-gray-600 dark:text-slate-300">Click &quot;Start Simulation&quot; to begin the AI consultation and start your learning journey</p>
-                      <div className="mx-auto flex max-w-md items-center justify-center space-x-3 rounded-xl border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/60 px-8 py-4 text-sm text-gray-700 dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10 dark:text-slate-200">
+                      <div className="mx-auto flex max-w-md items-center justify-center space-x-3 rounded-xl border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/60 px-8 py-4 text-sm text-gray-700 dark:border-primary-500/35 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/38 dark:!to-slate-900 dark:text-slate-100">
                         <Sparkles className="h-6 w-6 text-primary-600 dark:text-primary-300" />
                         <span>Learn from expert clinical interactions</span>
                       </div>
@@ -2338,7 +2349,7 @@ export function LearningInterface({
                             </div>
                               <div className={`rounded-lg px-4 py-3 ${
                               message.role === "doctor"
-                                  ? "bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-slate-100"
+                                  ? "bg-gray-100 text-gray-800 dark:!bg-slate-800/85 dark:text-slate-100"
                                   : "bg-primary text-primary-foreground"
                               }`}>
                                 <div className="flex items-center mb-1">
@@ -2371,7 +2382,7 @@ export function LearningInterface({
                           </div>
                         </div>
                         {showConversationInsights && message.explanation && (
-                            <div className="ml-13 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 p-4 dark:border-primary-400 dark:bg-primary-500/10">
+                            <div className="ml-13 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 p-4 dark:border-primary-400 dark:!bg-primary-950/45">
                               <div className="mb-2 flex items-center">
                                 <Lightbulb className="mr-2 h-4 w-4 text-primary-600 dark:text-primary-300" />
                                 <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">Learning Insight</span>
@@ -2404,7 +2415,7 @@ export function LearningInterface({
                   )}
                   {isProcessing && (
                     <div className="flex justify-center py-12">
-                      <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10">
+                      <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/35 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/38 dark:!to-slate-900 dark:shadow-black/40">
                         <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary-500"></div>
                         <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">Generating response...</span>
                       </div>
@@ -2416,7 +2427,7 @@ export function LearningInterface({
               <div className="h-full overflow-y-auto p-6">
                 {isSoapRefreshing && (
                   <div className="mb-6 flex justify-center">
-                    <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/25 dark:from-primary-500/10 dark:to-primary-500/10">
+                    <div className="flex items-center space-x-4 rounded-full border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100/70 px-8 py-4 shadow-xl dark:border-primary-500/35 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/38 dark:!to-slate-900 dark:shadow-black/40">
                       <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary-500"></div>
                       <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">
                         Updating SOAP note to match your conversation…
@@ -2426,18 +2437,18 @@ export function LearningInterface({
                 )}
                 {session.soapNote && (
                   <div className="space-y-6">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 dark:border-emerald-500/25 shadow-lg">
+                    <div className="rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-6 shadow-lg dark:border-emerald-500/30 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-emerald-950/45 dark:!to-slate-900">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-700 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">S</span>
                         </div>
                         <h3 className="text-lg font-bold text-green-800 dark:text-emerald-200">Subjective</h3>
                       </div>
-                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
+                      <div className="bg-white rounded-xl dark:!bg-slate-900/75 p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
                         <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.subjective}</p>
                       </div>
                       {session.soapNote.subjectiveExplanation && (
-                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/32 dark:!to-slate-900 rounded-xl p-4 border border-primary-200 dark:border-primary-500/30">
                           <div className="flex items-center mb-2">
                             <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
                             <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
@@ -2447,18 +2458,18 @@ export function LearningInterface({
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-500/10 dark:to-cyan-500/10 rounded-2xl p-6 border border-teal-200 dark:border-teal-500/25 shadow-lg">
+                    <div className="rounded-2xl border border-teal-200 bg-gradient-to-r from-teal-50 to-cyan-50 p-6 shadow-lg dark:border-teal-500/30 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-teal-950/42 dark:!to-slate-900">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">O</span>
                         </div>
                         <h3 className="text-lg font-bold text-teal-800 dark:text-teal-200">Objective</h3>
                       </div>
-                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-teal-100 mb-4 dark:border-teal-500/20">
+                      <div className="bg-white rounded-xl dark:!bg-slate-900/75 p-4 border border-teal-100 mb-4 dark:border-teal-500/20">
                         <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.objective}</p>
                       </div>
                       {session.soapNote.objectiveExplanation && (
-                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/32 dark:!to-slate-900 rounded-xl p-4 border border-primary-200 dark:border-primary-500/30">
                           <div className="flex items-center mb-2">
                             <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
                             <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
@@ -2468,18 +2479,18 @@ export function LearningInterface({
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-500/10 dark:to-emerald-500/10 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-500/25 shadow-lg">
+                    <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 p-6 shadow-lg dark:border-emerald-500/30 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-emerald-950/45 dark:!to-slate-900">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">A</span>
                         </div>
                         <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-200">Assessment</h3>
                       </div>
-                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-emerald-100 mb-4 dark:border-emerald-500/20">
+                      <div className="bg-white rounded-xl dark:!bg-slate-900/75 p-4 border border-emerald-100 mb-4 dark:border-emerald-500/20">
                         <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.assessment}</p>
                       </div>
                       {session.soapNote.assessmentExplanation && (
-                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/32 dark:!to-slate-900 rounded-xl p-4 border border-primary-200 dark:border-primary-500/30">
                           <div className="flex items-center mb-2">
                             <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
                             <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>
@@ -2489,18 +2500,18 @@ export function LearningInterface({
                       )}
                     </div>
 
-                    <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-2xl p-6 border border-green-200 dark:border-emerald-500/25 shadow-lg">
+                    <div className="rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-teal-50 p-6 shadow-lg dark:border-emerald-500/30 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-emerald-950/40 dark:!to-slate-900">
                       <div className="flex items-center mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
                           <span className="text-white font-bold text-xl">P</span>
                         </div>
                         <h3 className="text-lg font-bold text-green-800 dark:text-emerald-200">Plan</h3>
                       </div>
-                      <div className="bg-white rounded-xl dark:bg-white/[0.06] p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
+                      <div className="bg-white rounded-xl dark:!bg-slate-900/75 p-4 border border-green-100 mb-4 dark:border-emerald-500/20">
                         <p className="text-gray-700 leading-relaxed text-sm dark:text-slate-200">{session.soapNote.plan}</p>
                       </div>
                       {session.soapNote.planExplanation && (
-                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:from-primary-500/10 dark:to-primary-500/5 rounded-xl p-4 border border-primary-200 dark:border-primary-500/25">
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100/60 dark:!bg-gradient-to-r dark:!from-slate-950 dark:!via-primary-900/32 dark:!to-slate-900 rounded-xl p-4 border border-primary-200 dark:border-primary-500/30">
                           <div className="flex items-center mb-2">
                             <BookOpen className="h-4 w-4 text-primary-600 dark:text-primary-300 mr-2" />
                             <span className="font-semibold text-primary-700 dark:text-primary-100 text-sm">Educational Note</span>

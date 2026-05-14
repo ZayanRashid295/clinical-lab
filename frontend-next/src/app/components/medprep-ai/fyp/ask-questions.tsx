@@ -217,13 +217,13 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const getImportanceColor = (importance: string) => {
     switch (importance) {
       case "high":
-        return "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
+        return "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-500/35 dark:!bg-red-950/50 dark:!text-red-100 dark:hover:!bg-red-900/55"
       case "medium":
-        return "border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-500/25 dark:bg-yellow-500/10 dark:text-yellow-200 dark:hover:bg-yellow-500/20"
+        return "border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-500/35 dark:!bg-yellow-950/45 dark:!text-yellow-100 dark:hover:!bg-yellow-900/50"
       case "low":
-        return "border-primary-200 bg-primary-50 text-primary-800 hover:bg-primary-100 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200 dark:hover:bg-primary-500/25"
+        return "border-primary-200 bg-primary-50 text-primary-800 hover:bg-primary-100 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100 dark:hover:!bg-primary-800/50"
       default:
-        return "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
+        return "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-white/15 dark:!bg-slate-800/85 dark:!text-slate-200 dark:hover:!bg-slate-700/80"
     }
   }
 
@@ -247,17 +247,17 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
       case "history":
-        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200"
+        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100"
       case "assessment":
-        return "border-primary-300 bg-primary-100/80 text-primary-900 dark:border-primary-500/30 dark:bg-primary-500/20 dark:text-primary-100"
+        return "border-primary-300 bg-primary-100/80 text-primary-900 dark:border-primary-500/35 dark:!bg-primary-900/45 dark:!text-primary-50"
       case "examination":
-        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/25 dark:bg-primary-500/15 dark:text-primary-200"
+        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100"
       case "symptoms":
-        return "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/25 dark:bg-orange-950/30 dark:text-orange-200"
+        return "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/30 dark:!bg-orange-950/50 dark:!text-orange-100"
       case "impact":
-        return "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-500/25 dark:bg-pink-950/30 dark:text-pink-200"
+        return "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-500/30 dark:!bg-pink-950/50 dark:!text-pink-100"
       default:
-        return "border-gray-200 bg-gray-50 text-gray-700 dark:border-white/15 dark:bg-white/10 dark:text-slate-200"
+        return "border-gray-200 bg-gray-50 text-gray-700 dark:border-white/15 dark:!bg-slate-800/80 dark:!text-slate-200"
     }
   }
 
@@ -289,7 +289,15 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
             visibility: isFlipped ? 'hidden' : 'visible'
           }}
         >
-          <Card className="relative flex h-full items-center justify-center overflow-hidden border-2 border-dashed border-primary-300 bg-gradient-to-br from-primary-50 via-primary-100/80 to-primary-100 transition-all duration-300 hover:border-primary-400 hover:shadow-xl dark:border-primary-500/40 dark:from-primary-950/25 dark:via-primary-950/15 dark:to-primary-950/25 dark:hover:border-primary-400/60">
+          <Card
+            className={cn(
+              "relative flex h-full items-center justify-center overflow-hidden border-2 border-dashed transition-all duration-300",
+              "border-primary-300 bg-gradient-to-br from-primary-50 via-primary-100/80 to-primary-100",
+              "hover:border-primary-400 hover:shadow-xl",
+              "dark:border-primary-500/45 dark:!bg-gradient-to-br dark:!from-slate-950 dark:!via-primary-900/45 dark:!to-slate-950",
+              "dark:hover:border-primary-400/70 dark:hover:shadow-2xl dark:shadow-black/35"
+            )}
+          >
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute -top-4 -right-4 h-24 w-24 animate-pulse rounded-full bg-primary-200/40 dark:bg-primary-500/15"></div>
@@ -297,37 +305,39 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
               <div className="absolute top-1/2 left-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 transform animate-pulse rounded-full bg-primary-200/35 dark:bg-primary-500/10" style={{ animationDelay: "2s" }}></div>
             </div>
             
-            <CardContent className="relative z-10 p-6 text-center">
+            <CardContent className="relative z-10 p-6 text-center sm:p-8">
               <div className="relative mb-6">
                 <div className="absolute inset-0 animate-pulse rounded-full bg-primary-200/30 dark:bg-primary-500/15"></div>
-                <div className="relative rounded-full bg-gradient-to-r from-primary-500 to-primary-700 p-4 shadow-lg">
-                  <HelpCircle className="h-12 w-12 text-white" />
+                <div className="relative rounded-full bg-gradient-to-r from-primary-500 to-primary-700 p-4 shadow-lg sm:p-5">
+                  <HelpCircle className="h-12 w-12 text-white sm:h-14 sm:w-14" />
                 </div>
                 <div className="absolute -top-2 -right-2">
                   <Sparkles className="h-6 w-6 text-yellow-500 animate-spin" style={{ animationDuration: "3s" }} />
                 </div>
               </div>
               
-              <h3 className="mb-3 text-2xl font-bold text-primary-900 dark:text-primary-100">Get AI Question Hints</h3>
-              <p className="mx-auto mb-4 max-w-sm text-sm leading-relaxed text-primary-800 dark:text-primary-200/90">
+              <h3 className="mb-3 text-2xl font-bold text-primary-900 dark:text-primary-50 sm:text-3xl">
+                Get AI Question Hints
+              </h3>
+              <p className="mx-auto mb-4 max-w-md text-base leading-relaxed text-primary-800 dark:text-slate-200 sm:text-[17px]">
                 Click to reveal intelligent question suggestions tailored to this specific case and conversation
               </p>
               
-              <div className="mb-4 flex items-center justify-center space-x-3">
-                <div className="inline-flex items-center rounded-full bg-primary-100 px-3 py-1 dark:bg-primary-500/20">
-                  <Brain className="mr-1 h-4 w-4 text-primary-600 dark:text-primary-300" />
-                  <span className="text-xs font-semibold text-primary-800 dark:text-primary-100">AI-Powered</span>
+              <div className="mb-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                <div className="inline-flex items-center rounded-full border border-primary-200/70 bg-primary-100 px-3.5 py-1.5 dark:border-white/20 dark:!bg-slate-950/95 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+                  <Brain className="mr-1.5 h-4 w-4 shrink-0 text-primary-700 dark:!text-slate-200 sm:h-5 sm:w-5" />
+                  <span className="text-sm font-semibold text-primary-900 dark:!text-slate-100">AI-Powered</span>
                 </div>
-                <div className="inline-flex items-center rounded-full bg-primary-100/80 px-3 py-1 dark:bg-primary-500/15">
-                  <Zap className="mr-1 h-4 w-4 text-primary-600 dark:text-primary-300" />
-                  <span className="text-xs font-semibold text-primary-800 dark:text-primary-100">Smart Suggestions</span>
+                <div className="inline-flex items-center rounded-full border border-primary-200/70 bg-primary-100/90 px-3.5 py-1.5 dark:border-white/20 dark:!bg-slate-950/95 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+                  <Zap className="mr-1.5 h-4 w-4 shrink-0 text-primary-700 dark:!text-slate-200 sm:h-5 sm:w-5" />
+                  <span className="text-sm font-semibold text-primary-900 dark:!text-slate-100">Smart Suggestions</span>
                 </div>
               </div>
               
-              <div className="flex items-center justify-center text-sm text-primary-600 dark:text-primary-300">
-                <ArrowRight className="h-4 w-4 mr-1 animate-bounce" />
+              <div className="flex items-center justify-center text-base text-primary-600 dark:!text-slate-400 sm:text-[17px]">
+                <ArrowRight className="mr-1 h-5 w-5 shrink-0 animate-bounce" />
                 <span className="font-medium">Click to explore</span>
-                <ArrowRight className="h-4 w-4 ml-1 animate-bounce" style={{ animationDelay: "0.5s" }} />
+                <ArrowRight className="ml-1 h-5 w-5 shrink-0 animate-bounce" style={{ animationDelay: "0.5s" }} />
               </div>
             </CardContent>
           </Card>
@@ -343,23 +353,29 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
             visibility: isFlipped ? 'visible' : 'hidden'
           }}
         >
-          <Card className={cn(APP_GLASS_CARD, "h-full border border-gray-200/50 shadow-2xl backdrop-blur-sm dark:border-white/10")}>
-            <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-primary-50 to-primary-100/80 pb-2 pt-3 dark:border-white/10 dark:from-primary-950/30 dark:to-primary-950/20">
+          <Card
+            className={cn(
+              APP_GLASS_CARD,
+              "h-full border border-gray-200/50 shadow-2xl backdrop-blur-sm dark:border-white/10",
+              "dark:!bg-slate-900/94"
+            )}
+          >
+            <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-primary-50 to-primary-100/80 pb-2 pt-3 dark:border-white/10 dark:bg-gradient-to-r dark:!from-slate-900/95 dark:!to-slate-900/70">
               <div className="flex items-center justify-between">
                 
                 {/* Hint Usage Counter */}
                 {sessionId && (
                   <div className="flex items-center space-x-1">
-                    <div className="flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-100 to-red-100 px-2 py-1 dark:border-orange-500/25 dark:from-orange-500/15 dark:to-red-500/15">
-                      <Lightbulb className="mr-1 h-3 w-3 text-orange-600 dark:text-orange-300" />
-                      <span className="text-xs font-semibold text-orange-700 dark:text-orange-200">
+                    <div className="flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-100 to-red-100 px-2.5 py-1.5 dark:border-orange-500/30 dark:!bg-gradient-to-r dark:!from-orange-950/55 dark:!to-red-950/45">
+                      <Lightbulb className="mr-1 h-4 w-4 shrink-0 text-orange-600 dark:text-orange-300" />
+                      <span className="text-sm font-semibold text-orange-700 dark:text-orange-200">
                         Hints: <AnimatedCounter value={hintUsageCount} />
                       </span>
                     </div>
                     {hintUsageCount > 0 && (
-                      <div className="flex items-center rounded-full border border-red-200 bg-gradient-to-r from-red-100 to-pink-100 px-2 py-1 dark:border-red-500/25 dark:from-red-500/15 dark:to-pink-500/15">
-                        <AlertTriangle className="mr-1 h-3 w-3 text-red-600 dark:text-red-300" />
-                        <span className="text-xs font-medium text-red-700 dark:text-red-200">
+                      <div className="flex items-center rounded-full border border-red-200 bg-gradient-to-r from-red-100 to-pink-100 px-2.5 py-1.5 dark:border-red-500/30 dark:!bg-gradient-to-r dark:!from-red-950/55 dark:!to-pink-950/45">
+                        <AlertTriangle className="mr-1 h-4 w-4 shrink-0 text-red-600 dark:text-red-300" />
+                        <span className="text-sm font-medium text-red-700 dark:text-red-200">
                           -{Math.min(hintUsageCount * 2, 50)} pts
                         </span>
                       </div>
@@ -397,7 +413,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                   </Button>
                 </div>
               </div>
-              <p className="mt-0 text-xs text-gray-600 dark:text-slate-400">
+              <p className="mt-1 text-sm text-gray-600 dark:text-slate-400 md:text-base">
                 Click any question to use it in your conversation
               </p>
               
@@ -413,7 +429,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                         e.stopPropagation()
                         setSelectedCategory(category)
                       }}
-                      className={`text-xs ${
+                      className={`text-sm md:text-[15px] ${
                         selectedCategory === category 
                           ? "bg-primary text-primary-foreground" 
                           : "bg-white/50 text-gray-600 hover:bg-primary/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-primary/20"
@@ -490,18 +506,18 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-primary-700 text-sm font-bold text-white shadow-lg">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-primary-700 text-base font-bold text-white shadow-lg sm:h-10 sm:w-10">
                               {index + 1}
                             </div>
                             <Badge 
                               variant="secondary" 
-                              className={`text-xs border ${getCategoryColor(question.category)}`}
+                              className={`text-sm border ${getCategoryColor(question.category)}`}
                             >
                               {getCategoryIcon(question.category)} {question.category}
                             </Badge>
                             <Badge 
                               variant="outline" 
-                              className={`text-xs border-2 ${getImportanceColor(question.importance)}`}
+                              className={`text-sm border-2 ${getImportanceColor(question.importance)}`}
                             >
                               {question.importance.toUpperCase()}
                             </Badge>
@@ -513,17 +529,17 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                                     style={{ width: `${question.confidence}%` }}
                                   ></div>
                                 </div>
-                                <span className="text-xs text-gray-500 dark:text-slate-400">{question.confidence}%</span>
+                                <span className="text-sm text-gray-500 dark:text-slate-400">{question.confidence}%</span>
                               </div>
                             )}
                           </div>
                           <div className="flex items-center space-x-1 opacity-0 transition-opacity group-hover:opacity-100">
-                            <span className="text-xs text-gray-400 dark:text-slate-400">Click to use</span>
-                            <ArrowRight className="h-3 w-3 text-gray-400 dark:text-slate-400" />
+                            <span className="text-sm text-gray-400 dark:text-slate-400">Click to use</span>
+                            <ArrowRight className="h-4 w-4 text-gray-400 dark:text-slate-400" />
                           </div>
                         </div>
                         
-                        <p className="mb-2 text-sm font-semibold leading-relaxed text-gray-800 transition-colors group-hover:text-primary-700 dark:text-slate-100 dark:group-hover:text-primary-300">
+                        <p className="mb-2 text-base font-semibold leading-relaxed text-gray-800 transition-colors group-hover:text-primary-700 dark:text-slate-100 dark:group-hover:text-primary-300 md:text-[17px]">
                           {question.question}
                         </p>
                         
@@ -532,7 +548,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                             {question.tags.map((tag, tagIndex) => (
                               <span 
                                 key={tagIndex}
-                                className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-white/10 dark:text-slate-300"
+                                className="rounded-full bg-gray-100 px-2.5 py-1 text-sm text-gray-600 dark:bg-white/10 dark:text-slate-300"
                               >
                                 #{tag}
                               </span>
@@ -541,10 +557,10 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                         )}
                         
                         {question.rationale && showRationale && (
-                          <div className="mt-3 rounded-lg border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-3 dark:border-amber-500/25 dark:from-amber-950/25 dark:to-yellow-950/20">
+                          <div className="mt-3 rounded-lg border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-3 dark:border-amber-500/30 dark:!bg-gradient-to-r dark:!from-amber-950/45 dark:!to-yellow-950/35">
                             <div className="flex items-start">
                               <Lightbulb className="mr-2 mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-300" />
-                              <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-200">{question.rationale}</p>
+                              <p className="text-sm leading-relaxed text-amber-800 dark:text-amber-200 md:text-[15px]">{question.rationale}</p>
                             </div>
                           </div>
                         )}

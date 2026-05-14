@@ -27,6 +27,7 @@ import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-se
 import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 import { cn } from "@/shared/utils/cn"
 import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
+import { useUIConfigContext } from "@/shared/contexts/UIConfigContext"
 
 interface ModeCasesConfig {
   modeTitle: string
@@ -68,6 +69,8 @@ interface ModeCasesConfig {
 }
 
 export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
+  const { config: uiConfig } = useUIConfigContext()
+  const isDarkTheme = uiConfig.theme === "dark"
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState<"landing" | "generate" | "select">("landing")
   const [isGeneratingCase, setIsGeneratingCase] = useState(false)
@@ -252,19 +255,45 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
     </div>
   )
 
-  // Difficulty badge color helper
+  // Difficulty badge — branch on app theme so pastel light backgrounds never apply in dark mode.
   const difficultyBadgeClass = (difficulty: string) => {
+    if (isDarkTheme) {
+      switch (difficulty) {
+        case "beginner":
+          return "border border-emerald-500/40 bg-slate-900/90 text-emerald-200"
+        case "intermediate":
+          return "border border-amber-500/40 bg-slate-900/90 text-amber-200"
+        case "advanced":
+          return "border border-rose-500/40 bg-slate-900/90 text-rose-200"
+        default:
+          return "border border-white/15 bg-slate-900/90 text-slate-200"
+      }
+    }
     switch (difficulty) {
       case "beginner":
-        return "border-green-200 bg-green-50 text-green-700 dark:border-emerald-500/30 dark:bg-emerald-950/35 dark:text-emerald-200"
+        return "border-green-200 bg-green-50 text-green-800"
       case "intermediate":
-        return "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/25 dark:bg-amber-950/35 dark:text-amber-200"
+        return "border-amber-200 bg-amber-50 text-amber-800"
       case "advanced":
-        return "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/25 dark:bg-rose-950/35 dark:text-rose-200"
+        return "border-rose-200 bg-rose-50 text-rose-800"
       default:
-        return "border-gray-200 bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/10 dark:text-slate-300"
+        return "border-gray-200 bg-gray-100 text-gray-800"
     }
   }
+
+  const caseChipClass = cn(
+    "inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold sm:text-xs",
+    isDarkTheme
+      ? "border border-white/15 bg-slate-900/95 text-slate-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+      : "border border-primary-200/70 bg-primary-50 text-primary-900"
+  )
+
+  const caseSpecialtyChipClass = cn(
+    "inline-flex max-w-[75%] items-center truncate rounded-full px-3.5 py-1.5 text-xs font-bold sm:text-[13px]",
+    isDarkTheme
+      ? "border border-white/18 bg-slate-900/95 text-slate-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+      : "border border-primary-200/70 bg-primary-50 text-primary-800"
+  )
 
   // Shared horizontal frame: near full-bleed content so cards use most of the viewport.
   const pageFrameClass =
@@ -339,7 +368,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     <Link
                       key={session.id}
                       href={medprepSessionService.getContinueUrl(session)}
-                      className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50 dark:border-emerald-500/20 dark:bg-emerald-950/35 dark:text-emerald-100 dark:hover:bg-emerald-950/55"
+                      className="rounded-lg border border-emerald-200/80 bg-emerald-50/70 px-3 py-2 text-left text-sm font-medium text-emerald-900 transition-colors hover:border-emerald-300 hover:bg-emerald-100 hover:text-emerald-950 dark:border-emerald-500/25 dark:bg-emerald-900/35 dark:text-emerald-100 dark:hover:border-emerald-400/35 dark:hover:bg-emerald-800/85 dark:hover:text-emerald-50"
                     >
                       {session.title || session.caseId || "Untitled case"}
                     </Link>
@@ -712,7 +741,13 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     type="button"
                     onClick={() => handleCaseSelection(caseItem.id)}
                     disabled={isGeneratingCase}
-                    className={`group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl border border-primary-100 bg-white/90 p-7 shadow-[0_20px_44px_-32px_rgba(var(--color-primary-500-rgb),0.45)] backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary-300/60 hover:shadow-[0_28px_52px_-32px_rgba(var(--color-primary-500-rgb),0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/50 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-white/[0.06] dark:focus-visible:ring-offset-gray-950 sm:p-8 lg:p-9 cursor-pointer ${isGeneratingCase ? "opacity-50 pointer-events-none" : ""}`}
+                    className={cn(
+                      "group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl p-7 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/50 focus-visible:ring-offset-2 sm:p-8 lg:p-9 cursor-pointer",
+                      isDarkTheme
+                        ? "border border-white/10 bg-slate-950/75 shadow-black/30 focus-visible:ring-offset-slate-950 hover:border-white/18 hover:shadow-[0_28px_52px_-32px_rgba(0,0,0,0.45)]"
+                        : "border border-primary-100 bg-white/90 shadow-[0_20px_44px_-32px_rgba(var(--color-primary-500-rgb),0.45)] hover:border-primary-300/60 hover:shadow-[0_28px_52px_-32px_rgba(var(--color-primary-500-rgb),0.52)] focus-visible:ring-offset-white",
+                      isGeneratingCase && "opacity-50 pointer-events-none"
+                    )}
                   >
                     {/* Animated primary-tinted top bar (L → R on hover) */}
                     <span
@@ -792,27 +827,27 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                     {/* Symptom tags */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {visibleSymptoms.map((symptom, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1.5 text-[11px] font-semibold text-primary-800 dark:bg-primary-500/15 dark:text-primary-100 sm:text-xs"
-                        >
+                        <span key={index} className={caseChipClass}>
                           {symptom}
                         </span>
                       ))}
                       {extraCount > 0 && (
-                        <span className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1.5 text-[11px] font-semibold text-primary-800 dark:bg-primary-500/15 dark:text-primary-100 sm:text-xs">
-                          +{extraCount} more
-                        </span>
+                        <span className={caseChipClass}>+{extraCount} more</span>
                       )}
                     </div>
 
                     {/* Footer row */}
                     <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-50 pt-5 dark:border-white/10">
-                      <span className="inline-flex max-w-[75%] items-center truncate rounded-full bg-primary-50 px-3.5 py-1.5 text-xs font-bold text-primary-700 dark:bg-primary-500/15 dark:text-primary-200 sm:text-[13px]">
-                        {caseItem.specialty}
-                      </span>
+                      <span className={caseSpecialtyChipClass}>{caseItem.specialty}</span>
                       {caseItem.isRare ? (
-                        <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-red-50 text-red-700 text-[11px] sm:text-xs font-semibold border border-red-100 shrink-0">
+                        <span
+                          className={cn(
+                            "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-[11px] font-semibold sm:text-xs",
+                            isDarkTheme
+                              ? "border border-red-500/40 bg-red-950/70 text-red-100"
+                              : "border border-red-200 bg-red-50 text-red-700"
+                          )}
+                        >
                           Rare
                         </span>
                       ) : null}

@@ -66,44 +66,16 @@ const Header: React.FC<HeaderProps> = ({
 
           <NotificationBell />
 
-          <div className={`flex items-center ${spacing.element.sm}`}>
-            {/* User info - hidden on mobile, shown on tablet+ */}
-            <div className="text-right hidden md:block">
-              <p
-                className={`${typography.ui.regular} text-[color:var(--app-text)]`}
-              >
-                {user?.name || "User"}
-              </p>
-              <p
-                className={`${typography.caption.regular} text-[color:var(--app-muted)]`}
-              >
-                {user?.roles?.join(", ") || "No Role"}
-              </p>
-            </div>
-            <div
-              className={`w-8 h-8 sm:w-9 sm:h-9 bg-primary-600 rounded-full flex items-center justify-center text-white font-medium ${typography.ui.regular}`}
-            >
-              {user?.name?.charAt(0) || "U"}
-            </div>
-            <button
-              onClick={onLogout}
-              className={`${interactive.touch.sm} flex items-center justify-center text-[color:var(--app-muted)] hover:text-[color:var(--app-text)] hover:bg-[color:var(--app-elevated)] rounded-md transition-colors`}
-              title="Logout"
-            >
-              <LogOut size={18} className="sm:w-5 sm:h-5" />
-            </button>
-          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
                 className={`
                   ${interactive.touch.sm}
-                  inline-flex items-center gap-2 rounded-full
+                  inline-flex cursor-pointer items-center gap-2 rounded-full
                   border border-slate-200 bg-white/70 px-2 py-1
-                  shadow-sm hover:bg-white
-                  dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950
-                  transition-colors
+                  shadow-sm transition-colors hover:bg-white
+                  dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-900
                 `}
                 aria-label="Open user menu"
                 title={user?.name || "User"}
@@ -118,11 +90,10 @@ const Header: React.FC<HeaderProps> = ({
                 </span>
                 <span
                   className={`
-                    h-9 w-9 rounded-full
-                    bg-gradient-to-br from-teal-600 to-emerald-600
-                    text-white shadow-sm ring-2 ring-white/70
-                    dark:ring-slate-950/60
-                    flex items-center justify-center font-semibold
+                    flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+                    bg-gradient-to-br from-primary-500 to-primary-700
+                    font-semibold text-white shadow-sm ring-2 ring-white/70
+                    dark:ring-slate-800/80
                   `}
                 >
                   {initials}

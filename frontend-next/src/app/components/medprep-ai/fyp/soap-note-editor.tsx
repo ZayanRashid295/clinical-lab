@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/router"
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 import type { Conversation, MedicalCase, SOAPNote } from "@/lib/fyp/data-models"
 import type { SOAPGrading } from "@/lib/fyp/soap-service"
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, Send, CheckCircle, Loader2, Lightbulb, Zap, AlertCircle, HelpCircle, Download } from "lucide-react"
 import { cn } from "@/shared/utils/cn"
-import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
+import { APP_GLASS_CARD, APP_PAGE_PADDING } from "@/app/config/app-shell"
 
 interface StudentLike {
   id: string
@@ -181,18 +181,29 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
     setError(null)
     setIsSubmitting(true)
     setIsGeneratingAI(true)
+    const api = (path: string) =>
+      typeof window !== "undefined" ? `${window.location.origin}${path}` : path
+
     try {
-      const aiResponse = await fetch("/api/soap/generate-ai", {
+      const aiResponse = await fetch(api("/api/soap/generate-ai"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ conversation, medicalCase }),
       })
-      const aiResult = await aiResponse.json()
-      if (!aiResult.success) throw new Error(aiResult.error || "Failed to generate AI SOAP note")
+      const aiResult = await aiResponse.json().catch(() => ({}))
+      if (!aiResponse.ok || !aiResult.success) {
+        const extra =
+          typeof aiResult.details === "string" && aiResult.details.trim()
+            ? ` (${aiResult.details.trim()})`
+            : !aiResponse.ok
+              ? ` (HTTP ${aiResponse.status})`
+              : ""
+        throw new Error((aiResult.error || "Failed to generate AI SOAP note") + extra)
+      }
       setAiSOAP(aiResult.aiSOAP)
       setIsGeneratingAI(false)
 
-      const gradeResponse = await fetch("/api/soap/grade", {
+      const gradeResponse = await fetch(api("/api/soap/grade"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -205,16 +216,23 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
       setGrading(gradeResult.grading)
 
       setIsGradingConversation(true)
-      const conversationGradeResponse = await fetch("/api/ai/grade-conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversation, medicalCase }),
-      })
-      const conversationGradeResult = await conversationGradeResponse.json()
-      if (conversationGradeResult.success) setConversationGrading(conversationGradeResult.grading)
-      setIsGradingConversation(false)
+      try {
+        const conversationGradeResponse = await fetch(api("/api/ai/grade-conversation"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversation, medicalCase }),
+        })
+        const conversationGradeResult = await conversationGradeResponse.json().catch(() => ({}))
+        if (conversationGradeResponse.ok && conversationGradeResult.success) {
+          setConversationGrading(conversationGradeResult.grading)
+        }
+      } catch (gradeConvErr) {
+        console.warn("[SOAP] grade-conversation failed; continuing without conversation report.", gradeConvErr)
+      } finally {
+        setIsGradingConversation(false)
+      }
 
-      await fetch("/api/soap/save", {
+      await fetch(api("/api/soap/save"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -245,10 +263,15 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
   const canSubmit = conversation.messages.some((message) => message.role === "student")
 
   return (
-    <div className={cn(APP_PAGE_SHELL, "min-h-screen w-full")}>
-      <header className="border-b border-gray-200 bg-white/90 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+    <div
+      className={cn(
+        "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-6 pb-28",
+        APP_PAGE_PADDING,
+      )}
+    >
+      <header className="sticky top-0 z-20 shrink-0 rounded-lg border border-[color:var(--app-border)] bg-[color:var(--app-surface)] py-3 shadow-sm backdrop-blur-sm">
+        <div className="w-full px-1 sm:px-2">
+          <div className="flex min-h-14 flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
@@ -257,7 +280,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                   if (window.history.length > 1) {
                     router.back()
                   } else {
-                    router.push("/")
+                    router.push("/dashboard")
                   }
                 }}
               >
@@ -265,42 +288,52 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                 Back
               </Button>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                <h1 className="text-lg font-semibold text-foreground">
                   SOAP Note - {medicalCase.title}
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   Patient: {medicalCase.patientProfile?.name}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               {!isSubmitted && (
-                <div className="text-sm text-gray-600 dark:text-slate-400">
+                <div className="text-sm text-muted-foreground">
                   {autoSaveEnabled ? "Auto-save enabled" : "Auto-save disabled"}
                 </div>
               )}
               {!isSubmitted && (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 dark:text-slate-400">
+                  <span className="text-sm text-muted-foreground">
                     {completedSections}/4 sections
                   </span>
                   <Progress value={completionPercent} className="h-2 w-20" />
                 </div>
               )}
               {!isSubmitted && <Button variant="outline" size="sm" onClick={handleSaveDraft}><Save className="h-4 w-4 mr-2" />Save Draft</Button>}
-              {!isSubmitted && <Button size="sm" onClick={handleSubmit} disabled={isSubmitting || !canSubmit}><Send className="h-4 w-4 mr-2" />{isSubmitting ? "Submitting..." : "Submit for Grading"}</Button>}
+              {!isSubmitted && (
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !canSubmit}
+                  className="disabled:pointer-events-none disabled:opacity-50 dark:disabled:bg-slate-800 dark:disabled:text-slate-400 dark:disabled:opacity-80"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {isSubmitting ? "Submitting..." : "Submit for Grading"}
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4 space-y-6">
+      <div className="flex w-full flex-1 flex-col space-y-6">
         {error && <Alert><AlertCircle className="h-4 w-4" /><AlertDescription>{error}</AlertDescription></Alert>}
         {isGeneratingAI && <Alert><AlertDescription>Generating AI reference SOAP note...</AlertDescription></Alert>}
 
         {isSubmitted && grading ? (
           <Tabs defaultValue="comprehensive" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/60 text-muted-foreground dark:bg-muted/30">
               <TabsTrigger value="comprehensive">Comprehensive Report</TabsTrigger>
               <TabsTrigger value="comparison">AI Comparison</TabsTrigger>
               <TabsTrigger value="yours">Your SOAP Note</TabsTrigger>
@@ -316,20 +349,20 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                   <Progress value={grading.overallGrade} />
                   <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                     <div className="text-center">
-                      <p className="text-sm">Subjective</p>
-                      <p className="font-bold">{grading.subjectiveGrade}%</p>
+                      <p className="text-sm text-muted-foreground">Subjective</p>
+                      <p className="font-bold text-foreground">{grading.subjectiveGrade}%</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm">Objective</p>
-                      <p className="font-bold">{grading.objectiveGrade}%</p>
+                      <p className="text-sm text-muted-foreground">Objective</p>
+                      <p className="font-bold text-foreground">{grading.objectiveGrade}%</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm">Assessment</p>
-                      <p className="font-bold">{grading.assessmentGrade}%</p>
+                      <p className="text-sm text-muted-foreground">Assessment</p>
+                      <p className="font-bold text-foreground">{grading.assessmentGrade}%</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm">Plan</p>
-                      <p className="font-bold">{grading.planGrade}%</p>
+                      <p className="text-sm text-muted-foreground">Plan</p>
+                      <p className="font-bold text-foreground">{grading.planGrade}%</p>
                     </div>
                   </div>
                 </CardContent>
@@ -365,7 +398,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
           </Tabs>
         ) : (
           <>
-            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-blue-500/20 dark:from-blue-950/30 dark:to-indigo-950/25">
+            <Card className="border-blue-200/80 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-blue-500/20 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/45">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div><h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Writing Progress</h3><p className="text-sm text-blue-700 dark:text-blue-200/90">Track your SOAP note completion</p></div>
@@ -379,7 +412,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
             </Card>
 
             {showTips && (
-              <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50 dark:border-amber-500/20 dark:from-amber-950/25 dark:to-orange-950/20">
+              <Card className="border-amber-200/80 bg-gradient-to-r from-amber-50 to-orange-50 dark:border-amber-500/20 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-900 dark:to-orange-950/40">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2"><Lightbulb className="h-5 w-5" />Writing Tips - {SECTION_META[activeSection].title}</span>
@@ -391,7 +424,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                     {TIPS[activeSection].map((tip, i) => (
                       <div
                         key={i}
-                        className="rounded bg-white/60 p-2 text-sm dark:bg-white/10 dark:text-slate-200"
+                        className="rounded-md border border-border/60 bg-background/80 p-2 text-sm text-foreground dark:border-white/10 dark:bg-slate-900/40"
                       >
                         {tip}
                       </div>
@@ -406,8 +439,11 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                 <CardHeader>
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <CardTitle className="flex items-center gap-2">{SECTION_META[section].title} {completion[section] && <CheckCircle className="h-4 w-4 text-green-600" />}</CardTitle>
-                      <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
+                      <CardTitle className="flex items-center gap-2">
+                        {SECTION_META[section].title}{" "}
+                        {completion[section] && <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />}
+                      </CardTitle>
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {SECTION_META[section].description}
                       </p>
                     </div>
@@ -424,7 +460,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {assistantSuggestions[section].length > 0 && (
-                    <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm dark:border-blue-500/25 dark:bg-blue-950/25 dark:text-slate-200">
+                    <div className="rounded-md border border-blue-200/80 bg-blue-50/90 p-3 text-sm dark:border-blue-500/30 dark:bg-blue-900/25 dark:text-slate-200">
                       {assistantSuggestions[section].map((suggestion, index) => (
                         <div key={index} className="prose prose-sm max-w-none"><MarkdownContent variant="default">{suggestion}</MarkdownContent></div>
                       ))}
@@ -435,7 +471,7 @@ export function SOAPNoteEditor({ conversation, medicalCase, student }: SOAPNoteE
                     onChange={(event) => setters[section](event.target.value)}
                     onFocus={() => setActiveSection(section)}
                     placeholder={SECTION_META[section].placeholder}
-                    className="min-h-[200px]"
+                    className="min-h-[200px] border-border bg-background text-foreground placeholder:text-muted-foreground dark:bg-slate-950/50"
                     disabled={isSubmitted}
                   />
                 </CardContent>
