@@ -113,13 +113,13 @@ export function DiagnosisSubmission({
 
   if (!showForm && submissionResult) {
     return (
-      <Card className="mx-auto w-full max-w-2xl border-border">
+      <Card className="mx-auto w-full max-w-2xl border-border bg-card text-card-foreground shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1 space-y-1.5">
               <CardTitle className="flex items-center gap-2 text-foreground">
                 {submissionResult.feedback.isCorrect ? (
-                  <CheckCircle className="h-6 w-6 shrink-0 text-primary" />
+                  <CheckCircle className="h-6 w-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
                 ) : (
                   <XCircle className="h-6 w-6 shrink-0 text-red-500 dark:text-red-400" />
                 )}
@@ -147,12 +147,16 @@ export function DiagnosisSubmission({
           <Alert
             className={
               submissionResult.feedback.isCorrect
-                ? "border-primary-200 bg-primary-50 dark:border-primary-500/25 dark:bg-primary-500/10"
-                : "border-red-200 bg-red-50 dark:border-red-500/25 dark:bg-red-500/10"
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-950 dark:border-emerald-400/40 dark:bg-emerald-500/20 dark:text-emerald-50 [&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-400"
+                : "border-red-500/40 bg-red-500/15 text-red-950 dark:border-red-400/40 dark:bg-red-500/20 dark:text-red-50 [&>svg]:text-red-600 dark:[&>svg]:text-red-400"
             }
           >
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription className="text-foreground">
+            {submissionResult.feedback.isCorrect ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <AlertTriangle className="h-4 w-4" />
+            )}
+            <AlertDescription className="col-start-2 text-inherit [&_p]:text-inherit">
               {submissionResult.feedback.message}
             </AlertDescription>
           </Alert>
@@ -179,9 +183,9 @@ export function DiagnosisSubmission({
           </div>
 
           {caseMetadata.isRare && (
-            <Alert>
+            <Alert className="border-amber-500/40 bg-amber-500/15 text-amber-950 dark:border-amber-400/40 dark:bg-amber-500/20 dark:text-amber-50 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
+              <AlertDescription className="col-start-2 text-inherit [&_p]:text-inherit">
                 This was a rare disease case! Rare diseases can be challenging to diagnose 
                 because they often mimic more common conditions. Consider factors like family 
                 history, subtle physical findings, and specialized testing.
@@ -208,7 +212,7 @@ export function DiagnosisSubmission({
   }
 
   return (
-    <Card className="mx-auto w-full max-w-2xl border-border">
+    <Card className="mx-auto w-full max-w-2xl border-border bg-card text-card-foreground shadow-lg">
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-1.5">
@@ -259,9 +263,9 @@ export function DiagnosisSubmission({
         </div>
 
         {caseMetadata.isRare && (
-          <Alert className="border-amber-200 bg-amber-50 dark:border-amber-500/25 dark:bg-amber-950/25">
+          <Alert className="border-amber-500/40 bg-amber-500/15 text-amber-950 dark:border-amber-400/40 dark:bg-amber-500/20 dark:text-amber-50 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription className="text-foreground">
+            <AlertDescription className="col-start-2 text-inherit [&_p]:text-inherit">
               This is a rare disease case! Consider subtle clues, family history, 
               and specialized testing that might be needed for diagnosis.
             </AlertDescription>
