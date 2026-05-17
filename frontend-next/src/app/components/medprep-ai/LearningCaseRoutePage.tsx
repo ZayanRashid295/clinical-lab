@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { learningService, type LearningSession } from "@/lib/fyp/learning-service";
-import { sampleCases } from "@/lib/fyp/data-models";
+import { trimMedprepConversationIdQuery } from "@/lib/fyp/medprep-session-merge";
+import { resolveMedicalCase } from "@/lib/fyp/institution-case";
 import { CaseValidationService } from "@/lib/fyp/case-validation";
 import { LearningInterface } from "@/app/components/medprep-ai/fyp/learning-interface";
 import { Button } from "@/components/ui/button";
@@ -37,8 +38,8 @@ function LearningCaseRoutePageInner() {
   const caseId = caseIdFromPathname(pathname) || "";
 
   const conversationIdFromQuery = useMemo(() => {
-    const q = router.query.conversationId;
-    return typeof q === "string" && q.length > 0 ? q : null;
+    const id = trimMedprepConversationIdQuery(router.query.conversationId)
+    return id.length > 0 ? id : null
   }, [router.query.conversationId]);
 
   const [userId, setUserId] = useState("anonymous");
@@ -62,34 +63,21 @@ function LearningCaseRoutePageInner() {
 
     let cancelled = false;
 
-    console.log("Loading learning case with ID:", caseId);
-    let resolved = sampleCases.find((c) => c.id === caseId);
-
-    if (!resolved) {
-      const generatedCaseData = localStorage.getItem("generatedCase");
-      if (generatedCaseData) {
-        try {
-          resolved = JSON.parse(generatedCaseData);
-        } catch (parseError) {
-          console.error("Error parsing generated case:", parseError);
-        }
-      }
-    }
-
-    if (!resolved) {
-      setIsLoading(false);
-      return;
-    }
-
-    const validatedCase = CaseValidationService.validateAndFixCase(resolved);
-    if (validatedCase !== resolved && localStorage.getItem("generatedCase")) {
-      localStorage.setItem("generatedCase", JSON.stringify(validatedCase));
-    }
-    const mc = validatedCase;
-    setMedicalCase(mc);
-
     const run = async () => {
       setIsLoading(true);
+
+      let resolved =
+        userId && userId !== "anonymous"
+          ? await resolveMedicalCase(caseId, { userId, mode: "LEARNING" })
+          : null;
+
+      if (!resolved) {
+        if (!cancelled) setIsLoading(false);
+        return;
+      }
+
+      const mc = CaseValidationService.validateAndFixCase(resolved);
+      if (!cancelled) setMedicalCase(mc);
 
       if (conversationIdFromQuery && userId && userId !== "anonymous") {
         try {
@@ -114,16 +102,18 @@ function LearningCaseRoutePageInner() {
 
       if (cancelled) return;
 
-      const existingSession =
-        learningService.getLearningSession(`learn_${caseId}`) ??
-        learningService.getLearningSessionsForUser().find((s) => s.caseId === caseId);
-
-      if (existingSession) {
+      const fromDb = await learningService.resolveLearningSessionFromDatabase(
+        caseId,
+        userId,
+        conversationIdFromQuery,
+        mc,
+      );
+      if (fromDb) {
         const sid = learningService.normalizeStudentId(userId);
-        const merged: LearningSession = { ...existingSession, studentId: sid || existingSession.studentId };
+        if (sid) fromDb.studentId = sid;
         if (!cancelled) {
-          setSession(merged);
-          setHydratedFromDatabase(false);
+          setSession(fromDb);
+          setHydratedFromDatabase(true);
           setIsLoading(false);
         }
         return;
@@ -144,6 +134,20 @@ function LearningCaseRoutePageInner() {
       if (!cancelled) {
         setSession(newSession);
         setHydratedFromDatabase(false);
+        if (sid) {
+          const { startMedprepSession } = await import("@/lib/fyp/medprep-persistence-service");
+          const started = await startMedprepSession({
+            userId: sid,
+            mode: "LEARNING",
+            caseId,
+            title: mc.title,
+            caseSnapshot: mc,
+          });
+          if (started?.id) {
+            newSession.conversationId = started.id;
+            setSession({ ...newSession });
+          }
+        }
         void learningService.saveLearningSession(newSession);
         setIsLoading(false);
       }

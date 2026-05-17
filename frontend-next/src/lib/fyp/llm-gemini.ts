@@ -2,12 +2,25 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const BEST_GEMINI_MODEL = "gemini-2.5-flash";
 
+/** Lighter model for interactive turns; override with MEDPREP_GEMINI_TURN_MODEL or GEMINI_TURN_MODEL. */
+export const GEMINI_TURN_MODEL =
+  process.env.MEDPREP_GEMINI_TURN_MODEL?.trim() ||
+  process.env.GEMINI_TURN_MODEL?.trim() ||
+  "gemini-2.5-flash-lite";
+
+function normalizeApiKey(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+  return trimmed.replace(/^["']+|["']+$/g, "");
+}
+
 function resolveGeminiApiKey(): string | undefined {
-  return (
+  return normalizeApiKey(
     process.env.GOOGLE_API_KEY ||
-    process.env.GEMINI_API_KEY ||
-    process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY
+      process.env.GEMINI_API_KEY ||
+      process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY,
   );
 }
 
@@ -45,17 +58,65 @@ export async function runGemini(
   if (!modelName) {
     throw new Error(`Invalid Gemini model index: ${modelNo}`);
   }
-  return runNewGemini(modelName, instructions, prompt);
+  return runNewGemini(modelName, instructions, prompt, false, 0, true);
 }
 
-export async function runNewGemini(
+function isGeminiRetryableError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  const status = (err as { status?: number })?.status;
+  if (
+    status === 403 ||
+    status === 404 ||
+    status === 429 ||
+    status === 500 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  ) {
+    return true;
+  }
+  return /403|404|forbidden|not found|permission|503|429|500|502|504|unavailable|high demand|overloaded|resource exhausted|rate limit/i.test(
+    msg,
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function geminiModelFallbackChain(primary: string): string[] {
+  const chain = [
+    primary,
+    GEMINI_TURN_MODEL,
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+  ];
+  return chain.filter((m, i) => chain.indexOf(m) === i);
+}
+
+/** True when every model in the chain rejected the key (billing, API disabled, restrictions). */
+export function isGeminiPermissionOrAuthError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  const status = (err as { status?: number })?.status;
+  return (
+    status === 403 ||
+    status === 401 ||
+    /403|401|forbidden|permission|api key|invalid.*key|API_KEY_INVALID/i.test(msg)
+  );
+}
+
+async function runNewGeminiOnce(
   modelName: string,
   instructions: string,
   prompt: string,
-  thinkingMode = true,
-  thinkingBudget = 0,
-  isFromChatbot = false,
+  thinkingMode: boolean,
+  thinkingBudget: number,
+  isFromChatbot: boolean,
   temperature?: number,
+  maxOutputTokens?: number,
 ): Promise<string> {
   const apiKey = resolveGeminiApiKey();
   if (!apiKey) {
@@ -75,6 +136,9 @@ export async function runNewGemini(
     generationConfig.topK = 40;
     generationConfig.thinkingConfig = { thinkingBudget };
     generationConfig.responseMimeType = isFromChatbot ? "text/plain" : "application/json";
+    if (typeof maxOutputTokens === "number" && maxOutputTokens > 0) {
+      generationConfig.maxOutputTokens = maxOutputTokens;
+    }
   }
 
   const model = genAI.getGenerativeModel({
@@ -95,6 +159,45 @@ export async function runNewGemini(
     throw new Error("Gemini returned an empty response.");
   }
   return text;
+}
+
+export async function runNewGemini(
+  modelName: string,
+  instructions: string,
+  prompt: string,
+  thinkingMode = true,
+  thinkingBudget = 0,
+  isFromChatbot = false,
+  temperature?: number,
+  maxOutputTokens?: number,
+): Promise<string> {
+  const models = geminiModelFallbackChain(modelName);
+  let lastError: unknown;
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        return await runNewGeminiOnce(
+          model,
+          instructions,
+          prompt,
+          thinkingMode,
+          thinkingBudget,
+          isFromChatbot,
+          temperature,
+          maxOutputTokens,
+        );
+      } catch (err) {
+        lastError = err;
+        if (!isGeminiRetryableError(err)) throw err;
+        await sleep(350 * (attempt + 1));
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Gemini request failed after retries");
 }
 
 export async function* runNewGeminiStreaming(

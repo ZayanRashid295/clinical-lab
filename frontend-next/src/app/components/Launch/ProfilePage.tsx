@@ -216,7 +216,7 @@ export default function ProfilePage() {
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
             Update how your name, email, and phone appear on your account. Changes apply
-            everywhere you use Clinical Lab.
+            everywhere you use MedPrepAI.
           </p>
         </div>
         <Button

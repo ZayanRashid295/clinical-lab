@@ -31,7 +31,7 @@ export default function PaymentMethods() {
   return (
     <>
       <Head>
-        <title>Payment Methods - Medical Lab</title>
+        <title>Payment Methods - MedPrepAI</title>
         <meta
           name="description"
           content="Manage payment methods and settings"
@@ -40,7 +40,7 @@ export default function PaymentMethods() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

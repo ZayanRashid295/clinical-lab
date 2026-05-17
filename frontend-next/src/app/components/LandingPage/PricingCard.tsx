@@ -16,6 +16,7 @@ interface PricingCardProps {
   cta: string;
   packageId?: string;
   onSelect: () => void;
+  variant?: "light" | "dark";
 }
 
 export function PricingCard({
@@ -27,50 +28,86 @@ export function PricingCard({
   popular = false,
   cta,
   onSelect,
+  variant = "light",
 }: PricingCardProps) {
+  const isDark = variant === "dark";
+  const desc = description?.trim() || "";
+
   return (
     <Card
       className={cn(
-        "p-8 relative bg-card border-border h-full flex flex-col",
-        popular && "border-primary border-2 shadow-lg"
+        "relative flex h-full min-h-[420px] flex-col p-6 sm:p-8",
+        isDark
+          ? "border-white/10 bg-slate-900/60 text-slate-100 backdrop-blur-sm"
+          : "border-border bg-card",
+        popular &&
+          (isDark
+            ? "border-primary-500/60 shadow-[0_0_40px_-12px_rgba(var(--color-primary-500-rgb),0.45)] ring-1 ring-primary-500/30"
+            : "border-primary border-2 shadow-lg"),
       )}
     >
-      {popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-          <Badge 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-xs font-semibold rounded-full shadow-lg border-2 border-blue-700 whitespace-nowrap"
-          >
-            Most Popular
-          </Badge>
-        </div>
-      )}
+      {/* Same-height badge slot on every card keeps the row aligned */}
+      <div className="mb-4 flex h-9 shrink-0 items-center justify-center">
+        <Badge
+          className={cn(
+            "whitespace-nowrap rounded-full border-2 border-primary-600 bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white shadow-lg",
+            !popular && "pointer-events-none invisible",
+          )}
+          aria-hidden={!popular}
+        >
+          Most Popular
+        </Badge>
+      </div>
 
-      {/* Header section with fixed height */}
-      <div className={cn("mb-6", popular && "mt-2")}>
-        <h3 className="text-2xl font-bold mb-3 text-card-foreground min-h-[2rem] flex items-center">
+      <div className="mb-5 shrink-0">
+        <h3
+          className={cn(
+            "line-clamp-2 min-h-[3.25rem] text-2xl font-bold leading-tight",
+            isDark ? "text-white" : "text-card-foreground",
+          )}
+        >
           {name}
         </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed min-h-[3rem]">
-          {description}
+        <p
+          className={cn(
+            "mt-2 line-clamp-2 min-h-[2.75rem] text-sm leading-relaxed",
+            isDark ? "text-slate-400" : "text-muted-foreground",
+            !desc && "invisible",
+          )}
+        >
+          {desc || "\u00a0"}
         </p>
       </div>
 
-      {/* Price section with fixed height */}
-      <div className="mb-6 min-h-[4rem] flex items-end">
-        <div className="flex items-baseline gap-1 flex-wrap">
-          <span className="text-4xl font-bold text-card-foreground">
+      <div className="mb-5 flex min-h-[3.25rem] shrink-0 items-baseline">
+        <div className="flex flex-wrap items-baseline gap-1">
+          <span
+            className={cn(
+              "text-4xl font-bold",
+              isDark ? "text-white" : "text-card-foreground",
+            )}
+          >
             {price}
           </span>
-          <span className="text-base text-muted-foreground font-medium">
+          <span
+            className={cn(
+              "text-base font-medium",
+              isDark ? "text-slate-500" : "text-muted-foreground",
+            )}
+          >
             /{period}
           </span>
         </div>
       </div>
 
-      {/* Button section - fixed position */}
-      <div className="mb-6 min-h-[3.5rem] flex items-center">
+      <div className="mb-5 shrink-0">
         <Button
-          className="w-full font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-600 shadow-md"
+          className={cn(
+            "h-11 w-full border-2 font-semibold shadow-md transition-all",
+            isDark
+              ? "border-primary-500 bg-primary-600 text-white hover:bg-primary-500"
+              : "border-blue-600 bg-blue-600 text-white hover:bg-blue-700",
+          )}
           variant="default"
           onClick={onSelect}
           size="lg"
@@ -80,14 +117,18 @@ export function PricingCard({
         </Button>
       </div>
 
-      {/* Features section - flexible to fill remaining space */}
-      <div className="space-y-3 flex-1">
+      <div className="mt-auto space-y-3 border-t border-white/10 pt-5">
         {features.map((feature, idx) => (
           <div key={idx} className="flex items-start gap-3">
-            <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
               <Check className="h-3.5 w-3.5 text-primary" />
             </div>
-            <span className="text-sm text-card-foreground leading-relaxed break-words">
+            <span
+              className={cn(
+                "break-words text-sm leading-relaxed",
+                isDark ? "text-slate-300" : "text-card-foreground",
+              )}
+            >
               {feature}
             </span>
           </div>

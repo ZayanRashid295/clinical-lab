@@ -31,13 +31,13 @@ export default function Payouts() {
   return (
     <>
       <Head>
-        <title>Driver Payouts - Medical Lab</title>
+        <title>Driver Payouts - MedPrepAI</title>
         <meta name="description" content="Manage driver payouts and earnings" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

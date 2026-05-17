@@ -16,7 +16,7 @@ import {
   UpdateConversationDto,
 } from "./dto/ai-tutor.dto";
 
-const SYSTEM_PROMPT = `You are an experienced medical tutor assistant for clinical-lab students.
+const SYSTEM_PROMPT = `You are an experienced medical tutor assistant for MedPrepAI students.
 Guidelines:
 - Be concise but explain mechanisms when asked.
 - For clinical scenarios, walk through differentials and key discriminating features.

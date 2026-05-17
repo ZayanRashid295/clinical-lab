@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   Clock,
+  Eye,
   FileQuestion,
   GraduationCap,
   Layers,
@@ -63,6 +64,7 @@ import {
 } from "@/lib/fyp/medprep-session-service";
 import { getClinicalUserId } from "@/lib/fyp/medprep-user";
 import { cn } from "@/shared/utils/cn";
+import { DashboardInstitutionPanel } from "@/app/components/Dashboard/DashboardInstitutionPanel";
 
 type CaseLimitsPayload = {
   hasMedprepAccess: boolean;
@@ -89,6 +91,7 @@ const MEDPREP_ROUTE: Record<MedPrepModeId, string> = {
   "let-me-drive": "/medprep-ai/let-me-drive",
   qa: "/medprep-ai/qa",
   "ai-evaluation": "/medprep-ai/ai-evaluation",
+  "shadow-mode": "/medprep-ai/shadow-mode",
 };
 
 const MODE_VISUAL: Record<
@@ -104,32 +107,69 @@ const MODE_VISUAL: Record<
 > = {
   "let-me-drive": {
     Icon: Stethoscope,
-    bar: "from-primary-500 via-primary-600 to-primary-700",
-    iconBg: "bg-primary-100 dark:bg-primary-900/40",
-    iconFg: "text-primary-800 dark:text-primary-300",
+    bar: "from-rose-500 via-orange-500 to-amber-500",
+    iconBg:
+      "bg-rose-100 dark:bg-rose-950/50 dark:ring-rose-800/40",
+    iconFg: "text-rose-800 dark:text-rose-200",
     resumeBadge:
-      "border-primary-200/80 bg-primary-50 text-primary-900 dark:border-primary-800/50 dark:bg-primary-900/35 dark:text-primary-100",
-    cardRing: "hover:border-primary-300/80 dark:hover:border-primary-700",
+      "border-rose-200/80 bg-rose-50 text-rose-900 dark:border-rose-800/50 dark:bg-rose-950/45 dark:text-rose-100",
+    cardRing: "hover:border-rose-300/80 dark:hover:border-rose-800/60",
   },
   qa: {
     Icon: GraduationCap,
-    bar: "from-primary-400 via-primary-500 to-primary-600",
-    iconBg: "bg-primary-100 dark:bg-primary-900/40",
-    iconFg: "text-primary-800 dark:text-primary-300",
+    bar: "from-emerald-500 via-teal-500 to-cyan-500",
+    iconBg:
+      "bg-emerald-100 dark:bg-emerald-950/50 dark:ring-emerald-800/40",
+    iconFg: "text-emerald-800 dark:text-emerald-100",
     resumeBadge:
-      "border-primary-200/80 bg-primary-50 text-primary-900 dark:border-primary-800/50 dark:bg-primary-900/35 dark:text-primary-100",
-    cardRing: "hover:border-primary-300/80 dark:hover:border-primary-700",
+      "border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-800/50 dark:bg-emerald-950/45 dark:text-emerald-100",
+    cardRing: "hover:border-emerald-300/80 dark:hover:border-emerald-800/60",
   },
   "ai-evaluation": {
     Icon: ClipboardCheck,
-    bar: "from-primary-600 via-primary-700 to-primary-800",
-    iconBg: "bg-primary-100 dark:bg-primary-900/40",
-    iconFg: "text-primary-800 dark:text-primary-300",
+    bar: "from-indigo-500 via-violet-500 to-purple-600",
+    iconBg:
+      "bg-indigo-100 dark:bg-indigo-950/50 dark:ring-indigo-800/40",
+    iconFg: "text-indigo-800 dark:text-indigo-100",
     resumeBadge:
-      "border-primary-200/80 bg-primary-50 text-primary-900 dark:border-primary-800/50 dark:bg-primary-900/35 dark:text-primary-100",
-    cardRing: "hover:border-primary-300/80 dark:hover:border-primary-700",
+      "border-indigo-200/80 bg-indigo-50 text-indigo-900 dark:border-indigo-800/50 dark:bg-indigo-950/45 dark:text-indigo-100",
+    cardRing: "hover:border-indigo-300/80 dark:hover:border-indigo-800/60",
+  },
+  "shadow-mode": {
+    Icon: Eye,
+    bar: "from-cyan-500 via-sky-600 to-blue-700",
+    iconBg: "bg-cyan-100 dark:bg-cyan-950/50 dark:ring-cyan-800/40",
+    iconFg: "text-cyan-800 dark:text-cyan-100",
+    resumeBadge:
+      "border-cyan-200/80 bg-cyan-50 text-cyan-900 dark:border-cyan-800/50 dark:bg-cyan-950/45 dark:text-cyan-100",
+    cardRing: "hover:border-cyan-300/80 dark:hover:border-cyan-800/60",
   },
 };
+
+const QUICK_LINK_ICON: Record<
+  "achievements" | "mockExams" | "studyGroups" | "settings",
+  { wrap: string }
+> = {
+  achievements: {
+    wrap:
+      "bg-amber-100 text-amber-900 ring-amber-200/80 dark:bg-amber-500/30 dark:text-amber-50 dark:ring-amber-400/50",
+  },
+  mockExams: {
+    wrap:
+      "bg-indigo-100 text-indigo-900 ring-indigo-200/80 dark:bg-indigo-500/30 dark:text-indigo-50 dark:ring-indigo-400/50",
+  },
+  studyGroups: {
+    wrap:
+      "bg-emerald-100 text-emerald-900 ring-emerald-200/80 dark:bg-emerald-500/30 dark:text-emerald-50 dark:ring-emerald-400/50",
+  },
+  settings: {
+    wrap:
+      "bg-slate-100 text-slate-800 ring-slate-200/80 dark:bg-slate-600/70 dark:text-slate-50 dark:ring-white/25",
+  },
+};
+
+const quickLinkIconBox =
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset";
 
 function classifyTask(t: StudyTask): "upcoming" | "overdue" | "completed" {
   if (t.status === "COMPLETED") return "completed";
@@ -198,7 +238,6 @@ export default function StudentDashboardPage() {
 
   useEffect(() => {
     void refreshMedprepSessions();
-    const retry = setTimeout(() => void refreshMedprepSessions(), 450);
     const onFocus = () => void refreshMedprepSessions();
     const onVisible = () => {
       if (document.visibilityState === "visible") void refreshMedprepSessions();
@@ -206,7 +245,6 @@ export default function StudentDashboardPage() {
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
     return () => {
-      clearTimeout(retry);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
     };
@@ -322,7 +360,7 @@ export default function StudentDashboardPage() {
         <div className="w-full max-w-none space-y-2 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Clinical Lab
+              MedPrepAI
             </p>
             <div className="flex shrink-0 items-center gap-2">
               {loading && (
@@ -356,7 +394,7 @@ export default function StudentDashboardPage() {
             Welcome back{displayName ? `, ${displayName}` : ""}
           </h1>
           <p className="overflow-x-auto text-sm leading-relaxed whitespace-nowrap text-slate-600 [scrollbar-width:thin] dark:text-slate-400">
-            Your hub for QBank study, assessments, MedPrep AI clinical cases, and subscription-aware tools—organized in one place.
+            Your hub for QBank study, assessments, MedPrepAI clinical cases, and subscription-aware tools—organized in one place.
           </p>
         </div>
       </div>
@@ -370,6 +408,8 @@ export default function StudentDashboardPage() {
             {error}
           </div>
         )}
+
+        <DashboardInstitutionPanel />
 
         {/* KPI strip */}
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -475,7 +515,7 @@ export default function StudentDashboardPage() {
                   Resume clinical simulations
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Active MedPrep AI sessions—continue where you stopped
+                  Active MedPrepAI sessions—continue where you stopped
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -522,7 +562,9 @@ export default function StudentDashboardPage() {
                       ? "Practice"
                       : session.mode === "LEARNING"
                         ? "Learning"
-                        : "Evaluation";
+                        : session.mode === "SHADOW"
+                          ? "Shadow"
+                          : "Evaluation";
 
                   return (
                     <Link
@@ -679,12 +721,12 @@ export default function StudentDashboardPage() {
           </div>
         </section>
 
-        {/* MedPrep AI */}
+        {/* MedPrepAI */}
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                MedPrep AI
+                MedPrepAI
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 Clinical simulation modes—access follows your subscription
@@ -731,7 +773,7 @@ export default function StudentDashboardPage() {
                   <CardContent>
                     {!hasMedprepModuleAccess && !entitlementsLoading && (
                       <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-                        MedPrep AI is not included on your current plan.
+                        MedPrepAI is not included on your current plan.
                       </p>
                     )}
                     {entitlementsLoading ? (
@@ -815,8 +857,8 @@ export default function StudentDashboardPage() {
         </section>
 
         {/* Planner snapshot + AI tutor */}
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch">
+          <Card className="flex h-full flex-col border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
               <div>
                 <CardTitle className="text-base dark:text-white">Study planner snapshot</CardTitle>
@@ -905,11 +947,15 @@ export default function StudentDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 bg-gradient-to-br from-primary-50/80 to-white dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
+          <Card className="flex h-full flex-col border-slate-200 bg-gradient-to-br from-primary-50/80 to-white dark:border-white/10 dark:from-transparent dark:to-transparent dark:bg-white/5 dark:backdrop-blur-md">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/45">
-                  <Sparkles className="h-5 w-5 text-primary-700 dark:text-primary-300" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100 ring-1 ring-primary-200/70 dark:bg-primary-600/40 dark:ring-primary-500/45">
+                  <Sparkles
+                    className="h-5 w-5 text-primary-700 dark:text-primary-50"
+                    strokeWidth={2.25}
+                    aria-hidden
+                  />
                 </div>
                 <div>
                   <CardTitle className="text-base dark:text-white">AI Tutor</CardTitle>
@@ -919,8 +965,11 @@ export default function StudentDashboardPage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <Button className="bg-primary-600 text-white shadow-sm hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35" asChild>
+            <CardContent className="mt-auto">
+              <Button
+                className="w-full bg-primary-600 text-white shadow-sm hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35 sm:w-auto"
+                asChild
+              >
                 <Link href="/ai-tutor">Open AI Tutor</Link>
               </Button>
             </CardContent>
@@ -937,8 +986,10 @@ export default function StudentDashboardPage() {
               href="/achievements"
               className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-200">
-                <Trophy className="h-5 w-5" aria-hidden />
+              <span
+                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.achievements.wrap}`}
+              >
+                <Trophy className="h-5 w-5" strokeWidth={2.25} aria-hidden />
               </span>
               <span className="min-w-0 flex-1">Achievements</span>
               <ArrowRight
@@ -950,8 +1001,14 @@ export default function StudentDashboardPage() {
               href="/mock-exams"
               className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100/90 text-primary-800 dark:bg-primary-900/35 dark:text-primary-200">
-                <ClipboardCheck className="h-5 w-5" aria-hidden />
+              <span
+                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.mockExams.wrap}`}
+              >
+                <ClipboardCheck
+                  className="h-5 w-5"
+                  strokeWidth={2.25}
+                  aria-hidden
+                />
               </span>
               <span className="min-w-0 flex-1">Mock exams</span>
               <ArrowRight
@@ -963,8 +1020,10 @@ export default function StudentDashboardPage() {
               href="/study-groups"
               className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200">
-                <Users className="h-5 w-5" aria-hidden />
+              <span
+                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.studyGroups.wrap}`}
+              >
+                <Users className="h-5 w-5" strokeWidth={2.25} aria-hidden />
               </span>
               <span className="min-w-0 flex-1">Study groups</span>
               <ArrowRight
@@ -976,8 +1035,10 @@ export default function StudentDashboardPage() {
               href="/settings"
               className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-200">
-                <Settings className="h-5 w-5" aria-hidden />
+              <span
+                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.settings.wrap}`}
+              >
+                <Settings className="h-5 w-5" strokeWidth={2.25} aria-hidden />
               </span>
               <span className="min-w-0 flex-1">Settings</span>
               <ArrowRight

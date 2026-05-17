@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   Clock,
   Crown,
+  Eye,
   Gift,
   GraduationCap,
   LayoutDashboard,
@@ -58,6 +59,7 @@ const HIGHLIGHT_ICONS: Record<
   "let-me-drive": [BookOpen, Clock, Target],
   qa: [GraduationCap, MessageCircle, Sparkles],
   "ai-evaluation": [ClipboardCheck, Crown, TrendingUp],
+  "shadow-mode": [Eye, MessageCircle, Sparkles],
 };
 
 const MODE_THEME: Record<
@@ -121,6 +123,22 @@ const MODE_THEME: Record<
     resumeBadge:
       "bg-indigo-50 text-indigo-900 border-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-100 dark:border-indigo-800/50",
   },
+  "shadow-mode": {
+    topBar: "from-cyan-500 via-sky-600 to-blue-700",
+    iconWrap:
+      "bg-cyan-100 text-cyan-800 ring-cyan-200/80 dark:bg-cyan-950/45 dark:text-cyan-100 dark:ring-cyan-800/50",
+    highlightRing: "ring-cyan-100 bg-white dark:ring-white/10 dark:bg-white/5",
+    highlightIcon: "text-cyan-600 dark:text-cyan-300",
+    cardBorder: "border-cyan-100/90 dark:border-white/10",
+    cardBg:
+      "bg-gradient-to-b from-white to-cyan-50/35 dark:from-white/[0.06] dark:to-slate-950/80",
+    activeCta:
+      "bg-gradient-to-r from-cyan-600 to-sky-700 shadow-md shadow-cyan-500/20",
+    activeCtaHover:
+      "hover:from-cyan-700 hover:to-sky-800 hover:shadow-lg hover:shadow-cyan-500/25",
+    resumeBadge:
+      "bg-cyan-50 text-cyan-900 border-cyan-100 dark:bg-cyan-950/40 dark:text-cyan-100 dark:border-cyan-800/50",
+  },
 };
 
 function ModeCardIcon({ modeId }: { modeId: MedPrepModeId }) {
@@ -129,7 +147,9 @@ function ModeCardIcon({ modeId }: { modeId: MedPrepModeId }) {
       ? Stethoscope
       : modeId === "qa"
         ? BookOpen
-        : ClipboardCheck;
+        : modeId === "shadow-mode"
+          ? Eye
+          : ClipboardCheck;
   const t = MODE_THEME[modeId];
   return (
     <div
@@ -180,14 +200,12 @@ export default function MedPrepOverviewPage() {
         .catch(() => setSessions([]));
     };
     load();
-    const retry = setTimeout(load, 400);
     const onVisible = () => {
       if (document.visibilityState === "visible") load();
     };
     window.addEventListener("focus", load);
     document.addEventListener("visibilitychange", onVisible);
     return () => {
-      clearTimeout(retry);
       window.removeEventListener("focus", load);
       document.removeEventListener("visibilitychange", onVisible);
     };
@@ -216,7 +234,7 @@ export default function MedPrepOverviewPage() {
                 Clinical simulation
               </p>
               <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-100">
-                MedPrep AI
+                MedPrepAI
               </h1>
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 Pick how you want to work through cases—solo practice, guided
@@ -274,7 +292,9 @@ export default function MedPrepOverviewPage() {
                         ? "Practice"
                         : session.mode === "LEARNING"
                           ? "Learning"
-                          : "Evaluation"}
+                          : session.mode === "SHADOW"
+                            ? "Shadow"
+                            : "Evaluation"}
                     </p>
                   </Link>
                 );
@@ -292,7 +312,7 @@ export default function MedPrepOverviewPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    MedPrep AI isn&apos;t on your current plan
+                    MedPrepAI isn&apos;t on your current plan
                   </h2>
                   <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     Upgrade to unlock simulations, case generation, and usage
@@ -332,7 +352,7 @@ export default function MedPrepOverviewPage() {
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
+          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4 lg:items-stretch">
             {MEDPREP_MODES.map((mode) => {
               const row = caseLimits?.modes?.find((m) => m.slug === mode.id);
               const periodLabel =
@@ -359,7 +379,7 @@ export default function MedPrepOverviewPage() {
               return (
                 <article
                   key={mode.id}
-                  className={`relative flex flex-col overflow-x-hidden rounded-2xl border shadow-sm ring-1 ring-slate-950/[0.04] backdrop-blur-sm dark:ring-white/5 ${t.cardBorder} ${t.cardBg}`}
+                  className={`relative flex h-full flex-col overflow-x-hidden rounded-2xl border shadow-sm ring-1 ring-slate-950/[0.04] backdrop-blur-sm dark:ring-white/5 ${t.cardBorder} ${t.cardBg}`}
                 >
                   <div
                     className={`h-1.5 w-full bg-gradient-to-r ${t.topBar}`}
@@ -403,7 +423,7 @@ export default function MedPrepOverviewPage() {
                         return (
                           <li
                             key={h.title}
-                            className={`flex w-full gap-3 rounded-xl p-3.5 ring-1 ${t.highlightRing}`}
+                            className={`flex min-h-[4.5rem] w-full gap-3 rounded-xl p-3.5 ring-1 ${t.highlightRing}`}
                           >
                             <span
                               className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 dark:bg-white/10 ${t.highlightIcon}`}
@@ -449,7 +469,7 @@ export default function MedPrepOverviewPage() {
                       </p>
                     )}
 
-                    <div className="mt-6 flex flex-col gap-2 border-t border-slate-200/80 pt-6">
+                    <div className="mt-auto flex flex-col gap-2 border-t border-slate-200/80 pt-6 dark:border-white/10">
                       {!linkDisabled ? (
                         <Link
                           href={`/medprep-ai/${mode.id}`}

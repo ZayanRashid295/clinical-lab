@@ -40,7 +40,7 @@ export interface Role {
   updatedAt: string;
 }
 
-/** Roles seeded for Clinical Lab (education). */
+/** Roles seeded for MedPrepAI (education). */
 export type AppUserRole =
   | "SUPERADMIN"
   | "ADMIN"

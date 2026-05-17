@@ -31,13 +31,13 @@ export default function App() {
   return (
     <>
       <Head>
-        <title>App - Medical Lab</title>
+        <title>App - MedPrepAI</title>
         <meta name="description" content="Main application interface" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

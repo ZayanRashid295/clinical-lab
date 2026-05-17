@@ -1,6 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import {
+  FacultyAssignmentProgressStatus,
+  FacultyAssignmentStatus,
+} from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import { assignmentDueNotification } from "../faculty/faculty-notifications.util";
 import { NotificationsService } from "./notifications.service";
 
 /**
@@ -15,6 +20,8 @@ import { NotificationsService } from "./notifications.service";
  *  - SUBSCRIPTION_EXPIRING daily: any active subscription expiring in 7/3/1
  *                          days (one notification each).
  *  - SUBSCRIPTION_EXPIRED  daily: any subscription whose endDate just passed.
+ *  - ASSIGNMENT_DUE        daily: institution assignments due within 48h
+ *                          for students who have not submitted yet.
  */
 @Injectable()
 export class NotificationsScheduler {
@@ -249,5 +256,82 @@ export class NotificationsScheduler {
 
     if (sent > 0)
       this.logger.log(`Sent ${sent} subscription expiry notifications.`);
+  }
+
+  /**
+   * ASSIGNMENT_DUE — once per day, remind students about published assignments
+   * due within the next 48 hours that are not yet submitted or graded.
+   */
+  @Cron(CronExpression.EVERY_DAY_AT_8AM, { name: "faculty:assignment-due" })
+  async runAssignmentDueReminders(): Promise<void> {
+    const now = new Date();
+    const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+    const assignments = await this.prisma.facultyAssignment.findMany({
+      where: {
+        status: FacultyAssignmentStatus.PUBLISHED,
+        dueAt: { gte: now, lte: in48h },
+      },
+      select: { id: true, title: true, dueAt: true },
+      take: 200,
+    });
+
+    if (assignments.length === 0) return;
+
+    let sent = 0;
+    const startOfDay = this.startOfDay(now);
+
+    for (const assignment of assignments) {
+      if (!assignment.dueAt) continue;
+
+      const progresses = await this.prisma.facultyAssignmentProgress.findMany({
+        where: {
+          assignmentId: assignment.id,
+          status: {
+            in: [
+              FacultyAssignmentProgressStatus.NOT_STARTED,
+              FacultyAssignmentProgressStatus.IN_PROGRESS,
+              FacultyAssignmentProgressStatus.LATE,
+            ],
+          },
+        },
+        select: { studentUserId: true },
+      });
+
+      for (const { studentUserId } of progresses) {
+        const dedupeKey = `assignment:${assignment.id}:due:${startOfDay.toISOString().slice(0, 10)}`;
+        const recent = await this.prisma.notification.findMany({
+          where: {
+            userId: studentUserId,
+            type: "ASSIGNMENT_DUE",
+            createdAt: { gte: startOfDay },
+          },
+          select: { data: true },
+          take: 10,
+        });
+        if (recent.some((n) => (n.data as { dedupeKey?: string })?.dedupeKey === dedupeKey)) {
+          continue;
+        }
+
+        const payload = assignmentDueNotification({
+          assignmentId: assignment.id,
+          title: assignment.title,
+          dueAt: assignment.dueAt,
+        });
+
+        await this.notifications.emit({
+          userId: studentUserId,
+          type: payload.type,
+          title: payload.title,
+          message: payload.message,
+          data: { ...(payload.data as Record<string, unknown>), dedupeKey },
+        });
+        sent++;
+      }
+    }
+
+    if (sent > 0) {
+      this.logger.log(`Sent ${sent} assignment due reminders.`);
+    }
   }
 }

@@ -31,7 +31,7 @@ export class QueryUserDto {
   status?: "ACTIVE" | "INACTIVE";
 
   @ApiProperty({
-    description: "Filter by user role (Clinical Lab)",
+    description: "Filter by user role (MedPrepAI)",
     enum: [
       "SUPERADMIN",
       "ADMIN",

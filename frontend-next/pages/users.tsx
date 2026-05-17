@@ -30,7 +30,7 @@ export default function Users() {
   return (
     <MenuSystem
       contentRegistry={transportationContentRegistry}
-      applicationTitle="Medical Lab"
+      applicationTitle="MedPrepAI"
     />
   );
 }

@@ -21,12 +21,14 @@ export interface MedicalCase {
 }
 
 export interface ChatMessage {
-  id: string
+  id?: string
   role: "student" | "patient" | "doctor"
   content: string
   timestamp: string
   isIntervention?: boolean
   relevanceScore?: number
+  explanation?: string
+  isFollowUp?: boolean
 }
 
 export interface Conversation {
@@ -222,7 +224,26 @@ export const commonDiseases = [
   "Heart Failure",
   "Stroke",
   "Chronic Kidney Disease",
-  "Liver Cirrhosis"
+  "Liver Cirrhosis",
+  "Breast Cancer",
+  "Lung Cancer",
+  "Colon Cancer",
+  "Prostate Cancer",
+  "Melanoma",
+  "Pancreatic Cancer",
+  "Leukemia",
+  "Lymphoma",
+  "Psoriasis",
+  "Eczema",
+  "Kidney Stones",
+  "Benign Prostatic Hyperplasia",
+  "Schizophrenia",
+  "Bipolar Disorder",
+  "Crohn's Disease",
+  "Ulcerative Colitis",
+  "Epilepsy",
+  "Multiple Sclerosis",
+  "Parkinson's Disease",
 ]
 
 // Sample medical cases

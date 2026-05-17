@@ -20,7 +20,7 @@ NEXT_PUBLIC_API_URL=http://localhost:43817
 NEXT_PUBLIC_USE_MOCK_DATA=${useMockData}
 
 # Application Configuration
-NEXT_PUBLIC_APP_NAME="Ride Sharing Portal"
+NEXT_PUBLIC_APP_NAME="MedPrepAI"
 NEXT_PUBLIC_APP_VERSION="1.0.0"
 
 # Feature Flags

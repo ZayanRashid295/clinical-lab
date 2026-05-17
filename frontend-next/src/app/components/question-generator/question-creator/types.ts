@@ -17,6 +17,11 @@ export interface QuestionMetadata {
   productTagIds?: string[] // Deprecated: use categoryId
   questionId?: string | null // Optional question ID stored in metadata/tags
   tags?: string[]
+  /** Parsed labels from DOCX/Markdown before DB IDs are resolved */
+  parsedProductName?: string
+  parsedTopicName?: string
+  parsedSubtopicName?: string
+  parsedMcqTitle?: string
 }
 
 export interface QuestionCreatorData {

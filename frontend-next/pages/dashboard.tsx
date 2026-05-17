@@ -139,7 +139,7 @@ function DashboardContent() {
   return (
     <>
       <Head>
-        <title>Dashboard - Clinical Lab</title>
+        <title>Dashboard - MedPrepAI</title>
         <meta
           name="description"
           content="Main dashboard with key metrics and insights"
@@ -187,7 +187,7 @@ function DashboardContent() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Clinical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

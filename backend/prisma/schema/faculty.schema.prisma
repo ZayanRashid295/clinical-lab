@@ -1,0 +1,264 @@
+// Faculty dashboard, institution membership, assignments, and institution-scoped content
+
+enum InstitutionMemberStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum InstitutionMemberResolvedVia {
+  DOMAIN
+  INVITE
+  MANUAL
+}
+
+enum FacultyAssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum FacultyAssignmentType {
+  MEDPREP_CASE
+  MCQ_SET
+  MIXED
+}
+
+enum FacultyAssignmentItemType {
+  CASE
+  MCQ_SET
+}
+
+enum FacultyAssignmentProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+  LATE
+}
+
+enum InstitutionCaseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum StudentActivityType {
+  LOGIN
+  MEDPREP_SESSION_START
+  MEDPREP_SESSION_COMPLETE
+  QBANK_ACTIVITY
+  ASSIGNMENT_OPENED
+  ASSIGNMENT_SUBMITTED
+  MESSAGE_SENT
+}
+
+model InstitutionMember {
+  id                   String                     @id @default(cuid())
+  institutionId        String
+  userId               String                     @unique
+  status               InstitutionMemberStatus    @default(ACTIVE)
+  resolvedVia          InstitutionMemberResolvedVia @default(DOMAIN)
+  primaryFacultyUserId String?
+  joinedAt             DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId])
+  @@index([primaryFacultyUserId])
+  @@map("institution_members")
+}
+
+model FacultyProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  institutionId String
+  title         String?
+  department    String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId])
+  @@map("faculty_profiles")
+}
+
+model FacultyStudentAssignment {
+  id            String   @id @default(cuid())
+  institutionId String
+  facultyUserId String
+  studentUserId String
+  assignedAt    DateTime @default(now())
+  assignedBy    String?
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@unique([facultyUserId, studentUserId])
+  @@index([institutionId])
+  @@index([studentUserId])
+  @@map("faculty_student_assignments")
+}
+
+model StudentActivityEvent {
+  id            String              @id @default(cuid())
+  institutionId String
+  userId        String
+  type          StudentActivityType
+  summary       String?
+  metadata      Json?
+  createdAt     DateTime            @default(now())
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId, createdAt])
+  @@index([userId, createdAt])
+  @@map("student_activity_events")
+}
+
+model FacultyAssignment {
+  id                 String                  @id @default(cuid())
+  institutionId      String
+  createdByFacultyId String
+  title              String
+  instructions       String?                 @db.Text
+  type               FacultyAssignmentType   @default(MIXED)
+  status             FacultyAssignmentStatus @default(DRAFT)
+  dueAt              DateTime?
+  publishedAt        DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  institution Institution              @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  items       FacultyAssignmentItem[]
+  progress    FacultyAssignmentProgress[]
+
+  @@index([institutionId, status])
+  @@index([createdByFacultyId])
+  @@map("faculty_assignments")
+}
+
+model FacultyAssignmentItem {
+  id           String                    @id @default(cuid())
+  assignmentId String
+  itemType     FacultyAssignmentItemType
+  medprepMode  MedprepMode?
+  institutionCaseId String?
+  institutionQuestionSetId String?
+  sortOrder    Int                       @default(0)
+
+  assignment           FacultyAssignment           @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  institutionCase      InstitutionCase?            @relation(fields: [institutionCaseId], references: [id], onDelete: SetNull)
+  institutionQuestionSet InstitutionQuestionSet?   @relation(fields: [institutionQuestionSetId], references: [id], onDelete: SetNull)
+
+  @@index([assignmentId])
+  @@map("faculty_assignment_items")
+}
+
+model FacultyAssignmentProgress {
+  id             String                        @id @default(cuid())
+  assignmentId   String
+  studentUserId  String
+  status         FacultyAssignmentProgressStatus @default(NOT_STARTED)
+  score          Float?
+  conversationId String?
+  completedAt    DateTime?
+  updatedAt      DateTime                        @updatedAt
+
+  assignment FacultyAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User              @relation("FacultyAssignmentProgressStudent", fields: [studentUserId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentUserId])
+  @@index([studentUserId])
+  @@map("faculty_assignment_progress")
+}
+
+model InstitutionCase {
+  id                 String              @id @default(cuid())
+  institutionId      String
+  createdByFacultyId String
+  mode               MedprepMode
+  title              String
+  specialty          String?
+  difficulty         String?             @default("medium")
+  disease            String
+  diseaseName        String?
+  symptoms           Json                @default("[]")
+  history            Json                @default("[]")
+  labs               Json                @default("{}")
+  patientProfile     Json
+  learningObjectives String?             @db.Text
+  status             InstitutionCaseStatus @default(DRAFT)
+  publishedAt        DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  institution     Institution             @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  assignmentItems FacultyAssignmentItem[]
+
+  @@index([institutionId, mode, status])
+  @@map("institution_cases")
+}
+
+model InstitutionQuestionSet {
+  id                 String   @id @default(cuid())
+  institutionId      String
+  createdByFacultyId String
+  title              String
+  description        String?  @db.Text
+  isPublished        Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  institution     Institution             @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  questions       InstitutionQuestion[]
+  assignmentItems FacultyAssignmentItem[]
+
+  @@index([institutionId])
+  @@map("institution_question_sets")
+}
+
+model InstitutionQuestion {
+  id          String   @id @default(cuid())
+  setId       String?
+  institutionId String
+  createdByFacultyId String
+  question    String   @db.Text
+  explanation String?  @db.Text
+  choices     Json
+  difficulty  String   @default("medium")
+  tags        Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institution Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  set         InstitutionQuestionSet? @relation(fields: [setId], references: [id], onDelete: SetNull)
+
+  @@index([institutionId])
+  @@index([setId])
+  @@map("institution_questions")
+}
+
+model FacultyStudentThread {
+  id            String   @id @default(cuid())
+  institutionId String
+  facultyUserId String
+  studentUserId String
+  chatRoomId    String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  chatRoom    ChatRoom    @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+
+  @@unique([institutionId, facultyUserId, studentUserId])
+  @@index([facultyUserId])
+  @@index([studentUserId])
+  @@map("faculty_student_threads")
+}

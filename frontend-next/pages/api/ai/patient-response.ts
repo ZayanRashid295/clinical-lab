@@ -23,7 +23,8 @@ function hydrateGeminiApiKeyFromBackendEnv() {
   )
   if (!geminiKeyMatch?.[2]) return
 
-  process.env.GOOGLE_API_KEY = geminiKeyMatch[2]
+  const key = geminiKeyMatch[2].trim().replace(/^["']+|["']+$/g, "")
+  if (key) process.env.GOOGLE_API_KEY = key
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

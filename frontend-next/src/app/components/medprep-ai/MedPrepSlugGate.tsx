@@ -6,7 +6,7 @@ import useMyEntitlements from "@/hooks/useMyEntitlements";
 import { isMedprepSlugAllowed } from "@/lib/fyp/medprep-entitlements";
 
 type MedPrepSlugGateProps = {
-  /** Route id from `modes.ts`, e.g. `qa`, `let-me-drive`, `ai-evaluation`. */
+  /** Route id from `modes.ts`, e.g. `qa`, `let-me-drive`, `ai-evaluation`, `shadow-mode`. */
   slug: string;
   /** Display name for copy, e.g. "Learning Mode". */
   modeLabel: string;

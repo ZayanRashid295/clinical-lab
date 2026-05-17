@@ -3,6 +3,8 @@
  * Centralized configuration for the application
  */
 
+import { APP_DISPLAY_NAME } from "./brand";
+
 export const appConfig = {
   // API Configuration
   api: {
@@ -21,9 +23,9 @@ export const appConfig = {
 
   // Application Information
   app: {
-    name: process.env.NEXT_PUBLIC_APP_NAME || "Transportation Portal",
+    name: APP_DISPLAY_NAME,
     version: process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0",
-    description: "A comprehensive transportation management platform",
+    description: "AI-powered clinical education and case practice platform",
   },
 
   // Feature Flags

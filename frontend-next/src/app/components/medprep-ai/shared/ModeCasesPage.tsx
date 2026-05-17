@@ -24,6 +24,15 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
 import { medprepSessionService, type MedprepSession } from "@/lib/fyp/medprep-session-service"
+import {
+  assignmentStartMetadata,
+  casePurposeToMedprepMode,
+  institutionCaseToMedicalCase,
+  type InstitutionCaseRecord,
+} from "@/lib/fyp/institution-case"
+import { studentInstitutionApiService } from "@/app/services/faculty/student-institution-api.service"
+import { startMedprepSession } from "@/lib/fyp/medprep-persistence-service"
+import type { MedicalCase } from "@/lib/fyp/data-models"
 import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 import { cn } from "@/shared/utils/cn"
 import { APP_GLASS_CARD, APP_PAGE_SHELL } from "@/app/config/app-shell"
@@ -32,9 +41,21 @@ import { useUIConfigContext } from "@/shared/contexts/UIConfigContext"
 interface ModeCasesConfig {
   modeTitle: string
   chooseCaseSubtitle: string
+  /** Subtitle under the main landing title (defaults to practice-oriented copy). */
+  landingIntro?: string
+  /** Card heading for the generate path (default: "Generate New Case"). */
+  generateCardTitle?: string
+  /** Card heading for the browse path (default: "Browse Cases"). */
+  browseCardTitle?: string
+  /** Primary CTA on the generate card (default: "Create Custom Case"). */
+  generateCtaLabel?: string
+  /** Primary CTA on the browse card (default: "Explore Case Library"). */
+  browseCtaLabel?: string
   generateDescription: string
   browseDescription: string
-  casePurpose: "practice" | "learning" | "evaluation"
+  casePurpose: "practice" | "learning" | "evaluation" | "shadow"
+  /** Human-readable fragment after "Choose a case for …" (defaults to `casePurpose`). */
+  casePurposeLabel?: string
   backToModeLabel: string
   backToModeRoute: string
   routeForGeneratedCase: (caseId: string) => string
@@ -69,6 +90,13 @@ interface ModeCasesConfig {
 }
 
 export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
+  const landingIntro =
+    config.landingIntro ?? "Select how you want to practice today"
+  const generateCardTitle = config.generateCardTitle ?? "Generate New Case"
+  const browseCardTitle = config.browseCardTitle ?? "Browse Cases"
+  const generateCtaLabel = config.generateCtaLabel ?? "Create Custom Case"
+  const browseCtaLabel = config.browseCtaLabel ?? "Explore Case Library"
+
   const { config: uiConfig } = useUIConfigContext()
   const isDarkTheme = uiConfig.theme === "dark"
   const router = useRouter()
@@ -76,6 +104,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
   const [isGeneratingCase, setIsGeneratingCase] = useState(false)
   const [generationError, setGenerationError] = useState<string | null>(null)
   const [resumeSessions, setResumeSessions] = useState<MedprepSession[]>([])
+  const [institutionCases, setInstitutionCases] = useState<MedicalCase[]>([])
   const [caseFormData, setCaseFormData] = useState({
     specialty: "random",
     difficultyLevel: "intermediate",
@@ -157,7 +186,9 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
         ? "LEARNING"
         : config.casePurpose === "evaluation"
           ? "EVALUATION"
-          : "PRACTICE"
+          : config.casePurpose === "shadow"
+            ? "SHADOW"
+            : "PRACTICE"
 
     const loadResume = () => {
       const user = authService.getCurrentUser()
@@ -173,18 +204,32 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
     }
 
     loadResume()
-    const retry = window.setTimeout(loadResume, 400)
     const onVisible = () => {
       if (document.visibilityState === "visible") loadResume()
     }
     window.addEventListener("focus", loadResume)
     document.addEventListener("visibilitychange", onVisible)
     return () => {
-      clearTimeout(retry)
       window.removeEventListener("focus", loadResume)
       document.removeEventListener("visibilitychange", onVisible)
     }
   }, [config.casePurpose])
+
+  useEffect(() => {
+    if (currentStep !== "select") return
+    const mode = casePurposeToMedprepMode(config.casePurpose)
+    void studentInstitutionApiService
+      .listCases(mode)
+      .then((rows) => {
+        const list = Array.isArray(rows) ? rows : []
+        setInstitutionCases(
+          list.map((r) =>
+            institutionCaseToMedicalCase(r as InstitutionCaseRecord),
+          ),
+        )
+      })
+      .catch(() => setInstitutionCases([]))
+  }, [currentStep, config.casePurpose])
 
   const handleGenerateCase = async () => {
     setGenerationError(null)
@@ -200,7 +245,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
           forceRare: caseFormData.rareCase,
           rareProbability: caseFormData.rareCase ? 1.0 : 0.08,
           caseType: caseFormData.caseType === "any" ? "outpatient" : caseFormData.caseType,
-          useLLM: false,
+          useLLM: true,
         }),
       })
 
@@ -212,8 +257,26 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
       const data = await response.json()
       if (data.cases?.length) {
         const generatedCase = data.cases[0]
-        if (!persistGeneratedCase(generatedCase)) {
-          throw new Error("Unable to save generated case in local storage.")
+        const user = authService.getCurrentUser()
+        const userId = getClinicalUserId(user)
+        const mode =
+          config.casePurpose === "learning"
+            ? "LEARNING"
+            : config.casePurpose === "evaluation"
+              ? "EVALUATION"
+              : config.casePurpose === "shadow"
+                ? "SHADOW"
+                : "PRACTICE"
+        if (userId) {
+          const { startMedprepSession } = await import("@/lib/fyp/medprep-persistence-service")
+          await startMedprepSession({
+            userId,
+            mode,
+            caseId: generatedCase.id,
+            title: generatedCase.title,
+            isGeneratedCase: true,
+            caseSnapshot: generatedCase,
+          })
         }
         router.push(config.routeForGeneratedCase(generatedCase.id))
         return
@@ -228,10 +291,159 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
     }
   }
 
-  const handleCaseSelection = (caseId: string) => {
+  const handleCaseSelection = async (caseItem: MedicalCase) => {
     setIsGeneratingCase(true)
-    router.push(config.routeForSelectedCase(caseId))
+    try {
+      const user = authService.getCurrentUser()
+      const userId = getClinicalUserId(user)
+      const mode = casePurposeToMedprepMode(config.casePurpose)
+      const assignmentId =
+        typeof router.query.assignmentId === "string"
+          ? router.query.assignmentId
+          : undefined
+      if (userId) {
+        await startMedprepSession({
+          userId,
+          mode,
+          caseId: caseItem.id,
+          title: caseItem.title,
+          caseSnapshot: caseItem,
+          metadata: assignmentStartMetadata({
+            assignmentId,
+            institutionCaseId: caseItem.id,
+          }),
+        })
+        if (assignmentId) {
+          await studentInstitutionApiService
+            .updateAssignmentProgress(assignmentId, {
+              status: "IN_PROGRESS",
+              institutionCaseId: caseItem.id,
+            })
+            .catch(() => undefined)
+        }
+      }
+      let route = config.routeForSelectedCase(caseItem.id)
+      if (assignmentId) {
+        route += `${route.includes("?") ? "&" : "?"}assignmentId=${encodeURIComponent(assignmentId)}`
+      }
+      router.push(route)
+    } finally {
+      setIsGeneratingCase(false)
+    }
   }
+
+  const renderCaseCard = (caseItem: MedicalCase, badge?: string) => {
+    const durationLabel =
+      caseItem.difficulty === "beginner"
+        ? "~20m"
+        : caseItem.difficulty === "intermediate"
+          ? "~30m"
+          : "~45m"
+    const visibleSymptoms = caseItem.symptoms.slice(0, 3)
+    const extraCount = Math.max(caseItem.symptoms.length - 3, 0)
+    const difficultyLabel =
+      caseItem.difficulty.charAt(0).toUpperCase() +
+      caseItem.difficulty.slice(1).toLowerCase()
+
+    return (
+      <button
+        key={caseItem.id}
+        type="button"
+        onClick={() => void handleCaseSelection(caseItem)}
+        disabled={isGeneratingCase}
+        className={cn(
+          "group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl p-7 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/50 focus-visible:ring-offset-2 sm:p-8 lg:p-9 cursor-pointer",
+          isDarkTheme
+            ? "border border-white/10 bg-slate-950/75 shadow-black/30 focus-visible:ring-offset-slate-950 hover:border-white/18 hover:shadow-[0_28px_52px_-32px_rgba(0,0,0,0.45)]"
+            : "border border-primary-100 bg-white/90 shadow-[0_20px_44px_-32px_rgba(var(--color-primary-500-rgb),0.45)] hover:border-primary-300/60 hover:shadow-[0_28px_52px_-32px_rgba(var(--color-primary-500-rgb),0.52)] focus-visible:ring-offset-white",
+          isGeneratingCase && "opacity-50 pointer-events-none",
+          badge &&
+            (isDarkTheme
+              ? "border-sky-500/40 ring-1 ring-sky-500/20"
+              : "border-sky-300 ring-1 ring-sky-200"),
+        )}
+      >
+        <span
+          aria-hidden
+          className="absolute top-0 left-0 z-[1] h-[3px] w-0 bg-primary-700 transition-[width] duration-500 ease-out group-hover:w-full dark:bg-primary-400"
+        />
+        {badge ? (
+          <span className="mb-2 inline-flex w-fit rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-800 dark:bg-sky-950/60 dark:text-sky-200">
+            {badge}
+          </span>
+        ) : null}
+        <div className="flex items-start justify-between gap-3 mb-3 lg:mb-4">
+          <h3 className="pr-1 text-[17px] font-bold leading-snug text-slate-900 dark:text-slate-100 sm:text-lg lg:text-xl">
+            {caseItem.title}
+          </h3>
+          <span
+            className={`shrink-0 inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold border capitalize tracking-wide ${difficultyBadgeClass(
+              caseItem.difficulty,
+            )}`}
+          >
+            {difficultyLabel}
+          </span>
+        </div>
+        <p className="text-[13px] sm:text-sm text-gray-600 dark:text-slate-400 leading-relaxed line-clamp-3 mb-6 lg:mb-7 flex-shrink-0">
+          {caseItem.description}
+        </p>
+        <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 mb-6 lg:mb-7">
+          <div className="min-w-[4.5rem]">
+            <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
+              {caseItem.patientProfile.age}
+            </div>
+            <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
+              Age
+            </div>
+          </div>
+          <div className="min-w-[4.5rem]">
+            <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
+              {caseItem.symptoms.length}
+            </div>
+            <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
+              Symptoms
+            </div>
+          </div>
+          <div className="min-w-[4.5rem]">
+            <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
+              {durationLabel}
+            </div>
+            <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
+              Duration
+            </div>
+          </div>
+        </div>
+        <div className="mb-6 border-t border-gray-100 dark:border-white/10 lg:mb-7" />
+        <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 mb-6 text-[13px] sm:text-sm text-gray-600 dark:text-slate-400">
+          <div className="min-w-0">
+            <div className="truncate text-[14px] font-semibold text-gray-800 dark:text-slate-200">
+              {caseItem.patientProfile.name}
+            </div>
+            <div className="mt-1 truncate text-[12px] text-gray-500 dark:text-slate-400 sm:text-[13px]">
+              {caseItem.patientProfile.gender}
+            </div>
+          </div>
+          <div className="min-w-0 text-right">
+            <span className={caseSpecialtyChipClass}>{caseItem.specialty}</span>
+          </div>
+        </div>
+        <div className="mt-auto flex flex-wrap gap-2">
+          {visibleSymptoms.map((symptom) => (
+            <span key={symptom} className={caseChipClass}>
+              {symptom}
+            </span>
+          ))}
+          {extraCount > 0 ? (
+            <span className={caseChipClass}>+{extraCount} more</span>
+          ) : null}
+        </div>
+      </button>
+    )
+  }
+
+  const libraryCases = sampleCases.filter(
+    (c) => !institutionCases.some((ic) => ic.id === c.id),
+  )
 
   const generateFeatures: { label: string; icon: LucideIcon }[] = [
     { label: "Specialty selection", icon: Stethoscope },
@@ -357,18 +569,20 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                 {config.chooseCaseSubtitle}
               </h1>
               <p className="text-base text-gray-600 dark:text-slate-400">
-                Select how you want to practice today
+                {landingIntro}
               </p>
             </div>
             {resumeSessions.length > 0 ? (
-              <div className="mb-8 mx-auto max-w-5xl rounded-2xl border border-emerald-100 bg-white/85 p-4 dark:border-emerald-500/20 dark:bg-white/5 dark:backdrop-blur-md">
-                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200 mb-3">Continue where you left off</p>
-                <div className="grid gap-2 sm:grid-cols-3">
+              <div className="mb-8 mx-auto max-w-5xl rounded-2xl border border-primary-100 bg-white/85 p-4 text-left dark:border-primary-500/20 dark:bg-white/5 dark:backdrop-blur-md">
+                <p className="text-sm font-semibold text-primary-900 dark:text-primary-100">
+                  Resume ongoing simulation
+                </p>
+                <div className="mt-3 space-y-2">
                   {resumeSessions.map((session) => (
                     <Link
                       key={session.id}
                       href={medprepSessionService.getContinueUrl(session)}
-                      className="rounded-lg border border-emerald-200/80 bg-emerald-50/70 px-3 py-2 text-left text-sm font-medium text-emerald-900 transition-colors hover:border-emerald-300 hover:bg-emerald-100 hover:text-emerald-950 dark:border-emerald-500/25 dark:bg-emerald-900/35 dark:text-emerald-100 dark:hover:border-emerald-400/35 dark:hover:bg-emerald-800/85 dark:hover:text-emerald-50"
+                      className="block rounded-lg border border-primary-200/70 bg-primary-50/50 px-3 py-2 text-sm font-medium text-primary-900 shadow-sm transition-colors hover:border-primary-300/90 hover:bg-primary-100 hover:text-primary-950 dark:border-primary-500/30 dark:bg-primary-900/40 dark:text-primary-100 dark:hover:border-primary-400/35 dark:hover:bg-primary-800/85 dark:hover:text-primary-50"
                     >
                       {session.title || session.caseId || "Untitled case"}
                     </Link>
@@ -377,7 +591,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
               </div>
             ) : null}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
+            <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-6 lg:grid-cols-2">
               <div className="group relative overflow-hidden rounded-3xl border border-[#DCEFE5] bg-white/90 shadow-[0_20px_44px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_56px_-30px_rgba(16,185,129,0.5)] p-8 flex flex-col dark:border-white/10 dark:bg-white/5">
                 <span
                   aria-hidden
@@ -390,11 +604,10 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   <Sparkles className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
                 <h3 className="text-[20px] font-bold text-gray-900 dark:text-slate-100 mb-3">
-                  Generate New Case
+                  {generateCardTitle}
                 </h3>
                 <p className="text-[14px] text-gray-600 dark:text-slate-400 leading-relaxed mb-6">
-                  Create a custom AI-generated case with your preferred
-                  specialty, difficulty, and type.
+                  {config.generateDescription}
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {generateFeatures.map(({ label, icon: Icon }) => (
@@ -416,7 +629,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   style={themedSolidButton}
                   className="w-full text-white rounded-xl py-6 text-[15px] font-semibold hover:opacity-95 hover:brightness-105 transition-all duration-200"
                 >
-                  Create Custom Case
+                  {generateCtaLabel}
                 </Button>
               </div>
 
@@ -432,11 +645,10 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   <FileText className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
                 <h3 className="text-[20px] font-bold text-gray-900 dark:text-slate-100 mb-3">
-                  Browse Cases
+                  {browseCardTitle}
                 </h3>
                 <p className="text-[14px] text-gray-600 dark:text-slate-400 leading-relaxed mb-6">
-                  Explore pre-built cases across multiple specialties and
-                  difficulty levels.
+                  {config.browseDescription}
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {browseFeatures.map(({ label, icon: Icon }) => (
@@ -458,7 +670,7 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
                   variant="outline"
                   className="w-full rounded-xl border-2 border-primary bg-white py-6 text-[15px] font-semibold text-primary transition-all duration-200 hover:bg-primary/5 dark:border-primary/40 dark:bg-white/10 dark:hover:bg-white/15"
                 >
-                  Explore Case Library
+                  {browseCtaLabel}
                 </Button>
               </div>
             </div>
@@ -719,142 +931,23 @@ export function ModeCasesPage({ config }: { config: ModeCasesConfig }) {
             </div>
           )}
 
-          {renderPageHeader("Select Case", `Choose a case for ${config.casePurpose}`, "muted")}
+          {renderPageHeader(
+            "Select Case",
+            `Choose a case for ${config.casePurposeLabel ?? config.casePurpose}`,
+            "muted"
+          )}
 
           <div className={`relative py-8 md:py-10 lg:py-12 ${pageFrameClass}`}>
+            {institutionCases.length > 0 ? (
+              <p className="mb-4 text-sm font-semibold text-sky-800 dark:text-sky-200">
+                Cases from your institution ({institutionCases.length})
+              </p>
+            ) : null}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7 lg:gap-8 xl:gap-10 auto-rows-fr">
-              {sampleCases.map((caseItem) => {
-                const durationLabel =
-                  caseItem.difficulty === "beginner"
-                    ? "~20m"
-                    : caseItem.difficulty === "intermediate"
-                      ? "~30m"
-                      : "~45m"
-                const visibleSymptoms = caseItem.symptoms.slice(0, 3)
-                const extraCount = Math.max(caseItem.symptoms.length - 3, 0)
-                const difficultyLabel =
-                  caseItem.difficulty.charAt(0).toUpperCase() + caseItem.difficulty.slice(1).toLowerCase()
-
-                return (
-                  <button
-                    key={caseItem.id}
-                    type="button"
-                    onClick={() => handleCaseSelection(caseItem.id)}
-                    disabled={isGeneratingCase}
-                    className={cn(
-                      "group relative flex h-full min-h-[320px] flex-col overflow-hidden text-left rounded-3xl p-7 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/50 focus-visible:ring-offset-2 sm:p-8 lg:p-9 cursor-pointer",
-                      isDarkTheme
-                        ? "border border-white/10 bg-slate-950/75 shadow-black/30 focus-visible:ring-offset-slate-950 hover:border-white/18 hover:shadow-[0_28px_52px_-32px_rgba(0,0,0,0.45)]"
-                        : "border border-primary-100 bg-white/90 shadow-[0_20px_44px_-32px_rgba(var(--color-primary-500-rgb),0.45)] hover:border-primary-300/60 hover:shadow-[0_28px_52px_-32px_rgba(var(--color-primary-500-rgb),0.52)] focus-visible:ring-offset-white",
-                      isGeneratingCase && "opacity-50 pointer-events-none"
-                    )}
-                  >
-                    {/* Animated primary-tinted top bar (L → R on hover) */}
-                    <span
-                      aria-hidden
-                      className="absolute top-0 left-0 z-[1] h-[3px] w-0 bg-primary-700 transition-[width] duration-500 ease-out group-hover:w-full dark:bg-primary-400"
-                    />
-
-                    {/* Title row */}
-                    <div className="flex items-start justify-between gap-3 mb-3 lg:mb-4">
-                      <h3 className="pr-1 text-[17px] font-bold leading-snug text-slate-900 dark:text-slate-100 sm:text-lg lg:text-xl">
-                        {caseItem.title}
-                      </h3>
-                      <span
-                        className={`shrink-0 inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold border capitalize tracking-wide ${difficultyBadgeClass(
-                          caseItem.difficulty
-                        )}`}
-                      >
-                        {difficultyLabel}
-                      </span>
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-[13px] sm:text-sm text-gray-600 dark:text-slate-400 leading-relaxed line-clamp-3 mb-6 lg:mb-7 flex-shrink-0">
-                      {caseItem.description}
-                    </p>
-
-                    {/* Stats row — large forest green numbers, spread across card */}
-                    <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 mb-6 lg:mb-7">
-                      <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
-                          {caseItem.patientProfile.age}
-                        </div>
-                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
-                          Age
-                        </div>
-                      </div>
-                      <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
-                          {caseItem.symptoms.length}
-                        </div>
-                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
-                          Symptoms
-                        </div>
-                      </div>
-                      <div className="min-w-[4.5rem]">
-                        <div className="text-[26px] font-bold leading-none tabular-nums tracking-tight text-primary-700 dark:text-primary-300 sm:text-3xl lg:text-[32px]">
-                          {durationLabel}
-                        </div>
-                        <div className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500 sm:text-xs mt-2">
-                          Duration
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-6 border-t border-gray-100 dark:border-white/10 lg:mb-7" />
-
-                    {/* Patient profile */}
-                    <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 mb-6 text-[13px] sm:text-sm text-gray-600 dark:text-slate-400">
-                      <div className="min-w-0">
-                        <div className="truncate text-[14px] font-semibold text-gray-800 dark:text-slate-200">
-                          {caseItem.patientProfile.name}
-                        </div>
-                        <div className="mt-1 truncate text-[12px] text-gray-500 dark:text-slate-400 sm:text-[13px]">
-                          {caseItem.patientProfile.gender}
-                        </div>
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-[14px] font-semibold text-gray-800 dark:text-slate-200">
-                          Age: {caseItem.patientProfile.age}
-                        </div>
-                        <div className="mt-1 truncate text-[12px] text-gray-500 dark:text-slate-400 sm:text-[13px]">
-                          {caseItem.patientProfile.occupation}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Symptom tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {visibleSymptoms.map((symptom, index) => (
-                        <span key={index} className={caseChipClass}>
-                          {symptom}
-                        </span>
-                      ))}
-                      {extraCount > 0 && (
-                        <span className={caseChipClass}>+{extraCount} more</span>
-                      )}
-                    </div>
-
-                    {/* Footer row */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-50 pt-5 dark:border-white/10">
-                      <span className={caseSpecialtyChipClass}>{caseItem.specialty}</span>
-                      {caseItem.isRare ? (
-                        <span
-                          className={cn(
-                            "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-[11px] font-semibold sm:text-xs",
-                            isDarkTheme
-                              ? "border border-red-500/40 bg-red-950/70 text-red-100"
-                              : "border border-red-200 bg-red-50 text-red-700"
-                          )}
-                        >
-                          Rare
-                        </span>
-                      ) : null}
-                    </div>
-                  </button>
-                )
-              })}
+              {institutionCases.map((caseItem) =>
+                renderCaseCard(caseItem, "Your institution"),
+              )}
+              {libraryCases.map((caseItem) => renderCaseCard(caseItem))}
             </div>
 
             <div className="text-center mt-14 pb-10 md:pb-12">

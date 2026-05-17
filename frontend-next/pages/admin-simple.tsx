@@ -284,14 +284,14 @@ export default function AdminSimplePage() {
   return (
     <>
       <Head>
-        <title>Administration - Medical Lab</title>
+        <title>Administration - MedPrepAI</title>
         <meta
           name="description"
           content="System administration and management"
         />
       </Head>
       <MenuSystem
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
         customContent={customContent}
       />
     </>

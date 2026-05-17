@@ -32,6 +32,8 @@ import { StudyGroupsModule } from "./modules/study-groups/study-groups.module";
 import { GoalsModule } from "./modules/goals/goals.module";
 import { FeedbackModule } from "./modules/feedback/feedback.module";
 import { QuestionReportsModule } from "./modules/question-reports/question-reports.module";
+import { InstitutionModule } from "./modules/institution/institution.module";
+import { FacultyModule } from "./modules/faculty/faculty.module";
 
 @Module({
   imports: [
@@ -69,6 +71,8 @@ import { QuestionReportsModule } from "./modules/question-reports/question-repor
     GoalsModule,
     FeedbackModule,
     QuestionReportsModule,
+    InstitutionModule,
+    FacultyModule,
   ],
 })
 export class AppModule {}

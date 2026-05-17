@@ -13,7 +13,6 @@ import { learningService } from "@/lib/fyp/learning-service"
 import { getClinicalUserId } from "@/lib/fyp/medprep-user"
 import { authService } from "@/shared/services/auth.service"
 import { databaseConversationService } from "@/lib/fyp/database-conversation-service"
-import { caseProgressService } from "@/lib/fyp/case-progress-service"
 import { 
   ArrowLeft, Play, Pause, MessageCircle, FileText, User, Users, Stethoscope, 
   HelpCircle, Clock, CheckCircle, AlertCircle, AlertTriangle, Sparkles, BookOpen, 
@@ -462,15 +461,9 @@ export function LearningInterface({
 
   useEffect(() => {
     if (!hasLoadedSession) {
-      if (!hydratedFromDatabase) {
-        const savedSession = learningService.getLearningSession(session.id)
-        if (savedSession && savedSession.conversation.length > 0 && !savedSession.isComplete) {
-          setShowResumePrompt(true)
-        }
-      }
       setHasLoadedSession(true)
     }
-  }, [session.id, hasLoadedSession, hydratedFromDatabase])
+  }, [session.id, hasLoadedSession])
 
   useEffect(() => {
     soapSyncedConversationFingerprintRef.current = null
@@ -573,30 +566,30 @@ export function LearningInterface({
     }
   }, [session, hasLoadedSession])
 
+  const activeCaseIdRef = useRef<string | null>(null)
+
+  // Clear conversation only when navigating to a different case (not on every message).
+  // getLearningSession() no longer reads localStorage, so we must not treat "no cache" as stale.
   useEffect(() => {
-    console.log("useEffect triggered - session.caseId:", session.caseId, "session.id:", session.id, "lastResumedSessionId:", lastResumedSessionId.current)
-    
-    // Don't reset conversation if we just resumed this session
     if (lastResumedSessionId.current === session.id) {
-      console.log("Skipping conversation reset - session was just resumed")
       lastResumedSessionId.current = null
       return
     }
-    
-    // Only reset conversation if we're starting a completely new case
-    // Check if there's a saved session with conversation history
-    const savedSession = learningService.getLearningSession(session.id)
-    console.log("Saved session exists:", !!savedSession, "Saved conversation length:", savedSession?.conversation?.length || 0)
-    
-    if (session.conversation.length > 0 && (!savedSession || savedSession.conversation.length === 0)) {
-      console.log("Resetting conversation for new case")
-      const resetSession = {
+
+    const previousCaseId = activeCaseIdRef.current
+    activeCaseIdRef.current = session.caseId
+
+    if (
+      previousCaseId !== null &&
+      previousCaseId !== session.caseId &&
+      session.conversation.length > 0
+    ) {
+      onSessionUpdate({
         ...session,
         conversation: [],
         isComplete: false,
         soapNote: undefined,
-      }
-      onSessionUpdate(resetSession)
+      })
     }
   }, [onSessionUpdate, session, session.caseId, session.id])
 
@@ -916,46 +909,33 @@ export function LearningInterface({
     }
   }
 
-  const handleResume = () => {
-    const savedSession = learningService.getLearningSession(session.id)
-    if (savedSession) {
-      lastResumedSessionId.current = savedSession.id
-      
-      // Restore patient information if available
-      if (savedSession.patientInfo) {
-        setPatientInfo(savedSession.patientInfo)
+  const handleResume = async () => {
+    const userId = session.studentId?.trim()
+    const conversationId = session.conversationId?.trim()
+    if (userId && conversationId) {
+      try {
+        const fromDb = await learningService.getLearningSessionFromDatabase(
+          conversationId,
+          userId,
+          medicalCase,
+        )
+        if (fromDb) {
+          lastResumedSessionId.current = fromDb.id
+          if (fromDb.patientInfo) setPatientInfo(fromDb.patientInfo)
+          if (fromDb.vitalSigns) setVitalSigns(fromDb.vitalSigns)
+          if (fromDb.uiState) {
+            setActivePatientInfoSection(fromDb.uiState.activePatientInfoSection || "demographics")
+            setActiveNurseReportSection(fromDb.uiState.activeNurseReportSection || "chiefComplaint")
+            setActiveTab(fromDb.uiState.activeTab || "conversation")
+            if (fromDb.uiState.collapsedSections) {
+              setCollapsedSections((prev) => ({ ...prev, ...fromDb.uiState!.collapsedSections }))
+            }
+          }
+          onSessionUpdate(fromDb)
+        }
+      } catch (error) {
+        console.error("Error resuming learning session:", error)
       }
-      
-      // Restore vital signs if available
-      if (savedSession.vitalSigns) {
-        setVitalSigns(savedSession.vitalSigns)
-      }
-      
-      // Restore UI state if available
-      if (savedSession.uiState) {
-        setActivePatientInfoSection(savedSession.uiState.activePatientInfoSection || 'demographics')
-        setActiveNurseReportSection(savedSession.uiState.activeNurseReportSection || 'chiefComplaint')
-        setActiveTab(savedSession.uiState.activeTab || 'conversation')
-        setCollapsedSections(savedSession.uiState.collapsedSections || {
-          demographics: false,
-          medicalHistory: false,
-          socialHistory: false,
-          familyHistory: false,
-          chiefComplaint: false,
-          presentingSymptoms: false,
-          vitalSigns: false,
-          clinicalNotes: false,
-          initialAssessment: false,
-          learningGuidelines: false,
-          clinicalTips: false,
-          keyAreas: false,
-          redFlags: false,
-          sessionProgress: false
-        })
-      }
-      
-      console.log("Resuming session with conversation length:", savedSession.conversation.length)
-      onSessionUpdate(savedSession)
     }
     setShowResumePrompt(false)
   }
@@ -2382,26 +2362,26 @@ export function LearningInterface({
                           </div>
                         </div>
                         {showConversationInsights && message.explanation && (
-                            <div className="ml-13 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 p-4 dark:border-primary-400 dark:!bg-primary-950/45">
+                            <div className="ml-13 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 dark:border-amber-400/70 dark:bg-slate-800/95 dark:shadow-inner dark:shadow-black/20">
                               <div className="mb-2 flex items-center">
-                                <Lightbulb className="mr-2 h-4 w-4 text-primary-600 dark:text-primary-300" />
-                                <span className="text-sm font-semibold text-primary-700 dark:text-primary-200">Learning Insight</span>
+                                <Lightbulb className="mr-2 h-4 w-4 text-amber-600 dark:text-amber-300" />
+                                <span className="text-sm font-semibold text-amber-900 dark:text-amber-200">Learning Insight</span>
                             </div>
-                              <div className="prose prose-sm max-w-none text-sm leading-relaxed text-primary-900 dark:text-primary-100">
+                              <div className="prose prose-sm max-w-none text-sm leading-relaxed text-amber-950 dark:prose-invert dark:text-slate-200">
                                 <ReactMarkdown
                                   remarkPlugins={[remarkGfm]}
                                   components={{
-                                    p: ({ children }) => <p className="mb-2 text-left last:mb-0">{children}</p>,
-                                    h1: ({ children }) => <h1 className="mb-2 text-left text-lg font-bold">{children}</h1>,
-                                    h2: ({ children }) => <h2 className="mb-2 text-left text-base font-semibold">{children}</h2>,
-                                    h3: ({ children }) => <h3 className="mb-1 text-left text-sm font-semibold">{children}</h3>,
-                                    ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-left">{children}</ul>,
-                                    ol: ({ children }) => <ol className="mb-2 list-inside list-decimal space-y-1 text-left">{children}</ol>,
-                                    li: ({ children }) => <li className="text-left text-sm">{children}</li>,
-                                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                    em: ({ children }) => <em className="italic">{children}</em>,
-                                    code: ({ children }) => <code className="rounded bg-primary-500/15 px-1 py-0.5 font-mono text-xs dark:bg-primary-500/20">{children}</code>,
-                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-primary-300 pl-2 italic dark:border-primary-500/40">{children}</blockquote>
+                                    p: ({ children }) => <p className="mb-2 text-left last:mb-0 text-amber-950 dark:text-slate-200">{children}</p>,
+                                    h1: ({ children }) => <h1 className="mb-2 text-left text-lg font-bold text-amber-950 dark:text-slate-100">{children}</h1>,
+                                    h2: ({ children }) => <h2 className="mb-2 text-left text-base font-semibold text-amber-950 dark:text-slate-100">{children}</h2>,
+                                    h3: ({ children }) => <h3 className="mb-1 text-left text-sm font-semibold text-amber-950 dark:text-slate-100">{children}</h3>,
+                                    ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-left text-amber-950 dark:text-slate-200">{children}</ul>,
+                                    ol: ({ children }) => <ol className="mb-2 list-inside list-decimal space-y-1 text-left text-amber-950 dark:text-slate-200">{children}</ol>,
+                                    li: ({ children }) => <li className="text-left text-sm text-amber-950 dark:text-slate-200">{children}</li>,
+                                    strong: ({ children }) => <strong className="font-semibold text-amber-950 dark:text-white">{children}</strong>,
+                                    em: ({ children }) => <em className="italic text-amber-900 dark:text-slate-300">{children}</em>,
+                                    code: ({ children }) => <code className="rounded bg-amber-200/60 px-1 py-0.5 font-mono text-xs text-amber-950 dark:bg-slate-700 dark:text-amber-100">{children}</code>,
+                                    blockquote: ({ children }) => <blockquote className="border-l-2 border-amber-400 pl-2 italic text-amber-900 dark:border-amber-500/50 dark:text-slate-300">{children}</blockquote>
                                   }}
                                 >
                                   {message.explanation}

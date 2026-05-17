@@ -49,6 +49,10 @@ model User {
 
   // Institution management
   institutionManager InstitutionManager?
+  institutionMember  InstitutionMember?
+  facultyProfile     FacultyProfile?
+  facultyAssignmentProgress FacultyAssignmentProgress[] @relation("FacultyAssignmentProgressStudent")
+  studentActivityEvents     StudentActivityEvent[]
 
   // Launch modules (community + support)
   discussionsAuthored Discussion[]      @relation("DiscussionAuthor")
@@ -198,19 +202,31 @@ model SystemSettings {
 }
 
 model Institution {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  address     String?
-  phone       String?
-  email       String?
-  website     String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  name                    String   @unique
+  description             String?
+  address                 String?
+  phone                   String?
+  email                   String?
+  website                 String?
+  emailDomains            Json     @default("[]")
+  requireInstitutionMatch Boolean  @default(false)
+  settings                Json?
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   // Relations
-  managers InstitutionManager[]
+  managers                InstitutionManager[]
+  members                 InstitutionMember[]
+  facultyProfiles         FacultyProfile[]
+  facultyStudentAssignments FacultyStudentAssignment[]
+  activityEvents          StudentActivityEvent[]
+  assignments             FacultyAssignment[]
+  cases                   InstitutionCase[]
+  questionSets            InstitutionQuestionSet[]
+  questions               InstitutionQuestion[]
+  facultyThreads          FacultyStudentThread[]
 
   @@map("institutions")
 }

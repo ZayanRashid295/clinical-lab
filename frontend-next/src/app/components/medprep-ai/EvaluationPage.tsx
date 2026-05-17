@@ -19,6 +19,7 @@ import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownCon
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { authService } from "@/shared/services/auth.service"
+import { trimMedprepConversationIdQuery } from "@/lib/fyp/medprep-session-merge"
 
 const AVAILABLE_MODELS = [
   { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Fast Gemini model", provider: "gemini" },
@@ -764,8 +765,7 @@ function EvaluationPageContent({
 
   useEffect(() => {
     if (!router.isReady) return
-    const conversationId =
-      typeof router.query.conversationId === "string" ? router.query.conversationId : undefined
+    const conversationId = trimMedprepConversationIdQuery(router.query.conversationId)
     if (!conversationId || hasResumedFromSession) return
 
     const hydrateFromSession = async () => {

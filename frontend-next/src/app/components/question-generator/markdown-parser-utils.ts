@@ -1,4 +1,10 @@
-import { parseTagsFromString, parseTagsFromYamlLine, parseKeywordBlock, extractSystemFirstSegment } from "./parse-metadata-utils"
+import {
+  parseTagsFromString,
+  parseTagsFromYamlLine,
+  parseKeywordBlock,
+  extractSystemFirstSegment,
+  parseHierarchyLabelLine,
+} from "./parse-metadata-utils"
 
 /**
  * Normalize question stem so the doc is parsed exactly:
@@ -131,45 +137,26 @@ export function parseMarkdown(content: string): ParsedQuestion {
   while (i < lines.length) {
     const line = lines[i].trim()
 
-    // Extract hierarchy metadata lines from the new format.
-    // These may appear as plain lines and should override looser fallbacks.
-    const categoryMatch = line.match(/^Category:\s*(.+)/i)
-    if (categoryMatch) {
-      const category = categoryMatch[1].trim()
-      questionData.category = category
-      questionData.subject = category
-      i++
-      continue
-    }
-    const productMatch = line.match(/^Product:\s*(.+)/i)
-    if (productMatch) {
-      const product = productMatch[1].trim()
-      questionData.product = product
-      questionData.productId = product
-      i++
-      continue
-    }
-    const systemLineMatch = line.match(/^System:\s*(.+)/i)
-    if (systemLineMatch) {
-      questionData.system = extractSystemFirstSegment(systemLineMatch[1].trim())
-      i++
-      continue
-    }
-    const topicLineMatch = line.match(/^Topic:\s*(.+)/i)
-    if (topicLineMatch) {
-      questionData.topic = topicLineMatch[1].trim()
-      i++
-      continue
-    }
-    const subtopicLineMatch = line.match(/^Sub-?Topic:\s*(.+)/i)
-    if (subtopicLineMatch) {
-      questionData.subtopic = subtopicLineMatch[1].trim()
-      i++
-      continue
-    }
-    const mcqTitleMatch = line.match(/^MCQ\s*Title:\s*(.+)/i)
-    if (mcqTitleMatch) {
-      questionData.title = mcqTitleMatch[1].trim()
+    // Extract hierarchy metadata lines (plain or **Label:** value).
+    const hierarchyLine = parseHierarchyLabelLine(line)
+    if (hierarchyLine) {
+      const label = hierarchyLine.label.toLowerCase().replace(/\s+/g, "")
+      const value = hierarchyLine.value
+      if (label === "category") {
+        questionData.category = value
+        questionData.subject = value
+      } else if (label === "product") {
+        questionData.product = value
+        questionData.productId = value
+      } else if (label === "system") {
+        questionData.system = extractSystemFirstSegment(value)
+      } else if (label === "topic") {
+        questionData.topic = value
+      } else if (label === "subtopic" || label === "sub-topic") {
+        questionData.subtopic = value
+      } else if (label === "mcqtitle") {
+        questionData.title = value
+      }
       i++
       continue
     }

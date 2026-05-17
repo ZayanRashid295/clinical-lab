@@ -1,5 +1,80 @@
 import type { ConversationContext } from "./data-models"
-import { BEST_GEMINI_MODEL, runNewGemini } from "./llm-gemini"
+import {
+  BEST_GEMINI_MODEL,
+  GEMINI_TURN_MODEL,
+  hasGeminiApiKey,
+  runNewGemini,
+} from "./llm-gemini"
+
+function evaluateStudentQuestionHeuristic(studentQuestion: string): AIResponse {
+  const q = studentQuestion.trim()
+  if (q.length < 4) {
+    return {
+      content: "Please ask a complete clinical question so we can gather useful history.",
+      confidence: 0.55,
+      shouldIntervene: true,
+      interventionReason: "Question is too short to guide the interview.",
+    }
+  }
+  const vagueOnly = /^(hi|hello|hey|ok|okay|yes|no|thanks|thank you)\.?$/i
+  if (vagueOnly.test(q)) {
+    return {
+      content: "Try an open-ended clinical question about symptoms, timing, or associated features.",
+      confidence: 0.55,
+      shouldIntervene: true,
+      interventionReason: "This does not advance the clinical interview.",
+    }
+  }
+  return {
+    content: "Good question — continue building the history.",
+    confidence: 0.65,
+    shouldIntervene: false,
+  }
+}
+
+function generatePatientResponseHeuristic(
+  studentQuestion: string,
+  context: ConversationContext,
+): AIResponse {
+  const q = studentQuestion.toLowerCase()
+  const symptom = context.symptoms?.[0] || "my symptoms"
+  const name = context.patientProfile?.name?.split(" ")[0] || "I"
+
+  if (/when|start|begin|onset|how long/.test(q)) {
+    return {
+      content: `They started a few days ago — the ${symptom.toLowerCase()} came on gradually and has been bothering me since.`,
+      confidence: 0.55,
+    }
+  }
+  if (/pain|hurt|severe|scale|bad|worse/.test(q)) {
+    return {
+      content: `It's uncomfortable — I'd say moderate most of the time, and it can feel worse with activity.`,
+      confidence: 0.55,
+    }
+  }
+  if (/medication|medicine|drug|allerg/.test(q)) {
+    return {
+      content: "I'm not on any regular prescriptions that I can think of, and I don't have known drug allergies.",
+      confidence: 0.55,
+    }
+  }
+  if (/family|smoke|alcohol|travel|work/.test(q)) {
+    return {
+      content: "Nothing major stands out in my family history for this, but I'm happy to go through details if you need.",
+      confidence: 0.55,
+    }
+  }
+  if (/name|who are you/.test(q)) {
+    return {
+      content: `I'm ${name}. Thanks for seeing me today.`,
+      confidence: 0.55,
+    }
+  }
+  return {
+    content: `Mainly I've had ${symptom.toLowerCase()}. What else would you like to know?`,
+    confidence: 0.55,
+  }
+}
 
 export interface AIResponse {
   content: string
@@ -43,7 +118,9 @@ class AIService {
   }
 
   async generatePatientResponse(studentQuestion: string, context: ConversationContext): Promise<AIResponse> {
-    this.checkAPIKey()
+    if (!hasGeminiApiKey()) {
+      return generatePatientResponseHeuristic(studentQuestion, context)
+    }
 
     const { disease, symptoms, patientProfile, conversationHistory } = context
 
@@ -52,7 +129,7 @@ class AIService {
 
     try {
       const text = await runNewGemini(
-        BEST_GEMINI_MODEL,
+        GEMINI_TURN_MODEL,
         `You are a patient with ${disease}. You are the TRUTH SOURCE - you know your exact condition and all associated symptoms, history, and lab results.
 
 Your profile:
@@ -88,21 +165,23 @@ Respond as the patient with ${disease}. Keep it brief, natural, and to the point
         confidence: 0.9,
       }
     } catch (error) {
-      console.error("Error generating patient response:", error)
-      throw error
+      console.warn("Gemini patient response failed; using heuristic fallback:", error)
+      return generatePatientResponseHeuristic(studentQuestion, context)
     }
   }
 
   async evaluateStudentQuestion(studentQuestion: string, context: ConversationContext): Promise<AIResponse> {
-    this.checkAPIKey()
+    if (!hasGeminiApiKey()) {
+      return evaluateStudentQuestionHeuristic(studentQuestion)
+    }
 
-    const { disease, conversationHistory } = context
+    const { conversationHistory } = context
 
     const conversationContext = conversationHistory.map((msg) => `${msg.role}: ${msg.content}`).join("\n")
 
     try {
       const text = await runNewGemini(
-        BEST_GEMINI_MODEL,
+        GEMINI_TURN_MODEL,
         `You are an experienced medical supervisor evaluating a medical student's question. 
 
 IMPORTANT: You do NOT know the patient's diagnosis. You are evaluating the student's clinical reasoning and questioning approach based on the conversation so far.
@@ -136,8 +215,8 @@ Is this question appropriate for gathering diagnostic information and demonstrat
         interventionReason: shouldIntervene ? content : undefined,
       }
     } catch (error) {
-      console.error("Error evaluating student question:", error)
-      throw error
+      console.warn("Gemini question evaluation failed; using heuristic fallback:", error)
+      return evaluateStudentQuestionHeuristic(studentQuestion)
     }
   }
 

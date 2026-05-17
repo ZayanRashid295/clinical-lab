@@ -26,6 +26,8 @@ import {
   Trophy,
   CreditCard,
   ShieldAlert,
+  GraduationCap,
+  ClipboardList,
 } from "lucide-react";
 import {
   launchNotificationsService,
@@ -35,6 +37,7 @@ import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
 import { useRealtimeEvent } from "@/app/services/realtime/use-realtime-room";
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent";
+import { getNotificationRoute } from "@/lib/notifications/notification-routes";
 
 function timeAgo(iso: string): string {
   const d = new Date(iso);
@@ -120,26 +123,8 @@ export default function NotificationsPage() {
 
   const onClick = (n: AppNotification) => {
     if (!n.isRead) onMark(n.id).catch(() => undefined);
-    const data: any = n.data || {};
-    if (n.type === "DISCUSSION_REPLY" && data.discussionId) {
-      router.push(`/discussions/${data.discussionId}`);
-    } else if (n.type === "STUDY_GROUP_POST" && data.groupId) {
-      router.push(`/study-groups/${data.groupId}`);
-    } else if (n.type === "FEEDBACK_REPLY" && data.ticketId) {
-      router.push(`/feedback/${data.ticketId}`);
-    } else if (n.type === "FEEDBACK_TICKET_CREATED" && data.ticketId) {
-      router.push(`/feedback/${data.ticketId}`);
-    } else if (n.type === "MOCK_EXAM_RESULT") {
-      router.push(`/mock-exams`);
-    } else if (n.type === "GOAL_COMPLETED" || n.type === "GOAL_PROGRESS") {
-      router.push(`/goals`);
-    } else if (n.type === "ACHIEVEMENT_UNLOCKED" || n.type === "STREAK_MILESTONE") {
-      router.push(`/achievements`);
-    } else if (n.type === "QUESTION_REPORT_UPDATE" || n.type === "QUESTION_REPORT_CREATED") {
-      router.push(`/my-reports`);
-    } else if (n.type === "SUBSCRIPTION_EXPIRING" || n.type === "SUBSCRIPTION_EXPIRED") {
-      router.push(`/subscriptions`);
-    }
+    const target = getNotificationRoute(n);
+    if (target) router.push(target);
   };
 
   const unread = items.filter((n) => !n.isRead).length;
@@ -152,7 +137,7 @@ export default function NotificationsPage() {
             <Bell className="text-emerald-600" /> Notifications
           </h1>
           <p className="text-muted-foreground mt-1">
-            Stay on top of replies, achievements and study reminders.
+            Faculty assignments, messages, achievements, and study reminders.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -230,6 +215,9 @@ export default function NotificationsPage() {
                             return <Trophy className={cls} />;
                           if (t.startsWith("GOAL")) return <Target className={cls} />;
                           if (t.startsWith("SUBSCRIPTION")) return <CreditCard className={cls} />;
+                          if (t === "FACULTY_MESSAGE") return <GraduationCap className={cls} />;
+                          if (t === "ASSIGNMENT_PUBLISHED" || t === "ASSIGNMENT_DUE")
+                            return <ClipboardList className={cls} />;
                           if (t.includes("SECURITY")) return <ShieldAlert className={cls} />;
                           return <Sparkles className={cls} />;
                         })()}

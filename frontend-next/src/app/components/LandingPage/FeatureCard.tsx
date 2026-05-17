@@ -15,14 +15,12 @@ export function FeatureCard({
   description,
 }: FeatureCardProps) {
   return (
-    <Card className="p-6 hover:bg-accent/50 transition-all bg-card border-border">
-      <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-        <Icon className="h-6 w-6 text-primary" />
+    <Card className="border-white/10 bg-white/[0.03] p-6 transition-all hover:border-primary-500/30 hover:bg-white/[0.06]">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/15">
+        <Icon className="h-6 w-6 text-primary-400" />
       </div>
-      <h3 className="text-xl font-semibold mb-2 text-card-foreground">
-        {title}
-      </h3>
-      <p className="text-muted-foreground">{description}</p>
+      <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+      <p className="text-sm leading-relaxed text-slate-400">{description}</p>
     </Card>
   );
 }

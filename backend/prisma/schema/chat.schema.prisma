@@ -13,6 +13,7 @@ model ChatRoom {
   participants ChatParticipant[]
   messages     ChatMessage[]
   readStatus   ChatReadStatus[]
+  facultyThread FacultyStudentThread?
 
   @@map("chat_rooms")
 }
@@ -89,6 +90,7 @@ enum ChatType {
   GROUP
   SUPPORT
   RIDE
+  FACULTY_STUDENT
 }
 
 enum ChatRole {

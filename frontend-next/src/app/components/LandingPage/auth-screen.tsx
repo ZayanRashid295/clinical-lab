@@ -18,6 +18,7 @@ import { cn } from "@/shared/utils/cn";
 import { authService } from "@/shared/services/auth.service";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
 import { useRouter } from "next/router";
+import { routeAfterLogin } from "@/lib/auth/post-login-route";
 
 export type AuthModalView = "login" | "signup";
 
@@ -69,9 +70,10 @@ export function AuthScreen({
   const afterAuthSuccess = () => {
     if (pendingPackageId) {
       router.replace(`/checkout-basic?packageId=${encodeURIComponent(pendingPackageId)}`);
-    } else {
-      router.replace("/");
+      return;
     }
+    const user = authService.getCurrentUser() as { roles?: string[] } | null;
+    router.replace(routeAfterLogin(user?.roles));
   };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -80,8 +82,13 @@ export function AuthScreen({
     setIsLoading(true);
 
     try {
-      await authService.login(email, password);
-      afterAuthSuccess();
+      const result = await authService.login(email, password);
+      if (pendingPackageId) {
+        router.replace(`/checkout-basic?packageId=${encodeURIComponent(pendingPackageId)}`);
+        return;
+      }
+      const roles = (result?.user as { roles?: string[] })?.roles;
+      router.replace(routeAfterLogin(roles));
     } catch (err) {
       setError(getApiErrorMessage(err, "Sign-in failed. Check your details and try again."));
     } finally {
@@ -180,7 +187,7 @@ export function AuthScreen({
         <div className="relative z-[1] w-full max-w-xl text-center lg:max-w-lg lg:text-left">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-teal-100/95 shadow-sm backdrop-blur-md">
             <Sparkles className="h-3.5 w-3.5 text-teal-300" aria-hidden />
-            Clinical Lab
+            MedPrepAI
           </div>
           <h1 className="text-balance font-semibold tracking-tight text-white text-3xl sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             {isSignup ? "Create your account" : "Welcome back"}
@@ -495,7 +502,7 @@ export function AuthScreen({
           </div>
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             {isSignup
-              ? "By continuing, you agree to use Clinical Lab responsibly. We protect your data with encryption in transit and at rest."
+              ? "By continuing, you agree to use MedPrepAI responsibly. We protect your data with encryption in transit and at rest."
               : "Use a strong password and a device you trust. Never share your credentials with anyone."}
           </p>
         </div>
@@ -532,7 +539,7 @@ export function AuthScreen({
         ) : (
           <div className="mt-8 space-y-2 text-center lg:text-left">
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              New to Clinical Lab?{" "}
+              New to MedPrepAI?{" "}
               <button
                 type="button"
                 className="font-semibold text-teal-700 underline-offset-4 transition-colors hover:text-teal-800 hover:underline dark:text-teal-400 dark:hover:text-teal-300"

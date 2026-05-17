@@ -1,5 +1,10 @@
 /** Route ids from `modes.ts` — must match backend `medprep-mode-map` slugs. */
-export const MEDPREP_KNOWN_SLUGS = new Set(["let-me-drive", "qa", "ai-evaluation"]);
+export const MEDPREP_KNOWN_SLUGS = new Set([
+  "let-me-drive",
+  "qa",
+  "ai-evaluation",
+  "shadow-mode",
+]);
 
 /**
  * Mirrors backend {@link MedprepAiService} policy: absent `medprepai.modes` → legacy (any mode if access on).
@@ -28,10 +33,11 @@ export function parseMedprepModesPolicy(entitlements: Record<string, unknown>): 
 
 /** Maps backend session mode to overview / route slug (`modes.ts` ids). */
 export function medprepSessionModeToSlug(
-  mode: "PRACTICE" | "LEARNING" | "EVALUATION"
+  mode: "PRACTICE" | "LEARNING" | "EVALUATION" | "SHADOW"
 ): string {
   if (mode === "LEARNING") return "qa";
   if (mode === "EVALUATION") return "ai-evaluation";
+  if (mode === "SHADOW") return "shadow-mode";
   return "let-me-drive";
 }
 

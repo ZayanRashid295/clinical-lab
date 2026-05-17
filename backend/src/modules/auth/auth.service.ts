@@ -11,6 +11,8 @@ import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { TokenBlacklistService } from "./token-blacklist.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { InstitutionService } from "../institution/institution.service";
+import { StudentActivityType } from "@prisma/client";
 import { PatchUiPreferencesDto } from "./dto/patch-ui-preferences.dto";
 
 @Injectable()
@@ -19,8 +21,50 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private tokenBlacklistService: TokenBlacklistService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private institutionService: InstitutionService,
   ) {}
+
+  private async ensureStudentRole(userId: string) {
+    const studentRole = await this.prisma.role.findUnique({
+      where: { name: "STUDENT" },
+    });
+    if (!studentRole) return;
+    const hasRole = await this.prisma.userRole.findFirst({
+      where: { userId, roleId: studentRole.id },
+    });
+    if (!hasRole) {
+      await this.prisma.userRole.create({
+        data: { userId, roleId: studentRole.id },
+      });
+    }
+  }
+
+  private async shouldAutoLinkInstitution(userId: string): Promise<boolean> {
+    const faculty = await this.prisma.facultyProfile.findUnique({
+      where: { userId },
+    });
+    if (faculty) return false;
+
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: { role: true },
+    });
+    const names = userRoles.map((ur) => ur.role.name);
+    return !names.some((n) =>
+      ["FACULTY", "INSTITUTION_MANAGER", "SUPERADMIN", "ADMIN"].includes(n),
+    );
+  }
+
+  private async linkInstitutionForUser(userId: string, email: string) {
+    if (!(await this.shouldAutoLinkInstitution(userId))) return;
+    await this.institutionService.resolveMemberForUser(userId, email);
+    await this.institutionService.recordActivity(
+      userId,
+      StudentActivityType.LOGIN,
+      "Signed in",
+    );
+  }
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
@@ -40,6 +84,8 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException("Invalid credentials");
     }
+
+    await this.linkInstitutionForUser(user.id, email);
 
     // Get user with access information
     const userWithAccess = await this.getUserWithAccess(user.id);
@@ -92,6 +138,9 @@ export class AuthService {
         ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
       },
     });
+
+    await this.ensureStudentRole(user.id);
+    await this.linkInstitutionForUser(user.id, email);
 
     void this.notifications
       .emit({

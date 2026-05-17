@@ -10,6 +10,7 @@ import { sampleCases } from "@/lib/fyp/data-models"
 import { databaseConversationService } from "@/lib/fyp/database-conversation-service"
 import type { User } from "@/lib/fyp/medprep-user"
 import { toMedPrepUser } from "@/lib/fyp/medprep-user"
+import { trimMedprepConversationIdQuery } from "@/lib/fyp/medprep-session-merge"
 import { authService } from "@/shared/services/auth.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -64,7 +65,7 @@ function CasePageInner() {
   const caseId = caseIdFromPathname(pathname) || ""
   const evaluationMode = router.query.mode === "evaluation"
   const resumeConversationId =
-    typeof router.query.conversationId === "string" ? router.query.conversationId : undefined
+    trimMedprepConversationIdQuery(router.query.conversationId) || undefined
 
   const [medicalCase, setMedicalCase] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -110,15 +111,16 @@ function CasePageInner() {
           return
         }
 
-        const generatedCaseData = localStorage.getItem("generatedCase")
-        if (generatedCaseData) {
-          try {
-            const generatedCase = JSON.parse(generatedCaseData)
-            setMedicalCase(generatedCase)
+        if (sessionUser.id && sessionUser.id !== "anonymous") {
+          const { fetchResumeSession, caseSnapshotFromSession } = await import(
+            "@/lib/fyp/medprep-persistence-service"
+          )
+          const dbSession = await fetchResumeSession(sessionUser.id, "PRACTICE", resolvedCaseId)
+          const snap = dbSession ? caseSnapshotFromSession(dbSession) : null
+          if (snap) {
+            setMedicalCase(snap)
             setLoading(false)
             return
-          } catch (parseError) {
-            console.error("Error parsing generated case:", parseError)
           }
         }
 

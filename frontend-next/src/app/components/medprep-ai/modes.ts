@@ -1,4 +1,4 @@
-export type MedPrepModeId = "let-me-drive" | "qa" | "ai-evaluation";
+export type MedPrepModeId = "let-me-drive" | "qa" | "ai-evaluation" | "shadow-mode";
 
 export interface MedPrepHighlight {
   title: string;
@@ -58,6 +58,20 @@ export const MEDPREP_MODES: MedPrepModeDefinition[] = [
     ],
     ctaLabel: "Start Evaluation",
     standaloneAppPath: "/evaluation-mode",
+  },
+  {
+    id: "shadow-mode",
+    title: "Shadow Mode",
+    heroHeadline: "Observe AI clinical reasoning and replay encounters",
+    summary:
+      "Watch an AI physician work through cases: questions, internal reasoning, differentials, and reports, then replay step-by-step for study. Ideal for pattern recognition without being in the hot seat.",
+    highlights: [
+      { title: "AI physician playthrough", subtitle: "See questions and reasoning" },
+      { title: "Differentials & reports", subtitle: "Aligned with the encounter" },
+      { title: "Replay timeline", subtitle: "Step through what happened" },
+    ],
+    ctaLabel: "Start Shadow",
+    standaloneAppPath: "/shadow-mode",
   },
 ];
 

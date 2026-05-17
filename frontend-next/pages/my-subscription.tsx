@@ -32,7 +32,7 @@ export default function MySubscription() {
   return (
     <>
       <Head>
-        <title>My Subscription - Clinical Lab</title>
+        <title>My Subscription - MedPrepAI</title>
         <meta
           name="description"
           content="Manage your subscription, upgrade plans, and view billing details"
@@ -41,7 +41,7 @@ export default function MySubscription() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Clinical Lab"
+        applicationTitle="MedPrepAI"
       >
         <MySubscriptionPage />
       </MenuSystem>

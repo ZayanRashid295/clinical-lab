@@ -3,6 +3,99 @@ export interface KeywordEntry {
   explanation: string;
 }
 
+export interface DocxHierarchyMetadata {
+  category?: string;
+  product?: string;
+  system?: string;
+  topic?: string;
+  subtopic?: string;
+  mcqTitle?: string;
+}
+
+export function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&nbsp;/gi, " ")
+    .trim();
+}
+
+function cleanMetadataValue(value: string): string {
+  return decodeHtmlEntities(value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+}
+
+function extractLabelValue(source: string, labels: string[]): string | undefined {
+  for (const label of labels) {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const htmlRe = new RegExp(`<strong>\\s*${escaped}\\s*:?\\s*</strong>\\s*([^<]+)`, "i");
+    const htmlMatch = source.match(htmlRe);
+    if (htmlMatch?.[1]) {
+      const v = cleanMetadataValue(htmlMatch[1]);
+      if (v) return v;
+    }
+
+    const plainRe = new RegExp(`^\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*:\\s*(.+)$`, "im");
+    const plainMatch = source.match(plainRe);
+    if (plainMatch?.[1]) {
+      const v = cleanMetadataValue(plainMatch[1]);
+      if (v) return v;
+    }
+  }
+  return undefined;
+}
+
+/** Extract Category / Product / System / Topic / Sub-Topic / MCQ Title from DOCX HTML or markdown. */
+export function extractDocxHierarchyMetadata(source: string): DocxHierarchyMetadata {
+  if (!source?.trim()) return {};
+
+  const meta: DocxHierarchyMetadata = {};
+  const category = extractLabelValue(source, ["Category"]);
+  const product = extractLabelValue(source, ["Product"]);
+  const system = extractLabelValue(source, ["System"]);
+  const topic = extractLabelValue(source, ["Topic"]);
+  const subtopic = extractLabelValue(source, ["Sub-Topic", "Subtopic", "Sub topic"]);
+  const mcqTitle = extractLabelValue(source, ["MCQ Title", "MCQ title"]);
+
+  if (category) meta.category = category;
+  if (product) meta.product = product;
+  if (system) meta.system = system;
+  if (topic) meta.topic = topic;
+  if (subtopic) meta.subtopic = subtopic;
+  if (mcqTitle) meta.mcqTitle = mcqTitle;
+  return meta;
+}
+
+export function mergeParsedHierarchy(
+  parsed: DocxHierarchyMetadata,
+  fromSource: DocxHierarchyMetadata,
+): DocxHierarchyMetadata {
+  return {
+    category: parsed.category || fromSource.category,
+    product: parsed.product || fromSource.product,
+    system: parsed.system || fromSource.system,
+    topic: parsed.topic || fromSource.topic,
+    subtopic: parsed.subtopic || fromSource.subtopic,
+    mcqTitle: parsed.mcqTitle || fromSource.mcqTitle,
+  };
+}
+
+/** Parse "Category: value" or "**Category:** value" from a markdown line. */
+export function parseHierarchyLabelLine(
+  line: string,
+): { label: string; value: string } | null {
+  const trimmed = line.trim();
+  const match = trimmed.match(
+    /^(?:\*\*)?(Category|Product|System|Topic|Sub-?Topic|MCQ\s*Title)(?:\*\*)?\s*:\s*(.+)$/i,
+  );
+  if (!match) return null;
+  const value = decodeHtmlEntities(match[2].trim());
+  if (!value) return null;
+  return { label: match[1].trim(), value };
+}
+
 /**
  * Extract only the first segment of a system string for strict matching.
  * - Takes the part before any dash separator ( - , – , — ).

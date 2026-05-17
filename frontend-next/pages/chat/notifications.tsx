@@ -31,13 +31,13 @@ export default function Notifications() {
   return (
     <>
       <Head>
-        <title>Notifications - Medical Lab</title>
+        <title>Notifications - MedPrepAI</title>
         <meta name="description" content="View and manage your notifications" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

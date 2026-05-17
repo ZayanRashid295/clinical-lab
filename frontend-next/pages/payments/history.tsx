@@ -31,13 +31,13 @@ export default function PaymentHistory() {
   return (
     <>
       <Head>
-        <title>Payment History - Medical Lab</title>
+        <title>Payment History - MedPrepAI</title>
         <meta name="description" content="View and manage payment history" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

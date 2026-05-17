@@ -67,6 +67,12 @@ export class UpdateMedprepSessionDto {
   @IsOptional()
   @IsNumber()
   score?: number;
+
+  @ApiPropertyOptional({ description: "Case title for dashboard / resume cards" })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  title?: string;
 }
 
 export class CreateMedprepMessageDto {
@@ -87,6 +93,18 @@ export class CreateMedprepMessageDto {
   @IsOptional()
   @IsNumber()
   relevanceScore?: number;
+
+  @ApiPropertyOptional({ type: Object })
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
+}
+
+export class UpdateMedprepMessageDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isIntervention?: boolean;
 
   @ApiPropertyOptional({ type: Object })
   @IsOptional()

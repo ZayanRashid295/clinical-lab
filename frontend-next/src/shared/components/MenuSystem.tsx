@@ -9,6 +9,7 @@ import {
   UIConfigProvider,
 } from "../contexts/UIConfigContext";
 import ContentRenderer from "./Content/ContentRenderer";
+import { APP_DISPLAY_NAME } from "../../app/config/brand";
 // import { createContentRegistry } from "../../app/config/content.registry";
 
 /** Registry keys are pathnames only. Router `routeChangeComplete` passes `?query` which would break lookups and fall back to parent paths (e.g. `/medprep-ai`). */
@@ -28,7 +29,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   customDashboard,
   customMenuItems,
   onMenuChange,
-  applicationTitle = "Application Portal",
+  applicationTitle = APP_DISPLAY_NAME,
   customContent = {},
   contentRegistry,
 }) => {

@@ -21,6 +21,14 @@ function hydrateGeminiApiKeyFromBackendEnv() {
   process.env.GOOGLE_API_KEY = geminiKeyMatch[2]
 }
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "8mb",
+    },
+  },
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"])

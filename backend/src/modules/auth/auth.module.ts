@@ -17,11 +17,13 @@ import { EntitlementGuard } from "./guards/entitlement.guard";
 import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { UsersModule } from "../users/users.module";
+import { InstitutionModule } from "../institution/institution.module";
 
 @Module({
   imports: [
     PassportModule,
     UsersModule,
+    InstitutionModule,
     SubscriptionsModule, // Import to use SubscriptionsService in guards
     NotificationsModule, // Welcome notification on signup
     JwtModule.registerAsync({

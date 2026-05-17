@@ -87,7 +87,7 @@ function App() {
     <MenuSystem
       contentRegistry={transportationContentRegistry}
       customDashboard={TransportationDashboard}
-      applicationTitle="Transportation App"
+      applicationTitle="MedPrepAI"
     />
   );
 }

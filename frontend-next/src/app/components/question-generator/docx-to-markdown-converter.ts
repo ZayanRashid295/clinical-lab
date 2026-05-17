@@ -76,7 +76,7 @@ export async function extractDocxText(file: File): Promise<{
 // Template and prompt generation moved to backend
 
 /**
- * Main function to convert DOCX to Markdown using backend LLM service
+ * Main function to convert DOCX to Markdown using backend OpenAI (gpt-4o)
  * Sends HTML content (with image placeholders) to LLM for better structure understanding
  */
 export async function convertDocxToMarkdown(

@@ -1,3 +1,6 @@
+@import "./styles/theme.css";
+@import "./styles/demo.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -126,9 +129,6 @@
 .rtl [data-lucide="chevron-left"].-rotate-90 {
   transform: scaleX(1) rotate(-90deg);
 }
-
-/* Import theme styles */
-@import "./styles/theme.css";
 
 /* Semantic surfaces for MedPrep and other large surfaces (incremental adoption). */
 .medprep-app-shell {
@@ -294,6 +294,16 @@
   background-color: var(--app-surface);
   color: var(--app-text);
   border-color: var(--app-border);
+}
+
+/* User menu & dropdowns: keep hover rows dark (avoid light slate-100 flash) */
+.dark [data-slot="dropdown-menu-item"][data-highlighted]:not([data-variant="destructive"]) {
+  background-color: rgb(30 41 59) !important;
+  color: rgb(241 245 249) !important;
+}
+.dark [data-slot="dropdown-menu-item"][data-highlighted][data-variant="destructive"] {
+  background-color: rgb(69 10 10 / 0.55) !important;
+  color: rgb(252 165 165) !important;
 }
 
 /* Keep neutral badges dark-aware while preserving semantic accent badges */

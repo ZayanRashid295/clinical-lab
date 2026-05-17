@@ -1,5 +1,9 @@
 export { LandingPage } from "./LandingPage";
 export { LandingNav } from "./LandingNav";
+export { LandingHero } from "./LandingHero";
+export { LandingCategoriesSection } from "./LandingCategoriesSection";
+export { PricingCarousel } from "./PricingCarousel";
+export { LandingFooter } from "./LandingFooter";
 export { HeroCarousel } from "./HeroCarousel";
 export { FeatureCard } from "./FeatureCard";
 export { PricingCard } from "./PricingCard";

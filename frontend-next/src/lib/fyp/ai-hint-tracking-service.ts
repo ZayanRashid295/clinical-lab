@@ -1,5 +1,7 @@
 "use client"
 
+import { upsertHintSession } from "./medprep-persistence-service"
+
 export interface AIHintUsage {
   caseId: string
   sessionId: string
@@ -36,6 +38,8 @@ export interface HintGradeImpact {
 class AIHintTrackingService {
   private static instance: AIHintTrackingService
   private hintUsages: Map<string, AIHintUsage> = new Map()
+  private conversationIdBySessionKey = new Map<string, string>()
+  private userIdBySessionKey = new Map<string, string>()
 
   static getInstance(): AIHintTrackingService {
     if (!AIHintTrackingService.instance) {
@@ -44,8 +48,19 @@ class AIHintTrackingService {
     return AIHintTrackingService.instance
   }
 
+  bindConversation(sessionKey: string, conversationId: string, userId: string): void {
+    if (!conversationId || !userId || userId === "anonymous") return
+    this.conversationIdBySessionKey.set(sessionKey, conversationId)
+    this.userIdBySessionKey.set(sessionKey, userId)
+    void this.persistSessionToDatabase(sessionKey)
+  }
+
   // Start a new hint tracking session
-  startSession(caseId: string, sessionId: string): AIHintUsage {
+  startSession(
+    caseId: string,
+    sessionId: string,
+    opts?: { conversationId?: string; userId?: string },
+  ): AIHintUsage {
     const session: AIHintUsage = {
       caseId,
       sessionId,
@@ -62,7 +77,9 @@ class AIHintTrackingService {
     }
 
     this.hintUsages.set(sessionId, session)
-    this.saveToLocalStorage()
+    if (opts?.conversationId && opts?.userId) {
+      this.bindConversation(sessionId, opts.conversationId, opts.userId)
+    }
     return session
   }
 
@@ -84,8 +101,8 @@ class AIHintTrackingService {
     session.gradePenalty = this.calculateGradePenalty(session)
 
     this.hintUsages.set(sessionId, session)
-    this.saveToLocalStorage()
-    
+    void this.persistSessionToDatabase(sessionId)
+
     console.log(`Hint tracked: ${category} (${importance}) - Total hints: ${session.totalHintsUsed}`)
     return session
   }
@@ -99,7 +116,7 @@ class AIHintTrackingService {
 
     session.sessionEndTime = new Date().toISOString()
     this.hintUsages.set(sessionId, session)
-    this.saveToLocalStorage()
+    void this.persistSessionToDatabase(sessionId)
     return session
   }
 
@@ -233,32 +250,26 @@ class AIHintTrackingService {
     return recommendations
   }
 
-  // Save to localStorage for persistence
-  private saveToLocalStorage(): void {
-    if (typeof window === "undefined") {
-      return
-    }
-    try {
-      const data = Array.from(this.hintUsages.entries())
-      localStorage.setItem('aiHintUsages', JSON.stringify(data))
-    } catch (error) {
-      console.error('Failed to save hint usages to localStorage:', error)
-    }
-  }
+  private async persistSessionToDatabase(sessionKey: string): Promise<void> {
+    const session = this.hintUsages.get(sessionKey)
+    const conversationId = this.conversationIdBySessionKey.get(sessionKey)
+    const userId = this.userIdBySessionKey.get(sessionKey)
+    if (!session || !conversationId || !userId) return
 
-  // Load from localStorage on initialization
-  loadFromLocalStorage(): void {
-    if (typeof window === "undefined") {
-      return
-    }
     try {
-      const data = localStorage.getItem('aiHintUsages')
-      if (data) {
-        const entries = JSON.parse(data)
-        this.hintUsages = new Map(entries)
-      }
+      await upsertHintSession(conversationId, userId, {
+        sessionKey,
+        caseId: session.caseId,
+        totalHintsUsed: session.totalHintsUsed,
+        highImportanceHints: session.hintsByImportance.high,
+        mediumImportanceHints: session.hintsByImportance.medium,
+        lowImportanceHints: session.hintsByImportance.low,
+        gradePenalty: session.gradePenalty,
+        hintTimestamps: session.hintTimestamps,
+        hintsByCategory: session.hintsByCategory,
+      })
     } catch (error) {
-      console.error('Failed to load hint usages from localStorage:', error)
+      console.warn("[hints] database persist failed", error)
     }
   }
 
@@ -270,17 +281,12 @@ class AIHintTrackingService {
   // Clear all data (for testing or reset)
   clearAllData(): void {
     this.hintUsages.clear()
-    if (typeof window !== "undefined") {
-      localStorage.removeItem('aiHintUsages')
-    }
+    this.conversationIdBySessionKey.clear()
+    this.userIdBySessionKey.clear()
   }
 }
 
-// Initialize the service and load data
 const aiHintTrackingService = AIHintTrackingService.getInstance()
-if (typeof window !== "undefined") {
-  aiHintTrackingService.loadFromLocalStorage()
-}
 
 export { aiHintTrackingService }
 

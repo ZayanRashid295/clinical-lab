@@ -19,11 +19,12 @@ function hydrateGeminiApiKeyFromBackendEnv() {
 
   const backendEnv = fs.readFileSync(backendEnvPath, "utf8")
   const geminiKeyMatch = backendEnv.match(
-    /^(?:GOOGLE_API_KEY|GEMINI_API_KEY)\s*=\s*("?)(.*?)\1\s*$/m
+    /^(?:GOOGLE_API_KEY|GEMINI_API_KEY)\s*=\s*("?)(.*?)\1\s*$/m,
   )
   if (!geminiKeyMatch?.[2]) return
 
-  process.env.GOOGLE_API_KEY = geminiKeyMatch[2]
+  const key = geminiKeyMatch[2].trim().replace(/^["']+|["']+$/g, "")
+  if (key) process.env.GOOGLE_API_KEY = key
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -43,13 +44,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const evaluation = await aiService.evaluateStudentQuestion(studentQuestion, context)
     return res.status(200).json({
-      shouldIntervene: evaluation.shouldIntervene,
+      shouldIntervene: evaluation.shouldIntervene ?? false,
       content: evaluation.content,
       confidence: evaluation.confidence,
+      fallback: evaluation.confidence < 0.7,
     })
   } catch (error) {
     console.error("Error evaluating student question:", error)
     const details = error instanceof Error ? error.message : "Unknown error"
-    return res.status(500).json({ error: "Failed to evaluate student question", details })
+    return res.status(200).json({
+      shouldIntervene: false,
+      content: "Continue with your clinical questioning.",
+      confidence: 0.5,
+      fallback: true,
+      warning: details,
+    })
   }
 }

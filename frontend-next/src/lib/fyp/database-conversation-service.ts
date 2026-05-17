@@ -1,4 +1,5 @@
 import type { Conversation, ChatMessage, MedicalCase } from "./data-models"
+import { parseFetchJson } from "@/lib/api/parse-fetch-json"
 import { MedPrepConversationRequestError } from "./medprep-conversation-errors"
 
 interface DatabaseConversation {
@@ -51,14 +52,38 @@ class DatabaseConversationService {
   }
 
   // Create a new conversation
-  async createConversation(userId: string, caseId: string, patientName?: string, caseTitle?: string): Promise<Conversation> {
+  async createConversation(
+    userId: string,
+    caseId: string,
+    patientName?: string,
+    caseTitle?: string,
+    opts?: {
+      mode?: "PRACTICE" | "LEARNING" | "EVALUATION" | "SHADOW"
+      caseSnapshot?: MedicalCase | Record<string, unknown>
+      isGeneratedCase?: boolean
+      caseInstanceId?: string
+    },
+  ): Promise<Conversation> {
     try {
-      const requestBody: any = { userId, caseId }
+      const requestBody: Record<string, unknown> = {
+        userId,
+        caseId,
+        mode: opts?.mode ?? "PRACTICE",
+      }
       if (patientName) {
         requestBody.patientName = patientName
       }
       if (caseTitle) {
         requestBody.caseTitle = caseTitle
+      }
+      if (opts?.caseSnapshot) {
+        requestBody.caseSnapshot = opts.caseSnapshot
+      }
+      if (opts?.isGeneratedCase !== undefined) {
+        requestBody.isGeneratedCase = opts.isGeneratedCase
+      }
+      if (opts?.caseInstanceId) {
+        requestBody.caseInstanceId = opts.caseInstanceId
       }
       
       const baseUrl = this.getBaseUrl()
@@ -154,10 +179,14 @@ class DatabaseConversationService {
       }
       )
 
-      const data = await response.json()
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to add message')
+      const data = await parseFetchJson<{
+        success?: boolean
+        error?: string
+        message?: { id: string; createdAt: string }
+      }>(response)
+
+      if (!data?.success || !data.message) {
+        throw new Error(data?.error || "Failed to add message")
       }
 
       return {
@@ -183,12 +212,12 @@ class DatabaseConversationService {
         `${baseUrl}/api/conversations/${conversationId}?userId=${encodeURIComponent(resolvedUserId)}`
       )
 
-      let data: { success?: boolean; error?: string; conversation?: DatabaseConversation }
-      try {
-        data = await response.json()
-      } catch {
-        return null
-      }
+      const data = await parseFetchJson<{
+        success?: boolean
+        error?: string
+        conversation?: DatabaseConversation
+      }>(response)
+      if (!data) return null
 
       if (!data.success || !data.conversation) {
         // 401/403/404: subscription, ownership, or missing session — resume without throwing (Next dev overlay surfaces thrown Errors).

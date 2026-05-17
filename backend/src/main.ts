@@ -43,9 +43,9 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle("Uber Backend API")
+    .setTitle("MedPrepAI API")
     .setDescription(
-      "The Uber application backend API with multi-file Prisma schema"
+      "MedPrepAI backend API with multi-file Prisma schema"
     )
     .setVersion("1.0")
     .addBearerAuth()

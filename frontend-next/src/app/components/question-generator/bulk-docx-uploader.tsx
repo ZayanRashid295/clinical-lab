@@ -16,6 +16,10 @@ import { CategoriesService } from "@/app/services/categories/categories.service"
 import { ProductsService } from "@/app/services/products/products.service";
 import { normalizeName } from "./metadata-auto-match";
 import {
+  extractDocxHierarchyMetadata,
+  mergeParsedHierarchy,
+} from "./parse-metadata-utils";
+import {
   CheckCircle2,
   XCircle,
   AlertCircle,
@@ -450,6 +454,7 @@ export default function BulkDocxUploader({
       
       // Step 1: Extract HTML (with image placeholders) and images from DOCX
       const { html, images } = await extractDocxText(file);
+      const hierarchyFromHtml = extractDocxHierarchyMetadata(html);
       console.log(`[BulkDocxUploader] Extracted content from ${fileName}:`, {
         htmlLength: html.length,
         imagesCount: images.length,
@@ -569,10 +574,24 @@ export default function BulkDocxUploader({
 
       // Step 5: Parse Markdown using existing parser
       const parsed = parseMarkdown(processedMarkdown);
+      const hierarchy = mergeParsedHierarchy(
+        {
+          category: parsed.category,
+          product: parsed.product,
+          system: parsed.system,
+          topic: parsed.topic,
+          subtopic: parsed.subtopic,
+          mcqTitle: parsed.title,
+        },
+        hierarchyFromHtml,
+      );
       console.log(`[BulkDocxUploader] Parsed data for ${fileName}:`, {
         hasStem: !!parsed.stem,
         optionsCount: parsed.options?.length || 0,
         hasCorrectAnswer: !!parsed.correctAnswer,
+        category: hierarchy.category,
+        product: hierarchy.product,
+        system: hierarchy.system,
       });
 
       // Step 6: Replace image paths in parsed content
@@ -590,12 +609,13 @@ export default function BulkDocxUploader({
       const questionData = {
         stem: updatedStem,
         productId: parsed.productId,
-        product: parsed.product,
-        category: parsed.category,
-        title: parsed.title,
-        system: parsed.system,
-        topic: parsed.topic,
-        subtopic: parsed.subtopic,
+        product: hierarchy.product || parsed.product,
+        category: hierarchy.category || parsed.category,
+        title: hierarchy.mcqTitle || parsed.title,
+        mcqTitle: hierarchy.mcqTitle || parsed.title,
+        system: hierarchy.system || parsed.system,
+        topic: hierarchy.topic || parsed.topic,
+        subtopic: hierarchy.subtopic || parsed.subtopic,
         options: parsed.options,
         explanation: updatedMainExplanation,
         perAnswerExplanations: updatedPerAnswerExplanations,

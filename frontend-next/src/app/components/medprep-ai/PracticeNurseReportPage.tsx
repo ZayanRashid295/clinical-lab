@@ -8,6 +8,7 @@ export function PracticeNurseReportPage() {
     <MedPrepSlugGate slug="let-me-drive" modeLabel="Practice Mode">
       <ModeNurseReportPage
         config={{
+          medprepMode: "PRACTICE",
           modeLabel: "Practice Mode",
           backLabel: "Back to Practice Mode",
           backRoute: "/medprep-ai/let-me-drive",

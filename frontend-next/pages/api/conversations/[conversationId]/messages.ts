@@ -50,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       {
         method: "POST",
         userId,
+        timeoutMs: 30_000,
         body: {
           role: normalizedRole,
           content,

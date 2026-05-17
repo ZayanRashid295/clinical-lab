@@ -153,4 +153,6 @@ enum MedprepMode {
   PRACTICE
   LEARNING
   EVALUATION
+  /// AI doctor / shadow observation + replay (MedPrep route slug: shadow-mode)
+  SHADOW
 }

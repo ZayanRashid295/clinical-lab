@@ -43,4 +43,18 @@ export const MEDPREP_MODES = [
     ctaLabel: "Start Evaluation",
     standaloneAppPath: "/evaluation",
   },
+  {
+    id: "shadow-mode",
+    title: "Shadow Mode",
+    heroHeadline: "Observe AI Clinical Reasoning Like an Attending",
+    summary:
+      "Watch an AI physician interview a virtual patient, review differential updates, reports, and SOAP-style documentation—then replay the encounter turn-by-turn to study decision-making without pressure.",
+    highlights: [
+      { title: "Attending View", subtitle: "Doctor reasoning + DDx in context" },
+      { title: "Replay", subtitle: "Step through the encounter" },
+      { title: "Reports & SOAP", subtitle: "Structured outputs when generated" },
+    ],
+    ctaLabel: "Start Shadow",
+    standaloneAppPath: "/shadow-mode",
+  },
 ] as const;

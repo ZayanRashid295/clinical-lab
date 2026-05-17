@@ -11,10 +11,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       const body = parsed.data
       const userId = typeof body.userId === "string" ? body.userId : undefined
-      const caseId = typeof body.caseId === "string" ? body.caseId : undefined
+      const rawCaseId = body.caseId
+      const caseId =
+        rawCaseId != null && String(rawCaseId).trim() !== ""
+          ? String(rawCaseId).trim()
+          : undefined
       const caseInstanceId = typeof body.caseInstanceId === "string" ? body.caseInstanceId : undefined
-      const mode = (body.mode as "PRACTICE" | "LEARNING" | "EVALUATION" | undefined) || "PRACTICE"
+      const mode =
+        (body.mode as "PRACTICE" | "LEARNING" | "EVALUATION" | "SHADOW" | undefined) || "PRACTICE"
       const caseTitle = typeof body.caseTitle === "string" ? body.caseTitle : undefined
+      const caseSnapshot =
+        body.caseSnapshot && typeof body.caseSnapshot === "object" && !Array.isArray(body.caseSnapshot)
+          ? (body.caseSnapshot as Record<string, unknown>)
+          : undefined
+      const isGeneratedCase =
+        typeof body.isGeneratedCase === "boolean" ? body.isGeneratedCase : undefined
+      const metadata =
+        body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
+          ? (body.metadata as Record<string, unknown>)
+          : undefined
       if (!userId || !caseId) {
         return res.status(400).json({
           success: false,
@@ -29,6 +44,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           caseId,
           caseInstanceId,
           title: caseTitle,
+          ...(caseSnapshot ? { caseSnapshot } : {}),
+          ...(isGeneratedCase !== undefined ? { isGeneratedCase } : {}),
+          ...(metadata ? { metadata } : {}),
         },
       })
       return res.status(200).json({ success: true, conversation })
@@ -61,8 +79,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       const query = new URLSearchParams()
       if (caseId) query.set("caseId", caseId)
+      const mode = typeof req.query.mode === "string" ? req.query.mode : undefined
+      if (mode) query.set("mode", mode)
+      const status = typeof req.query.status === "string" ? req.query.status : undefined
+      if (status) query.set("status", status)
+      const summary = typeof req.query.summary === "string" ? req.query.summary : undefined
+      if (summary) query.set("summary", summary)
+      const qs = query.toString()
       const conversations = await medprepBackendRequest<any[]>(
-        `/medprep-ai/sessions${query.toString() ? `?${query.toString()}` : ""}`,
+        `/medprep-ai/sessions${qs ? `?${qs}` : ""}`,
         { userId }
       )
       return res.status(200).json({ success: true, conversations })

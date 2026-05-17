@@ -62,7 +62,11 @@ html {
 
 /* Global dark mode text colors - softer for better eye comfort */
 body {
-  @apply text-gray-900 dark:text-gray-200;
+  color: #111827;
+}
+
+.dark body {
+  color: #e5e7eb;
 }
 
 /* Theme-aware utility classes */

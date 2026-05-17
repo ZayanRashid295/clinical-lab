@@ -10,6 +10,7 @@ import { seedCategories } from "./seed-categories";
 import { seedSubscriptions } from "./seed-subscriptions";
 import { seedStudentContent } from "./seed-student-content";
 import { seedLaunch } from "./seed-launch";
+import { seedFaculty } from "./seed-faculty";
 
 // Load .env file from the backend directory (parent of prisma folder)
 config({ path: resolve(process.cwd(), ".env") });
@@ -38,6 +39,8 @@ async function main() {
 
     // Launch-time seeds: achievements catalogue, mock exams, welcome discussion, public study group
     await seedLaunch(prisma);
+
+    await seedFaculty(prisma);
 
     // Seed other data
     // await seedLearningCases(prisma);

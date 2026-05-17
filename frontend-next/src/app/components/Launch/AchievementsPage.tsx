@@ -219,8 +219,10 @@ export default function AchievementsPage() {
           <Badge
             variant="outline"
             className={cn(
-              "gap-1.5 border-slate-200 font-normal dark:border-white/10 dark:bg-white/5 dark:text-slate-300",
-              live && "border-primary-300/80 bg-primary-50 text-primary-900 dark:border-primary-700 dark:bg-primary-900/35 dark:text-primary-200"
+              "gap-1.5 font-normal",
+              live
+                ? "border-primary-300/80 bg-primary-50 text-primary-900 dark:border-primary-800/60 dark:bg-black dark:text-primary-200"
+                : "border-slate-200 text-slate-700 dark:border-white/10 dark:bg-black dark:text-slate-300",
             )}
           >
             <Radio

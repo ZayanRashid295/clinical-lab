@@ -2,6 +2,22 @@ const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /** Skip bundling the Gemini SDK into API route chunks (smaller graphs, faster dev compile). */
+  serverExternalPackages: ["@google/generative-ai"],
+  experimental: {
+    /** Tree-shake icon / UI barrels so fewer modules compile per route. */
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-tooltip",
+      "recharts",
+      "date-fns",
+    ],
+  },
   async redirects() {
     return [
       { source: "/login", destination: "/", permanent: true },

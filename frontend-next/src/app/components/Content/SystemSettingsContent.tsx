@@ -31,7 +31,7 @@ export default function SystemSettingsContent() {
 
   const [settings, setSettings] = useState({
     // General Settings
-    appName: "Medical Lab",
+    appName: "MedPrepAI",
     appVersion: "2.1.0",
     timezone: "America/New_York",
     language: "en",

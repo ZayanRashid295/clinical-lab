@@ -59,11 +59,7 @@ class CaseGenerationService {
     let selectedSpecialty: string
     
     if (specialty) {
-      // Filter diseases by specialty first
       const specialtyDiseases = this.getDiseasesBySpecialty(specialty, isRare)
-      if (specialtyDiseases.length === 0) {
-        throw new Error(`No diseases found for specialty: ${specialty}`)
-      }
       diseaseName = this.selectRandomDisease(specialtyDiseases)
       selectedSpecialty = specialty
     } else {
@@ -244,18 +240,16 @@ class CaseGenerationService {
     }
 
     const diseases = specialtyDiseaseMap[specialty] || []
-    
-    if (isRare) {
-      // Filter to only rare diseases for this specialty
-      return diseases.filter(disease => 
-        rareDiseases.includes(disease)
-      )
-    } else {
-      // Filter to only common diseases for this specialty
-      return diseases.filter(disease => 
-        commonDiseases.includes(disease)
-      )
+    if (diseases.length === 0) {
+      return isRare ? [...rareDiseases] : [...commonDiseases]
     }
+
+    const pool = isRare
+      ? diseases.filter((disease) => rareDiseases.includes(disease))
+      : diseases.filter((disease) => commonDiseases.includes(disease))
+
+    // Specialty lists (e.g. Oncology) may not overlap commonDiseases — use full specialty pool.
+    return pool.length > 0 ? pool : diseases
   }
 
   private selectRandomSpecialty(diseaseName: string): string {
@@ -343,6 +337,16 @@ class CaseGenerationService {
       // Neurology
       "Stroke": ["sudden weakness", "speech difficulty", "facial drooping", "confusion", "headache"],
       "Migraine": ["severe headache", "nausea", "sensitivity to light", "fatigue", "dizziness"],
+
+      // Oncology
+      "Breast Cancer": ["breast lump", "fatigue", "unintentional weight loss", "night sweats", "localized pain"],
+      "Lung Cancer": ["persistent cough", "hemoptysis", "chest pain", "shortness of breath", "weight loss"],
+      "Colon Cancer": ["change in bowel habits", "rectal bleeding", "abdominal pain", "fatigue", "weight loss"],
+      "Prostate Cancer": ["difficulty urinating", "weak urinary stream", "pelvic discomfort", "fatigue", "bone pain"],
+      "Melanoma": ["changing skin lesion", "irregular mole borders", "itching", "bleeding lesion", "fatigue"],
+      "Pancreatic Cancer": ["jaundice", "abdominal pain radiating to back", "weight loss", "dark urine", "pruritus"],
+      "Leukemia": ["fatigue", "easy bruising", "frequent infections", "fever", "bone pain"],
+      "Lymphoma": ["painless lymphadenopathy", "night sweats", "fever", "weight loss", "fatigue"],
 
       // Nephrology
       "Chronic Kidney Disease": ["fatigue", "swelling in legs", "decreased urine output", "nausea", "loss of appetite"],

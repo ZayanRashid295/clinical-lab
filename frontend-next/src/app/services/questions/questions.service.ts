@@ -166,7 +166,7 @@ export class QuestionsService extends BaseDataService<
   }
 
   /**
-   * Convert DOCX text content to Markdown using OpenAI (backend)
+   * Convert DOCX text content to Markdown using OpenAI GPT-4 (backend)
    */
   async convertDocxToMarkdown(htmlContent: string, imagePlaceholders: string[] = []): Promise<{ markdown: string }> {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";

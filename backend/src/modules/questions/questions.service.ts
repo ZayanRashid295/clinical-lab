@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Express } from "express";
 import * as sharp from "sharp";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { CreateQuestionChoiceDto } from "./dto/create-question-choice.dto";
@@ -14,6 +14,14 @@ import { UpdateQuestionChoiceDto } from "./dto/update-question-choice.dto";
 import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { ConvertDocxDto } from "./dto/convert-docx.dto";
+import {
+  compactHtmlForLlm,
+  ensureHierarchyMetadataInMarkdown,
+  estimateTokenCount,
+  extractDocxHierarchyMetadata,
+  getDocxCompletionMaxTokens,
+  getModelContextLimit,
+} from "./docx-hierarchy-metadata";
 
 interface QuestionFilters {
   subtopicId?: string;
@@ -37,9 +45,15 @@ interface RandomQuestionFilters {
   count?: number;
 }
 
+/**
+ * Default model for DOCX conversion. Use gpt-4o (128k context).
+ * Legacy gpt-4 is limited to 8k total tokens and fails on large exam questions.
+ */
+const DOCX_CONVERSION_MODEL = "gpt-4o";
+
 @Injectable()
 export class QuestionsService {
-  private gemini: GoogleGenerativeAI | null = null;
+  private openai: OpenAI | null = null;
   // Fixed demo question IDs for non-subscribed users (always the same questions)
   // These will be populated on first access
   private demoQuestionIds: string[] | null = null;
@@ -50,9 +64,9 @@ export class QuestionsService {
     private configService: ConfigService,
     private subscriptionsService: SubscriptionsService
   ) {
-    const googleApiKey = this.configService.get<string>("GOOGLE_API_KEY");
-    if (googleApiKey) {
-      this.gemini = new GoogleGenerativeAI(googleApiKey);
+    const openaiApiKey = this.configService.get<string>("OPENAI_API_KEY");
+    if (openaiApiKey) {
+      this.openai = new OpenAI({ apiKey: openaiApiKey });
     }
     // Get demo question count from environment variable, default to 10
     this.demoQuestionCount = this.configService.get<number>("DEMO_QUESTION_COUNT") || 10;
@@ -1880,11 +1894,18 @@ export class QuestionsService {
    * expects this exact structure.
    */
   async convertDocxToMarkdown(dto: ConvertDocxDto): Promise<{ markdown: string }> {
-    if (!this.gemini) {
+    if (!this.openai) {
       throw new BadRequestException(
-        "GOOGLE_API_KEY is not configured."
+        "OPENAI_API_KEY is not configured."
       );
     }
+
+    const model =
+      this.configService.get<string>("OPENAI_DOCX_MODEL")?.trim() ||
+      DOCX_CONVERSION_MODEL;
+
+    const hierarchyFromHtml = extractDocxHierarchyMetadata(dto.htmlContent);
+    const htmlForLlm = compactHtmlForLlm(dto.htmlContent);
 
     const template = `---
 title: "<Subject & Topic> — <Specific Focus>"
@@ -2004,7 +2025,7 @@ DO NOT change this structure. Do NOT omit the correct answer.
 ====================
 HTML CONTENT (SOURCE)
 ====================
-${dto.htmlContent}
+${htmlForLlm}
 ${imageNote}
 
 ====================
@@ -2031,13 +2052,16 @@ CRITICAL INSTRUCTIONS
        - Topic:
        - Sub-Topic:
        - MCQ Title:
-   - If present, preserve exact text and output these body lines (outside frontmatter), ideally together near the metadata area:
+   - **MANDATORY:** If the source contains Category, Product, System, Topic, Sub-Topic, or MCQ Title,
+     output these exact lines together immediately after the YAML frontmatter closing --- and BEFORE
+     the # title line (the parser requires them):
        Category: <value>
        Product: <value>
        System: <value>
        Topic: <value>
        Sub-Topic: <value>
        MCQ Title: <value>
+     Use plain "Label: value" format (no bold). Decode HTML entities (e.g. &amp; → &).
    - Also set frontmatter/body title using the best available title value:
     * Prefer "MCQ Title" when available.
     * Otherwise fallback to "<Product> — <System>" when available.
@@ -2174,12 +2198,13 @@ CRITICAL INSTRUCTIONS
    - For any content that you are not sure where to place, do NOT drop it and do
      NOT rewrite it. It must still appear somewhere in the Markdown, with the
      same wording and order (you may only adjust formatting to valid Markdown).
-   - If the source contains explicit metadata lines such as "Subject:",
-     "System:", "Subtopic:", "Competency Domain:", "Cognitive Level:",
-     "Clinical Skill:", or "Difficulty Level:", you may use them to infer
-     frontmatter fields (title, tags, difficulty, etc.), but you MUST NOT
-     copy these label/value lines into the body of the Markdown (they should
-     not appear under '## Question' or '## Explanation').
+   - Category, Product, System, Topic, Sub-Topic, and MCQ Title lines MUST appear in the
+     markdown body (after frontmatter) exactly as shown above when present in the source.
+   - Do NOT place Category/Product/System/Topic/Sub-Topic/MCQ Title inside '## Question'
+     or '## Explanation'.
+   - For other metadata (Subject, Competency Domain, Cognitive Level, Clinical Skill,
+     Difficulty Level): use them only to infer frontmatter; do NOT copy those lines into
+     the markdown body.
    - If the source contains a line like "Question ID:", "Question Id", or
      similar, you may use it to set the question_id in the frontmatter, but
      you MUST NOT include that line in the visible question stem or
@@ -2189,26 +2214,42 @@ ${imageInstructions}
 
 Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
-    try {
-      const model = this.gemini.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: {
-          temperature: 0.2,
-          // Large DOCX conversions can exceed 4k tokens and get cut mid-table/section.
-          maxOutputTokens: 8192,
-        },
-      });
-      const result = await model.generateContent(
-        `You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.\n\n${prompt}`,
+    const systemMessage =
+      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.";
+    const promptTokenEstimate = estimateTokenCount(systemMessage + prompt);
+    const contextLimit = getModelContextLimit(model);
+    const maxTokens = getDocxCompletionMaxTokens(model, systemMessage + prompt);
+
+    if (promptTokenEstimate + maxTokens > contextLimit) {
+      throw new BadRequestException(
+        `Document is too large for ${model} (${promptTokenEstimate} input tokens estimated). ` +
+          `Set OPENAI_DOCX_MODEL=gpt-4o in backend .env or use a shorter DOCX.`,
       );
-      const finishReason = result.response?.candidates?.[0]?.finishReason;
-      const rawMarkdown = result.response.text().trim();
+    }
+
+    try {
+      console.log(
+        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens}`,
+      );
+
+      const completion = await this.openai.chat.completions.create({
+        model,
+        messages: [
+          { role: "system", content: systemMessage },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.2,
+        max_tokens: maxTokens,
+      });
+
+      const finishReason = completion.choices[0]?.finish_reason;
+      const rawMarkdown = completion.choices[0]?.message?.content?.trim() ?? "";
       if (!rawMarkdown) {
-        throw new BadRequestException("Gemini did not return any content");
+        throw new BadRequestException("OpenAI did not return any content");
       }
-      if (finishReason === "MAX_TOKENS") {
+      if (finishReason === "length") {
         throw new BadRequestException(
-          "Gemini response was truncated (MAX_TOKENS). Please simplify the source DOCX content or split it into smaller sections."
+          "OpenAI response was truncated (max tokens). Please simplify the source DOCX content or split it into smaller sections."
         );
       }
       if (
@@ -2217,9 +2258,11 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
         !rawMarkdown.includes("## Explanation")
       ) {
         throw new BadRequestException(
-          "Gemini returned incomplete markdown structure. Please retry conversion."
+          "OpenAI returned incomplete markdown structure. Please retry conversion."
         );
       }
+
+      console.log(`[Backend] DOCX conversion model: ${model}`);
 
       // Log the raw markdown so you can inspect it in the backend terminal
       // (look for "DOCX->Markdown (raw)" in the NestJS logs).
@@ -2231,6 +2274,10 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
       let processedMarkdown = normalizeQuestionSectionParagraphs(rawMarkdown);
       processedMarkdown = normalizeKeywordsSection(processedMarkdown);
+      processedMarkdown = ensureHierarchyMetadataInMarkdown(
+        processedMarkdown,
+        hierarchyFromHtml,
+      );
       
       // Verify placeholders are still present after normalization
       const placeholderCountAfter = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
@@ -2246,7 +2293,7 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       
       return { markdown: processedMarkdown };
     } catch (error: any) {
-      console.error("Gemini API error:", error);
+      console.error("OpenAI API error:", error);
       throw new BadRequestException(
         `Failed to convert DOCX to Markdown: ${error.message || "Unknown error"}`
       );

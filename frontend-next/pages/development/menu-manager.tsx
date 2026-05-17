@@ -6,7 +6,7 @@ export default function MenuManagerPage() {
   return (
     <MenuSystem
       contentRegistry={transportationContentRegistry}
-      applicationTitle="Medical Lab"
+      applicationTitle="MedPrepAI"
     />
   );
 }

@@ -39,11 +39,20 @@ describe("MedprepAiService", () => {
     recordActivity: jest.fn().mockResolvedValue({ unlocked: [], pointsAwarded: 0 }),
   };
 
+  const studentInstitutionMock: any = {
+    syncAssignmentFromMedprepSession: jest.fn().mockResolvedValue(null),
+  };
+
   let service: MedprepAiService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new MedprepAiService(prismaMock, subscriptionsMock, achievementsMock);
+    service = new MedprepAiService(
+      prismaMock,
+      subscriptionsMock,
+      achievementsMock,
+      studentInstitutionMock,
+    );
   });
 
   it("returns existing active session instead of creating duplicate", async () => {

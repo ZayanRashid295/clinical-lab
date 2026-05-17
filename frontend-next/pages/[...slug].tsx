@@ -2,13 +2,19 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Construction, ArrowLeft, Home } from "lucide-react";
-import { MenuSystem, authService } from "../src/shared";
-import { getMenuItemsForRole, MenuItem } from "../src/app/types/menu";
-import { transportationContentRegistry } from "../src/app/config/content.registry";
+import MenuSystem from "@/shared/components/MenuSystem";
+import { authService } from "@/shared/services/auth.service";
+import { getMenuItemsForRole, MenuItem } from "@/app/types/menu";
+import type { ContentRegistry } from "@/app/types/dashboard";
 
+/**
+ * Catch-all for menu paths without a dedicated `pages/*.tsx` file.
+ * The full `content.registry` is lazy-loaded so this route does not compile ~3k modules up front.
+ */
 export default function CatchAllPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const [contentRegistry, setContentRegistry] = useState<ContentRegistry | null>(null);
+  const [bootstrapped, setBootstrapped] = useState(false);
   const [menuItem, setMenuItem] = useState<MenuItem | null>(null);
   const { slug } = router.query;
 
@@ -29,43 +35,37 @@ export default function CatchAllPage() {
   );
 
   useEffect(() => {
-    // Check authentication status
     if (!authService.isAuthenticated()) {
-      router.replace("/");
+      void router.replace("/");
       return;
-    } else {
-      setIsLoading(false);
     }
-
-    // Try to find the menu item for this route
-    if (slug) {
-      const currentPath = `/${Array.isArray(slug) ? slug.join("/") : slug}`;
-      const currentUser = authService.getCurrentUser();
-
-      if (currentUser) {
-        const menuItems = getMenuItemsForRole(currentUser.roles || []);
-        const foundItem = findMenuItemByPath(menuItems, currentPath);
-        setMenuItem(foundItem);
-
-        // Also check if this path exists in the content registry
-        console.log("Catch-all page checking path:", currentPath, {
-          hasMenuItem: !!foundItem,
-          hasContentRegistry:
-            !!transportationContentRegistry.content[currentPath],
-          availableContentPaths: Object.keys(
-            transportationContentRegistry.content
-          ).filter((p) => p.includes("chat")),
-        });
+    let cancelled = false;
+    void import("@/app/config/content.registry").then((m) => {
+      if (!cancelled) {
+        setContentRegistry(m.transportationContentRegistry);
+        setBootstrapped(true);
       }
-    }
-  }, [router, slug, findMenuItemByPath]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!slug || !contentRegistry) return;
+    const currentPath = `/${Array.isArray(slug) ? slug.join("/") : slug}`;
+    const currentUser = authService.getCurrentUser();
+    if (!currentUser) return;
+    const menuItems = getMenuItemsForRole(currentUser.roles || []);
+    setMenuItem(findMenuItemByPath(menuItems, currentPath));
+  }, [slug, contentRegistry, findMenuItemByPath]);
+
+  if (!bootstrapped || !contentRegistry) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">Loading…</p>
         </div>
       </div>
     );
@@ -75,9 +75,8 @@ export default function CatchAllPage() {
     ? `/${Array.isArray(slug) ? slug.join("/") : slug}`
     : "/";
 
-  // Check if this path exists in the content registry
   const hasContentRegistry =
-    !!transportationContentRegistry.content[currentPath];
+    !!contentRegistry.content[currentPath];
 
   const pageTitle =
     menuItem?.label ||
@@ -88,7 +87,7 @@ export default function CatchAllPage() {
   return (
     <>
       <Head>
-        <title>{pageTitle} - Medical Lab</title>
+        <title>{pageTitle} - MedPrepAI</title>
         <meta
           name="description"
           content={`${pageTitle} page is under construction`}
@@ -96,20 +95,18 @@ export default function CatchAllPage() {
       </Head>
 
       <MenuSystem
-        contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        contentRegistry={contentRegistry}
+        applicationTitle="MedPrepAI"
         customContent={
           menuId === "under-construction"
             ? {
                 [menuId]: () => (
                   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center">
-                      {/* Construction Icon */}
                       <div className="mx-auto flex items-center justify-center w-24 h-24 bg-yellow-100 rounded-full mb-8">
                         <Construction size={48} className="text-yellow-600" />
                       </div>
 
-                      {/* Main Content */}
                       <h1 className="text-4xl font-bold text-gray-900 mb-4">
                         {pageTitle}
                       </h1>
@@ -117,7 +114,6 @@ export default function CatchAllPage() {
                         This page is currently under construction
                       </p>
 
-                      {/* Page Info */}
                       <div className="bg-blue-50 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
                         <h3 className="text-lg font-semibold text-blue-900 mb-3">
                           Page Information
@@ -148,7 +144,6 @@ export default function CatchAllPage() {
                         </div>
                       </div>
 
-                      {/* Coming Soon Features */}
                       <div className="bg-white rounded-lg shadow-sm border p-6 mb-8 text-left max-w-2xl mx-auto">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">
                           Coming Soon
@@ -177,9 +172,9 @@ export default function CatchAllPage() {
                         </ul>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
+                          type="button"
                           onClick={() => router.back()}
                           className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                         >
@@ -187,7 +182,8 @@ export default function CatchAllPage() {
                           Go Back
                         </button>
                         <button
-                          onClick={() => router.push("/dashboard")}
+                          type="button"
+                          onClick={() => void router.push("/dashboard")}
                           className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
                         >
                           <Home size={16} />
@@ -195,7 +191,6 @@ export default function CatchAllPage() {
                         </button>
                       </div>
 
-                      {/* Additional Info */}
                       <div className="mt-12 text-sm text-gray-500">
                         <p>
                           This is a dynamic catch-all page that handles routes

@@ -21,6 +21,7 @@ import {
   SubmitMedprepDiagnosisDto,
   SubmitMedprepSoapDto,
   UpdateMedprepSessionDto,
+  UpdateMedprepMessageDto,
   UpsertMedprepHintSessionDto,
   UpsertMedprepSoapDto,
 } from "./dto/medprep-ai.dto";
@@ -65,12 +66,16 @@ export class MedprepAiController {
     @Request() req,
     @Query("mode") mode?: MedprepMode,
     @Query("status") status?: MedprepConversationStatus,
-    @Query("caseId") caseId?: string
+    @Query("caseId") caseId?: string,
+    @Query("summary") summary?: string
   ) {
+    const summaryFlag =
+      summary === "1" || String(summary).toLowerCase() === "true";
     return this.medprepAiService.listSessions(this.resolveUserId(req), {
       mode,
       status,
       caseId,
+      summary: summaryFlag,
     });
   }
 
@@ -118,6 +123,22 @@ export class MedprepAiController {
     @Body() dto: CreateMedprepMessageDto
   ) {
     return this.medprepAiService.addMessage(this.resolveUserId(req), id, dto);
+  }
+
+  @Patch("sessions/:id/messages/:messageId")
+  @ApiOperation({ summary: "Update message metadata (e.g. shadow supervisor flag)" })
+  updateMessage(
+    @Request() req,
+    @Param("id") id: string,
+    @Param("messageId") messageId: string,
+    @Body() dto: UpdateMedprepMessageDto,
+  ) {
+    return this.medprepAiService.updateMessage(
+      this.resolveUserId(req),
+      id,
+      messageId,
+      dto,
+    );
   }
 
   @Put("sessions/:id/soap")

@@ -31,7 +31,7 @@ export default function ChatRooms() {
   return (
     <>
       <Head>
-        <title>Chat Rooms - Medical Lab</title>
+        <title>Chat Rooms - MedPrepAI</title>
         <meta
           name="description"
           content="Manage chat conversations and messages"
@@ -40,7 +40,7 @@ export default function ChatRooms() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

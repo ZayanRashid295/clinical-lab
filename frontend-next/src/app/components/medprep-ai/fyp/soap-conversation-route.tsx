@@ -9,11 +9,21 @@ import { SOAPNoteEditor } from "@/app/components/medprep-ai/fyp/soap-note-editor
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/shared/services/auth.service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
+import {
+  caseSnapshotFromSession,
+  fetchMedprepSession,
+  resolveMedprepUserId,
+} from "@/lib/fyp/medprep-persistence-service"
 
-function buildFallbackCase(caseId: string, conversation: any): MedicalCase {
-  const title = conversation?.case?.title || conversation?.title || "Practice Case"
-  const specialty = conversation?.case?.specialty || "general"
-  const difficultyRaw = String(conversation?.case?.difficulty || "intermediate").toLowerCase()
+function buildFallbackCase(caseId: string, conversation: unknown): MedicalCase {
+  const title = (conversation as { case?: { title?: string }; title?: string })?.case?.title
+    || (conversation as { title?: string })?.title
+    || "Practice Case"
+  const specialty = (conversation as { case?: { specialty?: string } })?.case?.specialty || "general"
+  const difficultyRaw = String(
+    (conversation as { case?: { difficulty?: string } })?.case?.difficulty || "intermediate",
+  ).toLowerCase()
   const difficulty =
     difficultyRaw === "beginner" || difficultyRaw === "advanced" ? difficultyRaw : "intermediate"
 
@@ -40,11 +50,44 @@ function buildFallbackCase(caseId: string, conversation: any): MedicalCase {
   }
 }
 
+function resolveCaseFromId(caseId: string, dbSession: Awaited<ReturnType<typeof fetchMedprepSession>>): MedicalCase | null {
+  const fromDb = dbSession ? caseSnapshotFromSession(dbSession) : null
+  if (fromDb) return fromDb
+
+  let resolved = sampleCases.find((c) => c.id === caseId) || null
+  if (resolved) return resolved
+
+  let originalCaseId = caseId
+  if (caseId.startsWith("practice_")) {
+    const parts = caseId.split("_")
+    if (parts.length >= 2) originalCaseId = parts[1]
+  } else if (caseId.includes("_")) {
+    originalCaseId = caseId.split("_")[0]
+  }
+  if (originalCaseId) {
+    resolved = sampleCases.find((c) => c.id === originalCaseId) || null
+  }
+  return resolved
+}
+
 export function SoapConversationRoute({ conversationId }: { conversationId: string }) {
   const [isLoading, setIsLoading] = useState(true)
-  const [conversation, setConversation] = useState<any>(null)
+  const [conversation, setConversation] = useState<Awaited<
+    ReturnType<typeof databaseConversationService.getConversation>
+  > | null>(null)
   const [medicalCase, setMedicalCase] = useState<MedicalCase | null>(null)
   const [error, setError] = useState<string>("")
+  const [studentId, setStudentId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const syncAuth = () => {
+      const uid = resolveMedprepUserId() || getClinicalUserId(authService.getCurrentUser())
+      setStudentId(uid && uid !== "anonymous" ? uid : null)
+    }
+    syncAuth()
+    const t = window.setTimeout(syncAuth, 400)
+    return () => clearTimeout(t)
+  }, [])
 
   useEffect(() => {
     const load = async () => {
@@ -53,8 +96,15 @@ export function SoapConversationRoute({ conversationId }: { conversationId: stri
       setError("")
 
       try {
-        const user = authService.getCurrentUser()
-        const userId = user?.id ? String(user.id) : "anonymous"
+        const userId = resolveMedprepUserId() || getClinicalUserId(authService.getCurrentUser())
+        if (!userId || userId === "anonymous") {
+          setError("Sign in to view and save your SOAP note.")
+          setIsLoading(false)
+          return
+        }
+        setStudentId(userId)
+
+        const dbSession = await fetchMedprepSession(conversationId, userId)
         const conv = await databaseConversationService.getConversation(conversationId, userId)
         if (!conv) {
           setError("Conversation not found.")
@@ -63,49 +113,8 @@ export function SoapConversationRoute({ conversationId }: { conversationId: stri
         }
         setConversation(conv)
 
-        let resolvedCase = sampleCases.find((c) => c.id === conv.caseId) || null
-        if (!resolvedCase && typeof conv.caseId === "string") {
-          const safeCaseId = conv.caseId
-          let originalCaseId = safeCaseId
-          if (safeCaseId.startsWith("practice_")) {
-            const parts = safeCaseId.split("_")
-            if (parts.length >= 2) originalCaseId = parts[1]
-          } else if (safeCaseId.includes("_")) {
-            originalCaseId = safeCaseId.split("_")[0]
-          }
-          if (originalCaseId) {
-            resolvedCase = sampleCases.find((c) => c.id === originalCaseId) || null
-          }
-        }
-
-        if (!resolvedCase) {
-          const savedCase = localStorage.getItem(`soap_case_${conversationId}`)
-          if (savedCase) {
-            try {
-              const parsed = JSON.parse(savedCase)
-              if (parsed?.id) {
-                resolvedCase = parsed
-              }
-            } catch {
-              // Ignore malformed local cache and continue with other fallbacks.
-            }
-          }
-        }
-
-        if (!resolvedCase) {
-          const generatedCaseData = localStorage.getItem("generatedCase")
-          if (generatedCaseData) {
-            const generatedCase = JSON.parse(generatedCaseData)
-            if (
-              generatedCase?.id === conv.caseId ||
-              `${generatedCase?.id}_${generatedCase?.title}_${generatedCase?.disease}`.replace(/\s+/g, "_") === conv.caseId
-            ) {
-              resolvedCase = generatedCase
-            }
-          }
-        }
-
-        setMedicalCase(resolvedCase || buildFallbackCase(conv.caseId, conv))
+        const resolvedCase = resolveCaseFromId(conv.caseId, dbSession)
+        setMedicalCase(resolvedCase || buildFallbackCase(conv.caseId, dbSession ?? conv))
       } catch (loadError) {
         console.error("Failed to load SOAP page data:", loadError)
         setError(loadError instanceof Error ? loadError.message : "Failed to load SOAP page.")
@@ -114,7 +123,7 @@ export function SoapConversationRoute({ conversationId }: { conversationId: stri
       }
     }
 
-    load()
+    void load()
   }, [conversationId])
 
   const centerShell = "flex min-h-[50vh] w-full flex-1 items-center justify-center py-8"
@@ -132,19 +141,21 @@ export function SoapConversationRoute({ conversationId }: { conversationId: stri
     )
   }
 
-  if (error || !conversation || !medicalCase) {
+  if (error || !conversation || !medicalCase || !studentId) {
     return (
       <div className={centerShell}>
         <Card className="w-full max-w-xl border-border shadow-sm">
           <CardHeader>
             <CardTitle>SOAP Note Unavailable</CardTitle>
-            <CardDescription>{error || "Unable to resolve the case for this conversation."}</CardDescription>
+            <CardDescription>
+              {error || "Unable to resolve the case for this conversation."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard">
+            <Link href="/medprep-ai/practice-cases">
               <Button>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                Back to Practice Cases
               </Button>
             </Link>
           </CardContent>
@@ -154,9 +165,9 @@ export function SoapConversationRoute({ conversationId }: { conversationId: stri
   }
 
   const student = {
-    id: String(conversation.studentId || "student"),
-    name: "Student",
-    email: "student@local",
+    id: studentId,
+    name: authService.getCurrentUser()?.name || "Student",
+    email: authService.getCurrentUser()?.email || "student@local",
   }
 
   return <SOAPNoteEditor conversation={conversation} medicalCase={medicalCase} student={student} />

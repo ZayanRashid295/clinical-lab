@@ -1,5 +1,5 @@
 /**
- * Canonical education users for Clinical Lab — single source for Prisma seed
+ * Canonical education users for MedPrepAI — single source for Prisma seed
  * and documentation. Password is always set in seed-base (default: password123).
  */
 export type EducationSeedRole =

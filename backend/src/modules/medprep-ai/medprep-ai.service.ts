@@ -9,6 +9,7 @@ import { MedprepConversationStatus, MedprepMode } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { AchievementsService } from "../achievements/achievements.service";
+import { StudentInstitutionService } from "../faculty/student-institution.service";
 import {
   MEDPREP_ENTITLEMENT_SLUGS,
   MEDPREP_SLUG_TO_MODE,
@@ -29,7 +30,8 @@ export class MedprepAiService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly subscriptionsService: SubscriptionsService,
-    private readonly achievements: AchievementsService
+    private readonly achievements: AchievementsService,
+    private readonly studentInstitution: StudentInstitutionService,
   ) {}
 
   getModes() {
@@ -85,6 +87,9 @@ export class MedprepAiService {
     void this.achievements
       .recordActivity(userId!, "MEDPREP_CONVERSATIONS", 1)
       .catch(() => undefined);
+    void this.studentInstitution
+      .syncAssignmentFromMedprepSession(userId!, created)
+      .catch(() => undefined);
     return created;
   }
 
@@ -94,6 +99,8 @@ export class MedprepAiService {
       mode?: MedprepMode;
       status?: MedprepConversationStatus;
       caseId?: string;
+      /** When true, omit messages/soap/etc. — for dashboard resume lists only. */
+      summary?: boolean;
     }
   ) {
     this.ensureUserId(userId);
@@ -102,25 +109,46 @@ export class MedprepAiService {
       return [];
     }
 
+    // Only filter by subscription when the client asks for a specific mode.
+    // Listing all sessions must return every mode the user has (overview / resume
+    // cards apply entitlements on the client; getSession still enforces access).
     let modeFilter: MedprepMode | { in: MedprepMode[] } | undefined;
     if (params.mode) {
       if (allowedEnumModes !== null && !allowedEnumModes.includes(params.mode)) {
         return [];
       }
       modeFilter = params.mode;
-    } else if (allowedEnumModes !== null) {
-      modeFilter = { in: allowedEnumModes };
+    }
+
+    const where = {
+      userId,
+      mode: modeFilter,
+      status: params.status,
+      OR: params.caseId
+        ? [{ caseId: params.caseId }, { caseInstanceId: params.caseId }]
+        : undefined,
+    };
+
+    if (params.summary) {
+      return this.prisma.medprepConversation.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          userId: true,
+          mode: true,
+          status: true,
+          caseId: true,
+          caseInstanceId: true,
+          title: true,
+          updatedAt: true,
+        },
+        take: 50,
+      });
     }
 
     return this.prisma.medprepConversation.findMany({
-      where: {
-        userId,
-        mode: modeFilter,
-        status: params.status,
-        OR: params.caseId
-          ? [{ caseId: params.caseId }, { caseInstanceId: params.caseId }]
-          : undefined,
-      },
+      where,
       orderBy: { updatedAt: "desc" },
       include: this.sessionInclude,
       take: 100,
@@ -147,16 +175,23 @@ export class MedprepAiService {
       statusTimestamps.abandonedAt = undefined;
     }
 
-    return this.prisma.medprepConversation.update({
+    const updated = await this.prisma.medprepConversation.update({
       where: { id: session.id },
       data: {
         status: dto.status,
         score: dto.score,
+        ...(dto.title !== undefined ? { title: dto.title } : {}),
         metadata: dto.metadata ? { ...(session.metadata as any), ...dto.metadata } : undefined,
         ...statusTimestamps,
       },
       include: this.sessionInclude,
     });
+    if (dto.status) {
+      void this.studentInstitution
+        .syncAssignmentFromMedprepSession(userId!, updated)
+        .catch(() => undefined);
+    }
+    return updated;
   }
 
   async getResumeSession(userId: string | undefined, mode: MedprepMode, caseId?: string) {
@@ -194,6 +229,34 @@ export class MedprepAiService {
       });
     }
     return message;
+  }
+
+  async updateMessage(
+    userId: string | undefined,
+    sessionId: string,
+    messageId: string,
+    dto: { isIntervention?: boolean; metadata?: Record<string, unknown> },
+  ) {
+    const session = await this.getSession(userId, sessionId);
+    const existing = await this.prisma.medprepConversationMessage.findFirst({
+      where: { id: messageId, conversationId: session.id },
+    });
+    if (!existing) {
+      throw new NotFoundException("Message not found");
+    }
+    const prevMeta =
+      existing.metadata && typeof existing.metadata === "object" && !Array.isArray(existing.metadata)
+        ? (existing.metadata as Record<string, unknown>)
+        : {};
+    return this.prisma.medprepConversationMessage.update({
+      where: { id: messageId },
+      data: {
+        ...(dto.isIntervention !== undefined ? { isIntervention: dto.isIntervention } : {}),
+        ...(dto.metadata
+          ? { metadata: { ...prevMeta, ...dto.metadata } as any }
+          : {}),
+      },
+    });
   }
 
   async listMessages(userId: string | undefined, sessionId: string) {

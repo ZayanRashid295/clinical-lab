@@ -31,6 +31,7 @@ import { ApiHttpError, getApiErrorMessage } from "@/app/services/base/api-http-e
 import { Editor } from "@tiptap/react"
 import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
+import { runAutoMatch } from "../metadata-auto-match"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -147,6 +148,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
   const [chapters, setSystems] = useState<any[]>([])
   const [topics, setTopics] = useState<any[]>([])
   const [subtopics, setSubtopics] = useState<any[]>([])
+  const parsedHierarchyResolved = useRef(false)
   const [categories, setCategories] = useState<any[]>([])
   const [showTagsDropdown, setShowTagsDropdown] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(false)
@@ -171,6 +173,108 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       .catch(() => setCategories([]))
       .finally(() => setLoadingCategories(false))
   }, [])
+
+  // Populate hierarchy text fields from parsed DOCX/Markdown metadata
+  useEffect(() => {
+    const m = initialData?.metadata
+    if (!m) return
+    if (m.subject) {
+      setSubjectEditName(m.subject)
+      setCategoryName(m.subject)
+    }
+    if (m.parsedProductName) setProductEditName(m.parsedProductName)
+    if (m.parsedTopicName) setTopicEditName(m.parsedTopicName)
+    if (m.parsedSubtopicName) setSubtopicEditName(m.parsedSubtopicName)
+    if (m.parsedMcqTitle && !m.title) {
+      setMetadata((prev) => ({ ...prev, title: m.parsedMcqTitle }))
+    } else if (m.title && !metadata.title) {
+      setMetadata((prev) => ({ ...prev, title: m.title }))
+    }
+  }, [initialData?.metadata])
+
+  // Resolve parsed hierarchy names to DB IDs (dropdowns)
+  useEffect(() => {
+    const m = initialData?.metadata
+    if (!m || parsedHierarchyResolved.current) return
+    if (!categories.length || !products.length || !chapters.length) return
+
+    const hasParsedNames =
+      m.subject ||
+      m.parsedProductName ||
+      (typeof m.system === "string" && m.system) ||
+      m.parsedTopicName ||
+      m.parsedSubtopicName
+    if (!hasParsedNames) return
+    if (m.categoryId && m.systemId && m.topicId && m.subtopicId) {
+      parsedHierarchyResolved.current = true
+      return
+    }
+
+    let cancelled = false
+    ;(async () => {
+      const match = await runAutoMatch(
+        {
+          parsedCategory: m.subject,
+          parsedProduct: m.parsedProductName,
+          parsedSystem: typeof m.system === "string" ? m.system : undefined,
+          parsedTopic: m.parsedTopicName,
+          parsedSubtopic: m.parsedSubtopicName,
+        },
+        chapters,
+        {
+          products,
+          categories,
+          getTopicsForSystem: async (systemId) => {
+            const response = await topicsService.getTopics({
+              systemId,
+              status: "ACTIVE",
+              listAll: true,
+            })
+            return Array.isArray(response) ? response : (response as any)?.data || []
+          },
+          getSubtopicsForTopic: async (topicId) => {
+            const response = await subtopicsService.getSubtopics({
+              topicId,
+              status: "ACTIVE",
+              listAll: true,
+            })
+            return Array.isArray(response) ? response : (response as any)?.data || []
+          },
+        },
+      )
+      if (cancelled) return
+      parsedHierarchyResolved.current = true
+      if (
+        match.categoryId ||
+        match.productId ||
+        match.systemId ||
+        match.topicId ||
+        match.subtopicId
+      ) {
+        setMetadata((prev) => ({
+          ...prev,
+          categoryId: match.categoryId || prev.categoryId,
+          productId: match.productId || prev.productId,
+          systemId: match.systemId || prev.systemId,
+          topicId: match.topicId || prev.topicId,
+          subtopicId: match.subtopicId || prev.subtopicId,
+          productTagId: match.categoryId || prev.productTagId,
+          productTagIds: match.categoryId ? [match.categoryId] : prev.productTagIds,
+        }))
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [
+    initialData?.metadata,
+    categories,
+    products,
+    chapters,
+    topicsService,
+    subtopicsService,
+  ])
 
   // Load products on mount for creating new systems
   useEffect(() => {

@@ -1,4 +1,4 @@
-# Next.js Medical Lab
+# MedPrepAI — Frontend
 
 A dynamic, role-based dashboard application built with Next.js, TypeScript, and Tailwind CSS, featuring API integration and authentication.
 

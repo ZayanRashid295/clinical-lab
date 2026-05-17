@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { 
   HelpCircle, 
@@ -96,6 +95,74 @@ const AnimatedCounter = ({
   );
 };
 
+const CATEGORY_CHIP: Record<string, string> = {
+  history:
+    "border-slate-400 bg-slate-100 text-slate-900 dark:border-slate-500 dark:bg-slate-700 dark:text-white",
+  assessment:
+    "border-sky-400 bg-sky-50 text-sky-950 dark:border-sky-500 dark:bg-sky-900 dark:text-sky-50",
+  examination:
+    "border-teal-400 bg-teal-50 text-teal-950 dark:border-teal-500 dark:bg-teal-900 dark:text-teal-50",
+  symptoms:
+    "border-orange-400 bg-orange-50 text-orange-950 dark:border-orange-500 dark:bg-orange-900 dark:text-orange-50",
+  impact:
+    "border-violet-400 bg-violet-50 text-violet-950 dark:border-violet-500 dark:bg-violet-900 dark:text-violet-50",
+  default:
+    "border-slate-400 bg-slate-100 text-slate-900 dark:border-slate-500 dark:bg-slate-700 dark:text-white",
+}
+
+const IMPORTANCE_CHIP: Record<string, string> = {
+  high: "border-red-400 bg-red-50 text-red-900 dark:border-red-500 dark:bg-red-900 dark:text-red-50",
+  medium:
+    "border-amber-400 bg-amber-50 text-amber-950 dark:border-amber-500 dark:bg-amber-900 dark:text-amber-50",
+  low: "border-slate-400 bg-slate-50 text-slate-800 dark:border-slate-500 dark:bg-slate-800 dark:text-slate-100",
+}
+
+function getCategoryIcon(category: string) {
+  switch (category.toLowerCase()) {
+    case "history":
+      return "📋"
+    case "assessment":
+      return "🔍"
+    case "examination":
+      return "🩺"
+    case "symptoms":
+      return "🤒"
+    case "impact":
+      return "📊"
+    default:
+      return "❓"
+  }
+}
+
+function CategoryChip({ category }: { category: string }) {
+  const key = category.toLowerCase()
+  const styles = CATEGORY_CHIP[key] ?? CATEGORY_CHIP.default
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold",
+        styles,
+      )}
+    >
+      {getCategoryIcon(category)} {category}
+    </span>
+  )
+}
+
+function ImportanceChip({ importance }: { importance: string }) {
+  const styles = IMPORTANCE_CHIP[importance.toLowerCase()] ?? IMPORTANCE_CHIP.low
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-md border-2 px-2 py-0.5 text-xs font-semibold uppercase",
+        styles,
+      )}
+    >
+      {importance}
+    </span>
+  )
+}
+
 export function AskQuestions({ context, onQuestionSelect, isLoading = false, triggerRefresh = 0, sessionId, onHintUsed }: AskQuestionsProps) {
   const [suggestedQuestions, setSuggestedQuestions] = useState<SuggestedQuestion[]>([])
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false)
@@ -106,12 +173,20 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
   const [animationKey, setAnimationKey] = useState(0)
   const [hintUsageCount, setHintUsageCount] = useState(0)
 
+  const conversationFingerprint = useMemo(
+    () =>
+      context.conversationHistory
+        .map((m) => `${m.role}:${m.content}`)
+        .join("\n"),
+    [context.conversationHistory],
+  )
+
   const fetchSuggestedQuestions = useCallback(async () => {
     if (context.conversationHistory.length === 0) return
-    
+
     setIsLoadingQuestions(true)
     setError(null)
-    setAnimationKey(prev => prev + 1)
+    setAnimationKey((prev) => prev + 1)
 
     try {
       const response = await fetch("/api/ai/suggested-questions", {
@@ -135,7 +210,8 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
     } finally {
       setIsLoadingQuestions(false)
     }
-  }, [context])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- use fingerprint to avoid unstable context object
+  }, [conversationFingerprint])
 
   const generateFallbackQuestions = (disease: string): SuggestedQuestion[] => {
     const commonQuestions = [
@@ -204,6 +280,11 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
     }
   }, [triggerRefresh, fetchSuggestedQuestions])
 
+  useEffect(() => {
+    if (!isFlipped || context.conversationHistory.length === 0) return
+    fetchSuggestedQuestions()
+  }, [isFlipped, conversationFingerprint, fetchSuggestedQuestions, context.conversationHistory.length])
+
   // Update hint usage count when session changes
   useEffect(() => {
     if (sessionId) {
@@ -213,53 +294,6 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
       }
     }
   }, [sessionId, triggerRefresh])
-
-  const getImportanceColor = (importance: string) => {
-    switch (importance) {
-      case "high":
-        return "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-500/35 dark:!bg-red-950/50 dark:!text-red-100 dark:hover:!bg-red-900/55"
-      case "medium":
-        return "border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-500/35 dark:!bg-yellow-950/45 dark:!text-yellow-100 dark:hover:!bg-yellow-900/50"
-      case "low":
-        return "border-primary-200 bg-primary-50 text-primary-800 hover:bg-primary-100 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100 dark:hover:!bg-primary-800/50"
-      default:
-        return "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-white/15 dark:!bg-slate-800/85 dark:!text-slate-200 dark:hover:!bg-slate-700/80"
-    }
-  }
-
-  const getCategoryIcon = (category: string) => {
-    switch (category.toLowerCase()) {
-      case "history":
-        return "📋"
-      case "assessment":
-        return "🔍"
-      case "examination":
-        return "🩺"
-      case "symptoms":
-        return "🤒"
-      case "impact":
-        return "📊"
-      default:
-        return "❓"
-    }
-  }
-
-  const getCategoryColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case "history":
-        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100"
-      case "assessment":
-        return "border-primary-300 bg-primary-100/80 text-primary-900 dark:border-primary-500/35 dark:!bg-primary-900/45 dark:!text-primary-50"
-      case "examination":
-        return "border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-500/30 dark:!bg-primary-900/45 dark:!text-primary-100"
-      case "symptoms":
-        return "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/30 dark:!bg-orange-950/50 dark:!text-orange-100"
-      case "impact":
-        return "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-500/30 dark:!bg-pink-950/50 dark:!text-pink-100"
-      default:
-        return "border-gray-200 bg-gray-50 text-gray-700 dark:border-white/15 dark:!bg-slate-800/80 dark:!text-slate-200"
-    }
-  }
 
   const filteredQuestions = suggestedQuestions.filter(q => 
     selectedCategory === "all" || q.category.toLowerCase() === selectedCategory.toLowerCase()
@@ -429,11 +463,12 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                         e.stopPropagation()
                         setSelectedCategory(category)
                       }}
-                      className={`text-sm md:text-[15px] ${
-                        selectedCategory === category 
-                          ? "bg-primary text-primary-foreground" 
-                          : "bg-white/50 text-gray-600 hover:bg-primary/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-primary/20"
-                      }`}
+                      className={cn(
+                        "text-sm md:text-[15px]",
+                        selectedCategory === category
+                          ? "bg-primary text-primary-foreground"
+                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
+                      )}
                     >
                       {category === "all" ? "All" : category}
                     </Button>
@@ -509,18 +544,8 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-primary-700 text-base font-bold text-white shadow-lg sm:h-10 sm:w-10">
                               {index + 1}
                             </div>
-                            <Badge 
-                              variant="secondary" 
-                              className={`text-sm border ${getCategoryColor(question.category)}`}
-                            >
-                              {getCategoryIcon(question.category)} {question.category}
-                            </Badge>
-                            <Badge 
-                              variant="outline" 
-                              className={`text-sm border-2 ${getImportanceColor(question.importance)}`}
-                            >
-                              {question.importance.toUpperCase()}
-                            </Badge>
+                            <CategoryChip category={question.category} />
+                            <ImportanceChip importance={question.importance} />
                             {question.confidence && (
                               <div className="flex items-center space-x-1">
                                 <div className="h-2 w-16 rounded-full bg-gray-200 dark:bg-white/10">
@@ -539,7 +564,7 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                           </div>
                         </div>
                         
-                        <p className="mb-2 text-base font-semibold leading-relaxed text-gray-800 transition-colors group-hover:text-primary-700 dark:text-slate-100 dark:group-hover:text-primary-300 md:text-[17px]">
+                        <p className="mb-2 text-base font-semibold leading-relaxed text-gray-800 transition-colors group-hover:text-primary-700 dark:text-slate-100 dark:group-hover:text-slate-50 md:text-[17px]">
                           {question.question}
                         </p>
                         

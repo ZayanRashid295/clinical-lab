@@ -31,7 +31,7 @@ export default function TestSession() {
   return (
     <>
       <Head>
-        <title>Test Session - Clinical Lab</title>
+        <title>Test Session - MedPrepAI</title>
         <meta
           name="description"
           content="Take your test session"

@@ -120,14 +120,18 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
     ),
     mainExplanation: convertOldBlocksToNew(oldQuestion.explanation || []),
     metadata: {
-      subject: oldQuestion.subject,
+      subject: oldQuestion.category || oldQuestion.subject,
       system: oldQuestion.system,
       systemId: oldQuestion.systemId,
       topicId: oldQuestion.topicId,
       subtopicId: oldQuestion.subtopicId,
       productId: oldQuestion.productId,
       categoryId: oldQuestion.categoryId,
-      title: oldQuestion.title ?? oldQuestion.mcqTitle,
+      title: oldQuestion.mcqTitle ?? oldQuestion.title,
+      parsedProductName: oldQuestion.product,
+      parsedTopicName: oldQuestion.topic,
+      parsedSubtopicName: oldQuestion.subtopic,
+      parsedMcqTitle: oldQuestion.mcqTitle ?? oldQuestion.title,
       productTagId: oldQuestion.productTagId,
       // Convert single productTagId/categoryId to array for backward compatibility
       productTagIds: oldQuestion.categoryId 

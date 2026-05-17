@@ -50,12 +50,12 @@ export default function SoapConversationPage() {
   return (
     <>
       <Head>
-        <title>SOAP Note — Clinical Lab</title>
+        <title>SOAP Note — MedPrepAI</title>
         <meta name="description" content="Document and submit your SOAP note for this case." />
       </Head>
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Clinical Lab"
+        applicationTitle="MedPrepAI"
         customContent={customContent}
       />
     </>

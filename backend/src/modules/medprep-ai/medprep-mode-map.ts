@@ -5,12 +5,14 @@ export const MEDPREP_SLUG_TO_MODE: Record<string, MedprepMode> = {
   "let-me-drive": MedprepMode.PRACTICE,
   qa: MedprepMode.LEARNING,
   "ai-evaluation": MedprepMode.EVALUATION,
+  "shadow-mode": MedprepMode.SHADOW,
 };
 
 export const MEDPREP_MODE_TO_SLUG: Record<MedprepMode, string> = {
   [MedprepMode.PRACTICE]: "let-me-drive",
   [MedprepMode.LEARNING]: "qa",
   [MedprepMode.EVALUATION]: "ai-evaluation",
+  [MedprepMode.SHADOW]: "shadow-mode",
 };
 
 export function modeToSlug(mode: MedprepMode): string {

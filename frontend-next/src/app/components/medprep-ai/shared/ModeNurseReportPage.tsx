@@ -9,8 +9,21 @@ import Link from "next/link"
 import { MarkdownContent } from "@/shared/components/MarkdownContent/MarkdownContent"
 import { cn } from "@/shared/utils/cn"
 import { APP_PAGE_SHELL } from "@/app/config/app-shell"
+import { authService } from "@/shared/services/auth.service"
+import { getClinicalUserId } from "@/lib/fyp/medprep-user"
+import {
+  caseSnapshotFromSession,
+  fetchResumeSession,
+  startMedprepSession,
+} from "@/lib/fyp/medprep-persistence-service"
+import {
+  assignmentStartMetadata,
+  resolveMedicalCase,
+} from "@/lib/fyp/institution-case"
+import { studentInstitutionApiService } from "@/app/services/faculty/student-institution-api.service"
 
 interface ModeNurseReportConfig {
+  medprepMode?: "PRACTICE" | "LEARNING" | "EVALUATION" | "SHADOW"
   modeLabel: string
   backLabel: string
   backRoute: string
@@ -105,24 +118,26 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     setIsLoading(true)
     setError(null)
     try {
-      const existingCase = sampleCases.find((c) => c.id === caseId) as MedicalCase | undefined
-      if (existingCase) {
-        setMedicalCase(existingCase)
+      const userId = getClinicalUserId(authService.getCurrentUser())
+      const resolved = await resolveMedicalCase(caseId, {
+        userId: userId ?? undefined,
+        mode: config.medprepMode ?? "PRACTICE",
+      })
+      if (resolved) {
+        setMedicalCase(resolved as MedicalCase)
         return
       }
 
-      if (generated) {
-        const generatedCaseData = localStorage.getItem("generatedCase")
-        if (generatedCaseData) {
-          try {
-            const generatedCase = JSON.parse(generatedCaseData) as MedicalCase
-            if (!generatedCase?.id || generatedCase.id === caseId) {
-              setMedicalCase(generatedCase)
-              return
-            }
-          } catch (parseError) {
-            console.error("Error parsing generated case:", parseError)
-          }
+      if (generated && userId) {
+        const dbSession = await fetchResumeSession(
+          userId,
+          config.medprepMode ?? "PRACTICE",
+          caseId,
+        )
+        const fromDb = dbSession ? caseSnapshotFromSession(dbSession) : null
+        if (fromDb && (!fromDb.id || fromDb.id === caseId)) {
+          setMedicalCase(fromDb as MedicalCase)
+          return
         }
       }
 
@@ -141,10 +156,46 @@ export function ModeNurseReportPage({ config }: { config: ModeNurseReportConfig 
     }
   }
 
-  const handleStartCase = () => {
-    if (medicalCase && !isStartingSession) {
-      setIsStartingSession(true)
-      router.push(config.startRoute(medicalCase.id, { generated: isGenerated }))
+  const handleStartCase = async () => {
+    if (!medicalCase || isStartingSession) return
+    setIsStartingSession(true)
+    try {
+      const userId = getClinicalUserId(authService.getCurrentUser())
+      const assignmentId =
+        typeof router.query.assignmentId === "string"
+          ? router.query.assignmentId
+          : undefined
+      const mode = config.medprepMode ?? "PRACTICE"
+      if (userId) {
+        const session = await startMedprepSession({
+          userId,
+          mode,
+          caseId: medicalCase.id,
+          title: medicalCase.title,
+          caseSnapshot: medicalCase as unknown as Record<string, unknown>,
+          metadata: assignmentStartMetadata({
+            assignmentId,
+            institutionCaseId: medicalCase.id,
+          }),
+        })
+        if (assignmentId && session?.id) {
+          await studentInstitutionApiService
+            .updateAssignmentProgress(assignmentId, {
+              status: "IN_PROGRESS",
+              conversationId: session.id,
+              institutionCaseId: medicalCase.id,
+            })
+            .catch(() => undefined)
+        }
+      }
+      const startUrl = config.startRoute(medicalCase.id, { generated: isGenerated })
+      router.push(
+        assignmentId
+          ? `${startUrl}${startUrl.includes("?") ? "&" : "?"}assignmentId=${encodeURIComponent(assignmentId)}`
+          : startUrl,
+      )
+    } finally {
+      setIsStartingSession(false)
     }
   }
 

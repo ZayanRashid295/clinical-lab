@@ -31,7 +31,7 @@ export default function StudyCreateTestPage() {
   return (
     <>
       <Head>
-        <title>Study Create Test - Clinical Lab</title>
+        <title>Study Create Test - MedPrepAI</title>
         <meta
           name="description"
           content="Create custom tests with configurable parameters"
@@ -40,7 +40,7 @@ export default function StudyCreateTestPage() {
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Clinical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

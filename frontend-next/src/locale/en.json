@@ -148,7 +148,8 @@
     "medPrepAI": "MedPrepAI",
     "medPrepPractice": "Practice Mode",
     "medPrepLearning": "Learning Mode",
-    "medPrepAIEvaluation": "AI Evaluation Mode"
+    "medPrepAIEvaluation": "AI Evaluation Mode",
+    "medPrepShadow": "Shadow Mode"
   },
   "nav": {
     "section": {

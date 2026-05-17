@@ -1,6 +1,6 @@
-# Uber Backend API
+# MedPrepAI Backend API
 
-A comprehensive backend API for an Uber-like application built with NestJS, Prisma, and Swagger, featuring a multi-file Prisma schema architecture.
+Backend API for MedPrepAI — clinical education, case practice, and AI tutoring — built with NestJS, Prisma, and Swagger.
 
 ## 🚀 Features
 

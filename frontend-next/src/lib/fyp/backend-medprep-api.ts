@@ -3,7 +3,7 @@ const BACKEND_BASE_URL =
   process.env.API_URL ||
   "http://localhost:43817"
 
-const DEFAULT_TIMEOUT_MS = 15_000
+const DEFAULT_TIMEOUT_MS = Number(process.env.MEDPREP_BACKEND_TIMEOUT_MS) || 30_000
 
 export class MedprepBackendRequestError extends Error {
   readonly status: number;

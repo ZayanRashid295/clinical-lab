@@ -32,7 +32,7 @@ export default function TestResults() {
   return (
     <>
       <Head>
-        <title>Test Results - Clinical Lab</title>
+        <title>Test Results - MedPrepAI</title>
         <meta name="description" content="View your test results" />
       </Head>
 

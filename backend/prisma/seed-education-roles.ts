@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-/** Canonical roles for Clinical Lab (education). */
+/** Canonical roles for MedPrepAI (education). */
 export const EDUCATION_ROLE_NAMES = [
   "SUPERADMIN",
   "ADMIN",

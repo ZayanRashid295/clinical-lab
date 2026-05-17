@@ -1,4 +1,5 @@
 import type { MedicalCase, Conversation } from "./data-models"
+import { parseFetchJson } from "@/lib/api/parse-fetch-json"
 
 interface CaseProgressData {
   userId: string
@@ -18,7 +19,14 @@ class CaseProgressService {
       // Check if progress already exists
       const baseUrl = this.getBaseUrl()
       const existingResponse = await fetch(`${baseUrl}/api/case-progress?userId=${progressData.userId}&caseInstanceId=${progressData.caseInstanceId}`)
-      const existingData = await existingResponse.json()
+      const existingData = await parseFetchJson<{
+        success?: boolean
+        caseProgress?: unknown[]
+      }>(existingResponse)
+      if (!existingData) {
+        console.warn("[case-progress] API unavailable (non-JSON response); use MedPrep session APIs instead.")
+        return
+      }
       
       let response
       if (existingData.success && existingData.caseProgress.length > 0) {
@@ -59,9 +67,10 @@ class CaseProgressService {
     try {
       const baseUrl = this.getBaseUrl()
       const response = await fetch(`${baseUrl}/api/case-progress?userId=${userId}&caseInstanceId=${caseInstanceId}`)
-      const data = await response.json()
-      
-      if (data.success && data.caseProgress.length > 0) {
+      const data = await parseFetchJson<{ success?: boolean; caseProgress?: unknown[] }>(response)
+      if (!data) return null
+
+      if (data.success && data.caseProgress && data.caseProgress.length > 0) {
         return data.caseProgress[0]
       }
       

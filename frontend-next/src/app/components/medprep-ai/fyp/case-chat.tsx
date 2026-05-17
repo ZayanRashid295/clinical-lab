@@ -278,10 +278,12 @@ export function CaseChat({
       console.log("📋 Full Medical Case:", medicalCase)
 
       try {
+        let resolvedConversationId: string | undefined
         if (resumeConversationId) {
           const existingConversation =
             await databaseConversationService.getConversation(resumeConversationId, student.id)
           if (existingConversation) {
+            resolvedConversationId = existingConversation.id
             setConversation(existingConversation)
             setMessages(existingConversation.messages)
           } else {
@@ -299,15 +301,27 @@ export function CaseChat({
             student.id,
             medicalCase.id,
             medicalCase?.patientProfile?.name,
-            medicalCase?.title
+            medicalCase?.title,
+            {
+              mode: "PRACTICE",
+              caseSnapshot: medicalCase,
+              isGeneratedCase: Boolean(medicalCase.id?.includes?.("generated")),
+            },
           )
           console.log("✅ Created conversation object:", newConversation)
+          resolvedConversationId = newConversation.id
           setConversation(newConversation)
           setMessages(newConversation.messages)
         }
 
         if (cancelled) return
-        const session = aiHintTrackingService.startSession(medicalCase.id, sessionId)
+        const session = aiHintTrackingService.startSession(medicalCase.id, sessionId, {
+          conversationId: resolvedConversationId,
+          userId: student.id,
+        })
+        if (resolvedConversationId) {
+          aiHintTrackingService.bindConversation(sessionId, resolvedConversationId, student.id)
+        }
         setHintSession(session)
       } catch (error) {
         if (cancelled) return
@@ -422,7 +436,12 @@ export function CaseChat({
           student.id,
           medicalCase.id,
           medicalCase?.patientProfile?.name,
-          medicalCase?.title
+          medicalCase?.title,
+          {
+            mode: "PRACTICE",
+            caseSnapshot: medicalCase,
+            isGeneratedCase: Boolean(medicalCase.id?.includes?.("generated")),
+          },
         )
         setConversation(currentConversation)
         setMessages(currentConversation.messages)
@@ -445,7 +464,12 @@ export function CaseChat({
           student.id,
           medicalCase.id,
           medicalCase?.patientProfile?.name,
-          medicalCase?.title
+          medicalCase?.title,
+          {
+            mode: "PRACTICE",
+            caseSnapshot: medicalCase,
+            isGeneratedCase: Boolean(medicalCase.id?.includes?.("generated")),
+          },
         )
         console.log("✅ Created database conversation:", dbConversation.id)
         setConversation(dbConversation)
@@ -1403,8 +1427,14 @@ export function CaseChat({
                   setIsCompletingCase(true)
                   setIsTransitioningToSoap(true)
                   await databaseConversationService.completeConversation(conversation.id, student.id)
-                  // Persist selected case snapshot so SOAP page can resolve rich context reliably.
-                  localStorage.setItem(`soap_case_${conversation.id}`, JSON.stringify(medicalCase))
+                  const { ensureCaseSnapshotOnSession } = await import(
+                    "@/lib/fyp/medprep-persistence-service"
+                  )
+                  await ensureCaseSnapshotOnSession(
+                    conversation.id,
+                    student.id,
+                    medicalCase,
+                  )
                 } catch (e) {
                   console.error(e)
                 } finally {

@@ -1,18 +1,31 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { LandingNav } from "./LandingNav";
-import { HeroCarousel } from "./HeroCarousel";
+import { LandingHero } from "./LandingHero";
+import { LandingCategoriesSection } from "./LandingCategoriesSection";
+import { PricingCarousel } from "./PricingCarousel";
+import { LandingFooter } from "./LandingFooter";
 import { FeatureCard } from "./FeatureCard";
-import { PricingCard } from "./PricingCard";
-import { VideoModal } from "./VideoModal";
+import { DemoVideo } from "@/app/components/demo";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/shared/utils/cn";
-import { SubscriptionPackagesService } from "@/app/services/subscriptions/subscription-packages.service";
-import { SubscriptionPackage } from "@/app/types/subscription";
 import { authService } from "@/shared";
+import {
+  AUDIENCE_BLOCKS,
+  FAQ_ITEMS,
+  LEARNING_MODES,
+  TESTIMONIALS,
+} from "./landing-content";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/shared/ui/accordion";
+import { Button } from "@/shared/ui/button";
 import {
   Brain,
   Users,
@@ -23,469 +36,300 @@ import {
   Shield,
   Clock,
   Check,
+  ArrowRight,
+  Quote,
 } from "lucide-react";
 
+const heroImage =
+  "/images/Medical_students_AI_learning_collaboration_6db2826f.png";
 const studentPracticeImage =
   "/images/Student_practicing_virtual_patient_interview_225e435d.png";
 const facultyAnalyticsImage =
   "/images/Faculty_reviewing_student_analytics_dashboard_94a01cbe.png";
-const heroImage =
-  "/images/Medical_students_AI_learning_collaboration_6db2826f.png";
 
-function FeaturesGrid() {
-  const features = [
-    {
-      icon: Brain,
-      title: "AI Patient Simulations",
-      description:
-        "Practice with realistic AI patients that respond naturally to your clinical approach",
-    },
-    {
-      icon: Target,
-      title: "Shadow Mode",
-      description:
-        "Learn by observing AI doctor-patient interactions with teachable moments highlighted",
-    },
-    {
-      icon: BarChart3,
-      title: "OSCE-Style Assessment",
-      description:
-        "Receive detailed rubric-based feedback aligned with medical competencies",
-    },
-    {
-      icon: Award,
-      title: "Gamification",
-      description:
-        "Track progress with leaderboards, Elo ratings, and specialty-specific achievements",
-    },
-    {
-      icon: Zap,
-      title: "Instant Feedback",
-      description:
-        "Get real-time guidance on clinical decisions and communication skills",
-    },
-    {
-      icon: Users,
-      title: "Faculty Oversight",
-      description:
-        "Comprehensive analytics and cohort management for institutions",
-    },
-    {
-      icon: Shield,
-      title: "Evidence-Based",
-      description:
-        "Cases anchored to clinical guidelines and validated by medical experts",
-    },
-    {
-      icon: Clock,
-      title: "24/7 Access",
-      description: "Practice anytime, anywhere with our cloud-based platform",
-    },
+const FEATURES = [
+  { icon: Brain, title: "AI patient simulations", description: "Natural dialogue, evolving vitals, and realistic clinical responses." },
+  { icon: Target, title: "Shadow mode", description: "Observe expert reasoning and ask why at any teachable moment." },
+  { icon: BarChart3, title: "OSCE-style rubrics", description: "Competency-aligned scoring on history, exam, workup, and documentation." },
+  { icon: Award, title: "Gamification", description: "Streaks, achievements, Elo ratings, and specialty leaderboards." },
+  { icon: Zap, title: "Instant feedback", description: "Real-time coaching on decisions and communication." },
+  { icon: Users, title: "Faculty workspace", description: "Assignments, messaging, cases, and cohort analytics." },
+  { icon: Shield, title: "Evidence-based cases", description: "Grounded in guidelines with institution-authored content." },
+  { icon: Clock, title: "Always on", description: "Cloud platform for practice anytime, on any device." },
+];
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="mx-auto max-w-2xl text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-400">
+        {eyebrow}
+      </p>
+      <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        {title}
+      </h2>
+      <p className="mt-3 text-lg text-slate-400">{description}</p>
+    </div>
+  );
+}
+
+function FeaturesSection() {
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
+  return (
+    <section id="features" ref={ref} className="bg-slate-950 py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Platform"
+          title="Everything you need to train clinicians"
+          description="From solo study to full institutional deployments—one platform, multiple modes, measurable outcomes."
+        />
+        <div
+          className={cn(
+            "mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4",
+            "transition-all duration-700",
+            isVisible ? "opacity-100" : "opacity-0 translate-y-8",
+          )}
+        >
+          {FEATURES.map((f) => (
+            <FeatureCard
+              key={f.title}
+              icon={f.icon}
+              title={f.title}
+              description={f.description}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ModesSection() {
+  return (
+    <section id="modes" className="border-y border-white/5 bg-slate-900/50 py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Learning modes"
+          title="Learn, shadow, and perform"
+          description="Three complementary experiences—each designed for a different stage of clinical mastery."
+        />
+        <div className="mt-14 space-y-16">
+          {LEARNING_MODES.map((mode, i) => (
+            <div
+              key={mode.id}
+              className={cn(
+                "grid items-center gap-10 lg:grid-cols-2",
+                i % 2 === 1 && "lg:[&>div:first-child]:order-2",
+              )}
+            >
+              <div>
+                <span className="rounded-full border border-primary-500/30 bg-primary-500/10 px-3 py-1 text-xs font-semibold text-primary-300">
+                  {mode.badge}
+                </span>
+                <h3 className="mt-4 text-2xl font-bold text-white sm:text-3xl">
+                  {mode.title}
+                </h3>
+                <p className="mt-3 text-slate-400">{mode.description}</p>
+                <ul className="mt-6 space-y-2">
+                  {mode.highlights.map((h) => (
+                    <li key={h} className="flex items-center gap-2 text-slate-300">
+                      <Check className="h-4 w-4 shrink-0 text-primary-500" />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+                <Image
+                  src={mode.image}
+                  alt={mode.title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksSection() {
+  const steps = [
+    { step: "01", title: "Sign up & link", text: "Create an account or join via your institution email domain." },
+    { step: "02", title: "Pick a mode", text: "Shadow faculty, complete guided cases, or run full OSCE encounters." },
+    { step: "03", title: "Get feedback", text: "Review rubric scores, SOAP grading, and faculty comments." },
+    { step: "04", title: "Track growth", text: "Dashboards, assignments, and analytics show progress over time." },
   ];
 
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
-
   return (
-    <div
-      ref={ref}
-      className={cn(
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 opacity-0 transition-all duration-700 ease-out",
-        isVisible && "opacity-100 translate-y-0",
-        !isVisible && "translate-y-12"
-      )}
-    >
-      {features.map((feature, index) => (
-        <div
-          key={index}
-          className={cn(
-            "opacity-0 transition-all duration-700 ease-out",
-            isVisible && "opacity-100 translate-y-0",
-            !isVisible && "translate-y-12"
-          )}
-          style={{ transitionDelay: isVisible ? `${index * 100}ms` : "0ms" }}
-        >
-          <FeatureCard
-            icon={feature.icon}
-            title={feature.title}
-            description={feature.description}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PricingGrid({
-  onLoginClick,
-  onPackageSelect,
-  isAuthenticated,
-}: {
-  onLoginClick: () => void;
-  onPackageSelect: (packageId: string) => void;
-  isAuthenticated: boolean;
-}) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
-  const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const packagesService = useMemo(() => new SubscriptionPackagesService(), []);
-
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        setLoading(true);
-        if (process.env.NODE_ENV === "development") {
-          console.log("Fetching subscription packages...");
-        }
-        const response = await packagesService.getPackages({ status: "ACTIVE" });
-        
-        // Handle both array and paginated response formats
-        const packagesList = Array.isArray(response) 
-          ? response 
-          : (response?.data || []);
-        
-        // Sort by price ascending
-        const sortedPackages = packagesList.sort((a, b) => {
-          const priceA = parseFloat(a.price?.toString() || "0");
-          const priceB = parseFloat(b.price?.toString() || "0");
-          return priceA - priceB;
-        });
-        
-        setPackages(sortedPackages);
-      } catch (error) {
-        if (process.env.NODE_ENV === "development") {
-          console.error("Error fetching packages:", error);
-        }
-        setPackages([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPackages();
-  }, [packagesService]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <p className="text-gray-600">Loading pricing plans...</p>
-      </div>
-    );
-  }
-
-  if (packages.length === 0) {
-    return (
-      <div className="flex flex-col justify-center items-center py-20 space-y-4">
-        <p className="text-gray-600 dark:text-gray-400 text-lg">
-          No pricing plans available at the moment.
-        </p>
-        <p className="text-gray-500 dark:text-gray-500 text-sm">
-          Please check back later or contact support for more information.
-        </p>
-      </div>
-    );
-  }
-
-  // Map packages to pricing cards
-  // First package: Student (basic)
-  // Second package: Student Pro (if exists)
-  // Third: Institution or custom (if exists)
-  const studentPackage = packages[0] || null;
-  const studentProPackage = packages[1] || null;
-  const institutionPackage = packages[2] || null;
-
-  // Debug: Log packages to console (development only)
-  if (process.env.NODE_ENV === "development") {
-    console.log("Rendering packages:", {
-      total: packages.length,
-      studentPackage: studentPackage?.name,
-      studentProPackage: studentProPackage?.name,
-      institutionPackage: institutionPackage?.name,
-      isVisible,
-    });
-  }
-
-  return (
-    <div
-      ref={ref}
-      className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-4 items-stretch"
-    >
-      {studentPackage && (
-        <div className="transition-all duration-700 ease-out">
-          <PricingCard
-            name={studentPackage.name || "Student"}
-            price={`$${parseFloat(studentPackage.price?.toString() || "0").toFixed(2)}`}
-            period="month"
-            description={studentPackage.description || "For individual medical students"}
-            features={
-              studentPackage.subscriptionFeatures?.map(
-                (f) => f.packageFeature?.name || ""
-              ).filter(Boolean) || [
-                "Unlimited case access (20+ cases)",
-                "Shadow & Clinical Interview modes",
-                "AI-powered feedback & scoring",
-              ]
-            }
-            cta="Start Free Trial"
-            packageId={studentPackage.id}
-            onSelect={() => onPackageSelect(studentPackage.id)}
-          />
-        </div>
-      )}
-
-      {studentProPackage && (
-        <div className="transition-all duration-700 ease-out delay-100">
-          <PricingCard
-            name={studentProPackage.name || "Student Pro"}
-            price={`$${parseFloat(studentProPackage.price?.toString() || "0").toFixed(2)}`}
-            period="month"
-            description={studentProPackage.description || "Advanced features for serious learners"}
-            features={
-              studentProPackage.subscriptionFeatures?.map(
-                (f) => f.packageFeature?.name || ""
-              ).filter(Boolean) || [
-                "Everything in Student plan",
-                "50+ premium cases",
-                "Specialty-focused tracks",
-              ]
-            }
-            popular={true}
-            cta="Start Free Trial"
-            packageId={studentProPackage.id}
-            onSelect={() => onPackageSelect(studentProPackage.id)}
-          />
-        </div>
-      )}
-
-      {institutionPackage ? (
-        <div className="transition-all duration-700 ease-out delay-200">
-          <PricingCard
-            name={institutionPackage.name || "Institution"}
-            price={
-              parseFloat(institutionPackage.price?.toString() || "0") === 0
-                ? "Custom"
-                : `$${parseFloat(institutionPackage.price?.toString() || "0").toFixed(2)}`
-            }
-            period="year"
-            description={institutionPackage.description || "For medical schools & hospitals"}
-            features={
-              institutionPackage.subscriptionFeatures?.map(
-                (f) => f.packageFeature?.name || ""
-              ).filter(Boolean) || [
-                "Everything in Pro plan",
-                "Unlimited student accounts",
-                "Faculty dashboard & analytics",
-              ]
-            }
-            cta="Contact Sales"
-            packageId={institutionPackage.id}
-            onSelect={() => onPackageSelect(institutionPackage.id)}
-          />
-        </div>
-      ) : (
-        <div className="transition-all duration-700 ease-out delay-200">
-          <PricingCard
-            name="Institution"
-            price="Custom"
-            period="year"
-            description="For medical schools & hospitals"
-            features={[
-              "Everything in Pro plan",
-              "Unlimited student accounts",
-              "Faculty dashboard & analytics",
-              "Cohort management tools",
-              "Custom case authoring",
-              "OSCE-style assessments",
-              "White-label options",
-              "Dedicated account manager",
-              "SSO integration",
-              "Custom curriculum alignment",
-            ]}
-            cta="Contact Sales"
-            onSelect={onLoginClick}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function HowItWorksSection1() {
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
-    threshold: 0.2,
-  });
-  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
-    threshold: 0.2,
-  });
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-      <div
-        ref={contentRef}
-        className={cn(
-          "opacity-0 transition-all duration-700 ease-out",
-          contentVisible && "opacity-100 translate-x-0",
-          !contentVisible && "-translate-x-12"
-        )}
-      >
-        <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-          Mode 1
-        </div>
-        <h3 className="text-3xl font-bold mb-4 text-foreground">Shadow Mode</h3>
-        <p className="text-lg text-muted-foreground mb-6">
-          Watch AI doctors conduct patient interviews. Pause anytime to ask
-          questions like &quot;Why this test?&quot; or &quot;Why not X?&quot;
-          Learn from expert clinical reasoning in action.
-        </p>
-        <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">
-              Interactive AI doctor-patient conversations
-            </span>
-          </li>
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">
-              Highlighted teachable moments
-            </span>
-          </li>
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">
-              Pause and ask questions anytime
-            </span>
-          </li>
-        </ul>
-      </div>
-      <div
-        ref={imageRef}
-        className={cn(
-          "rounded-xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 ease-out delay-200",
-          imageVisible && "opacity-100 translate-x-0",
-          !imageVisible && "translate-x-12"
-        )}
-      >
-        <Image
-          src={studentPracticeImage}
-          alt="Shadow Mode"
-          width={800}
-          height={600}
-          className="w-full h-auto"
-          unoptimized
+    <section id="how-it-works" className="bg-slate-950 py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Workflow"
+          title="How MedPrepAI works"
+          description="A clear path from first login to confident patient encounters."
         />
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((s) => (
+            <div
+              key={s.step}
+              className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-6"
+            >
+              <span className="text-3xl font-bold text-primary-500/80">{s.step}</span>
+              <h3 className="mt-3 text-lg font-semibold text-white">{s.title}</h3>
+              <p className="mt-2 text-sm text-slate-400">{s.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-function HowItWorksSection2() {
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({
-    threshold: 0.2,
-  });
-  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation({
-    threshold: 0.2,
-  });
-
+function AudienceSection({ onCta }: { onCta: (institution?: boolean) => void }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div
-        ref={imageRef}
-        className={cn(
-          "order-2 lg:order-1 rounded-xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 ease-out delay-200",
-          imageVisible && "opacity-100 translate-x-0",
-          !imageVisible && "-translate-x-12"
-        )}
-      >
-        <Image
-          src={facultyAnalyticsImage}
-          alt="Clinical Interview Mode"
-          width={800}
-          height={600}
-          className="w-full h-auto"
-          unoptimized
-        />
-      </div>
-      <div
-        ref={contentRef}
-        className={cn(
-          "order-1 lg:order-2 opacity-0 transition-all duration-700 ease-out",
-          contentVisible && "opacity-100 translate-x-0",
-          !contentVisible && "translate-x-12"
-        )}
-      >
-        <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-          Mode 2
+    <section className="border-y border-white/5 bg-slate-900/40 py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-2">
+          {AUDIENCE_BLOCKS.map((block, i) => (
+            <div
+              key={block.title}
+              className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950/80"
+            >
+              <div className="relative aspect-[21/9]">
+                <Image src={block.image} alt="" fill className="object-cover" unoptimized />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+              </div>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold text-white">{block.title}</h3>
+                <p className="mt-2 text-slate-400">{block.description}</p>
+                <ul className="mt-6 space-y-2">
+                  {block.bullets.map((b) => (
+                    <li key={b} className="flex gap-2 text-sm text-slate-300">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="mt-8 bg-primary-600 hover:bg-primary-500"
+                  onClick={() => onCta(i === 1)}
+                >
+                  {block.cta}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
-        <h3 className="text-3xl font-bold mb-4 text-foreground">
-          Clinical Interview Mode
-        </h3>
-        <p className="text-lg text-muted-foreground mb-6">
-          Take the lead as the doctor. Conduct interviews, perform exams, order
-          tests, make diagnoses, and document everything with SOAP notes.
-        </p>
-        <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">
-              Full patient encounter simulation
-            </span>
-          </li>
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">
-              Virtual physical exams and investigations
-            </span>
-          </li>
-          <li className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-chart-3 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <span className="text-foreground">Automated SOAP note grading</span>
-          </li>
-        </ul>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  return (
+    <section className="bg-slate-950 py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Testimonials"
+          title="Trusted by learners and educators"
+          description="See why programs adopt MedPrepAI for scalable clinical skills training."
+        />
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <blockquote
+              key={t.name}
+              className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+            >
+              <Quote className="h-8 w-8 text-primary-500/50" />
+              <p className="mt-4 flex-1 text-slate-300">&ldquo;{t.quote}&rdquo;</p>
+              <footer className="mt-6 border-t border-white/10 pt-4">
+                <p className="font-medium text-white">{t.name}</p>
+                <p className="text-sm text-slate-500">{t.role}</p>
+              </footer>
+            </blockquote>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqSection() {
+  return (
+    <section id="faq" className="border-t border-white/5 bg-slate-900/30 py-20 sm:py-24">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="FAQ"
+          title="Common questions"
+          description="Quick answers before you start your free trial."
+        />
+        <Accordion type="single" collapsible className="mt-12">
+          {FAQ_ITEMS.map((item, i) => (
+            <AccordionItem
+              key={item.q}
+              value={`item-${i}`}
+              className="border-white/10"
+            >
+              <AccordionTrigger className="text-left text-slate-100 hover:text-white hover:no-underline">
+                {item.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-slate-400">
+                {item.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </section>
   );
 }
 
 export function LandingPage() {
   const router = useRouter();
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check authentication status
+  const openDemo = useCallback(() => {
+    setIsDemoOpen(true);
+    if (typeof window !== "undefined" && window.location.hash !== "#demo") {
+      window.history.pushState(null, "", `${window.location.pathname}${window.location.search}#demo`);
+    }
+  }, []);
+
+  const closeDemo = useCallback(() => {
+    setIsDemoOpen(false);
+    if (typeof window !== "undefined" && window.location.hash === "#demo") {
+      const base = `${window.location.pathname}${window.location.search}`;
+      window.history.replaceState(null, "", base || "/");
+    }
+  }, []);
+
   useEffect(() => {
-    const checkAuth = () => {
-      setIsAuthenticated(authService.isAuthenticated());
-    };
+    const checkAuth = () => setIsAuthenticated(authService.isAuthenticated());
     checkAuth();
-    
-    // Check every 2 seconds to reduce load (less frequent than LandingNav)
     const interval = setInterval(checkAuth, 2000);
-    
-    // Also listen for storage changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'authToken' || e.key === 'userData') {
-        checkAuth();
-      }
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const syncHash = () => {
+      if (window.location.hash === "#demo") setIsDemoOpen(true);
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
   }, []);
 
   const goToAuth = (opts?: { mode?: "login" | "signup"; packageId?: string }) => {
@@ -497,166 +341,160 @@ export function LandingPage() {
   };
 
   const handleGetStarted = () => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      goToAuth();
-    }
+    if (isAuthenticated) void router.push("/dashboard");
+    else goToAuth({ mode: "signup" });
   };
 
   const handlePackageSelect = (packageId: string) => {
-    if (isAuthenticated) {
-      router.push(`/checkout-basic?packageId=${packageId}`);
-    } else {
-      goToAuth({ packageId });
-    }
+    if (isAuthenticated) void router.push(`/checkout-basic?packageId=${packageId}`);
+    else goToAuth({ packageId });
   };
 
-  const handleOpenVideoModal = () => {
-    setIsVideoModalOpen(true);
-  };
-
-  const handleCloseVideoModal = () => {
-    setIsVideoModalOpen(false);
+  const scrollToFeatures = () => {
+    document.querySelector("#features")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const heroSlides = [
     {
-      title: "Revolutionize Medical Education with AI",
+      title: "Revolutionize medical education with AI",
       subtitle:
-        "Practice clinical interviews, shadow AI doctors, and receive OSCE-style assessments in a safe, scalable environment.",
+        "Practice clinical interviews, shadow expert doctors, and receive OSCE-style assessments—in a safe, scalable environment.",
       image: heroImage,
-      ctaPrimary: "Get Started",
-      ctaSecondary: "Watch Demo",
+      ctaPrimary: "Start free",
+      ctaSecondary: "Watch demo",
     },
     {
-      title: "AI Patient Simulations",
+      title: "AI patients that feel real",
       subtitle:
-        "Practice with realistic AI patients that respond naturally to your clinical approach. Experience safe, repeatable learning environments.",
+        "Natural conversations, evolving clinical data, and repeatable encounters for every learner.",
       image: studentPracticeImage,
-      ctaPrimary: "Try It Now",
-      ctaSecondary: "Learn More",
+      ctaPrimary: "Try a case",
+      ctaSecondary: "See modes",
     },
     {
-      title: "Shadow Mode Learning",
+      title: "Shadow mode learning",
       subtitle:
-        "Observe expert AI doctors and learn from their clinical reasoning. Pause anytime to ask questions and understand every decision.",
+        "Pause expert encounters, ask why, and build clinical reasoning step by step.",
       image: facultyAnalyticsImage,
-      ctaPrimary: "Start Learning",
-      ctaSecondary: "View Demo",
+      ctaPrimary: "Explore shadow",
+      ctaSecondary: "Watch demo",
     },
     {
-      title: "OSCE-Style Assessment & Feedback",
+      title: "Faculty & institution ready",
       subtitle:
-        "Receive detailed, rubric-based feedback on every case. Track your performance and improve with data-driven insights.",
+        "Assignments, messaging, custom cases, and analytics—built for medical schools and hospitals.",
       image: heroImage,
-      ctaPrimary: "Get Started",
-      ctaSecondary: "See Features",
+      ctaPrimary: "View plans",
+      ctaSecondary: "Contact sales",
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100">
       <LandingNav
         onLoginClick={() => goToAuth()}
         onSignupClick={() => goToAuth({ mode: "signup" })}
       />
 
-      <main className="flex-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <HeroCarousel
+      <main>
+        <LandingHero
           slides={heroSlides}
-          onLoginClick={handleGetStarted}
-          onDemoClick={handleOpenVideoModal}
           isAuthenticated={isAuthenticated}
+          onPrimaryClick={handleGetStarted}
+          onDemoClick={openDemo}
+          onExploreClick={scrollToFeatures}
         />
 
-        <section id="features" className="py-20 px-6 bg-white dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-                Transforming Clinical Education
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Safe, scalable AI-powered training that prepares students for
-                real patient encounters
-              </p>
-            </div>
+        <LandingCategoriesSection
+          isAuthenticated={isAuthenticated}
+          onGetStarted={() => goToAuth({ mode: "signup" })}
+        />
 
-            <FeaturesGrid />
-          </div>
-        </section>
+        <FeaturesSection />
 
-        <section
-          id="how-it-works"
-          className="py-20 px-6 bg-gray-50 dark:bg-gray-800"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-                How It Works
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300">
-                Three powerful modes for comprehensive clinical training
-              </p>
-            </div>
+        <ModesSection />
 
-            <HowItWorksSection1 />
-            <HowItWorksSection2 />
-          </div>
-        </section>
+        <HowItWorksSection />
 
-        <section id="pricing" className="py-20 px-6 bg-white dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
-                Choose Your Plan
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Flexible pricing for students and institutions. All plans include 14-day free trial.
-              </p>
-            </div>
+        <AudienceSection
+          onCta={(institution) => {
+            if (institution) {
+              document.querySelector("#pricing")?.scrollIntoView({ behavior: "smooth" });
+            } else {
+              handleGetStarted();
+            }
+          }}
+        />
 
-            <PricingGrid
-              onLoginClick={() => goToAuth()}
-              onPackageSelect={handlePackageSelect}
-              isAuthenticated={isAuthenticated}
+        <TestimonialsSection />
+
+        <section id="pricing" className="bg-slate-950 py-20 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              eyebrow="Pricing"
+              title="Plans for every learner and program"
+              description="All active packages from your administrator—compare features and start in minutes."
             />
-
-            <div className="text-center mt-12">
-              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                All plans include 14-day free trial. No credit card required.
-              </p>
-              <div className="flex flex-wrap gap-4 md:gap-6 justify-center text-sm md:text-base">
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
-                  <span>Cancel anytime</span>
-                </span>
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
-                  <span>Education discounts available</span>
-                </span>
-                <span className="flex items-center gap-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
-                  <span>Group pricing for cohorts</span>
-                </span>
-              </div>
+            <div className="mt-14 px-0 sm:px-8 lg:px-12">
+              <PricingCarousel
+                onPackageSelect={handlePackageSelect}
+                onContactSales={() => goToAuth({ mode: "signup" })}
+              />
+            </div>
+            <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm text-slate-400">
+              <span className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary-500" /> Cancel anytime
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary-500" /> Education discounts
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary-500" /> Institution billing
+              </span>
             </div>
           </div>
         </section>
+
+        <section className="relative overflow-hidden border-y border-primary-500/20 bg-primary-950/40 py-16">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(var(--color-primary-500-rgb),0.15),transparent_70%)]" />
+          <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">
+              Ready to practice like a doctor?
+            </h2>
+            <p className="mt-4 text-lg text-slate-300">
+              Join students and institutions using MedPrepAI for safer, smarter
+              clinical training.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button
+                size="lg"
+                className="bg-primary-600 hover:bg-primary-500"
+                onClick={handleGetStarted}
+              >
+                {isAuthenticated ? "Open dashboard" : "Get started free"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+                onClick={openDemo}
+              >
+                Watch demo
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <FaqSection />
       </main>
 
-      <footer className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center text-sm text-gray-600 dark:text-gray-300">
-          <p>&copy; 2025 Clinical Lab. All rights reserved.</p>
-        </div>
-      </footer>
-
-      <VideoModal
-        isOpen={isVideoModalOpen}
-        onClose={handleCloseVideoModal}
-        videoSrc="/video/promotional.mp4"
-        title="Clinical Lab Demo"
+      <LandingFooter
+        onLogin={() => goToAuth()}
+        onSignup={() => goToAuth({ mode: "signup" })}
       />
+
+      {isDemoOpen && <DemoVideo onExit={closeDemo} />}
     </div>
   );
 }

@@ -31,7 +31,7 @@ export default function TestAnalysis() {
   return (
     <>
       <Head>
-        <title>Test Analysis - Clinical Lab</title>
+        <title>Test Analysis - MedPrepAI</title>
         <meta name="description" content="View your test analysis" />
       </Head>
 

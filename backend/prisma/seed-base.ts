@@ -7,7 +7,7 @@ import {
 } from "./education-users.seed";
 
 export async function seedBase(prisma: PrismaClient) {
-  console.log("🌱 Starting database seeding (Clinical Lab education)…");
+  console.log("🌱 Starting database seeding (MedPrepAI education)…");
 
   const roles = await resetRolesAndSeedEducationRoles(prisma);
 
@@ -236,7 +236,7 @@ export async function seedBase(prisma: PrismaClient) {
 
   console.log("⚙️ Creating system settings…");
   const systemSettings = [
-    { key: "app_name", value: "Clinical Lab", type: "string" },
+    { key: "app_name", value: "MedPrepAI", type: "string" },
     { key: "maintenance_mode", value: "false", type: "boolean" },
     {
       key: "supported_currencies",

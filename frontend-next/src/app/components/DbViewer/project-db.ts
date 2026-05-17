@@ -1,7 +1,7 @@
 import { ProjectData } from "./db-types/db-model";
 
 export const initialData: ProjectData = {
-  projectName: "Clinical Lab System",
+  projectName: "MedPrepAI System",
   description:
     "Clinical laboratory management system with modules for authentication, content, payments, subscriptions, assessments, chat, and notifications",
 

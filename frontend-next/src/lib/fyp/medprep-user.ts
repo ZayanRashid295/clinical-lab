@@ -22,6 +22,24 @@ export function getClinicalUserId(clinicalUser: unknown): string | null {
   return String(raw)
 }
 
+/**
+ * MedPrep session POST must not run before auth hydrates (same issue as PracticeCaseRoutePage).
+ * Polls the getter until a non-anonymous id exists or maxMs elapses.
+ */
+export async function waitForClinicalUserId(
+  getUser: () => unknown,
+  opts?: { maxMs?: number; stepMs?: number },
+): Promise<string | null> {
+  const maxMs = opts?.maxMs ?? 10_000
+  const stepMs = opts?.stepMs ?? 50
+  for (let t = 0; t < maxMs; t += stepMs) {
+    const uid = getClinicalUserId(getUser())
+    if (uid && uid !== "anonymous") return uid
+    await new Promise((r) => setTimeout(r, stepMs))
+  }
+  return getClinicalUserId(getUser())
+}
+
 export function toMedPrepUser(
   clinicalUser: { id?: string; userId?: string; email?: string; name?: string; roles?: string[] } | null
 ): User | null {

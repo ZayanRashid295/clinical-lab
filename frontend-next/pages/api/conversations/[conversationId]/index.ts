@@ -76,13 +76,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ? (body.metadata as Record<string, unknown>)
           : undefined
       const score = typeof body.score === "number" ? body.score : undefined
+      const title = typeof body.title === "string" ? body.title : undefined
       const conversation = await medprepBackendRequest<any>(`/medprep-ai/sessions/${id}`, {
         method: "PATCH",
         userId: localUserId,
+        timeoutMs: 30_000,
         body: {
           status,
           metadata,
           score,
+          title,
         },
       })
       return res.status(200).json({ success: true, conversation })

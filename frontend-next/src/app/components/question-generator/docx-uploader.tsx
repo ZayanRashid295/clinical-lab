@@ -4,6 +4,10 @@ import { useState, useRef } from "react";
 import { Card } from "@/shared/ui/card";
 import { parseMarkdown } from "./markdown-parser-utils";
 import { convertDocxToMarkdown, extractDocxText } from "./docx-to-markdown-converter";
+import {
+  extractDocxHierarchyMetadata,
+  mergeParsedHierarchy,
+} from "./parse-metadata-utils";
 import { QuestionsService } from "@/app/services/questions/questions.service";
 import { replaceImagePaths, replaceImagePathsInBlocks } from "./markdown-parser-utils";
 
@@ -44,6 +48,7 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       setProgress("Extracting content from DOCX file...");
       console.log("[DocxUploader] Step 1: Extracting content from DOCX file:", file.name);
       const { html, images } = await extractDocxText(file);
+      const hierarchyFromHtml = extractDocxHierarchyMetadata(html);
       console.log("[DocxUploader] Extracted:", {
         htmlLength: html.length,
         imagesCount: images.length,
@@ -205,18 +210,19 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       // Format for question creator
       const questionData = {
         stem: updatedStem,
-        category: parsed.category || parsed.subject,
-        product: parsed.product,
-        subject: parsed.subject,
-        system: parsed.system,
+        category: hierarchy.category || parsed.category || parsed.subject,
+        product: hierarchy.product || parsed.product,
+        subject: hierarchy.category || parsed.category || parsed.subject,
+        system: hierarchy.system || parsed.system,
         options: parsed.options,
         explanation: updatedMainExplanation,
         perAnswerExplanations: updatedPerAnswerExplanations,
         tags: parsed.tags,
         questionId: parsed.questionId,
-        topic: parsed.topic,
-        subtopic: parsed.subtopic,
-        title: parsed.title,
+        topic: hierarchy.topic || parsed.topic,
+        subtopic: hierarchy.subtopic || parsed.subtopic,
+        title: hierarchy.mcqTitle || parsed.title,
+        mcqTitle: hierarchy.mcqTitle || parsed.title,
       };
 
       setProgress("Finalizing...");

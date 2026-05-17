@@ -61,6 +61,9 @@ import { LearningModePage } from "../components/medprep-ai/LearningModePage";
 import { LearnCasesPage } from "../components/medprep-ai/LearnCasesPage";
 import { LearningNurseReportPage } from "../components/medprep-ai/LearningNurseReportPage";
 import { EvaluationModePage } from "../components/medprep-ai/EvaluationModePage";
+import { ShadowModePage } from "../components/medprep-ai/ShadowModePage";
+import { ShadowCasesPage } from "../components/medprep-ai/ShadowCasesPage";
+import { ShadowModePlayPage } from "../components/medprep-ai/ShadowModePlayPage";
 import { EvaluationCasesPage } from "../components/medprep-ai/EvaluationCasesPage";
 import { EvaluationNurseReportPage } from "../components/medprep-ai/EvaluationNurseReportPage";
 import { MedPrepSlugGate } from "../components/medprep-ai/MedPrepSlugGate";
@@ -77,6 +80,8 @@ import FeedbackPage from "../components/Launch/FeedbackPage";
 import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
 import SettingsPage from "../components/Launch/SettingsPage";
 import ProfilePage from "../components/Launch/ProfilePage";
+import { StudentAssignmentsPage } from "../components/institution/StudentAssignmentsPage";
+import { StudentMessagesPage } from "../components/institution/StudentMessagesPage";
 
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
@@ -126,6 +131,18 @@ export const transportationContentRegistry: ContentRegistry = {
       <EntitlementDefinitionManagementContent />
     ),
     "/my-subscription": () => <MySubscriptionPage />,
+
+    // Institution (faculty ↔ student)
+    "/assignments": () => (
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <StudentAssignmentsPage />
+      </div>
+    ),
+    "/messages": () => (
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <StudentMessagesPage />
+      </div>
+    ),
 
     // Product routes
     "/admin/categories": () => <CategoryManagementContent />,
@@ -187,6 +204,9 @@ export const transportationContentRegistry: ContentRegistry = {
       </div>
     ),
     "/medprep-ai/ai-evaluation": () => <EvaluationModePage />,
+    "/medprep-ai/shadow-mode": () => <ShadowModePage />,
+    "/medprep-ai/shadow-cases": () => <ShadowCasesPage />,
+    "/medprep-ai/shadow-play": () => <ShadowModePlayPage />,
 
     "/test-creation": () => <StudyCreateTestPage />,
     "/test-creation/new": () => <StudyCreateTestPage />,

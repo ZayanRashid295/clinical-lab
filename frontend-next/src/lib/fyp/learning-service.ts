@@ -1,24 +1,55 @@
 import type { ConversationContext } from "./data-models"
-import { BEST_GEMINI_MODEL, runNewGemini } from "./llm-gemini"
+import { saveSoapDraft } from "./medprep-persistence-service"
+import { BEST_GEMINI_MODEL, GEMINI_TURN_MODEL, runNewGemini } from "./llm-gemini"
+import {
+  CLINICAL_PLAIN_TEXT_RULES,
+  formatClinicalText,
+} from "@/lib/medprep-shadow/shadow-ui/format-clinical-text"
 
 async function generateText({
   model,
   system,
   prompt,
+  jsonMode = false,
+  maxOutputTokens,
 }: {
-  model: string
+  model?: string
   system?: string
   prompt: string
+  /** When true, request application/json (use for structured JSON-only prompts). */
+  jsonMode?: boolean
+  maxOutputTokens?: number
 }): Promise<{ text: string }> {
-  const text = await runNewGemini(model || BEST_GEMINI_MODEL, system || "", prompt, true, 0, true)
+  const modelName = (model && model.trim()) || GEMINI_TURN_MODEL
+  const text = await runNewGemini(
+    modelName,
+    system || "",
+    prompt,
+    false,
+    0,
+    !jsonMode,
+    undefined,
+    maxOutputTokens,
+  )
   return { text }
 }
 
 export interface LearningConversationMessage {
+  id?: string
   role: "doctor" | "patient" | "student"
   content: string
   explanation?: string
   timestamp: string
+  /**
+   * Shadow / MedPrep: stored in `medprep_conversation_messages.metadata.shadowTurn`
+   * and rebuilt on resume so doctor thought + DD align with this chat row.
+   */
+  shadowTurn?: {
+    doctorThought?: string
+    differentialDiagnosis?: Array<Record<string, unknown>>
+  }
+  /** Prisma `medprep_conversation_messages.id` after sync. */
+  medprepMessageId?: string
 }
 
 export interface LearningSOAPNote {
@@ -151,7 +182,8 @@ class LearningService {
       this.checkAPIKey()
       const { text } = await generateText({
         model: BEST_GEMINI_MODEL,
-        prompt: "Say 'API connection successful'"
+        prompt: "Say 'API connection successful'",
+        maxOutputTokens: 64,
       })
       console.log("API Test Response:", text)
       return text.includes("successful")
@@ -172,7 +204,7 @@ class LearningService {
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        maxOutputTokens: 512,
         system: `You are an experienced doctor conducting a patient interview for educational purposes. You do NOT know the patient's diagnosis - you must investigate and deduce it through questioning.
 
 Patient Profile:
@@ -195,7 +227,8 @@ QUESTION: [Your question to the patient]
 EXPLANATION: [1 short sentence explaining why this question matters]
 
 Previous conversation:
-${conversationContext}`,
+${conversationContext}
+${CLINICAL_PLAIN_TEXT_RULES}`,
         prompt: `Based on the conversation so far, what is the next most important question to ask this patient to help narrow down the differential diagnosis? Include your educational explanation.`,
       })
 
@@ -203,10 +236,13 @@ ${conversationContext}`,
       const questionLine = lines.find((line) => line.startsWith("QUESTION:"))
       const explanationLine = lines.find((line) => line.startsWith("EXPLANATION:"))
 
-      const question = questionLine?.replace("QUESTION:", "").trim() || text.split("EXPLANATION:")[0].trim()
-      const explanation =
+      const question = formatClinicalText(
+        questionLine?.replace("QUESTION:", "").trim() || text.split("EXPLANATION:")[0].trim(),
+      )
+      const explanation = formatClinicalText(
         explanationLine?.replace("EXPLANATION:", "").trim() ||
-        `This question helps gather key diagnostic information efficiently.`
+          `This question helps gather key diagnostic information efficiently.`,
+      )
 
       return { question, explanation }
     } catch (error) {
@@ -218,6 +254,61 @@ ${conversationContext}`,
     }
   }
 
+  /** Closing statement when the case has gathered enough information (not a new question). */
+  async generateDoctorConclusion(
+    context: ConversationContext,
+    conversationHistory: LearningConversationMessage[],
+    instruction?: string,
+  ): Promise<{ question: string; explanation: string }> {
+    this.checkAPIKey()
+
+    const { symptoms, patientProfile } = context
+    const conversationContext = conversationHistory
+      .map((msg) => `${msg.role}: ${msg.content}`)
+      .join("\n")
+
+    const defaultInstruction =
+      "You have gathered enough information. Deliver a brief, empathetic closing statement (2–3 sentences). Thank the patient, acknowledge what was discussed, and state that you will now formulate your assessment. Do NOT ask any new questions."
+
+    try {
+      const { text } = await generateText({
+        maxOutputTokens: 512,
+        system: `You are an experienced physician ending a simulated patient interview for medical education.
+
+Patient: ${patientProfile.name}, ${patientProfile.age}y, ${patientProfile.gender}
+Symptoms on file: ${symptoms.join(", ")}
+
+Transcript:
+${conversationContext || "(empty)"}
+
+Output ONLY the doctor's closing statement to the patient. No QUESTION:/EXPLANATION: labels. No interview questions.
+${CLINICAL_PLAIN_TEXT_RULES}`,
+        prompt: instruction?.trim() || defaultInstruction,
+      })
+
+      const statement = formatClinicalText(
+        text
+          .replace(/^QUESTION:\s*/i, "")
+          .replace(/^EXPLANATION:.*$/gim, "")
+          .trim(),
+      )
+
+      return {
+        question:
+          statement ||
+          "Thank you for sharing all of this with me. I have enough information to formulate my assessment now.",
+        explanation: "",
+      }
+    } catch (error) {
+      console.error("Error generating doctor conclusion:", error)
+      return {
+        question:
+          "Thank you for providing this information. I have sufficient clinical data to conclude our consultation and formulate my assessment.",
+        explanation: "",
+      }
+    }
+  }
+
   async generatePatientResponse(doctorQuestion: string, context: ConversationContext): Promise<string> {
     this.checkAPIKey()
 
@@ -225,7 +316,7 @@ ${conversationContext}`,
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        maxOutputTokens: 384,
         system: `You are a patient with ${disease}. You are the TRUTH SOURCE - you know your exact condition and all associated symptoms, history, and lab results.
 
 Your profile:
@@ -249,13 +340,14 @@ IMPORTANT PATIENT AGENT RULES:
 11. Respond directly to the latest question first, then add one key detail
 12. Do not output role labels, bullets, or long paragraphs
 
-Respond to the doctor's questions naturally and realistically.`,
+Respond to the doctor's questions naturally and realistically.
+${CLINICAL_PLAIN_TEXT_RULES}`,
         prompt: `The doctor asks: "${doctorQuestion}"
 
 Respond as the patient with ${disease}. Keep it short, clear, and natural.`,
       })
 
-      return text
+      return formatClinicalText(text)
     } catch (error) {
       console.error("Error generating patient response:", error)
       return "I'm not feeling well, doctor. Could you please be more specific about what you'd like to know?"
@@ -272,7 +364,7 @@ Respond as the patient with ${disease}. Keep it short, clear, and natural.`,
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        maxOutputTokens: 256,
         system: `You are an experienced doctor evaluating whether you have gathered enough information to diagnose ${disease}.
 
 Review the conversation and determine if you have sufficient information for:
@@ -327,7 +419,7 @@ Do you have enough information to proceed with diagnosis and treatment planning?
     })
 
     const { text } = await generateText({
-      model: BEST_GEMINI_MODEL,
+      maxOutputTokens: 2048,
       system: `You are a medical AI assistant generating realistic patient information for a medical education case. Create authentic, medically accurate patient data based on the case details. Always respond in the exact format requested.`,
       prompt: `Generate realistic patient information for this medical case:
 
@@ -422,7 +514,7 @@ Father: [realistic family history]`
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        maxOutputTokens: 8192,
         system: isCaseOnly
           ? `You are an experienced doctor writing an educational SOAP note for a medical student based only on the following case information (no conversation yet).
 
@@ -507,7 +599,8 @@ PLAN_EXPLANATION: [explanation for plan]`,
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        jsonMode: true,
+        maxOutputTokens: 512,
         system: `You are an experienced physician generating realistic vital signs for a patient with ${disease}. 
 
 Patient Profile:
@@ -568,7 +661,8 @@ Respond with ONLY a JSON object in this exact format:
       try {
         console.log("Retrying vital signs generation...")
         const { text: retryText } = await generateText({
-          model: BEST_GEMINI_MODEL,
+          jsonMode: true,
+          maxOutputTokens: 512,
           system: `Generate vital signs for a patient with ${disease}. Age: ${patientProfile.age}, Gender: ${patientProfile.gender}. Return only JSON.`,
           prompt: `Patient has ${disease}. Generate realistic vital signs as JSON: {"bloodPressure": "systolic/diastolic", "heartRate": number, "temperature": "temp°F", "respiratoryRate": number}`,
         })
@@ -603,7 +697,7 @@ Respond with ONLY a JSON object in this exact format:
 
     try {
       const { text } = await generateText({
-        model: BEST_GEMINI_MODEL,
+        maxOutputTokens: 1536,
         system: `You are an experienced medical educator and doctor. A medical student is observing a patient consultation for ${disease} and has asked you a question.
 
 Provide a clear, educational response that helps the student understand:
@@ -637,21 +731,9 @@ Provide an educational response about this ${disease} case.`,
     return session
   }
 
-  private persistLocal(session: LearningSession): void {
-    this.normalizeLocalKey(session)
-    const sessions = this.getLearningSessionsForUser()
-    const key = session.id
-    const existingIndex = sessions.findIndex(
-      (s) => s.id === key || s.caseId === session.caseId || s.conversationId === session.conversationId
-    )
-
-    if (existingIndex >= 0) {
-      sessions[existingIndex] = session
-    } else {
-      sessions.push(session)
-    }
-
-    localStorage.setItem("learning_sessions", JSON.stringify(sessions))
+  /** @deprecated Learning sessions persist to MedPrep DB only — no browser storage. */
+  private persistLocal(_session: LearningSession): void {
+    // Intentionally empty: all learning state is stored in medprep_conversations (+ soap_notes).
   }
 
   /**
@@ -702,7 +784,13 @@ Provide an educational response about this ${disease} case.`,
 
     const rawMessages = Array.isArray(conv.messages) ? conv.messages : []
     const messages = collapseLegacyDuplicateAdjacentMessages(rawMessages)
-    const conversation: LearningConversationMessage[] = messages.map((msg: any) => ({
+    const conversation: LearningConversationMessage[] = messages.map((msg: any, idx: number) => ({
+        id:
+          typeof msg.id === "string" && msg.id
+            ? msg.id
+            : typeof msg.cuid === "string" && msg.cuid
+              ? msg.cuid
+              : `m-${idx}-${String(msg.createdAt || "")}`,
         role: String(msg.role || "")
           .toLowerCase()
           .trim() as "doctor" | "patient" | "student",
@@ -731,10 +819,31 @@ Provide an educational response about this ${disease} case.`,
       learningState.uiState && typeof learningState.uiState === "object"
         ? learningState.uiState
         : undefined
-    const soapNote =
+    let soapNote =
       learningState.soapNote && typeof learningState.soapNote === "object"
         ? (learningState.soapNote as LearningSOAPNote)
         : undefined
+
+    const latestSoap = Array.isArray(conv.soapNotes) ? conv.soapNotes[0] : null
+    if (latestSoap && typeof latestSoap === "object") {
+      const row = latestSoap as Record<string, unknown>
+      const base = {
+        subjective: String(row.subjective ?? ""),
+        objective: String(row.objective ?? ""),
+        assessment: String(row.assessment ?? ""),
+        plan: String(row.plan ?? ""),
+      }
+      soapNote = {
+        subjective: base.subjective,
+        subjectiveExplanation: soapNote?.subjectiveExplanation ?? "",
+        objective: base.objective,
+        objectiveExplanation: soapNote?.objectiveExplanation ?? "",
+        assessment: base.assessment,
+        assessmentExplanation: soapNote?.assessmentExplanation ?? "",
+        plan: base.plan,
+        planExplanation: soapNote?.planExplanation ?? "",
+      }
+    }
 
     const isComplete = conv.status === "COMPLETED" || Boolean(learningState.isComplete)
 
@@ -790,6 +899,13 @@ Provide an educational response about this ${disease} case.`,
             caseId: session.caseId,
             mode: "LEARNING",
             caseTitle: session.disease,
+            metadata: {
+              learningState: {
+                patientInfo: session.patientInfo,
+                vitalSigns: session.vitalSigns,
+                uiState: session.uiState,
+              },
+            },
           }),
         })
         const conversationData = await conversationResponse.json().catch(() => null)
@@ -806,6 +922,7 @@ Provide an educational response about this ${disease} case.`,
 
       const persistedCount = this.persistedMessageCounts.get(conversationId) ?? 0
       const already = Math.max(0, session.lastSyncedMessageCount ?? 0, persistedCount)
+      let syncedThrough = already
       for (let i = already; i < session.conversation.length; i++) {
         const message = session.conversation[i]
         const role = String(message.role).toUpperCase()
@@ -830,8 +947,9 @@ Provide an educational response about this ${disease} case.`,
           console.error("[learning] add message failed", msgRes.status, errText.slice(0, 300))
           break
         }
+        syncedThrough = i + 1
       }
-      session.lastSyncedMessageCount = session.conversation.length
+      session.lastSyncedMessageCount = syncedThrough
       this.persistedMessageCounts.set(conversationId, session.lastSyncedMessageCount)
 
       const learningState: LearningMetadataState = {
@@ -852,7 +970,6 @@ Provide an educational response about this ${disease} case.`,
       const metadataFingerprint =
         `${session.lastSyncedMessageCount}:${JSON.stringify(patchBody.metadata)}:${String(patchBody.status ?? "")}`
       if (this.lastSyncedMetadataFingerprintByConversation.get(conversationId) === metadataFingerprint) {
-        this.persistLocal(session)
         return
       }
 
@@ -870,30 +987,62 @@ Provide an educational response about this ${disease} case.`,
       } else {
         this.lastSyncedMetadataFingerprintByConversation.set(conversationId, metadataFingerprint)
       }
+
+      if (session.soapNote) {
+        const sn = session.soapNote
+        const hasSoap =
+          sn.subjective?.trim() ||
+          sn.objective?.trim() ||
+          sn.assessment?.trim() ||
+          sn.plan?.trim()
+        if (hasSoap) {
+          await saveSoapDraft({
+            conversationId,
+            userId,
+            subjective: sn.subjective || "",
+            objective: sn.objective || "",
+            assessment: sn.assessment || "",
+            plan: sn.plan || "",
+          })
+        }
+      }
     } catch (error) {
       console.error("Error saving session to database:", error)
     }
-
-    this.persistLocal(session)
   }
 
   getLearningSessionsForUser(): LearningSession[] {
-    const sessions = localStorage.getItem("learning_sessions")
-    return sessions ? JSON.parse(sessions) : []
+    return []
   }
 
-  getLearningSession(sessionId: string): LearningSession | null {
-    const sessions = this.getLearningSessionsForUser()
-    const caseIdFromKey = sessionId.startsWith(LEARN_PREFIX) ? sessionId.slice(LEARN_PREFIX.length) : sessionId
+  /** Browser cache removed — load via `getLearningSessionFromDatabase` or active session props. */
+  getLearningSession(_sessionId: string): LearningSession | null {
+    return null
+  }
 
-    const found =
-      sessions.find((s) => s.id === sessionId) ||
-      sessions.find((s) => s.caseId === caseIdFromKey) ||
-      sessions.find((s) => s.conversationId === sessionId) ||
-      null
-
-    if (!found) return null
-    return this.normalizeLocalKey({ ...found })
+  async resolveLearningSessionFromDatabase(
+    caseId: string,
+    userId: string,
+    conversationId?: string | null,
+    medicalCase?: unknown,
+  ): Promise<LearningSession | null> {
+    if (!userId || userId === "anonymous") return null
+    if (conversationId) {
+      return this.getLearningSessionFromDatabase(conversationId, userId, medicalCase)
+    }
+    try {
+      const q = new URLSearchParams({ userId, mode: "LEARNING" })
+      q.set("status", "ACTIVE")
+      q.set("caseId", caseId)
+      const res = await fetch(`/api/conversations?${q}`)
+      const data = await res.json().catch(() => null)
+      if (res.ok && data?.success && Array.isArray(data.conversations) && data.conversations[0]?.id) {
+        return this.getLearningSessionFromDatabase(data.conversations[0].id, userId, medicalCase)
+      }
+    } catch (e) {
+      console.warn("[learning] resolve session failed", e)
+    }
+    return null
   }
 
   async getLearningSessionFromDatabase(

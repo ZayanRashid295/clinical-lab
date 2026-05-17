@@ -1,8 +1,8 @@
 import { DashboardConfig } from "../types/dashboard";
 
 export const mainDashboardConfig: DashboardConfig = {
-  title: "Transportation Dashboard",
-  description: "Monitor and manage your transportation platform",
+  title: "MedPrepAI Dashboard",
+  description: "Monitor your clinical learning and practice progress",
   stats: [
     {
       label: "Today's Revenue",

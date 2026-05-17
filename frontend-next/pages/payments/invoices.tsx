@@ -31,13 +31,13 @@ export default function Invoices() {
   return (
     <>
       <Head>
-        <title>Invoices - Medical Lab</title>
+        <title>Invoices - MedPrepAI</title>
         <meta name="description" content="Manage invoices and billing" />
       </Head>
 
       <MenuSystem
         contentRegistry={transportationContentRegistry}
-        applicationTitle="Medical Lab"
+        applicationTitle="MedPrepAI"
       />
     </>
   );

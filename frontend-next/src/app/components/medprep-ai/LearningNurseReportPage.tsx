@@ -8,6 +8,7 @@ export function LearningNurseReportPage() {
     <MedPrepSlugGate slug="qa" modeLabel="Learning Mode">
       <ModeNurseReportPage
         config={{
+          medprepMode: "LEARNING",
           modeLabel: "Learning Mode",
           backLabel: "Back to Learning Cases",
           backRoute: "/medprep-ai/learn-cases",

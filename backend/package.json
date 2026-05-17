@@ -1,7 +1,7 @@
 {
-  "name": "uber-backend",
+  "name": "medprepai-backend",
   "version": "1.0.0",
-  "description": "Uber application backend with NestJS, Prisma, and Swagger",
+  "description": "MedPrepAI backend API with NestJS, Prisma, and Swagger",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
