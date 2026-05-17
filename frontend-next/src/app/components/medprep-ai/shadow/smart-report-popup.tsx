@@ -57,21 +57,20 @@ export function SmartReportPopup({
   const [selectedTests, setSelectedTests] = useState<Set<string>>(new Set());
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Only render when popup is actually open
+  // Auto-select high confidence tests when popup opens
+  useEffect(() => {
+    if (!isOpen || detectedTests.length === 0) return;
+
+    const highConfidenceTests = detectedTests
+      .filter((test) => test.confidence > 0.7)
+      .map((test) => `${test.type}-${test.category}`);
+
+    setSelectedTests(new Set(highConfidenceTests));
+  }, [detectedTests, isOpen]);
+
   if (!isOpen) {
     return null;
   }
-
-  // Auto-select high confidence tests
-  useEffect(() => {
-    if (detectedTests.length > 0) {
-      const highConfidenceTests = detectedTests
-        .filter(test => test.confidence > 0.7)
-        .map(test => `${test.type}-${test.category}`);
-      
-      setSelectedTests(new Set(highConfidenceTests));
-    }
-  }, [detectedTests]);
 
   const handleTestToggle = (test: DetectedTest) => {
     const testKey = `${test.type}-${test.category}`;

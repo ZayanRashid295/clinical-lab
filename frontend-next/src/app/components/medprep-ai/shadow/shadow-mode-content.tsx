@@ -54,19 +54,6 @@ export default function ShadowModeContent({
   // Use custom hook for persistent state management
   const shadowModeState = useShadowModeState();
   
-  // Check if the hook is properly initialized
-  if (!shadowModeState) {
-    return (
-      <div className={containerClass}>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Initializing shadow mode...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const {
     viewMode,
