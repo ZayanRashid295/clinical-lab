@@ -184,7 +184,7 @@ CREATE TABLE `faculty_student_threads` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     UNIQUE INDEX `faculty_student_threads_chatRoomId_key`(`chatRoomId`),
-    UNIQUE INDEX `faculty_student_threads_institutionId_facultyUserId_studentUserId_key`(`institutionId`, `facultyUserId`, `studentUserId`),
+    UNIQUE INDEX `fst_inst_fac_stu_uniq`(`institutionId`, `facultyUserId`, `studentUserId`),
     INDEX `faculty_student_threads_facultyUserId_idx`(`facultyUserId`),
     INDEX `faculty_student_threads_studentUserId_idx`(`studentUserId`),
     PRIMARY KEY (`id`)

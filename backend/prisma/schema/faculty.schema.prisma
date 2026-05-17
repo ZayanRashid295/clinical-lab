@@ -257,7 +257,7 @@ model FacultyStudentThread {
   institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   chatRoom    ChatRoom    @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 
-  @@unique([institutionId, facultyUserId, studentUserId])
+  @@unique([institutionId, facultyUserId, studentUserId], map: "fst_inst_fac_stu_uniq")
   @@index([facultyUserId])
   @@index([studentUserId])
   @@map("faculty_student_threads")
