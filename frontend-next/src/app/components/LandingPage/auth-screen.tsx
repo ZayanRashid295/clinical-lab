@@ -138,14 +138,13 @@ export function AuthScreen({
 
   const isSignup = view === "signup";
 
-  const fieldLabel =
-    "text-sm font-medium tracking-tight text-slate-700 dark:text-slate-200";
+  const fieldLabel = "text-sm font-medium tracking-tight text-slate-200";
 
   const inputClass =
-    "h-12 rounded-xl border border-slate-200/90 bg-white px-4 text-slate-900 shadow-sm transition-[border-color,box-shadow] placeholder:text-slate-400/90 focus-visible:border-teal-600/50 focus-visible:ring-2 focus-visible:ring-teal-600/15 dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-teal-500/45 dark:focus-visible:ring-teal-500/15";
+    "h-12 rounded-xl border border-white/10 bg-slate-900/80 px-4 text-slate-100 shadow-sm transition-[border-color,box-shadow] placeholder:text-slate-500 focus-visible:border-primary-500/50 focus-visible:ring-2 focus-visible:ring-primary-500/20";
 
   const primaryBtn =
-    "h-12 w-full rounded-xl text-[15px] font-semibold text-white shadow-lg shadow-teal-900/20 transition-all duration-200 bg-gradient-to-r from-teal-600 via-teal-600 to-emerald-700 hover:from-teal-500 hover:via-teal-600 hover:to-emerald-600 hover:shadow-xl hover:shadow-teal-900/25 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none dark:from-teal-500 dark:via-teal-600 dark:to-emerald-700 dark:shadow-teal-950/40";
+    "h-12 w-full rounded-xl text-[15px] font-semibold text-white shadow-lg shadow-primary-900/30 transition-all duration-200 bg-primary-600 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-900/40 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none";
 
   const heroBullets = isSignup
     ? [
@@ -160,15 +159,15 @@ export function AuthScreen({
       ];
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col overflow-hidden bg-slate-50 dark:bg-slate-950 lg:flex-row">
+    <div className="flex min-h-[calc(100dvh-4rem)] w-full flex-col overflow-hidden bg-slate-950 lg:flex-row">
       {/* Hero — full width on mobile, half viewport on large screens */}
-      <section className="relative flex min-h-[min(44vh,400px)] flex-1 flex-col items-center justify-center px-8 py-12 sm:px-12 sm:py-16 lg:min-h-0 lg:flex-[1.08] lg:items-start lg:justify-center lg:px-16 lg:py-20 xl:px-20">
+      <section className="relative flex min-h-[min(52vh,480px)] flex-1 flex-col items-center justify-center px-8 py-16 sm:px-12 sm:py-20 lg:min-h-0 lg:flex-[1.08] lg:items-center lg:justify-center lg:px-20 lg:py-24 xl:px-24 xl:py-28">
         <div
-          className="absolute inset-0 bg-gradient-to-br from-slate-900 via-teal-950 to-slate-950 dark:from-slate-950 dark:via-teal-950/90 dark:to-indigo-950"
+          className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           aria-hidden
         />
         <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_0%_-20%,rgba(45,212,191,0.22),transparent_50%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_0%_-20%,rgba(var(--color-primary-500-rgb,16,185,129),0.2),transparent_50%)]"
           aria-hidden
         />
         <div
@@ -184,25 +183,43 @@ export function AuthScreen({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent lg:from-slate-950/40" aria-hidden />
 
-        <div className="relative z-[1] w-full max-w-xl text-center lg:max-w-lg lg:text-left">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-teal-100/95 shadow-sm backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5 text-teal-300" aria-hidden />
-            MedPrepAI
+        <div className="relative z-[1] flex w-full max-w-xl flex-col items-center justify-center gap-10 py-4 text-center sm:gap-12 lg:max-w-xl lg:gap-16 lg:py-10">
+          <div
+            className={cn(
+              "flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl sm:h-24 sm:w-24",
+              "bg-gradient-to-br from-white/15 to-white/5 shadow-2xl shadow-black/20 ring-1 ring-white/20 backdrop-blur-xl",
+            )}
+          >
+            {isSignup ? (
+              <UserPlus className="h-10 w-10 text-white/95 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden />
+            ) : (
+              <Stethoscope className="h-10 w-10 text-white/95 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden />
+            )}
           </div>
-          <h1 className="text-balance font-semibold tracking-tight text-white text-3xl sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
-            {isSignup ? "Create your account" : "Welcome back"}
-          </h1>
-          <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-slate-300 sm:text-[17px] lg:mx-0 lg:max-w-none">
-            {isSignup
-              ? "Practice clinical skills with AI in a secure, structured environment — built for serious medical learners."
-              : "Sign in to continue simulations, assessments, and your personalized learning path."}
-          </p>
 
-          <ul className="mx-auto mt-8 max-w-md space-y-3 text-left text-sm leading-snug text-slate-300/95 sm:text-[15px] lg:mx-0 lg:max-w-none">
+          <div className="flex flex-col items-center gap-6 sm:gap-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary-500/30 bg-primary-500/10 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-primary-300 shadow-sm backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-primary-400" aria-hidden />
+              AI clinical education platform
+            </div>
+            <h1 className="max-w-lg text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl lg:leading-[1.12]">
+              {isSignup ? "Create your account" : "Welcome back"}
+            </h1>
+            <p className="max-w-lg text-pretty text-base leading-relaxed text-slate-300 sm:text-lg sm:leading-relaxed">
+              {isSignup
+                ? "Practice clinical skills with AI in a secure, structured environment — built for serious medical learners."
+                : "Sign in to continue simulations, assessments, and your personalized learning path."}
+            </p>
+          </div>
+
+          <ul className="flex w-full max-w-lg flex-col items-center gap-5 sm:gap-6">
             {heroBullets.map((line) => (
-              <li key={line} className="flex gap-3">
+              <li
+                key={line}
+                className="flex w-full max-w-md items-start justify-center gap-4 text-left text-sm leading-relaxed text-slate-300/95 sm:text-base"
+              >
                 <CheckCircle2
-                  className="mt-0.5 h-5 w-5 shrink-0 text-teal-400/90"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-primary-400 sm:h-6 sm:w-6"
                   strokeWidth={2}
                   aria-hidden
                 />
@@ -210,38 +227,22 @@ export function AuthScreen({
               </li>
             ))}
           </ul>
-
-          <div className="relative z-[1] mt-10 flex justify-center lg:mt-12 lg:justify-start">
-            <div
-              className={cn(
-                "flex h-16 w-16 items-center justify-center rounded-2xl sm:h-[4.5rem] sm:w-[4.5rem]",
-                "bg-gradient-to-br from-white/15 to-white/5 shadow-2xl shadow-black/20 ring-1 ring-white/20 backdrop-blur-xl"
-              )}
-            >
-              {isSignup ? (
-                <UserPlus className="h-8 w-8 text-white/95 sm:h-9 sm:w-9" strokeWidth={1.5} aria-hidden />
-              ) : (
-                <Stethoscope className="h-8 w-8 text-white/95 sm:h-9 sm:w-9" strokeWidth={1.5} aria-hidden />
-              )}
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Form — full width below hero on mobile, half viewport on large screens */}
       <section
         className={cn(
-          "relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t border-slate-200/80 bg-gradient-to-b from-white via-slate-50/90 to-slate-100/80",
-          "dark:border-white/10 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950",
-          "px-6 py-10 sm:px-10 sm:py-14 lg:min-h-0 lg:border-l lg:border-t-0 lg:border-slate-200/80 lg:px-12 lg:py-16 xl:px-16 dark:lg:border-white/10"
+          "relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t border-white/10 bg-slate-950",
+          "px-6 py-12 sm:px-10 sm:py-16 lg:min-h-0 lg:border-l lg:border-t-0 lg:px-14 lg:py-20 xl:px-20 xl:py-24",
         )}
       >
         <div className="mx-auto w-full max-w-md lg:max-w-lg">
-        <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 lg:text-left">
+        <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary-400 lg:text-left">
           {isSignup ? "Registration" : "Account access"}
         </p>
         <div
-          className="mb-8 flex rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1.5 shadow-inner dark:border-white/10 dark:bg-slate-800/70"
+          className="mb-8 flex rounded-2xl border border-white/10 bg-slate-900/70 p-1.5 shadow-inner"
           role="tablist"
           aria-label="Sign in or create account"
         >
@@ -252,8 +253,8 @@ export function AuthScreen({
             className={cn(
               "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
               !isSignup
-                ? "bg-white text-slate-900 shadow-md shadow-black/[0.06] ring-1 ring-slate-200/80 dark:bg-slate-700/90 dark:text-slate-50 dark:shadow-black/30 dark:ring-white/10"
-                : "text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-slate-100"
+                ? "bg-slate-800 text-white shadow-md shadow-black/30 ring-1 ring-white/10"
+                : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
             )}
             onClick={() => goToView("login")}
           >
@@ -266,8 +267,8 @@ export function AuthScreen({
             className={cn(
               "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
               isSignup
-                ? "bg-white text-slate-900 shadow-md shadow-black/[0.06] ring-1 ring-slate-200/80 dark:bg-slate-700/90 dark:text-slate-50 dark:shadow-black/30 dark:ring-white/10"
-                : "text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-slate-100"
+                ? "bg-slate-800 text-white shadow-md shadow-black/30 ring-1 ring-white/10"
+                : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
             )}
             onClick={() => goToView("signup")}
           >
@@ -280,7 +281,7 @@ export function AuthScreen({
             {error && (
               <Alert
                 variant="destructive"
-                className="rounded-2xl border-red-200/80 bg-red-50/90 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100"
+                className="rounded-2xl border-red-500/40 bg-red-500/15 text-red-100"
               >
                 <AlertDescription className="text-sm font-medium leading-snug">
                   {error}
@@ -380,7 +381,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-100"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -388,7 +389,7 @@ export function AuthScreen({
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{PASSWORD_HINT}</p>
+              <p className="text-xs leading-relaxed text-slate-400">{PASSWORD_HINT}</p>
             </div>
 
             <div className="space-y-2">
@@ -414,7 +415,7 @@ export function AuthScreen({
               className={cn(
                 primaryBtn,
                 "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25 dark:focus-visible:ring-offset-slate-950"
+                "focus-visible:ring-2 focus-visible:ring-primary-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               )}
             >
               {isLoading ? "Creating account…" : "Create account"}
@@ -425,7 +426,7 @@ export function AuthScreen({
             {error && (
               <Alert
                 variant="destructive"
-                className="rounded-2xl border-red-200/80 bg-red-50/90 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100"
+                className="rounded-2xl border-red-500/40 bg-red-500/15 text-red-100"
               >
                 <AlertDescription className="text-sm font-medium leading-snug">
                   {error}
@@ -472,7 +473,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-100"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -488,7 +489,7 @@ export function AuthScreen({
               className={cn(
                 primaryBtn,
                 "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-teal-600/30 focus-visible:ring-offset-2 dark:focus-visible:ring-teal-400/25 dark:focus-visible:ring-offset-slate-950"
+                "focus-visible:ring-2 focus-visible:ring-primary-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               )}
             >
               {isLoading ? "Signing in…" : "Sign in"}
@@ -496,11 +497,11 @@ export function AuthScreen({
           </form>
         )}
 
-        <div className="mt-8 flex gap-3.5 rounded-2xl border border-teal-600/10 bg-gradient-to-br from-teal-50/80 to-emerald-50/30 px-4 py-4 dark:border-teal-500/20 dark:from-teal-950/35 dark:to-emerald-950/25">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600/10 dark:bg-teal-400/15">
-            <ShieldCheck className="h-4 w-4 text-teal-700 dark:text-teal-400" aria-hidden />
+        <div className="mt-8 flex gap-3.5 rounded-2xl border border-primary-500/20 bg-primary-500/10 px-4 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-500/15">
+            <ShieldCheck className="h-4 w-4 text-primary-400" aria-hidden />
           </div>
-          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          <p className="text-sm leading-relaxed text-slate-300">
             {isSignup
               ? "By continuing, you agree to use MedPrepAI responsibly. We protect your data with encryption in transit and at rest."
               : "Use a strong password and a device you trust. Never share your credentials with anyone."}
@@ -508,8 +509,8 @@ export function AuthScreen({
         </div>
 
         {isDev && !isSignup && (
-          <div className="mt-8 border-t border-slate-200/80 pt-8 dark:border-white/10">
-            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+          <div className="mt-8 border-t border-white/10 pt-8">
+            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
               Local development
             </p>
             <Button
@@ -518,7 +519,7 @@ export function AuthScreen({
               size="sm"
               onClick={fillTestCredentials}
               disabled={isLoading}
-              className="w-full cursor-pointer rounded-xl border-dashed border-slate-300/90 text-slate-800 hover:bg-slate-100 dark:border-slate-500 dark:bg-slate-800/60 dark:text-slate-100 dark:hover:bg-slate-700/80"
+              className="w-full cursor-pointer rounded-xl border-dashed border-white/20 bg-slate-900/60 text-slate-200 hover:bg-slate-800"
             >
               Fill demo credentials
             </Button>
@@ -526,11 +527,11 @@ export function AuthScreen({
         )}
 
         {isSignup ? (
-          <p className="mt-8 text-center text-sm leading-relaxed text-slate-600 dark:text-slate-400 lg:text-left">
+          <p className="mt-8 text-center text-sm leading-relaxed text-slate-400 lg:text-left">
             Already have an account?{" "}
             <button
               type="button"
-              className="font-semibold text-teal-700 underline-offset-4 transition-colors hover:text-teal-800 hover:underline dark:text-teal-400 dark:hover:text-teal-300"
+              className="font-semibold text-primary-400 underline-offset-4 transition-colors hover:text-primary-300 hover:underline"
               onClick={() => goToView("login")}
             >
               Sign in
@@ -538,17 +539,17 @@ export function AuthScreen({
           </p>
         ) : (
           <div className="mt-8 space-y-2 text-center lg:text-left">
-            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            <p className="text-sm leading-relaxed text-slate-400">
               New to MedPrepAI?{" "}
               <button
                 type="button"
-                className="font-semibold text-teal-700 underline-offset-4 transition-colors hover:text-teal-800 hover:underline dark:text-teal-400 dark:hover:text-teal-300"
+                className="font-semibold text-primary-400 underline-offset-4 transition-colors hover:text-primary-300 hover:underline"
                 onClick={() => goToView("signup")}
               >
                 Create an account
               </button>
             </p>
-            <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-500">
+            <p className="text-xs leading-relaxed text-slate-500">
               Institutional access is managed by your administrator.
             </p>
           </div>
