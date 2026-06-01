@@ -1,0 +1,25 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    entity/.style={rectangle, draw, minimum width=2.1cm, minimum height=0.65cm, font=\scriptsize, align=center},
+    rel/.style={->, >=stealth}
+  ]
+    \node[entity] (prod) {Product};
+    \node[entity, right=1.4cm of prod] (sec) {Section};
+    \node[entity, right=1.4cm of sec] (ch) {Chapter};
+    \node[entity, below=1.1cm of ch] (top) {Topic};
+    \node[entity, left=1.4cm of top] (q) {Question};
+    \node[entity, left=1.4cm of q] (qc) {QuestionChoice};
+    \node[entity, below=1.1cm of q] (qp) {QuestionPaper};
+    \node[entity, left=1.4cm of qp] (qpq) {QPQuestion};
+    \draw[rel] (prod) -- node[above,font=\tiny]{1:N} (sec);
+    \draw[rel] (sec) -- node[above,font=\tiny]{1:N} (ch);
+    \draw[rel] (ch) -- node[right,font=\tiny]{1:N} (top);
+    \draw[rel] (top) -- node[above,font=\tiny]{1:N} (q);
+    \draw[rel] (q) -- node[above,font=\tiny]{1:N} (qc);
+    \draw[rel] (qp) -- node[above,font=\tiny]{1:N} (qpq);
+    \draw[rel] (q) -- node[right,font=\tiny]{N:M} (qpq);
+  \end{tikzpicture}
+  \caption{Core LMS content hierarchy and assessment linkage.}
+  \label{fig:lms-er}
+\end{figure}

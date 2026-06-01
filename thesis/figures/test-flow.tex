@@ -1,0 +1,18 @@
+% Test workflow — tabular layout (avoids TikZ node overlap on Overleaf)
+\begin{figure}[H]
+  \centering
+  \vspace{0.3em}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}c@{$\rightarrow$}c@{$\rightarrow$}c@{$\rightarrow$}c@{$\rightarrow$}c@{$\rightarrow$}c@{}}
+    \fbox{\parbox{1.45cm}{\centering\scriptsize Create\\paper}} &
+    \fbox{\parbox{1.45cm}{\centering\scriptsize Select\\questions}} &
+    \fbox{\parbox{1.45cm}{\centering\scriptsize Start\\session}} &
+    \fbox{\parbox{1.45cm}{\centering\scriptsize Answer\\items}} &
+    \fbox{\parbox{1.45cm}{\centering\scriptsize Submit}} &
+    \fbox{\parbox{1.55cm}{\centering\scriptsize Results\\analytics}}
+  \end{tabular}%
+  }
+  \vspace{0.3em}
+  \caption{Student QBank test session workflow.}
+  \label{fig:test-flow}
+\end{figure}

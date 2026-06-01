@@ -107,13 +107,50 @@ export function getDocxCompletionMaxTokens(model: string, promptText: string): n
   return Math.min(8192, Math.max(1024, available));
 }
 
-/** Shrink HTML payload when approaching context limits (metadata extracted separately). */
-export function compactHtmlForLlm(html: string, maxChars = 100000): string {
-  let compact = html
+/** Strip verbose HTML markup before token-heavy LLM calls. Preserves structure and image placeholders. */
+export function normalizeHtmlForLlm(html: string): string {
+  return html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(style|script)[^>]*>[\s\S]*?<\/\1>/gi, "")
+    .replace(
+      /\s(?:class|style|id|width|height|align|valign|border|cellpadding|cellspacing|colspan|rowspan|data-[a-z-]+)="[^"]*"/gi,
+      "",
+    )
+    .replace(/<(\/?)(?:span|div|font|o:p)[^>]*>/gi, "")
     .replace(/[\r\n\t]+/g, " ")
     .replace(/\s{2,}/g, " ")
     .replace(/>\s+</g, "><")
     .trim();
+}
+
+/** Org TPM tier for gpt-4o (override via OPENAI_DOCX_TPM_LIMIT). */
+export function getDocxTpmLimit(): number {
+  const raw = process.env.OPENAI_DOCX_TPM_LIMIT;
+  const parsed = raw ? parseInt(raw, 10) : 30000;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 30000;
+}
+
+export function getDocxTpmSafetyMargin(): number {
+  const raw = process.env.OPENAI_DOCX_TPM_SAFETY;
+  const parsed = raw ? parseInt(raw, 10) : 2000;
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 2000;
+}
+
+/** Max HTML chars that fit within OpenAI TPM budget given static prompt + completion reserve. */
+export function computeMaxHtmlCharsForTpm(
+  tpmLimit: number,
+  promptOverheadTokens: number,
+  maxCompletionTokens: number,
+  safetyMargin = 2000,
+): number {
+  const maxInputTokens = tpmLimit - safetyMargin - maxCompletionTokens;
+  const htmlTokenBudget = Math.max(2048, maxInputTokens - promptOverheadTokens);
+  return Math.min(100000, htmlTokenBudget * 4);
+}
+
+/** Shrink HTML payload when approaching context limits (metadata extracted separately). */
+export function compactHtmlForLlm(html: string, maxChars = 100000): string {
+  let compact = normalizeHtmlForLlm(html);
   if (compact.length > maxChars) {
     compact =
       compact.slice(0, maxChars) +

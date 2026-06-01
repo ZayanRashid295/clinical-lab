@@ -16,11 +16,15 @@ import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { ConvertDocxDto } from "./dto/convert-docx.dto";
 import {
   compactHtmlForLlm,
+  computeMaxHtmlCharsForTpm,
   ensureHierarchyMetadataInMarkdown,
   estimateTokenCount,
   extractDocxHierarchyMetadata,
   getDocxCompletionMaxTokens,
+  getDocxTpmLimit,
+  getDocxTpmSafetyMargin,
   getModelContextLimit,
+  normalizeHtmlForLlm,
 } from "./docx-hierarchy-metadata";
 
 interface QuestionFilters {
@@ -1905,7 +1909,6 @@ export class QuestionsService {
       DOCX_CONVERSION_MODEL;
 
     const hierarchyFromHtml = extractDocxHierarchyMetadata(dto.htmlContent);
-    const htmlForLlm = compactHtmlForLlm(dto.htmlContent);
 
     const template = `---
 title: "<Subject & Topic> — <Specific Focus>"
@@ -1978,7 +1981,10 @@ question_id: <Unique Question ID>
       imageInstructions = `\n\n7. IMAGES (CRITICAL - DO NOT OMIT)\n   - The HTML source contains image placeholders like:\n     <img src="[IMAGE_PLACEHOLDER:image_0.png]" />\n   - You MUST include these placeholders in your Markdown output.\n   - Convert them to Markdown image syntax:\n     ![Description]([IMAGE_PLACEHOLDER:image_0.png])\n   - Place images in the appropriate location:\n     * If in the question stem → place in "## Question" section\n     * If in explanations → place in "## Explanation" section\n   - DO NOT remove or ignore image placeholders.\n   - DO NOT replace them with text descriptions.\n   - The system requires these placeholders to work correctly.\n   - Available placeholders: ${dto.imagePlaceholders.join(", ")}`;
     }
 
-    const prompt = `You are a medical question parser.
+    const systemMessage =
+      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.";
+
+    const buildPrompt = (htmlForLlm: string) => `You are a medical question parser.
 Your task is to perform a **faithful, structure-preserving conversion** of HTML
 content (extracted from a DOCX exam question) into Markdown that EXACTLY follows
 the template below.
@@ -2214,11 +2220,35 @@ ${imageInstructions}
 
 Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
-    const systemMessage =
-      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.";
+    const tpmLimit = getDocxTpmLimit();
+    const tpmSafety = getDocxTpmSafetyMargin();
+    const staticOverhead = estimateTokenCount(systemMessage + buildPrompt(""));
+    const maxCompletionBudget = Math.min(
+      8192,
+      Math.max(2048, tpmLimit - staticOverhead - tpmSafety),
+    );
+    const maxHtmlChars = computeMaxHtmlCharsForTpm(
+      tpmLimit,
+      staticOverhead,
+      maxCompletionBudget,
+      tpmSafety,
+    );
+    const normalizedHtml = normalizeHtmlForLlm(dto.htmlContent);
+    const htmlForLlm = compactHtmlForLlm(normalizedHtml, maxHtmlChars);
+    if (normalizedHtml.length > maxHtmlChars) {
+      console.warn(
+        `[Backend] DOCX HTML truncated for TPM limit (${tpmLimit}): ` +
+          `${normalizedHtml.length} -> ${htmlForLlm.length} chars`,
+      );
+    }
+
+    const prompt = buildPrompt(htmlForLlm);
     const promptTokenEstimate = estimateTokenCount(systemMessage + prompt);
     const contextLimit = getModelContextLimit(model);
-    const maxTokens = getDocxCompletionMaxTokens(model, systemMessage + prompt);
+    const maxTokens = Math.min(
+      getDocxCompletionMaxTokens(model, systemMessage + prompt),
+      maxCompletionBudget,
+    );
 
     if (promptTokenEstimate + maxTokens > contextLimit) {
       throw new BadRequestException(
@@ -2227,9 +2257,17 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       );
     }
 
+    const totalTpmEstimate = promptTokenEstimate + maxTokens;
+    if (totalTpmEstimate > tpmLimit) {
+      throw new BadRequestException(
+        `Document is too large for your OpenAI TPM limit (${tpmLimit}; estimated ${totalTpmEstimate} tokens). ` +
+          `Split the DOCX into smaller files (one question per file), remove embedded images, or raise OPENAI_DOCX_TPM_LIMIT after upgrading your OpenAI tier.`,
+      );
+    }
+
     try {
       console.log(
-        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens}`,
+        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens} tpmLimit=${tpmLimit} htmlChars=${htmlForLlm.length}`,
       );
 
       const completion = await this.openai.chat.completions.create({
@@ -2294,8 +2332,14 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       return { markdown: processedMarkdown };
     } catch (error: any) {
       console.error("OpenAI API error:", error);
+      const message = error?.message || "Unknown error";
+      if (/429|tokens per min|TPM|rate limit/i.test(message)) {
+        throw new BadRequestException(
+          `Document is too large for your OpenAI rate limit. Split the DOCX into smaller files (one question per file) or upgrade your OpenAI tier. Details: ${message}`,
+        );
+      }
       throw new BadRequestException(
-        `Failed to convert DOCX to Markdown: ${error.message || "Unknown error"}`
+        `Failed to convert DOCX to Markdown: ${message}`,
       );
     }
   }

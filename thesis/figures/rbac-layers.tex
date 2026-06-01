@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    layer/.style={rectangle, draw, rounded corners, minimum width=11cm, minimum height=0.9cm, align=center, font=\small},
+    arr/.style={->, thick}
+  ]
+    \node[layer, fill=blue!8] (l1) at (0,3.2) {Layer 1: JWT Authentication (identity + token blacklist)};
+    \node[layer, fill=green!8] (l2) at (0,2.0) {Layer 2: RBAC --- Roles (Admin, Student, InstitutionManager) + Permissions};
+    \node[layer, fill=orange!10] (l3) at (0,0.8) {Layer 3: Subscription --- Active package + legacy PackageFeatures};
+    \node[layer, fill=red!8] (l4) at (0,-0.4) {Layer 4: Entitlements --- JSON limits (Qbank, MedPrep slugs, AI tutor quota)};
+    \draw[arr] (l1) -- (l2);
+    \draw[arr] (l2) -- (l3);
+    \draw[arr] (l3) -- (l4);
+    \node[font=\scriptsize, right=6.2cm] at (l4.east) {Request denied if any layer fails};
+  \end{tikzpicture}
+  \caption{Defense-in-depth access control stack in MedPrepAI.}
+  \label{fig:rbac-layers}
+\end{figure}

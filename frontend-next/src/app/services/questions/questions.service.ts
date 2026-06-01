@@ -201,6 +201,11 @@ export class QuestionsService extends BaseDataService<
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      if (response.status === 413) {
+        throw new Error(
+          "Document is too large to process. Try splitting it into smaller files or removing embedded images."
+        );
+      }
       throw new Error(errorData.message || `Failed to convert DOCX: ${response.status}`);
     }
 

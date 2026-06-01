@@ -8,7 +8,12 @@ import { join } from "path";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
+
+  // Large DOCX files produce sizable HTML payloads for /questions/convert-docx-to-markdown
+  const bodyLimit = process.env.BODY_PARSER_LIMIT || "50mb";
+  app.useBodyParser("json", { limit: bodyLimit });
+  app.useBodyParser("urlencoded", { limit: bodyLimit, extended: true });
+
   // Serve static files from public/uploads directory
   app.useStaticAssets(join(process.cwd(), "public", "uploads"), {
     prefix: "/uploads/",

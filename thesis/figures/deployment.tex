@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    box/.style={rectangle, draw, rounded corners, minimum width=2.4cm, minimum height=0.7cm, align=center, font=\scriptsize}
+  ]
+    \node[box, fill=gray!12] (user) {Browser / Student};
+    \node[box, fill=cyan!15, below=1.1cm of user] (nginx) {Nginx (TLS, reverse proxy)};
+    \node[box, fill=blue!10, below left=0.9cm and 0.3cm of nginx] (fe) {Next.js :3001};
+    \node[box, fill=blue!10, below right=0.9cm and 0.3cm of nginx] (be) {NestJS API};
+    \node[box, fill=yellow!15, below=1.0cm of be] (db) {MySQL};
+    \node[box, fill=green!12, right=1.6cm of be] (ext) {Stripe / Gemini APIs};
+    \draw[->] (user) -- (nginx);
+    \draw[->] (nginx) -- (fe);
+    \draw[->] (nginx) -- node[font=\tiny,right]{/api} (be);
+    \draw[->] (be) -- (db);
+    \draw[->] (be) -- (ext);
+    \draw[->, dashed] (fe) -- node[font=\tiny,above]{SSR + API routes} (be);
+  \end{tikzpicture}
+  \caption{Production deployment topology (clinical-lab on cloud VM with PM2).}
+  \label{fig:deployment}
+\end{figure}

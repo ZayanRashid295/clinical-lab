@@ -1,0 +1,110 @@
+\chapter{Literature Review}
+\label{ch:lit}
+
+The research landscape for AI-augmented medical education spans virtual patient simulation, intelligent tutoring systems, learning management platforms, and secure multi-tenant SaaS design. This chapter surveys work most relevant to MedPrepAI, organized into thematic areas with comparative synthesis.
+
+\section{Traditional Clinical Skills Training and OSCE}
+Clinical skills education traditionally combines didactic teaching, bedside rounds, and OSCE stations where learners interact with standardized patients or manikins while faculty score checklists \cite{harden_osce_1975}. OSCE rubrics emphasize communication, data gathering, clinical reasoning, and professionalism. Limitations include faculty time cost, station throughput, inter-rater variability, and limited repetition for struggling students.
+
+Table~\ref{tab:osce-digital} contrasts traditional OSCE with digital alternatives including MedPrepAI.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Comparison of OSCE modalities.}
+  \label{tab:osce-digital}
+  \small
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Criterion} & \textbf{Live OSCE} & \textbf{Video OSCE} & \textbf{MedPrepAI} \\
+    \midrule
+    Scalability & Low & Medium & High (cloud) \\
+    Repetition cost & High & Medium & Low \\
+    Dialogue flexibility & High (actor) & Low & High (LLM patient) \\
+    Standardized rubric & Yes & Partial & Yes (SOAP AI fields) \\
+    Faculty oversight & In-person & Async review & Dashboard analytics \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+MedPrepAI's Practice and Evaluation modes explicitly target OSCE-aligned outputs (SOAP grading, structured scoring) while allowing unlimited repetition.
+
+\section{Virtual Patients and Simulation-Based Learning}
+Virtual patient (VP) systems model clinical encounters as state machines or narrative graphs, tracking learner actions against expected pathways \cite{cook_vp_2005,linkesch_virtual_2020}. Research consistently reports improved communication skills and diagnostic hypothesis generation when VPs supplement---not replace---clinical exposure.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Virtual patient implementation paradigms.}
+  \label{tab:vp-paradigms}
+  \small
+  \begin{tabular}{@{}p{3.2cm}p{5.2cm}p{4.8cm}@{}}
+    \toprule
+    \textbf{Paradigm} & \textbf{Mechanism} & \textbf{Limitation} \\
+    \midrule
+    Branching script & Fixed decision tree & Brittle dialogue \\
+    Semantic parser & NLP over expected terms & Authoring effort \\
+    LLM-grounded case & Generative + hidden diagnosis & Requires guardrails \\
+    Hybrid (MedPrepAI) & LLM + case JSON snapshot & API cost, validation \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+MedPrepAI adopts the hybrid approach: utterances are generative, but \texttt{caseSnapshot} metadata in conversation records anchors ground truth for grading and prevents unconstrained clinical fantasy \cite{van_melle_fyp_2000}. Cognitive load theory motivates Shadow mode (observe expert first) before high-autonomy Practice \cite{sweller_cognitive_1988}.
+
+\section{LLM-Based Medical Dialogue, Tutoring, and Assessment}
+Large language models exhibit strong few-shot performance on medical knowledge benchmarks, but raw models risk hallucination and unsafe advice in real-patient contexts \cite{singhal_medpalm_2023}. Educational deployments therefore emphasize \emph{role boundaries} (simulated patients, tutors, evaluators), retrieval of case ground truth, and logging for faculty review.
+
+Prior work on AI clinical evaluation includes automated scoring of student explanations and rubric-based feedback generation \cite{chan_gpt4_usmle_2023}. MedPrepAI's Evaluation mode and SOAP note persistence (\texttt{MedprepSoapNote} with AI-generated rubric fields) align with this line of research. Shadow mode relates to \emph{cognitive apprenticeship}: learners observe expert reasoning before independent performance \cite{collins_cognitive_1991}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{LLM roles in MedPrepAI (separation of concerns).}
+  \label{tab:llm-roles}
+  \small
+  \begin{tabular}{@{}p{2.8cm}p{4.5cm}p{5.9cm}@{}}
+    \toprule
+    \textbf{Agent role} & \textbf{Endpoint / module} & \textbf{Safety constraint} \\
+    \midrule
+    Virtual patient & \texttt{patient-response} & Stay in character; no tutor leakage \\
+    AI attending & \texttt{doctor-thought}, Shadow & Explanations for teaching only \\
+    Supervisor & \texttt{ai-supervisor} & Hints without final answer \\
+    Evaluator & Evaluation UI + grading & Rubric-based; logged SOAP \\
+    Tutor & \texttt{AiTutorService} & No real-patient advice disclaimer \\
+    Case generator & \texttt{cases/generate} & JSON schema validation \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{LMS, Question Banks, and Learning Analytics}
+Medical licensing preparation historically relies on large question banks with rich explanations, tagging by subject and system, and performance analytics. Academic literature on LMS platforms highlights hierarchical content organization, spaced repetition, and institutional reporting \cite{ellis_lms_2015}.
+
+MedPrepAI's product--section--chapter--topic--question hierarchy, subscription-gated features (Qbank, Self Assessment, Study Planner), and student statistics module instantiate these principles \cite{ellis_lms_2015,freeman_active_2014}. Mock exams and timed \texttt{QuestionPaper} sessions extend the LMS into high-fidelity exam simulation. Active learning literature supports combining retrieval practice (QBank) with constructivist encounter simulation (MedPrep modes) \cite{freeman_active_2014,kolb_experiential_1984}.
+
+\section{Platform Security, RBAC, and Multi-Tenant Education SaaS}
+Educational SaaS for healthcare must combine privacy expectations with role separation and commercial entitlements \cite{fowler_patterns_2002}. MedPrepAI's CombinedAccessGuard, subscription feature decorators, and MedPrep mode entitlements implement defense in depth.
+
+Payment integration literature emphasizes idempotent webhooks and PCI scope reduction via Stripe \cite{stripe_docs}. MedPrepAI separates wallet, invoices, and promo codes in \texttt{payment.schema.prisma}.
+
+\section{Comparative Analysis: Related Platforms}
+Table~\ref{tab:related-platforms} positions MedPrepAI against representative categories (not exhaustive commercial survey).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Feature comparison with representative platform categories.}
+  \label{tab:related-platforms}
+  \footnotesize
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    \textbf{Capability} & \textbf{Commercial QBank} & \textbf{Scripted VP} & \textbf{Generic LMS} & \textbf{MedPrepAI} \\
+    \midrule
+    MCQ + explanations & Strong & Weak & Medium & Strong \\
+    LLM patient chat & Rare & No & No & Strong \\
+    Shadow / observe mode & No & Sometimes & No & Strong \\
+    Faculty cohort dashboard & Limited & Medium & Strong & Strong \\
+    Built-in subscriptions & Yes & Varies & Plugins & Strong \\
+    Open extensible codebase & No & No & Partial & Yes (this repo) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Research Gap and Positioning of MedPrepAI}
+Existing tools typically excel in one dimension: VP fidelity, QBank breadth, or institutional LMS---but seldom integrate AI consultation, faculty assignment workflow, subscription commerce, community features, and real-time messaging in one codebase. MedPrepAI synthesizes these modalities within the clinical-lab monorepo. Chapter~\ref{ch:method} details architectural realization.

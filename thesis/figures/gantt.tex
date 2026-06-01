@@ -1,0 +1,23 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[x=0.38cm, y=0.65cm, scale=0.95, transform shape]
+    \draw[->] (0,0) -- (17,0) node[right,font=\scriptsize]{Timeline};
+    \foreach \x/\m in {0/Phase 1, 4/Phase 2, 8/Phase 3, 12/Phase 4, 15/Phase 5} {
+      \node[font=\tiny, below] at (\x,0) {\m};
+    }
+    \node[left, font=\scriptsize] at (0,1) {Auth + DB};
+    \draw[fill=blue!30] (0,0.7) rectangle (3.5,1.3);
+    \node[left, font=\scriptsize] at (0,2) {LMS/QBank};
+    \draw[fill=green!30] (3,1.7) rectangle (7.5,2.3);
+    \node[left, font=\scriptsize] at (0,3) {MedPrep AI};
+    \draw[fill=orange!30] (7,2.7) rectangle (11.5,3.3);
+    \node[left, font=\scriptsize] at (0,4) {Shadow+Eval};
+    \draw[fill=purple!25] (10.5,3.7) rectangle (13.5,4.3);
+    \node[left, font=\scriptsize] at (0,5) {Faculty+Pay};
+    \draw[fill=red!20] (12.5,4.7) rectangle (15.5,5.3);
+    \node[left, font=\scriptsize] at (0,6) {Community};
+    \draw[fill=cyan!20] (14,5.7) rectangle (16.5,6.3);
+  \end{tikzpicture}
+  \caption{Project development timeline (approximate phases).}
+  \label{fig:gantt}
+\end{figure}
