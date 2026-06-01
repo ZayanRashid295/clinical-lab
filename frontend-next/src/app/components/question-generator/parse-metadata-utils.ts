@@ -82,6 +82,14 @@ export function mergeParsedHierarchy(
   };
 }
 
+/** DOCX auxiliary bullets (infer frontmatter only — not question body). */
+const AUXILIARY_DOCX_METADATA =
+  /^(?:[-*•]\s+)?(?:\*\*)?(?:Domain|Competency\s+Domain|Cognitive\s+Level|Clinical\s+Skill|Difficulty\s+Level)(?:\*\*)?\s*:/i;
+
+export function isAuxiliaryDocxMetadataLine(line: string): boolean {
+  return AUXILIARY_DOCX_METADATA.test(line.trim());
+}
+
 /** Parse "Category: value" or "**Category:** value" from a markdown line. */
 export function parseHierarchyLabelLine(
   line: string,

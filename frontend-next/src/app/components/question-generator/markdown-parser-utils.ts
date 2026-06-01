@@ -4,6 +4,7 @@ import {
   parseKeywordBlock,
   extractSystemFirstSegment,
   parseHierarchyLabelLine,
+  isAuxiliaryDocxMetadataLine,
 } from "./parse-metadata-utils"
 
 /**
@@ -133,6 +134,37 @@ export function parseMarkdown(content: string): ParsedQuestion {
   let seenPerAnswerSection = false
   let keywordsFromSection: Array<{ keyword: string; explanation: string }> = []
 
+  // Content between hierarchy metadata and ## Question (tables, section headings, images)
+  let preQuestionBuffer: string[] = []
+  let capturePreQuestion = true
+
+  const flushPreQuestionInto = (target: string[]) => {
+    if (preQuestionBuffer.length === 0) return
+    target.push(...preQuestionBuffer)
+    preQuestionBuffer = []
+    capturePreQuestion = false
+  }
+
+  const shouldBufferPreQuestionLine = (rawLine: string, trimmed: string): boolean => {
+    if (!capturePreQuestion || !trimmed) {
+      return (
+        capturePreQuestion &&
+        preQuestionBuffer.length > 0 &&
+        trimmed === ""
+      )
+    }
+    if (parseHierarchyLabelLine(trimmed)) return false
+    if (isAuxiliaryDocxMetadataLine(trimmed)) return false
+    if (trimmed.match(/^##+\s+(Topic|Subtopic):/i)) return false
+    if (trimmed.match(/^##+\s+(Question|Clinical Case|Stem|Options|Explanation|Keywords)/i))
+      return false
+    if (trimmed.match(/^\*?\*?[A-E]\.\*?\*?\s+/)) return false
+    if (trimmed.includes("title:") || trimmed.includes("tags:") || trimmed.includes("correct_answer:"))
+      return false
+    if (trimmed === "---" || /^---+$/.test(trimmed)) return false
+    return true
+  }
+
   // Parse rest of the file
   while (i < lines.length) {
     const line = lines[i].trim()
@@ -157,6 +189,19 @@ export function parseMarkdown(content: string): ParsedQuestion {
       } else if (label === "mcqtitle") {
         questionData.title = value
       }
+      i++
+      continue
+    }
+
+    // Skip auxiliary DOCX bullets (Domain, Cognitive Level, etc.) — not question body
+    if (isAuxiliaryDocxMetadataLine(line)) {
+      i++
+      continue
+    }
+
+    // Buffer teaching content (headings, tables, images) before ## Question
+    if (shouldBufferPreQuestionLine(lines[i], line)) {
+      preQuestionBuffer.push(lines[i])
       i++
       continue
     }
@@ -242,6 +287,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     // Handle Clinical Case and Question sections (can be ## or ###)
     if (line.match(/^##+ (Clinical Case|Question|Stem)/)) {
       let caseLines: string[] = []
+      flushPreQuestionInto(caseLines)
       if (questionData.stem) {
         // If we already have stem content, split it and add to lines
         caseLines = questionData.stem.split("\n").filter(l => l.trim())
@@ -296,7 +342,9 @@ export function parseMarkdown(content: string): ParsedQuestion {
 
     // Fallback: if no stem found and we hit options, collect all text before options
     if (!questionData.stem && line.match(/^\*?\*?[A-E]\.\*?\*?\s+/) && i > 0) {
-      let stemLines: string[] = []
+      capturePreQuestion = false
+      let stemLines: string[] = [...preQuestionBuffer]
+      preQuestionBuffer = []
       for (let j = 0; j < i; j++) {
         const prevLine = lines[j]
         const trimmed = prevLine.trim()
@@ -316,9 +364,11 @@ export function parseMarkdown(content: string): ParsedQuestion {
           continue
         }
         
+        if (parseHierarchyLabelLine(trimmed) || isAuxiliaryDocxMetadataLine(trimmed)) {
+          continue
+        }
         if (
           trimmed &&
-          !trimmed.startsWith("#") &&
           !trimmed.startsWith("---") &&
           !trimmed.includes("title:") &&
           !trimmed.includes("tags:") &&
@@ -326,8 +376,9 @@ export function parseMarkdown(content: string): ParsedQuestion {
           !trimmed.includes("correct_answer:") &&
           trimmed !== ""
         ) {
-          // Preserve original line to maintain markdown structure
-          stemLines.push(prevLine)
+          // Preserve original line to maintain markdown structure (include # headings)
+          const alreadyBuffered = stemLines.some((l) => l === prevLine)
+          if (!alreadyBuffered) stemLines.push(prevLine)
         } else if (!trimmed) {
           // Preserve empty lines
           stemLines.push("")
@@ -804,6 +855,19 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
 
     i++
+  }
+
+  // Any teaching content buffered before ## Question (e.g. tables under section headings)
+  if (preQuestionBuffer.length > 0) {
+    const preamble = normalizeQuestionStemParagraphs(preQuestionBuffer.join("\n"))
+    if (questionData.stem) {
+      questionData.stem = normalizeQuestionStemParagraphs(
+        [preamble, questionData.stem].filter(Boolean).join("\n\n"),
+      )
+    } else {
+      questionData.stem = preamble
+    }
+    preQuestionBuffer = []
   }
 
   if (!questionData.stem) {

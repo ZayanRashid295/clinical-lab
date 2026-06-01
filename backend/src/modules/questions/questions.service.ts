@@ -26,6 +26,13 @@ import {
   getModelContextLimit,
   normalizeHtmlForLlm,
 } from "./docx-hierarchy-metadata";
+import {
+  buildImageSystemAddendum,
+  ensureImagePlaceholdersInMarkdown,
+  extractImagePlacementsFromHtml,
+  insertImageMarkersInHtml,
+  resolveImageMarkersInMarkdown,
+} from "./docx-image-placement";
 
 interface QuestionFilters {
   subtopicId?: string;
@@ -1909,6 +1916,12 @@ export class QuestionsService {
       DOCX_CONVERSION_MODEL;
 
     const hierarchyFromHtml = extractDocxHierarchyMetadata(dto.htmlContent);
+    const imageNames = dto.imagePlaceholders ?? [];
+    const imagePlacements = extractImagePlacementsFromHtml(
+      dto.htmlContent,
+      imageNames,
+    );
+    const htmlWithImageMarkers = insertImageMarkersInHtml(dto.htmlContent);
 
     const template = `---
 title: "<Subject & Topic> — <Specific Focus>"
@@ -1970,19 +1983,16 @@ question_id: <Unique Question ID>
     let imageNote = "";
     let imageInstructions = "";
     if (dto.imagePlaceholders && dto.imagePlaceholders.length > 0) {
-      imageNote = `\n\n⚠️ CRITICAL: IMAGE PLACEHOLDERS DETECTED ⚠️\n\nThe HTML content contains ${
-        dto.imagePlaceholders.length
-      } embedded image(s) with placeholders like: <img src="[IMAGE_PLACEHOLDER:filename]" />\n\nAvailable image placeholders in the HTML:\n${dto.imagePlaceholders
-        .map((name, idx) => `  ${idx + 1}. [IMAGE_PLACEHOLDER:${name}]`)
-        .join(
-          "\n"
-        )}\n\nYou MUST preserve these placeholders in your Markdown output!`;
+      imageNote = `\n\n⚠️ CRITICAL: ${dto.imagePlaceholders.length} IMAGE(S) IN SOURCE ⚠️\n\nThe HTML contains markers [[DOCX_IMAGE:filename]] at the exact image positions.\nYou MUST output each as: ![Image]([IMAGE_PLACEHOLDER:filename])\n\nRequired (${dto.imagePlaceholders.length} total):\n${dto.imagePlaceholders
+        .map((name, idx) => `  ${idx + 1}. [[DOCX_IMAGE:${name}]] → ![Image]([IMAGE_PLACEHOLDER:${name}])`)
+        .join("\n")}\n\nPlace each image in the same section as the marker (Question vs Explanation).`;
       
-      imageInstructions = `\n\n7. IMAGES (CRITICAL - DO NOT OMIT)\n   - The HTML source contains image placeholders like:\n     <img src="[IMAGE_PLACEHOLDER:image_0.png]" />\n   - You MUST include these placeholders in your Markdown output.\n   - Convert them to Markdown image syntax:\n     ![Description]([IMAGE_PLACEHOLDER:image_0.png])\n   - Place images in the appropriate location:\n     * If in the question stem → place in "## Question" section\n     * If in explanations → place in "## Explanation" section\n   - DO NOT remove or ignore image placeholders.\n   - DO NOT replace them with text descriptions.\n   - The system requires these placeholders to work correctly.\n   - Available placeholders: ${dto.imagePlaceholders.join(", ")}`;
+      imageInstructions = `\n\n7. IMAGES (MANDATORY — EXACT COUNT: ${dto.imagePlaceholders.length})\n   - The HTML uses [[DOCX_IMAGE:filename]] where each image appears.\n   - Output EVERY marker as: ![Image]([IMAGE_PLACEHOLDER:filename])\n   - Question images → inside "## Question". Explanation images → inside "## Explanation".\n   - Do NOT skip, paraphrase, or replace with text. The parser requires exactly ${dto.imagePlaceholders.length} placeholder(s).\n   - Files: ${dto.imagePlaceholders.join(", ")}`;
     }
 
     const systemMessage =
-      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser.";
+      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser." +
+      buildImageSystemAddendum(imageNames);
 
     const buildPrompt = (htmlForLlm: string) => `You are a medical question parser.
 Your task is to perform a **faithful, structure-preserving conversion** of HTML
@@ -2073,10 +2083,13 @@ CRITICAL INSTRUCTIONS
     * Otherwise fallback to "<Product> — <System>" when available.
   - Keep "## Subtopic: ..." populated from Sub-Topic when available.
    - Do not truncate any extracted hierarchy values.
-2. QUESTION STEM (CLINICAL CASE ONLY – PRESERVE PARAGRAPH STRUCTURE AS IN SOURCE)
-   - Put ONLY the clinical case / question stem text under '## Question'.
+2. QUESTION STEM (INCLUDE ALL PRE-OPTION TEACHING CONTENT)
+   - Put ALL content that appears after the hierarchy metadata and BEFORE the options under '## Question'.
+   - This INCLUDES section headings (e.g. "Medicine – Gastroenterology / Oral Cavity Infections"), subsection titles, tables, images, and the clinical vignette—everything until "Options and Explanations" or option letters A–E.
+   - ONLY omit these auxiliary bullet lines (do not copy into markdown): Domain, Competency Domain, Cognitive Level, Clinical Skill, Difficulty Level.
    - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
-   - The '## Question' section must contain only the scenario, vignette, or question text—no "Options and Explanations" heading, no options, and no per-option explanation content here.
+   - The '## Question' section must NOT contain options or per-option explanation content.
+   - Convert every table in this section to a Markdown table (preserve all rows/columns).
    - **PARAGRAPH STRUCTURE (CRITICAL):** Preserve the question stem exactly as in the source DOCX:
      * If the source question stem is a **single paragraph** (one block of text with no blank lines between sentences), output it as a **single paragraph** in the markdown: do NOT insert line breaks or blank lines between sentences. Use spaces between sentences, not newlines.
      * If the source has **multiple distinct paragraphs** (clearly separated by blank lines in the DOCX), preserve that: use a single blank line between paragraphs in the markdown.
@@ -2208,9 +2221,11 @@ CRITICAL INSTRUCTIONS
      markdown body (after frontmatter) exactly as shown above when present in the source.
    - Do NOT place Category/Product/System/Topic/Sub-Topic/MCQ Title inside '## Question'
      or '## Explanation'.
-   - For other metadata (Subject, Competency Domain, Cognitive Level, Clinical Skill,
-     Difficulty Level): use them only to infer frontmatter; do NOT copy those lines into
-     the markdown body.
+   - For auxiliary metadata bullets ONLY (Domain, Competency Domain, Cognitive Level,
+     Clinical Skill, Difficulty Level): use them only to infer frontmatter tags/difficulty;
+     do NOT copy those bullet lines into the markdown body.
+   - Do NOT skip section headings, tables, or images that appear immediately after those
+     bullets—they are question content and MUST appear under '## Question'.
    - If the source contains a line like "Question ID:", "Question Id", or
      similar, you may use it to set the question_id in the frontmatter, but
      you MUST NOT include that line in the visible question stem or
@@ -2233,7 +2248,7 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       maxCompletionBudget,
       tpmSafety,
     );
-    const normalizedHtml = normalizeHtmlForLlm(dto.htmlContent);
+    const normalizedHtml = normalizeHtmlForLlm(htmlWithImageMarkers);
     const htmlForLlm = compactHtmlForLlm(normalizedHtml, maxHtmlChars);
     if (normalizedHtml.length > maxHtmlChars) {
       console.warn(
@@ -2306,29 +2321,46 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
       // (look for "DOCX->Markdown (raw)" in the NestJS logs).
       console.log("===== DOCX->Markdown (raw) =====\n", rawMarkdown, "\n===============================");
       
-      // Check for image placeholders before normalization
-      const placeholderCount = (rawMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
-      console.log(`[Backend] Found ${placeholderCount} image placeholders in raw markdown`);
+      let processedMarkdown = resolveImageMarkersInMarkdown(rawMarkdown);
 
-      let processedMarkdown = normalizeQuestionSectionParagraphs(rawMarkdown);
+      const placeholderCountRaw = (
+        processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
+      ).length;
+      console.log(
+        `[Backend] Found ${placeholderCountRaw} image placeholders in raw markdown (expected ${imageNames.length})`,
+      );
+
+      processedMarkdown = normalizeQuestionSectionParagraphs(processedMarkdown);
       processedMarkdown = normalizeKeywordsSection(processedMarkdown);
       processedMarkdown = ensureHierarchyMetadataInMarkdown(
         processedMarkdown,
         hierarchyFromHtml,
       );
-      
-      // Verify placeholders are still present after normalization
-      const placeholderCountAfter = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
-      console.log(`[Backend] Found ${placeholderCountAfter} image placeholders after normalization`);
-      
-      // If placeholders are missing, try to inject them from HTML
-      if (dto.imagePlaceholders && dto.imagePlaceholders.length > 0 && placeholderCountAfter === 0) {
-        console.warn(`[Backend] ⚠️ WARNING: LLM did not include image placeholders. Attempting to inject them from HTML...`);
-        processedMarkdown = injectMissingImagePlaceholders(processedMarkdown, dto.htmlContent, dto.imagePlaceholders);
-        const injectedCount = (processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []).length;
-        console.log(`[Backend] Injected ${injectedCount} image placeholders from HTML`);
+
+      const {
+        markdown: withImages,
+        placedFromHtml,
+        alreadyPresent,
+      } = ensureImagePlaceholdersInMarkdown(
+        processedMarkdown,
+        dto.htmlContent,
+        imageNames,
+        imagePlacements,
+      );
+      processedMarkdown = withImages;
+
+      const placeholderCountAfter = (
+        processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
+      ).length;
+      console.log(
+        `[Backend] Found ${placeholderCountAfter} image placeholders after normalization (expected ${imageNames.length})`,
+      );
+      if (imageNames.length > 0 && placedFromHtml > 0) {
+        console.log(
+          `[Backend] Placed ${placedFromHtml} image(s) from HTML structure (${alreadyPresent} from LLM)`,
+        );
       }
-      
+
       return { markdown: processedMarkdown };
     } catch (error: any) {
       console.error("OpenAI API error:", error);
@@ -2537,120 +2569,3 @@ function normalizeKeywordsSection(markdown: string): string {
   return finalLines.join("\n");
 }
 
-/**
- * Inject missing image placeholders into markdown by analyzing HTML source
- * This is a fallback when LLM doesn't preserve placeholders
- */
-function injectMissingImagePlaceholders(
-  markdown: string,
-  htmlContent: string,
-  imagePlaceholders: string[]
-): string {
-  // Extract image positions from HTML
-  const imagePositions: Array<{ placeholder: string; context: string; position: number }> = [];
-  
-  for (const placeholder of imagePlaceholders) {
-    const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const imgPattern = new RegExp(`<img[^>]*src=["']\\[IMAGE_PLACEHOLDER:${escapedPlaceholder}\\][^>]*>`, "gi");
-    const matches = Array.from(htmlContent.matchAll(imgPattern));
-    
-    for (const match of matches) {
-      const position = match.index || 0;
-      // Extract surrounding context (50 chars before and after)
-      const contextStart = Math.max(0, position - 50);
-      const contextEnd = Math.min(htmlContent.length, position + match[0].length + 50);
-      const context = htmlContent.substring(contextStart, contextEnd).replace(/<[^>]+>/g, " ").trim();
-      
-      imagePositions.push({
-        placeholder,
-        context: context.substring(0, 100), // Limit context length
-        position,
-      });
-    }
-  }
-  
-  // If no images found in HTML, return markdown as-is
-  if (imagePositions.length === 0) {
-    return markdown;
-  }
-  
-  // Try to find appropriate locations in markdown to inject placeholders
-  // Strategy: Look for sections that might contain images (Question, Explanation sections)
-  let result = markdown;
-  const injected: Set<string> = new Set();
-  
-  for (const imgInfo of imagePositions) {
-    if (injected.has(imgInfo.placeholder)) continue;
-    
-    // Try to find a good location based on context
-    // If context mentions "question", "stem", "case" → inject in Question section
-    // Otherwise → inject in Explanation section
-    
-    const contextLower = imgInfo.context.toLowerCase();
-    let insertionPoint = -1;
-    
-    if (contextLower.includes("question") || contextLower.includes("stem") || contextLower.includes("case") || contextLower.includes("patient")) {
-      // Insert in Question section
-      const questionMatch = result.match(/^##\s+Question\s*$/m);
-      if (questionMatch && questionMatch.index !== undefined) {
-        // Find the end of the question text (before Options section)
-        const questionEnd = result.indexOf("## Options", questionMatch.index);
-        if (questionEnd > questionMatch.index) {
-          insertionPoint = questionEnd;
-        } else {
-          insertionPoint = questionMatch.index + questionMatch[0].length;
-        }
-      }
-    } else {
-      // Insert in Explanation section (after Choice-by-Choice Explanations)
-      const choiceSectionMatch = result.match(/^##\s+Choice-by-Choice Explanations\s*$/m);
-      if (choiceSectionMatch && choiceSectionMatch.index !== undefined) {
-        // Find the end of per-option blocks (look for next ## heading or end of section)
-        let searchStart = choiceSectionMatch.index + choiceSectionMatch[0].length;
-        const nextSectionMatch = result.substring(searchStart).match(/^##\s+/m);
-        if (nextSectionMatch) {
-          insertionPoint = searchStart + nextSectionMatch.index;
-        } else {
-          // Insert at end of Choice-by-Choice section
-          insertionPoint = result.length;
-        }
-      } else {
-        // Fallback: insert at end of Explanation section
-        const explanationMatch = result.match(/^##\s+Explanation\s*$/m);
-        if (explanationMatch && explanationMatch.index !== undefined) {
-          insertionPoint = explanationMatch.index + explanationMatch[0].length;
-        }
-      }
-    }
-    
-    // Insert placeholder if we found a location
-    if (insertionPoint >= 0) {
-      const imageMarkdown = `\n\n![Image]([IMAGE_PLACEHOLDER:${imgInfo.placeholder}])\n\n`;
-      result = result.substring(0, insertionPoint) + imageMarkdown + result.substring(insertionPoint);
-      injected.add(imgInfo.placeholder);
-      console.log(`[Backend] Injected placeholder ${imgInfo.placeholder} at position ${insertionPoint}`);
-    }
-  }
-  
-  // If we still have uninjected placeholders, add them at the end of Explanation section
-  for (const placeholder of imagePlaceholders) {
-    if (!injected.has(placeholder)) {
-      const explanationMatch = result.match(/^##\s+Explanation\s*$/m);
-      if (explanationMatch && explanationMatch.index !== undefined) {
-        // Find end of explanation section
-        let searchStart = explanationMatch.index + explanationMatch[0].length;
-        const nextMajorSection = result.substring(searchStart).match(/^#\s+/m);
-        const insertionPoint = nextMajorSection 
-          ? searchStart + nextMajorSection.index 
-          : result.length;
-        
-        const imageMarkdown = `\n\n![Image]([IMAGE_PLACEHOLDER:${placeholder}])\n\n`;
-        result = result.substring(0, insertionPoint) + imageMarkdown + result.substring(insertionPoint);
-        injected.add(placeholder);
-        console.log(`[Backend] Injected placeholder ${placeholder} at end of Explanation section`);
-      }
-    }
-  }
-  
-  return result;
-}
