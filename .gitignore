@@ -29,3 +29,21 @@ ref/
 org-data/
 nextjs/.next/
 nextjs/node_modules/
+
+# Accidental TypeScript emit outside dist/ (run tsc from repo root)
+tsc-output*.txt
+backend/*.js
+backend/*.js.map
+backend/*.d.ts
+backend/prisma/*.js
+backend/prisma/*.js.map
+backend/prisma/*.d.ts
+backend/scripts/*.js
+backend/scripts/*.js.map
+backend/scripts/*.d.ts
+
+# Local docs / thesis artifacts (not part of the app)
+thesis/
+thesis.zip
+*.docx
+!test_questions/**/*.docx

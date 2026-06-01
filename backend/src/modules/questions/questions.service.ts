@@ -15,24 +15,11 @@ import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { ConvertDocxDto } from "./dto/convert-docx.dto";
 import {
-  compactHtmlForLlm,
-  computeMaxHtmlCharsForTpm,
   ensureHierarchyMetadataInMarkdown,
   estimateTokenCount,
   extractDocxHierarchyMetadata,
   getDocxCompletionMaxTokens,
-  getDocxTpmLimit,
-  getDocxTpmSafetyMargin,
-  getModelContextLimit,
-  normalizeHtmlForLlm,
 } from "./docx-hierarchy-metadata";
-import {
-  buildImageSystemAddendum,
-  ensureImagePlaceholdersInMarkdown,
-  extractImagePlacementsFromHtml,
-  insertImageMarkersInHtml,
-  resolveImageMarkersInMarkdown,
-} from "./docx-image-placement";
 
 interface QuestionFilters {
   subtopicId?: string;
@@ -57,10 +44,10 @@ interface RandomQuestionFilters {
 }
 
 /**
- * Default model for DOCX conversion. Use gpt-4o (128k context).
- * Legacy gpt-4 is limited to 8k total tokens and fails on large exam questions.
+ * Default model for DOCX conversion (128k context, strong instruction following).
+ * Override with OPENAI_DOCX_MODEL in .env.
  */
-const DOCX_CONVERSION_MODEL = "gpt-4o";
+const DOCX_CONVERSION_MODEL = "gpt-4.1";
 
 @Injectable()
 export class QuestionsService {
@@ -1916,12 +1903,7 @@ export class QuestionsService {
       DOCX_CONVERSION_MODEL;
 
     const hierarchyFromHtml = extractDocxHierarchyMetadata(dto.htmlContent);
-    const imageNames = dto.imagePlaceholders ?? [];
-    const imagePlacements = extractImagePlacementsFromHtml(
-      dto.htmlContent,
-      imageNames,
-    );
-    const htmlWithImageMarkers = insertImageMarkersInHtml(dto.htmlContent);
+    const htmlForLlm = dto.htmlContent;
 
     const template = `---
 title: "<Subject & Topic> — <Specific Focus>"
@@ -1935,7 +1917,7 @@ question_id: <Unique Question ID>
 ## Subtopic: <Topic or Subtopic>
 
 ## Question
-<Question Stem Here — if the DOCX has a single paragraph, output one paragraph with no blank lines between sentences; if multiple paragraphs, preserve blank lines between them.>
+<Clinical vignette ONLY — patient presentation and question sentence ending with "?", no topic headers or teaching tables.>
 
 ## Options and Explanations
 
@@ -1983,16 +1965,12 @@ question_id: <Unique Question ID>
     let imageNote = "";
     let imageInstructions = "";
     if (dto.imagePlaceholders && dto.imagePlaceholders.length > 0) {
-      imageNote = `\n\n⚠️ CRITICAL: ${dto.imagePlaceholders.length} IMAGE(S) IN SOURCE ⚠️\n\nThe HTML contains markers [[DOCX_IMAGE:filename]] at the exact image positions.\nYou MUST output each as: ![Image]([IMAGE_PLACEHOLDER:filename])\n\nRequired (${dto.imagePlaceholders.length} total):\n${dto.imagePlaceholders
-        .map((name, idx) => `  ${idx + 1}. [[DOCX_IMAGE:${name}]] → ![Image]([IMAGE_PLACEHOLDER:${name}])`)
-        .join("\n")}\n\nPlace each image in the same section as the marker (Question vs Explanation).`;
-      
-      imageInstructions = `\n\n7. IMAGES (MANDATORY — EXACT COUNT: ${dto.imagePlaceholders.length})\n   - The HTML uses [[DOCX_IMAGE:filename]] where each image appears.\n   - Output EVERY marker as: ![Image]([IMAGE_PLACEHOLDER:filename])\n   - Question images → inside "## Question". Explanation images → inside "## Explanation".\n   - Do NOT skip, paraphrase, or replace with text. The parser requires exactly ${dto.imagePlaceholders.length} placeholder(s).\n   - Files: ${dto.imagePlaceholders.join(", ")}`;
+      imageNote = `\n\nIMAGES (${dto.imagePlaceholders.length}): The HTML has <img src="[IMAGE_PLACEHOLDER:filename]" /> tags.\nPreserve each as: ![Image]([IMAGE_PLACEHOLDER:filename])\n${dto.imagePlaceholders.map((n) => `  - ${n}`).join("\n")}`;
+      imageInstructions = `\n\n7. IMAGES AND MEDIA ORDER (CRITICAL)\n   - For every <img src="[IMAGE_PLACEHOLDER:...]" /> in the HTML, output exactly: ![Image]([IMAGE_PLACEHOLDER:filename])\n   - Keep each image in the same section as the source (Question vs Explanation).\n   - **Never reorder content**: tables, images, and paragraphs must appear in the Markdown in the **same sequence** as in the HTML/DOCX (do not move an image above a table if the table comes first in the source).\n   - Required: ${dto.imagePlaceholders.join(", ")}`;
     }
 
     const systemMessage =
-      "You are an expert at converting medical question documents into Markdown that follows a strict template used by a parser." +
-      buildImageSystemAddendum(imageNames);
+      "You are an expert at converting medical exam DOCX (HTML) into Markdown that follows a strict template. Preserve all tables, headings, and images. Never omit content.";
 
     const buildPrompt = (htmlForLlm: string) => `You are a medical question parser.
 Your task is to perform a **faithful, structure-preserving conversion** of HTML
@@ -2003,7 +1981,7 @@ The frontend parser expects this exact structure:
 - YAML frontmatter with: title, tags, difficulty, correct_answer, question_id
 - "# ..." title line
 - "## Subtopic: ..." line
-- "## Question" section with ONLY the clinical case / stem (do not put the "Options and Explanations" heading or options inside it)
+- "## Question" section: all content from the source that appears before the options, in the same order (excluding hierarchy metadata lines)
 - "## Options and Explanations" with options A–E in the '**A. text**' format and
   a '### Choice X Explanation' block for each option
 - A line '**Correct Answer:** X' where X is A–E may appear once after the options (before ## Explanation); do NOT put it under ## Explanation.
@@ -2083,13 +2061,11 @@ CRITICAL INSTRUCTIONS
     * Otherwise fallback to "<Product> — <System>" when available.
   - Keep "## Subtopic: ..." populated from Sub-Topic when available.
    - Do not truncate any extracted hierarchy values.
-2. QUESTION STEM (INCLUDE ALL PRE-OPTION TEACHING CONTENT)
-   - Put ALL content that appears after the hierarchy metadata and BEFORE the options under '## Question'.
-   - This INCLUDES section headings (e.g. "Medicine – Gastroenterology / Oral Cavity Infections"), subsection titles, tables, images, and the clinical vignette—everything until "Options and Explanations" or option letters A–E.
-   - ONLY omit these auxiliary bullet lines (do not copy into markdown): Domain, Competency Domain, Cognitive Level, Clinical Skill, Difficulty Level.
-   - Do NOT include the heading "Options and Explanations" (or "## Options and Explanations") inside the question stem. That heading appears only once, later in the document, before the options list.
-   - The '## Question' section must NOT contain options or per-option explanation content.
-   - Convert every table in this section to a Markdown table (preserve all rows/columns).
+2. QUESTION SECTION (PRESERVE SOURCE ORDER)
+   - Under '## Question', include everything from the source that appears before the options block, in the **same order** as the DOCX.
+   - Do NOT put in '## Question': Category / Product / System / Topic / MCQ Title (those go after frontmatter only), Domain/Cognitive Level/Clinical Skill/Difficulty bullets, or options/per-option explanations.
+   - Do NOT relocate, split, or reorder blocks between '## Question' and '## Explanation'—if tables or headings appear before options in the source, keep them before options under '## Question'.
+   - Do NOT include "Options and Explanations" inside '## Question'.
    - **PARAGRAPH STRUCTURE (CRITICAL):** Preserve the question stem exactly as in the source DOCX:
      * If the source question stem is a **single paragraph** (one block of text with no blank lines between sentences), output it as a **single paragraph** in the markdown: do NOT insert line breaks or blank lines between sentences. Use spaces between sentences, not newlines.
      * If the source has **multiple distinct paragraphs** (clearly separated by blank lines in the DOCX), preserve that: use a single blank line between paragraphs in the markdown.
@@ -2127,9 +2103,9 @@ CRITICAL INSTRUCTIONS
      Keywords block, and remaining explanation text/tables) must appear under that
      single "## Explanation" section. Do not add a second "## Explanation" before
      Keywords, before Choice-by-Choice Explanations, or elsewhere.
-   - Under '## Explanation', build the content in **this exact order**:
+   - Under '## Explanation', preserve **source document order**. Use the steps below only as section markers where the source already has that structure; do not move content to satisfy step order.
      
-     STEP 1 – KEYWORDS BLOCK (FIRST)
+     STEP 1 – KEYWORDS BLOCK (when present in source)
      - As the very first content under '## Explanation', create one heading:
        '### Keywords in the Stem to Identify the Correct Option'
      - **CRITICAL**: Extract ALL content from the DOCX that appears under the "Keywords" heading (or similar heading like "Keywords in the Stem to Identify the Correct Option") until you reach the "Explanation" heading (or "## Explanation").
@@ -2174,10 +2150,8 @@ CRITICAL INSTRUCTIONS
        block.
      - After the placeholder, include a blank line.
      
-     STEP 3 – FULL EXPLANATION CONTENT (QUESTION-LEVEL ONLY)
-     - After the '## Choice-by-Choice Explanations' placeholder, you must output **all remaining question-level
-       explanation content** from the DOCX that appears AFTER the "Explanation" heading **in the same order it appears in
-       the doc**, converted to Markdown:
+     STEP 3 – REMAINING EXPLANATION CONTENT
+     - Output **all remaining question-level explanation content** from the DOCX **in the same order it appears in the doc**, converted to Markdown (typically after the Choice-by-Choice placeholder when that placeholder is used):
        - Plain text paragraphs
        - Lists
        - Headings/subheadings (using proper Markdown heading syntax ##, ###, ####, etc. - NOT bold text **Heading**)
@@ -2224,8 +2198,7 @@ CRITICAL INSTRUCTIONS
    - For auxiliary metadata bullets ONLY (Domain, Competency Domain, Cognitive Level,
      Clinical Skill, Difficulty Level): use them only to infer frontmatter tags/difficulty;
      do NOT copy those bullet lines into the markdown body.
-   - Do NOT skip section headings, tables, or images that appear immediately after those
-     bullets—they are question content and MUST appear under '## Question'.
+   - Content after metadata bullets keeps its position relative to options and explanations as in the source (before options → '## Question'; after Explanation heading → '## Explanation').
    - If the source contains a line like "Question ID:", "Question Id", or
      similar, you may use it to set the question_id in the frontmatter, but
      you MUST NOT include that line in the visible question stem or
@@ -2235,54 +2208,13 @@ ${imageInstructions}
 
 Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
-    const tpmLimit = getDocxTpmLimit();
-    const tpmSafety = getDocxTpmSafetyMargin();
-    const staticOverhead = estimateTokenCount(systemMessage + buildPrompt(""));
-    const maxCompletionBudget = Math.min(
-      8192,
-      Math.max(2048, tpmLimit - staticOverhead - tpmSafety),
-    );
-    const maxHtmlChars = computeMaxHtmlCharsForTpm(
-      tpmLimit,
-      staticOverhead,
-      maxCompletionBudget,
-      tpmSafety,
-    );
-    const normalizedHtml = normalizeHtmlForLlm(htmlWithImageMarkers);
-    const htmlForLlm = compactHtmlForLlm(normalizedHtml, maxHtmlChars);
-    if (normalizedHtml.length > maxHtmlChars) {
-      console.warn(
-        `[Backend] DOCX HTML truncated for TPM limit (${tpmLimit}): ` +
-          `${normalizedHtml.length} -> ${htmlForLlm.length} chars`,
-      );
-    }
-
     const prompt = buildPrompt(htmlForLlm);
     const promptTokenEstimate = estimateTokenCount(systemMessage + prompt);
-    const contextLimit = getModelContextLimit(model);
-    const maxTokens = Math.min(
-      getDocxCompletionMaxTokens(model, systemMessage + prompt),
-      maxCompletionBudget,
-    );
-
-    if (promptTokenEstimate + maxTokens > contextLimit) {
-      throw new BadRequestException(
-        `Document is too large for ${model} (${promptTokenEstimate} input tokens estimated). ` +
-          `Set OPENAI_DOCX_MODEL=gpt-4o in backend .env or use a shorter DOCX.`,
-      );
-    }
-
-    const totalTpmEstimate = promptTokenEstimate + maxTokens;
-    if (totalTpmEstimate > tpmLimit) {
-      throw new BadRequestException(
-        `Document is too large for your OpenAI TPM limit (${tpmLimit}; estimated ${totalTpmEstimate} tokens). ` +
-          `Split the DOCX into smaller files (one question per file), remove embedded images, or raise OPENAI_DOCX_TPM_LIMIT after upgrading your OpenAI tier.`,
-      );
-    }
+    const maxTokens = getDocxCompletionMaxTokens(model, systemMessage + prompt);
 
     try {
       console.log(
-        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens} tpmLimit=${tpmLimit} htmlChars=${htmlForLlm.length}`,
+        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens} htmlChars=${htmlForLlm.length} (full HTML, no trimming)`,
       );
 
       const completion = await this.openai.chat.completions.create({
@@ -2319,49 +2251,21 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
 
       // Log the raw markdown so you can inspect it in the backend terminal
       // (look for "DOCX->Markdown (raw)" in the NestJS logs).
-      console.log("===== DOCX->Markdown (raw) =====\n", rawMarkdown, "\n===============================");
-      
-      let processedMarkdown = resolveImageMarkersInMarkdown(rawMarkdown);
-
-      const placeholderCountRaw = (
-        processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
+      const placeholderCount = (
+        rawMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
       ).length;
+      const expectedImages = dto.imagePlaceholders?.length ?? 0;
       console.log(
-        `[Backend] Found ${placeholderCountRaw} image placeholders in raw markdown (expected ${imageNames.length})`,
+        `[Backend] Found ${placeholderCount} image placeholders in markdown (expected ${expectedImages})`,
       );
 
-      processedMarkdown = normalizeQuestionSectionParagraphs(processedMarkdown);
-      processedMarkdown = normalizeKeywordsSection(processedMarkdown);
-      processedMarkdown = ensureHierarchyMetadataInMarkdown(
-        processedMarkdown,
+      // Only add hierarchy lines if the LLM omitted them; do not rewrite question/explanation body.
+      const markdown = ensureHierarchyMetadataInMarkdown(
+        rawMarkdown,
         hierarchyFromHtml,
       );
 
-      const {
-        markdown: withImages,
-        placedFromHtml,
-        alreadyPresent,
-      } = ensureImagePlaceholdersInMarkdown(
-        processedMarkdown,
-        dto.htmlContent,
-        imageNames,
-        imagePlacements,
-      );
-      processedMarkdown = withImages;
-
-      const placeholderCountAfter = (
-        processedMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
-      ).length;
-      console.log(
-        `[Backend] Found ${placeholderCountAfter} image placeholders after normalization (expected ${imageNames.length})`,
-      );
-      if (imageNames.length > 0 && placedFromHtml > 0) {
-        console.log(
-          `[Backend] Placed ${placedFromHtml} image(s) from HTML structure (${alreadyPresent} from LLM)`,
-        );
-      }
-
-      return { markdown: processedMarkdown };
+      return { markdown };
     } catch (error: any) {
       console.error("OpenAI API error:", error);
       const message = error?.message || "Unknown error";
@@ -2376,196 +2280,3 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
     }
   }
 }
-
-/**
- * Normalize the ## Question section so the doc is parsed exactly:
- * Consecutive non-empty plain-text lines (no image, table, list) with no blank line
- * between them are joined with a single space (one paragraph). Blank lines are kept.
- */
-function normalizeQuestionSectionParagraphs(markdown: string): string {
-  const lines = markdown.split("\n");
-  const result: string[] = [];
-  let i = 0;
-  const isQuestionHeader = (line: string) => /^##+\s+Question\s*$/i.test(line.trim());
-  const isBlockLine = (line: string): boolean => {
-    const t = line.trim();
-    return (
-      /^!\[.*\]\(.*\)\s*$/.test(t) ||
-      /^\|[\s\S]*\|?\s*$/.test(t) ||
-      /^[-*+]\s/.test(t) ||
-      /^\d+\.\s/.test(t)
-    );
-  };
-
-  while (i < lines.length) {
-    const line = lines[i];
-    if (!isQuestionHeader(line)) {
-      result.push(line);
-      i++;
-      continue;
-    }
-    result.push(line);
-    i++;
-    const paragraphLines: string[] = [];
-    const flushParagraph = (joinWithSpace: boolean) => {
-      if (paragraphLines.length === 0) return;
-      result.push(joinWithSpace ? paragraphLines.map((l) => l.trim()).join(" ") : paragraphLines.join("\n"));
-      paragraphLines.length = 0;
-    };
-    while (i < lines.length && !/^##\s+/.test(lines[i].trim())) {
-      const current = lines[i];
-      const trimmed = current.trim();
-      if (trimmed === "") {
-        flushParagraph(true);
-        result.push("");
-        i++;
-        continue;
-      }
-      if (isBlockLine(current)) {
-        flushParagraph(true);
-        result.push(current);
-        i++;
-        continue;
-      }
-      paragraphLines.push(current);
-      i++;
-    }
-    flushParagraph(true);
-  }
-  return result.join("\n");
-}
-
-/**
- * Post-process the markdown to:
- * - Ensure the "Keywords in the Stem..." section appears only once
- * - De-duplicate keyword bullet lines
- * - Avoid touching other headings like "Key Concepts", "Notes", etc.
- */
-function normalizeKeywordsSection(markdown: string): string {
-  const lines = markdown.split("\n");
-  const result: string[] = [];
-  const seenKeywords = new Set<string>();
-
-  let inKeywords = false;
-  let keywordsSectionSeen = false;
-
-  const isKeywordsHeading = (line: string) =>
-    /^###\s+Keywords in the Stem to Identify the Correct Option/i.test(line.trim());
-
-  const isSectionBreak = (line: string) => {
-    const trimmed = line.trim();
-    if (!trimmed) return true;
-    if (/^---\s*$/.test(trimmed)) return true;
-    if (/^##\s+/.test(trimmed)) return true;
-    if (/^###\s+/.test(trimmed) && !isKeywordsHeading(trimmed)) return true;
-    return false;
-  };
-
-  // First pass: normalize and deduplicate keywords section
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-
-    // Start of a keywords heading
-    if (isKeywordsHeading(trimmed)) {
-      // If we've already handled a keywords section, skip this entire duplicate block
-      if (keywordsSectionSeen) {
-        inKeywords = true;
-        // Skip this heading and its bullets
-        continue;
-      }
-
-      // First (and only) keywords section
-      keywordsSectionSeen = true;
-      inKeywords = true;
-      result.push("### Keywords in the Stem to Identify the Correct Option");
-      continue;
-    }
-
-    if (inKeywords) {
-      // If we hit a break, close the keywords block and continue normal copy
-      if (isSectionBreak(line)) {
-        inKeywords = false;
-        // Preserve the break line itself
-        result.push(line);
-        continue;
-      }
-
-      // Handle bullet lines in keywords section
-      if (/^[-*•]\s+/.test(trimmed)) {
-        // Try to extract the quoted keyword text between **"..."**
-        // Examples:
-        // - **"Keyword"** – explanation
-        // - **“Keyword”** – explanation
-        const keywordMatch = trimmed.match(/\*\*["“]?([^"”]+)["”]?\*\*/);
-        const keywordText = keywordMatch ? keywordMatch[1].trim() : trimmed;
-
-        if (!seenKeywords.has(keywordText)) {
-          seenKeywords.add(keywordText);
-          result.push(line);
-        }
-        // Skip duplicate bullets
-        continue;
-      }
-
-      // Any non-bullet non-break line inside keywords: just copy once
-      result.push(line);
-      continue;
-    }
-
-    // Outside keywords block: copy as-is
-    result.push(line);
-  }
-
-  // Second pass: remove duplicated per-option blocks under "## Choice-by-Choice Explanations"
-  const lines2 = result.join("\n").split("\n");
-  const finalLines: string[] = [];
-  let inChoiceSection = false;
-
-  for (let i = 0; i < lines2.length; i++) {
-    const line = lines2[i];
-    const trimmed = line.trim();
-
-    if (/^##\s+Choice-by-Choice Explanations/i.test(trimmed)) {
-      // Always keep only the clean header line without any trailing content
-      finalLines.push("## Choice-by-Choice Explanations");
-      inChoiceSection = true;
-      continue;
-    }
-
-    if (inChoiceSection) {
-      // Skip any "(Option X)" blocks – these are duplicates of the per-choice explanations.
-      // We skip the line itself and all following non-empty lines until a blank line
-      // or a new section header. This handles both list-style and paragraph-style blocks.
-      if (/^\(Option\s+[A-E]\)/i.test(trimmed) || /^-\s*\(Option\s+[A-E]\)/i.test(trimmed)) {
-        i++;
-        while (
-          i < lines2.length &&
-          lines2[i].trim() !== "" &&
-          !/^##\s+/.test(lines2[i].trim())
-        ) {
-          i++;
-        }
-        // for-loop will i++ again; adjust
-        i--;
-        continue;
-      }
-
-      // If we hit another section/header, we are out of the choice section
-      if (/^##\s+/.test(trimmed) && !/^##\s+Choice-by-Choice Explanations/i.test(trimmed)) {
-        inChoiceSection = false;
-        finalLines.push(line);
-        continue;
-      }
-
-      // Otherwise, keep whatever remains (e.g. Key Concept, Exam Pearl headings, tables)
-      finalLines.push(line);
-      continue;
-    }
-
-    finalLines.push(line);
-  }
-
-  return finalLines.join("\n");
-}
-

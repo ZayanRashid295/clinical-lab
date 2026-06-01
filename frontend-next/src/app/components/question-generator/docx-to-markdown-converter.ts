@@ -5,6 +5,7 @@
 
 import mammoth from "mammoth";
 import { QuestionsService } from "@/app/services/questions/questions.service";
+import { applyDocxHtmlOrderFixes, getHtmlMediaSequence } from "./docx-html-order";
 
 // Options interface removed - conversion is handled by backend
 
@@ -94,7 +95,19 @@ export async function convertDocxToMarkdown(
   // Convert HTML to Markdown using backend service
   // LLM will see the full document structure and place images correctly
   const questionsService = new QuestionsService();
-  const { markdown } = await questionsService.convertDocxToMarkdown(html, imagePlaceholders);
+  const { markdown: rawMarkdown } = await questionsService.convertDocxToMarkdown(
+    html,
+    imagePlaceholders,
+  );
+
+  const markdown = applyDocxHtmlOrderFixes(rawMarkdown, html, imagePlaceholders);
+
+  if (process.env.NODE_ENV === "development" && imagePlaceholders.length > 0) {
+    const htmlSeq = getHtmlMediaSequence(html)
+      .map((x) => (x.type === "image" ? `image:${x.key}` : `table:${x.index}`))
+      .join(" → ");
+    console.log("[DOCX] HTML media order:", htmlSeq);
+  }
 
   return {
     markdown,

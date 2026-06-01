@@ -4,50 +4,68 @@ import {
   parseKeywordBlock,
   extractSystemFirstSegment,
   parseHierarchyLabelLine,
-  isAuxiliaryDocxMetadataLine,
 } from "./parse-metadata-utils"
 
-/**
- * Normalize question stem so the doc is parsed exactly:
- * - Consecutive non-empty lines that are plain text (no image, table, list) with no blank line
- *   between them are treated as one paragraph — joined with a single space.
- * - Blank lines are preserved as paragraph breaks.
- * This fixes "sentence per line" source content displaying as one paragraph as in the original doc.
- */
+/** Preserve stem markdown as produced by the converter (no line-merging). */
 function normalizeQuestionStemParagraphs(stem: string): string {
   if (!stem || !stem.trim()) return stem
-  const lines = stem.split("\n")
-  const isBlockLine = (line: string): boolean => {
-    const t = line.trim()
-    return (
-      /^!\[.*\]\(.*\)\s*$/.test(t) || // image
-      /^\|[\s\S]*\|?\s*$/.test(t) || // table row
-      /^[-*+]\s/.test(t) || // unordered list
-      /^\d+\.\s/.test(t) // ordered list
-    )
-  }
-  const result: string[] = []
-  let run: string[] = []
-  const flushRun = (joinWithSpace: boolean) => {
-    if (run.length === 0) return
-    result.push(joinWithSpace ? run.map((l) => l.trim()).join(" ") : run.join("\n"))
-    run = []
-  }
-  for (const line of lines) {
-    if (line.trim() === "") {
-      flushRun(true)
-      result.push("")
+  return stem.replace(/\n{3,}/g, "\n\n").trim()
+}
+
+type ExplanationBlock = {
+  id: number
+  type: string
+  order: number
+  data: Record<string, unknown>
+}
+
+const PER_ANSWER_SLOT = "<!--PER_ANSWER_EXPLANATION_SLOT-->";
+
+/** One markdown pass for ## Explanation; slot marker becomes the per-answer UI placeholder. */
+function parseExplanationSection(
+  lines: string[],
+  startIndex: number,
+  convertMd: (text: string) => ExplanationBlock[],
+): { blocks: ExplanationBlock[]; lastIndex: number } {
+  const body: string[] = []
+  let j = startIndex + 1
+
+  while (j < lines.length) {
+    const t = lines[j].trim()
+    if (t.match(/^##\s+(Question|Clinical Case|Stem)\s*$/i)) break
+    if (t.match(/^##\s+Choice-by-Choice\s+Explanations\s*$/i)) {
+      body.push(PER_ANSWER_SLOT)
+      j++
       continue
     }
-    if (isBlockLine(line)) {
-      flushRun(true)
-      result.push(line)
-      continue
-    }
-    run.push(line)
+    body.push(lines[j])
+    j++
   }
-  flushRun(true)
-  return result.join("\n").replace(/\n{3,}/g, "\n\n").trim()
+
+  const blocks: ExplanationBlock[] = []
+  let blockId = Date.now()
+  const parts = body.join("\n").split(PER_ANSWER_SLOT)
+
+  parts.forEach((part, idx) => {
+    const text = part.trim()
+    if (text) {
+      convertMd(text).forEach((b) => {
+        b.id = blockId++
+        b.order = blocks.length
+        blocks.push(b)
+      })
+    }
+    if (idx < parts.length - 1) {
+      blocks.push({
+        id: blockId++,
+        type: "per-answer-explanation",
+        order: blocks.length,
+        data: { placeholder: true, isPerAnswerExplanation: true },
+      })
+    }
+  })
+
+  return { blocks, lastIndex: j - 1 }
 }
 
 export interface ParsedQuestion {
@@ -131,39 +149,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
   }
 
   // Track if we've seen per-answer explanations section
-  let seenPerAnswerSection = false
   let keywordsFromSection: Array<{ keyword: string; explanation: string }> = []
-
-  // Content between hierarchy metadata and ## Question (tables, section headings, images)
-  let preQuestionBuffer: string[] = []
-  let capturePreQuestion = true
-
-  const flushPreQuestionInto = (target: string[]) => {
-    if (preQuestionBuffer.length === 0) return
-    target.push(...preQuestionBuffer)
-    preQuestionBuffer = []
-    capturePreQuestion = false
-  }
-
-  const shouldBufferPreQuestionLine = (rawLine: string, trimmed: string): boolean => {
-    if (!capturePreQuestion || !trimmed) {
-      return (
-        capturePreQuestion &&
-        preQuestionBuffer.length > 0 &&
-        trimmed === ""
-      )
-    }
-    if (parseHierarchyLabelLine(trimmed)) return false
-    if (isAuxiliaryDocxMetadataLine(trimmed)) return false
-    if (trimmed.match(/^##+\s+(Topic|Subtopic):/i)) return false
-    if (trimmed.match(/^##+\s+(Question|Clinical Case|Stem|Options|Explanation|Keywords)/i))
-      return false
-    if (trimmed.match(/^\*?\*?[A-E]\.\*?\*?\s+/)) return false
-    if (trimmed.includes("title:") || trimmed.includes("tags:") || trimmed.includes("correct_answer:"))
-      return false
-    if (trimmed === "---" || /^---+$/.test(trimmed)) return false
-    return true
-  }
 
   // Parse rest of the file
   while (i < lines.length) {
@@ -189,19 +175,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
       } else if (label === "mcqtitle") {
         questionData.title = value
       }
-      i++
-      continue
-    }
-
-    // Skip auxiliary DOCX bullets (Domain, Cognitive Level, etc.) — not question body
-    if (isAuxiliaryDocxMetadataLine(line)) {
-      i++
-      continue
-    }
-
-    // Buffer teaching content (headings, tables, images) before ## Question
-    if (shouldBufferPreQuestionLine(lines[i], line)) {
-      preQuestionBuffer.push(lines[i])
       i++
       continue
     }
@@ -287,7 +260,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
     // Handle Clinical Case and Question sections (can be ## or ###)
     if (line.match(/^##+ (Clinical Case|Question|Stem)/)) {
       let caseLines: string[] = []
-      flushPreQuestionInto(caseLines)
       if (questionData.stem) {
         // If we already have stem content, split it and add to lines
         caseLines = questionData.stem.split("\n").filter(l => l.trim())
@@ -334,17 +306,13 @@ export function parseMarkdown(content: string): ParsedQuestion {
         }
         i++
       }
-      // Join with newlines, then normalize so consecutive sentence-only lines become one paragraph (parse doc exactly)
       questionData.stem = normalizeQuestionStemParagraphs(caseLines.join("\n"))
-      // Don't increment i here since we want to process the line we stopped at
       continue
     }
 
     // Fallback: if no stem found and we hit options, collect all text before options
     if (!questionData.stem && line.match(/^\*?\*?[A-E]\.\*?\*?\s+/) && i > 0) {
-      capturePreQuestion = false
-      let stemLines: string[] = [...preQuestionBuffer]
-      preQuestionBuffer = []
+      let stemLines: string[] = []
       for (let j = 0; j < i; j++) {
         const prevLine = lines[j]
         const trimmed = prevLine.trim()
@@ -364,11 +332,9 @@ export function parseMarkdown(content: string): ParsedQuestion {
           continue
         }
         
-        if (parseHierarchyLabelLine(trimmed) || isAuxiliaryDocxMetadataLine(trimmed)) {
-          continue
-        }
         if (
           trimmed &&
+          !trimmed.startsWith("#") &&
           !trimmed.startsWith("---") &&
           !trimmed.includes("title:") &&
           !trimmed.includes("tags:") &&
@@ -376,9 +342,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
           !trimmed.includes("correct_answer:") &&
           trimmed !== ""
         ) {
-          // Preserve original line to maintain markdown structure (include # headings)
-          const alreadyBuffered = stemLines.some((l) => l === prevLine)
-          if (!alreadyBuffered) stemLines.push(prevLine)
+          stemLines.push(prevLine)
         } else if (!trimmed) {
           // Preserve empty lines
           stemLines.push("")
@@ -521,328 +485,31 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
 
     if (line.startsWith("## Explanation") && !line.startsWith("### Explanation") && !line.match(/^## Choice/)) {
-      let explanationText = ""
-      // Continue until we hit "### Explanation [A-E]" or "### Choice [A-E] Explanation" or end of file
-      // Allow all other content including headings, tables, images, etc.
-      // Start from the next line after "## Explanation"
-      let j = i + 1
-      let choiceByChoiceIdx = -1 // Track where "## Choice-by-Choice Explanations" appears
-      // Match both per-answer explanation formats as stopping points
-      const choiceByChoicePattern = /^##+\s+(Choice-by-Choice|Additional|Raw|Example)/
-      while (
-        j < lines.length &&
-        !lines[j].trim().match(/^### Explanation\s+[A-E](?:\s|$)/) &&
-        !lines[j].trim().match(/^### Choice\s+[A-E]\s+Explanation/)
-      ) {
-        const currentLine = lines[j].trim()
-        // Check if this is the Choice-by-Choice section header
-        if (currentLine.match(choiceByChoicePattern)) {
-          choiceByChoiceIdx = j
-          break
-        }
-        explanationText += lines[j] + "\n"
-        j++
-      }
-      // Set i to the last line we processed (j-1), so the outer loop will
-      // continue from the next line (which might be a per-answer explanation)
-      i = j - 1
-      // Convert the main explanation markdown to content blocks
-      let explanationBlocks = convertMarkdownToExplanationBlocks(explanationText.trim())
+      const { blocks, lastIndex } = parseExplanationSection(
+        lines,
+        i,
+        convertMarkdownToExplanationBlocks,
+      )
       if (keywordsFromSection.length > 0) {
-        const keywordsMarkdown = "### Keywords in the Stem to Identify the Correct Option\n\n" + keywordsFromSection.map((kw) => `- **"${kw.keyword}"** – ${kw.explanation}`).join("\n") + "\n"
-        explanationBlocks.unshift({
+        const keywordsMarkdown =
+          "### Keywords in the Stem to Identify the Correct Option\n\n" +
+          keywordsFromSection.map((kw) => `- **"${kw.keyword}"** – ${kw.explanation}`).join("\n") +
+          "\n"
+        blocks.unshift({
           id: Date.now(),
           type: "text",
           order: 0,
           data: { markdown: keywordsMarkdown },
         })
-        explanationBlocks.forEach((block, idx) => { block.order = idx })
-        keywordsFromSection = []
-      }
-      // If we found "## Choice-by-Choice Explanations" in the explanation, insert a placeholder there
-      if (choiceByChoiceIdx >= 0) {
-        // Find the block that contains the Choice-by-Choice header
-        // We need to split the blocks at the point where Choice-by-Choice appears
-        const explanationTextBeforeChoice = explanationText.trim()
-        const choiceByChoiceLine = lines[choiceByChoiceIdx]
-        
-        // Find which block contains the Choice-by-Choice line
-        let splitPoint = -1
-        for (let blockIdx = 0; blockIdx < explanationBlocks.length; blockIdx++) {
-          const block = explanationBlocks[blockIdx]
-          if (block.type === "text" && block.data?.markdown) {
-            if (block.data.markdown.includes(choiceByChoiceLine.trim())) {
-              // Split this block at the Choice-by-Choice line
-              const markdown = block.data.markdown
-              const choiceIndex = markdown.indexOf(choiceByChoiceLine.trim())
-              if (choiceIndex >= 0) {
-                const beforeChoice = markdown.substring(0, choiceIndex).trim()
-                const afterChoice = markdown.substring(choiceIndex + choiceByChoiceLine.trim().length).trim()
-                
-                // Replace the block with content before Choice-by-Choice
-                if (beforeChoice) {
-                  explanationBlocks[blockIdx] = {
-                    ...block,
-                    data: { ...block.data, markdown: beforeChoice },
-                  }
-                } else {
-                  // Remove the block if it's empty
-                  explanationBlocks.splice(blockIdx, 1)
-                  blockIdx--
-                }
-                
-                // Insert placeholder after this block
-                splitPoint = blockIdx + 1
-                break
-              }
-            }
-          }
-        }
-        
-        // Insert per-answer explanation placeholder at the split point (or at the end if not found)
-        const placeholderBlock = {
-          id: Date.now(),
-          type: "per-answer-explanation",
-          order: splitPoint >= 0 ? splitPoint : explanationBlocks.length,
-          data: {
-            placeholder: true,
-            isPerAnswerExplanation: true,
-          },
-        }
-        
-        if (splitPoint >= 0) {
-          explanationBlocks.splice(splitPoint, 0, placeholderBlock)
-        } else {
-          explanationBlocks.push(placeholderBlock)
-        }
-        
-        // Re-number orders
-        explanationBlocks.forEach((block, idx) => {
+        blocks.forEach((block, idx) => {
           block.order = idx
         })
+        keywordsFromSection = []
       }
-      
-      questionData.mainExplanation = explanationBlocks
+      questionData.mainExplanation = blocks
+      i = lastIndex
       i++
       continue
-    }
-
-    // Handle "## Choice-by-Choice Explanations" section header
-    // This is now only a placeholder marker in the main explanation
-    // Per-answer explanations are now inline with choices, so we just skip this line
-    if (line.match(/^##+\s+Choice-by-Choice\s+Explanations/i)) {
-      // Mark that we've seen the per-answer explanations section (for placeholder insertion)
-      seenPerAnswerSection = true
-      // Skip this line - it's just a placeholder marker
-      i++
-      continue
-    }
-
-    // Skip per-answer explanations in the old location (after "## Choice-by-Choice Explanations")
-    // They should now be inline with choices, so we ignore them here
-    // Only process if they haven't been processed inline with choices
-    const perAnswerMatch1 = line.match(/^### Explanation\s+([A-E])(?:\s|$)/)
-    const perAnswerMatch2 = line.match(/^### Choice\s+([A-E])\s+Explanation/)
-    const perAnswerMatch = perAnswerMatch1 || perAnswerMatch2
-    if (perAnswerMatch) {
-      const answerLabel = perAnswerMatch[1]
-      // Only process if this explanation hasn't already been captured inline with the choice
-      // If it's already in perAnswerExplanations, skip it (it was processed inline)
-      if (answerLabel && !questionData.perAnswerExplanations?.[answerLabel]) {
-        let explanationText = ""
-        // Continue until we hit the next per-answer explanation, a new major section (##), or end of file
-        // Allow all other content including headings, tables, images, etc.
-        // Start from the next line after the explanation header
-        let j = i + 1
-        // Match both formats for stopping condition (more flexible - allows text after "Explanation")
-        // Stop at: next per-answer explanation, new major section (##), or end of file
-        while (j < lines.length) {
-          const currentLine = lines[j].trim()
-          
-          // Stop at next per-answer explanation
-          if (currentLine.match(/^### Explanation\s+[A-E](?:\s|$)/) ||
-              currentLine.match(/^### Choice\s+[A-E]\s+Explanation/)) {
-            break
-          }
-          
-          // Stop at "## Choice-by-Choice Explanations" header
-          if (currentLine.match(/^##+\s+Choice-by-Choice\s+Explanations/i)) {
-            break
-          }
-          
-          // Stop at any new major section (##) - this includes "## Management Approach" and similar
-          // Only stop at ## (not ###), as ### can be part of the explanation content
-          if (currentLine.match(/^##\s+/) && !currentLine.match(/^###\s+/)) {
-            // Always stop at "## Explanation" - that's the main explanation section, not part of per-answer explanation
-            if (currentLine.match(/^##\s+Explanation/i)) {
-              break
-            }
-            // Stop at other major sections, but don't stop at excluded sections that might appear within per-answer explanations
-            if (!currentLine.match(/^##\s+(Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)) {
-              break
-            }
-          }
-          
-          explanationText += lines[j] + "\n"
-          j++
-        }
-        // Set i to the last line we processed (j-1), so the outer loop will
-        // continue from the next line (which might be another per-answer explanation)
-        i = j - 1
-        if (!questionData.perAnswerExplanations) {
-          questionData.perAnswerExplanations = {}
-        }
-        // Convert each per-answer explanation to content blocks
-        questionData.perAnswerExplanations[answerLabel] = convertMarkdownToExplanationBlocks(explanationText.trim())
-      } else {
-        // Skip this line if explanation was already processed inline
-        i++
-      }
-      continue
-    }
-
-    // After per-answer explanations, collect any remaining content (like "## Management Approach", "**Key Concept**", tables, images, "**Notes**")
-    // and add it to the main explanation
-    // This should run after we've seen the per-answer section and processed all per-answer explanations
-    const hasPerAnswerSection = seenPerAnswerSection
-    const hasPerAnswerExplanations = questionData.perAnswerExplanations && Object.keys(questionData.perAnswerExplanations).length > 0
-    
-    // Check if we're past the per-answer explanations and should collect remaining content
-    // This includes: section headers, bold text like "**Key Concept**", tables, images, notes, etc.
-    if (hasPerAnswerSection && hasPerAnswerExplanations) {
-      // Check if this is additional content that should be added to main explanation
-      // This can be:
-      // 1. A section header (## or ###) that's not Explanation, Choice-by-Choice, Clinical Case, Question, Stem, or Topic
-      // 2. Content after per-answer explanations (like "**Key Concept**", tables, images, "**Notes**")
-      // 3. Per-answer explanation blocks like "(Option A) ..." that haven't been processed yet
-      
-      // Note: line is already trimmed in the main loop (line 76: const line = lines[i].trim())
-      // First, check if this is a per-answer explanation block in the old format "(Option X) ..."
-      const isPerAnswerBlock = line.match(/^\(Option\s+([A-E])\)/i)
-      if (isPerAnswerBlock) {
-        // Skip these - they're duplicates of inline per-answer explanations
-        i++
-        continue
-      }
-      
-      // Check if this is a section header
-      const isSectionHeader = line.match(/^##+\s+/)
-      const isExcludedSection = line.match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i)
-      const isPerAnswerHeader = line.match(/^###\s+(Explanation|Choice)\s+[A-E]/i)
-      const isAdditionalSection = isSectionHeader && !isExcludedSection && !isPerAnswerHeader
-      
-      // Check if this is content that should be collected (not already processed)
-      // This includes: bold text, tables, images, regular text, section headers, etc.
-      // We want to collect ANY content after per-answer explanations (except excluded sections and per-answer blocks)
-      // Note: line is already trimmed, so we can use it directly
-      const isCollectableContent = line && 
-        !isExcludedSection && 
-        !isPerAnswerHeader &&
-        !line.match(/^\(Option\s+[A-E]\)/i) && // Not a per-answer block
-        !line.match(/^\*End of test question/i) && // Not end marker
-        !line.match(/^Correct Answer:/i) // Not correct answer line (already processed)
-      
-      // Collect content if:
-      // 1. It's a section header (## or ###) that's additional content, OR
-      // 2. It's any collectable content and we haven't collected additional content yet
-      // We need to collect everything after per-answer explanations until end of file or new major section
-      const shouldCollect = (isAdditionalSection || isCollectableContent) && !(questionData as any)._additionalContentCollected
-      
-      if (shouldCollect) {
-        let additionalContent = ""
-        let j = i
-        let startedCollecting = false
-        
-        // Collect all content until end of file, end marker, or another major section
-        while (
-          j < lines.length &&
-          !lines[j].trim().match(/^##+\s+(Explanation|Choice-by-Choice|Clinical Case|Question|Stem|Topic)/i) &&
-          !lines[j].trim().match(/^###\s+(Explanation|Choice)\s+[A-E]/i) &&
-          !lines[j].trim().match(/^\*End of test question/i)
-        ) {
-          const currentLine = lines[j].trim()
-          // Skip per-answer blocks in old format
-          if (!currentLine.match(/^\(Option\s+[A-E]\)/i)) {
-            additionalContent += lines[j] + "\n"
-            startedCollecting = true
-          }
-          j++
-        }
-        
-        // Insert additional content AFTER the per-answer-explanation placeholder
-        if (additionalContent.trim() && startedCollecting) {
-          const existingExplanation = questionData.mainExplanation || []
-          const additionalBlocks = convertMarkdownToExplanationBlocks(additionalContent.trim())
-          
-          console.log("[MarkdownParser] Collecting additional content after per-answer explanations:", {
-            startLine: i,
-            endLine: j - 1,
-            contentLength: additionalContent.length,
-            blockCount: additionalBlocks.length,
-            firstFewLines: additionalContent.split("\n").slice(0, 5).join(" | "),
-          })
-          
-          // Find the placeholder block index
-          const placeholderIndex = existingExplanation.findIndex(
-            (block: any) => block.type === "per-answer-explanation" && block.data?.placeholder === true
-          )
-          
-          if (placeholderIndex >= 0) {
-            // Insert additional blocks right after the placeholder
-            const insertIndex = placeholderIndex + 1
-            
-            // Calculate order for new blocks (should be after placeholder)
-            const placeholderOrder = existingExplanation[placeholderIndex].order || 0
-            additionalBlocks.forEach((block: any, idx: number) => {
-              block.order = placeholderOrder + 1 + idx
-            })
-            
-            // Insert blocks after placeholder
-            existingExplanation.splice(insertIndex, 0, ...additionalBlocks)
-            
-            // Renumber all blocks after the inserted blocks to maintain sequential order
-            const startRenumberFrom = insertIndex + additionalBlocks.length
-            for (let k = startRenumberFrom; k < existingExplanation.length; k++) {
-              existingExplanation[k].order = placeholderOrder + additionalBlocks.length + (k - startRenumberFrom) + 1
-            }
-            
-            questionData.mainExplanation = existingExplanation;
-            (questionData as any)._additionalContentCollected = true // Mark that we've collected additional content
-            
-            console.log("[MarkdownParser] Successfully inserted additional content:", {
-              placeholderIndex,
-              insertIndex,
-              totalBlocks: existingExplanation.length,
-              insertedBlocks: additionalBlocks.length,
-            })
-          } else {
-            // Fallback: if no placeholder found, append to end
-            const maxOrder = existingExplanation.length > 0 
-              ? Math.max(...existingExplanation.map((b: any) => typeof b.order === "number" ? b.order : 0))
-              : -1
-            additionalBlocks.forEach((block: any, idx: number) => {
-              block.order = maxOrder + 1 + idx
-            })
-            
-            questionData.mainExplanation = [...existingExplanation, ...additionalBlocks];
-            (questionData as any)._additionalContentCollected = true
-            
-            // Debug: Log when additional content is found (fallback case)
-            if (process.env.NODE_ENV === "development") {
-              console.log("[MarkdownParser] Found additional content but no placeholder found (fallback):", {
-                section: line.trim(),
-                startLine: i,
-                endLine: j - 1,
-                blockCount: additionalBlocks.length,
-                firstBlockType: additionalBlocks[0]?.type,
-              })
-            }
-          }
-        }
-        // Skip to the end of the collected content (j-1 because j is the line after)
-        i = j - 1
-        continue
-      }
     }
 
     // Extract tags (body line) – same logic as DOCX for consistency
@@ -855,19 +522,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }
 
     i++
-  }
-
-  // Any teaching content buffered before ## Question (e.g. tables under section headings)
-  if (preQuestionBuffer.length > 0) {
-    const preamble = normalizeQuestionStemParagraphs(preQuestionBuffer.join("\n"))
-    if (questionData.stem) {
-      questionData.stem = normalizeQuestionStemParagraphs(
-        [preamble, questionData.stem].filter(Boolean).join("\n\n"),
-      )
-    } else {
-      questionData.stem = preamble
-    }
-    preQuestionBuffer = []
   }
 
   if (!questionData.stem) {
@@ -993,7 +647,7 @@ export function parseMarkdown(content: string): ParsedQuestion {
     }))
   }
 
-  // Final cleanup: Remove question ID patterns and "Options and Explanations" from stem (stem = all content before that heading only)
+  // Final cleanup: Remove question ID patterns and "Options and Explanations" from stem
   let finalStem = questionData.stem || ""
   finalStem = finalStem
     .replace(/\n\s*#+\s*Options and Explanations\s*(?=\n|$)/gim, "\n")
@@ -1047,428 +701,120 @@ function ensureParagraphBreaksInPlainText(markdown: string): string {
   return markdown.replace(/([a-z])\.\s+([A-Z])/g, "$1.\n\n$2")
 }
 
+const MD_TABLE_ROW_RE = /^\|.+\|$/;
+const MD_TABLE_SEP_RE = /^\|[\s\-:|]+\|$/;
+const MD_IMAGE_LINE_RE = /!\[[^\]]*\]\([^)]+\)/;
+const IMAGE_PLACEHOLDER_RE = /\[IMAGE_PLACEHOLDER:[^\]]+\]/i;
+
+function isMdTableRow(line: string): boolean {
+  const t = line.trim();
+  return MD_TABLE_ROW_RE.test(t) || MD_TABLE_SEP_RE.test(t);
+}
+
+function isStandaloneImageLine(line: string): boolean {
+  const t = line.trim();
+  if (!t) return false;
+  const stripped = t.replace(MD_IMAGE_LINE_RE, "").replace(IMAGE_PLACEHOLDER_RE, "").trim();
+  return stripped.length === 0 && (MD_IMAGE_LINE_RE.test(t) || IMAGE_PLACEHOLDER_RE.test(t));
+}
+
+/**
+ * Split markdown into blocks in strict source order.
+ * Only splits on HTML tables and standalone image lines; everything else stays in reading order.
+ */
 export function convertMarkdownToExplanationBlocks(markdownText: string): any[] {
-  const blocks: any[] = []
-  // Clean up the markdown: remove unnecessary separators and normalize line breaks
-  // Strip "Correct Answer: X" lines so they never appear in explanation blocks
-  let cleanedMarkdown = markdownText
-    .replace(/^\s*(\*\*)?Correct Answer(\*\*)?\s*:\s*(\*\*)?\s*[A-Ea-e]\s*$/gim, "") // Standalone "Correct Answer: X" line so it never appears in explanation blocks
-    .replace(/^---+$/gm, "") // Remove horizontal rules (---)
-    .replace(/^--+$/gm, "") // Remove double dashes (--)
-    .replace(/\n{3,}/g, "\n\n") // Normalize multiple line breaks to max 2
-    .trim()
+  const cleanedMarkdown = markdownText
+    .replace(/^\s*(\*\*)?Correct Answer(\*\*)?\s*:\s*(\*\*)?\s*[A-Ea-e]\s*$/gim, "")
+    .replace(/^---+$/gm, "")
+    .trim();
 
-  const lines = cleanedMarkdown.split("\n")
+  if (!cleanedMarkdown) return [];
 
-  let currentText = ""
-  let i = 0
-  let blockIdCounter = Date.now()
-  let blockOrder = 0 // Track order to preserve markdown file structure
+  const lines = cleanedMarkdown.split("\n");
+  const blocks: any[] = [];
+  let textBuf: string[] = [];
+  let blockId = Date.now();
+  let blockOrder = 0;
+  let i = 0;
 
-  // Image markdown pattern: ![alt](url) or just image URLs
-  const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
-  const urlPattern = /(https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg))/i
-
-  // Helper function to check if a line is a list item (ordered or unordered, including nested)
-  const isListItem = (line: string): boolean => {
-    const trimmed = line.trim()
-    // Check for unordered list markers: -, *, +
-    if (/^[-*+]\s/.test(trimmed)) return true
-    // Check for ordered list markers: 1., 2., etc. (with optional indentation)
-    if (/^\d+\.\s/.test(trimmed)) return true
-    // Check for nested list items (indented with spaces or tabs)
-    const indentMatch = line.match(/^(\s*)/)
-    if (indentMatch) {
-      const indent = indentMatch[1]
-      // If line has indentation and matches list pattern, it's a nested list item
-      if (indent.length > 0) {
-        const afterIndent = trimmed
-        if (/^[-*+]\s/.test(afterIndent) || /^\d+\.\s/.test(afterIndent)) return true
-      }
-    }
-    return false
-  }
-
-  // Helper function to check if we're still in the same list context
-  // (handles empty lines between list items and images within lists)
-  const isInListContext = (lines: string[], currentIndex: number): boolean => {
-    // Look ahead to find the next non-empty line
-    for (let j = currentIndex; j < lines.length; j++) {
-      const nextLine = lines[j].trim()
-      if (nextLine === "") continue // Skip empty lines
-      
-      // If next non-empty line is a list item, we're still in list context
-      if (isListItem(lines[j])) return true
-      
-      // If next non-empty line is an image, we're still in list context
-      // (images can be part of lists)
-      const imageMatches = Array.from(nextLine.matchAll(imagePattern))
-      const urlMatch = nextLine.match(urlPattern)
-      if (imageMatches.length > 0 || (urlMatch && nextLine === urlMatch[0])) {
-        // It's an image - check if there's a list item after it
-        // Continue looking for a list item after the image
-        for (let k = j + 1; k < lines.length; k++) {
-          const afterImageLine = lines[k].trim()
-          if (afterImageLine === "") continue
-          if (isListItem(lines[k])) return true
-          // If we hit something that's not a list item or image, we're not in list context
-          break
-        }
-        return true // Image is part of list context
-      }
-      
-      // Not a list item and not an image, we're not in list context
-      return false
-    }
-    return false
-  }
-
-  // Helper function to check if text contains list items
-  const textContainsListItems = (text: string): boolean => {
-    if (!text) return false
-    const textLines = text.split("\n")
-    return textLines.some(line => isListItem(line))
-  }
+  const flushText = () => {
+    const md = textBuf.join("\n").trim();
+    textBuf = [];
+    if (!md) return;
+    const withBreaks = ensureParagraphBreaksInPlainText(md);
+    blocks.push({
+      id: blockId++,
+      type: "text",
+      order: blockOrder++,
+      data: { markdown: withBreaks },
+    });
+  };
 
   while (i < lines.length) {
-    const line = lines[i]
-    const trimmed = line.trim()
+    const line = lines[i];
+    const trimmed = line.trim();
 
-    // Check if current line is an image
-    const imageMatches = Array.from(trimmed.matchAll(imagePattern))
-    const urlMatch = trimmed.match(urlPattern)
-    const isImageLine = imageMatches.length > 0 || (urlMatch && trimmed === urlMatch[0])
-
-    // Handle images (markdown format: ![alt](url))
-    // If we're in a list context (currentText contains list items), include image in the list block
-    // Also check if next line is a list item - if so, we're in the middle of a list
-    if (isImageLine) {
-      // Check if we're currently collecting a list
-      if (textContainsListItems(currentText)) {
-        // We're in a list - add image to current list block
-        currentText += "\n" + line
-      i++
-      continue
-      } else {
-        // Check if the next non-empty line is a list item - if so, we're in the middle of a list
-        // This handles the case where list items 1-2 were already flushed, but item 3 is coming
-        const nextIsListItem = isInListContext(lines, i + 1)
-        if (nextIsListItem) {
-          // Next line is a list item - this image is part of a list
-          // Check if previous block ended with a list item (we need to check the last block)
-          // For now, add it to currentText and the next list item will handle continuation
-          if (currentText) {
-            currentText += "\n" + line
-          } else {
-            currentText = line
-          }
-          i++
-          continue
-        } else {
-          // Not in a list - add to current text block
-          if (currentText) {
-            currentText += "\n" + line
-          } else {
-            currentText = line
-          }
-          i++
-          continue
-        }
-      }
-    }
-
-    // Handle headings (H1: #, H2: ##, H3: ###, etc.)
-    if (trimmed.match(/^#{1,6}\s+/)) {
-      if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
-      // Add heading as part of markdown text block
-      currentText = trimmed + "\n"
-      i++
-      continue
-    }
-    
-    // Handle lists (ordered and unordered) - keep them together in a single block
-    // This includes images within the list to preserve numbering
-    if (isListItem(line)) {
-      // Check if we're already collecting a list in currentText
-      if (textContainsListItems(currentText)) {
-        // We're continuing an existing list - add this item to currentText and continue collecting
-        currentText += "\n" + line
-        i++
-        
-        // Continue collecting more list items, images, etc.
-        let continueCollecting = true
-        while (i < lines.length && continueCollecting) {
-          const nextLine = lines[i]
-          const nextTrimmed = nextLine.trim()
-          
-          if (nextTrimmed === "") {
-            // Empty line - check if we're still in list context
-            if (isInListContext(lines, i + 1)) {
-              currentText += "\n"
-              i++
-              continue
-            } else {
-              continueCollecting = false
-              break
-            }
-          } else if (isListItem(nextLine)) {
-            // It's a list item, add it
-            currentText += "\n" + nextLine
-            i++
-          } else {
-            // Check if it's an image line
-            const imageMatches = Array.from(nextTrimmed.matchAll(imagePattern))
-            const urlMatch = nextTrimmed.match(urlPattern)
-            
-            if (imageMatches.length > 0 || (urlMatch && nextTrimmed === urlMatch[0])) {
-              // It's an image - include it in the list block
-              currentText += "\n" + nextLine
-              i++
-              continue
-            } else {
-              // Not a list item and not an image, end the list
-              continueCollecting = false
-              break
-            }
-          }
-        }
-        continue
-      }
-      
-      // Starting a new list - flush any non-list text before starting
-      if (currentText.trim() && !textContainsListItems(currentText)) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
-      
-      // Collect all list items, including empty lines and images between them
-      // Start with the current line (which is a list item)
-      const listItems: string[] = [line]
-      i++ // Move past the first list item - we've already processed it
-      let inList = true
-      
-      while (i < lines.length && inList) {
-        const currentLine = lines[i]
-        const currentTrimmed = currentLine.trim()
-        
-        if (currentTrimmed === "") {
-          // Empty line - check if we're still in list context
-          if (isInListContext(lines, i + 1)) {
-            // Next non-empty line is still a list item or image, keep the empty line
-            listItems.push("")
-            i++
-            continue
-          } else {
-            // Next non-empty line is not a list item or image, end the list
-            inList = false
-            break
-          }
-        } else if (isListItem(currentLine)) {
-          // It's a list item, add it
-          listItems.push(currentLine)
-          i++
-        } else {
-          // Check if it's an image line - if so, include it in the list block
-          const imageMatches = Array.from(currentTrimmed.matchAll(imagePattern))
-          const urlMatch = currentTrimmed.match(urlPattern)
-          
-          if (imageMatches.length > 0 || (urlMatch && currentTrimmed === urlMatch[0])) {
-            // It's an image - include it in the list block to preserve numbering
-            listItems.push(currentLine)
-            i++
-            // Continue collecting - next line might be another list item
-            continue
-          } else {
-            // Not a list item and not an image
-            // Check if we should still continue (e.g., if next line is a list item after some non-list content)
-            // For now, end the list - we can't include non-list, non-image content
-            inList = false
-            break
-          }
-        }
-      }
-      
-      // Add the complete list (including images) as a single text block
-      if (listItems.length > 0) {
-        // Remove trailing empty lines
-        while (listItems.length > 0 && listItems[listItems.length - 1] === "") {
-          listItems.pop()
+    if (/<table[\s>]/i.test(trimmed)) {
+      flushText();
+      let htmlTable = line;
+      i++;
+      while (i < lines.length && !/<\/table>/i.test(htmlTable)) {
+        htmlTable += "\n" + lines[i];
+        i++;
       }
       blocks.push({
-        id: blockIdCounter++,
-        type: "text",
-        order: blockOrder++,
-        data: { markdown: listItems.join("\n") },
-      })
-      }
-      continue
-    }
-    // Handle HTML tables (if the line contains <table tag)
-    else if (trimmed.match(/<table[\s>]/i)) {
-      // HTML table found - create a table block with HTML
-      if (currentText.trim()) {
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-      }
-      // Collect the entire HTML table (may span multiple lines)
-      let htmlTable = trimmed
-      let tableClosed = !!trimmed.match(/<\/table>/i)
-      i++
-      
-      while (i < lines.length && !tableClosed) {
-        htmlTable += "\n" + lines[i]
-        if (lines[i].trim().match(/<\/table>/i)) {
-          tableClosed = true
-        }
-        i++
-      }
-      
-      // Create a table block with HTML data
-      blocks.push({
-        id: blockIdCounter++,
+        id: blockId++,
         type: "table",
         order: blockOrder++,
         data: { html: htmlTable },
-      })
-      continue
-    }
-    // Handle markdown tables - keep them as part of text blocks instead of separate table blocks
-    else if (trimmed.startsWith("|") || trimmed.match(/^\|[\s\-\|:]+\|$/)) {
-      // Collect all table lines and add them to current text block
-      // This includes table rows (| col1 | col2 |) and separator rows (| --- | --- |)
-      const tableLines: string[] = []
-      let inTable = true
-      
-      while (i < lines.length && inTable) {
-        const currentLine = lines[i]
-        const currentTrimmed = currentLine.trim()
-        
-        // Check if it's a table row (starts and ends with |)
-        if (currentTrimmed.startsWith("|") && currentTrimmed.endsWith("|")) {
-          tableLines.push(currentLine)
-          i++
-        } 
-        // Check if it's a separator row (| --- | --- | or |--------|-------------|)
-        else if (currentTrimmed.match(/^\|[\s\-\|:]+\|$/)) {
-          tableLines.push(currentLine)
-        i++
-      }
-        // Empty line might be part of table (some markdown allows blank lines in tables)
-        else if (currentTrimmed === "" && tableLines.length > 0) {
-          // If we have table lines and encounter empty line, check next line
-          // If next line is also a table line, include the empty line
-          if (i + 1 < lines.length) {
-            const nextTrimmed = lines[i + 1].trim()
-            if (nextTrimmed.startsWith("|") || nextTrimmed.match(/^\|[\s\-\|:]+\|$/)) {
-              tableLines.push(currentLine)
-              i++
-            } else {
-              inTable = false
-            }
-          } else {
-            inTable = false
-          }
-        } else {
-          // Not a table line, stop collecting
-          inTable = false
-        }
-      }
-      
-      // Add table lines to current text block (with newlines)
-      if (tableLines.length > 0) {
-        currentText += (currentText ? "\n" : "") + tableLines.join("\n")
-      }
-      // Don't increment i here since the while loop already did
-      continue
-    } else if (trimmed) {
-      // Skip separator lines (---, --, etc.)
-      if (trimmed.match(/^[-=]{2,}$/)) {
-        i++
-        continue
-      }
-      // Regular text line - add to current text block
-      currentText += (currentText ? "\n" : "") + trimmed
-    } else {
-      // Empty line - check if we should flush or continue
-      // If current text ends with a list item and next non-empty line is also a list item,
-      // keep the empty line and continue (don't flush)
-      if (currentText.trim()) {
-        const currentTextLines = currentText.trim().split("\n")
-        const lastLine = currentTextLines[currentTextLines.length - 1]
-        
-        // Check if the last line in current text is a list item
-        const lastLineIsListItem = isListItem(lastLine)
-        
-        // Check if next non-empty line is a list item
-        const nextIsListItem = isInListContext(lines, i + 1)
-        
-        if (lastLineIsListItem && nextIsListItem) {
-          // We're in the middle of a list, keep the empty line and continue
-          currentText += "\n"
-          i++
-          continue
-        } else {
-          // Not in a list context, flush the current text
-        blocks.push({
-          id: blockIdCounter++,
-          type: "text",
-          order: blockOrder++,
-          data: { markdown: currentText.trim() },
-        })
-        currentText = ""
-        }
-      }
+      });
+      continue;
     }
 
-    i++
+    if (isStandaloneImageLine(line)) {
+      flushText();
+      blocks.push({
+        id: blockId++,
+        type: "text",
+        order: blockOrder++,
+        data: { markdown: line.trim() },
+      });
+      i++;
+      continue;
+    }
+
+    if (isMdTableRow(trimmed)) {
+      flushText();
+      const tableLines: string[] = [];
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        if (isMdTableRow(t)) {
+          tableLines.push(lines[i]);
+          i++;
+          continue;
+        }
+        if (t === "" && i + 1 < lines.length && isMdTableRow(lines[i + 1].trim())) {
+          tableLines.push(lines[i]);
+          i++;
+          continue;
+        }
+        break;
+      }
+      blocks.push({
+        id: blockId++,
+        type: "text",
+        order: blockOrder++,
+        data: { markdown: tableLines.join("\n") },
+      });
+      continue;
+    }
+
+    textBuf.push(line);
+    i++;
   }
 
-  // Flush any remaining text at the end
-  if (currentText.trim()) {
-    blocks.push({
-      id: blockIdCounter++,
-      type: "text",
-      order: blockOrder++,
-      data: { markdown: currentText.trim() },
-    })
-  }
-
-  // For text blocks that are long run-on paragraphs (no lists, no double newlines),
-  // insert paragraph breaks so per-choice explanations render with structure.
-  const normalizedBlocks = blocks.map((block) => {
-    if (block.type === "text" && block.data?.markdown) {
-      const md = ensureParagraphBreaksInPlainText(block.data.markdown)
-      if (md !== block.data.markdown) {
-        return { ...block, data: { ...block.data, markdown: md } }
-      }
-    }
-    return block
-  })
-
-  // Ensure blocks are sorted by order (should already be in order, but just in case)
-  return normalizedBlocks.sort((a, b) => {
-    const orderA = typeof a.order === "number" ? a.order : 999
-    const orderB = typeof b.order === "number" ? b.order : 999
-    return orderA - orderB
-  })
+  flushText();
+  return blocks;
 }
 
 /**

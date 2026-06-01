@@ -572,7 +572,7 @@ export default function BulkDocxUploader({
         warnings.push(`Only ${replacementCount} of ${images.length} image placeholders were replaced in Markdown`);
       }
 
-      // Step 5: Parse Markdown using existing parser
+      // Step 5: Parse markdown as produced (no structural rewriting)
       const parsed = parseMarkdown(processedMarkdown);
       const hierarchy = mergeParsedHierarchy(
         {
