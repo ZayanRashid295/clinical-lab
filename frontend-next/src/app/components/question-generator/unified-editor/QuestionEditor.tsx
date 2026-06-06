@@ -710,11 +710,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         const res: any = await subtopicsService.createSubtopic({ topicId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          const list = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
-          const data = Array.isArray(list) ? list : (list as any)?.data || []
+          const listRes = await subtopicsService.getSubtopics({ topicId, status: "ACTIVE", listAll: true })
+          let data = Array.isArray(listRes) ? listRes : (listRes as any)?.data || []
+          if (!data.some((s: any) => s.id === id)) {
+            data = [...data, { id, name, topicId }]
+          }
           setSubtopics(data)
           setMetadata((prev) => ({ ...prev, subtopicId: id }))
+          setSubtopicEditName(name)
           setAddMetaContext(null)
+        } else {
+          setAddMetaError("Subtopic was created but no ID was returned. Please refresh and try again.")
         }
       }
     } catch (e: unknown) {
@@ -2021,7 +2027,11 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               onClick={() => {
                                 if (!metadata.topicId) return
                                 setAddMetaContext({ type: "subtopic" })
-                                setAddMetaName("")
+                                setAddMetaName(
+                                  subtopicEditName.trim() ||
+                                    initialData?.metadata?.parsedSubtopicName?.trim() ||
+                                    "New Subtopic"
+                                )
                                 setAddMetaError(null)
                               }}
                             >

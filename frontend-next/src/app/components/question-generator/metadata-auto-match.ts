@@ -6,7 +6,12 @@
 
 export function normalizeName(name: string): string {
   if (!name) return "";
-  return name.toLowerCase().trim().replace(/\s+/g, " ");
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, " and ")
+    .replace(/[–—−]/g, "-")
+    .replace(/\s+/g, " ");
 }
 
 export function fuzzyMatch(str1: string, str2: string): boolean {
@@ -24,6 +29,23 @@ export function fuzzyMatch(str1: string, str2: string): boolean {
     );
   }
   return false;
+}
+
+/** Match a parsed label to a DB entity by exact name, then fuzzy name. */
+export function pickByName(
+  list: any[],
+  name?: string,
+  constrain?: (item: any) => boolean
+): any | null {
+  const n = String(name || "").trim();
+  if (!n || !Array.isArray(list) || list.length === 0) return null;
+  const filtered = constrain ? list.filter(constrain) : list;
+  if (filtered.length === 0) return null;
+  const exact = filtered.find(
+    (item: any) => normalizeName(item?.name || "") === normalizeName(n)
+  );
+  if (exact) return exact;
+  return filtered.find((item: any) => fuzzyMatch(item?.name || "", n)) || null;
 }
 
 export interface AutoMatchInput {
@@ -111,10 +133,7 @@ export async function runAutoMatch(
         
       const systemTopics = await getTopicsForSystem(matchedSystemId);
       if (parsedTopic && systemTopics.length > 0) {
-        const normalizedTopic = normalizeName(parsedTopic);
-        const matchedTopic = systemTopics.find(
-          (t: any) => normalizeName(t.name) === normalizedTopic
-        );
+        const matchedTopic = pickByName(systemTopics, parsedTopic);
         if (matchedTopic) matchedTopicId = matchedTopic.id;
         else if (systemTopics.length === 1) matchedTopicId = systemTopics[0].id;
       } else if (systemTopics.length === 1) {
@@ -125,10 +144,7 @@ export async function runAutoMatch(
       if (matchedTopicId) {
         const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
         if (parsedSubtopic && topicSubtopics.length > 0) {
-          const normalizedSubtopic = normalizeName(parsedSubtopic);
-          const matchedSubtopic = topicSubtopics.find(
-            (t: any) => normalizeName(t.name) === normalizedSubtopic
-          );
+          const matchedSubtopic = pickByName(topicSubtopics, parsedSubtopic);
           if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
           else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
         } else if (topicSubtopics.length === 1) {
@@ -155,10 +171,7 @@ export async function runAutoMatch(
         matchedSystemId = matchedSystem.id;
         const systemTopics = await getTopicsForSystem(matchedSystemId);
         if (parsedTopic && systemTopics.length > 0) {
-          const normalizedTopic = normalizeName(parsedTopic);
-          const matchedTopic = systemTopics.find(
-            (t: any) => normalizeName(t.name) === normalizedTopic
-          );
+          const matchedTopic = pickByName(systemTopics, parsedTopic);
           if (matchedTopic) matchedTopicId = matchedTopic.id;
           else if (systemTopics.length === 1)
             matchedTopicId = systemTopics[0].id;
@@ -170,10 +183,7 @@ export async function runAutoMatch(
         if (matchedTopicId) {
           const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
           if (parsedSubtopic && topicSubtopics.length > 0) {
-            const normalizedSubtopic = normalizeName(parsedSubtopic);
-            const matchedSubtopic = topicSubtopics.find(
-              (t: any) => normalizeName(t.name) === normalizedSubtopic
-            );
+            const matchedSubtopic = pickByName(topicSubtopics, parsedSubtopic);
             if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
             else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
           } else if (topicSubtopics.length === 1) {

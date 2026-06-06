@@ -14,7 +14,12 @@ import { TopicsService } from "@/app/services/content/topics.service";
 import { SubtopicsService } from "@/app/services/content/subtopics.service";
 import { CategoriesService } from "@/app/services/categories/categories.service";
 import { ProductsService } from "@/app/services/products/products.service";
-import { normalizeName } from "./metadata-auto-match";
+import { normalizeName, pickByName } from "./metadata-auto-match";
+import {
+  buildBulkMetadataValidationReport,
+  formatBulkMetadataValidationErrors,
+} from "./question-metadata-validation";
+import { BulkMetadataValidationPanel } from "./bulk-metadata-validation-panel";
 import {
   extractDocxHierarchyMetadata,
   mergeParsedHierarchy,
@@ -186,16 +191,6 @@ export default function BulkDocxUploader({
     if (!summary?.results?.length) return;
     let cancelled = false;
 
-    const pickByName = (list: any[], name?: string, constrain?: (item: any) => boolean) => {
-      const n = String(name || "").trim();
-      if (!n || !Array.isArray(list) || list.length === 0) return null;
-      const filtered = constrain ? list.filter(constrain) : list;
-      if (filtered.length === 0) return null;
-      const exact = filtered.find((item: any) => normalizeName(item?.name || "") === normalizeName(n));
-      if (exact) return exact;
-      return null;
-    };
-
     const run = async () => {
       for (const result of summary.results) {
         if (cancelled || result.status !== "success" || !result.questionData) continue;
@@ -265,6 +260,12 @@ export default function BulkDocxUploader({
               subtopicId: nextSubtopicId,
             },
           }));
+          if (nextSystemId && nextSystemId !== (current.systemId || "")) {
+            void loadTopics(nextSystemId);
+          }
+          if (nextTopicId && nextTopicId !== (current.topicId || "")) {
+            void loadSubtopics(nextTopicId);
+          }
         }
       }
     };
@@ -309,11 +310,15 @@ export default function BulkDocxUploader({
   };
 
   // Load subtopics when topic is selected for any question
-  const loadSubtopics = async (topicId: string, skipStateUpdate = false): Promise<any[]> => {
+  const loadSubtopics = async (
+    topicId: string,
+    skipStateUpdate = false,
+    forceRefresh = false
+  ): Promise<any[]> => {
     if (!topicId) return [];
-    
-    // Return cached data if available
-    if (subtopics[topicId]) {
+
+    // Only use cache when we have loaded items; empty arrays must be refetchable
+    if (!forceRefresh && subtopics[topicId]?.length > 0) {
       return subtopics[topicId];
     }
     
@@ -776,7 +781,7 @@ export default function BulkDocxUploader({
       if (topicId) {
         let subtopicList = subtopics[topicId] ?? [];
         if (subtopicList.length === 0) {
-          subtopicList = await loadSubtopics(topicId, true);
+          subtopicList = await loadSubtopics(topicId, true, true);
           setSubtopics((prev) => ({ ...prev, [topicId]: subtopicList }));
         }
         const existingSubtopic = subtopicList.find((s: any) => String(s?.name ?? "").trim().toLowerCase() === nameLower);
@@ -868,13 +873,18 @@ export default function BulkDocxUploader({
         const res: any = await subtopicsService.createSubtopic({ topicId, name, isActive: true });
         const id = res?.id ?? (res?.data as any)?.id;
         if (id) {
-          const list = await loadSubtopics(topicId, true);
+          let list = await loadSubtopics(topicId, true, true);
+          if (!list.some((s: any) => s.id === id)) {
+            list = [...list, { id, name, topicId }];
+          }
           setSubtopics((prev) => ({ ...prev, [topicId]: list }));
           setQuestionMetadata((prev) => ({
             ...prev,
             [fileName]: { ...prev[fileName], subtopicId: id, subtopicName: name },
           }));
           setAddToDbContext(null);
+        } else {
+          setAddToDbError("Subtopic was created but no ID was returned. Please refresh and try again.");
         }
       }
     } catch (e: any) {
@@ -950,7 +960,7 @@ export default function BulkDocxUploader({
         } else if (type === "subtopic") {
           const topicId = questionMetadata[fileName]?.topicId;
           if (topicId) {
-            const list = await loadSubtopics(topicId, true);
+            const list = await loadSubtopics(topicId, true, true);
             setSubtopics((prev) => ({ ...prev, [topicId]: list }));
             const existing = list.find((s: any) => String(s?.name).trim().toLowerCase() === name.toLowerCase());
             if (existing) {
@@ -1051,6 +1061,23 @@ export default function BulkDocxUploader({
 
   // Metadata update logic is handled by updateQuestionMetadata
 
+  const metadataValidation = useMemo(
+    () =>
+      summary?.results
+        ? buildBulkMetadataValidationReport(summary.results, questionMetadata)
+        : { isComplete: true, issues: [] },
+    [summary?.results, questionMetadata]
+  );
+
+  const metadataIssuesByFile = useMemo(() => {
+    const map = new Map<
+      string,
+      (typeof metadataValidation.issues)[number]
+    >();
+    metadataValidation.issues.forEach((issue) => map.set(issue.fileName, issue));
+    return map;
+  }, [metadataValidation.issues]);
+
   // Create questions from processed files
   const handleCreateQuestions = async () => {
     if (!summary || summary.successful === 0) {
@@ -1067,17 +1094,14 @@ export default function BulkDocxUploader({
       return;
     }
 
-    // Ensure all questions have topic IDs
-    const missingTopics = successfulResults.filter(
-      (r) => !questionMetadata[r.fileName]?.topicId || !questionMetadata[r.fileName].topicId.trim()
+    // Ensure all questions have complete metadata
+    const validation = buildBulkMetadataValidationReport(
+      successfulResults,
+      questionMetadata
     );
 
-    if (missingTopics.length > 0) {
-      setErrors([
-        `Select or add a Topic for each question. Missing for: ${missingTopics
-          .map((r) => r.fileName)
-          .join(", ")}`,
-      ]);
+    if (!validation.isComplete) {
+      setErrors(formatBulkMetadataValidationErrors(validation));
       return;
     }
 
@@ -1495,6 +1519,12 @@ export default function BulkDocxUploader({
                             ({result.questionData.system} - {result.questionData.category})
                           </div>
                         )}
+                        {result.status === "success" && metadataIssuesByFile.get(result.fileName) && (
+                          <div className="mt-1 text-xs text-amber-600 dark:text-amber-400 break-words">
+                            Missing:{" "}
+                            {metadataIssuesByFile.get(result.fileName)!.missingLabels.join(", ")}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -1880,21 +1910,24 @@ export default function BulkDocxUploader({
 
             {/* Create Button */}
             {summary.successful > 0 && (
-              <Button
-                onClick={handleCreateQuestions}
-                disabled={isCreating}
-                className="w-full"
-                size="lg"
-              >
-                {isCreating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Questions...
-                  </>
-                ) : (
-                  `Create ${summary.successful} Question(s)`
-                )}
-              </Button>
+              <div className="space-y-3">
+                <BulkMetadataValidationPanel report={metadataValidation} />
+                <Button
+                  onClick={handleCreateQuestions}
+                  disabled={isCreating || !metadataValidation.isComplete}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Questions...
+                    </>
+                  ) : (
+                    `Create ${summary.successful} Question(s)`
+                  )}
+                </Button>
+              </div>
             )}
           </div>
         )}

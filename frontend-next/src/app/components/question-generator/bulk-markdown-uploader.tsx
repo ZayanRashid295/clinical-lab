@@ -13,7 +13,12 @@ import { TopicsService } from "@/app/services/content/topics.service"
 import { SubtopicsService } from "@/app/services/content/subtopics.service"
 import { CategoriesService } from "@/app/services/categories/categories.service"
 import { ProductsService } from "@/app/services/products/products.service"
-import { runAutoMatch, fuzzyMatch, normalizeName } from "./metadata-auto-match"
+import { runAutoMatch, fuzzyMatch, normalizeName, pickByName } from "./metadata-auto-match"
+import {
+  buildBulkMetadataValidationReport,
+  formatBulkMetadataValidationErrors,
+} from "./question-metadata-validation"
+import { BulkMetadataValidationPanel } from "./bulk-metadata-validation-panel"
 import { CheckCircle2, XCircle, AlertCircle, Loader2, FileText, FolderOpen, Image as ImageIcon, Edit, ChevronDown, ChevronUp, Plus, X } from "lucide-react"
 import {
   AlertDialog,
@@ -210,11 +215,14 @@ export default function BulkMarkdownUploader({
   }
 
   // Load subtopics when topic is selected for any question
-  const loadSubtopics = async (topicId: string, skipStateUpdate = false): Promise<any[]> => {
+  const loadSubtopics = async (
+    topicId: string,
+    skipStateUpdate = false,
+    forceRefresh = false
+  ): Promise<any[]> => {
     if (!topicId) return []
-    
-    // Return cached data if available
-    if (subtopics[topicId]) {
+
+    if (!forceRefresh && subtopics[topicId]?.length > 0) {
       return subtopics[topicId]
     }
     
@@ -319,16 +327,6 @@ export default function BulkMarkdownUploader({
   useEffect(() => {
     if (!summary?.results?.length) return
     let cancelled = false
-
-    const pickByName = (list: any[], name?: string, constrain?: (item: any) => boolean) => {
-      const n = String(name || "").trim()
-      if (!n || !Array.isArray(list) || list.length === 0) return null
-      const filtered = constrain ? list.filter(constrain) : list
-      if (filtered.length === 0) return null
-      const exact = filtered.find((item: any) => normalizeName(item?.name || "") === normalizeName(n))
-      if (exact) return exact
-      return null
-    }
 
     const run = async () => {
       for (const result of summary.results) {
@@ -1016,7 +1014,7 @@ export default function BulkMarkdownUploader({
       if (topicId) {
         let subtopicList = subtopics[topicId] ?? []
         if (subtopicList.length === 0) {
-          subtopicList = await loadSubtopics(topicId, true)
+          subtopicList = await loadSubtopics(topicId, true, true)
           setSubtopics((prev) => ({ ...prev, [topicId]: subtopicList }))
         }
         const existingSubtopic = subtopicList.find((s: any) => String(s?.name ?? "").trim().toLowerCase() === nameLower)
@@ -1094,9 +1092,15 @@ export default function BulkMarkdownUploader({
         const res: any = await subtopicsService.createSubtopic({ topicId, name, isActive: true })
         const id = res?.id ?? (res?.data as any)?.id
         if (id) {
-          await loadSubtopics(topicId)
+          let list = await loadSubtopics(topicId, true, true)
+          if (!list.some((s: any) => s.id === id)) {
+            list = [...list, { id, name, topicId }]
+          }
+          setSubtopics((prev) => ({ ...prev, [topicId]: list }))
           updateQuestionMetadata(fileName, { subtopicId: id, subtopicName: name })
           setAddToDbContext(null)
+        } else {
+          setAddToDbError("Subtopic was created but no ID was returned. Please refresh and try again.")
         }
       }
     } catch (e: any) {
@@ -1184,7 +1188,7 @@ export default function BulkMarkdownUploader({
         } else if (type === "subtopic") {
           const topicId = questionMetadata[fileName]?.topicId
           if (topicId) {
-            const list = await loadSubtopics(topicId, true)
+            const list = await loadSubtopics(topicId, true, true)
             setSubtopics((prev) => ({ ...prev, [topicId]: list }))
             const existing = list.find((s: any) => String(s?.name).trim().toLowerCase() === nameVal.toLowerCase())
             if (existing) {
@@ -1285,6 +1289,23 @@ export default function BulkMarkdownUploader({
     }
   }, [addToDbContext, products])
 
+  const metadataValidation = useMemo(
+    () =>
+      summary?.results
+        ? buildBulkMetadataValidationReport(summary.results, questionMetadata)
+        : { isComplete: true, issues: [] },
+    [summary?.results, questionMetadata]
+  )
+
+  const metadataIssuesByFile = useMemo(() => {
+    const map = new Map<
+      string,
+      (typeof metadataValidation.issues)[number]
+    >()
+    metadataValidation.issues.forEach((issue) => map.set(issue.fileName, issue))
+    return map
+  }, [metadataValidation.issues])
+
   // Create questions from parsed data
   const createQuestions = async () => {
     if (!summary) return
@@ -1296,15 +1317,13 @@ export default function BulkMarkdownUploader({
       return
     }
 
-    // Check if all questions have topic IDs
-    const missingTopics = successfulResults.filter(
-      (r) => !questionMetadata[r.fileName]?.topicId || !questionMetadata[r.fileName].topicId.trim()
+    const validation = buildBulkMetadataValidationReport(
+      successfulResults,
+      questionMetadata
     )
 
-    if (missingTopics.length > 0) {
-      setErrors([
-        `Select or add a Topic for each question. Missing for: ${missingTopics.map((r) => r.fileName).join(", ")}`,
-      ])
+    if (!validation.isComplete) {
+      setErrors(formatBulkMetadataValidationErrors(validation))
       return
     }
 
@@ -1746,6 +1765,12 @@ export default function BulkMarkdownUploader({
                           
                           {result.error && (
                             <div className="text-xs text-red-600 dark:text-red-400 mt-1">{result.error}</div>
+                          )}
+                          {result.status === "success" && metadataIssuesByFile.get(result.fileName) && (
+                            <div className="mt-1 text-xs text-amber-600 dark:text-amber-400 break-words">
+                              Missing:{" "}
+                              {metadataIssuesByFile.get(result.fileName)!.missingLabels.join(", ")}
+                            </div>
                           )}
                           {result.warnings && result.warnings.length > 0 && (
                             <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
@@ -2241,27 +2266,25 @@ export default function BulkMarkdownUploader({
 
         {/* Action Buttons */}
         {summary && !isProcessing && (
-          <div className="flex gap-2">
+          <div className="space-y-3">
             {summary.successful > 0 && (
-              <Button
-                onClick={createQuestions}
-                disabled={
-                  isCreating ||
-                  summary.results.filter(
-                    (r) => r.status === "success" && (!questionMetadata[r.fileName]?.topicId || !questionMetadata[r.fileName].topicId.trim())
-                  ).length > 0
-                }
-                className="w-full bg-primary hover:bg-primary/90 sm:flex-1"
-              >
-                {isCreating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  `Create ${summary.successful} Question${summary.successful > 1 ? "s" : ""}`
-                )}
-              </Button>
+              <>
+                <BulkMetadataValidationPanel report={metadataValidation} />
+                <Button
+                  onClick={createQuestions}
+                  disabled={isCreating || !metadataValidation.isComplete}
+                  className="w-full bg-primary hover:bg-primary/90 sm:flex-1"
+                >
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    `Create ${summary.successful} Question${summary.successful > 1 ? "s" : ""}`
+                  )}
+                </Button>
+              </>
             )}
           </div>
         )}
