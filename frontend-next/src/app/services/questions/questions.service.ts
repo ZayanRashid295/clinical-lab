@@ -5,6 +5,10 @@ import {
   UpdateResponse,
 } from "../base/api-types";
 import { Question, QuestionQueryParams, CreateQuestionDto, UpdateQuestionDto } from "../../types/question";
+import {
+  compressImageForUpload,
+  formatFileSize,
+} from "../../utils/compress-image-for-upload";
 
 export class QuestionsService extends BaseDataService<
   Question,
@@ -65,11 +69,15 @@ export class QuestionsService extends BaseDataService<
    * Upload an image for question content
    */
   async uploadImage(file: File): Promise<{ url: string }> {
+    const prepared = await compressImageForUpload(file);
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", prepared);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
-    const url = `${API_BASE_URL}${this.endpoint}/upload-image`;
+    // Same-origin proxy avoids Next.js 1MB API limit and nginx/Nest routing quirks in production
+    const url =
+      typeof window !== "undefined"
+        ? "/api/questions/upload-image"
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817"}${this.endpoint}/upload-image`;
 
     const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
@@ -85,7 +93,15 @@ export class QuestionsService extends BaseDataService<
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to upload image: ${response.status}`);
+      if (response.status === 413) {
+        throw new Error(
+          `Image is too large (${formatFileSize(prepared.size)} compressed, was ${formatFileSize(file.size)}). Add nginx location for /api/questions/upload-image → port 3001, then rebuild frontend.`
+        );
+      }
+      throw new Error(
+        (errorData as { message?: string }).message ||
+          `Failed to upload image: ${response.status}`
+      );
     }
 
     return response.json();

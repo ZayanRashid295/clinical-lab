@@ -395,7 +395,11 @@ export class QuestionsController {
   @Post("upload-image")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @UseInterceptors(FileInterceptor("image"))
+  @UseInterceptors(
+    FileInterceptor("image", {
+      limits: { fileSize: 10 * 1024 * 1024 },
+    })
+  )
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
