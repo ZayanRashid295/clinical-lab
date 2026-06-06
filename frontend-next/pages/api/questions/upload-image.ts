@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Readable } from "stream";
 
 /**
  * Proxy multipart image uploads to Nest on localhost.
- * Next.js Pages API default bodyParser limit is 1MB (413) — disabled here; body is streamed.
+ * Browser → nginx → Next (this route) → Nest on 127.0.0.1:3000
  */
 export const config = {
   api: {
@@ -14,12 +15,21 @@ function getBackendBaseUrl(): string {
   const internal = process.env.BACKEND_INTERNAL_URL?.replace(/\/$/, "");
   if (internal) return internal;
 
-  const publicApi = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
-  if (publicApi) {
-    return publicApi.replace(/\/api$/i, "");
-  }
+  const port = process.env.BACKEND_PORT || "3000";
+  return `http://127.0.0.1:${port}`;
+}
 
-  return "http://127.0.0.1:3000";
+async function readRequestBody(req: NextApiRequest): Promise<Buffer> {
+  const readable = req as unknown as Readable;
+  const chunks: Buffer[] = [];
+
+  return new Promise((resolve, reject) => {
+    readable.on("data", (chunk: Buffer | string) => {
+      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+    });
+    readable.on("end", () => resolve(Buffer.concat(chunks)));
+    readable.on("error", reject);
+  });
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const backendUrl = `${getBackendBaseUrl()}/questions/upload-image`;
 
   try {
+    const body = await readRequestBody(req);
     const headers: Record<string, string> = {};
     const auth = req.headers.authorization;
     const contentType = req.headers["content-type"];
@@ -40,35 +51,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const backendRes = await fetch(backendUrl, {
       method: "POST",
       headers,
-      body: req as unknown as BodyInit,
-      // Required when streaming a request body in Node 18+ fetch
-      // @ts-expect-error Node fetch duplex option
-      duplex: "half",
+      body: new Uint8Array(body),
     });
 
     const responseText = await backendRes.text();
-    const responseType = backendRes.headers.get("content-type");
-    if (responseType) res.setHeader("Content-Type", responseType);
 
     if (!backendRes.ok) {
       let message = `Failed to upload image: ${backendRes.status}`;
       try {
-        const parsed = JSON.parse(responseText) as { message?: string };
-        if (parsed.message) message = parsed.message;
+        const parsed = JSON.parse(responseText) as { message?: string | string[] };
+        if (typeof parsed.message === "string") message = parsed.message;
+        else if (Array.isArray(parsed.message)) message = parsed.message.join(", ");
       } catch {
-        /* non-JSON error body */
+        if (responseText.trim()) {
+          console.error("[upload-image proxy] backend error body:", responseText.slice(0, 500));
+        }
       }
       return res.status(backendRes.status).json({ message });
     }
 
+    if (!responseText.trim()) {
+      console.error("[upload-image proxy] empty success body from", backendUrl);
+      return res.status(502).json({ message: "Upload service returned an empty response" });
+    }
+
     try {
-      return res.status(backendRes.status).json(JSON.parse(responseText));
+      const data = JSON.parse(responseText) as { url?: string };
+      if (!data.url) {
+        console.error("[upload-image proxy] missing url in response:", responseText.slice(0, 500));
+        return res.status(502).json({ message: "Upload service did not return an image URL" });
+      }
+      return res.status(backendRes.status).json(data);
     } catch {
-      return res.status(500).json({ message: "Invalid response from upload service" });
+      console.error(
+        "[upload-image proxy] non-JSON success from",
+        backendUrl,
+        responseText.slice(0, 500)
+      );
+      return res.status(502).json({
+        message: "Invalid response from upload service. Check BACKEND_INTERNAL_URL points to Nest (http://127.0.0.1:3000).",
+      });
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Upload proxy failed";
-    console.error("[upload-image proxy]", message);
-    return res.status(502).json({ message });
+    console.error("[upload-image proxy]", backendUrl, message);
+    return res.status(502).json({ message: `Upload proxy failed: ${message}` });
   }
 }
