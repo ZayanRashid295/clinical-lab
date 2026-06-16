@@ -1,0 +1,99 @@
+{
+  "questionId": "515024",
+  "questionNumber": "21",
+  "stem": "A woman of childbearing age with severe psoriasis is being considered for systemic therapy. She plans to conceive in the near future. Which of the following medications is contraindicated due to teratogenicity?",
+  "options": [
+    "Methotrexate",
+    "Cyclosporine",
+    "Acitretin",
+    "Narrow-band UVB",
+    "Topical steroids"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "Woman of childbearing age – Indicates pregnancy considerations and teratogenic risk.",
+    "Systemic therapy – Narrows focus to drugs affecting the whole body, not topical/local treatments.",
+    "Contraindicated / teratogenicity – Directly points to drugs that can cause fetal malformations."
+  ],
+  "explanations": {
+    "C": {
+      "title": "Acitretin",
+      "body": "Acitretin is a second-generation systemic retinoid primarily used for severe or recalcitrant psoriasis. While highly effective, it is strictly contraindicated in women who are pregnant or planning to become pregnant due to its extreme teratogenicity (ability to cause severe birth defects).\nHighly teratogenic retinoid. Even after discontinuation, pregnancy must be avoided for at least 3 years due to its long half-life and risk of severe congenital malformations (craniofacial, cardiac, CNS).\nNot safe in women of childbearing age planning conception.",
+      "systemInvolved": "Dermatologic (skin), teratogenic effects on multiple fetal organ systems (CNS, heart, craniofacial)."
+    },
+    "A": {
+      "title": "Methotrexate",
+      "body": "Methotrexate is a folate antagonist and highly teratogenic, causing fetal malformations and miscarriage.\nIt is contraindicated in pregnancy and women planning conception, but its teratogenicity can be reversed after discontinuation for an adequate washout period (usually 3–6 months).",
+      "systemInvolved": "Hematologic / immune system (also affects rapidly dividing cells)."
+    },
+    "B": {
+      "title": "Cyclosporine",
+      "body": "Immunosuppressant that inhibits T-cell activation.\nGenerally considered relatively safer in women planning pregnancy if used with caution, though monitoring for maternal hypertension and renal effects is needed.",
+      "systemInvolved": "Immune / renal / cardiovascular system."
+    },
+    "D": {
+      "title": "Narrow-band UVB",
+      "body": "Phototherapy is safe in pregnancy.\nUsed as a systemic-sparing treatment for severe psoriasis when systemic drugs are contraindicated.",
+      "systemInvolved": "Dermatologic (skin)."
+    },
+    "E": {
+      "title": "Topical steroids",
+      "body": "Safe for short-term or moderate use during pregnancy.\nMay cause systemic absorption in very high-potency or large-area use, but generally low risk.",
+      "systemInvolved": "Dermatologic (skin)."
+    }
+  },
+  "keyConcept": "Acitretin is a systemic retinoid and absolute contraindication in women planning pregnancy due to long-lasting teratogenicity. Safe systemic alternatives for childbearing women include cyclosporine and narrow-band UVB, while topical steroids are generally safe.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Classification & Variants - Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Childbearing age + Systemic therapy + Teratogenicity → This “triad” immediately signals that acitretin is the drug to avoid.",
+  "featureTableName": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age Systemic Therapy of Psoriasis",
+  "featureTable": [
+    {
+      "feature": "Methotrexate",
+      "description": "Contraindicated; teratogenic",
+      "clinicalImportance": "Avoid in pregnancy; washout 3–6 months before conception; affects rapidly dividing cells"
+    },
+    {
+      "feature": "Acitretin",
+      "description": "Absolutely contraindicated; highly teratogenic",
+      "clinicalImportance": "Avoid conception for ≥3 years after use; causes severe fetal malformations (CNS, craniofacial, cardiac)"
+    },
+    {
+      "feature": "Cyclosporine",
+      "description": "Relatively safe with caution",
+      "clinicalImportance": "Can be used if necessary; monitor for maternal hypertension and renal effects"
+    },
+    {
+      "feature": "Narrow-band UVB",
+      "description": "Safe",
+      "clinicalImportance": "Non-drug option; systemic-sparing; safe in pregnancy"
+    },
+    {
+      "feature": "Topical steroids",
+      "description": "Safe",
+      "clinicalImportance": "Use low–moderate potency; minimal systemic absorption"
+    }
+  ],
+  "diagram": {
+    "name": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age Systemic Therapy of Psoriasis",
+    "caption": "This diagram illustrates the safety profile of systemic and topical treatments for severe psoriasis in women planning pregnancy. It highlights highly teratogenic drugs (Acitretin, Methotrexate) to avoid, relatively safe options (Cyclosporine, Narrowband UVB), and generally safe topical steroids, emphasizing clinical decision-making for pregnancy planning. The central figure of a pregnant woman reinforces the focus on reproductive safety.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

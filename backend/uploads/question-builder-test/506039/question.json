@@ -1,0 +1,169 @@
+{
+  "questionId": "506039",
+  "questionNumber": "02",
+  "stem": "A 22-year-old university student presents with a 3-day history of fever, malaise, and painful oral vesicular lesions involving the lips and gingiva. Physical examination shows multiple small vesicles and shallow ulcers on an erythematous base in the oral cavity. Which of the following is the most likely diagnosis?",
+  "options": [
+    "Recurrent aphthous stomatitis",
+    "Primary herpetic gingivostomatitis",
+    "Herpangina",
+    "Oral candidiasis",
+    "Oral lichen planus"
+  ],
+  "correctAnswer": "B",
+  "keywords": [
+    "Painful oral vesicular lesions — Classic description of HSV-related mucosal infection with vesicles progressing to ulcers.",
+    "Fever and malaise — Systemic prodromal symptoms strongly favor primary HSV infection over benign aphthous ulcers or lichen planus.",
+    "Lips and gingiva involvement — Gingival involvement is highly characteristic of primary herpetic gingivostomatitis."
+  ],
+  "explanations": {
+    "B": {
+      "title": "Primary herpetic gingivostomatitis",
+      "body": "Primary herpetic gingivostomatitis is an acute oral infection caused by herpes simplex virus type 1 (HSV-1). It commonly presents in children and young adults with fever, malaise, painful vesicles, gingivitis, and shallow oral ulcers. Lesions often involve the lips, gingiva, buccal mucosa, and tongue. The condition is highly painful and may interfere with eating and drinking.\nThe patient has an acute febrile illness with multiple painful vesicles and shallow ulcers involving the lips and gingiva. Gingival inflammation with vesicular lesions is classic for primary HSV infection. The combination of fever, malaise, and diffuse oral vesicles strongly supports primary herpetic gingivostomatitis.",
+      "systemInvolved": "Gastrointestinal System – Oral Cavity / Infectious Diseases"
+    },
+    "A": {
+      "title": "Recurrent aphthous stomatitis",
+      "body": "Recurrent aphthous stomatitis is characterized by recurrent painful aphthous ulcers in the oral cavity. Lesions are usually small, round ulcers with a yellow-gray base and erythematous halo. They commonly affect nonkeratinized mucosa such as the buccal mucosa and soft palate. Systemic symptoms are usually absent.\nThis option is incorrect because aphthous ulcers are not preceded by vesicles and are not typically associated with fever, malaise, or gingival involvement. The stem specifically describes vesicular lesions, which are characteristic of HSV infection."
+    },
+    "C": {
+      "title": "Herpangina",
+      "body": "Herpangina is an enteroviral infection, commonly caused by Coxsackie A virus. It presents with fever and painful vesicles or ulcers involving the posterior oral cavity, especially the soft palate, uvula, and tonsillar pillars. It is more common in children.\nThis option is incorrect because herpangina typically affects the posterior oropharynx rather than the lips and gingiva. Gingivostomatitis with diffuse anterior oral involvement is more typical of HSV infection."
+    },
+    "D": {
+      "title": "Oral candidiasis",
+      "body": "Oral candidiasis is a fungal infection caused mainly by Candida albicans. It commonly presents with white curd-like plaques that can be scraped off, leaving an erythematous base underneath. It is associated with immunosuppression, diabetes, antibiotic use, or inhaled corticosteroids.\nThis option is incorrect because candidiasis produces white plaques rather than painful vesicular lesions. Fever and diffuse vesicular ulceration are not typical features of oral candidiasis."
+    },
+    "E": {
+      "title": "Oral lichen planus",
+      "body": "Oral lichen planus is a chronic inflammatory mucosal disorder mediated by T-cell immune reactions. It commonly presents with white lacy reticular lesions known as Wickham striae and may sometimes cause erosive painful lesions. The disease is chronic and recurrent.\nThis option is incorrect because oral lichen planus does not present as an acute febrile vesicular illness. The presence of fever, malaise, and multiple vesicles strongly argues against lichen planus."
+    }
+  },
+  "keyConcept": "Primary herpetic gingivostomatitis classically presents with fever, malaise, painful oral vesicles, gingivitis, and shallow ulcers caused by HSV-1 infection. Gingival involvement and vesicular lesions help distinguish it from aphthous ulcers and other oral mucosal diseases.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections - Recognition & Diagnosis",
+    "mcqTitle": "Infections - Recognition & Diagnosis - Primary Herpetic Gingivostomatitis",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Clinical Reasoning",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTable": [
+    {
+      "feature": "Etiology",
+      "description": "• Caused by HSV-1 infection • Occasionally HSV-2 • Primary oral herpes infection",
+      "clinicalImportance": "• Common acute viral oral infection • Highly contagious"
+    },
+    {
+      "feature": "Age Group",
+      "description": "• Common in children • Can occur in young adults",
+      "clinicalImportance": "• Young adults may present with severe symptomatic disease"
+    },
+    {
+      "feature": "Prodromal Symptoms",
+      "description": "• Fever • Malaise • Irritability • Sore throat",
+      "clinicalImportance": "• Helps differentiate from aphthous ulcers"
+    },
+    {
+      "feature": "Oral Lesions",
+      "description": "• Multiple painful vesicles • Vesicles rupture into shallow ulcers • Erythematous base",
+      "clinicalImportance": "• Vesicular stage is highly characteristic"
+    },
+    {
+      "feature": "Site of Involvement",
+      "description": "• Lips • Gingiva • Buccal mucosa • Tongue",
+      "clinicalImportance": "• Gingival involvement strongly favors HSV"
+    },
+    {
+      "feature": "Gingival Findings",
+      "description": "• Diffuse gingivitis • Swollen gums • Friable gums • Bleeding tendency",
+      "clinicalImportance": "• Important distinguishing feature"
+    },
+    {
+      "feature": "Pain",
+      "description": "• Severe oral pain • Odynophagia • Difficulty eating/drinking",
+      "clinicalImportance": "• May cause dehydration"
+    },
+    {
+      "feature": "Lymph Nodes",
+      "description": "• Cervical lymphadenopathy may occur",
+      "clinicalImportance": "• Supports infectious etiology"
+    },
+    {
+      "feature": "Diagnosis",
+      "description": "• Usually clinical • PCR if uncertain • Viral culture occasionally used",
+      "clinicalImportance": "• Clinical diagnosis is most common"
+    },
+    {
+      "feature": "Treatment",
+      "description": "• Hydration • Analgesics • Oral acyclovir in severe cases",
+      "clinicalImportance": "• Early antiviral therapy shortens illness"
+    },
+    {
+      "feature": "Complications",
+      "description": "• Dehydration • Secondary bacterial infection • Recurrent herpes labialis",
+      "clinicalImportance": "• Important in severe disease"
+    },
+    {
+      "feature": "System Involved",
+      "description": "• Gastrointestinal system • Oral cavity • Infectious diseases",
+      "clinicalImportance": "• Common oral mucosal infection"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Recurrent aphthous stomatitis",
+      "distinguishingFeatures": "• Painful shallow ulcers • Nonkeratinized mucosa • No vesicles • No fever",
+      "keyDifferences": "• Absence of vesicular stage • No gingivitis • No systemic symptoms"
+    },
+    {
+      "condition": "Herpangina",
+      "distinguishingFeatures": "• Coxsackie virus infection • Fever • Posterior oral ulcers • Soft palate involvement",
+      "keyDifferences": "• Lesions mainly posterior • Gingiva usually spared"
+    },
+    {
+      "condition": "Hand-foot-and-mouth disease",
+      "distinguishingFeatures": "• Oral ulcers • Vesicular rash on hands/feet • Enteroviral infection",
+      "keyDifferences": "• Characteristic extremity rash present"
+    },
+    {
+      "condition": "Oral candidiasis",
+      "distinguishingFeatures": "• White curd-like plaques • Scrapable lesions • Burning sensation",
+      "keyDifferences": "• No vesicles • No diffuse gingivitis"
+    },
+    {
+      "condition": "Oral lichen planus",
+      "distinguishingFeatures": "• Chronic course • Wickham striae • Reticular white lesions",
+      "keyDifferences": "• Chronic inflammatory condition • No fever or vesicles"
+    },
+    {
+      "condition": "Behçet disease",
+      "distinguishingFeatures": "• Recurrent oral ulcers • Genital ulcers • Uveitis",
+      "keyDifferences": "• Multisystem disease • No vesicular eruption"
+    },
+    {
+      "condition": "Stevens–Johnson syndrome",
+      "distinguishingFeatures": "• Painful mucosal erosions • Skin lesions • Drug association",
+      "keyDifferences": "• Severe systemic illness • Extensive skin involvement"
+    },
+    {
+      "condition": "Oral squamous cell carcinoma",
+      "distinguishingFeatures": "• Nonhealing ulcer • Indurated margins • Chronic progression",
+      "keyDifferences": "• Chronic malignant lesion • No acute febrile illness"
+    }
+  ],
+  "diagram": {
+    "caption": "This diagram illustrates the clinical recognition and diagnostic approach to primary herpetic gingivostomatitis caused by HSV-1 infection. It highlights characteristic features including fever, malaise, painful oral vesicles, diffuse gingivitis, and shallow ulcers involving the lips and oral mucosa. The infographic also summarizes pathogenesis, common sites of involvement, differential diagnoses, diagnostic methods such as PCR and Tzanck smear, management strategies, and important complications.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

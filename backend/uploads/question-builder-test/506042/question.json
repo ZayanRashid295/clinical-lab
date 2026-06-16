@@ -1,0 +1,170 @@
+{
+  "questionId": "506042",
+  "questionNumber": "04",
+  "stem": "A 47-year-old man presents with a non-healing painful ulcer on the tongue for 5 weeks. He reports progressive pain during swallowing, low-grade fever, and unintentional weight loss. He has a known history of recently diagnosed pulmonary tuberculosis for which he has not yet started treatment. Oral examination shows a single, irregular ulcer with undermined edges and a granular base on the lateral border of the tongue. There is mild tenderness in the cervical lymph nodes. What is the most likely cause of this patient’s oral lesion?",
+  "options": [
+    "Squamous cell carcinoma",
+    "Tertiary syphilitic gumma",
+    "Deep fungal infection (Histoplasmosis)",
+    "Oral tuberculosis",
+    "Chronic traumatic ulcer"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "Known pulmonary tuberculosis (untreated) → suggests possible hematogenous or direct spread to oral cavity",
+    "Painful chronic oral ulcer (5 weeks) with fever + weight loss → indicates infectious systemic disease rather than malignancy alone",
+    "Irregular ulcer with undermined edges + granular base → classic description of tuberculous ulcer"
+  ],
+  "explanations": {
+    "D": {
+      "title": "Oral tuberculosis",
+      "body": "A chronic infectious ulcer of the oral cavity caused by Mycobacterium tuberculosis. It often occurs secondary to pulmonary TB via autoinoculation or hematogenous spread. Lesions are typically painful, irregular, and show undermined edges with a granular base. Systemic symptoms like fever and weight loss are common.",
+      "clinicalReasoning": "This patient has untreated pulmonary TB with systemic symptoms (fever, weight loss) and a characteristic painful oral ulcer. The ulcer morphology (undermined edges + granular base) strongly supports oral tuberculosis. Cervical lymph node tenderness further supports infectious spread rather than malignancy.",
+      "systemInvolved": "Oral cavity (GIT – Head & Neck region), Infectious disease (Pulmonary tuberculosis with extrapulmonary spread)"
+    },
+    "A": {
+      "title": "Squamous cell carcinoma",
+      "body": "A malignant epithelial tumor commonly affecting the tongue, especially in smokers and alcohol users. It usually presents as a non-healing ulcer or mass with indurated borders. Early lesions are often painless and gradually progress.",
+      "clinicalReasoning": "Although tongue location and chronicity are consistent, SCC typically lacks systemic infectious symptoms like fever. The presence of untreated TB and constitutional symptoms favors infection over malignancy. SCC remains an important differential but is less likely here."
+    },
+    "B": {
+      "title": "Tertiary syphilitic gumma",
+      "body": "A late manifestation of syphilis characterized by granulomatous lesions affecting skin, bone, and mucosa. Oral gummas are usually painless and slowly progressive with a destructive ulcerative pattern.",
+      "clinicalReasoning": "This option is less likely due to absence of painless chronic course and lack of syphilis history. Additionally, systemic TB features better explain the presentation. Gumma ulcers are typically deeper but not associated with fever and acute systemic decline."
+    },
+    "C": {
+      "title": "Deep fungal infection (Histoplasmosis)",
+      "body": "A systemic fungal infection that can involve the oral cavity, especially in immunocompromised patients. Oral lesions may appear as ulcers or ulceroproliferative masses.",
+      "clinicalReasoning": "Histoplasmosis usually occurs in severe immunosuppression and often presents with multiple lesions. The patient’s presentation is more consistent with TB, and there is no clear immunocompromised state described."
+    },
+    "E": {
+      "title": "Chronic traumatic ulcer",
+      "body": "A benign ulcer caused by repeated mechanical irritation (sharp teeth, dentures). It is typically localized, shallow, and resolves once the trauma is removed.",
+      "clinicalReasoning": "This is unlikely because there is no history of local trauma, and systemic symptoms (fever, weight loss) are not explained. Additionally, ulcer morphology is more aggressive and infectious in nature rather than reactive."
+    }
+  },
+  "keyConcept": "Oral tuberculosis presents as a painful chronic non-healing ulcer with undermined edges and granular base, often secondary to pulmonary TB. It is associated with systemic symptoms like fever, weight loss, and lymphadenopathy. It mimics malignancy but is differentiated by infectious systemic features and TB history.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections - Recognition & Diagnosis",
+    "mcqTitle": "Infections - Recognition & Diagnosis - Oral Tuberculosis – Extrapulmonary Tuberculosis (Head & Neck Manifestations)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Clinical reasoning and pattern recognition",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "chronic ulcer + systemic symptoms (fever, weight loss) + TB history → strongly favors oral TB",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "description": "• Chronic granulomatous infection of oral cavity caused by Mycobacterium tuberculosis • Usually secondary to pulmonary TB",
+      "clinicalImportance": "• Important extrapulmonary manifestation of TB"
+    },
+    {
+      "feature": "Etiology / Spread",
+      "description": "• Direct inoculation from infected sputum • Hematogenous spread • Secondary spread from pulmonary TB",
+      "clinicalImportance": "• Usually occurs in patients with active pulmonary disease"
+    },
+    {
+      "feature": "Common Sites",
+      "description": "• Tongue (most common) • Buccal mucosa • Gingiva • Palate • Lips",
+      "clinicalImportance": "• Tongue lesions are highly characteristic"
+    },
+    {
+      "feature": "Morphology of Ulcer",
+      "description": "• Chronic non-healing ulcer • Painful lesion • Irregular margins • Undermined edges • Granular base",
+      "clinicalImportance": "• Helps differentiate from traumatic ulcer and SCC"
+    },
+    {
+      "feature": "Symptoms",
+      "description": "• Pain during swallowing • Fever • Weight loss • Malaise • Cough may coexist",
+      "clinicalImportance": "• Constitutional symptoms suggest systemic infection"
+    },
+    {
+      "feature": "Lymph Nodes",
+      "description": "• Cervical lymphadenopathy • Tender nodes may occur",
+      "clinicalImportance": "• Supports infectious etiology"
+    },
+    {
+      "feature": "Histopathology",
+      "description": "• Caseating granulomas • Epithelioid histiocytes • Langhans giant cells",
+      "clinicalImportance": "• Diagnostic hallmark"
+    },
+    {
+      "feature": "Investigations",
+      "description": "• Biopsy of ulcer • Ziehl–Neelsen stain • Sputum AFB • Chest X-ray • PCR for TB",
+      "clinicalImportance": "• Confirms diagnosis and systemic involvement"
+    },
+    {
+      "feature": "Complications",
+      "description": "• Persistent painful ulceration • Secondary infection • Delayed diagnosis due to resemblance to SCC",
+      "clinicalImportance": "• Often mistaken for malignancy"
+    },
+    {
+      "feature": "Treatment",
+      "description": "• Standard anti-tuberculous therapy (ATT) • Nutritional support • Oral hygiene maintenance",
+      "clinicalImportance": "• Lesions usually improve with ATT"
+    },
+    {
+      "feature": "Prognosis",
+      "description": "• Good with early diagnosis and treatment • Delayed treatment may prolong ulceration",
+      "clinicalImportance": "• Early recognition prevents complications"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Squamous Cell Carcinoma (SCC)",
+      "distinguishingFeatures": "• Indurated ulcer • Irregular margins • Smoking/alcohol history • May bleed",
+      "keyDifferences": "• Usually painless early • No infectious constitutional symptoms initially"
+    },
+    {
+      "condition": "Chronic Traumatic Ulcer",
+      "distinguishingFeatures": "• Repeated local trauma • Sharp tooth/denture history • Localized lesion",
+      "keyDifferences": "• Resolves after removal of trauma • No fever or weight loss"
+    },
+    {
+      "condition": "Tertiary Syphilitic Gumma",
+      "distinguishingFeatures": "• Granulomatous ulcer • Painless lesion • Late syphilis manifestation",
+      "keyDifferences": "• Syphilis serology positive • Usually painless"
+    },
+    {
+      "condition": "Deep Fungal Infection (Histoplasmosis)",
+      "distinguishingFeatures": "• Chronic oral ulcer • Immunocompromised host • May have pulmonary symptoms",
+      "keyDifferences": "• Fungal stain/culture positive • Usually associated with immunosuppression"
+    },
+    {
+      "condition": "Aphthous Ulcer",
+      "distinguishingFeatures": "• Recurrent painful ulcers • Shallow lesions • Heal spontaneously",
+      "keyDifferences": "• Short duration • No systemic TB findings"
+    },
+    {
+      "condition": "Herpetic Ulcer (HSV)",
+      "distinguishingFeatures": "• Vesicles preceding ulcers • Acute painful lesions • Fever possible",
+      "keyDifferences": "• Multiple grouped vesicles/ulcers • Acute course rather than chronic"
+    },
+    {
+      "condition": "Crohn Disease Oral Ulcer",
+      "distinguishingFeatures": "• Chronic oral ulcers • GI symptoms • Lip swelling/cobblestoning",
+      "keyDifferences": "• Associated intestinal manifestations"
+    },
+    {
+      "condition": "Behçet Disease",
+      "distinguishingFeatures": "• Recurrent oral ulcers • Genital ulcers • Uveitis",
+      "keyDifferences": "• Multisystem vasculitic disease pattern"
+    }
+  ],
+  "diagram": {
+    "caption": "This diagram illustrates the clinical presentation, pathogenesis, histopathology, investigations, management, and differential diagnosis of oral tuberculosis, an uncommon extrapulmonary manifestation of Mycobacterium tuberculosis. It highlights the characteristic chronic painful oral ulcer with undermined edges and granular base, commonly involving the tongue in patients with active pulmonary tuberculosis. The infographic also emphasizes important diagnostic tools such as biopsy, Ziehl–Neelsen staining, PCR testing, and chest imaging, while comparing oral TB with other chronic oral ulcerative lesions including squamous cell carcinoma, syphilitic gumma, fungal infections, aphthous ulcers, and HSV infection.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

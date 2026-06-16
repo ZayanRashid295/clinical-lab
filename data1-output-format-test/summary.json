@@ -1,0 +1,16 @@
+{
+  "psoriasis": {
+    "ok": 12,
+    "fail": 0,
+    "failures": []
+  },
+  "cvs": {
+    "ok": 5,
+    "fail": 0
+  },
+  "sample515017": {
+    "hasBodyHtml": true,
+    "hasBoldClassicDistribution": true,
+    "bodyHtmlSnippet": "<p>Chronic plaque psoriasis (Psoriasis Vulgaris) is a chronic inflammatory skin condition characterized by well-demarcated, erythematous (red) plaques covered with characteristic <strong>silvery-white scales</strong>.</p><ul><li><strong>Cla"
+  }
+}

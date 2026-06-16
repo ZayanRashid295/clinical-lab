@@ -18,6 +18,7 @@ import Color from "@tiptap/extension-color"
 import Highlight from "@tiptap/extension-highlight"
 import { FontSize } from "./FontSizeExtension"
 import { FontFamily } from "./FontFamilyExtension"
+import { TIPTAP_TABLE_CELL_CONTENT } from "../question-builder/table-html-utils"
 import { useEffect, useRef } from "react"
 import { cn } from "@/shared/utils/cn"
 
@@ -40,6 +41,8 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const isUpdatingRef = useRef(false)
   const isTypingRef = useRef(false)
+  const isFocusedRef = useRef(false)
+  const lastEmittedHtmlRef = useRef<string | null>(null)
   const onChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const editor = useEditor({
@@ -94,7 +97,7 @@ export default function RichTextEditor({
       }),
       TableRow,
       TableCell.extend({
-        content: 'paragraph+',
+        content: TIPTAP_TABLE_CELL_CONTENT,
         addAttributes() {
           const parentAttrs = (this as any).parent?.() || {}
           return {
@@ -160,7 +163,7 @@ export default function RichTextEditor({
       }),
       // Use extended TableHeader instead of base one to avoid duplicate extension warning
       TableHeader.extend({
-        content: 'paragraph+',
+        content: TIPTAP_TABLE_CELL_CONTENT,
         addAttributes() {
           const parentAttrs = (this as any).parent?.() || {}
           return {
@@ -238,9 +241,12 @@ export default function RichTextEditor({
       }
       
       onChangeTimeoutRef.current = setTimeout(() => {
-      const html = editor.getHTML()
-      onChange(html)
-        isTypingRef.current = false
+        const html = editor.getHTML()
+        lastEmittedHtmlRef.current = html
+        onChange(html)
+        if (!editor.isFocused) {
+          isTypingRef.current = false
+        }
       }, 300) // 300ms debounce
     },
     editorProps: {
@@ -274,6 +280,35 @@ export default function RichTextEditor({
       }
     }
   }, [])
+
+  // Track focus/blur and flush pending changes on blur
+  useEffect(() => {
+    if (!editor) return
+
+    const handleFocus = () => {
+      isFocusedRef.current = true
+    }
+
+    const handleBlur = () => {
+      isFocusedRef.current = false
+      if (onChangeTimeoutRef.current) {
+        clearTimeout(onChangeTimeoutRef.current)
+        onChangeTimeoutRef.current = null
+      }
+      const html = editor.getHTML()
+      lastEmittedHtmlRef.current = html
+      onChange(html)
+      isTypingRef.current = false
+    }
+
+    editor.on("focus", handleFocus)
+    editor.on("blur", handleBlur)
+
+    return () => {
+      editor.off("focus", handleFocus)
+      editor.off("blur", handleBlur)
+    }
+  }, [editor, onChange])
 
   // Helper function to normalize list HTML and remove excessive spacing
   const normalizeListHTML = (html: string): string => {
@@ -446,16 +481,29 @@ export default function RichTextEditor({
     return normalized
   }
 
-  // Update editor content when prop changes
+  // Update editor content when prop changes (external only — never while user is editing)
   useEffect(() => {
-    // Don't update if user is actively typing
-    if (isTypingRef.current) return
-    
-    if (editor && content !== editor.getHTML()) {
+    if (!editor) return
+    // Don't reset content while the user is actively editing
+    if (isTypingRef.current || isFocusedRef.current || editor.isFocused) return
+
+    const normalizedContent = normalizeListHTML(content || "<p></p>")
+    const currentHtml = editor.getHTML()
+
+    // Skip if editor already has this content
+    if (normalizedContent === currentHtml) return
+
+    // Skip parent echo of our own recent onChange (TipTap HTML can differ slightly from prop)
+    if (
+      lastEmittedHtmlRef.current &&
+      (content === lastEmittedHtmlRef.current ||
+        normalizedContent === normalizeListHTML(lastEmittedHtmlRef.current))
+    ) {
+      return
+    }
+
+    if (content !== currentHtml) {
       isUpdatingRef.current = true
-      
-      // Normalize list HTML to fix spacing issues, but preserve font size classes
-      const normalizedContent = normalizeListHTML(content || "<p></p>")
       
       // Set content - TipTap will parse the HTML
       editor.commands.setContent(normalizedContent, { emitUpdate: false })

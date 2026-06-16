@@ -33,6 +33,11 @@ import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
 import { runAutoMatch } from "../metadata-auto-match"
 import {
+  mergeResolvedMetadata,
+  resolveCreatorMetadataIds,
+} from "../resolve-creator-metadata"
+import { coerceLabelString } from "../metadata-label-utils"
+import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
@@ -174,21 +179,36 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       .finally(() => setLoadingCategories(false))
   }, [])
 
+  // Reset auto-match when a different parsed question is loaded
+  useEffect(() => {
+    parsedHierarchyResolved.current = false
+  }, [initialData?.metadata?.questionId])
+
   // Populate hierarchy text fields from parsed DOCX/Markdown metadata
   useEffect(() => {
     const m = initialData?.metadata
     if (!m) return
     if (m.subject) {
-      setSubjectEditName(m.subject)
-      setCategoryName(m.subject)
+      setSubjectEditName(coerceLabelString(m.subject))
+      setCategoryName(coerceLabelString(m.subject))
     }
-    if (m.parsedProductName) setProductEditName(m.parsedProductName)
-    if (m.parsedTopicName) setTopicEditName(m.parsedTopicName)
-    if (m.parsedSubtopicName) setSubtopicEditName(m.parsedSubtopicName)
+    if (m.parsedProductName) setProductEditName(coerceLabelString(m.parsedProductName))
+    if (m.parsedTopicName) setTopicEditName(coerceLabelString(m.parsedTopicName))
+    if (m.parsedSubtopicName) setSubtopicEditName(coerceLabelString(m.parsedSubtopicName))
     if (m.parsedMcqTitle && !m.title) {
       setMetadata((prev) => ({ ...prev, title: m.parsedMcqTitle }))
     } else if (m.title && !metadata.title) {
       setMetadata((prev) => ({ ...prev, title: m.title }))
+    }
+    if (m.categoryId || m.productId || m.systemId || m.topicId || m.subtopicId) {
+      setMetadata((prev) => ({
+        ...prev,
+        categoryId: m.categoryId || prev.categoryId,
+        productId: m.productId || prev.productId,
+        systemId: m.systemId || prev.systemId,
+        topicId: m.topicId || prev.topicId,
+        subtopicId: m.subtopicId || prev.subtopicId,
+      }))
     }
   }, [initialData?.metadata])
 
@@ -217,8 +237,8 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
           parsedCategory: m.subject,
           parsedProduct: m.parsedProductName,
           parsedSystem: typeof m.system === "string" ? m.system : undefined,
-          parsedTopic: m.parsedTopicName,
-          parsedSubtopic: m.parsedSubtopicName,
+          parsedTopic: coerceLabelString(m.parsedTopicName),
+          parsedSubtopic: coerceLabelString(m.parsedSubtopicName),
         },
         chapters,
         {
@@ -290,52 +310,87 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Keep editable names in sync with current selections
+  const parsedCategoryName = coerceLabelString(initialData?.metadata?.subject)
+  const parsedProductName = coerceLabelString(initialData?.metadata?.parsedProductName)
+  const parsedSystemName = coerceLabelString(
+    typeof initialData?.metadata?.system === "string"
+      ? initialData.metadata.system
+      : initialData?.metadata?.system,
+  )
+  const parsedTopicName = coerceLabelString(initialData?.metadata?.parsedTopicName)
+  const parsedSubtopicName = coerceLabelString(initialData?.metadata?.parsedSubtopicName)
+
+  const resolveSelectLabel = (
+    selectedId: string | undefined,
+    list: any[],
+    parsedName: string,
+    placeholder: string,
+  ) => {
+    if (selectedId) {
+      const item = list.find((entry) => entry.id === selectedId)
+      if (item?.name) return item.name
+    }
+    return parsedName || placeholder
+  }
+
+  const defaultAddMetaName = (editName: string, parsedName: string) =>
+    editName.trim() || parsedName.trim()
+
+  // Keep editable names in sync with current selections (preserve parsed names when unmatched)
   useEffect(() => {
-    const selectedId = metadata.categoryId
+    const selectedId =
+      metadata.categoryId ||
+      metadata.productTagId ||
+      (metadata.productTagIds && metadata.productTagIds[0])
     if (selectedId) {
       const cat = categories.find((t) => t.id === selectedId)
-      setSubjectEditName(cat?.name || "")
+      setSubjectEditName(cat?.name || parsedCategoryName)
     } else {
-      setSubjectEditName("")
+      setSubjectEditName(parsedCategoryName)
     }
-  }, [metadata.categoryId, metadata.productTagId, metadata.productTagIds, categories])
+  }, [
+    metadata.categoryId,
+    metadata.productTagId,
+    metadata.productTagIds,
+    categories,
+    parsedCategoryName,
+  ])
 
   useEffect(() => {
     if (metadata.productId) {
       const product = products.find((p: any) => p.id === metadata.productId)
-      setProductEditName(product?.name || "")
+      setProductEditName(product?.name || parsedProductName)
     } else {
-      setProductEditName("")
+      setProductEditName(parsedProductName)
     }
-  }, [metadata.productId, products])
+  }, [metadata.productId, products, parsedProductName])
 
   useEffect(() => {
     if (metadata.systemId) {
       const chapter = chapters.find((c: any) => c.id === metadata.systemId)
-      setSystemEditName(chapter?.name || "")
+      setSystemEditName(chapter?.name || parsedSystemName)
     } else {
-      setSystemEditName("")
+      setSystemEditName(parsedSystemName)
     }
-  }, [metadata.systemId, chapters])
+  }, [metadata.systemId, chapters, parsedSystemName])
 
   useEffect(() => {
     if (metadata.topicId) {
       const topic = topics.find((t: any) => t.id === metadata.topicId)
-      setTopicEditName(topic?.name || "")
+      setTopicEditName(topic?.name || parsedTopicName)
     } else {
-      setTopicEditName("")
+      setTopicEditName(parsedTopicName)
     }
-  }, [metadata.topicId, topics])
+  }, [metadata.topicId, topics, parsedTopicName])
 
   useEffect(() => {
     if (metadata.subtopicId) {
       const subtopic = subtopics.find((s: any) => s.id === metadata.subtopicId)
-      setSubtopicEditName(subtopic?.name || "")
+      setSubtopicEditName(subtopic?.name || parsedSubtopicName)
     } else {
-      setSubtopicEditName("")
+      setSubtopicEditName(parsedSubtopicName)
     }
-  }, [metadata.subtopicId, subtopics])
+  }, [metadata.subtopicId, subtopics, parsedSubtopicName])
 
   // Close tags dropdown when clicking outside
   useEffect(() => {
@@ -1227,18 +1282,54 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     }
   }, [getActiveEditor])
 
-  const handleSave = useCallback(() => {
-    onSave({
-      stem: stemBlocks,
-      choices,
-      perAnswerExplanations,
-      mainExplanation: mainExplanationBlocks,
-      metadata: {
-        ...metadata,
-        questionId,
-      },
-    })
-  }, [stemBlocks, choices, perAnswerExplanations, mainExplanationBlocks, metadata, questionId, onSave])
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = useCallback(async () => {
+    setSaving(true)
+    try {
+      let metadataToSave = { ...metadata, questionId }
+
+      if (!metadataToSave.topicId) {
+        const resolved = await resolveCreatorMetadataIds(metadataToSave)
+        metadataToSave = mergeResolvedMetadata(metadataToSave, resolved)
+        if (resolved.topicId || resolved.systemId || resolved.categoryId) {
+          setMetadata((prev) => mergeResolvedMetadata(prev, resolved))
+        }
+      }
+
+      if (!metadataToSave.topicId) {
+        const topicLabel = metadataToSave.parsedTopicName || parsedTopicName
+        toast({
+          title: "Registration Error",
+          description: topicLabel
+            ? `Could not match topic "${topicLabel}" in the database. Select an existing topic from the dropdown or use + to add it.`
+            : "Please select a topic for this question.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      onSave({
+        stem: stemBlocks,
+        choices,
+        perAnswerExplanations,
+        mainExplanation: mainExplanationBlocks,
+        metadata: metadataToSave,
+      })
+    } finally {
+      setSaving(false)
+    }
+  }, [
+    stemBlocks,
+    choices,
+    perAnswerExplanations,
+    mainExplanationBlocks,
+    metadata,
+    questionId,
+    onSave,
+    parsedTopicName,
+    toast,
+  ])
 
   const handleChoiceChange = useCallback(
     (index: number, field: keyof Choice, value: any) => {
@@ -1443,8 +1534,12 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             }}>
               Preview
             </Button>
-            <Button onClick={handleSave} className="bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700">
-              Save
+            <Button
+              onClick={() => void handleSave()}
+              disabled={saving}
+              className="bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700"
+            >
+              {saving ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -1748,7 +1843,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                                 disabled={loadingCategories}
                               >
                                 <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
-                                  <SelectValue placeholder="Select Category..." />
+                                  <SelectValue placeholder="Select Category...">
+                                    {resolveSelectLabel(
+                                      metadata.categoryId ||
+                                        metadata.productTagId ||
+                                        (metadata.productTagIds && metadata.productTagIds[0]) ||
+                                        undefined,
+                                      categories,
+                                      parsedCategoryName,
+                                      "Select Category...",
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
                                   <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
@@ -1769,7 +1874,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               className="shrink-0"
                               onClick={() => {
                                 setAddMetaContext({ type: "subject" }) // "subject" type is used for Category creation
-                                setAddMetaName("")
+                                setAddMetaName(
+                                  defaultAddMetaName(subjectEditName, parsedCategoryName),
+                                )
                                 setAddMetaProductId("")
                                 setAddMetaError(null)
                               }}
@@ -1813,7 +1920,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                                 disabled={loadingProducts}
                               >
                                 <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
-                                  <SelectValue placeholder="Select Product..." />
+                                  <SelectValue placeholder="Select Product...">
+                                    {resolveSelectLabel(
+                                      metadata.productId,
+                                      products,
+                                      parsedProductName,
+                                      "Select Product...",
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
                                   <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
@@ -1834,7 +1948,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               className="shrink-0"
                               onClick={() => {
                                 setAddMetaContext({ type: "product" })
-                                setAddMetaName("")
+                                setAddMetaName(
+                                  defaultAddMetaName(productEditName, parsedProductName),
+                                )
                                 setAddMetaError(null)
                               }}
                             >
@@ -1874,7 +1990,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                                 disabled={loadingSystems}
                               >
                                 <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
-                                  <SelectValue placeholder="Select System..." />
+                                  <SelectValue placeholder="Select System...">
+                                    {resolveSelectLabel(
+                                      metadata.systemId,
+                                      chapters,
+                                      parsedSystemName,
+                                      "Select System...",
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
                                   <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
@@ -1895,8 +2018,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               className="shrink-0"
                               onClick={() => {
                                 setAddMetaContext({ type: "chapter" })
-                                setAddMetaName("")
-                                setAddMetaProductId(products[0]?.id || "")
+                                setAddMetaName(
+                                  defaultAddMetaName(systemEditName, parsedSystemName),
+                                )
+                                setAddMetaProductId(metadata.productId || products[0]?.id || "")
                                 setAddMetaError(null)
                               }}
                             >
@@ -1936,7 +2061,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                                 disabled={loadingTopics || !metadata.systemId}
                               >
                                 <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
-                                  <SelectValue placeholder="Select Topic..." />
+                                  <SelectValue placeholder="Select Topic...">
+                                    {resolveSelectLabel(
+                                      metadata.topicId,
+                                      topics,
+                                      parsedTopicName,
+                                      "Select Topic...",
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
                                   <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
@@ -1955,12 +2087,17 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               variant="outline"
                               size="icon"
                               className="shrink-0"
-                              disabled={!metadata.systemId}
-                              title={!metadata.systemId ? "Select system first" : "Add topic to database"}
+                              disabled={!metadata.systemId && !parsedSystemName}
+                              title={
+                                !metadata.systemId && !parsedSystemName
+                                  ? "Select system first"
+                                  : "Add topic to database"
+                              }
                               onClick={() => {
-                                if (!metadata.systemId) return
                                 setAddMetaContext({ type: "topic" })
-                                setAddMetaName("")
+                                setAddMetaName(
+                                  defaultAddMetaName(topicEditName, parsedTopicName),
+                                )
                                 setAddMetaError(null)
                               }}
                             >
@@ -2003,7 +2140,14 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                                 disabled={loadingSubtopics || !metadata.topicId}
                               >
                                 <SelectTrigger className="h-9 w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-xs focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 [&>span]:line-clamp-1">
-                                  <SelectValue placeholder="Select Subtopic..." />
+                                  <SelectValue placeholder="Select Subtopic...">
+                                    {resolveSelectLabel(
+                                      metadata.subtopicId,
+                                      subtopics,
+                                      parsedSubtopicName,
+                                      "Select Subtopic...",
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)]">
                                   <SelectItem value={SELECT_EMPTY_VALUE} className="text-muted-foreground">
@@ -2022,15 +2166,16 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                               variant="outline"
                               size="icon"
                               className="shrink-0"
-                              disabled={!metadata.topicId}
-                              title={!metadata.topicId ? "Select topic first" : "Add subtopic to database"}
+                              disabled={!metadata.topicId && !parsedTopicName}
+                              title={
+                                !metadata.topicId && !parsedTopicName
+                                  ? "Select topic first"
+                                  : "Add subtopic to database"
+                              }
                               onClick={() => {
-                                if (!metadata.topicId) return
                                 setAddMetaContext({ type: "subtopic" })
                                 setAddMetaName(
-                                  subtopicEditName.trim() ||
-                                    initialData?.metadata?.parsedSubtopicName?.trim() ||
-                                    "New Subtopic"
+                                  defaultAddMetaName(subtopicEditName, parsedSubtopicName),
                                 )
                                 setAddMetaError(null)
                               }}

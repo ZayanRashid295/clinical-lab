@@ -20,6 +20,12 @@ import Color from "@tiptap/extension-color"
 import Highlight from "@tiptap/extension-highlight"
 import { FontSize } from "./unified-editor/FontSizeExtension"
 import { FontFamily } from "./unified-editor/FontFamilyExtension"
+import { TIPTAP_TABLE_CELL_CONTENT, normalizeTableHtmlForEditor } from "./question-builder/table-html-utils"
+
+function prepareTableEditorHtml(html: string): string {
+  if (!html?.includes("<table")) return html
+  return normalizeTableHtmlForEditor(html)
+}
 
 import { unified } from "unified"
 import remarkParse from "remark-parse"
@@ -37,7 +43,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui/tooltip"
 
 const CustomTableCell = BaseTableCell.extend({
-  content: 'paragraph+',
+  content: TIPTAP_TABLE_CELL_CONTENT,
   addAttributes() {
     const parentAttrs = (this as any).parent?.() || {}
     return {
@@ -159,7 +165,9 @@ export default function AdvancedTableEditor({
         allowTableNodeSelection: true, // Allow cell selection for merging
       }),
       TableRow,
-      TableHeader,
+      TableHeader.extend({
+        content: TIPTAP_TABLE_CELL_CONTENT,
+      }),
       CustomTableCell,
       TextAlign.configure({ types: ["heading", "paragraph", "tableHeader", "tableCell"] }),
       TextStyle,
@@ -319,7 +327,7 @@ export default function AdvancedTableEditor({
     }
 
     // Only set content if we haven't initialized yet, or if initialContent actually changed
-    editor.commands.setContent(desiredHtml || "", { emitUpdate: false }) // Don't emit update to prevent loops
+    editor.commands.setContent(prepareTableEditorHtml(desiredHtml || ""), { emitUpdate: false }) // Don't emit update to prevent loops
     initialContentRef.current = initialContent
     setInitialized(true)
     hasLoadedInitialContentRef.current = true // Mark that we've loaded initial content
@@ -355,7 +363,7 @@ export default function AdvancedTableEditor({
       } else {
         // Save markdown changes before switching to visual
         const html = await markdownToHTML(markdownDraft)
-        editor.commands.setContent(html, { emitUpdate: false })
+        editor.commands.setContent(prepareTableEditorHtml(html), { emitUpdate: false })
         // Mark as edited when user switches back from markdown mode
         hasUserEditedRef.current = true
         
@@ -372,7 +380,7 @@ export default function AdvancedTableEditor({
 
   const applyMarkdownDraft = useCallback(async () => {
     if (!editor) return
-    const html = await markdownToHTML(markdownDraft)
+    const html = prepareTableEditorHtml(await markdownToHTML(markdownDraft))
     editor.commands.setContent(html, { emitUpdate: false })
     setMode("visual")
     setInitialized(true)
@@ -396,7 +404,7 @@ export default function AdvancedTableEditor({
 
   const importMarkdown = useCallback(async () => {
     if (!editor || !importMarkdownText.trim()) return
-    const html = await markdownToHTML(importMarkdownText)
+    const html = prepareTableEditorHtml(await markdownToHTML(importMarkdownText))
     editor.commands.setContent(html, { emitUpdate: false })
     setImportMarkdownText("")
     setMode("visual")
@@ -404,7 +412,7 @@ export default function AdvancedTableEditor({
 
   const importHtml = useCallback(async () => {
     if (!editor || !importHtmlText.trim()) return
-    editor.commands.setContent(importHtmlText, { emitUpdate: false })
+    editor.commands.setContent(prepareTableEditorHtml(importHtmlText), { emitUpdate: false })
     // Generate markdown from imported HTML
     try {
       const markdown = await htmlToMarkdown(importHtmlText)
@@ -889,6 +897,24 @@ export default function AdvancedTableEditor({
         .ProseMirror table td p {
           margin: 0;
           min-height: 1.5em;
+        }
+        .ProseMirror table th ul,
+        .ProseMirror table td ul {
+          list-style-type: disc !important;
+          list-style-position: outside !important;
+          margin: 0.25rem 0 !important;
+          padding-left: 1.25rem !important;
+        }
+        .ProseMirror table th ol,
+        .ProseMirror table td ol {
+          list-style-type: decimal !important;
+          list-style-position: outside !important;
+          margin: 0.25rem 0 !important;
+          padding-left: 1.25rem !important;
+        }
+        .ProseMirror table th li,
+        .ProseMirror table td li {
+          display: list-item !important;
         }
         .ProseMirror table th:empty::before,
         .ProseMirror table td:empty::before {

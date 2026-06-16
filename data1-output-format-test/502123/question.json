@@ -1,0 +1,203 @@
+{
+  "questionId": "502123",
+  "questionNumber": "09",
+  "stem": "A 58-year-old man presents with 4 hours of central chest pain. His ECG shows no ST-segment elevation. At 6 hours after symptom onset, high-sensitivity troponin I is elevated, while CK-MB remains normal. Based on these findings, what is the most likely diagnosis?",
+  "stemHtml": "<p>A 58-year-old man presents with 4 hours of central chest pain. His ECG shows no ST-segment elevation. At 6 hours after symptom onset, high-sensitivity troponin I is elevated, while CK-MB remains normal. Based on these findings, what is the most likely diagnosis? <strong>(Question Id: 5021</strong><strong>23</strong><strong>)</strong></p>",
+  "options": [
+    "Confirms STEMI",
+    "Confirms NSTEMI",
+    "Suggests unstable angina",
+    "Indicates pericarditis",
+    "Excludes ACS"
+  ],
+  "optionsHtml": [
+    "<p>Confirms STEMI</p>",
+    "<p>Confirms NSTEMI</p>",
+    "<p>Suggests unstable angina</p>",
+    "<p>Indicates pericarditis</p>",
+    "<p>Excludes ACS</p>"
+  ],
+  "correctAnswer": "B",
+  "keywords": [
+    "“ECG shows no ST-segment elevation” – Rules out STEMI, points toward NSTEMI or unstable angina.",
+    "“High-sensitivity troponin I is elevated” – Confirms myocardial injury; distinguishes NSTEMI from unstable angina."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>“ECG shows no ST-segment elevation”</strong> – Rules out STEMI, points toward NSTEMI or unstable angina.</li></ol>",
+    "<ol><li><strong>“High-sensitivity troponin I is elevated”</strong> – Confirms myocardial injury; distinguishes NSTEMI from unstable angina.</li></ol>"
+  ],
+  "explanations": {
+    "B": {
+      "title": "Confirms NSTEMI",
+      "body": "NSTEMI is diagnosed when there is myocardial injury evidenced by elevated cardiac biomarkers (troponin) without ST-segment elevation on ECG.\nThis patient has elevated high-sensitivity troponin I at 6 hours, CK-MB normal, and no ST-elevation, which fits NSTEMI criteria.\nKey point: Troponin is more sensitive than CK-MB and rises earlier in myocardial injury. NSTEMI can be diagnosed even if CK-MB is normal.",
+      "bodyHtml": "<ul><li>NSTEMI is diagnosed when there is <strong>myocardial injury evidenced by elevated cardiac biomarkers (troponin) without ST-segment elevation on ECG</strong>.</li><li>This patient has <strong>elevated high-sensitivity troponin I at 6 hours</strong>, CK-MB normal, and <strong>no ST-elevation</strong>, which fits <strong>NSTEMI criteria</strong>.</li><li><strong>Key point:</strong> Troponin is more sensitive than CK-MB and rises earlier in myocardial injury. NSTEMI can be diagnosed even if CK-MB is normal.</li></ul>"
+    },
+    "A": {
+      "title": "Confirms STEMI",
+      "body": "STEMI requires ST-segment elevation on ECG or new LBBB.\nIn this patient, ECG is normal, so STEMI is not present.",
+      "bodyHtml": "<ul><li>STEMI requires <strong>ST-segment elevation on ECG</strong> or new LBBB.</li><li>In this patient, ECG is normal, so STEMI is <strong>not present</strong>.</li></ul>"
+    },
+    "C": {
+      "title": "Suggests unstable angina",
+      "body": "Unstable angina presents with chest pain at rest or new-onset, normal ECG or nonspecific changes, and no rise in cardiac biomarkers.\nThis patient has elevated troponin, so UA is excluded.",
+      "bodyHtml": "<ul><li>Unstable angina presents with <strong>chest pain at rest or new-onset</strong>, <strong>normal ECG or nonspecific changes</strong>, and <strong>no rise in cardiac biomarkers</strong>.</li><li>This patient has elevated troponin, so <strong>UA is excluded</strong>.</li></ul>"
+    },
+    "D": {
+      "title": "Indicates pericarditis",
+      "body": "Pericarditis often presents with diffuse ST-elevation, PR depression, and chest pain that changes with posture.\nBiomarkers may be mildly elevated but usually not isolated troponin rise without ECG changes.",
+      "bodyHtml": "<ul><li>Pericarditis often presents with <strong>diffuse ST-elevation, PR depression</strong>, and <strong>chest pain that changes with posture</strong>.</li><li>Biomarkers may be mildly elevated but usually <strong>not isolated troponin rise without ECG changes</strong>.</li></ul>"
+    },
+    "E": {
+      "title": "Excludes ACS",
+      "body": "Elevated troponin confirms myocardial injury, so ACS cannot be excluded.",
+      "bodyHtml": "<ul><li>Elevated troponin <strong>confirms myocardial injury</strong>, so ACS <strong>cannot be excluded</strong>.</li></ul>"
+    }
+  },
+  "keyConcept": "NSTEMI is diagnosed in patients with elevated cardiac biomarkers (troponin) without ST-segment elevation. High-sensitivity troponin is more sensitive than CK-MB. Unstable angina occurs with normal biomarkers, and STEMI requires ECG changes.",
+  "keyConceptHtml": "<p>NSTEMI is diagnosed in patients with <strong>elevated cardiac biomarkers</strong> (troponin) <strong>without ST-segment elevation</strong>. High-sensitivity troponin is more sensitive than CK-MB. <strong>Unstable angina occurs with normal biomarkers</strong>, and STEMI requires ECG changes.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Cardiovascular System (CVS)",
+    "topic": "Acute Coronary Syndrome (ACS)",
+    "subtopic": "Acute Coronary Syndrome (ACS) - STEMI vs NSTEMI (Pathophysiology & Biomarkers)",
+    "mcqTitle": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Interpretation",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Chest pain + normal ECG + elevated troponin → Classic triad for NSTEMI.",
+  "classicTriadHtml": "<ul><li><strong>Chest pain + normal ECG + elevated troponin</strong> → Classic triad for <strong>NSTEMI</strong>.</li></ul>",
+  "featureTableName": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
+  "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI Differential Diagnosis of NSTEMI",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "featureHtml": "<p>Definition</p>",
+      "description": "Myocardial ischemia with elevated cardiac biomarkers but no ST-segment elevation on ECG",
+      "descriptionHtml": "<p>Myocardial ischemia with <strong>elevated cardiac biomarkers</strong> but <strong>no ST-segment elevation</strong> on ECG</p>",
+      "clinicalImportance": "Differentiates NSTEMI from STEMI and unstable angina",
+      "clinicalImportanceHtml": "<p>Differentiates NSTEMI from STEMI and unstable angina</p>"
+    },
+    {
+      "feature": "Symptoms",
+      "featureHtml": "<p>Symptoms</p>",
+      "description": "Central chest pain,\noften at rest or minimal exertion,\nmay radiate to arm/jaw/back,\nassociated with sweating,\nnausea",
+      "descriptionHtml": "<ul><li>Central chest pain, </li><li>often <strong>at rest or minimal exertion</strong>, </li><li>may radiate to arm/jaw/back, </li><li>associated with sweating, </li><li>nausea</li></ul>",
+      "clinicalImportance": "Guides initial clinical suspicion",
+      "clinicalImportanceHtml": "<p>Guides initial clinical suspicion</p>"
+    },
+    {
+      "feature": "ECG Findings",
+      "featureHtml": "<p>ECG Findings</p>",
+      "description": "Normal or nonspecific ST/T changes,\nno ST elevation",
+      "descriptionHtml": "<ul><li><strong>Normal or nonspecific ST/T changes</strong>, </li><li>no ST elevation</li></ul>",
+      "clinicalImportance": "Helps rule out STEMI",
+      "clinicalImportanceHtml": "<p>Helps rule out STEMI</p>"
+    },
+    {
+      "feature": "Biomarkers",
+      "featureHtml": "<p>Biomarkers</p>",
+      "description": "High-sensitivity troponin I/T elevated,\nCK-MB may be normal or mildly raised",
+      "descriptionHtml": "<ul><li><strong>High-sensitivity troponin I/T elevated</strong>, </li><li>CK-MB may be normal or mildly raised</li></ul>",
+      "clinicalImportance": "Confirms myocardial injury",
+      "clinicalImportanceHtml": "<p>Confirms myocardial injury</p>"
+    },
+    {
+      "feature": "Risk Factors",
+      "featureHtml": "<p>Risk Factors</p>",
+      "description": "Hypertension,\ndiabetes,\nsmoking,\ndyslipidemia,\nolder age,\nmale sex",
+      "descriptionHtml": "<ul><li>Hypertension, </li><li>diabetes, </li><li>smoking, </li><li>dyslipidemia, </li><li>older age, </li><li>male sex</li></ul>",
+      "clinicalImportance": "Important for prevention and prognosis",
+      "clinicalImportanceHtml": "<p>Important for prevention and prognosis</p>"
+    },
+    {
+      "feature": "Management",
+      "featureHtml": "<p>Management</p>",
+      "description": "Antiplatelets (aspirin, P2Y12 inhibitor),\nanticoagulants,\nbeta-blockers,\nstatins,\nearly invasive strategy if high risk",
+      "descriptionHtml": "<ul><li>Antiplatelets (aspirin, P2Y12 inhibitor), </li><li>anticoagulants, </li><li>beta-blockers, </li><li>statins, </li><li>early invasive strategy if high risk</li></ul>",
+      "clinicalImportance": "Reduces morbidity and mortality",
+      "clinicalImportanceHtml": "<p>Reduces morbidity and mortality</p>"
+    },
+    {
+      "feature": "Complications",
+      "featureHtml": "<p>Complications</p>",
+      "description": "Heart failure,\narrhythmias,\nrecurrent ischemia,\ncardiogenic shock",
+      "descriptionHtml": "<ul><li>Heart failure, </li><li>arrhythmias, </li><li>recurrent ischemia, </li><li>cardiogenic shock</li></ul>",
+      "clinicalImportance": "Requires monitoring and timely intervention",
+      "clinicalImportanceHtml": "<p>Requires monitoring and timely intervention</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Unstable Angina",
+      "conditionHtml": "<p><strong>Unstable Angina</strong></p>",
+      "distinguishingFeatures": "Chest pain at rest or minimal exertion",
+      "distinguishingFeaturesHtml": "<p>Chest pain at rest or minimal exertion</p>",
+      "keyDifferences": "No elevation of cardiac biomarkers; ECG may show ST depression or T-wave inversion",
+      "keyDifferencesHtml": "<p><strong>No elevation of cardiac biomarkers</strong>; ECG may show ST depression or T-wave inversion</p>"
+    },
+    {
+      "condition": "STEMI",
+      "conditionHtml": "<p><strong>STEMI</strong></p>",
+      "distinguishingFeatures": "Chest pain with ST-segment elevation on ECG",
+      "distinguishingFeaturesHtml": "<p>Chest pain with ST-segment elevation on ECG</p>",
+      "keyDifferences": "ECG shows ST elevation, usually higher troponin rise",
+      "keyDifferencesHtml": "<p>ECG shows <strong>ST elevation</strong>, usually higher troponin rise</p>"
+    },
+    {
+      "condition": "Myocarditis",
+      "conditionHtml": "<p><strong>Myocarditis</strong></p>",
+      "distinguishingFeatures": "Chest pain, viral prodrome, sometimes fever",
+      "distinguishingFeaturesHtml": "<p>Chest pain, viral prodrome, sometimes fever</p>",
+      "keyDifferences": "Troponin elevated, ECG may show diffuse ST changes; cardiac MRI may help",
+      "keyDifferencesHtml": "<p>Troponin elevated, ECG may show diffuse ST changes; cardiac MRI may help</p>"
+    },
+    {
+      "condition": "Pericarditis",
+      "conditionHtml": "<p><strong>Pericarditis</strong></p>",
+      "distinguishingFeatures": "Sharp chest pain, relieved by leaning forward",
+      "distinguishingFeaturesHtml": "<p>Sharp chest pain, relieved by leaning forward</p>",
+      "keyDifferences": "ECG shows diffuse ST elevation and PR depression, biomarkers may be mildly raised",
+      "keyDifferencesHtml": "<p>ECG shows <strong>diffuse ST elevation and PR depression</strong>, biomarkers may be mildly raised</p>"
+    },
+    {
+      "condition": "Pulmonary Embolism",
+      "conditionHtml": "<p><strong>Pulmonary Embolism</strong></p>",
+      "distinguishingFeatures": "Sudden dyspnea, pleuritic chest pain, hypoxia",
+      "distinguishingFeaturesHtml": "<p>Sudden dyspnea, pleuritic chest pain, hypoxia</p>",
+      "keyDifferences": "Troponin may rise, ECG may show S1Q3T3 pattern, imaging confirms PE",
+      "keyDifferencesHtml": "<p>Troponin may rise, ECG may show <strong>S1Q3T3 pattern</strong>, imaging confirms PE</p>"
+    },
+    {
+      "condition": "Aortic Dissection",
+      "conditionHtml": "<p><strong>Aortic Dissection</strong></p>",
+      "distinguishingFeatures": "Sudden severe tearing chest/back pain, pulse deficit",
+      "distinguishingFeaturesHtml": "<p>Sudden severe tearing chest/back pain, pulse deficit</p>",
+      "keyDifferences": "Troponin may rise; CT angiography shows dissection",
+      "keyDifferencesHtml": "<p>Troponin may rise; CT angiography shows dissection</p>"
+    },
+    {
+      "condition": "Severe Heart Failure / Tachyarrhythmias",
+      "conditionHtml": "<p><strong>Severe Heart Failure / Tachyarrhythmias</strong></p>",
+      "distinguishingFeatures": "Dyspnea, edema, palpitations",
+      "distinguishingFeaturesHtml": "<p>Dyspnea, edema, palpitations</p>",
+      "keyDifferences": "Troponin may rise due to demand ischemia; ECG and echo help differentiate",
+      "keyDifferencesHtml": "<p>Troponin may rise due to demand ischemia; ECG and echo help differentiate</p>"
+    }
+  ],
+  "diagram": {
+    "name": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
+    "caption": "This diagram illustrates the pathophysiology of NSTEMI, showing partial coronary artery occlusion leading to subendocardial ischemia and myocardial necrosis. It highlights key clinical features, ECG findings (no ST elevation with possible ST depression/T-wave inversion), and the role of elevated troponin in diagnosis, along with an overview of initial management strategies.",
+    "captionHtml": "<p>This diagram illustrates the pathophysiology of NSTEMI, showing partial coronary artery occlusion leading to subendocardial ischemia and myocardial necrosis. It highlights key clinical features, ECG findings (no ST elevation with possible ST depression/T-wave inversion), and the role of elevated troponin in diagnosis, along with an overview of initial management strategies.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

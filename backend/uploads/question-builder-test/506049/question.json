@@ -1,0 +1,98 @@
+{
+  "questionId": "506049",
+  "questionNumber": "11",
+  "stem": "A 48-year-old man with recent lower molar infection complicated by Ludwig’s angina is admitted on IV antibiotics. On day 2, he develops high-grade fever, severe chest pain, tachycardia, and rapidly worsening sepsis despite treatment. Examination shows toxic look and crepitus over the lower neck extending toward the chest. What is the most likely life-threatening complication?",
+  "options": [
+    "Descending necrotizing mediastinitis",
+    "Aspiration pneumonia",
+    "Acute myocardial infarction",
+    "Pulmonary embolism",
+    "Acute pericarditis"
+  ],
+  "correctAnswer": "A",
+  "keywords": [
+    "Ludwig’s angina → deep neck space infection with risk of downward spread",
+    "Crepitus extending to chest + worsening sepsis → suggests gas-forming infection spreading into mediastinum",
+    "Day 2 deterioration despite IV antibiotics → indicates complication, not primary infection"
+  ],
+  "explanations": {
+    "A": {
+      "title": "Descending necrotizing mediastinitis",
+      "body": "This is a severe, rapidly progressive polymicrobial infection that spreads from the oral cavity or deep neck spaces into the mediastinum through fascial planes. Ludwig’s angina is a classic predisposing condition. The presence of neck crepitus, toxic appearance, persistent fever, and chest pain strongly suggests mediastinal involvement. It carries high mortality if not surgically drained and treated aggressively with broad-spectrum antibiotics.\nPathophysiology involves infection tracking along cervical fascial planes into the superior and posterior mediastinum, leading to necrosis, gas formation, and systemic sepsis. This is a surgical emergency requiring imaging (CT chest) and immediate drainage.",
+      "systemInvolved": "Head & Neck + Cardiothoracic (mediastinum)"
+    },
+    "B": {
+      "title": "Aspiration pneumonia",
+      "body": "Aspiration pneumonia results from inhalation of oropharyngeal contents into the lungs, commonly seen in altered consciousness or swallowing dysfunction. It presents with fever, cough, and respiratory symptoms rather than crepitus or mediastinal extension. It does not explain progressive neck-to-chest spread."
+    },
+    "C": {
+      "title": "Acute myocardial infarction",
+      "body": "MI presents with ischemic chest pain, radiation to arm/jaw, diaphoresis, and ECG changes. It is unrelated to infection or neck pathology. Crepitus and sepsis strongly argue against a cardiac ischemic event."
+    },
+    "D": {
+      "title": "Pulmonary embolism",
+      "body": "PE causes sudden pleuritic chest pain, dyspnea, tachycardia, and hypoxia. It may mimic sepsis but does not cause neck crepitus or originate from dental infection. There is no anatomical connection to Ludwig’s angina."
+    },
+    "E": {
+      "title": "Acute pericarditis",
+      "body": "Pericarditis presents with sharp chest pain relieved by leaning forward, pericardial rub, and possible viral or bacterial causes. However, it does not explain fascial spread from neck infection or subcutaneous emphysema."
+    }
+  },
+  "keyConcept": "Ludwig’s angina can progress via deep cervical fascial planes into the mediastinum, causing descending necrotizing mediastinitis, a fatal complication characterized by fever, chest pain, sepsis, and subcutaneous emphysema (crepitus). Early recognition and surgical drainage are critical for survival.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections – Complications & Special Situations",
+    "mcqTitle": "Infections – Complications & Special Situations - Ludwig’s Angina – Complications (Descending Necrotizing Mediastinitis)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning",
+    "difficultyLevel": "Difficult"
+  },
+  "classicTriad": "fever + chest pain + toxic sepsis (with neck crepitus) → suggests mediastinal extension",
+  "featureTable": [
+    {
+      "feature": "Source of disease",
+      "description": "• Odontogenic infection• Lower molar infection• Spreads from deep neck spaces",
+      "clinicalImportance": "• Cardiac ischemia (MI)• Aspiration of gastric contents• Thromboembolism• Viral/bacterial pericardial inflammation"
+    },
+    {
+      "feature": "Key clinical clues",
+      "description": "• Ludwig’s angina history• Neck infection progression• Chest pain + toxic sepsis• Subcutaneous crepitus, gas in tissues",
+      "clinicalImportance": "• MI: crushing chest pain, radiation, diaphoresis• Aspiration: cough, fever, infiltrates• PE: sudden dyspnea, pleuritic pain• Pericarditis: positional chest pain, rub"
+    },
+    {
+      "feature": "Progression pattern",
+      "description": "• Rapid spread from neck → mediastinum• Worsening despite antibiotics• High mortality if untreated",
+      "clinicalImportance": "• MI: coronary occlusion• Aspiration: acute lung inflammation• PE: embolic vascular blockage• Pericarditis: inflammatory pericardial involvement"
+    },
+    {
+      "feature": "Physical findings",
+      "description": "• Crepitus over neck/chest• Severe sepsis• Toxic appearance• Neck swelling",
+      "clinicalImportance": "• MI: S4, ECG changes• Aspiration: crackles, wheeze• PE: tachycardia, hypoxia• Pericarditis: pericardial rub"
+    },
+    {
+      "feature": "Imaging findings",
+      "description": "• CT: mediastinal air + fluid collections• Fascial plane spread",
+      "clinicalImportance": "• MI: ECG/troponin elevation• Aspiration: infiltrates in dependent lobes• PE: wedge infarct, CT angiography clot• Pericarditis: pericardial effusion"
+    },
+    {
+      "feature": "Mortality risk",
+      "description": "• Very high without surgery• Surgical emergency",
+      "clinicalImportance": "• MI: high without reperfusion• PE: variable risk• Aspiration: moderate risk• Pericarditis: usually low"
+    }
+  ],
+  "diagram": {
+    "caption": "This diagram illustrates the progression of Ludwig’s angina from an odontogenic lower molar infection into the deep neck fascial spaces and downward extension into the mediastinum, resulting in descending necrotizing mediastinitis. It highlights the anatomical pathways of spread through the submandibular, parapharyngeal, retropharyngeal, and danger spaces, along with major clinical features such as chest pain, crepitus, severe sepsis, and respiratory compromise. The image also emphasizes the life-threatening nature of mediastinal extension and the need for urgent airway protection, broad-spectrum IV antibiotics, and surgical drainage.",
+    "images": [
+      {
+        "filename": "image1.jpeg",
+        "path": "images/image1.jpeg",
+        "sourceName": "image1.jpeg"
+      }
+    ],
+    "image": "images/image1.jpeg"
+  }
+}

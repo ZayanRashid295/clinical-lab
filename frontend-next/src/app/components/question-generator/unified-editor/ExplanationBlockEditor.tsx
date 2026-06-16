@@ -477,7 +477,9 @@ const TextBlockEditor = memo(({
     })
   }, [needsConversion, blockMarkdown, blockId, onChange])
   
-  // Use converted HTML if available, otherwise use blockHtml
+  // Use converted HTML if available, otherwise use blockHtml as-is.
+  // Do not re-normalize on every parent update — that changes the content prop
+  // while typing and forces RichTextEditor to reset the cursor.
   const contentToRender = useMemo(() => {
     // If we have converted HTML, use it (already normalized)
     if (convertedHtml && convertedHtml.trim() && convertedHtml !== "<p></p>") {
@@ -485,9 +487,8 @@ const TextBlockEditor = memo(({
     }
     
     // Only use blockHtml if it's actual HTML (starts with <)
-    // Normalize it to remove excessive spacing from markdown conversion
     if (blockHtml && blockHtml.trim() && blockHtml !== "<p></p>" && blockHtml.trim().startsWith("<")) {
-      return normalizeListHTML(blockHtml)
+      return blockHtml
     }
     
     // If we're converting, show empty until conversion completes
@@ -1024,6 +1025,84 @@ export default function ExplanationBlockEditor({
         const isActive = isAllChoicesBlock
           ? activeSection === "per-answer-all"
           : activeSection === `explanation-block-${block.id}`
+
+        if (block.type === "image" || block.type === "images") {
+          const images = Array.isArray(block.data?.images) ? block.data.images : []
+          const blockActiveSection = `explanation-block-${block.id}`
+          const isImageBlockActive = activeSection === blockActiveSection
+
+          return (
+            <Card
+              key={block.id}
+              data-explanation-block
+              className={`border bg-card dark:bg-gray-800 !py-0 !px-0 !gap-0 ${
+                isImageBlockActive
+                  ? "border-primary ring-2 ring-primary dark:border-blue-500 dark:ring-blue-500"
+                  : "border-border/30 dark:border-gray-700"
+              }`}
+              style={{ padding: 0 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSectionChange(blockActiveSection)
+              }}
+            >
+              <div className="flex items-center justify-between px-2 pt-1 pb-0.5">
+                <Label className="text-xs text-muted-foreground dark:text-gray-300">
+                  Image Block
+                </Label>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleMoveBlock(index, "up")}
+                    disabled={index === 0}
+                    className="h-6 w-6 p-0"
+                  >
+                    <ChevronUp className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleMoveBlock(index, "down")}
+                    disabled={index === blocks.length - 1}
+                    className="h-6 w-6 p-0"
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveBlock(index)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="px-2 pb-2 space-y-2">
+                {images.length > 0 ? (
+                  images.map((img: { url?: string; alt?: string; id?: string }, imgIdx: number) =>
+                    img?.url ? (
+                      <img
+                        key={img.id || `${block.id}-${imgIdx}`}
+                        src={img.url}
+                        alt={img.alt || `Diagram ${imgIdx + 1}`}
+                        className="max-w-full rounded-lg border border-border dark:border-gray-700"
+                      />
+                    ) : null,
+                  )
+                ) : (
+                  <p className="text-sm text-muted-foreground dark:text-gray-400 py-4 text-center">
+                    No image loaded
+                  </p>
+                )}
+              </div>
+            </Card>
+          )
+        }
 
         if (isAllChoicesBlock) {
           return (

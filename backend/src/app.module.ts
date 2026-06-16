@@ -14,6 +14,7 @@ import { CategoriesModule } from "./modules/categories/categories.module";
 import { SystemsModule } from "./modules/systems/systems.module";
 import { ContentModule } from "./modules/content/content.module";
 import { QuestionsModule } from "./modules/questions/questions.module";
+import { QuestionBuilderModule } from "./modules/question-builder/question-builder.module";
 import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { AssessmentsModule } from "./modules/assessments/assessments.module";
 import { MedprepAiModule } from "./modules/medprep-ai/medprep-ai.module";
@@ -54,6 +55,7 @@ import { FacultyModule } from "./modules/faculty/faculty.module";
     SystemsModule,
     ContentModule,
     QuestionsModule,
+    QuestionBuilderModule,
     SubscriptionsModule,
     AssessmentsModule,
     MedprepAiModule,

@@ -1,0 +1,128 @@
+{
+  "questionId": "502120",
+  "questionNumber": "06",
+  "stem": "A 60-year-old woman presents to the emergency department with sudden-onset chest pain radiating to her left arm. She is diaphoretic and anxious. On examination, her vitals are stable. ECG shows no persistent ST-segment elevation, but her high-sensitivity troponin I is markedly elevated above the 99th percentile. Based on these findings, what is the most likely diagnosis?",
+  "options": [
+    "STEMI",
+    "Unstable Angina",
+    "NSTEMI",
+    "Prinzmetal Angina",
+    "Pericarditis"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "“No persistent ST-segment elevation” – Indicates it is not STEMI, helps narrow to NSTEMI or unstable angina.",
+    "“Troponin I is markedly elevated above the 99th percentile” – Confirms myocardial injury, differentiating NSTEMI from unstable angina.",
+    "“Chest pain radiating to left arm” – Classic ischemic chest pain symptom, supporting ACS diagnosis.",
+    "These keywords together point directly to NSTEMI."
+  ],
+  "explanations": {
+    "C": {
+      "title": "NSTEMI",
+      "body": "Non-ST-Elevation Myocardial Infarction occurs when there is ischemic chest pain with elevated cardiac biomarkers (troponin) without ST-segment elevation on ECG.\nThis patient fits NSTEMI criteria: acute chest pain + troponin elevation + no persistent ST elevation.\nNSTEMI requires risk stratification and early management including antiplatelets, anticoagulation, and possible coronary angiography."
+    },
+    "A": {
+      "title": "STEMI",
+      "body": "ST-Elevation Myocardial Infarction is diagnosed when there is persistent ST-segment elevation on ECG and/or new left bundle branch block, along with elevated cardiac biomarkers.\nThis patient has no ST-segment elevation, so STEMI is less likely."
+    },
+    "B": {
+      "title": "Unstable Angina",
+      "body": "Characterized by chest pain at rest or worsening angina without troponin elevation.\nIn this case, troponin is markedly elevated, which rules out unstable angina."
+    },
+    "D": {
+      "title": "Prinzmetal Angina (Variant Angina)",
+      "body": "Caused by coronary artery spasm, typically presents as transient ST-segment elevation during episodes of chest pain, often at rest, and usually resolves spontaneously or with nitrates.\nThis patient has troponin elevation and no ST elevation, making Prinzmetal angina unlikely."
+    },
+    "E": {
+      "title": "Pericarditis",
+      "body": "Presents with sharp, pleuritic chest pain relieved by sitting forward, diffuse ST elevation and PR depression on ECG, and usually mild troponin rise if myocardium involved.\nThis patient has typical ischemic chest pain, localized ECG changes absent, so pericarditis is unlikely."
+    }
+  },
+  "keyConcept": "NSTEMI is diagnosed in patients with ischemic chest pain and elevated cardiac biomarkers without persistent ST-segment elevation. Differentiation from unstable angina depends on troponin elevation, and from STEMI on ECG changes.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Cardiovascular System (CVS)",
+    "topic": "Acute Coronary Syndrome (ACS)",
+    "subtopic": "Acute Coronary Syndrome (ACS) - STEMI vs NSTEMI (Pathophysiology & Biomarkers)",
+    "mcqTitle": "NSTEMI",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Chest pain + Radiation to left arm + Diaphoresis/anxiety – Suggestive of acute coronary syndrome.",
+  "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
+  "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI Differential Diagnosis of NSTEMI",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "description": "NSTEMI is myocardial infarction without persistent ST-segment elevation on ECG but with elevated cardiac biomarkers (troponin).",
+      "clinicalImportance": "Differentiates NSTEMI from STEMI and unstable angina; guides management."
+    },
+    {
+      "feature": "Pathophysiology / Mechanism",
+      "description": "Usually caused by partial or transient coronary artery occlusion due to plaque rupture and thrombosis.",
+      "clinicalImportance": "Explains ischemia without full-thickness myocardial injury seen in STEMI."
+    },
+    {
+      "feature": "Clinical Features / Investigation",
+      "description": "Chest pain (often radiating to arm/jaw), diaphoresis, troponin elevation, ECG may show ST depression or T-wave inversion but no persistent ST elevation.",
+      "clinicalImportance": "Supports early diagnosis and risk stratification; guides timing of intervention."
+    },
+    {
+      "feature": "Management",
+      "description": "Antiplatelets,anticoagulation, beta-blockers, statins, and early invasive strategy (angiography ± PCI) based on risk.",
+      "clinicalImportance": "Prevents progression to STEMI and reduces morbidity/mortality."
+    },
+    {
+      "feature": "Prognosis / Complications",
+      "description": "Risk of heart failure, arrhythmias, recurrent MI; mortality lower than STEMI but higher than unstable angina.",
+      "clinicalImportance": "Importance of:monitoring, secondary prevention, and follow-up."
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Unstable Angina",
+      "distinguishingFeatures": "Chest pain at rest or on minimal exertion, no troponin elevation, ECG may show ST depression or T-wave inversion.",
+      "keyDifferences": "Troponin helps differentiate from NSTEMI."
+    },
+    {
+      "condition": "STEMI",
+      "distinguishingFeatures": "Persistent ST-segment elevation on ECG with troponin elevation.",
+      "keyDifferences": "ECG is the main differentiator; urgent reperfusion required."
+    },
+    {
+      "condition": "Myocarditis / Myopericarditis",
+      "distinguishingFeatures": "Chest pain, troponin may be elevated, ECG changes often diffuse ST elevation, may have viral prodrome.",
+      "keyDifferences": "Cardiac MRI and inflammatory markers help differentiate."
+    },
+    {
+      "condition": "Takotsubo (Stress) Cardiomyopathy",
+      "distinguishingFeatures": "Chest pain, troponin mild to moderate elevation, ECG may mimic ACS, often triggered by stress, regional wall motion abnormalities on echo.",
+      "keyDifferences": "Coronary angiography shows no obstructive CAD."
+    },
+    {
+      "condition": "Pulmonary Embolism",
+      "distinguishingFeatures": "Sudden chest pain, dyspnea, hypoxia, may have mild troponin elevation, ECG may show sinus tachycardia or S1Q3T3.",
+      "keyDifferences": "Imaging (CT pulmonary angiography) differentiates."
+    },
+    {
+      "condition": "Severe Anemia or Sepsis",
+      "distinguishingFeatures": "Troponin may be mildly elevated due to supply-demand mismatch, chest pain may be absent or atypical.",
+      "keyDifferences": "Clinical context and labs help differentiate."
+    }
+  ],
+  "diagram": {
+    "name": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
+    "caption": "This diagram illustrates the pathophysiology, clinical features, diagnostic criteria, and management of NSTEMI. It highlights partial coronary artery occlusion leading to subendocardial ischemia, presenting with chest pain and elevated troponin without ST-segment elevation, and outlines key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

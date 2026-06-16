@@ -1,6 +1,6 @@
 // Migration utilities to convert between old and new question formats
 
-import { ContentBlock } from "./rich-editor/types"
+import { coerceLabelString } from "./metadata-label-utils";
 import { Choice } from "./choice-system/types"
 import { QuestionCreatorData } from "./question-creator/types"
 import { stemStringToStemBlocks } from "./stem-blocks-utils"
@@ -127,11 +127,11 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
       subtopicId: oldQuestion.subtopicId,
       productId: oldQuestion.productId,
       categoryId: oldQuestion.categoryId,
-      title: oldQuestion.mcqTitle ?? oldQuestion.title,
-      parsedProductName: oldQuestion.product,
-      parsedTopicName: oldQuestion.topic,
-      parsedSubtopicName: oldQuestion.subtopic,
-      parsedMcqTitle: oldQuestion.mcqTitle ?? oldQuestion.title,
+      title: coerceLabelString(oldQuestion.mcqTitle ?? oldQuestion.title),
+      parsedProductName: coerceLabelString(oldQuestion.product),
+      parsedTopicName: coerceLabelString(oldQuestion.topic ?? (oldQuestion as any).topicName),
+      parsedSubtopicName: coerceLabelString(oldQuestion.subtopic ?? (oldQuestion as any).subtopicName),
+      parsedMcqTitle: coerceLabelString(oldQuestion.mcqTitle ?? oldQuestion.title),
       productTagId: oldQuestion.productTagId,
       // Convert single productTagId/categoryId to array for backward compatibility
       productTagIds: oldQuestion.categoryId 

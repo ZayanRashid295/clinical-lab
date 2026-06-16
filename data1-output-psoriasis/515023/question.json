@@ -1,0 +1,131 @@
+{
+  "questionId": "515023",
+  "questionNumber": "20",
+  "stem": "A 45-year-old patient with chronic plaque psoriasis is planned to start methotrexate therapy. Before initiating treatment, which investigation is most crucial to ensure patient safety?",
+  "options": [
+    "ECG",
+    "Liver function tests",
+    "Chest X-ray",
+    "ESR",
+    "Urinalysis"
+  ],
+  "correctAnswer": "B",
+  "keywords": [
+    "Methotrexate – Indicates the drug in question; points directly to its major toxicity profile (hepatotoxicity).",
+    "Ensure patient safety / before initiating treatment – Suggests a baseline investigation to prevent adverse effects.",
+    "These keywords together lead directly to Liver function tests as the correct option."
+  ],
+  "explanations": {
+    "B": {
+      "title": "Liver function tests",
+      "body": "Methotrexate is primarily metabolized and stored in the liver. It carries a significant risk of hepatotoxicity, which can cause elevated liver enzymes and, can lead to hepatic fibrosis or cirrhosis over long-term use.\nBefore starting a patient on methotrexate, clinicians must establish a baseline of liver health to ensure the patient doesn't have pre-existing liver disease (like NAFLD or Hepatitis B/C) that would contraindicate the drug.\nDuring treatment, LFTs are monitored frequently (often every 1–3 months) to detect early signs of drug-induced liver injury.",
+      "systemInvolved": "This question pertains to Dermatological Therapeutics and Gastroenterology/Hepatology, specifically focusing on the monitoring of systemic immunosuppressants."
+    },
+    "A": {
+      "title": "ECG",
+      "body": "Electrocardiogram assesses cardiac rhythm and conduction.\nNot routinely required before methotrexate unless there is underlying heart disease.",
+      "systemInvolved": "Cardiovascular"
+    },
+    "C": {
+      "title": "Chest X-ray",
+      "body": "Useful to detect pulmonary disease (e.g., TB or fibrosis).\nNot required routinely before methotrexate unless there is a risk of pre-existing lung disease.",
+      "systemInvolved": "Respiratory"
+    },
+    "D": {
+      "title": "ESR",
+      "body": "Erythrocyte sedimentation rate measures inflammation.\nDoes not provide information about drug safety; more relevant for disease activity assessment.",
+      "systemInvolved": "Hematologic / Inflammatory marker"
+    },
+    "E": {
+      "title": "Urinalysis",
+      "body": "Detects renal disease or infection.\nMethotrexate is renally excreted, but baseline urinalysis is not mandatory unless renal disease is suspected.",
+      "systemInvolved": "Renal / Urinary"
+    }
+  },
+  "keyConcept": "Before starting methotrexate, baseline liver function tests are crucial due to its hepatotoxic potential. Monitoring LFTs during therapy helps prevent serious liver damage. Other tests may be considered based on comorbidities but are not routinely required.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Classification & Variants - Systemic Therapy – Methotrexate Pre-treatment Monitoring",
+    "competencyDomain": "Investigation",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Psoriasis – Systemic Therapy: Methotrexate Pre-treatment Monitoring",
+  "differentialDiagnosisTableName": "Psoriasis – Systemic Therapy – Methotrexate Pre-treatment Monitoring Differential Diagnosis of Chronic Plaque Psoriasis",
+  "featureTable": [
+    {
+      "feature": "Liver function tests (LFTs)",
+      "description": "Detect baseline liver disease; prevent hepatotoxicity",
+      "clinicalImportance": "Hepatobiliary / Liver"
+    },
+    {
+      "feature": "Complete blood count (CBC)",
+      "description": "Identify baseline cytopenias; monitor bone marrow suppression",
+      "clinicalImportance": "Hematologic"
+    },
+    {
+      "feature": "Renal function tests (RFTs)",
+      "description": "Assess methotrexate excretion; prevent toxicity",
+      "clinicalImportance": "Renal / Urinary"
+    },
+    {
+      "feature": "Chest X-ray",
+      "description": "Screen for pulmonary disease (rare complication)",
+      "clinicalImportance": "Respiratory"
+    },
+    {
+      "feature": "Viral hepatitis screening",
+      "description": "Detect chronic hepatitis B or C before immunosuppressive therapy",
+      "clinicalImportance": "Hepatobiliary / Liver"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Eczema (Chronic Atopic / Lichenified Dermatitis)",
+      "distinguishingFeatures": "Intense pruritus, poorly demarcated erythematous plaques, lichenification",
+      "keyDifferences": "Dermatology / Skin"
+    },
+    {
+      "condition": "Seborrheic Dermatitis",
+      "distinguishingFeatures": "Greasy, yellowish scales, commonly on scalp, nasolabial folds, mild erythema",
+      "keyDifferences": "Dermatology / Skin"
+    },
+    {
+      "condition": "Tinea Corporis (Fungal Infection)",
+      "distinguishingFeatures": "Annular plaques with central clearing, scaling at edges, positive KOH test",
+      "keyDifferences": "Dermatology / Skin / Infectious"
+    },
+    {
+      "condition": "Lichen Planus",
+      "distinguishingFeatures": "Violaceous, flat-topped papules, often pruritic, fine white lines (Wickham striae)",
+      "keyDifferences": "Dermatology / Skin"
+    },
+    {
+      "condition": "Pityriasis Rubra Pilaris (PRP)",
+      "distinguishingFeatures": "Orange-red plaques with islands of sparing, follicular papules, palmoplantar keratoderma",
+      "keyDifferences": "Dermatology / Skin"
+    },
+    {
+      "condition": "Secondary Syphilis",
+      "distinguishingFeatures": "Copper-colored maculopapular rash, may involve palms and soles, positive serology",
+      "keyDifferences": "Dermatology / Skin / Infectious"
+    }
+  ],
+  "diagram": {
+    "name": "Psoriasis – Systemic Therapy: Methotrexate Pre-treatment Monitoring",
+    "caption": "This diagram illustrates the essential baseline investigations required before initiating methotrexate in patients with psoriasis, emphasizing patient safety and toxicity prevention. It highlights the key organ systems affected by methotrexate—particularly the liver, bone marrow, kidneys, and lungs—and reinforces guideline-based pre-treatment assessment for medical graduates and exam preparation.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

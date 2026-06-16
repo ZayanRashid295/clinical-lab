@@ -1,0 +1,132 @@
+{
+  "questionId": "515026",
+  "questionNumber": "23",
+  "stem": "A 45-year-old patient with a known history of psoriasis complains of pain and stiffness in the fingers, most pronounced in the morning. The stiffness improves as the day progresses with movement. On examination, mild swelling of the distal interphalangeal joints is noted. Based on the clinical features, which of the following is the most likely diagnosis?",
+  "options": [
+    "Osteoarthritis",
+    "Rheumatoid arthritis",
+    "Psoriatic arthritis",
+    "Septic arthritis",
+    "Gout"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "History of psoriasis – Strong clue linking joint symptoms to psoriatic arthritis.",
+    "DIP joint swelling – Classic site of involvement in psoriatic arthritis (helps distinguish from RA).",
+    "Morning stiffness improving with activity – Indicates inflammatory arthritis pattern rather than OA or gout."
+  ],
+  "explanations": {
+    "C": {
+      "title": "Psoriatic arthritis",
+      "body": "Psoriatic arthritis is an inflammatory arthritis associated with psoriasis. While it can manifest in several ways (symmetric, asymmetric, or spinal), the involvement of the DIP joints (the joints closest to the fingertips) is a hallmark feature that distinguishes it from Rheumatoid Arthritis.\nPatients often experience \"morning stiffness\" that lasts more than 30 minutes and improves with activity—a sign of inflammatory rather than degenerative pain.\nAnother key diagnostic feature often seen is \"dactylitis\" (sausage-like swelling of an entire finger) and nail changes such as pitting or onycholysis, which are present in about 80% of PsA patients.\nCan present as asymmetric oligoarthritis, spondyloarthritis, or arthritis mutilans.\nThis patient’s psoriasis history + DIP involvement + morning stiffness is classic for psoriatic arthritis."
+    },
+    "A": {
+      "title": "Osteoarthritis",
+      "body": "Usually presents with joint pain worsened by activity and relieved by rest, not morning stiffness.\nCommonly affects DIP, PIP, and first carpometacarpal joints.\nSwelling is usually bony enlargement (Heberden’s nodes) rather than inflammatory swelling."
+    },
+    "B": {
+      "title": "Rheumatoid arthritis",
+      "body": "Typically causes morning stiffness >1 hour that improves with activity.\nSymmetric involvement of small joints (MCP, PIP).\nDIP joints are usually spared, making it less likely in this patient."
+    },
+    "D": {
+      "title": "Septic arthritis",
+      "body": "Usually acute, severe, and monoarticular with redness, warmth, and systemic signs like fever.\nRarely chronic or mild; patient in question has gradual symptoms, so less likely."
+    },
+    "E": {
+      "title": "Gout",
+      "body": "Typically causes sudden, severe pain in a single joint, often the first MTP (big toe).\nChronic gout can affect multiple joints, but DIP involvement is less common, and morning stiffness pattern is not typical."
+    }
+  },
+  "keyConcept": "Psoriatic arthritis is an inflammatory arthritis associated with psoriasis, commonly affecting DIP joints and showing morning stiffness that improves with activity.\nDistinguishing features from RA, OA, gout, or septic arthritis are pattern of joint involvement, symmetry, and clinical context.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Complications - Psoriatic Arthritis in Psoriasis Patients",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Psoriasis + DIP involvement + Inflammatory joint stiffness → Triad suggestive of Psoriatic Arthritis.",
+  "featureTableName": "Psoriatic Arthritis in Psoriasis Patients",
+  "differentialDiagnosisTableName": "Psoriatic Arthritis in Psoriasis Patients Differential Diagnosis of Psoriatic Arthritis",
+  "featureTable": [
+    {
+      "feature": "Epidemiology",
+      "description": "Affects 10–30% of patients with psoriasis; can precede or follow skin lesions",
+      "clinicalImportance": "Usually adults, both genders; family history may be positive"
+    },
+    {
+      "feature": "Joints Involved",
+      "description": "DIP joints, PIP, sometimes MCP, asymmetric oligoarthritis, spine (spondylitis)",
+      "clinicalImportance": "DIP involvement + nail changes suggest psoriatic arthritis"
+    },
+    {
+      "feature": "Symptoms",
+      "description": "Morning stiffness improving with activity, pain, swelling, tenderness",
+      "clinicalImportance": "Inflammatory pattern distinguishes from OA (worse with activity)"
+    },
+    {
+      "feature": "Extra-articular Manifestations",
+      "description": "Nail pitting, onycholysis, dactylitis, enthesitis",
+      "clinicalImportance": "Helps differentiate from RA and gout"
+    },
+    {
+      "feature": "Investigations",
+      "description": "X-ray: pencil-in-cup deformity, joint erosion; ESR/CRP elevated; RF negative",
+      "clinicalImportance": "Imaging supports diagnosis; labs mainly to rule out other arthritis"
+    },
+    {
+      "feature": "Management",
+      "description": "NSAIDs for mild disease, DMARDs (methotrexate, sulfasalazine), biologics for severe",
+      "clinicalImportance": "Treatment tailored to severity, joint involvement, and comorbidities"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Rheumatoid Arthritis (RA)",
+      "distinguishingFeatures": "Symmetric small joint involvement (MCP, PIP), spares DIP, prolonged morning stiffness",
+      "keyDifferences": "RF and anti-CCP positive; systemic features common"
+    },
+    {
+      "condition": "Osteoarthritis (OA)",
+      "distinguishingFeatures": "Joint pain worsens with activity, improves with rest; bony swelling (Heberden’s nodes)",
+      "keyDifferences": "Non-inflammatory; minimal morning stiffness"
+    },
+    {
+      "condition": "Gout",
+      "distinguishingFeatures": "Acute monoarticular attacks, often first MTP; severe pain, redness",
+      "keyDifferences": "Urate crystals on synovial fluid;recurrent flares"
+    },
+    {
+      "condition": "Reactive Arthritis",
+      "distinguishingFeatures": "Usually post-infection; asymmetric lower limb arthritis, conjunctivitis, urethritis",
+      "keyDifferences": "HLA-B27 associated; short-term course"
+    },
+    {
+      "condition": "Septic Arthritis",
+      "distinguishingFeatures": "Acute, severe, monoarticular pain with swelling,erythema, fever",
+      "keyDifferences": "Urgent management; synovial fluid culture positive"
+    },
+    {
+      "condition": "Ankylosing Spondylitis (AS)",
+      "distinguishingFeatures": "Spine and sacroiliac involvement,inflammatory back pain",
+      "keyDifferences": "HLA-B27 positive; peripheral arthritis possible"
+    }
+  ],
+  "diagram": {
+    "name": "Psoriatic Arthritis in Psoriasis Patients",
+    "caption": "This diagram illustrates the key clinical manifestations of psoriatic arthritis in patients with psoriasis, highlighting inflammatory joint involvement (especially DIP joints), morning stiffness improving with movement, dactylitis (sausage digits), enthesitis, nail changes (pitting and onycholysis), spinal involvement (spondylitis), and characteristic radiological findings such as pencil-in-cup deformity.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

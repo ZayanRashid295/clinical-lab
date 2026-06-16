@@ -12,6 +12,9 @@ import MarkdownUploader from "./markdown-uploader"
 import BulkMarkdownUploader from "./bulk-markdown-uploader"
 import DocxUploader from "./docx-uploader"
 import BulkDocxUploader from "./bulk-docx-uploader"
+import QuestionBuilderUploader, {
+  type SaveQuestionOptions,
+} from "./question-builder-uploader"
 import AdminQuestionView from "./admin-question-view"
 import QuestionCreator from "./question-creator/QuestionCreator"
 import { QuestionCreatorData } from "./question-creator/types"
@@ -27,6 +30,10 @@ import {
   ApiHttpError,
   getApiErrorMessage,
 } from "@/app/services/base/api-http-error"
+import {
+  mergeResolvedMetadata,
+  resolveCreatorMetadataIds,
+} from "./resolve-creator-metadata"
 
 interface Question {
   id: string
@@ -75,9 +82,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [showBulkUploader, setShowBulkUploader] = useState(false)
   const [showDocxUploader, setShowDocxUploader] = useState(false)
   const [showBulkDocxUploader, setShowBulkDocxUploader] = useState(false)
+  const [showQuestionBuilder, setShowQuestionBuilder] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [systemFilter, setSystemFilter] = useState<"all" | string>("all")
   const [loading, setLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [parsedMarkdownData, setParsedMarkdownData] = useState<any>(null)
   const [showNewQuestionMenu, setShowNewQuestionMenu] = useState(false)
@@ -94,7 +103,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     !showMarkdownUploader &&
     !showBulkUploader &&
     !showDocxUploader &&
-    !showBulkDocxUploader
+    !showBulkDocxUploader &&
+    !showQuestionBuilder
 
   useEffect(() => {
     if (!layoutHeader) return
@@ -940,9 +950,14 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     } as any
   }
 
-  const loadQuestions = useCallback(async () => {
+  const loadQuestions = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent === true
     try {
-      setLoading(true)
+      if (silent) {
+        setIsRefreshing(true)
+      } else {
+        setLoading(true)
+      }
       setError(null)
       
       // Load all questions using pagination (like student mode)
@@ -1005,7 +1020,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         setQuestions([])
       }
     } finally {
-      setLoading(false)
+      if (silent) {
+        setIsRefreshing(false)
+      } else {
+        setLoading(false)
+      }
     }
   }, [questionsService])
 
@@ -1024,7 +1043,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   useEffect(() => {
     const handleQuestionUpdate = () => {
       if (authService.isAuthenticated()) {
-        loadQuestions()
+        loadQuestions({ silent: true })
       }
     }
 
@@ -1036,7 +1055,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "questionsUpdated") {
         if (authService.isAuthenticated()) {
-          loadQuestions()
+          loadQuestions({ silent: true })
         }
       }
     }
@@ -1050,17 +1069,30 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
   }, [loadQuestions])
 
-  const handleSaveQuestion = async (questionData: QuestionCreatorData) => {
+  const handleSaveQuestion = async (
+    questionData: QuestionCreatorData,
+    options?: SaveQuestionOptions,
+  ): Promise<boolean> => {
     try {
       setError(null)
-      
+
+      let metadata = questionData.metadata
+      if (!metadata.topicId) {
+        const resolved = await resolveCreatorMetadataIds(metadata)
+        metadata = mergeResolvedMetadata(metadata, resolved)
+        questionData = { ...questionData, metadata }
+      }
+
       if (!questionData.metadata.topicId) {
+        const topicLabel = questionData.metadata.parsedTopicName
         toast({
           title: "Registration Error",
-          description: "Please select a topic for this question.",
+          description: topicLabel
+            ? `Could not match topic "${topicLabel}" in the database. Select an existing topic from the dropdown or use + to add it.`
+            : "Please select a topic for this question.",
           variant: "destructive",
         })
-        return
+        return false
       }
 
       // Convert new format to old format for backend compatibility
@@ -1169,7 +1201,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           }
         }
         // Reload questions to get updated data
-        await loadQuestions()
+        await loadQuestions({ silent: true })
         // If viewing the edited question, refresh the view
         if (viewingId === editingId) {
           setViewingId(null)
@@ -1232,7 +1264,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         }
 
         // Reload questions to get new question with all data
-        await loadQuestions()
+        await loadQuestions({ silent: options?.batchReview === true })
         // Notify other tabs/components that questions were updated
         // Use a unique timestamp to ensure the event is detected
         if (typeof window !== "undefined") {
@@ -1245,10 +1277,13 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         }
       }
       
-      setShowNewQuestion(false)
-      setEditingId(null)
-      setViewingId(null)
-      setParsedMarkdownData(null)
+      if (!options?.batchReview) {
+        setShowNewQuestion(false)
+        setEditingId(null)
+        setViewingId(null)
+        setParsedMarkdownData(null)
+      }
+      return true
     } catch (err: unknown) {
       console.error("Failed to save question:", err)
 
@@ -1258,6 +1293,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         description: getApiErrorMessage(err, "Unknown error during save"),
         variant: "destructive",
       })
+      return false
     }
   }
 
@@ -1385,6 +1421,19 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     setShowNewQuestion(true)
     setEditingId(null)
     setViewingId(null)
+  }
+
+  const handleQuestionBuilder = () => {
+    setShowQuestionBuilder(true)
+    setShowMarkdownUploader(false)
+    setShowBulkUploader(false)
+    setShowDocxUploader(false)
+    setShowBulkDocxUploader(false)
+    setShowNewQuestion(false)
+    setParsedMarkdownData(null)
+    setEditingId(null)
+    setViewingId(null)
+    setShowNewQuestionMenu(false)
   }
 
   const editingQuestion = editingId ? questions.find((q) => q.id === editingId) : null
@@ -1577,6 +1626,16 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         </div>
       )}
 
+      {/* Question Builder (template-based DOCX, no AI) */}
+      {showQuestionBuilder && (
+        <div className="mb-4 flex-1 min-h-0 overflow-hidden">
+          <QuestionBuilderUploader
+            onSave={handleSaveQuestion}
+            onCancel={() => setShowQuestionBuilder(false)}
+          />
+        </div>
+      )}
+
       {/* Bulk DOCX Uploader Section */}
       {showBulkDocxUploader && (
         <div className="mb-4 overflow-y-auto max-h-[calc(100vh-200px)]">
@@ -1612,7 +1671,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                     return converted
                   })()
                 : parsedMarkdownData
-                  ? convertOldQuestionToNew(parsedMarkdownData)
+                  ? Array.isArray(parsedMarkdownData.stem)
+                    ? parsedMarkdownData
+                    : convertOldQuestionToNew(parsedMarkdownData)
                   : undefined
             }
             onSave={handleSaveQuestion}
@@ -1622,6 +1683,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
               setShowBulkUploader(false)
               setShowDocxUploader(false)
               setShowBulkDocxUploader(false)
+              setShowQuestionBuilder(false)
               setEditingId(null)
               setViewingId(null)
               setParsedMarkdownData(null)
@@ -1643,7 +1705,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           }}
         />
         </div>
-      ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader ? (
+      ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader && !showQuestionBuilder ? (
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           <QuestionBankListHeader
             title={t("questionGenerator.bankTitle")}
@@ -1690,6 +1752,13 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                         className="text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors w-full"
                       >
                         Upload DOCX Questions
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleQuestionBuilder}
+                        className="w-full text-left px-4 py-2 text-sm text-foreground dark:text-gray-100 hover:bg-muted dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Question Builder
                       </button>
                       <div className="border-t border-border dark:border-gray-700 my-1" />
                       <button

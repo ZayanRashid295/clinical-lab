@@ -11,6 +11,8 @@ export function normalizeName(name: string): string {
     .trim()
     .replace(/&/g, " and ")
     .replace(/[–—−]/g, "-")
+    .replace(/\//g, " ")
+    .replace(/[()]/g, " ")
     .replace(/\s+/g, " ");
 }
 
@@ -95,34 +97,25 @@ export async function runAutoMatch(
   let matchedSubtopicId = "";
   let matchedCategoryId = "";
 
-  // Match Product -> Product (exact only)
+  // Match Product → Product (fuzzy)
   if (parsedProduct && products.length > 0) {
-    const normalizedProduct = normalizeName(parsedProduct);
-    const matchedProduct = products.find(
-      (p: any) => normalizeName(p.name) === normalizedProduct
-    );
+    const matchedProduct = pickByName(products, parsedProduct);
     if (matchedProduct) {
       matchedProductId = matchedProduct.id;
     }
   }
 
-  // Match Category → Category (exact only)
+  // Match Category → Category (fuzzy)
   if (parsedCategory && categories.length > 0) {
-    const normalizedCategory = normalizeName(parsedCategory);
-    const matchedCategory = categories.find(
-      (t: any) => normalizeName(t.name) === normalizedCategory
-    );
+    const matchedCategory = pickByName(categories, parsedCategory);
     if (matchedCategory) {
       matchedCategoryId = matchedCategory.id;
     }
   }
 
-  // Match System → System (exact name only – no fuzzy)
+  // Match System → System (fuzzy)
   if (parsedSystem && systems.length > 0) {
-    const normalizedSystem = normalizeName(parsedSystem);
-    const matchedSystem = systems.find(
-      (s: any) => normalizeName(s.name) === normalizedSystem
-    );
+    const matchedSystem = pickByName(systems, parsedSystem);
     if (matchedSystem) {
       matchedSystemId = matchedSystem.id;
       matchedProductId =

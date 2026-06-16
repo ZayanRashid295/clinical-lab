@@ -1,0 +1,112 @@
+{
+  "questionId": "506050A",
+  "questionNumber": "12A",
+  "stem": "A 24-year-old man presents to the emergency department with fever, severe toothache, progressive neck swelling, drooling, muffled voice, and difficulty swallowing. On examination, there is firm, bilateral submandibular swelling with elevation of the tongue and a “bull neck” appearance. He is anxious, sitting upright, and has stridor with mild respiratory distress. Airway compromise due to deep neck space infection is suspected. What is the most appropriate immediate next step in management?",
+  "options": [
+    "Emergency cricothyrotomy",
+    "Surgical tracheostomy in the operating room",
+    "Intravenous broad-spectrum antibiotics only",
+    "Awake fiberoptic endotracheal intubation",
+    "Contrast-enhanced CT scan of the neck"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "“Fever + severe toothache + submandibular swelling + drooling” → suggests odontogenic deep neck infection",
+    "“Tongue elevation + bull neck + muffled voice + stridor” → classic **Ludwig's angina airway emergency triad (airway obstruction + floor of mouth infection + bilateral submandibular swelling)",
+    "“Respiratory distress with stridor” → indicates impending complete airway obstruction requiring immediate airway control"
+  ],
+  "explanations": {
+    "D": {
+      "title": "Awake fiberoptic endotracheal intubation",
+      "body": "This is the most appropriate immediate airway management in a patient with deep neck space infection and partial airway compromise. The patient is still maintaining spontaneous breathing but shows signs of impending obstruction (stridor, tongue elevation, muffled voice). Awake fiberoptic intubation allows airway control while preserving spontaneous respiration and minimizing risk of complete obstruction during sedation. This is the safest controlled airway strategy before airway collapse occurs.",
+      "clinicalReasoning": "Patient has partial airway obstruction but is still ventilating\nSedation or loss of airway tone could cause complete obstruction\nAwake fiberoptic technique allows visualized, controlled intubation\nPreferred in suspected difficult airway (tongue elevation + neck swelling)\nPrevents need for emergency surgical airway in unstable deterioration phase",
+      "systemInvolved": "Head and Neck – Deep Neck Space Infections (Oral cavity & airway)"
+    },
+    "A": {
+      "title": "Emergency cricothyrotomy",
+      "body": "Represents a surgical airway through the cricothyroid membrane, typically reserved for a “can’t intubate, can’t ventilate” scenario. In this patient, spontaneous breathing is still present, so proceeding directly to cricothyrotomy would be premature. It is a rescue procedure rather than a first-line airway strategy. In Ludwig’s angina, it is only used if non-surgical airway attempts fail or complete obstruction occurs.",
+      "clinicalReasoning": "Reserved for failed airway / complete obstruction\nHighly invasive and not first-line if intubation is possible\nBypasses upper airway but carries complications\nNot indicated while patient is still maintaining airway reflexes\nUsed only as a last-resort life-saving step"
+    },
+    "B": {
+      "title": "Surgical tracheostomy in the operating room",
+      "body": "Tracheostomy provides a definitive airway but is not the immediate emergency step. It requires operating room setup and surgical time, which is not appropriate in rapidly evolving airway obstruction. It is sometimes used in anticipated prolonged airway compromise but not as the first emergency intervention in acute settings.",
+      "clinicalReasoning": "Definitive airway but time-consuming procedure\nRequires OR setup and surgical team\nNot suitable for immediate airway compromise\nConsidered after stabilization or failed intubation\nDelayed compared to endotracheal strategies"
+    },
+    "C": {
+      "title": "Intravenous broad-spectrum antibiotics only",
+      "body": "Antibiotics are essential in managing Ludwig’s angina but are not sufficient as an immediate step when airway compromise is present. The priority is airway protection before infection control. Giving antibiotics alone risks rapid deterioration due to untreated airway obstruction.",
+      "clinicalReasoning": "Treats infection but does not secure airway\nAirway obstruction is immediate life threat\nAntibiotics take hours to act\nMust be given AFTER airway stabilization\nInadequate as sole initial management"
+    },
+    "E": {
+      "title": "Contrast-enhanced CT scan of the neck",
+      "body": "CT imaging helps define extent of deep neck infection but is contraindicated before airway stabilization in unstable patients. Transporting a patient with stridor and airway compromise to radiology may precipitate complete airway collapse. Imaging is a secondary step after securing airway.",
+      "clinicalReasoning": "Useful for defining abscess spread\nNot safe in unstable airway patients\nRequires patient transport → risk of deterioration\nDelays life-saving airway management\nDiagnostic, not immediate therapeutic step"
+    }
+  },
+  "keyConcept": "In Ludwig's angina, the most critical and immediate priority is airway protection before antibiotics or imaging. In a patient with stridor and tongue elevation, the safest definitive early airway strategy is awake fiberoptic intubation, as it maintains spontaneous respiration and prevents sudden airway collapse during intervention.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections – Management",
+    "mcqTitle": "Infections – Management - Emergency Airway Management in Ludwig’s Angina (Deep Neck Space Infection)",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Difficult"
+  },
+  "featureTable": [
+    {
+      "feature": "Etiology",
+      "description": "• Odontogenic infection• Mandibular molar infection (2nd, 3rd molars)• Polymicrobial (aerobes, anaerobes)",
+      "clinicalImportance": "Infection spreads from dental source into deep neck spaces rapidly"
+    },
+    {
+      "feature": "Anatomical involvement",
+      "description": "• Submandibular space• Sublingual space• Submental space",
+      "clinicalImportance": "Causes firm “woody” floor of mouth swelling"
+    },
+    {
+      "feature": "Airway compromise signs",
+      "description": "• Stridor, drooling, muffled voice• Dysphagia, dyspnea• Tongue elevation",
+      "clinicalImportance": "Indicates impending airway obstruction requiring urgent intervention"
+    },
+    {
+      "feature": "Systemic features",
+      "description": "• Fever, toxic appearance• Tachycardia, anxiety• Malaise",
+      "clinicalImportance": "Suggests severe spreading infection and possible sepsis"
+    },
+    {
+      "feature": "Classic triad",
+      "description": "• Bilateral submandibular swelling, tongue elevation, airway obstruction",
+      "clinicalImportance": "Diagnostic hallmark of Ludwig's angina"
+    },
+    {
+      "feature": "Immediate priority",
+      "description": "• Airway protection first• Awake fiberoptic intubation preferred• Avoid sedation before airway secured",
+      "clinicalImportance": "Prevents sudden complete airway collapse due to loss of muscle tone"
+    },
+    {
+      "feature": "Definitive management",
+      "description": "• IV broad-spectrum antibiotics• Surgical drainage if abscess forms• ICU monitoring",
+      "clinicalImportance": "Infection control after airway stabilization"
+    },
+    {
+      "feature": "Imaging role",
+      "description": "• Contrast-enhanced CT neck• Evaluate extent of infection• Post-airway stabilization only",
+      "clinicalImportance": "Diagnostic, not initial emergency step"
+    }
+  ],
+  "diagram": {
+    "caption": "This medical educational diagram illustrates the pathophysiology, clinical features, anatomical spread, and emergency airway management of Ludwig's angina. It highlights the rapid progression of odontogenic infection into the submandibular and sublingual spaces, causing tongue elevation and life-threatening airway obstruction. The diagram emphasizes airway-first management, especially awake fiberoptic endotracheal intubation, along with rescue airway procedures, antibiotic therapy, and post-stabilization management steps.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

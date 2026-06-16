@@ -1,0 +1,195 @@
+{
+  "questionId": "515027",
+  "questionNumber": "24",
+  "stem": "A 42-year-old patient with a long-standing history of psoriasis presents with joint pain and morning stiffness in the fingers and knees. You suspect psoriatic arthritis. Which investigation would be most appropriate initially to assess the extent of joint involvement?",
+  "stemHtml": "<p>Q 11:<strong> </strong>A 42-year-old patient with a long-standing history of psoriasis presents with joint pain and morning stiffness in the fingers and knees. You suspect psoriatic arthritis. Which investigation would be most appropriate initially to assess the extent of joint involvement?<strong> </strong><strong>(</strong><strong>Question Id: 515027)</strong></p>",
+  "options": [
+    "ANA",
+    "RF",
+    "Skin biopsy",
+    "X-ray of joints",
+    "ESR alone"
+  ],
+  "optionsHtml": [
+    "<p>ANA</p>",
+    "<p>RF</p>",
+    "<p>Skin biopsy</p>",
+    "<p>X-ray of joints</p>",
+    "<p>ESR alone</p>"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "Psoriasis – Indicates underlying systemic disease associated with arthritis; points toward psoriatic arthritis rather than other autoimmune arthropathies.",
+    "Joint pain and morning stiffness – Highlights musculoskeletal involvement, suggesting the need for joint imaging rather than skin or blood tests.",
+    "(Optional classic triad if considered)",
+    "Psoriasis + distal joint pain + morning stiffness – Represents the typical presentation of psoriatic arthritis, directing toward X-ray for assessment.",
+    "Reason",
+    "These keywords signal that the question is about assessing the extent of joint involvement in a patient with psoriasis, making X-ray of joints the most appropriate initial investigation."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Psoriasis</strong> – Indicates underlying systemic disease associated with arthritis; points toward <strong>psoriatic arthritis</strong> rather than other autoimmune arthropathies.</li></ol>",
+    "<ol><li><strong>Joint pain and morning stiffness</strong> – Highlights <strong>musculoskeletal involvement</strong>, suggesting the need for <strong>joint imaging</strong> rather than skin or blood tests.</li></ol>",
+    "<p><u><strong>(Optional classic triad if considered)</strong></u></p>",
+    "<p><strong>Psoriasis + distal joint pain + morning stiffness</strong> – Represents the <strong>typical presentation of psoriatic arthritis</strong>, directing toward <strong>X-ray</strong> for assessment.</p>",
+    "<p><u><strong>Reason</strong></u></p>",
+    "<p>These keywords signal that the question is about <strong>assessing the extent of joint involvement</strong> in a patient with psoriasis, making <strong>X-ray of joints</strong> the most appropriate initial investigation.</p>"
+  ],
+  "explanations": {
+    "D": {
+      "title": "X-ray of joints",
+      "body": "X-rays detect joint space narrowing, erosions, and new bone formation, which are characteristic in psoriatic arthritis.\nHelps assess extent and pattern of joint involvement (distal interphalangeal joints, asymmetric involvement).\nExtra note: Other imaging like MRI or ultrasound can detect early changes, but X-ray is the initial, practical investigation.",
+      "bodyHtml": "<ul><li>X-rays detect <strong>joint space narrowing, erosions, and new bone formation</strong>, which are characteristic in psoriatic arthritis.</li><li>Helps assess <strong>extent and pattern of joint involvement</strong> (distal interphalangeal joints, asymmetric involvement).</li><li><strong>Extra note:</strong> Other imaging like MRI or ultrasound can detect early changes, but <strong>X-ray is the initial, practical investigation</strong>.</li></ul>",
+      "systemInvolved": "Musculoskeletal system.",
+      "systemInvolvedHtml": "<p>Musculoskeletal system.</p>"
+    },
+    "A": {
+      "title": "ANA (Antinuclear Antibody)",
+      "body": "Used primarily to screen for autoimmune connective tissue diseases such as SLE.\nNot specific or useful for assessing joint involvement in psoriatic arthritis.",
+      "bodyHtml": "<ul><li>Used primarily to screen for autoimmune connective tissue diseases such as <strong>SLE</strong>.</li><li>Not specific or useful for assessing joint involvement in psoriatic arthritis.</li></ul>",
+      "systemInvolved": "Immune system/Connective tissue.",
+      "systemInvolvedHtml": "<p>Immune system/Connective tissue.</p>"
+    },
+    "B": {
+      "title": "RF (Rheumatoid Factor)",
+      "body": "Helps differentiate rheumatoid arthritis from seronegative arthropathies.\nMost patients with psoriatic arthritis are RF-negative, so this is supportive but not for assessing joint damage.",
+      "bodyHtml": "<ul><li>Helps differentiate <strong>rheumatoid arthritis</strong> from seronegative arthropathies.</li><li>Most patients with psoriatic arthritis are <strong>RF-negative</strong>, so this is supportive but not for assessing joint damage.</li></ul>",
+      "systemInvolved": "Musculoskeletal/Immune system.",
+      "systemInvolvedHtml": "<p>Musculoskeletal/Immune system.</p>"
+    },
+    "C": {
+      "title": "Skin biopsy",
+      "body": "Confirms psoriasis histologically but does not assess joint involvement.\nUseful only if diagnosis of skin disease is unclear.",
+      "bodyHtml": "<ul><li>Confirms psoriasis histologically but <strong>does not assess joint involvement</strong>.</li><li>Useful only if diagnosis of skin disease is unclear.</li></ul>",
+      "systemInvolved": "Integumentary system.",
+      "systemInvolvedHtml": "<p>Integumentary system.</p>"
+    },
+    "E": {
+      "title": "ESR alone",
+      "body": "ESR indicates inflammation but is non-specific.\nCannot define joint damage or involvement, only supportive for disease activity.",
+      "bodyHtml": "<ul><li>ESR indicates <strong>inflammation</strong> but is <strong>non-specific</strong>.</li><li>Cannot define joint damage or involvement, only supportive for disease activity.</li></ul>",
+      "systemInvolved": "Immune system/Inflammatory response.",
+      "systemInvolvedHtml": "<p>Immune system/Inflammatory response.</p>"
+    }
+  },
+  "keyConcept": "Psoriatic arthritis is a seronegative inflammatory arthritis associated with psoriasis.\nInitial assessment of joint involvement is best done with X-ray, as it shows characteristic erosions, joint space narrowing, and bony proliferation.\nBlood tests (RF, ANA, ESR) or skin biopsy are supportive, but not primary for assessing joints.",
+  "keyConceptHtml": "<ul><li>Psoriatic arthritis is a <strong>seronegative inflammatory arthritis</strong> associated with psoriasis.</li><li><strong>Initial assessment of joint involvement</strong> is best done with <strong>X-ray</strong>, as it shows characteristic erosions, joint space narrowing, and bony proliferation.</li><li>Blood tests (RF, ANA, ESR) or skin biopsy are <strong>supportive</strong>, but not primary for assessing joints.</li></ul>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Complications - Psoriatic Arthritis – Initial Investigation of Joint Involvement",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Psoriatic Arthritis – Initial Investigation of Joint Involvement",
+  "differentialDiagnosisTableName": "Psoriatic Arthritis – Initial Investigation of Joint Involvement Differential Diagnosis of Psoriatic Arthritis",
+  "featureTable": [
+    {
+      "feature": "X-ray of joints",
+      "featureHtml": "<p>X-ray of joints</p>",
+      "description": "Detects joint space narrowing,\nerosions,\nbony proliferation",
+      "descriptionHtml": "<ul><li>Detects joint space narrowing, </li><li>erosions, </li><li>bony proliferation</li></ul>",
+      "clinicalImportance": "First-line imaging to assess extent and pattern of joint involvement",
+      "clinicalImportanceHtml": "<p>First-line imaging to assess extent and pattern of joint involvement</p>"
+    },
+    {
+      "feature": "RF (Rheumatoid Factor)",
+      "featureHtml": "<p>RF (Rheumatoid Factor)</p>",
+      "description": "Differentiates from rheumatoid arthritis (seronegative in PsA)",
+      "descriptionHtml": "<p>Differentiates from rheumatoid arthritis (seronegative in PsA)</p>",
+      "clinicalImportance": "Usually negative in psoriatic arthritis",
+      "clinicalImportanceHtml": "<p>Usually negative in psoriatic arthritis</p>"
+    },
+    {
+      "feature": "ANA (Antinuclear Antibody)",
+      "featureHtml": "<p>ANA (Antinuclear Antibody)</p>",
+      "description": "Screens for connective tissue disorders like SLE",
+      "descriptionHtml": "<p>Screens for connective tissue disorders like SLE</p>",
+      "clinicalImportance": "Not useful for joint assessment in PsA",
+      "clinicalImportanceHtml": "<p>Not useful for joint assessment in PsA</p>"
+    },
+    {
+      "feature": "ESR / CRP",
+      "featureHtml": "<p>ESR / CRP</p>",
+      "description": "Indicates systemic inflammation",
+      "descriptionHtml": "<p>Indicates systemic inflammation</p>",
+      "clinicalImportance": "Supportive but non-specific;\ncannot define joint damage",
+      "clinicalImportanceHtml": "<ul><li>Supportive but non-specific; </li><li>cannot define joint damage</li></ul>"
+    },
+    {
+      "feature": "Skin biopsy",
+      "featureHtml": "<p>Skin biopsy</p>",
+      "description": "Confirms psoriasis if diagnosis uncertain",
+      "descriptionHtml": "<p>Confirms psoriasis if diagnosis uncertain</p>",
+      "clinicalImportance": "Does not assess joint involvement",
+      "clinicalImportanceHtml": "<p>Does not assess joint involvement</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Rheumatoid Arthritis (RA)",
+      "conditionHtml": "<p>Rheumatoid Arthritis (RA)</p>",
+      "distinguishingFeatures": "Symmetric small joint involvement,\nmorning stiffness >1 hr",
+      "distinguishingFeaturesHtml": "<ul><li>Symmetric small joint involvement, </li><li>morning stiffness &gt;1 hr</li></ul>",
+      "keyDifferences": "Usually RF positive,\nerosions without new bone formation,\nMCP/PIP preference",
+      "keyDifferencesHtml": "<ul><li>Usually <strong>RF positive</strong>, </li><li>erosions without new bone formation, </li><li>MCP/PIP preference</li></ul>"
+    },
+    {
+      "condition": "Osteoarthritis (OA)",
+      "conditionHtml": "<p>Osteoarthritis (OA)</p>",
+      "distinguishingFeatures": "Joint pain worsens with activity,\nminimal morning stiffness",
+      "distinguishingFeaturesHtml": "<ul><li>Joint pain worsens with activity, </li><li>minimal morning stiffness</li></ul>",
+      "keyDifferences": "Non-inflammatory, X-ray shows osteophytes,\nno erosions or soft tissue swelling typical of PsA",
+      "keyDifferencesHtml": "<ul><li><strong>Non-inflammatory</strong>, X-ray shows osteophytes, </li><li>no erosions or soft tissue swelling typical of PsA</li></ul>"
+    },
+    {
+      "condition": "Ankylosing Spondylitis (AS)",
+      "conditionHtml": "<p>Ankylosing Spondylitis (AS)</p>",
+      "distinguishingFeatures": "Chronic back pain,\nsacroiliac involvement,\nHLA-B27 positive",
+      "distinguishingFeaturesHtml": "<ul><li>Chronic back pain, </li><li>sacroiliac involvement, </li><li>HLA-B27 positive</li></ul>",
+      "keyDifferences": "Axial predominance;\nPsA may involve spine but often asymmetric sacroiliitis",
+      "keyDifferencesHtml": "<ul><li>Axial predominance; </li><li>PsA may involve spine but often asymmetric sacroiliitis</li></ul>"
+    },
+    {
+      "condition": "Gout / Pseudogout",
+      "conditionHtml": "<p>Gout / Pseudogout</p>",
+      "distinguishingFeatures": "Acute monoarthritis,\ncrystals in synovial fluid",
+      "distinguishingFeaturesHtml": "<ul><li>Acute monoarthritis, </li><li>crystals in synovial fluid</li></ul>",
+      "keyDifferences": "Crystals on microscopy, sudden attacks;\nPsA usually chronic and polyarticular",
+      "keyDifferencesHtml": "<ul><li>Crystals on microscopy, sudden attacks; </li><li>PsA usually chronic and polyarticular</li></ul>"
+    },
+    {
+      "condition": "Reactive Arthritis",
+      "conditionHtml": "<p>Reactive Arthritis</p>",
+      "distinguishingFeatures": "Joint pain after infection (GI/urinary),\nconjunctivitis,\nurethritis",
+      "distinguishingFeaturesHtml": "<ul><li>Joint pain after infection (GI/urinary), </li><li>conjunctivitis, </li><li>urethritis</li></ul>",
+      "keyDifferences": "History of preceding infection;\nPsA associated with chronic psoriasis",
+      "keyDifferencesHtml": "<ul><li>History of preceding infection; </li><li>PsA associated with <strong>chronic psoriasis</strong></li></ul>"
+    },
+    {
+      "condition": "Systemic Lupus Erythematosus (SLE)",
+      "conditionHtml": "<p>Systemic Lupus Erythematosus (SLE)</p>",
+      "distinguishingFeatures": "Multi-system involvement,\nANA positive,\njoint pain",
+      "distinguishingFeaturesHtml": "<ul><li>Multi-system involvement, </li><li>ANA positive, </li><li>joint pain</li></ul>",
+      "keyDifferences": "Usually ANA positive, rarely destructive joint changes;\nPsA has characteristic X-ray changes",
+      "keyDifferencesHtml": "<ul><li>Usually <strong>ANA positive</strong>, rarely destructive joint changes; </li><li>PsA has characteristic X-ray changes</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Psoriatic Arthritis – Initial Investigation of Joint Involvement",
+    "caption": "This diagram highlights the initial diagnostic approach to joint involvement in psoriatic arthritis, emphasizing X-ray of joints as the first-line investigation. It illustrates characteristic radiographic findings such as joint space narrowing, erosions, and new bone formation, while showing that tests like RF, ANA, ESR/CRP, and skin biopsy are supportive or exclusionary but not primary for assessing joint damage.",
+    "captionHtml": "<p>This diagram highlights the <strong>initial diagnostic approach</strong> to joint involvement in psoriatic arthritis, emphasizing <strong>X-ray of joints as the first-line investigation</strong>. It illustrates characteristic radiographic findings such as <strong>joint space narrowing, erosions, and new bone formation</strong>, while showing that tests like <strong>RF, ANA, ESR/CRP, and skin biopsy</strong> are supportive or exclusionary but <strong>not primary for assessing joint damage</strong>.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

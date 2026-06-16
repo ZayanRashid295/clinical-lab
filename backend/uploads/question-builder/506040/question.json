@@ -1,0 +1,169 @@
+{
+  "questionId": "506040",
+  "questionNumber": "03",
+  "stem": "A 48-year-old man presents to the emergency department with rapidly progressive swelling of the floor of the mouth, fever, muffled “hot potato” voice, drooling, and difficulty swallowing for 2 days. He has poor dental hygiene and severe tenderness in the submandibular region. On examination, the tongue is elevated posteriorly, and the floor of the mouth is indurated bilaterally. Which of the following is the most likely diagnosis?",
+  "options": [
+    "Acute epiglottitis",
+    "Ludwig angina",
+    "Peritonsillar abscess",
+    "Retropharyngeal abscess",
+    "Parapharyngeal abscess"
+  ],
+  "correctAnswer": "B",
+  "keywords": [
+    "Floor of mouth swelling + bilateral induration → classic deep neck space infection involving sublingual/submandibular spaces",
+    "Tongue elevation + drooling + hot potato voice → airway compromise from posterior displacement of tongue",
+    "Poor dental hygiene + rapid progression (2 days) → odontogenic polymicrobial infection spreading rapidly"
+  ],
+  "explanations": {
+    "B": {
+      "title": "Ludwig angina",
+      "body": "A rapidly progressive, life-threatening cellulitis of the submandibular, sublingual, and submental spaces, usually arising from infected lower molars. It causes bilateral, “board-like” induration of the floor of mouth, posterior displacement of the tongue, drooling, dysphagia, and airway compromise. It is a surgical emergency due to risk of asphyxiation and often requires airway protection plus IV antibiotics. Infection is typically polymicrobial (oral anaerobes + streptococci). The hallmark is bilateral submandibular space involvement without abscess formation in early stages, distinguishing it from localized abscesses.",
+      "clinicalReasoning": "The combination of rapid onset, bilateral floor-of-mouth swelling, tongue elevation, and dental source strongly localizes to a deep neck space cellulitis rather than a focal abscess or pharyngeal infection. Airway displacement signs make Ludwig angina the best fit."
+    },
+    "A": {
+      "title": "Acute epiglottitis",
+      "body": "An acute bacterial infection (classically *H. influenzae type b in children, now also streptococci/staphylococci in adults) affecting the epiglottis, leading to rapid airway obstruction. Patients present with high fever, severe sore throat, drooling, dysphagia, and tripod positioning. However, oral cavity examination is usually relatively unremarkable, and there is no floor-of-mouth induration.",
+      "clinicalReasoning": "Although drooling and muffled voice overlap, absence of floor-of-mouth induration and presence of localized epiglottic inflammation (not dental source) makes it less likely."
+    },
+    "C": {
+      "title": "Peritonsillar abscess",
+      "body": "A localized pus collection between the tonsillar capsule and pharyngeal muscles, usually following tonsillitis. Presents with unilateral throat pain, uvular deviation, trismus, and muffled voice. Swelling is peritonsillar, not submandibular or floor-of-mouth.",
+      "clinicalReasoning": "Unilateral tonsillar findings and uvular deviation are absent here. Bilateral floor-of-mouth involvement excludes this diagnosis."
+    },
+    "D": {
+      "title": "Retropharyngeal abscess",
+      "body": "Deep neck infection in the retropharyngeal space, more common in children. Presents with fever, neck stiffness, dysphagia, and sometimes respiratory distress. Posterior pharyngeal wall bulging may be seen.",
+      "clinicalReasoning": "No posterior pharyngeal wall symptoms or neck stiffness are described. Oral floor involvement points away from retropharyngeal space."
+    },
+    "E": {
+      "title": "Parapharyngeal abscess",
+      "body": "A deep neck space infection lateral to the pharynx, often secondary to tonsillar or dental infections. It presents with fever, trismus, neck swelling, and sometimes cranial nerve involvement.",
+      "clinicalReasoning": "Although related to dental infection, it typically causes lateral neck swelling and trismus, not bilateral floor-of-mouth induration or tongue elevation."
+    }
+  },
+  "keyConcept": "Rapidly progressive bilateral submandibular infection from dental source causing airway compromise = Ludwig angina\nDistinguished by floor-of-mouth elevation + tongue displacement + drooling\nSurgical emergency requiring airway protection",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections - Recognition & Diagnosis",
+    "mcqTitle": "Infections - Recognition & Diagnosis - Emergency Medicine – ENT/Oral Cavity – Deep Neck Space Infections – Ludwig Angina",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning, Interpretation",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Drooling + dysphagia + muffled voice suggests impending airway obstruction",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "description": "• Rapidly progressive cellulitis involving:• Sublingual space• Submandibular space• Submental space• Usually bilateral",
+      "clinicalImportance": "• Causes life-threatening airway compromise"
+    },
+    {
+      "feature": "Etiology",
+      "description": "• Odontogenic infection (most common)• Lower second/third molar infection• Oral trauma• Dental extraction• Mandibular fracture",
+      "clinicalImportance": "• Dental infections are the classic source"
+    },
+    {
+      "feature": "Common Organisms",
+      "description": "• Polymicrobial infection• Streptococci• Anaerobes• Bacteroides• Fusobacterium",
+      "clinicalImportance": "• Broad-spectrum antibiotic coverage required"
+    },
+    {
+      "feature": "Risk Factors",
+      "description": "• Poor dental hygiene• Diabetes mellitus• Immunocompromised state• Malnutrition• Alcoholism",
+      "clinicalImportance": "• Increased risk of rapid spread"
+    },
+    {
+      "feature": "Symptoms",
+      "description": "• Fever• Severe mouth pain• Dysphagia• Odynophagia• Drooling• Muffled “hot potato” voice• Dyspnea",
+      "clinicalImportance": "• Suggest evolving airway obstruction"
+    },
+    {
+      "feature": "Examination Findings",
+      "description": "• Bilateral submandibular swelling• Woody/board-like induration• Elevated tongue• Tender floor of mouth• Neck swelling• Trismus may occur",
+      "clinicalImportance": "• Tongue elevation is highly characteristic"
+    },
+    {
+      "feature": "Airway Signs",
+      "description": "• Stridor• Drooling• Respiratory distress• Difficulty handling secretions• Cyanosis (late sign)",
+      "clinicalImportance": "• Immediate airway management may be needed"
+    },
+    {
+      "feature": "Diagnosis",
+      "description": "• Clinical diagnosis primarily• Contrast CT neck• CBC showing leukocytosis• Blood cultures if septic",
+      "clinicalImportance": "• CT helps define spread/abscess formation"
+    },
+    {
+      "feature": "Complications",
+      "description": "• Airway obstruction• Mediastinitis• Sepsis• Aspiration• Internal jugular thrombosis",
+      "clinicalImportance": "• Mortality increases if airway delayed"
+    },
+    {
+      "feature": "Treatment",
+      "description": "• Secure airway first• IV broad-spectrum antibiotics• Surgical drainage if abscess develops• Dental source control",
+      "clinicalImportance": "• Airway stabilization is top priority"
+    },
+    {
+      "feature": "Prognosis",
+      "description": "• Good with early treatment• Fatal if airway compromise untreated",
+      "clinicalImportance": "• Early recognition is critical"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Peritonsillar Abscess",
+      "distinguishingFeatures": "• Unilateral throat pain• Uvular deviation• Trismus• Tonsillar swelling",
+      "keyDifferences": "• Usually unilateral• No bilateral floor-of-mouth induration"
+    },
+    {
+      "condition": "Retropharyngeal Abscess",
+      "distinguishingFeatures": "• Neck stiffness• Posterior pharyngeal wall bulge• Fever• Dysphagia",
+      "keyDifferences": "• Retropharyngeal involvement rather than submandibular spaces"
+    },
+    {
+      "condition": "Parapharyngeal Abscess",
+      "distinguishingFeatures": "• Lateral neck swelling• Trismus• Fever• Cranial nerve involvement possible",
+      "keyDifferences": "• More lateral neck disease rather than floor-of-mouth cellulitis"
+    },
+    {
+      "condition": "Acute Epiglottitis",
+      "distinguishingFeatures": "• Severe sore throat• Drooling• Stridor• Tripod posture",
+      "keyDifferences": "• No submandibular swelling or tongue elevation"
+    },
+    {
+      "condition": "Submandibular Sialadenitis",
+      "distinguishingFeatures": "• Painful salivary gland swelling• Worse with meals• Purulent duct discharge",
+      "keyDifferences": "• Localized salivary gland infection without deep neck cellulitis"
+    },
+    {
+      "condition": "Dental Abscess",
+      "distinguishingFeatures": "• Localized tooth pain• Gingival swelling• Facial pain",
+      "keyDifferences": "• More localized infection without diffuse bilateral spread"
+    },
+    {
+      "condition": "Angioedema",
+      "distinguishingFeatures": "• Rapid soft tissue swelling• Allergic trigger• Noninfectious",
+      "keyDifferences": "• No fever or infectious signs"
+    },
+    {
+      "condition": "Oral Cellulitis",
+      "distinguishingFeatures": "• Localized oral soft tissue inflammation• Erythema• Tenderness",
+      "keyDifferences": "• Lacks classic bilateral deep neck involvement"
+    }
+  ],
+  "diagram": {
+    "caption": "This diagram illustrates the recognition and diagnosis of Ludwig angina, a rapidly progressive cellulitis involving the submandibular, sublingual, and submental spaces, most commonly originating from odontogenic infections of lower molars. The image highlights characteristic clinical findings including bilateral submandibular swelling, floor-of-mouth induration, posterior tongue elevation, drooling, dysphagia, and muffled “hot potato” voice leading to potential airway compromise. It also demonstrates the involved fascial spaces, diagnostic approach with contrast-enhanced CT neck, emergency airway management, IV antibiotic therapy, and major complications such as airway obstruction, mediastinitis, and sepsis.",
+    "images": [
+      {
+        "filename": "image1.jpeg",
+        "path": "images/image1.jpeg",
+        "sourceName": "image1.jpeg"
+      }
+    ],
+    "image": "images/image1.jpeg"
+  }
+}

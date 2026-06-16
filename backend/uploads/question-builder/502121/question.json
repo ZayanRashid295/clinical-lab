@@ -1,0 +1,187 @@
+{
+  "questionId": "502121",
+  "questionNumber": "07",
+  "stem": "A 58-year-old man presents to the emergency department with sudden-onset, severe, crushing chest pain radiating to his left arm. His ECG shows ST-segment elevation in leads II, III, and aVF. Based on his clinical presentation and ECG findings, which of the following best describes the mechanism of his myocardial infarction?",
+  "stemHtml": "<p>A 58-year-old man presents to the emergency department with sudden-onset, severe, crushing chest pain radiating to his left arm. His ECG shows ST-segment elevation in leads II, III, and aVF. Based on his clinical presentation and ECG findings, which of the following best describes the mechanism of his myocardial infarction?<strong> </strong><strong>(Question Id: 5021</strong><strong>21</strong><strong>)</strong></p>",
+  "options": [
+    "Transmural myocardial necrosis due to complete coronary artery occlusion",
+    "Subendocardial ischemia due to partial obstruction",
+    "Vasospasm with no plaque rupture",
+    "Myocardial inflammation without infarction",
+    "Microvascular disease only"
+  ],
+  "optionsHtml": [
+    "<p>Transmural myocardial necrosis due to complete coronary artery occlusion</p>",
+    "<p>Subendocardial ischemia due to partial obstruction</p>",
+    "<p>Vasospasm with no plaque rupture</p>",
+    "<p>Myocardial inflammation without infarction</p>",
+    "<p>Microvascular disease only</p>"
+  ],
+  "correctAnswer": "A",
+  "keywords": [
+    "“Crushing chest pain” – Classic symptom of acute myocardial infarction.",
+    "“ST-segment elevation in II, III, aVF” – Indicates inferior wall STEMI caused by complete coronary artery occlusion."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>“Crushing chest pain”</strong> – Classic symptom of <strong>acute myocardial infarction</strong>.</li></ol>",
+    "<ol><li><strong>“ST-segment elevation in II, III, aVF”</strong> – Indicates <strong>inferior wall STEMI</strong> caused by <strong>complete coronary artery occlusion</strong>.</li></ol>"
+  ],
+  "explanations": {
+    "A": {
+      "title": "Transmural myocardial necrosis due to complete coronary artery occlusion",
+      "body": "The patient's presentation—sudden-onset, severe, crushing chest pain radiating to the left arm—is a classic sign of an acute myocardial infarction (MI).\nThe key diagnostic finding is the ST-segment elevation in leads II, III, and aVF on the ECG.\nST-segment elevation on an ECG signifies a STEMI (ST-Elevation Myocardial Infarction). This pattern indicates a full-thickness (or transmural) injury to the heart muscle caused by a prolonged, complete occlusion of a major coronary artery, most commonly due to a ruptured atherosclerotic plaque leading to a thrombus (blood clot) completely blocking the vessel. Leads II, III, and aVF look at the inferior wall of the heart, meaning the infarction is likely due to the blockage of the Right Coronary Artery (RCA).\nThe resulting lack of blood flow (ischemia) is severe and prolonged enough to cause transmural myocardial necrosis (death of the heart muscle across the entire wall thickness).\nEarly intervention (PCI or thrombolysis) is critical to limit myocardial damage.",
+      "bodyHtml": "<ul><li>The patient's presentation—<strong>sudden-onset, severe, crushing chest pain</strong> radiating to the left arm—is a classic sign of an acute <strong>myocardial infarction (MI)</strong>. </li><li>The key diagnostic finding is the <strong>ST-segment elevation in leads II, III, and aVF</strong> on the <strong>ECG</strong>.</li><li>ST-segment elevation on an ECG signifies a <strong>STEMI (ST-Elevation Myocardial Infarction)</strong>. This pattern indicates a <strong>full-thickness</strong> (or <strong>transmural</strong>) injury to the heart muscle caused by a <strong>prolonged, complete occlusion</strong> of a major coronary artery, most commonly due to a ruptured atherosclerotic plaque leading to a thrombus (blood clot) completely blocking the vessel. Leads II, III, and aVF look at the <strong>inferior wall</strong> of the heart, meaning the infarction is likely due to the blockage of the <strong>Right Coronary Artery (RCA)</strong>.</li><li>The resulting lack of blood flow (ischemia) is severe and prolonged enough to cause <strong>transmural myocardial necrosis</strong> (death of the heart muscle across the entire wall thickness).</li><li>Early intervention (PCI or thrombolysis) is critical to limit myocardial damage.</li></ul>"
+    },
+    "B": {
+      "title": "Subendocardial ischemia due to partial obstruction",
+      "body": "Causes NSTEMI, not STEMI.\nECG shows ST-segment depression or T-wave inversion, not elevation.\nIschemia is limited to the inner layer (subendocardium), not full-thickness.",
+      "bodyHtml": "<ul><li>Causes <strong>NSTEMI</strong>, not STEMI.</li><li>ECG shows <strong>ST-segment depression or T-wave inversion</strong>, not elevation.</li><li>Ischemia is <strong>limited to the inner layer (subendocardium)</strong>, not full-thickness.</li></ul>"
+    },
+    "C": {
+      "title": "Vasospasm with no plaque rupture",
+      "body": "Seen in Prinzmetal/variant angina, usually transient ST elevation.\nPain often occurs at rest, often nocturnal, and resolves spontaneously or with nitrates.\nUsually not associated with complete infarction unless prolonged.",
+      "bodyHtml": "<ul><li>Seen in <strong>Prinzmetal/variant angina</strong>, usually transient ST elevation.</li><li>Pain often occurs <strong>at rest, often nocturnal</strong>, and resolves spontaneously or with nitrates.</li><li>Usually <strong>not associated with complete infarction</strong> unless prolonged.</li></ul>"
+    },
+    "D": {
+      "title": "Myocardial inflammation without infarction",
+      "body": "Suggests myocarditis, which may show diffuse ST changes and elevated troponins.\nPain is usually less typical, may be pleuritic, not classic crushing chest pain.\nNo localized coronary occlusion.",
+      "bodyHtml": "<ul><li>Suggests <strong>myocarditis</strong>, which may show <strong>diffuse ST changes</strong> and elevated troponins.</li><li>Pain is usually <strong>less typical, may be pleuritic</strong>, not classic crushing chest pain.</li><li>No localized coronary occlusion.</li></ul>"
+    },
+    "E": {
+      "title": "Microvascular disease only",
+      "body": "Seen in small-vessel disease or cardiac syndrome X.\nECG changes are usually minimal or absent; ST elevation is uncommon.\nChest pain is often exertional, not acute STEMI pattern.",
+      "bodyHtml": "<ul><li>Seen in <strong>small-vessel disease or cardiac syndrome X</strong>.</li><li>ECG changes are usually minimal or absent; ST elevation is uncommon.</li><li>Chest pain is often <strong>exertional, not acute STEMI pattern</strong>.</li></ul>"
+    }
+  },
+  "keyConcept": "Inferior STEMI with ST elevation in II, III, aVF is caused by complete occlusion of the RCA, leading to transmural myocardial necrosis. NSTEMI, vasospasm, myocarditis, and microvascular disease present differently on ECG and clinical features.",
+  "keyConceptHtml": "<p>Inferior STEMI with ST elevation in II, III, aVF is caused by <strong>complete occlusion of the RCA</strong>, leading to <strong>transmural myocardial necrosis</strong>. NSTEMI, vasospasm, myocarditis, and microvascular disease present differently on ECG and clinical features.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Cardiovascular System (CVS)",
+    "topic": "Acute Coronary Syndrome (ACS)",
+    "subtopic": "Acute Coronary Syndrome (ACS) - STEMI vs NSTEMI (Pathophysiology & Biomarkers)",
+    "mcqTitle": "STEMI (Inferior Wall Myocardial Infarction)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Interpretation",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Chest pain + ECG ST elevation + typical radiation (left arm/jaw) → classic STEMI triad.",
+  "classicTriadHtml": "<ul><li><strong>Chest pain + ECG ST elevation + typical radiation (left arm/jaw)</strong> → classic STEMI triad.</li></ul>",
+  "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
+  "differentialDiagnosisTableName": "Acute Coronary Syndrome – STEMI (Inferior Wall MI) Differential Diagnosis of Inferior Wall STEMI",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "featureHtml": "<p><strong>Definition</strong></p>",
+      "description": "Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion",
+      "descriptionHtml": "<p>Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion</p>",
+      "clinicalImportance": "Causes sudden, severe chest pain and elevated cardiac enzymes",
+      "clinicalImportanceHtml": "<p>Causes sudden, severe chest pain and elevated cardiac enzymes</p>"
+    },
+    {
+      "feature": "Common Cause",
+      "featureHtml": "<p><strong>Common Cause</strong></p>",
+      "description": "Acute thrombotic occlusion of Right Coronary Artery (RCA)",
+      "descriptionHtml": "<p>Acute thrombotic occlusion of <strong>Right Coronary Artery (RCA)</strong></p>",
+      "clinicalImportance": "Leads to ST elevation in inferior leads (II, III, aVF)",
+      "clinicalImportanceHtml": "<p>Leads to ST elevation in inferior leads (II, III, aVF)</p>"
+    },
+    {
+      "feature": "Clinical Presentation",
+      "featureHtml": "<p><strong>Clinical Presentation</strong></p>",
+      "description": "Crushing retrosternal chest pain,\nradiating to left arm/jaw,\ndiaphoresis,\nnausea,\nvomiting",
+      "descriptionHtml": "<ul><li>Crushing retrosternal chest pain, </li><li>radiating to left arm/jaw, </li><li>diaphoresis, </li><li>nausea, </li><li>vomiting</li></ul>",
+      "clinicalImportance": "Typical STEMI symptoms requiring urgent intervention",
+      "clinicalImportanceHtml": "<p>Typical STEMI symptoms requiring urgent intervention</p>"
+    },
+    {
+      "feature": "ECG Findings",
+      "featureHtml": "<p><strong>ECG Findings</strong></p>",
+      "description": "ST-segment elevation in II, III, aVF;\nreciprocal ST depression in I, aVL",
+      "descriptionHtml": "<ul><li>ST-segment elevation in II, III, aVF; </li><li>reciprocal ST depression in I, aVL</li></ul>",
+      "clinicalImportance": "Key diagnostic feature differentiating STEMI from NSTEMI",
+      "clinicalImportanceHtml": "<p>Key diagnostic feature differentiating STEMI from NSTEMI</p>"
+    },
+    {
+      "feature": "Complications",
+      "featureHtml": "<p><strong>Complications</strong></p>",
+      "description": "Arrhythmias (bradycardia, AV block),\ncardiogenic shock, heart failure,\nRV infarction",
+      "descriptionHtml": "<ul><li>Arrhythmias (bradycardia, AV block), </li><li>cardiogenic shock, heart failure, </li><li>RV infarction</li></ul>",
+      "clinicalImportance": "Guides monitoring and management decisions",
+      "clinicalImportanceHtml": "<p>Guides monitoring and management decisions</p>"
+    },
+    {
+      "feature": "Management",
+      "featureHtml": "<p><strong>Management</strong></p>",
+      "description": "Immediate reperfusion therapy:\nPCI or thrombolysis,\nantiplatelets,\nanticoagulants,\nnitrates,\nbeta-blockers",
+      "descriptionHtml": "<ul><li>Immediate reperfusion therapy: </li><li>PCI or thrombolysis, </li><li>antiplatelets, </li><li>anticoagulants, </li><li>nitrates, </li><li>beta-blockers</li></ul>",
+      "clinicalImportance": "Early intervention reduces morbidity and mortality",
+      "clinicalImportanceHtml": "<p>Early intervention reduces morbidity and mortality</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Unstable Angina / NSTEMI",
+      "conditionHtml": "<p><strong>Unstable Angina / NSTEMI</strong></p>",
+      "distinguishingFeatures": "Chest pain at rest or exertion,\nmild troponin rise",
+      "distinguishingFeaturesHtml": "<ul><li>Chest pain at rest or exertion, </li><li>mild troponin rise</li></ul>",
+      "keyDifferences": "ECG shows ST depression or T-wave inversion,\nnot ST elevation",
+      "keyDifferencesHtml": "<ul><li>ECG shows <strong>ST depression or T-wave inversion</strong>, </li><li>not ST elevation</li></ul>"
+    },
+    {
+      "condition": "Pericarditis",
+      "conditionHtml": "<p><strong>Pericarditis</strong></p>",
+      "distinguishingFeatures": "Sharp,\npleuritic chest pain,\nrelieved by leaning forward",
+      "distinguishingFeaturesHtml": "<ul><li>Sharp, </li><li>pleuritic chest pain, </li><li>relieved by leaning forward</li></ul>",
+      "keyDifferences": "ECG shows diffuse ST elevation (not limited to II, III, aVF),\nPR depression",
+      "keyDifferencesHtml": "<ul><li>ECG shows <strong>diffuse ST elevation</strong> (not limited to II, III, aVF), </li><li>PR depression</li></ul>"
+    },
+    {
+      "condition": "Acute Pulmonary Embolism (PE)",
+      "conditionHtml": "<p><strong>Acute Pulmonary Embolism (PE)</strong></p>",
+      "distinguishingFeatures": "Sudden dyspnea,\npleuritic chest pain,\nhypoxia",
+      "distinguishingFeaturesHtml": "<ul><li>Sudden dyspnea, </li><li>pleuritic chest pain, </li><li>hypoxia</li></ul>",
+      "keyDifferences": "ECG may show S1Q3T3,\nsinus tachycardia;\ntroponin may be mildly elevated",
+      "keyDifferencesHtml": "<ul><li>ECG may show <strong>S1Q3T3</strong>, </li><li>sinus tachycardia; </li><li>troponin may be mildly elevated</li></ul>"
+    },
+    {
+      "condition": "Aortic Dissection",
+      "conditionHtml": "<p><strong>Aortic Dissection</strong></p>",
+      "distinguishingFeatures": "Severe tearing chest/back pain,\nunequal BP in limbs",
+      "distinguishingFeaturesHtml": "<ul><li>Severe tearing chest/back pain, </li><li>unequal BP in limbs</li></ul>",
+      "keyDifferences": "CXR or CT angiography shows intimal flap;\nST elevation absent unless coronary involvement",
+      "keyDifferencesHtml": "<ul><li>CXR or CT angiography shows <strong>intimal flap</strong>; </li><li>ST elevation absent unless coronary involvement</li></ul>"
+    },
+    {
+      "condition": "Gastroesophageal Reflux / Esophageal Spasm",
+      "conditionHtml": "<p><strong>Gastroesophageal Reflux / Esophageal Spasm</strong></p>",
+      "distinguishingFeatures": "Burning retrosternal pain,\nworse after meals",
+      "distinguishingFeaturesHtml": "<ul><li>Burning retrosternal pain, </li><li>worse after meals</li></ul>",
+      "keyDifferences": "Relief with antacids,\nECG normal,\ntroponin normal",
+      "keyDifferencesHtml": "<ul><li>Relief with antacids, </li><li>ECG normal, </li><li>troponin normal</li></ul>"
+    },
+    {
+      "condition": "Myocarditis",
+      "conditionHtml": "<p><strong>Myocarditis</strong></p>",
+      "distinguishingFeatures": "Viral prodrome,\ndiffuse chest discomfort",
+      "distinguishingFeaturesHtml": "<ul><li>Viral prodrome, </li><li>diffuse chest discomfort</li></ul>",
+      "keyDifferences": "ECG:\ndiffuse ST/T changes,\nelevated troponin;\nST elevation not confined to coronary territory",
+      "keyDifferencesHtml": "<p><strong>ECG: </strong></p><ul><li>diffuse ST/T changes, </li><li>elevated troponin; </li></ul><p>ST elevation not confined to coronary territory</p>"
+    }
+  ],
+  "diagram": {
+    "name": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
+    "caption": "This diagram illustrates the pathophysiology, clinical features, diagnostic criteria, and management of NSTEMI. It highlights partial coronary artery occlusion leading to subendocardial ischemia, presenting with chest pain and elevated troponin without ST-segment elevation, and outlines key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention.",
+    "captionHtml": "<p>This diagram illustrates the <strong>pathophysiology, clinical features, diagnostic criteria, and management</strong> of NSTEMI. It highlights <strong>partial coronary artery occlusion leading to subendocardial ischemia</strong>, presenting with <strong>chest pain and elevated troponin without ST-segment elevation</strong>, and outlines <strong>key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention</strong>.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

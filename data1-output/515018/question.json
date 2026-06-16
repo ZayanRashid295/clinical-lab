@@ -1,0 +1,138 @@
+{
+  "questionId": "515018",
+  "questionNumber": "15",
+  "stem": "A 35-year-old patient presents with a well-demarcated, erythematous plaque covered with silvery scales on the extensor surface of the elbow. During examination, gentle removal of the scales results in tiny pinpoint bleeding spots. This clinical finding supports the most likely diagnosis. Which of the following signs is being demonstrated?",
+  "options": [
+    "Koebner phenomenon",
+    "Nikolsky sign",
+    "Auspitz sign",
+    "Darier sign",
+    "Wickham striae"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "Silvery scales – Suggests psoriasis, a chronic plaque type.",
+    "Extensor surface – Classic location for chronic plaque psoriasis.",
+    "Pinpoint bleeding after scale removal – Directly points to Auspitz sign, confirming psoriasis.",
+    "The combination of well-demarcated erythematous plaque + silvery scales + pinpoint bleeding (Auspitz sign) is the high-yield feature cluster for psoriasis."
+  ],
+  "explanations": {
+    "C": {
+      "title": "Auspitz sign",
+      "body": "Auspitz sign: This is the appearance of pinpoint bleeding when psoriatic scales are scraped off.\nIt occurs due to the thinning of the suprapapillary epidermis over elongated dermal papillae containing dilated capillaries in psoriasis.\nThis sign is highly suggestive of psoriasis and is used to confirm the clinical diagnosis.\nAdditional note: The sign reflects epidermal-dermal microvascular changes in chronic plaque psoriasis.",
+      "systemInvolved": "Integumentary system (skin)."
+    },
+    "A": {
+      "title": "Koebner phenomenon",
+      "body": "Appearance of psoriatic or other skin lesions at sites of trauma.\nNot the same as bleeding upon scale removal; it is lesion induction after injury."
+    },
+    "B": {
+      "title": "Nikolsky sign",
+      "body": "Gentle lateral pressure on skin causes the epidermis to shear off.\nSeen in pemphigus vulgaris and other blistering disorders, not psoriasis."
+    },
+    "D": {
+      "title": "Darier sign",
+      "body": "Rubbing a lesion causes urtication and redness.\nSeen in mastocytosis, not psoriasis."
+    },
+    "E": {
+      "title": "Wickham striae",
+      "body": "Fine, lacy white lines on mucosal surfaces.\nCharacteristic of lichen planus, not psoriasis."
+    }
+  },
+  "keyConcept": "Auspitz sign is pinpoint bleeding after removal of psoriatic scales, caused by dilated capillaries under a thin epidermis. It helps clinically confirm chronic plaque psoriasis.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Recognition & Diagnosis - Chronic Plaque Psoriasis",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Interpretation",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Psoriasis – Chronic Plaque Psoriasis",
+  "differentialDiagnosisTableName": "Psoriasis – Chronic Plaque Psoriasis Differential Diagnosis of Chronic Plaque Psoriasis",
+  "featureTable": [
+    {
+      "feature": "Definition",
+      "description": "Chronic, immune-mediated skin disorder characterized by well-demarcated erythematous plaques with silvery scales",
+      "clinicalImportance": "Most common type of psoriasis (~80–90% cases)"
+    },
+    {
+      "feature": "Typical Sites",
+      "description": "Extensor surfaces (elbows, knees), scalp, sacral area",
+      "clinicalImportance": "Helps in clinical recognition and diagnosis"
+    },
+    {
+      "feature": "Lesion Morphology",
+      "description": "Erythematous, raised plaques with silvery-white scales; Auspitz sign may be present",
+      "clinicalImportance": "Key diagnostic feature for physical examination"
+    },
+    {
+      "feature": "Pathophysiology",
+      "description": "Dysregulated T-cell mediated inflammation → keratinocyte hyperproliferation and angiogenesis",
+      "clinicalImportance": "Explains rationale for immunomodulatory treatment"
+    },
+    {
+      "feature": "Trigger Factors",
+      "description": "Stress, infections (e.g., streptococcal), trauma (Koebner phenomenon), drugs",
+      "clinicalImportance": "Guides prevention and patient counseling"
+    },
+    {
+      "feature": "Associated Findings",
+      "description": "Nail changes (pitting, onycholysis), arthritis (psoriatic arthritis)",
+      "clinicalImportance": "Important for systemic evaluation"
+    },
+    {
+      "feature": "Management Overview",
+      "description": "Topical corticosteroids, vitamin D analogues, phototherapy, systemic agents (methotrexate, biologics)",
+      "clinicalImportance": "Stepwise treatment based on severity and extent"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Eczema (Chronic Atopic/Dermatitis)",
+      "distinguishingFeatures": "Itchy, ill-defined erythematous plaques; lichenification common",
+      "keyDifferences": "Usually more pruritic, less well-demarcated; scales are not silvery; Auspitz sign absent"
+    },
+    {
+      "condition": "Lichen Planus",
+      "distinguishingFeatures": "Violaceous, flat-topped, polygonal papules; Wickham striae on mucosa",
+      "keyDifferences": "Color (violaceous), mucosal involvement, Wickham striae present, no Auspitz sign"
+    },
+    {
+      "condition": "Tinea Corporis (Fungal Infection)",
+      "distinguishingFeatures": "Annular plaques with central clearing, active borders; scaling",
+      "keyDifferences": "Fungal hyphae on KOH, central clearing, less sharply demarcated"
+    },
+    {
+      "condition": "Seborrheic Dermatitis",
+      "distinguishingFeatures": "Greasy, yellowish scales;commonly scalp, nasolabial folds",
+      "keyDifferences": "Greasy yellow scales, distribution differs, less well-demarcated, Auspitz sign absent"
+    },
+    {
+      "condition": "Pityriasis Rubra Pilaris",
+      "distinguishingFeatures": "Follicular papules, orange-red plaques with islands of sparing",
+      "keyDifferences": "Follicular involvement, “islands of sparing”, less common, histology differs"
+    },
+    {
+      "condition": "Cutaneous T-cell Lymphoma (Patch Stage)",
+      "distinguishingFeatures": "Erythematous patches/plaques with scaling, chronic course",
+      "keyDifferences": "Progressive, patchy, often asymmetrical, biopsy shows atypical lymphocytes, no Auspitz sign"
+    }
+  ],
+  "diagram": {
+    "name": "Psoriasis – Chronic Plaque Psoriasis",
+    "caption": "The diagram provides a comprehensive, medical graduate-level overview of chronic plaque psoriasis. It illustrates a typical scaly plaque on the elbow, highlighting the Auspitz sign (pinpoint bleeding after scale removal). It also shows common sites of involvement (scalp, knees, lower back), triggers (stress, infections, trauma, medications), nail changes (pitting, onycholysis), and psoriatic arthritis features. This visual is designed to help identify key clinical features, sites, and systemic associations of chronic plaque psoriasis for diagnosis.",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

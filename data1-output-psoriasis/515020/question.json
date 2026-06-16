@@ -1,0 +1,126 @@
+{
+  "questionId": "515020",
+  "questionNumber": "17",
+  "stem": "A 32-year-old patient presents with small, well-demarcated, scaly plaques on the elbows and knees, involving less than 5% of the body surface area. The patient reports mild itching but is otherwise healthy. Considering the extent and severity of the disease, which of the following is the most appropriate initial therapy?",
+  "options": [
+    "Systemic corticosteroids",
+    "PUVA",
+    "Biologics",
+    "Topical corticosteroids",
+    "Methotrexate"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "“<5% body surface area” – Indicates limited/mild psoriasis, pointing to topical therapy.",
+    "“Small, well-demarcated, scaly plaques” – Classic description of plaque psoriasis, confirming the type of lesion.",
+    "“Mild itching, otherwise healthy” – Suggests mild disease with no systemic involvement, ruling out systemic therapy."
+  ],
+  "explanations": {
+    "D": {
+      "title": "Topical corticosteroids",
+      "body": "Topical corticosteroids are first-line therapy for limited plaque psoriasis (<5% body surface area).\nThey reduce inflammation, erythema, and scaling by inhibiting keratinocyte proliferation, and suppressing local immune responses in the skin.\nPotency is selected based on lesion location (low-medium potency for face/flexures, high potency for elbows/knees).\nSafe for short-term and intermittent use, and effective in mild, localized disease."
+    },
+    "A": {
+      "title": "Systemic corticosteroids",
+      "body": "Not recommended for psoriasis due to risk of rebound flares and pustular psoriasis upon withdrawal.\nReserved only for severe, refractory cases or specific complications."
+    },
+    "B": {
+      "title": "PUVA (Psoralen + UVA therapy)",
+      "body": "Used in moderate to severe or extensive psoriasis, not for limited disease.\nRequires multiple sessions and monitoring for skin cancer risk and phototoxicity."
+    },
+    "C": {
+      "title": "Biologics",
+      "body": "Reserved for moderate to severe plaque psoriasis or cases unresponsive to topical/systemic therapy.\nHigh cost and potential immunosuppression; overkill for <5% BSA involvement."
+    },
+    "E": {
+      "title": "Methotrexate",
+      "body": "Systemic therapy for severe, extensive, or rapidly progressing psoriasis.\nRequires monitoring for hepatotoxicity and myelosuppression, so not suitable for mild, localized disease."
+    }
+  },
+  "keyConcept": "Mild, limited plaque psoriasis (<5% BSA) is treated first-line with topical corticosteroids.\nSystemic therapies (methotrexate, biologics, systemic corticosteroids, PUVA) are reserved for moderate to severe or refractory disease.",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Classification & Variants - Plaque Psoriasis – Mild / Limited Disease Management",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Easy"
+  },
+  "featureTableName": "Plaque Psoriasis: Mild / Limited Disease Management",
+  "differentialDiagnosisTableName": "Dermatology – Plaque Psoriasis – Mild / Limited Disease Management Differential Diagnosis of Mild / Limited Plaque Psoriasis",
+  "featureTable": [
+    {
+      "feature": "Definition / Extent",
+      "description": "Plaque psoriasis involving <5% body surface area",
+      "clinicalImportance": "Usually limited to:elbows, knees, scalp"
+    },
+    {
+      "feature": "Clinical Features",
+      "description": "Small, well-demarcated, scaly plaques; mild itching",
+      "clinicalImportance": "Common sites: extensor surfaces; no systemic involvement"
+    },
+    {
+      "feature": "First-line Therapy",
+      "description": "Topical corticosteroids",
+      "clinicalImportance": "Low-to-medium potency for face/flexures; high potency for elbows/knees"
+    },
+    {
+      "feature": "Other Topical Options",
+      "description": "Vitamin D analogs (calcipotriol), coal tar, moisturizers",
+      "clinicalImportance": "Can be combined with corticosteroids for synergistic effect"
+    },
+    {
+      "feature": "Systemic / Advanced Therapy",
+      "description": "Reserved for moderate to severe psoriasis",
+      "clinicalImportance": "Methotrexate, biologics, PUVA; not indicated for <5% BSA"
+    },
+    {
+      "feature": "Follow-up / Monitoring",
+      "description": "Assess response in 2–4 weeks; monitor for side effects",
+      "clinicalImportance": "Educate patient on intermittent use and adherence"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Eczema / Atopic Dermatitis",
+      "distinguishingFeatures": "Pruritic, erythematous, sometimes oozing plaques",
+      "keyDifferences": "Typically ill-defined borders, more flexural involvement, acute flares"
+    },
+    {
+      "condition": "Tinea corporis (Fungal infection)",
+      "distinguishingFeatures": "Annular, scaly plaques with central clearing",
+      "keyDifferences": "Positive KOH mount; often single or few lesions; responds to antifungals"
+    },
+    {
+      "condition": "Lichen planus",
+      "distinguishingFeatures": "Purple, flat-topped, polygonal papules",
+      "keyDifferences": "Violaceous color, Wickham striae; usually pruritic; mucosal involvement possible"
+    },
+    {
+      "condition": "Seborrheic dermatitis",
+      "distinguishingFeatures": "Greasy, yellowish scales on scalp, face, chest",
+      "keyDifferences": "Distribution favors seborrheic areas; less sharply demarcated"
+    },
+    {
+      "condition": "Pityriasis rosea",
+      "distinguishingFeatures": "Herald patch followed by Christmas-tree pattern",
+      "keyDifferences": "Self-limiting; characteristic eruption pattern; usually trunk involvement"
+    }
+  ],
+  "diagram": {
+    "name": "Plaque Psoriasis: Mild / Limited Disease Management",
+    "caption": "The diagram illustrates mild plaque psoriasis (<5% BSA) with small, well-demarcated scaly plaques on elbows and knees, highlighting first-line treatment with topical corticosteroids, vitamin D analogs, and moisturizers. It also shows follow-up recommendations and indicates advanced therapies (methotrexate, biologics, PUVA) reserved for moderate to severe or uncontrolled disease (>10% BSA).",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

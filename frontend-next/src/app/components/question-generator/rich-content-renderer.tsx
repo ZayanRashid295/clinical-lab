@@ -1289,6 +1289,51 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
             margin: 0;
             min-height: 1.5em;
           }
+          /* Lists inside table cells — match edit mode (Tailwind resets list-style otherwise) */
+          .table-view-${itemId} table th ul,
+          .table-view-${itemId} table td ul {
+            list-style-type: disc !important;
+            list-style-position: outside !important;
+            margin: 0.25rem 0 !important;
+            padding-left: 1.25rem !important;
+          }
+          .table-view-${itemId} table th ol,
+          .table-view-${itemId} table td ol {
+            list-style-type: decimal !important;
+            list-style-position: outside !important;
+            margin: 0.25rem 0 !important;
+            padding-left: 1.25rem !important;
+          }
+          .table-view-${itemId} table th li,
+          .table-view-${itemId} table td li {
+            display: list-item !important;
+            list-style-position: outside !important;
+            margin: 0.2rem 0 !important;
+          }
+          .table-view-${itemId} table th ul ul,
+          .table-view-${itemId} table td ul ul {
+            list-style-type: circle !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          .table-view-${itemId} table th ol ol,
+          .table-view-${itemId} table td ol ol {
+            list-style-type: lower-alpha !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          .table-view-${itemId} table th strong,
+          .table-view-${itemId} table td strong {
+            font-weight: 600 !important;
+          }
+          .table-view-${itemId} table th em,
+          .table-view-${itemId} table td em {
+            font-style: italic !important;
+          }
+          .table-view-${itemId} table th u,
+          .table-view-${itemId} table td u {
+            text-decoration: underline !important;
+          }
           /* Handle merged cells - same as edit mode */
           .table-view-${itemId} table th[colspan] + th,
           .table-view-${itemId} table td[colspan] + td,
