@@ -81,53 +81,87 @@
   "classicTriad": "Childbearing age + Systemic therapy + Teratogenicity → This “triad” immediately signals that acitretin is the drug to avoid.",
   "classicTriadHtml": "<ul><li><strong>Childbearing age + Systemic therapy + Teratogenicity</strong> → This “triad” immediately signals that <strong>acitretin</strong> is the drug to avoid.</li></ul>",
   "classicTriadTitle": "Classic Triad in Stem",
-  "featureTableName": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age Systemic Therapy of Psoriasis",
-  "featureTable": [
-    {
-      "feature": "Methotrexate",
-      "featureHtml": "<p>Methotrexate</p>",
-      "description": "Contraindicated;\nteratogenic",
-      "descriptionHtml": "<ul><li>Contraindicated; </li><li>teratogenic</li></ul>",
-      "clinicalImportance": "Avoid in pregnancy;\nwashout 3–6 months before conception;\naffects rapidly dividing cells",
-      "clinicalImportanceHtml": "<ul><li>Avoid in pregnancy; </li><li>washout 3–6 months before conception; </li><li>affects rapidly dividing cells</li></ul>"
-    },
-    {
-      "feature": "Acitretin",
-      "featureHtml": "<p>Acitretin</p>",
-      "description": "Absolutely contraindicated;\nhighly teratogenic",
-      "descriptionHtml": "<ul><li>Absolutely contraindicated; </li><li>highly teratogenic</li></ul>",
-      "clinicalImportance": "Avoid conception for ≥3 years after use;\ncauses severe fetal malformations (CNS, craniofacial, cardiac)",
-      "clinicalImportanceHtml": "<ul><li>Avoid conception for ≥3 years after use; </li><li>causes severe fetal malformations (CNS, craniofacial, cardiac)</li></ul>"
-    },
-    {
-      "feature": "Cyclosporine",
-      "featureHtml": "<p>Cyclosporine</p>",
-      "description": "Relatively safe with caution",
-      "descriptionHtml": "<p>Relatively safe with caution</p>",
-      "clinicalImportance": "Can be used if necessary;\nmonitor for maternal hypertension and renal effects",
-      "clinicalImportanceHtml": "<ul><li>Can be used if necessary; </li><li>monitor for maternal hypertension and renal effects</li></ul>"
-    },
-    {
-      "feature": "Narrow-band UVB",
-      "featureHtml": "<p>Narrow-band UVB</p>",
-      "description": "Safe",
-      "descriptionHtml": "<p>Safe</p>",
-      "clinicalImportance": "Non-drug option; systemic-sparing;\nsafe in pregnancy",
-      "clinicalImportanceHtml": "<ul><li>Non-drug option; systemic-sparing; </li><li>safe in pregnancy</li></ul>"
-    },
-    {
-      "feature": "Topical steroids",
-      "featureHtml": "<p>Topical steroids</p>",
-      "description": "Safe",
-      "descriptionHtml": "<p>Safe</p>",
-      "clinicalImportance": "Use low–moderate potency;\nminimal systemic absorption",
-      "clinicalImportanceHtml": "<ul><li>Use low–moderate potency; </li><li>minimal systemic absorption</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age",
+    "headingHtml": "<p><u><strong>Systemic Therapy of Psoriasis – </strong></u></p><p><u><strong>Drug Safety in Women of Childbearing Age</strong></u></p>",
+    "columns": [
+      "Drug",
+      "Pregnancy Safety",
+      "Key Points"
+    ],
+    "columnsHtml": [
+      "<p><strong>Drug</strong></p>",
+      "<p><strong>Pregnancy Safety</strong></p>",
+      "<p><strong>Key Points</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Methotrexate",
+          "Contraindicated;\nteratogenic",
+          "Avoid in pregnancy;\nwashout 3–6 months before conception;\naffects rapidly dividing cells"
+        ],
+        "cellsHtml": [
+          "<p>Methotrexate</p>",
+          "<ul><li>Contraindicated; </li><li>teratogenic</li></ul>",
+          "<ul><li>Avoid in pregnancy; </li><li>washout 3–6 months before conception; </li><li>affects rapidly dividing cells</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Acitretin",
+          "Absolutely contraindicated;\nhighly teratogenic",
+          "Avoid conception for ≥3 years after use;\ncauses severe fetal malformations (CNS, craniofacial, cardiac)"
+        ],
+        "cellsHtml": [
+          "<p>Acitretin</p>",
+          "<ul><li>Absolutely contraindicated; </li><li>highly teratogenic</li></ul>",
+          "<ul><li>Avoid conception for ≥3 years after use; </li><li>causes severe fetal malformations (CNS, craniofacial, cardiac)</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Cyclosporine",
+          "Relatively safe with caution",
+          "Can be used if necessary;\nmonitor for maternal hypertension and renal effects"
+        ],
+        "cellsHtml": [
+          "<p>Cyclosporine</p>",
+          "<p>Relatively safe with caution</p>",
+          "<ul><li>Can be used if necessary; </li><li>monitor for maternal hypertension and renal effects</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Narrow-band UVB",
+          "Safe",
+          "Non-drug option; systemic-sparing;\nsafe in pregnancy"
+        ],
+        "cellsHtml": [
+          "<p>Narrow-band UVB</p>",
+          "<p>Safe</p>",
+          "<ul><li>Non-drug option; systemic-sparing; </li><li>safe in pregnancy</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Topical steroids",
+          "Safe",
+          "Use low–moderate potency;\nminimal systemic absorption"
+        ],
+        "cellsHtml": [
+          "<p>Topical steroids</p>",
+          "<p>Safe</p>",
+          "<ul><li>Use low–moderate potency; </li><li>minimal systemic absorption</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age Systemic Therapy of Psoriasis",
-    "caption": "This diagram illustrates the safety profile of systemic and topical treatments for severe psoriasis in women planning pregnancy. It highlights highly teratogenic drugs (Acitretin, Methotrexate) to avoid, relatively safe options (Cyclosporine, Narrowband UVB), and generally safe topical steroids, emphasizing clinical decision-making for pregnancy planning. The central figure of a pregnant woman reinforces the focus on reproductive safety.",
-    "captionHtml": "<p>This diagram illustrates the safety profile of systemic and topical treatments for severe psoriasis in women planning pregnancy. It highlights <strong>highly teratogenic drugs</strong> (Acitretin, Methotrexate) to avoid, <strong>relatively safe options</strong> (Cyclosporine, Narrowband UVB), and <strong>generally safe topical steroids</strong>, emphasizing clinical decision-making for pregnancy planning. The central figure of a pregnant woman reinforces the focus on reproductive safety.</p>",
+    "heading": "Systemic Therapy of Psoriasis: Drug Safety in Women of Childbearing Age",
+    "headingHtml": "<p><u><strong>Systemic Therapy of Psoriasis: </strong></u></p><p><u><strong>Drug Safety in Women of Childbearing Age</strong></u></p>",
+    "description": "This diagram illustrates the safety profile of systemic and topical treatments for severe psoriasis in women planning pregnancy. It highlights highly teratogenic drugs (Acitretin, Methotrexate) to avoid, relatively safe options (Cyclosporine, Narrowband UVB), and generally safe topical steroids, emphasizing clinical decision-making for pregnancy planning. The central figure of a pregnant woman reinforces the focus on reproductive safety.",
+    "descriptionHtml": "<p>This diagram illustrates the safety profile of systemic and topical treatments for severe psoriasis in women planning pregnancy. It highlights <strong>highly teratogenic drugs</strong> (Acitretin, Methotrexate) to avoid, <strong>relatively safe options</strong> (Cyclosporine, Narrowband UVB), and <strong>generally safe topical steroids</strong>, emphasizing clinical decision-making for pregnancy planning. The central figure of a pregnant woman reinforces the focus on reproductive safety.</p>",
     "images": [
       {
         "filename": "image1.png",

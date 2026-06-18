@@ -4,18 +4,23 @@ import * as path from "node:path";
 const JSZip = require("jszip") as typeof import("jszip");
 import type {
   ConvertFileResult,
-  DifferentialRow,
   Explanation,
-  FeatureRow,
   ImageRef,
   QuestionData,
   QuestionMetadata,
 } from "./types";
+import {
+  blockIndexForParagraphOrder,
+  collectOrderedBodyBlocks,
+  findBlockContentEnd,
+  findMetadataBlockRange,
+  parseTablesAndDiagramFromBlocks,
+  type BodyBlock,
+} from "./bodyBlockParser";
 import { validateDocxFromBuffer } from "./validateDocx";
 import {
   buildGroupedHtmlFragments,
   collectFormattedParagraphEntries,
-  collectFormattedTables,
   joinFormattedHtml,
   parseRichXml,
   singleParagraphHtml,
@@ -26,7 +31,6 @@ import {
 import {
   ANSWER_RE,
   COMPETENCY_DOMAIN_VALUES,
-  DIAGRAM_RE,
   QUESTION_NUM_RE,
   QUESTION_ID_RE,
   findQuestionContentEnd,
@@ -89,196 +93,15 @@ async function extractParagraphsFromBuffer(buffer: Buffer): Promise<string[]> {
   return entries.map((entry) => entry.formatted.text);
 }
 
-type RichCell = { text: string; html: string };
-type RichTable = RichCell[][];
-
-async function extractRichTablesFromBuffer(buffer: Buffer): Promise<RichTable[]> {
-  const { documentXml, numberingXml } = await readDocxPartsFromBuffer(buffer);
-  return collectFormattedTables(parseRichXml(documentXml), numberingXml);
-}
-
-async function extractTablesFromBuffer(buffer: Buffer): Promise<string[][][]> {
-  const richTables = await extractRichTablesFromBuffer(buffer);
-  return richTables.map((table) =>
-    table.map((row) => row.map((cell) => cell.text)),
-  );
-}
-
-function normalizeTableHeaderCell(cell: string): string {
-  return cell.toLowerCase().trim().replace(/\s+/g, " ");
-}
-
-function isDifferentialTableHeader(first: string, second: string, third: string): boolean {
-  if (first.includes("differential diagnosis")) return true;
-  const isConditionCol =
-    first === "condition" ||
-    first.startsWith("condition /") ||
-    first.startsWith("condition/") ||
-    first.startsWith("condition (");
-  if (!isConditionCol) return false;
-  if (["differentiat", "distinguish", "differ"].some((token) => third.includes(token))) {
-    return true;
+function countDiagramImageBlocks(blocks: BodyBlock[], fromIndex: number, toIndex: number): number {
+  let sawTable = false;
+  let count = 0;
+  for (let index = fromIndex; index < toIndex; index += 1) {
+    const block = blocks[index];
+    if (block.kind === "table") sawTable = true;
+    if (sawTable && block.kind === "paragraph" && block.hasImage) count += 1;
   }
-  if (
-    ["distinguish", "differentiat", "key features", "key clinical features"].some((token) =>
-      second.includes(token),
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
-
-function classifyTable(rows: string[][]): "feature" | "differential" | null {
-  if (!rows.length || rows[0].length < 3) return null;
-  const [first, second, third] = rows[0]
-    .slice(0, 3)
-    .map((cell) => normalizeTableHeaderCell(cell));
-  if (isDifferentialTableHeader(first, second, third)) {
-    return "differential";
-  }
-  if (
-    first === "feature" ||
-    first === "clinical feature" ||
-    first === "clinical features" ||
-    first === "mechanism" ||
-    first === "severity category" ||
-    first === "aspect" ||
-    first === "parameter" ||
-    first === "drug" ||
-    first.includes("drug class") ||
-    first.includes("investigation") ||
-    second.includes("mechanism of action") ||
-    second.includes("mechanism explanation") ||
-    second === "key features" ||
-    second.includes("typical finding") ||
-    second.includes("expected change") ||
-    second.includes("findings in") ||
-    second === "key points" ||
-    second.includes("clinical details") ||
-    second.includes("management approach") ||
-    third.includes("significance") ||
-    third.includes("clinical relevance") ||
-    third.includes("clinical importance") ||
-    third.includes("pathophysiology") ||
-    ["description", "details", "clinical description"].includes(second)
-  ) {
-    return "feature";
-  }
-  return null;
-}
-
-function tableToFeatureRecords(rows: string[][], richRows?: RichCell[][]): FeatureRow[] {
-  const records: FeatureRow[] = [];
-  for (let index = 1; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (row.length < 3) continue;
-    const [first, second, third] = row.slice(0, 3).map((cell) => cell.trim());
-    if (!first && !second && !third) continue;
-    const rich = richRows?.[index];
-    records.push({
-      feature: first,
-      ...(rich?.[0]?.html ? { featureHtml: rich[0].html } : {}),
-      description: second,
-      ...(rich?.[1]?.html ? { descriptionHtml: rich[1].html } : {}),
-      clinicalImportance: third,
-      ...(rich?.[2]?.html ? { clinicalImportanceHtml: rich[2].html } : {}),
-    });
-  }
-  return records;
-}
-
-function tableToDifferentialRecords(
-  rows: string[][],
-  richRows?: RichCell[][],
-): DifferentialRow[] {
-  const records: DifferentialRow[] = [];
-  for (let index = 1; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (row.length < 3) continue;
-    const [first, second, third] = row.slice(0, 3).map((cell) => cell.trim());
-    if (!first && !second && !third) continue;
-    const rich = richRows?.[index];
-    records.push({
-      condition: first,
-      ...(rich?.[0]?.html ? { conditionHtml: rich[0].html } : {}),
-      distinguishingFeatures: second,
-      ...(rich?.[1]?.html ? { distinguishingFeaturesHtml: rich[1].html } : {}),
-      keyDifferences: third,
-      ...(rich?.[2]?.html ? { keyDifferencesHtml: rich[2].html } : {}),
-    });
-  }
-  return records;
-}
-
-async function parseTablesFromBuffer(
-  buffer: Buffer,
-  options?: { multiQuestion?: boolean },
-) {
-  let featureTable: FeatureRow[] = [];
-  let differentialTable: DifferentialRow[] = [];
-  let tables = await extractTablesFromBuffer(buffer);
-  let richTables = await extractRichTablesFromBuffer(buffer);
-
-  if (options?.multiQuestion) {
-    let sawFeature = false;
-    let sawDiff = false;
-    const scoped: string[][][] = [];
-    const scopedRich: RichTable[] = [];
-    for (let index = 0; index < tables.length; index += 1) {
-      const rows = tables[index];
-      scoped.push(rows);
-      scopedRich.push(richTables[index] ?? []);
-      const tableType = classifyTable(rows);
-      if (tableType === "feature") sawFeature = true;
-      if (tableType === "differential") sawDiff = true;
-      if (sawFeature && sawDiff) break;
-    }
-    tables = scoped.length ? scoped : tables.slice(0, 1);
-    richTables = scopedRich.length ? scopedRich : richTables.slice(0, 1);
-  }
-
-  for (let index = 0; index < tables.length; index += 1) {
-    const rows = tables[index];
-    const richRows = richTables[index];
-    const tableType = classifyTable(rows);
-    if (tableType === "feature" && featureTable.length === 0) {
-      featureTable = tableToFeatureRecords(rows, richRows);
-    } else if (tableType === "differential" && differentialTable.length === 0) {
-      differentialTable = tableToDifferentialRecords(rows, richRows);
-    }
-  }
-  return { featureTable, differentialTable };
-}
-
-function countDiagramCaptions(paragraphs: string[]): number {
-  return paragraphs.filter((paragraph) => DIAGRAM_RE.test(paragraph)).length;
-}
-
-function extractPreDiagramFeatureName(preDiagram: string[]): string | undefined {
-  const parts: string[] = [];
-  for (let index = preDiagram.length - 1; index >= 0; index -= 1) {
-    const line = preDiagram[index]?.trim();
-    if (!line) continue;
-    if (
-      isProseContentLine(line) ||
-      isTableHeaderLabel(line) ||
-      isSecondaryKeyConceptHeading(line) ||
-      isDifferentialDelimiter(line)
-    ) {
-      break;
-    }
-    if (parts.length && parts[0].toLowerCase() === line.toLowerCase()) continue;
-    parts.unshift(line.replace(/:$/, "").trim());
-    if (parts.length >= 4) break;
-  }
-  const unique: string[] = [];
-  for (const part of parts) {
-    if (!unique.some((entry) => entry.toLowerCase() === part.toLowerCase())) {
-      unique.push(part);
-    }
-  }
-  return normalizeTableName(unique);
+  return count;
 }
 
 async function extractImagesFromBuffer(
@@ -340,397 +163,6 @@ function parseKeyConceptText(
   return { text, html };
 }
 
-function findDiagramCaption(entries: FormattedParagraphEntry[]): {
-  text: string | null;
-  html?: string;
-} {
-  for (const entry of entries) {
-    if (DIAGRAM_RE.test(entry.formatted.text)) {
-      return {
-        text: entry.formatted.text.trim(),
-        html: singleParagraphHtml(entry.formatted) || undefined,
-      };
-    }
-  }
-  return { text: null };
-}
-
-function normalizeTableName(parts: string[]): string | undefined {
-  const name = parts
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return name || undefined;
-}
-
-function isSecondaryKeyConceptHeading(paragraph: string): boolean {
-  const line = paragraph.toLowerCase().trim();
-  return (
-    line === "key concept" ||
-    line === "key point" ||
-    line === "key points" ||
-    /^key (concept summary|clinical insight|diagnostic insight|takeaway)$/.test(line)
-  );
-}
-
-function isTableHeaderLabel(line: string): boolean {
-  const trimmed = line.trim();
-  if (
-    trimmed === "Feature" ||
-    trimmed === "Clinical Feature" ||
-    trimmed === "Details" ||
-    trimmed === "Differential Diagnosis" ||
-    trimmed === "Condition" ||
-    trimmed === "Notes" ||
-    trimmed === "Note" ||
-    trimmed === "Summary" ||
-    trimmed === "Brief Key Points" ||
-    trimmed === "Key Point" ||
-    trimmed === "Key Points" ||
-    trimmed === "Investigation" ||
-    trimmed === "Description" ||
-    trimmed === "Morphology" ||
-    trimmed === "Distribution"
-  ) {
-    return true;
-  }
-  return (
-    /^Notes\s*\//i.test(trimmed) ||
-    /^Purpose\s*\//i.test(trimmed) ||
-    /^Key Points\s*\//i.test(trimmed)
-  );
-}
-
-function getPreDiagramTitleRegion(rest: string[]): string[] {
-  const diagramIdx = rest.findIndex((paragraph) => DIAGRAM_RE.test(paragraph));
-  if (diagramIdx >= 0) return rest.slice(0, diagramIdx);
-
-  const tableHeaderIdx = rest.findIndex((line) => isTableHeaderLabel(line));
-  return tableHeaderIdx >= 0 ? rest.slice(0, tableHeaderIdx) : rest;
-}
-
-function isDifferentialDelimiter(line: string): boolean {
-  const trimmed = line.trim();
-  return (
-    /^differential diagnosis(\s+of)?$/i.test(trimmed) ||
-    /^differential diagnosis of\b/i.test(trimmed)
-  );
-}
-
-function isProseContentLine(line: string): boolean {
-  if (line.length > 180) return true;
-  if (line.length > 90 && /[.!:]\s/.test(line)) return true;
-  if (line.endsWith(":") && line.length > 40) return true;
-  if (/\bis based on\b/i.test(line)) return true;
-  if (/\bmust be distinguished\b/i.test(line)) return true;
-  if (/\bis distinguished by\b/i.test(line)) return true;
-  if (line.endsWith(".") && line.split(/\s+/).length >= 6) return true;
-  return false;
-}
-
-function isBadFeatureName(name?: string): boolean {
-  if (!name) return true;
-  if (/^Notes\b|^Note\b|^Summary\b/i.test(name)) return true;
-  if (/Differentiation is based on|must be distinguished|is distinguished by/i.test(name)) return true;
-  if (/\. [A-Z(]/.test(name)) return true;
-  return false;
-}
-
-function skipLongContentLines(lines: string[], startIndex: number): number {
-  let index = startIndex;
-  while (index < lines.length) {
-    const line = lines[index].trim();
-    if (!line) {
-      index += 1;
-      continue;
-    }
-    if (
-      isProseContentLine(line) ||
-      isSecondaryKeyConceptHeading(line) ||
-      isMetadataLine(line) ||
-      isTableHeaderLabel(line)
-    ) {
-      index += 1;
-      continue;
-    }
-    break;
-  }
-  return index;
-}
-
-function scoreFeatureName(name?: string): number {
-  if (!name) return -1;
-  let score = name.length;
-  if (name.includes("–") || name.includes("-")) score += 50;
-  if (/Recognition|Diagnosis|Management|Approach/i.test(name)) score += 30;
-  if (/Differential Diagnosis/i.test(name)) score -= 60;
-  if (name.split(/\s+/).length > 6 && !name.includes("–") && !name.includes("-")) {
-    score -= 80;
-  }
-  return score;
-}
-
-function findFeatureTitleStart(lines: string[], startIndex: number): number {
-  const direct = collectTitleLines(lines, startIndex);
-  if (direct.lines.length > 0 && direct.lines.length <= 4) {
-    const joined = direct.lines.join(" ");
-    if (
-      joined.includes("–") ||
-      joined.includes("-") ||
-      /Recognition|Diagnosis|Management|Approach/i.test(joined)
-    ) {
-      return startIndex;
-    }
-  }
-
-  for (let index = lines.length - 1; index >= startIndex; index -= 1) {
-    const line = lines[index]?.trim();
-    if (!line || isProseContentLine(line)) continue;
-    if (line.includes("–") || (line.includes("-") && !/^X-ray\b/i.test(line))) {
-      const prev = lines[index - 1]?.trim();
-      if (
-        index > startIndex &&
-        prev &&
-        !isProseContentLine(prev) &&
-        (/^[a-z(]/.test(prev) || prev.includes("–") || prev.includes("-"))
-      ) {
-        return index - 1;
-      }
-      return index;
-    }
-  }
-
-  return startIndex;
-}
-
-function chooseFeatureTableName(
-  forward?: string,
-  trailing?: string,
-  beforeDiff?: string,
-): string | undefined {
-  if (forward && !isBadFeatureName(forward) && scoreFeatureName(forward) > 0) {
-    return forward;
-  }
-  const fallback = [trailing, beforeDiff, forward]
-    .filter(Boolean)
-    .map((name) => ({ name: name as string, score: scoreFeatureName(name) }))
-    .sort((a, b) => b.score - a.score);
-  return fallback[0]?.name;
-}
-
-function chooseDiagramName(
-  forward?: string,
-  trailing?: string,
-  beforeDiff?: string,
-): string | undefined {
-  if (trailing && scoreFeatureName(trailing) > 0) return trailing;
-  if (forward && scoreFeatureName(forward) > 0) return forward;
-  return beforeDiff;
-}
-
-function extractTrailingTitleLines(preDiagram: string[]): string[] {
-  if (!preDiagram.length) return [];
-
-  const last = preDiagram[preDiagram.length - 1]?.trim();
-  if (!last || isProseContentLine(last) || DIAGRAM_RE.test(last)) return [];
-
-  const parts = [last];
-  if (preDiagram.length >= 2) {
-    const prev = preDiagram[preDiagram.length - 2]?.trim();
-    if (
-      prev &&
-      !isProseContentLine(prev) &&
-      !isSecondaryKeyConceptHeading(prev) &&
-      !isDifferentialDelimiter(prev) &&
-      !isTableHeaderLabel(prev) &&
-      prev.length < 80 &&
-      !prev.endsWith(".") &&
-      (/^[a-z(]/.test(prev) || prev.includes("–") || prev.includes("-"))
-    ) {
-      parts.unshift(prev);
-    }
-  }
-  return parts;
-}
-
-function collectTitleLines(
-  lines: string[],
-  startIndex: number,
-): { lines: string[]; nextIndex: number } {
-  const parts: string[] = [];
-  let index = startIndex;
-  while (index < lines.length) {
-    const line = lines[index].trim();
-    if (!line) {
-      index += 1;
-      continue;
-    }
-    if (
-      isProseContentLine(line) ||
-      isSecondaryKeyConceptHeading(line) ||
-      isMetadataLine(line) ||
-      isDifferentialDelimiter(line) ||
-      isTableHeaderLabel(line)
-    ) {
-      break;
-    }
-    parts.push(line);
-    index += 1;
-  }
-  return { lines: parts, nextIndex: index };
-}
-
-function collectInitialTitleRun(lines: string[]): string[] {
-  const parts: string[] = [];
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    if (
-      isTableHeaderLabel(trimmed) ||
-      isProseContentLine(trimmed) ||
-      isSecondaryKeyConceptHeading(trimmed) ||
-      isDifferentialDelimiter(trimmed)
-    ) {
-      break;
-    }
-    parts.push(trimmed);
-  }
-  return parts;
-}
-
-function extendDiffEnd(preDiagram: string[], ddDelimiterIdx: number): number {
-  const delimiterLine = preDiagram[ddDelimiterIdx]?.trim() ?? "";
-  if (/^differential diagnosis of\s+\S+/i.test(delimiterLine)) {
-    return ddDelimiterIdx;
-  }
-
-  let diffEnd = ddDelimiterIdx;
-  if (diffEnd + 1 < preDiagram.length) {
-    const next = preDiagram[diffEnd + 1].trim();
-    if (
-      next.length <= 120 &&
-      !isTableHeaderLabel(next) &&
-      !isSecondaryKeyConceptHeading(next) &&
-      !isDifferentialDelimiter(next) &&
-      !isProseContentLine(next)
-    ) {
-      diffEnd += 1;
-    }
-  }
-  return diffEnd;
-}
-
-function buildDifferentialTableName(
-  preDiagram: string[],
-  ddDelimiterIdx: number,
-  diffEnd: number,
-): string | undefined {
-  const titleBeforeDiff = collectInitialTitleRun(
-    preDiagram.slice(0, ddDelimiterIdx).filter((line) => !isMetadataLine(line)),
-  );
-  const diffSection = preDiagram
-    .slice(ddDelimiterIdx, diffEnd + 1)
-    .filter((line) => !isMetadataLine(line));
-  return normalizeTableName([...titleBeforeDiff, ...diffSection]);
-}
-
-/**
- * After metadata, table titles appear as paragraphs before the diagram caption.
- * Layout A: diff title → optional secondary Key Concept block → feature/diagram title.
- * Layout B: diff title (through "Differential Diagnosis of …") → feature/diagram title.
- */
-function extractTableNamesAfterMetadata(
-  paragraphs: string[],
-  metadataEnd: number | null,
-): {
-  featureTableName?: string;
-  differentialDiagnosisTableName?: string;
-  diagramName?: string;
-} {
-  if (metadataEnd === null || metadataEnd >= paragraphs.length) {
-    return {};
-  }
-
-  const rest = paragraphs.slice(metadataEnd);
-  const preDiagram = getPreDiagramTitleRegion(rest);
-  if (!preDiagram.length) return {};
-
-  const secondaryKeyConceptIdx = preDiagram.findIndex((paragraph) =>
-    isSecondaryKeyConceptHeading(paragraph),
-  );
-
-  if (secondaryKeyConceptIdx > 0) {
-    const ddBeforeKc = preDiagram.findIndex(
-      (line, index) => index < secondaryKeyConceptIdx && isDifferentialDelimiter(line),
-    );
-    const differentialTableName =
-      ddBeforeKc !== -1
-        ? buildDifferentialTableName(
-            preDiagram,
-            ddBeforeKc,
-            extendDiffEnd(preDiagram, ddBeforeKc),
-          )
-        : normalizeTableName(
-            preDiagram.slice(0, secondaryKeyConceptIdx).filter((line) => !isMetadataLine(line)),
-          );
-    const featureIndex = findFeatureTitleStart(
-      preDiagram,
-      skipLongContentLines(preDiagram, secondaryKeyConceptIdx + 1),
-    );
-    const forwardName = normalizeTableName(
-      collectTitleLines(preDiagram, featureIndex).lines,
-    );
-    const trailingName = normalizeTableName(extractTrailingTitleLines(preDiagram));
-    const featureTableName = chooseFeatureTableName(forwardName, trailingName);
-    const diagramName = chooseDiagramName(forwardName, trailingName) || featureTableName;
-
-    return {
-      differentialDiagnosisTableName: differentialTableName,
-      featureTableName,
-      diagramName,
-    };
-  }
-
-  const ddDelimiterIdx = preDiagram.findIndex((line) => isDifferentialDelimiter(line));
-  if (ddDelimiterIdx === -1) {
-    const preDiagramName = extractPreDiagramFeatureName(preDiagram);
-    const trailingName = normalizeTableName(extractTrailingTitleLines(preDiagram));
-    const name =
-      chooseFeatureTableName(preDiagramName, trailingName) || preDiagramName || trailingName;
-    return { featureTableName: name, diagramName: chooseDiagramName(preDiagramName, trailingName) || name };
-  }
-
-  let diffEnd = extendDiffEnd(preDiagram, ddDelimiterIdx);
-
-  const differentialTableName = buildDifferentialTableName(preDiagram, ddDelimiterIdx, diffEnd);
-
-  let featureStart = diffEnd + 1;
-  const secondaryKcAfterDiff = preDiagram.findIndex(
-    (line, index) => index >= featureStart && isSecondaryKeyConceptHeading(line),
-  );
-  if (secondaryKcAfterDiff !== -1) {
-    featureStart = skipLongContentLines(preDiagram, secondaryKcAfterDiff + 1);
-  }
-  featureStart = findFeatureTitleStart(preDiagram, featureStart);
-
-  const forwardName = normalizeTableName(collectTitleLines(preDiagram, featureStart).lines);
-  const trailingName = normalizeTableName(extractTrailingTitleLines(preDiagram));
-  const beforeDiffName = normalizeTableName(
-    collectInitialTitleRun(
-      preDiagram.slice(0, ddDelimiterIdx).filter((line) => !isMetadataLine(line)),
-    ),
-  );
-  const featureTableName = chooseFeatureTableName(forwardName, trailingName, beforeDiffName);
-  const diagramName = chooseDiagramName(forwardName, trailingName, beforeDiffName) || featureTableName;
-
-  return {
-    differentialDiagnosisTableName: differentialTableName,
-    featureTableName,
-    diagramName,
-  };
-}
 
 function optionPrefixOffset(text: string): number {
   const match = text.match(/^[A-E][.)]\s*/);
@@ -1137,26 +569,21 @@ async function parseDocxFromBuffer(
     metadata = parseMetadata(paragraphs, metadataStart, metadataEnd);
   }
 
-  const contentEnd =
-    metadataEnd !== null
-      ? findQuestionContentEnd(paragraphs, question.questionId, metadataEnd)
-      : paragraphs.length;
-  const scopedEntries = entries.slice(0, contentEnd);
-  const scopedParagraphs = scopedEntries.map((entry) => entry.formatted.text);
-  const scopedAfterMetadata =
-    metadataEnd !== null ? scopedEntries.slice(metadataEnd) : [];
-
-  const isMultiQuestion = contentEnd < paragraphs.length;
-
-  const { featureTable, differentialTable } = await parseTablesFromBuffer(buffer, {
-    multiQuestion: isMultiQuestion,
-  });
-  const diagramCaption = findDiagramCaption(scopedEntries);
-  const tableNames = extractTableNamesAfterMetadata(scopedParagraphs, metadataEnd);
-  const diagramImageCount = Math.max(
-    1,
-    countDiagramCaptions(scopedAfterMetadata.map((entry) => entry.formatted.text)),
+  const { documentXml, numberingXml } = await readDocxPartsFromBuffer(buffer);
+  const bodyBlocks = collectOrderedBodyBlocks(documentXml, numberingXml);
+  const metadataSearchFrom = blockIndexForParagraphOrder(bodyBlocks, firstKeyConceptIndex);
+  const metadataBlockRange = findMetadataBlockRange(bodyBlocks, metadataSearchFrom);
+  const contentEndBlockIndex = metadataBlockRange
+    ? findBlockContentEnd(bodyBlocks, question.questionId, metadataBlockRange.end)
+    : bodyBlocks.length;
+  const supplemental = parseTablesAndDiagramFromBlocks(
+    bodyBlocks,
+    contentEndBlockIndex,
+    metadataSearchFrom,
   );
+  const diagramImageCount = metadataBlockRange
+    ? countDiagramImageBlocks(bodyBlocks, metadataBlockRange.end, contentEndBlockIndex)
+    : 0;
 
   const result: QuestionData = {
     questionId: question.questionId,
@@ -1180,19 +607,9 @@ async function parseDocxFromBuffer(
     if (keywordData.classicTriadHtml) result.classicTriadHtml = keywordData.classicTriadHtml;
     if (keywordData.classicTriadTitle) result.classicTriadTitle = keywordData.classicTriadTitle;
   }
-  if (tableNames.featureTableName) result.featureTableName = tableNames.featureTableName;
-  if (tableNames.differentialDiagnosisTableName) {
-    result.differentialDiagnosisTableName = tableNames.differentialDiagnosisTableName;
-  }
-  if (featureTable.length > 0) result.featureTable = featureTable;
-  if (differentialTable.length > 0) result.differentialDiagnosisTable = differentialTable;
-  if (diagramCaption.text || tableNames.diagramName) {
-    result.diagram = {
-      ...(tableNames.diagramName ? { name: tableNames.diagramName } : {}),
-      ...(diagramCaption.text ? { caption: diagramCaption.text } : {}),
-      ...(diagramCaption.html ? { captionHtml: diagramCaption.html } : {}),
-    };
-  }
+  if (supplemental.table1) result.table1 = supplemental.table1;
+  if (supplemental.table2) result.table2 = supplemental.table2;
+  if (supplemental.diagram) result.diagram = supplemental.diagram;
 
   return { questionData: result, diagramImageCount };
 }
@@ -1206,9 +623,8 @@ async function convertFromBuffer(
   const imagesDir = path.join(questionDir, "images");
   await mkdir(imagesDir, { recursive: true });
 
-  const images = await extractImagesFromBuffer(buffer, imagesDir, diagramImageCount);
-  if (images.length > 0) {
-    questionData.diagram = questionData.diagram ?? {};
+  const images = await extractImagesFromBuffer(buffer, imagesDir, diagramImageCount || undefined);
+  if (images.length > 0 && questionData.diagram) {
     questionData.diagram.images = images;
     questionData.diagram.image = images[0].path;
   }

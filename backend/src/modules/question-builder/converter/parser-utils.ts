@@ -2,7 +2,7 @@ export const ANSWER_RE = /^ANSWER:\s*([A-E])\s*$/i;
 export const QUESTION_ID_RE = /Question Id:\s*(\S+)/i;
 export const QUESTION_NUM_RE = /^Q\s*([\dA]+):\s*(.+)$/i;
 export const DIAGRAM_RE =
-  /^(?:This (?:medical educational )?|The )diagram (?:illustrates|highlights|shows|depicts|provides)\b/i;
+  /^(?:This (?:medical educational )?|The )diagram\b/i;
 export const CLASSIC_TRIAD_RE = /^Classic Triad/i;
 
 export function isClassicTriadHeadingLine(paragraph: string): boolean {
@@ -132,10 +132,30 @@ export function findFirstKeyConceptIndex(paragraphs: string[], searchFrom = 0): 
 }
 
 export function isMetadataLine(paragraph: string): boolean {
-  if (paragraph.startsWith("Domain:")) return true;
-  if (paragraph.startsWith("Competency Domain:")) return true;
-  if (paragraph.startsWith("Subject:")) return true;
-  return METADATA_LABELS.some((label) => paragraph.startsWith(`${label}:`));
+  const trimmed = paragraph.trim();
+  if (trimmed.startsWith("Domain:")) return true;
+  if (trimmed.startsWith("Competency Domain:")) return true;
+  if (trimmed.startsWith("Subject:")) return true;
+  if (/^System\s*\/\s*Title:/i.test(trimmed)) return true;
+  return METADATA_LABELS.some((label) => trimmed.startsWith(`${label}:`));
+}
+
+const INTERIM_TABLE_SECTION_RE =
+  /^(Key Clinical Interpretation|Brief Key Points?|Clinical Takeaway|Key Concept Summary|Key Points?)$/i;
+
+export function isInterimTableSectionHeading(paragraph: string): boolean {
+  return INTERIM_TABLE_SECTION_RE.test(paragraph.trim());
+}
+
+export function isProseParagraph(paragraph: string): boolean {
+  const trimmed = paragraph.trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("(") && trimmed.endsWith(")") && trimmed.length <= 120) return false;
+  if (trimmed.length > 100) return true;
+  if (/\bis defined by\b/i.test(trimmed)) return true;
+  if (trimmed.length > 80 && trimmed.includes(", ")) return true;
+  if (/^[a-z]/.test(trimmed) && trimmed.length > 30) return true;
+  return /^(Used in|Target |Chosen after|The |This |Patients |Although |A known |A \d)/.test(trimmed);
 }
 
 export function normalizeQuestionId(raw: string): string {

@@ -79,192 +79,307 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
-  "featureTableName": "Ludwig Angina – Emergency Airway Management in Deep Neck Space Infection",
-  "differentialDiagnosisTableName": "Ludwig Angina – Emergency Airway Management in Deep Neck Space Infection Differential Diagnosis of Ludwig Angina",
-  "featureTable": [
-    {
-      "feature": "Definition",
-      "featureHtml": "<p><strong>Definition</strong></p>",
-      "description": "• Rapidly progressive cellulitis of the submandibular, sublingual, and submental spaces • Usually originates from odontogenic infection",
-      "descriptionHtml": "<p>• Rapidly progressive cellulitis of the submandibular, sublingual, and submental spaces <br/>• Usually originates from odontogenic infection</p>",
-      "clinicalImportance": "• Causes rapidly progressive airway compromise • Medical and surgical emergency",
-      "clinicalImportanceHtml": "<p>• Causes rapidly progressive airway compromise <br/>• Medical and surgical emergency</p>"
-    },
-    {
-      "feature": "Common Cause",
-      "featureHtml": "<p><strong>Common Cause</strong></p>",
-      "description": "• Dental infection • Mandibular molar abscess • Poor oral hygiene • Recent dental extraction",
-      "descriptionHtml": "<p>• Dental infection <br/>• Mandibular molar abscess <br/>• Poor oral hygiene <br/>• Recent dental extraction</p>",
-      "clinicalImportance": "• Infection spreads through fascial planes of neck",
-      "clinicalImportanceHtml": "<p>• Infection spreads through fascial planes of neck</p>"
-    },
-    {
-      "feature": "Classic Clinical\nFeatures",
-      "featureHtml": "<p><strong>Classic Clinical </strong></p><p><strong>Features</strong></p>",
-      "description": "• Fever • Drooling • Muffled “hot potato” voice • Bilateral submandibular swelling • Elevation of tongue • Dysphagia • Neck pain",
-      "descriptionHtml": "<p>• Fever <br/>• Drooling <br/>• Muffled “hot potato” voice <br/>• Bilateral submandibular swelling <br/>• Elevation of tongue <br/>• Dysphagia <br/>• Neck pain</p>",
-      "clinicalImportance": "• Strongly suggests Ludwig angina",
-      "clinicalImportanceHtml": "<p>• Strongly suggests Ludwig angina</p>"
-    },
-    {
-      "feature": "Signs of Airway\nCompromise",
-      "featureHtml": "<p><strong>Signs of Airway </strong></p><p><strong>Compromise</strong></p>",
-      "description": "• Stridor • Respiratory distress • Tachypnea • Cyanosis • Inability to handle secretions",
-      "descriptionHtml": "<p>• Stridor <br/>• Respiratory distress <br/>• Tachypnea <br/>• Cyanosis <br/>• Inability to handle secretions</p>",
-      "clinicalImportance": "• Indicates impending airway obstruction • Requires immediate airway management",
-      "clinicalImportanceHtml": "<p>• Indicates impending airway obstruction <br/>• Requires immediate airway management</p>"
-    },
-    {
-      "feature": "Pathophysiology",
-      "featureHtml": "<p><strong>Pathophysiology</strong></p>",
-      "description": "• Infection spreads through connective tissue spaces • Massive edema elevates tongue posteriorly • Compression of upper airway occurs",
-      "descriptionHtml": "<p>• Infection spreads through connective tissue spaces <br/>• Massive edema elevates tongue posteriorly <br/>• Compression of upper airway occurs</p>",
-      "clinicalImportance": "• Airway obstruction is most feared complication",
-      "clinicalImportanceHtml": "<p>• Airway obstruction is most feared complication</p>"
-    },
-    {
-      "feature": "Most Important\nImmediate Step",
-      "featureHtml": "<p><strong>Most Important </strong></p><p><strong>Immediate Step</strong></p>",
-      "description": "• Secure the airway • Awake fiberoptic intubation preferred • Surgical airway if intubation fails",
-      "descriptionHtml": "<p>• Secure the airway <br/>• Awake fiberoptic intubation preferred <br/>• Surgical airway if intubation fails</p>",
-      "clinicalImportance": "• ABC stabilization takes priority over all other steps",
-      "clinicalImportanceHtml": "<p>• ABC stabilization takes priority over all other steps</p>"
-    },
-    {
-      "feature": "Investigations",
-      "featureHtml": "<p><strong>Investigations</strong></p>",
-      "description": "• Clinical diagnosis initially • CT neck with contrast after stabilization • CBC • Blood cultures",
-      "descriptionHtml": "<p>• Clinical diagnosis initially <br/>• CT neck with contrast after stabilization <br/>• CBC <br/>• Blood cultures</p>",
-      "clinicalImportance": "• Imaging should never delay airway protection",
-      "clinicalImportanceHtml": "<p>• Imaging should never delay airway protection</p>"
-    },
-    {
-      "feature": "Treatment",
-      "featureHtml": "<p><strong>Treatment</strong></p>",
-      "description": "• Airway stabilization • Broad-spectrum IV antibiotics • Surgical drainage if abscess present • ICU monitoring",
-      "descriptionHtml": "<p>• Airway stabilization <br/>• Broad-spectrum IV antibiotics <br/>• Surgical drainage if abscess present <br/>• ICU monitoring</p>",
-      "clinicalImportance": "• Prevents airway collapse and septic complications",
-      "clinicalImportanceHtml": "<p>• Prevents airway collapse and septic complications</p>"
-    },
-    {
-      "feature": "Common\nAntibiotics",
-      "featureHtml": "<p><strong>Common </strong></p><p><strong>Antibiotics</strong></p>",
-      "description": "• Ampicillin-sulbactam • Clindamycin • Piperacillin-tazobactam",
-      "descriptionHtml": "<p>• Ampicillin-sulbactam <br/>• Clindamycin <br/>• Piperacillin-tazobactam</p>",
-      "clinicalImportance": "• Covers oral anaerobes and streptococci",
-      "clinicalImportanceHtml": "<p>• Covers oral anaerobes and streptococci</p>"
-    },
-    {
-      "feature": "Complications",
-      "featureHtml": "<p><strong>Complications</strong></p>",
-      "description": "• Complete airway obstruction • Mediastinitis • Sepsis • Aspiration • Death",
-      "descriptionHtml": "<p>• Complete airway obstruction <br/>• Mediastinitis <br/>• Sepsis <br/>• Aspiration <br/>• Death</p>",
-      "clinicalImportance": "• Delayed treatment significantly increases mortality",
-      "clinicalImportanceHtml": "<p>• Delayed treatment significantly increases mortality</p>"
-    },
-    {
-      "feature": "Why Airway First?",
-      "featureHtml": "<p><strong>Why Airway First?</strong></p>",
-      "description": "• Stridor is a late sign • Sudden airway collapse may occur • Edema progresses rapidly",
-      "descriptionHtml": "<p>• Stridor is a late sign <br/>• Sudden airway collapse may occur <br/>• Edema progresses rapidly</p>",
-      "clinicalImportance": "• Airway intervention is lifesaving",
-      "clinicalImportanceHtml": "<p>• Airway intervention is lifesaving</p>"
-    },
-    {
-      "feature": "Prognosis",
-      "featureHtml": "<p><strong>Prognosis</strong></p>",
-      "description": "• Good with early treatment • Poor if airway compromise is delayed",
-      "descriptionHtml": "<p>• Good with early treatment <br/>• Poor if airway compromise is delayed</p>",
-      "clinicalImportance": "• Early recognition reduces mortality",
-      "clinicalImportanceHtml": "<p>• Early recognition reduces mortality</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Peritonsillar Abscess",
-      "conditionHtml": "<p><strong>Peritonsillar Abscess</strong></p>",
-      "distinguishingFeatures": "• Fever • Sore throat • Uvular deviation • Muffled voice",
-      "distinguishingFeaturesHtml": "<p>• Fever <br/>• Sore throat <br/>• Uvular deviation <br/>• Muffled voice</p>",
-      "keyDifferences": "• Usually unilateral • No bilateral submandibular swelling",
-      "keyDifferencesHtml": "<p>• Usually unilateral <br/>• No bilateral submandibular swelling</p>"
-    },
-    {
-      "condition": "Retropharyngeal\nAbscess",
-      "conditionHtml": "<p><strong>Retropharyngeal </strong></p><p><strong>Abscess</strong></p>",
-      "distinguishingFeatures": "• Fever • Neck stiffness • Dysphagia • Respiratory distress",
-      "distinguishingFeaturesHtml": "<p>• Fever <br/>• Neck stiffness <br/>• Dysphagia <br/>• Respiratory distress</p>",
-      "keyDifferences": "• Posterior pharyngeal wall swelling present",
-      "keyDifferencesHtml": "<p>• Posterior pharyngeal wall swelling present</p>"
-    },
-    {
-      "condition": "Epiglottitis",
-      "conditionHtml": "<p><strong>Epiglottitis</strong></p>",
-      "distinguishingFeatures": "• Drooling • Stridor • Tripod position • Sudden onset",
-      "distinguishingFeaturesHtml": "<p>• Drooling <br/>• Stridor <br/>• Tripod position <br/>• Sudden onset</p>",
-      "keyDifferences": "• No tongue elevation or submandibular swelling",
-      "keyDifferencesHtml": "<p>• No tongue elevation or submandibular swelling</p>"
-    },
-    {
-      "condition": "Angioedema",
-      "conditionHtml": "<p><strong>Angioedema</strong></p>",
-      "distinguishingFeatures": "• Rapid facial swelling • Lip swelling • Tongue edema",
-      "distinguishingFeaturesHtml": "<p>• Rapid facial swelling <br/>• Lip swelling <br/>• Tongue edema</p>",
-      "keyDifferences": "• Noninfectious • Usually no fever",
-      "keyDifferencesHtml": "<p>• Noninfectious <br/>• Usually no fever</p>"
-    },
-    {
-      "condition": "Dental Abscess",
-      "conditionHtml": "<p><strong>Dental Abscess</strong></p>",
-      "distinguishingFeatures": "• Tooth pain • Local gum swelling • Fever",
-      "distinguishingFeaturesHtml": "<p>• Tooth pain <br/>• Local gum swelling <br/>• Fever</p>",
-      "keyDifferences": "• More localized infection • Less diffuse neck involvement",
-      "keyDifferencesHtml": "<p>• More localized infection <br/>• Less diffuse neck involvement</p>"
-    },
-    {
-      "condition": "Submandibular\nSialadenitis",
-      "conditionHtml": "<p><strong>Submandibular </strong></p><p><strong>Sialadenitis</strong></p>",
-      "distinguishingFeatures": "• Painful salivary gland swelling • Fever • Purulent discharge",
-      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling <br/>• Fever <br/>• Purulent discharge</p>",
-      "keyDifferences": "• Involves salivary gland rather than fascial spaces",
-      "keyDifferencesHtml": "<p>• Involves salivary gland rather than fascial spaces</p>"
-    },
-    {
-      "condition": "Deep Neck Space\nAbscess",
-      "conditionHtml": "<p><strong>Deep Neck Space </strong></p><p><strong>Abscess</strong></p>",
-      "distinguishingFeatures": "• Fever • Neck swelling • Dysphagia",
-      "distinguishingFeaturesHtml": "<p>• Fever <br/>• Neck swelling <br/>• Dysphagia</p>",
-      "keyDifferences": "• Often localized abscess cavity on imaging",
-      "keyDifferencesHtml": "<p>• Often localized abscess cavity on imaging</p>"
-    },
-    {
-      "condition": "Anaphylaxis",
-      "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
-      "distinguishingFeatures": "• Airway edema • Wheezing • Hypotension • Urticaria",
-      "distinguishingFeaturesHtml": "<p>• Airway edema <br/>• Wheezing <br/>• Hypotension <br/>• Urticaria</p>",
-      "keyDifferences": "• Allergic trigger present • No infectious source",
-      "keyDifferencesHtml": "<p>• Allergic trigger present <br/>• No infectious source</p>"
-    },
-    {
-      "condition": "Cellulitis of Neck",
-      "conditionHtml": "<p><strong>Cellulitis of Neck</strong></p>",
-      "distinguishingFeatures": "• Neck redness • Tender swelling • Fever",
-      "distinguishingFeaturesHtml": "<p>• Neck redness <br/>• Tender swelling <br/>• Fever</p>",
-      "keyDifferences": "• Less tongue elevation and airway distortion",
-      "keyDifferencesHtml": "<p>• Less tongue elevation and airway distortion</p>"
-    },
-    {
-      "condition": "Oral Floor Tumor",
-      "conditionHtml": "<p><strong>Oral Floor Tumor</strong></p>",
-      "distinguishingFeatures": "• Progressive swelling • Dysphagia • Weight loss",
-      "distinguishingFeaturesHtml": "<p>• Progressive swelling <br/>• Dysphagia <br/>• Weight loss</p>",
-      "keyDifferences": "• Chronic course rather than acute infectious presentation",
-      "keyDifferencesHtml": "<p>• Chronic course rather than acute infectious presentation</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Ludwig Angina – Emergency Airway Management in Deep Neck Space Infection",
+    "headingHtml": "<p><u><strong>Ludwig Angina – Emergency Airway Management in </strong></u></p><p><u><strong>Deep Neck Space Infection</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Details",
+      "Clinical Importance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Details</strong></p>",
+      "<p><strong>Clinical Importance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Definition",
+          "• Rapidly progressive cellulitis of the submandibular, sublingual, and submental spaces • Usually originates from odontogenic infection",
+          "• Causes rapidly progressive airway compromise • Medical and surgical emergency"
+        ],
+        "cellsHtml": [
+          "<p><strong>Definition</strong></p>",
+          "<p>• Rapidly progressive cellulitis of the submandibular, sublingual, and submental spaces <br/>• Usually originates from odontogenic infection</p>",
+          "<p>• Causes rapidly progressive airway compromise <br/>• Medical and surgical emergency</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Common Cause",
+          "• Dental infection • Mandibular molar abscess • Poor oral hygiene • Recent dental extraction",
+          "• Infection spreads through fascial planes of neck"
+        ],
+        "cellsHtml": [
+          "<p><strong>Common Cause</strong></p>",
+          "<p>• Dental infection <br/>• Mandibular molar abscess <br/>• Poor oral hygiene <br/>• Recent dental extraction</p>",
+          "<p>• Infection spreads through fascial planes of neck</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Classic Clinical\nFeatures",
+          "• Fever • Drooling • Muffled “hot potato” voice • Bilateral submandibular swelling • Elevation of tongue • Dysphagia • Neck pain",
+          "• Strongly suggests Ludwig angina"
+        ],
+        "cellsHtml": [
+          "<p><strong>Classic Clinical </strong></p><p><strong>Features</strong></p>",
+          "<p>• Fever <br/>• Drooling <br/>• Muffled “hot potato” voice <br/>• Bilateral submandibular swelling <br/>• Elevation of tongue <br/>• Dysphagia <br/>• Neck pain</p>",
+          "<p>• Strongly suggests Ludwig angina</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Signs of Airway\nCompromise",
+          "• Stridor • Respiratory distress • Tachypnea • Cyanosis • Inability to handle secretions",
+          "• Indicates impending airway obstruction • Requires immediate airway management"
+        ],
+        "cellsHtml": [
+          "<p><strong>Signs of Airway </strong></p><p><strong>Compromise</strong></p>",
+          "<p>• Stridor <br/>• Respiratory distress <br/>• Tachypnea <br/>• Cyanosis <br/>• Inability to handle secretions</p>",
+          "<p>• Indicates impending airway obstruction <br/>• Requires immediate airway management</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pathophysiology",
+          "• Infection spreads through connective tissue spaces • Massive edema elevates tongue posteriorly • Compression of upper airway occurs",
+          "• Airway obstruction is most feared complication"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pathophysiology</strong></p>",
+          "<p>• Infection spreads through connective tissue spaces <br/>• Massive edema elevates tongue posteriorly <br/>• Compression of upper airway occurs</p>",
+          "<p>• Airway obstruction is most feared complication</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Most Important\nImmediate Step",
+          "• Secure the airway • Awake fiberoptic intubation preferred • Surgical airway if intubation fails",
+          "• ABC stabilization takes priority over all other steps"
+        ],
+        "cellsHtml": [
+          "<p><strong>Most Important </strong></p><p><strong>Immediate Step</strong></p>",
+          "<p>• Secure the airway <br/>• Awake fiberoptic intubation preferred <br/>• Surgical airway if intubation fails</p>",
+          "<p>• ABC stabilization takes priority over all other steps</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Investigations",
+          "• Clinical diagnosis initially • CT neck with contrast after stabilization • CBC • Blood cultures",
+          "• Imaging should never delay airway protection"
+        ],
+        "cellsHtml": [
+          "<p><strong>Investigations</strong></p>",
+          "<p>• Clinical diagnosis initially <br/>• CT neck with contrast after stabilization <br/>• CBC <br/>• Blood cultures</p>",
+          "<p>• Imaging should never delay airway protection</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Treatment",
+          "• Airway stabilization • Broad-spectrum IV antibiotics • Surgical drainage if abscess present • ICU monitoring",
+          "• Prevents airway collapse and septic complications"
+        ],
+        "cellsHtml": [
+          "<p><strong>Treatment</strong></p>",
+          "<p>• Airway stabilization <br/>• Broad-spectrum IV antibiotics <br/>• Surgical drainage if abscess present <br/>• ICU monitoring</p>",
+          "<p>• Prevents airway collapse and septic complications</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Common\nAntibiotics",
+          "• Ampicillin-sulbactam • Clindamycin • Piperacillin-tazobactam",
+          "• Covers oral anaerobes and streptococci"
+        ],
+        "cellsHtml": [
+          "<p><strong>Common </strong></p><p><strong>Antibiotics</strong></p>",
+          "<p>• Ampicillin-sulbactam <br/>• Clindamycin <br/>• Piperacillin-tazobactam</p>",
+          "<p>• Covers oral anaerobes and streptococci</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complications",
+          "• Complete airway obstruction • Mediastinitis • Sepsis • Aspiration • Death",
+          "• Delayed treatment significantly increases mortality"
+        ],
+        "cellsHtml": [
+          "<p><strong>Complications</strong></p>",
+          "<p>• Complete airway obstruction <br/>• Mediastinitis <br/>• Sepsis <br/>• Aspiration <br/>• Death</p>",
+          "<p>• Delayed treatment significantly increases mortality</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Why Airway First?",
+          "• Stridor is a late sign • Sudden airway collapse may occur • Edema progresses rapidly",
+          "• Airway intervention is lifesaving"
+        ],
+        "cellsHtml": [
+          "<p><strong>Why Airway First?</strong></p>",
+          "<p>• Stridor is a late sign <br/>• Sudden airway collapse may occur <br/>• Edema progresses rapidly</p>",
+          "<p>• Airway intervention is lifesaving</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Prognosis",
+          "• Good with early treatment • Poor if airway compromise is delayed",
+          "• Early recognition reduces mortality"
+        ],
+        "cellsHtml": [
+          "<p><strong>Prognosis</strong></p>",
+          "<p>• Good with early treatment <br/>• Poor if airway compromise is delayed</p>",
+          "<p>• Early recognition reduces mortality</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Ludwig Angina",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Ludwig Angina</strong></u></p>",
+    "columns": [
+      "Differential Diagnosis",
+      "Key Features",
+      "Distinguishing Points from\nLudwig Angina"
+    ],
+    "columnsHtml": [
+      "<p><strong>Differential Diagnosis</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Distinguishing Points from </strong></p><p><strong>Ludwig Angina</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Peritonsillar Abscess",
+          "• Fever • Sore throat • Uvular deviation • Muffled voice",
+          "• Usually unilateral • No bilateral submandibular swelling"
+        ],
+        "cellsHtml": [
+          "<p><strong>Peritonsillar Abscess</strong></p>",
+          "<p>• Fever <br/>• Sore throat <br/>• Uvular deviation <br/>• Muffled voice</p>",
+          "<p>• Usually unilateral <br/>• No bilateral submandibular swelling</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Retropharyngeal\nAbscess",
+          "• Fever • Neck stiffness • Dysphagia • Respiratory distress",
+          "• Posterior pharyngeal wall swelling present"
+        ],
+        "cellsHtml": [
+          "<p><strong>Retropharyngeal </strong></p><p><strong>Abscess</strong></p>",
+          "<p>• Fever <br/>• Neck stiffness <br/>• Dysphagia <br/>• Respiratory distress</p>",
+          "<p>• Posterior pharyngeal wall swelling present</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Epiglottitis",
+          "• Drooling • Stridor • Tripod position • Sudden onset",
+          "• No tongue elevation or submandibular swelling"
+        ],
+        "cellsHtml": [
+          "<p><strong>Epiglottitis</strong></p>",
+          "<p>• Drooling <br/>• Stridor <br/>• Tripod position <br/>• Sudden onset</p>",
+          "<p>• No tongue elevation or submandibular swelling</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Angioedema",
+          "• Rapid facial swelling • Lip swelling • Tongue edema",
+          "• Noninfectious • Usually no fever"
+        ],
+        "cellsHtml": [
+          "<p><strong>Angioedema</strong></p>",
+          "<p>• Rapid facial swelling <br/>• Lip swelling <br/>• Tongue edema</p>",
+          "<p>• Noninfectious <br/>• Usually no fever</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Dental Abscess",
+          "• Tooth pain • Local gum swelling • Fever",
+          "• More localized infection • Less diffuse neck involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Dental Abscess</strong></p>",
+          "<p>• Tooth pain <br/>• Local gum swelling <br/>• Fever</p>",
+          "<p>• More localized infection <br/>• Less diffuse neck involvement</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Submandibular\nSialadenitis",
+          "• Painful salivary gland swelling • Fever • Purulent discharge",
+          "• Involves salivary gland rather than fascial spaces"
+        ],
+        "cellsHtml": [
+          "<p><strong>Submandibular </strong></p><p><strong>Sialadenitis</strong></p>",
+          "<p>• Painful salivary gland swelling <br/>• Fever <br/>• Purulent discharge</p>",
+          "<p>• Involves salivary gland rather than fascial spaces</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Deep Neck Space\nAbscess",
+          "• Fever • Neck swelling • Dysphagia",
+          "• Often localized abscess cavity on imaging"
+        ],
+        "cellsHtml": [
+          "<p><strong>Deep Neck Space </strong></p><p><strong>Abscess</strong></p>",
+          "<p>• Fever <br/>• Neck swelling <br/>• Dysphagia</p>",
+          "<p>• Often localized abscess cavity on imaging</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Anaphylaxis",
+          "• Airway edema • Wheezing • Hypotension • Urticaria",
+          "• Allergic trigger present • No infectious source"
+        ],
+        "cellsHtml": [
+          "<p><strong>Anaphylaxis</strong></p>",
+          "<p>• Airway edema <br/>• Wheezing <br/>• Hypotension <br/>• Urticaria</p>",
+          "<p>• Allergic trigger present <br/>• No infectious source</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Cellulitis of Neck",
+          "• Neck redness • Tender swelling • Fever",
+          "• Less tongue elevation and airway distortion"
+        ],
+        "cellsHtml": [
+          "<p><strong>Cellulitis of Neck</strong></p>",
+          "<p>• Neck redness <br/>• Tender swelling <br/>• Fever</p>",
+          "<p>• Less tongue elevation and airway distortion</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral Floor Tumor",
+          "• Progressive swelling • Dysphagia • Weight loss",
+          "• Chronic course rather than acute infectious presentation"
+        ],
+        "cellsHtml": [
+          "<p><strong>Oral Floor Tumor</strong></p>",
+          "<p>• Progressive swelling <br/>• Dysphagia <br/>• Weight loss</p>",
+          "<p>• Chronic course rather than acute infectious presentation</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Ludwig Angina – Emergency Airway Management in Deep Neck Space Infection",
-    "caption": "This diagram illustrates Ludwig angina, a rapidly progressive cellulitis involving the submandibular, sublingual, and submental spaces, most commonly caused by odontogenic infection. The image highlights the characteristic bilateral submandibular swelling, tongue elevation, and airway compression leading to stridor and respiratory distress. It emphasizes the emergency principle that airway stabilization is the first and most critical step before imaging or antibiotic therapy. The diagram also demonstrates pathophysiology, clinical features, airway management techniques, investigations, treatment strategies, and potential life-threatening complications.",
-    "captionHtml": "<p>This diagram illustrates Ludwig angina, a rapidly progressive cellulitis involving the submandibular, sublingual, and submental spaces, most commonly caused by odontogenic infection. The image highlights the characteristic bilateral submandibular swelling, tongue elevation, and airway compression leading to stridor and respiratory distress. It emphasizes the emergency principle that airway stabilization is the first and most critical step before imaging or antibiotic therapy. The diagram also demonstrates pathophysiology, clinical features, airway management techniques, investigations, treatment strategies, and potential life-threatening complications.</p>",
+    "heading": "Ludwig Angina – Emergency Airway Management in Deep Neck Space Infection",
+    "headingHtml": "<p><u><strong>Ludwig Angina – Emergency Airway Management in </strong></u></p><p><u><strong>Deep Neck Space Infection</strong></u></p>",
+    "description": "This diagram illustrates Ludwig angina, a rapidly progressive cellulitis involving the submandibular, sublingual, and submental spaces, most commonly caused by odontogenic infection. The image highlights the characteristic bilateral submandibular swelling, tongue elevation, and airway compression leading to stridor and respiratory distress. It emphasizes the emergency principle that airway stabilization is the first and most critical step before imaging or antibiotic therapy. The diagram also demonstrates pathophysiology, clinical features, airway management techniques, investigations, treatment strategies, and potential life-threatening complications.",
+    "descriptionHtml": "<p>This diagram illustrates Ludwig angina, a rapidly progressive cellulitis involving the submandibular, sublingual, and submental spaces, most commonly caused by odontogenic infection. The image highlights the characteristic bilateral submandibular swelling, tongue elevation, and airway compression leading to stridor and respiratory distress. It emphasizes the emergency principle that airway stabilization is the first and most critical step before imaging or antibiotic therapy. The diagram also demonstrates pathophysiology, clinical features, airway management techniques, investigations, treatment strategies, and potential life-threatening complications.</p>",
     "images": [
       {
         "filename": "image1.png",

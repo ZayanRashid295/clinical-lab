@@ -228,7 +228,7 @@ function getListInfo(
   return { isListItem: true, listOrdered: ordered, listLevel: ilvl };
 }
 
-function paragraphToFormatted(
+export function paragraphToFormatted(
   paragraph: XmlObject,
   numberingMap: NumberingMap,
 ): FormattedParagraph {

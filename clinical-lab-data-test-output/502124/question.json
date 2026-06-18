@@ -73,104 +73,175 @@
   "classicTriad": "Chest pain + ST elevation + elevated troponin → Triad strongly indicating STEMI.",
   "classicTriadHtml": "<ul><li><strong>Chest pain + ST elevation + elevated troponin</strong> → Triad strongly indicating <strong>STEMI</strong>.</li></ul>",
   "classicTriadTitle": "Classic triad in stem",
-  "featureTableName": "STEMI (ST-Elevation Myocardial Infarction)",
-  "differentialDiagnosisTableName": "Acute Coronary Syndrome – STEMI Differential Diagnosis of STEMI (ST-Elevation Myocardial Infarction)",
-  "featureTable": [
-    {
-      "feature": "Definition",
-      "featureHtml": "<p>Definition</p>",
-      "description": "Acute myocardial infarction with ST-segment elevation on ECG and elevated cardiac biomarkers (troponin).",
-      "descriptionHtml": "<p>Acute myocardial infarction with <strong>ST-segment elevation</strong> on ECG and elevated cardiac biomarkers (troponin).</p>",
-      "clinicalImportance": "Identifies patients who need immediate reperfusion therapy.",
-      "clinicalImportanceHtml": "<p>Identifies patients who need <strong>immediate reperfusion therapy</strong>.</p>"
-    },
-    {
-      "feature": "Clinical Presentation",
-      "featureHtml": "<p>Clinical Presentation</p>",
-      "description": "Sudden severe central chest pain,\nradiation to left arm/jaw,\ndiaphoresis,\nnausea,\nhypotension.",
-      "descriptionHtml": "<ul><li>Sudden <strong>severe central chest pain</strong>, </li><li>radiation to left arm/jaw, </li><li>diaphoresis, </li><li>nausea, </li><li>hypotension.</li></ul>",
-      "clinicalImportance": "Helps in early recognition and triage in emergency settings.",
-      "clinicalImportanceHtml": "<p>Helps in <strong>early recognition</strong> and triage in emergency settings.</p>"
-    },
-    {
-      "feature": "Diagnosis & Investigation",
-      "featureHtml": "<p>Diagnosis &amp; Investigation</p>",
-      "description": "ECG:\nST elevation in contiguous leads;\nTroponin:\nelevated;\nechocardiography for wall motion.",
-      "descriptionHtml": "<p><strong>ECG:</strong> </p><ul><li>ST elevation in contiguous leads; </li></ul><p><strong>Troponin: </strong></p><ul><li>elevated; </li><li>echocardiography for wall motion.</li></ul>",
-      "clinicalImportance": "Confirms STEMI and guides urgent PCI or thrombolysis.",
-      "clinicalImportanceHtml": "<p>Confirms STEMI and guides <strong>urgent PCI or thrombolysis</strong>.</p>"
-    },
-    {
-      "feature": "Management",
-      "featureHtml": "<p>Management</p>",
-      "description": "Immediate reperfusion:\nprimary PCI (preferred) or thrombolysis;\ndual antiplatelet therapy,\nanticoagulation,\nstatins,\nnitrates,\nbeta-blockers.",
-      "descriptionHtml": "<p><strong>Immediate reperfusion:</strong> </p><ul><li>primary PCI (preferred) or thrombolysis; </li><li>dual antiplatelet therapy, </li><li>anticoagulation, </li><li>statins, </li><li>nitrates, </li><li>beta-blockers.</li></ul>",
-      "clinicalImportance": "Reduces mortality and complications (heart failure, arrhythmias).",
-      "clinicalImportanceHtml": "<p>Reduces <strong>mortality and complications</strong> (heart failure, arrhythmias).</p>"
-    },
-    {
-      "feature": "Complications",
-      "featureHtml": "<p>Complications</p>",
-      "description": "Cardiogenic shock,\narrhythmias,\nheart failure,\nmechanical complications (VSD, rupture).",
-      "descriptionHtml": "<ul><li>Cardiogenic shock, </li><li>arrhythmias, </li><li>heart failure, </li><li>mechanical complications (VSD, rupture).</li></ul>",
-      "clinicalImportance": "Early recognition improves prognosis and survival.",
-      "clinicalImportanceHtml": "<p>Early recognition improves <strong>prognosis and survival</strong>.</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "NSTEMI",
-      "conditionHtml": "<p>NSTEMI</p>",
-      "distinguishingFeatures": "Chest pain,\nelevated troponin,\nno persistent ST elevation",
-      "distinguishingFeaturesHtml": "<ul><li>Chest pain, </li><li>elevated troponin, </li><li><strong>no persistent ST elevation</strong></li></ul>",
-      "keyDifferences": "ST depression or T-wave inversion instead of ST elevation; less urgent reperfusion required.",
-      "keyDifferencesHtml": "<p>ST depression or T-wave inversion instead of ST elevation; less urgent reperfusion required.</p>"
-    },
-    {
-      "condition": "Unstable Angina",
-      "conditionHtml": "<p>Unstable Angina</p>",
-      "distinguishingFeatures": "Chest pain at rest,\ntroponin normal,\nECG may be normal or show transient changes",
-      "distinguishingFeaturesHtml": "<ul><li>Chest pain at rest, </li><li><strong>troponin normal</strong>, </li><li>ECG may be normal or show transient changes</li></ul>",
-      "keyDifferences": "No biomarker elevation; ST changes resolve quickly.",
-      "keyDifferencesHtml": "<p>No biomarker elevation; ST changes resolve quickly.</p>"
-    },
-    {
-      "condition": "Prinzmetal (Variant) Angina",
-      "conditionHtml": "<p>Prinzmetal (Variant) Angina</p>",
-      "distinguishingFeatures": "Chest pain at rest,\ntransient ST elevation,\noften younger patients",
-      "distinguishingFeaturesHtml": "<ul><li>Chest pain at rest, </li><li><strong>transient ST elevation</strong>, </li><li>often younger patients</li></ul>",
-      "keyDifferences": "ST elevation is transient; troponin may be normal; responds to nitrates.",
-      "keyDifferencesHtml": "<p>ST elevation is transient; troponin may be normal; responds to nitrates.</p>"
-    },
-    {
-      "condition": "Acute Pericarditis",
-      "conditionHtml": "<p>Acute Pericarditis</p>",
-      "distinguishingFeatures": "Sharp pleuritic chest pain,\ndiffuse ST elevation,\nPR depression",
-      "distinguishingFeaturesHtml": "<ul><li>Sharp pleuritic chest pain, </li><li>diffuse ST elevation, </li><li>PR depression</li></ul>",
-      "keyDifferences": "ST elevation is diffuse, not regional; often positional; troponin mildly elevated if myopericarditis.",
-      "keyDifferencesHtml": "<p>ST elevation is <strong>diffuse</strong>, not regional; often positional; troponin mildly elevated if myopericarditis.</p>"
-    },
-    {
-      "condition": "Pulmonary Embolism (massive)",
-      "conditionHtml": "<p>Pulmonary Embolism (massive)</p>",
-      "distinguishingFeatures": "Sudden dyspnea,\npleuritic chest pain,\ntachycardia,\nsometimes troponin rise",
-      "distinguishingFeaturesHtml": "<ul><li>Sudden dyspnea, </li><li>pleuritic chest pain, </li><li>tachycardia, </li><li>sometimes troponin rise</li></ul>",
-      "keyDifferences": "ECG may show S1Q3T3 or nonspecific changes; no contiguous ST elevation.",
-      "keyDifferencesHtml": "<p>ECG may show S1Q3T3 or nonspecific changes; no contiguous ST elevation.</p>"
-    },
-    {
-      "condition": "Aortic Dissection",
-      "conditionHtml": "<p>Aortic Dissection</p>",
-      "distinguishingFeatures": "Severe tearing chest/back pain,\nunequal pulses,\nhypotension",
-      "distinguishingFeaturesHtml": "<ul><li>Severe tearing chest/back pain, </li><li>unequal pulses, </li><li>hypotension</li></ul>",
-      "keyDifferences": "ST changes may be secondary; imaging confirms dissection; anticoagulation is dangerous.",
-      "keyDifferencesHtml": "<p>ST changes may be secondary; imaging confirms dissection; anticoagulation is dangerous.</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Acute Coronary Syndrome – STEMI",
+    "headingHtml": "<p><u><strong>Acute Coronary Syndrome – STEMI</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Key Points",
+      "Clinical Relevance / Management"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Key Points</strong></p>",
+      "<p><strong>Clinical Relevance / Management</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Definition",
+          "Acute myocardial infarction with ST-segment elevation on ECG and elevated cardiac biomarkers (troponin).",
+          "Identifies patients who need immediate reperfusion therapy."
+        ],
+        "cellsHtml": [
+          "<p>Definition</p>",
+          "<p>Acute myocardial infarction with <strong>ST-segment elevation</strong> on ECG and elevated cardiac biomarkers (troponin).</p>",
+          "<p>Identifies patients who need <strong>immediate reperfusion therapy</strong>.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Clinical Presentation",
+          "Sudden severe central chest pain,\nradiation to left arm/jaw,\ndiaphoresis,\nnausea,\nhypotension.",
+          "Helps in early recognition and triage in emergency settings."
+        ],
+        "cellsHtml": [
+          "<p>Clinical Presentation</p>",
+          "<ul><li>Sudden <strong>severe central chest pain</strong>, </li><li>radiation to left arm/jaw, </li><li>diaphoresis, </li><li>nausea, </li><li>hypotension.</li></ul>",
+          "<p>Helps in <strong>early recognition</strong> and triage in emergency settings.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Diagnosis & Investigation",
+          "ECG:\nST elevation in contiguous leads;\nTroponin:\nelevated;\nechocardiography for wall motion.",
+          "Confirms STEMI and guides urgent PCI or thrombolysis."
+        ],
+        "cellsHtml": [
+          "<p>Diagnosis &amp; Investigation</p>",
+          "<p><strong>ECG:</strong> </p><ul><li>ST elevation in contiguous leads; </li></ul><p><strong>Troponin: </strong></p><ul><li>elevated; </li><li>echocardiography for wall motion.</li></ul>",
+          "<p>Confirms STEMI and guides <strong>urgent PCI or thrombolysis</strong>.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Management",
+          "Immediate reperfusion:\nprimary PCI (preferred) or thrombolysis;\ndual antiplatelet therapy,\nanticoagulation,\nstatins,\nnitrates,\nbeta-blockers.",
+          "Reduces mortality and complications (heart failure, arrhythmias)."
+        ],
+        "cellsHtml": [
+          "<p>Management</p>",
+          "<p><strong>Immediate reperfusion:</strong> </p><ul><li>primary PCI (preferred) or thrombolysis; </li><li>dual antiplatelet therapy, </li><li>anticoagulation, </li><li>statins, </li><li>nitrates, </li><li>beta-blockers.</li></ul>",
+          "<p>Reduces <strong>mortality and complications</strong> (heart failure, arrhythmias).</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complications",
+          "Cardiogenic shock,\narrhythmias,\nheart failure,\nmechanical complications (VSD, rupture).",
+          "Early recognition improves prognosis and survival."
+        ],
+        "cellsHtml": [
+          "<p>Complications</p>",
+          "<ul><li>Cardiogenic shock, </li><li>arrhythmias, </li><li>heart failure, </li><li>mechanical complications (VSD, rupture).</li></ul>",
+          "<p>Early recognition improves <strong>prognosis and survival</strong>.</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of STEMI (ST-Elevation Myocardial Infarction)",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>STEMI (ST-Elevation Myocardial Infarction)</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "Differentiating Points from STEMI"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Differentiating Points from STEMI</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "NSTEMI",
+          "Chest pain,\nelevated troponin,\nno persistent ST elevation",
+          "ST depression or T-wave inversion instead of ST elevation; less urgent reperfusion required."
+        ],
+        "cellsHtml": [
+          "<p>NSTEMI</p>",
+          "<ul><li>Chest pain, </li><li>elevated troponin, </li><li><strong>no persistent ST elevation</strong></li></ul>",
+          "<p>ST depression or T-wave inversion instead of ST elevation; less urgent reperfusion required.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Unstable Angina",
+          "Chest pain at rest,\ntroponin normal,\nECG may be normal or show transient changes",
+          "No biomarker elevation; ST changes resolve quickly."
+        ],
+        "cellsHtml": [
+          "<p>Unstable Angina</p>",
+          "<ul><li>Chest pain at rest, </li><li><strong>troponin normal</strong>, </li><li>ECG may be normal or show transient changes</li></ul>",
+          "<p>No biomarker elevation; ST changes resolve quickly.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Prinzmetal (Variant) Angina",
+          "Chest pain at rest,\ntransient ST elevation,\noften younger patients",
+          "ST elevation is transient; troponin may be normal; responds to nitrates."
+        ],
+        "cellsHtml": [
+          "<p>Prinzmetal (Variant) Angina</p>",
+          "<ul><li>Chest pain at rest, </li><li><strong>transient ST elevation</strong>, </li><li>often younger patients</li></ul>",
+          "<p>ST elevation is transient; troponin may be normal; responds to nitrates.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Acute Pericarditis",
+          "Sharp pleuritic chest pain,\ndiffuse ST elevation,\nPR depression",
+          "ST elevation is diffuse, not regional; often positional; troponin mildly elevated if myopericarditis."
+        ],
+        "cellsHtml": [
+          "<p>Acute Pericarditis</p>",
+          "<ul><li>Sharp pleuritic chest pain, </li><li>diffuse ST elevation, </li><li>PR depression</li></ul>",
+          "<p>ST elevation is <strong>diffuse</strong>, not regional; often positional; troponin mildly elevated if myopericarditis.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pulmonary Embolism (massive)",
+          "Sudden dyspnea,\npleuritic chest pain,\ntachycardia,\nsometimes troponin rise",
+          "ECG may show S1Q3T3 or nonspecific changes; no contiguous ST elevation."
+        ],
+        "cellsHtml": [
+          "<p>Pulmonary Embolism (massive)</p>",
+          "<ul><li>Sudden dyspnea, </li><li>pleuritic chest pain, </li><li>tachycardia, </li><li>sometimes troponin rise</li></ul>",
+          "<p>ECG may show S1Q3T3 or nonspecific changes; no contiguous ST elevation.</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Aortic Dissection",
+          "Severe tearing chest/back pain,\nunequal pulses,\nhypotension",
+          "ST changes may be secondary; imaging confirms dissection; anticoagulation is dangerous."
+        ],
+        "cellsHtml": [
+          "<p>Aortic Dissection</p>",
+          "<ul><li>Severe tearing chest/back pain, </li><li>unequal pulses, </li><li>hypotension</li></ul>",
+          "<p>ST changes may be secondary; imaging confirms dissection; anticoagulation is dangerous.</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "STEMI (ST-Elevation Myocardial Infarction)",
-    "caption": "This diagram illustrates the pathophysiology of STEMI, starting from atherosclerotic plaque rupture leading to thrombus formation and complete coronary artery occlusion. It highlights key clinical features, characteristic ECG changes (ST elevation in contiguous leads), and elevated cardiac biomarkers. The diagram emphasizes the urgency of management with immediate reperfusion therapy (primary PCI or thrombolysis) along with adjunct medical treatment to restore blood flow, limit myocardial damage, and improve survival.",
-    "captionHtml": "<p>This diagram illustrates the pathophysiology of STEMI, starting from atherosclerotic plaque rupture leading to thrombus formation and complete coronary artery occlusion. It highlights key clinical features, characteristic ECG changes (ST elevation in contiguous leads), and elevated cardiac biomarkers. The diagram emphasizes the urgency of management with immediate reperfusion therapy (primary PCI or thrombolysis) along with adjunct medical treatment to restore blood flow, limit myocardial damage, and improve survival.</p>",
+    "heading": "Acute Coronary Syndrome STEMI (ST-Elevation Myocardial Infarction)",
+    "headingHtml": "<p><u><strong>Acute Coronary Syndrome</strong></u></p><p><u><strong>STEMI (ST-Elevation Myocardial Infarction)</strong></u></p>",
+    "description": "This diagram illustrates the pathophysiology of STEMI, starting from atherosclerotic plaque rupture leading to thrombus formation and complete coronary artery occlusion. It highlights key clinical features, characteristic ECG changes (ST elevation in contiguous leads), and elevated cardiac biomarkers. The diagram emphasizes the urgency of management with immediate reperfusion therapy (primary PCI or thrombolysis) along with adjunct medical treatment to restore blood flow, limit myocardial damage, and improve survival.",
+    "descriptionHtml": "<p>This diagram illustrates the pathophysiology of STEMI, starting from atherosclerotic plaque rupture leading to thrombus formation and complete coronary artery occlusion. It highlights key clinical features, characteristic ECG changes (ST elevation in contiguous leads), and elevated cardiac biomarkers. The diagram emphasizes the urgency of management with immediate reperfusion therapy (primary PCI or thrombolysis) along with adjunct medical treatment to restore blood flow, limit myocardial damage, and improve survival.</p>",
     "images": [
       {
         "filename": "image1.png",

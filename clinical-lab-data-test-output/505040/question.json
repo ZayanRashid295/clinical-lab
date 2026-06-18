@@ -70,106 +70,185 @@
   "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
-    "product": "Medicine & Allied"
+    "product": "Medicine & Allied",
+    "topic": "Asthma",
+    "subtopic": "Recognition",
+    "mcqTitle": "Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Variation in Airway Hyperresponsiveness)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning",
+    "difficultyLevel": "Moderate",
+    "system": "Respiratory System (Pulmonology)"
   },
-  "featureTableName": "Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Variation in Airway Hyperresponsiveness)",
-  "differentialDiagnosisTableName": "System/ Title: Pulmonology Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Airway Hyperresponsiveness) Differential Diagnosis of Nocturnal Respiratory Symptoms",
-  "featureTable": [
-    {
-      "feature": "Nocturnal\nsymptoms",
-      "featureHtml": "<p><strong>Nocturnal </strong></p><p><strong>symptoms</strong></p>",
-      "description": "• Worsening after midnight\n• Early morning exacerbation\n• Sleep disturbance",
-      "descriptionHtml": "<p>• Worsening after midnight </p><p>• Early morning exacerbation </p><p>• Sleep disturbance</p>",
-      "clinicalImportance": "Classic circadian pattern due to increased airway inflammation and vagal tone at night",
-      "clinicalImportanceHtml": "<p>Classic circadian pattern due to increased airway inflammation and vagal tone at night</p>"
-    },
-    {
-      "feature": "Symptom pattern",
-      "featureHtml": "<p><strong>Symptom pattern</strong></p>",
-      "description": "• Episodic wheeze\n• Intermittent chest tightness\n• Variable cough",
-      "descriptionHtml": "<p>• Episodic wheeze </p><p>• Intermittent chest tightness </p><p>• Variable cough</p>",
-      "clinicalImportance": "Indicates reversible airflow obstruction rather than fixed lung disease",
-      "clinicalImportanceHtml": "<p>Indicates reversible airflow obstruction rather than fixed lung disease</p>"
-    },
-    {
-      "feature": "Daytime status",
-      "featureHtml": "<p><strong>Daytime status</strong></p>",
-      "description": "• Often asymptomatic\n• Normal examination\n• Minimal findings between attacks",
-      "descriptionHtml": "<p>• Often asymptomatic </p><p>• Normal examination </p><p>• Minimal findings between attacks</p>",
-      "clinicalImportance": "Supports intermittent airway narrowing typical of asthma",
-      "clinicalImportanceHtml": "<p>Supports intermittent airway narrowing typical of asthma</p>"
-    },
-    {
-      "feature": "Airway behavior",
-      "featureHtml": "<p><strong>Airway behavior</strong></p>",
-      "description": "• Bronchial hyperreactivity\n• Reversible obstruction\n• Trigger-dependent symptoms",
-      "descriptionHtml": "<p>• Bronchial hyperreactivity </p><p>• Reversible obstruction </p><p>• Trigger-dependent symptoms</p>",
-      "clinicalImportance": "Core pathophysiology of asthma distinguishing it from COPD or fibrosis",
-      "clinicalImportanceHtml": "<p>Core pathophysiology of asthma distinguishing it from COPD or fibrosis</p>"
-    },
-    {
-      "feature": "Trigger pattern",
-      "featureHtml": "<p><strong>Trigger pattern</strong></p>",
-      "description": "• Allergens\n• Dust exposure\n• Cold air\n• Night-time circadian shift",
-      "descriptionHtml": "<p>• Allergens </p><p>• Dust exposure </p><p>• Cold air </p><p>• Night-time circadian shift</p>",
-      "clinicalImportance": "Helps differentiate allergic asthma from infectious or structural causes",
-      "clinicalImportanceHtml": "<p>Helps differentiate allergic asthma from infectious or structural causes</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "COPD",
-      "conditionHtml": "<p><strong>COPD</strong></p>",
-      "distinguishingFeatures": "• Progressive dyspnea\n• Chronic cough\n• Smoking history\n• Persistent symptoms",
-      "distinguishingFeaturesHtml": "<p>• Progressive dyspnea </p><p>• Chronic cough </p><p>• Smoking history </p><p>• Persistent symptoms</p>",
-      "keyDifferences": "Fixed airflow limitation, lacks full reversibility and strong nocturnal pattern",
-      "keyDifferencesHtml": "<p>Fixed airflow limitation, lacks full reversibility and strong nocturnal pattern</p>"
-    },
-    {
-      "condition": "Left heart failure\n(Cardiac asthma)",
-      "conditionHtml": "<p><strong>Left heart failure </strong></p><p><strong>(Cardiac asthma)</strong></p>",
-      "distinguishingFeatures": "• Orthopnea\n• Paroxysmal nocturnal dyspnea\n• Basal crackles\n• Edema",
-      "distinguishingFeaturesHtml": "<p>• Orthopnea </p><p>• Paroxysmal nocturnal dyspnea </p><p>• Basal crackles </p><p>• Edema</p>",
-      "keyDifferences": "Fluid overload causes wheeze-like symptoms but cardiac in origin",
-      "keyDifferencesHtml": "<p>Fluid overload causes wheeze-like symptoms but cardiac in origin</p>"
-    },
-    {
-      "condition": "GERD",
-      "conditionHtml": "<p><strong>GERD</strong></p>",
-      "distinguishingFeatures": "• Night cough\n• Acid reflux symptoms\n• Post-meal worsening",
-      "distinguishingFeaturesHtml": "<p>• Night cough </p><p>• Acid reflux symptoms </p><p>• Post-meal worsening</p>",
-      "keyDifferences": "Microaspiration triggers cough, not bronchospasm",
-      "keyDifferencesHtml": "<p>Microaspiration triggers cough, not bronchospasm</p>"
-    },
-    {
-      "condition": "Obstructive sleep\napnea",
-      "conditionHtml": "<p><strong>Obstructive sleep </strong></p><p><strong>apnea</strong></p>",
-      "distinguishingFeatures": "• Loud snoring\n• Daytime somnolence\n• Apneic episodes",
-      "distinguishingFeaturesHtml": "<p>• Loud snoring </p><p>• Daytime somnolence </p><p>• Apneic episodes</p>",
-      "keyDifferences": "Upper airway collapse rather than bronchial obstruction",
-      "keyDifferencesHtml": "<p>Upper airway collapse rather than bronchial obstruction</p>"
-    },
-    {
-      "condition": "Post-nasal drip\n(Upper airway\ncough syndrome)",
-      "conditionHtml": "<p><strong>Post-nasal drip </strong></p><p><strong>(Upper airway </strong></p><p><strong>cough syndrome)</strong></p>",
-      "distinguishingFeatures": "• Chronic throat clearing\n• Nasal congestion\n• Night cough",
-      "distinguishingFeaturesHtml": "<p>• Chronic throat clearing </p><p>• Nasal congestion </p><p>• Night cough</p>",
-      "keyDifferences": "Upper airway secretion-related cough, not lower airway disease",
-      "keyDifferencesHtml": "<p>Upper airway secretion-related cough, not lower airway disease</p>"
-    },
-    {
-      "condition": "Pulmonary TB",
-      "conditionHtml": "<p><strong>Pulmonary TB</strong></p>",
-      "distinguishingFeatures": "• Weight loss\n• Hemoptysis\n• Night sweats",
-      "distinguishingFeaturesHtml": "<p>• Weight loss </p><p>• Hemoptysis </p><p>• Night sweats</p>",
-      "keyDifferences": "Chronic infective destructive disease, not episodic reversible obstruction",
-      "keyDifferencesHtml": "<p>Chronic infective destructive disease, not episodic reversible obstruction</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Airway Hyperresponsiveness)",
+    "headingHtml": "<p><u><strong>Bronchial Asthma – Nocturnal Symptom Pattern </strong></u></p><p><u><strong>(Circadian Airway Hyperresponsiveness)</strong></u></p>",
+    "columns": [
+      "Clinical Feature",
+      "Key Characteristics",
+      "Brief Clinical Significance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Clinical Feature</strong></p>",
+      "<p><strong>Key Characteristics </strong></p>",
+      "<p><strong>Brief Clinical Significance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Nocturnal\nsymptoms",
+          "• Worsening after midnight\n• Early morning exacerbation\n• Sleep disturbance",
+          "Classic circadian pattern due to increased airway inflammation and vagal tone at night"
+        ],
+        "cellsHtml": [
+          "<p><strong>Nocturnal </strong></p><p><strong>symptoms</strong></p>",
+          "<p>• Worsening after midnight </p><p>• Early morning exacerbation </p><p>• Sleep disturbance</p>",
+          "<p>Classic circadian pattern due to increased airway inflammation and vagal tone at night</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Symptom pattern",
+          "• Episodic wheeze\n• Intermittent chest tightness\n• Variable cough",
+          "Indicates reversible airflow obstruction rather than fixed lung disease"
+        ],
+        "cellsHtml": [
+          "<p><strong>Symptom pattern</strong></p>",
+          "<p>• Episodic wheeze </p><p>• Intermittent chest tightness </p><p>• Variable cough</p>",
+          "<p>Indicates reversible airflow obstruction rather than fixed lung disease</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Daytime status",
+          "• Often asymptomatic\n• Normal examination\n• Minimal findings between attacks",
+          "Supports intermittent airway narrowing typical of asthma"
+        ],
+        "cellsHtml": [
+          "<p><strong>Daytime status</strong></p>",
+          "<p>• Often asymptomatic </p><p>• Normal examination </p><p>• Minimal findings between attacks</p>",
+          "<p>Supports intermittent airway narrowing typical of asthma</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Airway behavior",
+          "• Bronchial hyperreactivity\n• Reversible obstruction\n• Trigger-dependent symptoms",
+          "Core pathophysiology of asthma distinguishing it from COPD or fibrosis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Airway behavior</strong></p>",
+          "<p>• Bronchial hyperreactivity </p><p>• Reversible obstruction </p><p>• Trigger-dependent symptoms</p>",
+          "<p>Core pathophysiology of asthma distinguishing it from COPD or fibrosis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Trigger pattern",
+          "• Allergens\n• Dust exposure\n• Cold air\n• Night-time circadian shift",
+          "Helps differentiate allergic asthma from infectious or structural causes"
+        ],
+        "cellsHtml": [
+          "<p><strong>Trigger pattern</strong></p>",
+          "<p>• Allergens </p><p>• Dust exposure </p><p>• Cold air </p><p>• Night-time circadian shift</p>",
+          "<p>Helps differentiate allergic asthma from infectious or structural causes</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Nocturnal Respiratory Symptoms",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Nocturnal Respiratory Symptoms</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Features",
+      "How it differs from Asthma"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Features </strong></p>",
+      "<p><strong>How it differs from Asthma</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "COPD",
+          "• Progressive dyspnea\n• Chronic cough\n• Smoking history\n• Persistent symptoms",
+          "Fixed airflow limitation, lacks full reversibility and strong nocturnal pattern"
+        ],
+        "cellsHtml": [
+          "<p><strong>COPD</strong></p>",
+          "<p>• Progressive dyspnea </p><p>• Chronic cough </p><p>• Smoking history </p><p>• Persistent symptoms</p>",
+          "<p>Fixed airflow limitation, lacks full reversibility and strong nocturnal pattern</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Left heart failure\n(Cardiac asthma)",
+          "• Orthopnea\n• Paroxysmal nocturnal dyspnea\n• Basal crackles\n• Edema",
+          "Fluid overload causes wheeze-like symptoms but cardiac in origin"
+        ],
+        "cellsHtml": [
+          "<p><strong>Left heart failure </strong></p><p><strong>(Cardiac asthma)</strong></p>",
+          "<p>• Orthopnea </p><p>• Paroxysmal nocturnal dyspnea </p><p>• Basal crackles </p><p>• Edema</p>",
+          "<p>Fluid overload causes wheeze-like symptoms but cardiac in origin</p>"
+        ]
+      },
+      {
+        "cells": [
+          "GERD",
+          "• Night cough\n• Acid reflux symptoms\n• Post-meal worsening",
+          "Microaspiration triggers cough, not bronchospasm"
+        ],
+        "cellsHtml": [
+          "<p><strong>GERD</strong></p>",
+          "<p>• Night cough </p><p>• Acid reflux symptoms </p><p>• Post-meal worsening</p>",
+          "<p>Microaspiration triggers cough, not bronchospasm</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Obstructive sleep\napnea",
+          "• Loud snoring\n• Daytime somnolence\n• Apneic episodes",
+          "Upper airway collapse rather than bronchial obstruction"
+        ],
+        "cellsHtml": [
+          "<p><strong>Obstructive sleep </strong></p><p><strong>apnea</strong></p>",
+          "<p>• Loud snoring </p><p>• Daytime somnolence </p><p>• Apneic episodes</p>",
+          "<p>Upper airway collapse rather than bronchial obstruction</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Post-nasal drip\n(Upper airway\ncough syndrome)",
+          "• Chronic throat clearing\n• Nasal congestion\n• Night cough",
+          "Upper airway secretion-related cough, not lower airway disease"
+        ],
+        "cellsHtml": [
+          "<p><strong>Post-nasal drip </strong></p><p><strong>(Upper airway </strong></p><p><strong>cough syndrome)</strong></p>",
+          "<p>• Chronic throat clearing </p><p>• Nasal congestion </p><p>• Night cough</p>",
+          "<p>Upper airway secretion-related cough, not lower airway disease</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pulmonary TB",
+          "• Weight loss\n• Hemoptysis\n• Night sweats",
+          "Chronic infective destructive disease, not episodic reversible obstruction"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pulmonary TB</strong></p>",
+          "<p>• Weight loss </p><p>• Hemoptysis </p><p>• Night sweats</p>",
+          "<p>Chronic infective destructive disease, not episodic reversible obstruction</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Variation in Airway Hyperresponsiveness)",
-    "caption": "This diagram illustrates the characteristic nocturnal worsening of bronchial asthma symptoms due to circadian variation in airway hyperresponsiveness. It highlights increased night-time bronchoconstriction caused by elevated vagal tone, reduced cortisol levels, inflammatory mediator release, and airway narrowing during sleep. The image also demonstrates typical nocturnal symptoms, common triggers, early morning exacerbation, and daytime improvement in airway caliber and lung function.",
-    "captionHtml": "<p>This diagram illustrates the characteristic nocturnal worsening of bronchial asthma symptoms due to circadian variation in airway hyperresponsiveness. It highlights increased night-time bronchoconstriction caused by elevated vagal tone, reduced cortisol levels, inflammatory mediator release, and airway narrowing during sleep. The image also demonstrates typical nocturnal symptoms, common triggers, early morning exacerbation, and daytime improvement in airway caliber and lung function.</p>",
+    "heading": "Bronchial Asthma – Nocturnal Symptom Pattern (Circadian Variation in Airway Hyperresponsiveness)",
+    "headingHtml": "<p><u><strong>Bronchial Asthma – Nocturnal Symptom Pattern </strong></u></p><p><u><strong>(Circadian Variation in Airway Hyperresponsiveness)</strong></u></p>",
+    "description": "This diagram illustrates the characteristic nocturnal worsening of bronchial asthma symptoms due to circadian variation in airway hyperresponsiveness. It highlights increased night-time bronchoconstriction caused by elevated vagal tone, reduced cortisol levels, inflammatory mediator release, and airway narrowing during sleep. The image also demonstrates typical nocturnal symptoms, common triggers, early morning exacerbation, and daytime improvement in airway caliber and lung function.",
+    "descriptionHtml": "<p>This diagram illustrates the characteristic nocturnal worsening of bronchial asthma symptoms due to circadian variation in airway hyperresponsiveness. It highlights increased night-time bronchoconstriction caused by elevated vagal tone, reduced cortisol levels, inflammatory mediator release, and airway narrowing during sleep. The image also demonstrates typical nocturnal symptoms, common triggers, early morning exacerbation, and daytime improvement in airway caliber and lung function.</p>",
     "images": [
       {
         "filename": "image1.png",

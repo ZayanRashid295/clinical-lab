@@ -71,94 +71,163 @@
   "classicTriad": "Microcytosis + Normal RDW + Normal Ferritin → highly suggestive of beta-thalassemia minor.",
   "classicTriadHtml": "<ul><li><strong>Microcytosis + Normal RDW + Normal Ferritin</strong> → highly suggestive of <strong>beta-thalassemia minor</strong>.</li></ul>",
   "classicTriadTitle": "Classic Triad in Stem (for Beta-thalassemia minor suspicion)",
-  "featureTableName": "Microcytic Anemia: Iron Deficiency Anemia vs Beta-Thalassemia Minor – Response to Oral Iron Therapy",
-  "differentialDiagnosisTableName": "Microcytic Anemia – Beta-Thalassemia Minor Differential Diagnosis of Microcytic Anemia with Normal RDW and Ferritin",
-  "featureTable": [
-    {
-      "feature": "RBC Indices",
-      "featureHtml": "<p><strong>RBC Indices</strong></p>",
-      "description": "Microcytic anemia (low MCV),\nnormal RDW",
-      "descriptionHtml": "<ul><li>Microcytic anemia (low MCV), </li><li><strong>normal RDW</strong></li></ul>",
-      "clinicalImportance": "Uniformly small RBCs;\ndistinguishes from iron deficiency",
-      "clinicalImportanceHtml": "<ul><li>Uniformly small RBCs; </li><li>distinguishes from iron deficiency</li></ul>"
-    },
-    {
-      "feature": "Iron Studies",
-      "featureHtml": "<p><strong>Iron Studies</strong></p>",
-      "description": "Normal ferritin,\nnormal serum iron,\nnormal TIBC",
-      "descriptionHtml": "<ul><li>Normal ferritin, </li><li>normal serum iron, </li><li>normal TIBC</li></ul>",
-      "clinicalImportance": "Iron stores are adequate;\nnot iron deficiency",
-      "clinicalImportanceHtml": "<ul><li>Iron stores are adequate; </li><li>not iron deficiency</li></ul>"
-    },
-    {
-      "feature": "Peripheral Smear",
-      "featureHtml": "<p><strong>Peripheral Smear</strong></p>",
-      "description": "Target cells,\nbasophilic stippling",
-      "descriptionHtml": "<ul><li>Target cells, </li><li>basophilic stippling</li></ul>",
-      "clinicalImportance": "Suggests globin chain synthesis defect",
-      "clinicalImportanceHtml": "<p>Suggests globin chain synthesis defect</p>"
-    },
-    {
-      "feature": "Clinical Features",
-      "featureHtml": "<p><strong>Clinical Features</strong></p>",
-      "description": "Usually asymptomatic or mild fatigue",
-      "descriptionHtml": "<ul><li>Usually asymptomatic or mild fatigue</li></ul>",
-      "clinicalImportance": "Often discovered incidentally during routine labs",
-      "clinicalImportanceHtml": "<p>Often discovered incidentally during routine labs</p>"
-    },
-    {
-      "feature": "Genetics",
-      "featureHtml": "<p><strong>Genetics</strong></p>",
-      "description": "Autosomal recessive;\nmutation in β-globin gene",
-      "descriptionHtml": "<ul><li>Autosomal recessive; </li><li>mutation in β-globin gene</li></ul>",
-      "clinicalImportance": "Important for genetic counseling and family screening",
-      "clinicalImportanceHtml": "<p>Important for genetic counseling and family screening</p>"
-    },
-    {
-      "feature": "Hb Electrophoresis",
-      "featureHtml": "<p><strong>Hb Electrophoresis</strong></p>",
-      "description": "Elevated HbA2,\nsometimes mildly elevated HbF",
-      "descriptionHtml": "<ul><li>Elevated HbA2, </li><li>sometimes mildly elevated HbF</li></ul>",
-      "clinicalImportance": "Confirms diagnosis of beta-thalassemia minor",
-      "clinicalImportanceHtml": "<p>Confirms diagnosis of beta-thalassemia minor</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Beta-thalassemia minor",
-      "conditionHtml": "<p>Beta-thalassemia minor</p>",
-      "distinguishingFeatures": "Microcytic anemia,\nnormal RDW,\nnormal ferritin,\ntarget cells on smear",
-      "distinguishingFeaturesHtml": "<ul><li>Microcytic anemia, </li><li><strong>normal RDW</strong>, </li><li>normal ferritin, </li><li>target cells on smear</li></ul>",
-      "keyDifferences": "MCV low out of proportion to mild anemia, HbA2 elevated on electrophoresis",
-      "keyDifferencesHtml": "<p>MCV low out of proportion to mild anemia, HbA2 elevated on electrophoresis</p>"
-    },
-    {
-      "condition": "Iron deficiency anemia",
-      "conditionHtml": "<p>Iron deficiency anemia</p>",
-      "distinguishingFeatures": "Microcytic anemia,\nhigh RDW,\nlow ferritin,\nlow serum iron,\nhigh TIBC",
-      "distinguishingFeaturesHtml": "<ul><li>Microcytic anemia, </li><li><strong>high RDW</strong>, </li><li>low ferritin, </li><li>low serum iron, </li><li>high TIBC</li></ul>",
-      "keyDifferences": "Elevated RDW and low ferritin differentiate from thalassemia minor",
-      "keyDifferencesHtml": "<p>Elevated RDW and low ferritin differentiate from thalassemia minor</p>"
-    },
-    {
-      "condition": "Anemia of chronic disease",
-      "conditionHtml": "<p>Anemia of chronic disease</p>",
-      "distinguishingFeatures": "Mild microcytic or normocytic anemia,\nnormal or high ferritin,\nlow serum iron,\nlow TIBC",
-      "distinguishingFeaturesHtml": "<ul><li>Mild microcytic or normocytic anemia, </li><li>normal or high ferritin, </li><li>low serum iron, </li><li>low TIBC</li></ul>",
-      "keyDifferences": "Usually associated with chronic infection, inflammation, or malignancy",
-      "keyDifferencesHtml": "<p>Usually associated with chronic infection, inflammation, or malignancy</p>"
-    },
-    {
-      "condition": "Lead poisoning",
-      "conditionHtml": "<p>Lead poisoning</p>",
-      "distinguishingFeatures": "Microcytic anemia,\nbasophilic stippling,\nsometimes high RDW",
-      "distinguishingFeaturesHtml": "<ul><li>Microcytic anemia, </li><li>basophilic stippling, </li><li>sometimes high RDW</li></ul>",
-      "keyDifferences": "Exposure history and basophilic stippling help differentiate",
-      "keyDifferencesHtml": "<p>Exposure history and basophilic stippling help differentiate</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Microcytic Anemia – Beta-Thalassemia Minor",
+    "headingHtml": "<p><u><strong>Microcytic Anemia – Beta-Thalassemia Minor</strong></u></p>",
+    "columns": [
+      "Parameter",
+      "Findings in Beta-Thalassemia Minor",
+      "Key Point / Clinical Relevance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Parameter</strong></p>",
+      "<p><strong>Findings in Beta-Thalassemia Minor</strong></p>",
+      "<p><strong>Key Point / Clinical Relevance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "RBC Indices",
+          "Microcytic anemia (low MCV),\nnormal RDW",
+          "Uniformly small RBCs;\ndistinguishes from iron deficiency"
+        ],
+        "cellsHtml": [
+          "<p><strong>RBC Indices</strong></p>",
+          "<ul><li>Microcytic anemia (low MCV), </li><li><strong>normal RDW</strong></li></ul>",
+          "<ul><li>Uniformly small RBCs; </li><li>distinguishes from iron deficiency</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Iron Studies",
+          "Normal ferritin,\nnormal serum iron,\nnormal TIBC",
+          "Iron stores are adequate;\nnot iron deficiency"
+        ],
+        "cellsHtml": [
+          "<p><strong>Iron Studies</strong></p>",
+          "<ul><li>Normal ferritin, </li><li>normal serum iron, </li><li>normal TIBC</li></ul>",
+          "<ul><li>Iron stores are adequate; </li><li>not iron deficiency</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Peripheral Smear",
+          "Target cells,\nbasophilic stippling",
+          "Suggests globin chain synthesis defect"
+        ],
+        "cellsHtml": [
+          "<p><strong>Peripheral Smear</strong></p>",
+          "<ul><li>Target cells, </li><li>basophilic stippling</li></ul>",
+          "<p>Suggests globin chain synthesis defect</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Clinical Features",
+          "Usually asymptomatic or mild fatigue",
+          "Often discovered incidentally during routine labs"
+        ],
+        "cellsHtml": [
+          "<p><strong>Clinical Features</strong></p>",
+          "<ul><li>Usually asymptomatic or mild fatigue</li></ul>",
+          "<p>Often discovered incidentally during routine labs</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Genetics",
+          "Autosomal recessive;\nmutation in β-globin gene",
+          "Important for genetic counseling and family screening"
+        ],
+        "cellsHtml": [
+          "<p><strong>Genetics</strong></p>",
+          "<ul><li>Autosomal recessive; </li><li>mutation in β-globin gene</li></ul>",
+          "<p>Important for genetic counseling and family screening</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Hb Electrophoresis",
+          "Elevated HbA2,\nsometimes mildly elevated HbF",
+          "Confirms diagnosis of beta-thalassemia minor"
+        ],
+        "cellsHtml": [
+          "<p><strong>Hb Electrophoresis</strong></p>",
+          "<ul><li>Elevated HbA2, </li><li>sometimes mildly elevated HbF</li></ul>",
+          "<p>Confirms diagnosis of beta-thalassemia minor</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Microcytic Anemia with Normal RDW and Ferritin",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Microcytic Anemia with Normal RDW and Ferritin</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Laboratory Features",
+      "Distinguishing Point / How to Differentiate"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Laboratory Features</strong></p>",
+      "<p><strong>Distinguishing Point / How to Differentiate</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Beta-thalassemia minor",
+          "Microcytic anemia,\nnormal RDW,\nnormal ferritin,\ntarget cells on smear",
+          "MCV low out of proportion to mild anemia, HbA2 elevated on electrophoresis"
+        ],
+        "cellsHtml": [
+          "<p>Beta-thalassemia minor</p>",
+          "<ul><li>Microcytic anemia, </li><li><strong>normal RDW</strong>, </li><li>normal ferritin, </li><li>target cells on smear</li></ul>",
+          "<p>MCV low out of proportion to mild anemia, HbA2 elevated on electrophoresis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Iron deficiency anemia",
+          "Microcytic anemia,\nhigh RDW,\nlow ferritin,\nlow serum iron,\nhigh TIBC",
+          "Elevated RDW and low ferritin differentiate from thalassemia minor"
+        ],
+        "cellsHtml": [
+          "<p>Iron deficiency anemia</p>",
+          "<ul><li>Microcytic anemia, </li><li><strong>high RDW</strong>, </li><li>low ferritin, </li><li>low serum iron, </li><li>high TIBC</li></ul>",
+          "<p>Elevated RDW and low ferritin differentiate from thalassemia minor</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Anemia of chronic disease",
+          "Mild microcytic or normocytic anemia,\nnormal or high ferritin,\nlow serum iron,\nlow TIBC",
+          "Usually associated with chronic infection, inflammation, or malignancy"
+        ],
+        "cellsHtml": [
+          "<p>Anemia of chronic disease</p>",
+          "<ul><li>Mild microcytic or normocytic anemia, </li><li>normal or high ferritin, </li><li>low serum iron, </li><li>low TIBC</li></ul>",
+          "<p>Usually associated with chronic infection, inflammation, or malignancy</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Lead poisoning",
+          "Microcytic anemia,\nbasophilic stippling,\nsometimes high RDW",
+          "Exposure history and basophilic stippling help differentiate"
+        ],
+        "cellsHtml": [
+          "<p>Lead poisoning</p>",
+          "<ul><li>Microcytic anemia, </li><li>basophilic stippling, </li><li>sometimes high RDW</li></ul>",
+          "<p>Exposure history and basophilic stippling help differentiate</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "sometimes mildly elevated HbF Confirms diagnosis of beta-thalassemia minor",
+    "heading": "Microcytic Anemia: Iron Deficiency Anemia vs Beta-Thalassemia Minor – Response to Oral Iron Therapy",
+    "headingHtml": "<p><u><strong>Microcytic Anemia: </strong></u></p><p><u><strong>Iron Deficiency Anemia vs Beta-Thalassemia Minor – </strong></u></p><p><u><strong>Response to Oral Iron Therapy</strong></u></p>",
+    "description": "This diagram compares iron deficiency anemia and beta-thalassemia minor as causes of microcytic anemia, highlighting their underlying mechanisms and laboratory differences. It emphasizes that iron deficiency anemia shows low ferritin and responds to oral iron therapy, whereas beta-thalassemia minor has normal ferritin, normal RDW, and does not significantly improve with iron therapy, as it is a genetic disorder of globin synthesis rather than iron deficiency.",
+    "descriptionHtml": "<p>This diagram compares <strong>iron deficiency anemia</strong> and <strong>beta-thalassemia minor</strong> as causes of microcytic anemia, highlighting their underlying mechanisms and laboratory differences. It emphasizes that <strong>iron deficiency anemia shows low ferritin and responds to oral iron therapy</strong>, whereas <strong>beta-thalassemia minor has normal ferritin, normal RDW, and does not significantly improve with iron therapy</strong>, as it is a genetic disorder of globin synthesis rather than iron deficiency.</p>",
     "images": [
       {
         "filename": "image1.png",

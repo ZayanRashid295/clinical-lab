@@ -71,112 +71,187 @@
   "classicTriad": "Psoriasis + DIP involvement + Inflammatory joint stiffness → Triad suggestive of Psoriatic Arthritis.",
   "classicTriadHtml": "<ul><li><strong>Psoriasis + DIP involvement + Inflammatory joint stiffness</strong> → Triad suggestive of <strong>Psoriatic Arthritis</strong>.</li></ul>",
   "classicTriadTitle": "Classic Triad in Stem",
-  "featureTableName": "Psoriatic Arthritis in Psoriasis Patients",
-  "differentialDiagnosisTableName": "Psoriatic Arthritis in Psoriasis Patients Differential Diagnosis of Psoriatic Arthritis",
-  "featureTable": [
-    {
-      "feature": "Epidemiology",
-      "featureHtml": "<p><strong>Epidemiology</strong></p>",
-      "description": "Affects 10–30% of patients with psoriasis;\ncan precede or follow skin lesions",
-      "descriptionHtml": "<ul><li>Affects 10–30% of patients with psoriasis; </li><li>can precede or follow skin lesions</li></ul>",
-      "clinicalImportance": "Usually adults, both genders;\nfamily history may be positive",
-      "clinicalImportanceHtml": "<ul><li>Usually adults, both genders; </li><li>family history may be positive</li></ul>"
-    },
-    {
-      "feature": "Joints Involved",
-      "featureHtml": "<p><strong>Joints Involved</strong></p>",
-      "description": "DIP joints,\nPIP,\nsometimes MCP,\nasymmetric oligoarthritis,\nspine (spondylitis)",
-      "descriptionHtml": "<ul><li>DIP joints, </li><li>PIP, </li><li>sometimes MCP, </li><li>asymmetric oligoarthritis, </li><li>spine (spondylitis)</li></ul>",
-      "clinicalImportance": "DIP involvement + nail changes suggest psoriatic arthritis",
-      "clinicalImportanceHtml": "<p>DIP involvement + nail changes suggest psoriatic arthritis</p>"
-    },
-    {
-      "feature": "Symptoms",
-      "featureHtml": "<p><strong>Symptoms</strong></p>",
-      "description": "Morning stiffness improving with activity,\npain,\nswelling,\ntenderness",
-      "descriptionHtml": "<ul><li>Morning stiffness improving with activity, </li><li>pain, </li><li>swelling, </li><li>tenderness</li></ul>",
-      "clinicalImportance": "Inflammatory pattern distinguishes from OA (worse with activity)",
-      "clinicalImportanceHtml": "<p>Inflammatory pattern distinguishes from OA (worse with activity)</p>"
-    },
-    {
-      "feature": "Extra-articular Manifestations",
-      "featureHtml": "<p><strong>Extra-articular Manifestations</strong></p>",
-      "description": "Nail pitting,\nonycholysis,\ndactylitis,\nenthesitis",
-      "descriptionHtml": "<ul><li>Nail pitting, </li><li>onycholysis, </li><li>dactylitis, </li><li>enthesitis</li></ul>",
-      "clinicalImportance": "Helps differentiate from RA and gout",
-      "clinicalImportanceHtml": "<p>Helps differentiate from RA and gout</p>"
-    },
-    {
-      "feature": "Investigations",
-      "featureHtml": "<p><strong>Investigations</strong></p>",
-      "description": "X-ray: pencil-in-cup deformity, joint erosion;\nESR/CRP elevated;\nRF negative",
-      "descriptionHtml": "<ul><li><strong>X-ray:</strong> pencil-in-cup deformity, joint erosion; </li><li>ESR/CRP elevated; </li><li>RF negative</li></ul>",
-      "clinicalImportance": "Imaging supports diagnosis;\nlabs mainly to rule out other arthritis",
-      "clinicalImportanceHtml": "<ul><li>Imaging supports diagnosis; </li><li>labs mainly to rule out other arthritis</li></ul>"
-    },
-    {
-      "feature": "Management",
-      "featureHtml": "<p><strong>Management</strong></p>",
-      "description": "NSAIDs for mild disease,\nDMARDs (methotrexate, sulfasalazine),\nbiologics for severe",
-      "descriptionHtml": "<ul><li>NSAIDs for mild disease, </li><li>DMARDs (methotrexate, sulfasalazine), </li><li>biologics for severe</li></ul>",
-      "clinicalImportance": "Treatment tailored to severity, joint involvement, and comorbidities",
-      "clinicalImportanceHtml": "<p>Treatment tailored to severity, joint involvement, and comorbidities</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Rheumatoid Arthritis (RA)",
-      "conditionHtml": "<p><strong>Rheumatoid Arthritis (RA)</strong></p>",
-      "distinguishingFeatures": "Symmetric small joint involvement (MCP, PIP),\nspares DIP,\nprolonged morning stiffness",
-      "distinguishingFeaturesHtml": "<ul><li>Symmetric small joint involvement (MCP, PIP), </li><li>spares DIP, </li><li>prolonged morning stiffness</li></ul>",
-      "keyDifferences": "RF and anti-CCP positive;\nsystemic features common",
-      "keyDifferencesHtml": "<ul><li>RF and anti-CCP positive; </li><li>systemic features common</li></ul>"
-    },
-    {
-      "condition": "Osteoarthritis (OA)",
-      "conditionHtml": "<p><strong>Osteoarthritis (OA)</strong></p>",
-      "distinguishingFeatures": "Joint pain worsens with activity, improves with rest;\nbony swelling (Heberden’s nodes)",
-      "distinguishingFeaturesHtml": "<ul><li>Joint pain worsens with activity, improves with rest; </li><li>bony swelling (Heberden’s nodes)</li></ul>",
-      "keyDifferences": "Non-inflammatory;\nminimal morning stiffness",
-      "keyDifferencesHtml": "<ul><li>Non-inflammatory; </li><li>minimal morning stiffness</li></ul>"
-    },
-    {
-      "condition": "Gout",
-      "conditionHtml": "<p><strong>Gout</strong></p>",
-      "distinguishingFeatures": "Acute monoarticular attacks, often first MTP;\nsevere pain, redness",
-      "distinguishingFeaturesHtml": "<ul><li>Acute monoarticular attacks, often first MTP; </li><li>severe pain, redness</li></ul>",
-      "keyDifferences": "Urate crystals on synovial fluid;\nrecurrent flares",
-      "keyDifferencesHtml": "<ul><li>Urate crystals on synovial fluid;</li><li>recurrent flares</li></ul>"
-    },
-    {
-      "condition": "Reactive Arthritis",
-      "conditionHtml": "<p><strong>Reactive Arthritis</strong></p>",
-      "distinguishingFeatures": "Usually post-infection;\nasymmetric lower limb arthritis, conjunctivitis, urethritis",
-      "distinguishingFeaturesHtml": "<ul><li>Usually post-infection; </li><li>asymmetric lower limb arthritis, conjunctivitis, urethritis</li></ul>",
-      "keyDifferences": "HLA-B27 associated;\nshort-term course",
-      "keyDifferencesHtml": "<ul><li>HLA-B27 associated; </li><li>short-term course</li></ul>"
-    },
-    {
-      "condition": "Septic Arthritis",
-      "conditionHtml": "<p><strong>Septic Arthritis</strong></p>",
-      "distinguishingFeatures": "Acute,\nsevere,\nmonoarticular pain with swelling,\nerythema,\nfever",
-      "distinguishingFeaturesHtml": "<ul><li>Acute, </li><li>severe, </li><li>monoarticular pain with swelling,</li><li>erythema, </li><li>fever</li></ul>",
-      "keyDifferences": "Urgent management;\nsynovial fluid culture positive",
-      "keyDifferencesHtml": "<ul><li>Urgent management; </li><li>synovial fluid culture positive</li></ul>"
-    },
-    {
-      "condition": "Ankylosing Spondylitis (AS)",
-      "conditionHtml": "<p><strong>Ankylosing Spondylitis (AS)</strong></p>",
-      "distinguishingFeatures": "Spine and sacroiliac involvement,\ninflammatory back pain",
-      "distinguishingFeaturesHtml": "<ul><li>Spine and sacroiliac involvement,</li><li>inflammatory back pain</li></ul>",
-      "keyDifferences": "HLA-B27 positive;\nperipheral arthritis possible",
-      "keyDifferencesHtml": "<ul><li>HLA-B27 positive; </li><li>peripheral arthritis possible</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Psoriatic Arthritis in Psoriasis Patients",
+    "headingHtml": "<p><u><strong>Psoriatic Arthritis in Psoriasis Patients</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Clinical Details",
+      "Key Points"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Clinical Details</strong></p>",
+      "<p><strong>Key Points</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Epidemiology",
+          "Affects 10–30% of patients with psoriasis;\ncan precede or follow skin lesions",
+          "Usually adults, both genders;\nfamily history may be positive"
+        ],
+        "cellsHtml": [
+          "<p><strong>Epidemiology</strong></p>",
+          "<ul><li>Affects 10–30% of patients with psoriasis; </li><li>can precede or follow skin lesions</li></ul>",
+          "<ul><li>Usually adults, both genders; </li><li>family history may be positive</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Joints Involved",
+          "DIP joints,\nPIP,\nsometimes MCP,\nasymmetric oligoarthritis,\nspine (spondylitis)",
+          "DIP involvement + nail changes suggest psoriatic arthritis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Joints Involved</strong></p>",
+          "<ul><li>DIP joints, </li><li>PIP, </li><li>sometimes MCP, </li><li>asymmetric oligoarthritis, </li><li>spine (spondylitis)</li></ul>",
+          "<p>DIP involvement + nail changes suggest psoriatic arthritis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Symptoms",
+          "Morning stiffness improving with activity,\npain,\nswelling,\ntenderness",
+          "Inflammatory pattern distinguishes from OA (worse with activity)"
+        ],
+        "cellsHtml": [
+          "<p><strong>Symptoms</strong></p>",
+          "<ul><li>Morning stiffness improving with activity, </li><li>pain, </li><li>swelling, </li><li>tenderness</li></ul>",
+          "<p>Inflammatory pattern distinguishes from OA (worse with activity)</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Extra-articular Manifestations",
+          "Nail pitting,\nonycholysis,\ndactylitis,\nenthesitis",
+          "Helps differentiate from RA and gout"
+        ],
+        "cellsHtml": [
+          "<p><strong>Extra-articular Manifestations</strong></p>",
+          "<ul><li>Nail pitting, </li><li>onycholysis, </li><li>dactylitis, </li><li>enthesitis</li></ul>",
+          "<p>Helps differentiate from RA and gout</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Investigations",
+          "X-ray: pencil-in-cup deformity, joint erosion;\nESR/CRP elevated;\nRF negative",
+          "Imaging supports diagnosis;\nlabs mainly to rule out other arthritis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Investigations</strong></p>",
+          "<ul><li><strong>X-ray:</strong> pencil-in-cup deformity, joint erosion; </li><li>ESR/CRP elevated; </li><li>RF negative</li></ul>",
+          "<ul><li>Imaging supports diagnosis; </li><li>labs mainly to rule out other arthritis</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Management",
+          "NSAIDs for mild disease,\nDMARDs (methotrexate, sulfasalazine),\nbiologics for severe",
+          "Treatment tailored to severity, joint involvement, and comorbidities"
+        ],
+        "cellsHtml": [
+          "<p><strong>Management</strong></p>",
+          "<ul><li>NSAIDs for mild disease, </li><li>DMARDs (methotrexate, sulfasalazine), </li><li>biologics for severe</li></ul>",
+          "<p>Treatment tailored to severity, joint involvement, and comorbidities</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Psoriatic Arthritis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Psoriatic Arthritis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Distinguishing Features",
+      "Notes"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Distinguishing Features</strong></p>",
+      "<p><strong>Notes</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Rheumatoid Arthritis (RA)",
+          "Symmetric small joint involvement (MCP, PIP),\nspares DIP,\nprolonged morning stiffness",
+          "RF and anti-CCP positive;\nsystemic features common"
+        ],
+        "cellsHtml": [
+          "<p><strong>Rheumatoid Arthritis (RA)</strong></p>",
+          "<ul><li>Symmetric small joint involvement (MCP, PIP), </li><li>spares DIP, </li><li>prolonged morning stiffness</li></ul>",
+          "<ul><li>RF and anti-CCP positive; </li><li>systemic features common</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Osteoarthritis (OA)",
+          "Joint pain worsens with activity, improves with rest;\nbony swelling (Heberden’s nodes)",
+          "Non-inflammatory;\nminimal morning stiffness"
+        ],
+        "cellsHtml": [
+          "<p><strong>Osteoarthritis (OA)</strong></p>",
+          "<ul><li>Joint pain worsens with activity, improves with rest; </li><li>bony swelling (Heberden’s nodes)</li></ul>",
+          "<ul><li>Non-inflammatory; </li><li>minimal morning stiffness</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Gout",
+          "Acute monoarticular attacks, often first MTP;\nsevere pain, redness",
+          "Urate crystals on synovial fluid;\nrecurrent flares"
+        ],
+        "cellsHtml": [
+          "<p><strong>Gout</strong></p>",
+          "<ul><li>Acute monoarticular attacks, often first MTP; </li><li>severe pain, redness</li></ul>",
+          "<ul><li>Urate crystals on synovial fluid;</li><li>recurrent flares</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Reactive Arthritis",
+          "Usually post-infection;\nasymmetric lower limb arthritis, conjunctivitis, urethritis",
+          "HLA-B27 associated;\nshort-term course"
+        ],
+        "cellsHtml": [
+          "<p><strong>Reactive Arthritis</strong></p>",
+          "<ul><li>Usually post-infection; </li><li>asymmetric lower limb arthritis, conjunctivitis, urethritis</li></ul>",
+          "<ul><li>HLA-B27 associated; </li><li>short-term course</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Septic Arthritis",
+          "Acute,\nsevere,\nmonoarticular pain with swelling,\nerythema,\nfever",
+          "Urgent management;\nsynovial fluid culture positive"
+        ],
+        "cellsHtml": [
+          "<p><strong>Septic Arthritis</strong></p>",
+          "<ul><li>Acute, </li><li>severe, </li><li>monoarticular pain with swelling,</li><li>erythema, </li><li>fever</li></ul>",
+          "<ul><li>Urgent management; </li><li>synovial fluid culture positive</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Ankylosing Spondylitis (AS)",
+          "Spine and sacroiliac involvement,\ninflammatory back pain",
+          "HLA-B27 positive;\nperipheral arthritis possible"
+        ],
+        "cellsHtml": [
+          "<p><strong>Ankylosing Spondylitis (AS)</strong></p>",
+          "<ul><li>Spine and sacroiliac involvement,</li><li>inflammatory back pain</li></ul>",
+          "<ul><li>HLA-B27 positive; </li><li>peripheral arthritis possible</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Psoriatic Arthritis in Psoriasis Patients",
-    "caption": "This diagram illustrates the key clinical manifestations of psoriatic arthritis in patients with psoriasis, highlighting inflammatory joint involvement (especially DIP joints), morning stiffness improving with movement, dactylitis (sausage digits), enthesitis, nail changes (pitting and onycholysis), spinal involvement (spondylitis), and characteristic radiological findings such as pencil-in-cup deformity.",
-    "captionHtml": "<p>This diagram illustrates the key clinical manifestations of psoriatic arthritis in patients with psoriasis, highlighting inflammatory joint involvement (especially DIP joints), morning stiffness improving with movement, dactylitis (sausage digits), enthesitis, nail changes (pitting and onycholysis), spinal involvement (spondylitis), and characteristic radiological findings such as pencil-in-cup deformity.</p>",
+    "heading": "Psoriatic Arthritis in Psoriasis Patients",
+    "headingHtml": "<p><u><strong>Psoriatic Arthritis in Psoriasis Patients</strong></u></p>",
+    "description": "This diagram illustrates the key clinical manifestations of psoriatic arthritis in patients with psoriasis, highlighting inflammatory joint involvement (especially DIP joints), morning stiffness improving with movement, dactylitis (sausage digits), enthesitis, nail changes (pitting and onycholysis), spinal involvement (spondylitis), and characteristic radiological findings such as pencil-in-cup deformity.",
+    "descriptionHtml": "<p>This diagram illustrates the key clinical manifestations of psoriatic arthritis in patients with psoriasis, highlighting inflammatory joint involvement (especially DIP joints), morning stiffness improving with movement, dactylitis (sausage digits), enthesitis, nail changes (pitting and onycholysis), spinal involvement (spondylitis), and characteristic radiological findings such as pencil-in-cup deformity.</p>",
     "images": [
       {
         "filename": "image1.png",

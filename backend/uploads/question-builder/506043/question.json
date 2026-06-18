@@ -80,173 +80,276 @@
     "clinicalSkill": "Reasoning",
     "difficultyLevel": "Easy"
   },
-  "featureTableName": "Recurrent Aphthous Stomatitis (Aphthous Ulcers)",
-  "differentialDiagnosisTableName": "Recurrent Aphthous Stomatitis (Aphthous Ulcers) Differential Diagnosis of Recurrent Painful Oral Ulcers",
-  "featureTable": [
-    {
-      "feature": "Definition",
-      "featureHtml": "<p><strong>Definition</strong></p>",
-      "description": "• Recurrent painful oral ulcerative disorder • Involves non-keratinized oral mucosa • Idiopathic inflammatory condition",
-      "descriptionHtml": "<p>• Recurrent painful oral ulcerative disorder <br/>• Involves non-keratinized oral mucosa <br/>• Idiopathic inflammatory condition</p>",
-      "clinicalImportance": "• Most common cause of recurrent oral ulcers",
-      "clinicalImportanceHtml": "<p>• Most common cause of recurrent oral ulcers</p>"
-    },
-    {
-      "feature": "Typical Age\nGroup",
-      "featureHtml": "<p><strong>Typical Age </strong></p><p><strong>Group</strong></p>",
-      "description": "• Children • Adolescents • Young adults",
-      "descriptionHtml": "<p>• Children <br/>• Adolescents <br/>• Young adults</p>",
-      "clinicalImportance": "• Commonly begins before 30 years of age",
-      "clinicalImportanceHtml": "<p>• Commonly begins before 30 years of age</p>"
-    },
-    {
-      "feature": "Common Sites",
-      "featureHtml": "<p><strong>Common Sites</strong></p>",
-      "description": "• Buccal mucosa • Inner lips • Floor of mouth • Ventral tongue • Soft palate",
-      "descriptionHtml": "<p>• Buccal mucosa <br/>• Inner lips <br/>• Floor of mouth <br/>• Ventral tongue <br/>• Soft palate</p>",
-      "clinicalImportance": "• Preference for non-keratinized mucosa is classic clue",
-      "clinicalImportanceHtml": "<p>• Preference for non-keratinized mucosa is classic clue</p>"
-    },
-    {
-      "feature": "Ulcer Appearance",
-      "featureHtml": "<p><strong>Ulcer Appearance</strong></p>",
-      "description": "• Shallow ulcers • Round-to-oval shape • Yellow-gray base • Erythematous halo",
-      "descriptionHtml": "<p>• Shallow ulcers <br/>• Round-to-oval shape <br/>• Yellow-gray base <br/>• Erythematous halo</p>",
-      "clinicalImportance": "• Helps distinguish from malignant or traumatic ulcers",
-      "clinicalImportanceHtml": "<p>• Helps distinguish from malignant or traumatic ulcers</p>"
-    },
-    {
-      "feature": "Pain",
-      "featureHtml": "<p><strong>Pain</strong></p>",
-      "description": "• Painful • Burning sensation • Worse with eating/spicy food",
-      "descriptionHtml": "<p>• Painful <br/>• Burning sensation <br/>• Worse with eating/spicy food</p>",
-      "clinicalImportance": "• Pain severity may interfere with oral intake",
-      "clinicalImportanceHtml": "<p>• Pain severity may interfere with oral intake</p>"
-    },
-    {
-      "feature": "Number of\nLesions",
-      "featureHtml": "<p><strong>Number of </strong></p><p><strong>Lesions</strong></p>",
-      "description": "• Single ulcer • Multiple ulcers • Recurrent episodes",
-      "descriptionHtml": "<p>• Single ulcer <br/>• Multiple ulcers <br/>• Recurrent episodes</p>",
-      "clinicalImportance": "• Recurrence strongly supports diagnosis",
-      "clinicalImportanceHtml": "<p>• Recurrence strongly supports diagnosis</p>"
-    },
-    {
-      "feature": "Associated\nSymptoms",
-      "featureHtml": "<p><strong>Associated </strong></p><p><strong>Symptoms</strong></p>",
-      "description": "• Usually no fever • No vesicles • No lymphadenopathy • No systemic illness",
-      "descriptionHtml": "<p>• Usually no fever <br/>• No vesicles <br/>• No lymphadenopathy <br/>• No systemic illness</p>",
-      "clinicalImportance": "• Absence of systemic findings helps exclude HSV or Behçet disease",
-      "clinicalImportanceHtml": "<p>• Absence of systemic findings helps exclude HSV or Behçet disease</p>"
-    },
-    {
-      "feature": "Etiologic\nAssociations",
-      "featureHtml": "<p><strong>Etiologic </strong></p><p><strong>Associations</strong></p>",
-      "description": "• Stress • Minor trauma • Nutritional deficiency • Iron deficiency • Vitamin B12 deficiency • Folate deficiency",
-      "descriptionHtml": "<p>• Stress <br/>• Minor trauma <br/>• Nutritional deficiency <br/>• Iron deficiency <br/>• Vitamin B12 deficiency <br/>• Folate deficiency</p>",
-      "clinicalImportance": "• Identifying triggers helps long-term management",
-      "clinicalImportanceHtml": "<p>• Identifying triggers helps long-term management</p>"
-    },
-    {
-      "feature": "Types",
-      "featureHtml": "<p><strong>Types</strong></p>",
-      "description": "• Minor aphthae • Major aphthae • Herpetiform aphthae",
-      "descriptionHtml": "<p>• Minor aphthae <br/>• Major aphthae <br/>• Herpetiform aphthae</p>",
-      "clinicalImportance": "• Minor aphthae are most common type",
-      "clinicalImportanceHtml": "<p>• Minor aphthae are most common type</p>"
-    },
-    {
-      "feature": "Diagnosis",
-      "featureHtml": "<p><strong>Diagnosis</strong></p>",
-      "description": "• Clinical diagnosis • Based on history and examination",
-      "descriptionHtml": "<p>• Clinical diagnosis <br/>• Based on history and examination</p>",
-      "clinicalImportance": "• No specific laboratory test required",
-      "clinicalImportanceHtml": "<p>• No specific laboratory test required</p>"
-    },
-    {
-      "feature": "Treatment",
-      "featureHtml": "<p><strong>Treatment</strong></p>",
-      "description": "• Topical corticosteroids • Topical anesthetics • Avoid trigger foods • Nutritional correction if deficient",
-      "descriptionHtml": "<p>• Topical corticosteroids <br/>• Topical anesthetics <br/>• Avoid trigger foods <br/>• Nutritional correction if deficient</p>",
-      "clinicalImportance": "• Symptomatic relief is primary goal",
-      "clinicalImportanceHtml": "<p>• Symptomatic relief is primary goal</p>"
-    },
-    {
-      "feature": "Complications",
-      "featureHtml": "<p><strong>Complications</strong></p>",
-      "description": "• Painful eating • Reduced oral intake • Rare scarring in major aphthae",
-      "descriptionHtml": "<p>• Painful eating <br/>• Reduced oral intake <br/>• Rare scarring in major aphthae</p>",
-      "clinicalImportance": "• Severe recurrent disease may require evaluation for systemic disease",
-      "clinicalImportanceHtml": "<p>• Severe recurrent disease may require evaluation for systemic disease</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Herpes Simplex Virus\n(HSV) Infection",
-      "conditionHtml": "<p><strong>Herpes Simplex Virus </strong></p><p><strong>(HSV) Infection</strong></p>",
-      "distinguishingFeatures": "• Vesicular lesions precede ulcers • Fever may occur • Gingivostomatitis common • Keratinized mucosa involvement",
-      "distinguishingFeaturesHtml": "<p>• Vesicular lesions precede ulcers <br/>• Fever may occur <br/>• Gingivostomatitis common <br/>• Keratinized mucosa involvement</p>",
-      "keyDifferences": "• Aphthous ulcers lack vesicles and systemic prodrome",
-      "keyDifferencesHtml": "<p>• Aphthous ulcers lack vesicles and systemic prodrome</p>"
-    },
-    {
-      "condition": "Behçet Disease",
-      "conditionHtml": "<p><strong>Behçet Disease</strong></p>",
-      "distinguishingFeatures": "• Recurrent oral ulcers • Genital ulcers • Uveitis • Systemic vasculitis",
-      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis <br/>• Systemic vasculitis</p>",
-      "keyDifferences": "• Presence of multisystem involvement",
-      "keyDifferencesHtml": "<p>• Presence of multisystem involvement</p>"
-    },
-    {
-      "condition": "Traumatic Ulcer",
-      "conditionHtml": "<p><strong>Traumatic Ulcer</strong></p>",
-      "distinguishingFeatures": "• History of biting/irritation • Solitary irregular lesion • Local mechanical cause",
-      "distinguishingFeaturesHtml": "<p>• History of biting/irritation <br/>• Solitary irregular lesion <br/>• Local mechanical cause</p>",
-      "keyDifferences": "• Usually non-recurrent and associated with trauma",
-      "keyDifferencesHtml": "<p>• Usually non-recurrent and associated with trauma</p>"
-    },
-    {
-      "condition": "Erosive Oral Lichen\nPlanus",
-      "conditionHtml": "<p><strong>Erosive Oral Lichen </strong></p><p><strong>Planus</strong></p>",
-      "distinguishingFeatures": "• White lacy Wickham striae • Chronic erosive lesions • Autoimmune disorder",
-      "distinguishingFeaturesHtml": "<p>• White lacy Wickham striae <br/>• Chronic erosive lesions <br/>• Autoimmune disorder</p>",
-      "keyDifferences": "• Characteristic reticular white lesions absent in aphthous ulcers",
-      "keyDifferencesHtml": "<p>• Characteristic reticular white lesions absent in aphthous ulcers</p>"
-    },
-    {
-      "condition": "Oral Squamous Cell\nCarcinoma",
-      "conditionHtml": "<p><strong>Oral Squamous Cell</strong></p><p><strong> Carcinoma</strong></p>",
-      "distinguishingFeatures": "• Non-healing indurated ulcer • Bleeding lesion • Tobacco/alcohol risk factors • Older age group",
-      "distinguishingFeaturesHtml": "<p>• Non-healing indurated ulcer <br/>• Bleeding lesion <br/>• Tobacco/alcohol risk factors <br/>• Older age group</p>",
-      "keyDifferences": "• SCC is persistent and malignant, not recurrent self-limited ulcers",
-      "keyDifferencesHtml": "<p>• SCC is persistent and malignant, not recurrent self-limited ulcers</p>"
-    },
-    {
-      "condition": "Oral Candidiasis",
-      "conditionHtml": "<p><strong>Oral Candidiasis</strong></p>",
-      "distinguishingFeatures": "• White curd-like plaques • Can be scraped off • Burning sensation",
-      "distinguishingFeaturesHtml": "<p>• White curd-like plaques <br/>• Can be scraped off <br/>• Burning sensation</p>",
-      "keyDifferences": "• Usually plaques rather than discrete ulcers",
-      "keyDifferencesHtml": "<p>• Usually plaques rather than discrete ulcers</p>"
-    },
-    {
-      "condition": "Tuberculous Oral\nUlcer",
-      "conditionHtml": "<p><strong>Tuberculous Oral</strong></p><p><strong> Ulcer</strong></p>",
-      "distinguishingFeatures": "• Chronic non-healing ulcer • Constitutional symptoms • Pulmonary TB association",
-      "distinguishingFeaturesHtml": "<p>• Chronic non-healing ulcer <br/>• Constitutional symptoms <br/>• Pulmonary TB association</p>",
-      "keyDifferences": "• Rare and associated with systemic tuberculosis",
-      "keyDifferencesHtml": "<p>• Rare and associated with systemic tuberculosis</p>"
-    },
-    {
-      "condition": "Crohn Disease",
-      "conditionHtml": "<p><strong>Crohn Disease</strong></p>",
-      "distinguishingFeatures": "• Oral ulcers • Abdominal pain • Diarrhea • Weight loss",
-      "distinguishingFeaturesHtml": "<p>• Oral ulcers <br/>• Abdominal pain <br/>• Diarrhea <br/>• Weight loss</p>",
-      "keyDifferences": "• Gastrointestinal manifestations accompany ulcers",
-      "keyDifferencesHtml": "<p>• Gastrointestinal manifestations accompany ulcers</p>"
-    }
-  ],
-  "diagram": {
-    "name": "Recurrent Painful Oral Ulcers"
+  "table1": {
+    "heading": "Recurrent Aphthous Stomatitis (Aphthous Ulcers)",
+    "headingHtml": "<p><u><strong>Recurrent Aphthous Stomatitis </strong></u></p><p><u><strong>(Aphthous Ulcers)</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Description",
+      "Clinical Importance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Description</strong></p>",
+      "<p><strong>Clinical Importance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Definition",
+          "• Recurrent painful oral ulcerative disorder • Involves non-keratinized oral mucosa • Idiopathic inflammatory condition",
+          "• Most common cause of recurrent oral ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Definition</strong></p>",
+          "<p>• Recurrent painful oral ulcerative disorder <br/>• Involves non-keratinized oral mucosa <br/>• Idiopathic inflammatory condition</p>",
+          "<p>• Most common cause of recurrent oral ulcers</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Typical Age\nGroup",
+          "• Children • Adolescents • Young adults",
+          "• Commonly begins before 30 years of age"
+        ],
+        "cellsHtml": [
+          "<p><strong>Typical Age </strong></p><p><strong>Group</strong></p>",
+          "<p>• Children <br/>• Adolescents <br/>• Young adults</p>",
+          "<p>• Commonly begins before 30 years of age</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Common Sites",
+          "• Buccal mucosa • Inner lips • Floor of mouth • Ventral tongue • Soft palate",
+          "• Preference for non-keratinized mucosa is classic clue"
+        ],
+        "cellsHtml": [
+          "<p><strong>Common Sites</strong></p>",
+          "<p>• Buccal mucosa <br/>• Inner lips <br/>• Floor of mouth <br/>• Ventral tongue <br/>• Soft palate</p>",
+          "<p>• Preference for non-keratinized mucosa is classic clue</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Ulcer Appearance",
+          "• Shallow ulcers • Round-to-oval shape • Yellow-gray base • Erythematous halo",
+          "• Helps distinguish from malignant or traumatic ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Ulcer Appearance</strong></p>",
+          "<p>• Shallow ulcers <br/>• Round-to-oval shape <br/>• Yellow-gray base <br/>• Erythematous halo</p>",
+          "<p>• Helps distinguish from malignant or traumatic ulcers</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pain",
+          "• Painful • Burning sensation • Worse with eating/spicy food",
+          "• Pain severity may interfere with oral intake"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pain</strong></p>",
+          "<p>• Painful <br/>• Burning sensation <br/>• Worse with eating/spicy food</p>",
+          "<p>• Pain severity may interfere with oral intake</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Number of\nLesions",
+          "• Single ulcer • Multiple ulcers • Recurrent episodes",
+          "• Recurrence strongly supports diagnosis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Number of </strong></p><p><strong>Lesions</strong></p>",
+          "<p>• Single ulcer <br/>• Multiple ulcers <br/>• Recurrent episodes</p>",
+          "<p>• Recurrence strongly supports diagnosis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Associated\nSymptoms",
+          "• Usually no fever • No vesicles • No lymphadenopathy • No systemic illness",
+          "• Absence of systemic findings helps exclude HSV or Behçet disease"
+        ],
+        "cellsHtml": [
+          "<p><strong>Associated </strong></p><p><strong>Symptoms</strong></p>",
+          "<p>• Usually no fever <br/>• No vesicles <br/>• No lymphadenopathy <br/>• No systemic illness</p>",
+          "<p>• Absence of systemic findings helps exclude HSV or Behçet disease</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Etiologic\nAssociations",
+          "• Stress • Minor trauma • Nutritional deficiency • Iron deficiency • Vitamin B12 deficiency • Folate deficiency",
+          "• Identifying triggers helps long-term management"
+        ],
+        "cellsHtml": [
+          "<p><strong>Etiologic </strong></p><p><strong>Associations</strong></p>",
+          "<p>• Stress <br/>• Minor trauma <br/>• Nutritional deficiency <br/>• Iron deficiency <br/>• Vitamin B12 deficiency <br/>• Folate deficiency</p>",
+          "<p>• Identifying triggers helps long-term management</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Types",
+          "• Minor aphthae • Major aphthae • Herpetiform aphthae",
+          "• Minor aphthae are most common type"
+        ],
+        "cellsHtml": [
+          "<p><strong>Types</strong></p>",
+          "<p>• Minor aphthae <br/>• Major aphthae <br/>• Herpetiform aphthae</p>",
+          "<p>• Minor aphthae are most common type</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Diagnosis",
+          "• Clinical diagnosis • Based on history and examination",
+          "• No specific laboratory test required"
+        ],
+        "cellsHtml": [
+          "<p><strong>Diagnosis</strong></p>",
+          "<p>• Clinical diagnosis <br/>• Based on history and examination</p>",
+          "<p>• No specific laboratory test required</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Treatment",
+          "• Topical corticosteroids • Topical anesthetics • Avoid trigger foods • Nutritional correction if deficient",
+          "• Symptomatic relief is primary goal"
+        ],
+        "cellsHtml": [
+          "<p><strong>Treatment</strong></p>",
+          "<p>• Topical corticosteroids <br/>• Topical anesthetics <br/>• Avoid trigger foods <br/>• Nutritional correction if deficient</p>",
+          "<p>• Symptomatic relief is primary goal</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complications",
+          "• Painful eating • Reduced oral intake • Rare scarring in major aphthae",
+          "• Severe recurrent disease may require evaluation for systemic disease"
+        ],
+        "cellsHtml": [
+          "<p><strong>Complications</strong></p>",
+          "<p>• Painful eating <br/>• Reduced oral intake <br/>• Rare scarring in major aphthae</p>",
+          "<p>• Severe recurrent disease may require evaluation for systemic disease</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Recurrent Painful Oral Ulcers",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Recurrent Painful Oral Ulcers</strong></u></p>",
+    "columns": [
+      "Differential Diagnosis",
+      "Distinguishing Features",
+      "Key Difference from\nAphthous Ulcers"
+    ],
+    "columnsHtml": [
+      "<p><strong>Differential Diagnosis</strong></p>",
+      "<p><strong>Distinguishing Features</strong></p>",
+      "<p><strong>Key Difference from </strong></p><p><strong>Aphthous Ulcers</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Herpes Simplex Virus\n(HSV) Infection",
+          "• Vesicular lesions precede ulcers • Fever may occur • Gingivostomatitis common • Keratinized mucosa involvement",
+          "• Aphthous ulcers lack vesicles and systemic prodrome"
+        ],
+        "cellsHtml": [
+          "<p><strong>Herpes Simplex Virus </strong></p><p><strong>(HSV) Infection</strong></p>",
+          "<p>• Vesicular lesions precede ulcers <br/>• Fever may occur <br/>• Gingivostomatitis common <br/>• Keratinized mucosa involvement</p>",
+          "<p>• Aphthous ulcers lack vesicles and systemic prodrome</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Behçet Disease",
+          "• Recurrent oral ulcers • Genital ulcers • Uveitis • Systemic vasculitis",
+          "• Presence of multisystem involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Behçet Disease</strong></p>",
+          "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis <br/>• Systemic vasculitis</p>",
+          "<p>• Presence of multisystem involvement</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Traumatic Ulcer",
+          "• History of biting/irritation • Solitary irregular lesion • Local mechanical cause",
+          "• Usually non-recurrent and associated with trauma"
+        ],
+        "cellsHtml": [
+          "<p><strong>Traumatic Ulcer</strong></p>",
+          "<p>• History of biting/irritation <br/>• Solitary irregular lesion <br/>• Local mechanical cause</p>",
+          "<p>• Usually non-recurrent and associated with trauma</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Erosive Oral Lichen\nPlanus",
+          "• White lacy Wickham striae • Chronic erosive lesions • Autoimmune disorder",
+          "• Characteristic reticular white lesions absent in aphthous ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Erosive Oral Lichen </strong></p><p><strong>Planus</strong></p>",
+          "<p>• White lacy Wickham striae <br/>• Chronic erosive lesions <br/>• Autoimmune disorder</p>",
+          "<p>• Characteristic reticular white lesions absent in aphthous ulcers</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral Squamous Cell\nCarcinoma",
+          "• Non-healing indurated ulcer • Bleeding lesion • Tobacco/alcohol risk factors • Older age group",
+          "• SCC is persistent and malignant, not recurrent self-limited ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Oral Squamous Cell</strong></p><p><strong> Carcinoma</strong></p>",
+          "<p>• Non-healing indurated ulcer <br/>• Bleeding lesion <br/>• Tobacco/alcohol risk factors <br/>• Older age group</p>",
+          "<p>• SCC is persistent and malignant, not recurrent self-limited ulcers</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral Candidiasis",
+          "• White curd-like plaques • Can be scraped off • Burning sensation",
+          "• Usually plaques rather than discrete ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Oral Candidiasis</strong></p>",
+          "<p>• White curd-like plaques <br/>• Can be scraped off <br/>• Burning sensation</p>",
+          "<p>• Usually plaques rather than discrete ulcers</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Tuberculous Oral\nUlcer",
+          "• Chronic non-healing ulcer • Constitutional symptoms • Pulmonary TB association",
+          "• Rare and associated with systemic tuberculosis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tuberculous Oral</strong></p><p><strong> Ulcer</strong></p>",
+          "<p>• Chronic non-healing ulcer <br/>• Constitutional symptoms <br/>• Pulmonary TB association</p>",
+          "<p>• Rare and associated with systemic tuberculosis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Crohn Disease",
+          "• Oral ulcers • Abdominal pain • Diarrhea • Weight loss",
+          "• Gastrointestinal manifestations accompany ulcers"
+        ],
+        "cellsHtml": [
+          "<p><strong>Crohn Disease</strong></p>",
+          "<p>• Oral ulcers <br/>• Abdominal pain <br/>• Diarrhea <br/>• Weight loss</p>",
+          "<p>• Gastrointestinal manifestations accompany ulcers</p>"
+        ]
+      }
+    ]
   }
 }

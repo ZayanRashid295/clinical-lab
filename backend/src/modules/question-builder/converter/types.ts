@@ -14,28 +14,24 @@ export interface Explanation {
   systemInvolvedHtml?: string;
 }
 
-export interface FeatureRow {
-  feature: string;
-  featureHtml?: string;
-  description: string;
-  descriptionHtml?: string;
-  clinicalImportance: string;
-  clinicalImportanceHtml?: string;
+export interface TableRow {
+  cells: string[];
+  cellsHtml?: string[];
 }
 
-export interface DifferentialRow {
-  condition: string;
-  conditionHtml?: string;
-  distinguishingFeatures: string;
-  distinguishingFeaturesHtml?: string;
-  keyDifferences: string;
-  keyDifferencesHtml?: string;
+export interface ParsedTable {
+  heading: string;
+  headingHtml?: string;
+  columns: string[];
+  columnsHtml?: string[];
+  rows: TableRow[];
 }
 
 export interface Diagram {
-  name?: string;
-  caption?: string;
-  captionHtml?: string;
+  heading?: string;
+  headingHtml?: string;
+  description?: string;
+  descriptionHtml?: string;
   image?: string;
   images?: ImageRef[];
 }
@@ -72,10 +68,8 @@ export interface QuestionData {
   classicTriad?: string;
   classicTriadHtml?: string;
   classicTriadTitle?: string;
-  featureTableName?: string;
-  featureTable?: FeatureRow[];
-  differentialDiagnosisTableName?: string;
-  differentialDiagnosisTable?: DifferentialRow[];
+  table1?: ParsedTable;
+  table2?: ParsedTable;
   diagram?: Diagram;
 }
 

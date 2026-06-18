@@ -70,112 +70,187 @@
   "classicTriad": "Chest pain + ECG ST elevation + typical radiation (left arm/jaw) → classic STEMI triad.",
   "classicTriadHtml": "<ul><li><strong>Chest pain + ECG ST elevation + typical radiation (left arm/jaw)</strong> → classic STEMI triad.</li></ul>",
   "classicTriadTitle": "Classic triad",
-  "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
-  "differentialDiagnosisTableName": "Acute Coronary Syndrome – STEMI (Inferior Wall MI) Differential Diagnosis of Inferior Wall STEMI",
-  "featureTable": [
-    {
-      "feature": "Definition",
-      "featureHtml": "<p><strong>Definition</strong></p>",
-      "description": "Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion",
-      "descriptionHtml": "<p>Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion</p>",
-      "clinicalImportance": "Causes sudden, severe chest pain and elevated cardiac enzymes",
-      "clinicalImportanceHtml": "<p>Causes sudden, severe chest pain and elevated cardiac enzymes</p>"
-    },
-    {
-      "feature": "Common Cause",
-      "featureHtml": "<p><strong>Common Cause</strong></p>",
-      "description": "Acute thrombotic occlusion of Right Coronary Artery (RCA)",
-      "descriptionHtml": "<p>Acute thrombotic occlusion of <strong>Right Coronary Artery (RCA)</strong></p>",
-      "clinicalImportance": "Leads to ST elevation in inferior leads (II, III, aVF)",
-      "clinicalImportanceHtml": "<p>Leads to ST elevation in inferior leads (II, III, aVF)</p>"
-    },
-    {
-      "feature": "Clinical Presentation",
-      "featureHtml": "<p><strong>Clinical Presentation</strong></p>",
-      "description": "Crushing retrosternal chest pain,\nradiating to left arm/jaw,\ndiaphoresis,\nnausea,\nvomiting",
-      "descriptionHtml": "<ul><li>Crushing retrosternal chest pain, </li><li>radiating to left arm/jaw, </li><li>diaphoresis, </li><li>nausea, </li><li>vomiting</li></ul>",
-      "clinicalImportance": "Typical STEMI symptoms requiring urgent intervention",
-      "clinicalImportanceHtml": "<p>Typical STEMI symptoms requiring urgent intervention</p>"
-    },
-    {
-      "feature": "ECG Findings",
-      "featureHtml": "<p><strong>ECG Findings</strong></p>",
-      "description": "ST-segment elevation in II, III, aVF;\nreciprocal ST depression in I, aVL",
-      "descriptionHtml": "<ul><li>ST-segment elevation in II, III, aVF; </li><li>reciprocal ST depression in I, aVL</li></ul>",
-      "clinicalImportance": "Key diagnostic feature differentiating STEMI from NSTEMI",
-      "clinicalImportanceHtml": "<p>Key diagnostic feature differentiating STEMI from NSTEMI</p>"
-    },
-    {
-      "feature": "Complications",
-      "featureHtml": "<p><strong>Complications</strong></p>",
-      "description": "Arrhythmias (bradycardia, AV block),\ncardiogenic shock, heart failure,\nRV infarction",
-      "descriptionHtml": "<ul><li>Arrhythmias (bradycardia, AV block), </li><li>cardiogenic shock, heart failure, </li><li>RV infarction</li></ul>",
-      "clinicalImportance": "Guides monitoring and management decisions",
-      "clinicalImportanceHtml": "<p>Guides monitoring and management decisions</p>"
-    },
-    {
-      "feature": "Management",
-      "featureHtml": "<p><strong>Management</strong></p>",
-      "description": "Immediate reperfusion therapy:\nPCI or thrombolysis,\nantiplatelets,\nanticoagulants,\nnitrates,\nbeta-blockers",
-      "descriptionHtml": "<ul><li>Immediate reperfusion therapy: </li><li>PCI or thrombolysis, </li><li>antiplatelets, </li><li>anticoagulants, </li><li>nitrates, </li><li>beta-blockers</li></ul>",
-      "clinicalImportance": "Early intervention reduces morbidity and mortality",
-      "clinicalImportanceHtml": "<p>Early intervention reduces morbidity and mortality</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Unstable Angina / NSTEMI",
-      "conditionHtml": "<p><strong>Unstable Angina / NSTEMI</strong></p>",
-      "distinguishingFeatures": "Chest pain at rest or exertion,\nmild troponin rise",
-      "distinguishingFeaturesHtml": "<ul><li>Chest pain at rest or exertion, </li><li>mild troponin rise</li></ul>",
-      "keyDifferences": "ECG shows ST depression or T-wave inversion,\nnot ST elevation",
-      "keyDifferencesHtml": "<ul><li>ECG shows <strong>ST depression or T-wave inversion</strong>, </li><li>not ST elevation</li></ul>"
-    },
-    {
-      "condition": "Pericarditis",
-      "conditionHtml": "<p><strong>Pericarditis</strong></p>",
-      "distinguishingFeatures": "Sharp,\npleuritic chest pain,\nrelieved by leaning forward",
-      "distinguishingFeaturesHtml": "<ul><li>Sharp, </li><li>pleuritic chest pain, </li><li>relieved by leaning forward</li></ul>",
-      "keyDifferences": "ECG shows diffuse ST elevation (not limited to II, III, aVF),\nPR depression",
-      "keyDifferencesHtml": "<ul><li>ECG shows <strong>diffuse ST elevation</strong> (not limited to II, III, aVF), </li><li>PR depression</li></ul>"
-    },
-    {
-      "condition": "Acute Pulmonary Embolism (PE)",
-      "conditionHtml": "<p><strong>Acute Pulmonary Embolism (PE)</strong></p>",
-      "distinguishingFeatures": "Sudden dyspnea,\npleuritic chest pain,\nhypoxia",
-      "distinguishingFeaturesHtml": "<ul><li>Sudden dyspnea, </li><li>pleuritic chest pain, </li><li>hypoxia</li></ul>",
-      "keyDifferences": "ECG may show S1Q3T3,\nsinus tachycardia;\ntroponin may be mildly elevated",
-      "keyDifferencesHtml": "<ul><li>ECG may show <strong>S1Q3T3</strong>, </li><li>sinus tachycardia; </li><li>troponin may be mildly elevated</li></ul>"
-    },
-    {
-      "condition": "Aortic Dissection",
-      "conditionHtml": "<p><strong>Aortic Dissection</strong></p>",
-      "distinguishingFeatures": "Severe tearing chest/back pain,\nunequal BP in limbs",
-      "distinguishingFeaturesHtml": "<ul><li>Severe tearing chest/back pain, </li><li>unequal BP in limbs</li></ul>",
-      "keyDifferences": "CXR or CT angiography shows intimal flap;\nST elevation absent unless coronary involvement",
-      "keyDifferencesHtml": "<ul><li>CXR or CT angiography shows <strong>intimal flap</strong>; </li><li>ST elevation absent unless coronary involvement</li></ul>"
-    },
-    {
-      "condition": "Gastroesophageal Reflux / Esophageal Spasm",
-      "conditionHtml": "<p><strong>Gastroesophageal Reflux / Esophageal Spasm</strong></p>",
-      "distinguishingFeatures": "Burning retrosternal pain,\nworse after meals",
-      "distinguishingFeaturesHtml": "<ul><li>Burning retrosternal pain, </li><li>worse after meals</li></ul>",
-      "keyDifferences": "Relief with antacids,\nECG normal,\ntroponin normal",
-      "keyDifferencesHtml": "<ul><li>Relief with antacids, </li><li>ECG normal, </li><li>troponin normal</li></ul>"
-    },
-    {
-      "condition": "Myocarditis",
-      "conditionHtml": "<p><strong>Myocarditis</strong></p>",
-      "distinguishingFeatures": "Viral prodrome,\ndiffuse chest discomfort",
-      "distinguishingFeaturesHtml": "<ul><li>Viral prodrome, </li><li>diffuse chest discomfort</li></ul>",
-      "keyDifferences": "ECG:\ndiffuse ST/T changes,\nelevated troponin;\nST elevation not confined to coronary territory",
-      "keyDifferencesHtml": "<p><strong>ECG: </strong></p><ul><li>diffuse ST/T changes, </li><li>elevated troponin; </li></ul><p>ST elevation not confined to coronary territory</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Acute Coronary Syndrome – STEMI (Inferior Wall MI)",
+    "headingHtml": "<p><u><strong>Acute Coronary Syndrome – STEMI (Inferior Wall MI)</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Details",
+      "Clinical/Relevance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Details</strong></p>",
+      "<p><strong>Clinical/Relevance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Definition",
+          "Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion",
+          "Causes sudden, severe chest pain and elevated cardiac enzymes"
+        ],
+        "cellsHtml": [
+          "<p><strong>Definition</strong></p>",
+          "<p>Full-thickness (transmural) myocardial necrosis due to complete coronary artery occlusion</p>",
+          "<p>Causes sudden, severe chest pain and elevated cardiac enzymes</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Common Cause",
+          "Acute thrombotic occlusion of Right Coronary Artery (RCA)",
+          "Leads to ST elevation in inferior leads (II, III, aVF)"
+        ],
+        "cellsHtml": [
+          "<p><strong>Common Cause</strong></p>",
+          "<p>Acute thrombotic occlusion of <strong>Right Coronary Artery (RCA)</strong></p>",
+          "<p>Leads to ST elevation in inferior leads (II, III, aVF)</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Clinical Presentation",
+          "Crushing retrosternal chest pain,\nradiating to left arm/jaw,\ndiaphoresis,\nnausea,\nvomiting",
+          "Typical STEMI symptoms requiring urgent intervention"
+        ],
+        "cellsHtml": [
+          "<p><strong>Clinical Presentation</strong></p>",
+          "<ul><li>Crushing retrosternal chest pain, </li><li>radiating to left arm/jaw, </li><li>diaphoresis, </li><li>nausea, </li><li>vomiting</li></ul>",
+          "<p>Typical STEMI symptoms requiring urgent intervention</p>"
+        ]
+      },
+      {
+        "cells": [
+          "ECG Findings",
+          "ST-segment elevation in II, III, aVF;\nreciprocal ST depression in I, aVL",
+          "Key diagnostic feature differentiating STEMI from NSTEMI"
+        ],
+        "cellsHtml": [
+          "<p><strong>ECG Findings</strong></p>",
+          "<ul><li>ST-segment elevation in II, III, aVF; </li><li>reciprocal ST depression in I, aVL</li></ul>",
+          "<p>Key diagnostic feature differentiating STEMI from NSTEMI</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complications",
+          "Arrhythmias (bradycardia, AV block),\ncardiogenic shock, heart failure,\nRV infarction",
+          "Guides monitoring and management decisions"
+        ],
+        "cellsHtml": [
+          "<p><strong>Complications</strong></p>",
+          "<ul><li>Arrhythmias (bradycardia, AV block), </li><li>cardiogenic shock, heart failure, </li><li>RV infarction</li></ul>",
+          "<p>Guides monitoring and management decisions</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Management",
+          "Immediate reperfusion therapy:\nPCI or thrombolysis,\nantiplatelets,\nanticoagulants,\nnitrates,\nbeta-blockers",
+          "Early intervention reduces morbidity and mortality"
+        ],
+        "cellsHtml": [
+          "<p><strong>Management</strong></p>",
+          "<ul><li>Immediate reperfusion therapy: </li><li>PCI or thrombolysis, </li><li>antiplatelets, </li><li>anticoagulants, </li><li>nitrates, </li><li>beta-blockers</li></ul>",
+          "<p>Early intervention reduces morbidity and mortality</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Inferior Wall STEMI",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of Inferior Wall STEMI</strong></u></p>",
+    "columns": [
+      "Differential Diagnosis",
+      "Key Features",
+      "Distinguishing Points from STEMI"
+    ],
+    "columnsHtml": [
+      "<p><strong>Differential Diagnosis</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Distinguishing Points from STEMI</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Unstable Angina / NSTEMI",
+          "Chest pain at rest or exertion,\nmild troponin rise",
+          "ECG shows ST depression or T-wave inversion,\nnot ST elevation"
+        ],
+        "cellsHtml": [
+          "<p><strong>Unstable Angina / NSTEMI</strong></p>",
+          "<ul><li>Chest pain at rest or exertion, </li><li>mild troponin rise</li></ul>",
+          "<ul><li>ECG shows <strong>ST depression or T-wave inversion</strong>, </li><li>not ST elevation</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Pericarditis",
+          "Sharp,\npleuritic chest pain,\nrelieved by leaning forward",
+          "ECG shows diffuse ST elevation (not limited to II, III, aVF),\nPR depression"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pericarditis</strong></p>",
+          "<ul><li>Sharp, </li><li>pleuritic chest pain, </li><li>relieved by leaning forward</li></ul>",
+          "<ul><li>ECG shows <strong>diffuse ST elevation</strong> (not limited to II, III, aVF), </li><li>PR depression</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Acute Pulmonary Embolism (PE)",
+          "Sudden dyspnea,\npleuritic chest pain,\nhypoxia",
+          "ECG may show S1Q3T3,\nsinus tachycardia;\ntroponin may be mildly elevated"
+        ],
+        "cellsHtml": [
+          "<p><strong>Acute Pulmonary Embolism (PE)</strong></p>",
+          "<ul><li>Sudden dyspnea, </li><li>pleuritic chest pain, </li><li>hypoxia</li></ul>",
+          "<ul><li>ECG may show <strong>S1Q3T3</strong>, </li><li>sinus tachycardia; </li><li>troponin may be mildly elevated</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Aortic Dissection",
+          "Severe tearing chest/back pain,\nunequal BP in limbs",
+          "CXR or CT angiography shows intimal flap;\nST elevation absent unless coronary involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Aortic Dissection</strong></p>",
+          "<ul><li>Severe tearing chest/back pain, </li><li>unequal BP in limbs</li></ul>",
+          "<ul><li>CXR or CT angiography shows <strong>intimal flap</strong>; </li><li>ST elevation absent unless coronary involvement</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Gastroesophageal Reflux / Esophageal Spasm",
+          "Burning retrosternal pain,\nworse after meals",
+          "Relief with antacids,\nECG normal,\ntroponin normal"
+        ],
+        "cellsHtml": [
+          "<p><strong>Gastroesophageal Reflux / Esophageal Spasm</strong></p>",
+          "<ul><li>Burning retrosternal pain, </li><li>worse after meals</li></ul>",
+          "<ul><li>Relief with antacids, </li><li>ECG normal, </li><li>troponin normal</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Myocarditis",
+          "Viral prodrome,\ndiffuse chest discomfort",
+          "ECG:\ndiffuse ST/T changes,\nelevated troponin;\nST elevation not confined to coronary territory"
+        ],
+        "cellsHtml": [
+          "<p><strong>Myocarditis</strong></p>",
+          "<ul><li>Viral prodrome, </li><li>diffuse chest discomfort</li></ul>",
+          "<p><strong>ECG: </strong></p><ul><li>diffuse ST/T changes, </li><li>elevated troponin; </li></ul><p>ST elevation not confined to coronary territory</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
-    "caption": "This diagram illustrates the pathophysiology, clinical features, diagnostic criteria, and management of NSTEMI. It highlights partial coronary artery occlusion leading to subendocardial ischemia, presenting with chest pain and elevated troponin without ST-segment elevation, and outlines key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention.",
-    "captionHtml": "<p>This diagram illustrates the <strong>pathophysiology, clinical features, diagnostic criteria, and management</strong> of NSTEMI. It highlights <strong>partial coronary artery occlusion leading to subendocardial ischemia</strong>, presenting with <strong>chest pain and elevated troponin without ST-segment elevation</strong>, and outlines <strong>key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention</strong>.</p>",
+    "heading": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
+    "headingHtml": "<p><u><strong>Acute Coronary Syndrome </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation Myocardial Infarction)</strong></u></p>",
+    "description": "This diagram illustrates the pathophysiology, clinical features, diagnostic criteria, and management of NSTEMI. It highlights partial coronary artery occlusion leading to subendocardial ischemia, presenting with chest pain and elevated troponin without ST-segment elevation, and outlines key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention.",
+    "descriptionHtml": "<p>This diagram illustrates the <strong>pathophysiology, clinical features, diagnostic criteria, and management</strong> of NSTEMI. It highlights <strong>partial coronary artery occlusion leading to subendocardial ischemia</strong>, presenting with <strong>chest pain and elevated troponin without ST-segment elevation</strong>, and outlines <strong>key treatment strategies including antiplatelets, anticoagulation, and early invasive intervention</strong>.</p>",
     "images": [
       {
         "filename": "image1.png",

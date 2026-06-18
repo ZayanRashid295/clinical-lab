@@ -70,106 +70,185 @@
   "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
-    "product": "Medicine & Allied"
+    "product": "Medicine & Allied",
+    "topic": "Asthma",
+    "subtopic": "Acute Asthma & Severity Assessment",
+    "mcqTitle": "Acute Severe Bronchial Asthma – Clinical Signs of Impending Respiratory Failure (Silent Chest)",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning and interpretation",
+    "difficultyLevel": "Moderate",
+    "system": "Respiratory System (Pulmonology)"
   },
-  "featureTableName": "Acute Severe Bronchial Asthma – Clinical Signs of Impending Respiratory Failure (Silent Chest)",
-  "differentialDiagnosisTableName": "System/ Title: Pulmonology Acute Severe Bronchial Asthma – Clinical Features & Impending Respiratory Failure Signs Differential Diagnosis of Acute Severe Dyspnea with Wheeze/Silent Chest",
-  "featureTable": [
-    {
-      "feature": "Severe dyspnea",
-      "featureHtml": "<p><strong>Severe dyspnea</strong></p>",
-      "description": "• Marked shortness of breath• Progressive worsening despite bronchodilator therapy",
-      "descriptionHtml": "<p>• Marked shortness of breath<br/>• Progressive worsening despite bronchodilator therapy</p>",
-      "clinicalImportance": "Indicates severe airflow limitation and poor response to treatment",
-      "clinicalImportanceHtml": "<p>Indicates severe airflow limitation and poor response to treatment</p>"
-    },
-    {
-      "feature": "Accessory\nmuscle use",
-      "featureHtml": "<p><strong>Accessory </strong></p><p><strong>muscle use</strong></p>",
-      "description": "• Sternocleidomastoid contraction• Intercostal retractions",
-      "descriptionHtml": "<p>• Sternocleidomastoid contraction<br/>• Intercostal retractions</p>",
-      "clinicalImportance": "Sign of increased work of breathing and respiratory distress",
-      "clinicalImportanceHtml": "<p>Sign of increased work of breathing and respiratory distress</p>"
-    },
-    {
-      "feature": "Inability to speak\nfull sentences",
-      "featureHtml": "<p><strong>Inability to speak </strong></p><p><strong>full sentences</strong></p>",
-      "description": "• Speaks in words only• Interrupted speech due to dyspnea",
-      "descriptionHtml": "<p>• Speaks in words only<br/>• Interrupted speech due to dyspnea</p>",
-      "clinicalImportance": "Marker of severe obstruction and reduced tidal volume",
-      "clinicalImportanceHtml": "<p>Marker of severe obstruction and reduced tidal volume</p>"
-    },
-    {
-      "feature": "Silent chest",
-      "featureHtml": "<p><strong>Silent chest</strong></p>",
-      "description": "• Absent or minimal breath sounds• No audible wheeze despite obstruction",
-      "descriptionHtml": "<p>• Absent or minimal breath sounds<br/>• No audible wheeze despite obstruction</p>",
-      "clinicalImportance": "Critical sign of near-complete airway obstruction and impending respiratory failure",
-      "clinicalImportanceHtml": "<p><strong>Critical sign of near-complete airway obstruction and impending respiratory failure</strong></p>"
-    },
-    {
-      "feature": "Tachypnea",
-      "featureHtml": "<p><strong>Tachypnea</strong></p>",
-      "description": "• Increased respiratory rate• Rapid shallow breathing",
-      "descriptionHtml": "<p>• Increased respiratory rate<br/>• Rapid shallow breathing</p>",
-      "clinicalImportance": "Compensatory response to hypoxia and hypercapnia",
-      "clinicalImportanceHtml": "<p>Compensatory response to hypoxia and hypercapnia</p>"
-    },
-    {
-      "feature": "Wheeze\n(early/moderate)",
-      "featureHtml": "<p><strong>Wheeze </strong></p><p><strong>(early/moderate)</strong></p>",
-      "description": "• Expiratory wheeze• Prolonged expiration",
-      "descriptionHtml": "<p>• Expiratory wheeze<br/>• Prolonged expiration</p>",
-      "clinicalImportance": "Indicates partially patent airways with airflow turbulence",
-      "clinicalImportanceHtml": "<p>Indicates partially patent airways with airflow turbulence</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Acute severe\nbronchial asthma",
-      "conditionHtml": "<p><strong>Acute severe </strong></p><p><strong>bronchial asthma</strong></p>",
-      "distinguishingFeatures": "• Wheeze (may disappear in silent chest)• History of asthma• Reversible airflow obstruction",
-      "distinguishingFeaturesHtml": "<p>• Wheeze (may disappear in silent chest)<br/>• History of asthma<br/>• Reversible airflow obstruction</p>",
-      "keyDifferences": "Improves with bronchodilators and steroids",
-      "keyDifferencesHtml": "<p>Improves with bronchodilators and steroids</p>"
-    },
-    {
-      "condition": "COPD\nexacerbation",
-      "conditionHtml": "<p><strong>COPD </strong></p><p><strong>exacerbation</strong></p>",
-      "distinguishingFeatures": "• Chronic smoking history• Chronic cough and sputum• Reduced baseline lung function",
-      "distinguishingFeaturesHtml": "<p>• Chronic smoking history<br/>• Chronic cough and sputum<br/>• Reduced baseline lung function</p>",
-      "keyDifferences": "Older age group, less reversibility",
-      "keyDifferencesHtml": "<p>Older age group, less reversibility</p>"
-    },
-    {
-      "condition": "Tension\npneumothorax",
-      "conditionHtml": "<p><strong>Tension </strong></p><p><strong>pneumothorax</strong></p>",
-      "distinguishingFeatures": "• Sudden unilateral breath sounds loss• Tracheal deviation• Hypotension",
-      "distinguishingFeaturesHtml": "<p>• Sudden unilateral breath sounds loss<br/>• Tracheal deviation<br/>• Hypotension</p>",
-      "keyDifferences": "Unilateral findings + mediastinal shift",
-      "keyDifferencesHtml": "<p>Unilateral findings + mediastinal shift</p>"
-    },
-    {
-      "condition": "Foreign body\nairway obstruction",
-      "conditionHtml": "<p><strong>Foreign body </strong></p><p><strong>airway obstruction</strong></p>",
-      "distinguishingFeatures": "• Sudden onset choking• Localized wheeze or silence• History of aspiration",
-      "distinguishingFeaturesHtml": "<p>• Sudden onset choking<br/>• Localized wheeze or silence<br/>• History of aspiration</p>",
-      "keyDifferences": "Acute onset, often unilateral airflow loss",
-      "keyDifferencesHtml": "<p>Acute onset, often unilateral airflow loss</p>"
-    },
-    {
-      "condition": "Anaphylaxis",
-      "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
-      "distinguishingFeatures": "• Wheeze + urticaria• Hypotension• Rapid onset after allergen exposure",
-      "distinguishingFeaturesHtml": "<p>• Wheeze + urticaria<br/>• Hypotension<br/>• Rapid onset after allergen exposure</p>",
-      "keyDifferences": "Systemic allergic signs present",
-      "keyDifferencesHtml": "<p>Systemic allergic signs present</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Acute Severe Bronchial Asthma – Clinical Features & Impending Respiratory Failure Signs",
+    "headingHtml": "<p><u><strong>Acute Severe Bronchial Asthma – </strong></u></p><p><u><strong>Clinical Features &amp; Impending Respiratory Failure Signs</strong></u></p>",
+    "columns": [
+      "Clinical Feature",
+      "Description",
+      "Clinical Significance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Clinical Feature</strong></p>",
+      "<p><strong>Description </strong></p>",
+      "<p><strong>Clinical Significance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Severe dyspnea",
+          "• Marked shortness of breath• Progressive worsening despite bronchodilator therapy",
+          "Indicates severe airflow limitation and poor response to treatment"
+        ],
+        "cellsHtml": [
+          "<p><strong>Severe dyspnea</strong></p>",
+          "<p>• Marked shortness of breath<br/>• Progressive worsening despite bronchodilator therapy</p>",
+          "<p>Indicates severe airflow limitation and poor response to treatment</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Accessory\nmuscle use",
+          "• Sternocleidomastoid contraction• Intercostal retractions",
+          "Sign of increased work of breathing and respiratory distress"
+        ],
+        "cellsHtml": [
+          "<p><strong>Accessory </strong></p><p><strong>muscle use</strong></p>",
+          "<p>• Sternocleidomastoid contraction<br/>• Intercostal retractions</p>",
+          "<p>Sign of increased work of breathing and respiratory distress</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Inability to speak\nfull sentences",
+          "• Speaks in words only• Interrupted speech due to dyspnea",
+          "Marker of severe obstruction and reduced tidal volume"
+        ],
+        "cellsHtml": [
+          "<p><strong>Inability to speak </strong></p><p><strong>full sentences</strong></p>",
+          "<p>• Speaks in words only<br/>• Interrupted speech due to dyspnea</p>",
+          "<p>Marker of severe obstruction and reduced tidal volume</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Silent chest",
+          "• Absent or minimal breath sounds• No audible wheeze despite obstruction",
+          "Critical sign of near-complete airway obstruction and impending respiratory failure"
+        ],
+        "cellsHtml": [
+          "<p><strong>Silent chest</strong></p>",
+          "<p>• Absent or minimal breath sounds<br/>• No audible wheeze despite obstruction</p>",
+          "<p><strong>Critical sign of near-complete airway obstruction and impending respiratory failure</strong></p>"
+        ]
+      },
+      {
+        "cells": [
+          "Tachypnea",
+          "• Increased respiratory rate• Rapid shallow breathing",
+          "Compensatory response to hypoxia and hypercapnia"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tachypnea</strong></p>",
+          "<p>• Increased respiratory rate<br/>• Rapid shallow breathing</p>",
+          "<p>Compensatory response to hypoxia and hypercapnia</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Wheeze\n(early/moderate)",
+          "• Expiratory wheeze• Prolonged expiration",
+          "Indicates partially patent airways with airflow turbulence"
+        ],
+        "cellsHtml": [
+          "<p><strong>Wheeze </strong></p><p><strong>(early/moderate)</strong></p>",
+          "<p>• Expiratory wheeze<br/>• Prolonged expiration</p>",
+          "<p>Indicates partially patent airways with airflow turbulence</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Acute Severe Dyspnea with Wheeze/Silent Chest",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Acute Severe Dyspnea with Wheeze/Silent Chest</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "How to Differentiate"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features </strong></p>",
+      "<p><strong>How to Differentiate</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Acute severe\nbronchial asthma",
+          "• Wheeze (may disappear in silent chest)• History of asthma• Reversible airflow obstruction",
+          "Improves with bronchodilators and steroids"
+        ],
+        "cellsHtml": [
+          "<p><strong>Acute severe </strong></p><p><strong>bronchial asthma</strong></p>",
+          "<p>• Wheeze (may disappear in silent chest)<br/>• History of asthma<br/>• Reversible airflow obstruction</p>",
+          "<p>Improves with bronchodilators and steroids</p>"
+        ]
+      },
+      {
+        "cells": [
+          "COPD\nexacerbation",
+          "• Chronic smoking history• Chronic cough and sputum• Reduced baseline lung function",
+          "Older age group, less reversibility"
+        ],
+        "cellsHtml": [
+          "<p><strong>COPD </strong></p><p><strong>exacerbation</strong></p>",
+          "<p>• Chronic smoking history<br/>• Chronic cough and sputum<br/>• Reduced baseline lung function</p>",
+          "<p>Older age group, less reversibility</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Tension\npneumothorax",
+          "• Sudden unilateral breath sounds loss• Tracheal deviation• Hypotension",
+          "Unilateral findings + mediastinal shift"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tension </strong></p><p><strong>pneumothorax</strong></p>",
+          "<p>• Sudden unilateral breath sounds loss<br/>• Tracheal deviation<br/>• Hypotension</p>",
+          "<p>Unilateral findings + mediastinal shift</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Foreign body\nairway obstruction",
+          "• Sudden onset choking• Localized wheeze or silence• History of aspiration",
+          "Acute onset, often unilateral airflow loss"
+        ],
+        "cellsHtml": [
+          "<p><strong>Foreign body </strong></p><p><strong>airway obstruction</strong></p>",
+          "<p>• Sudden onset choking<br/>• Localized wheeze or silence<br/>• History of aspiration</p>",
+          "<p>Acute onset, often unilateral airflow loss</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Anaphylaxis",
+          "• Wheeze + urticaria• Hypotension• Rapid onset after allergen exposure",
+          "Systemic allergic signs present"
+        ],
+        "cellsHtml": [
+          "<p><strong>Anaphylaxis</strong></p>",
+          "<p>• Wheeze + urticaria<br/>• Hypotension<br/>• Rapid onset after allergen exposure</p>",
+          "<p>Systemic allergic signs present</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Acute Severe Bronchial Asthma – Clinical Signs of Impending Respiratory Failure (Silent Chest)",
-    "caption": "This diagram illustrates the progression of acute severe bronchial asthma to impending respiratory failure, emphasizing the critical clinical sign of a silent chest. It highlights key warning features including severe dyspnea, accessory muscle use, inability to speak in full sentences, tachypnea, hypoxemia, and clinical deterioration despite bronchodilator therapy. The diagram demonstrates the pathophysiological sequence from bronchoconstriction and mucus plugging to severe airway obstruction, resulting in minimal airflow and absent breath sounds. It also underscores that disappearance of wheeze in a severely ill asthmatic patient is a danger sign indicating near-complete airway obstruction, requiring urgent escalation of care and possible ventilatory support.",
-    "captionHtml": "<p>This diagram illustrates the progression of acute severe bronchial asthma to <strong>impending respiratory failure</strong>, emphasizing the critical clinical sign of a <strong>silent chest</strong>. It highlights key warning features including severe dyspnea, accessory muscle use, inability to speak in full sentences, tachypnea, hypoxemia, and clinical deterioration despite bronchodilator therapy. The diagram demonstrates the pathophysiological sequence from bronchoconstriction and mucus plugging to severe airway obstruction, resulting in minimal airflow and absent breath sounds. It also underscores that disappearance of wheeze in a severely ill asthmatic patient is a <strong>danger sign indicating near-complete airway obstruction</strong>, requiring urgent escalation of care and possible ventilatory support.</p>",
+    "heading": "Acute Severe Bronchial Asthma – Clinical Signs of Impending Respiratory Failure (Silent Chest)",
+    "headingHtml": "<p><u><strong>Acute Severe Bronchial Asthma – </strong></u></p><p><u><strong>Clinical Signs of Impending Respiratory Failure (Silent Chest)</strong></u></p>",
+    "description": "This diagram illustrates the progression of acute severe bronchial asthma to impending respiratory failure, emphasizing the critical clinical sign of a silent chest. It highlights key warning features including severe dyspnea, accessory muscle use, inability to speak in full sentences, tachypnea, hypoxemia, and clinical deterioration despite bronchodilator therapy. The diagram demonstrates the pathophysiological sequence from bronchoconstriction and mucus plugging to severe airway obstruction, resulting in minimal airflow and absent breath sounds. It also underscores that disappearance of wheeze in a severely ill asthmatic patient is a danger sign indicating near-complete airway obstruction, requiring urgent escalation of care and possible ventilatory support.",
+    "descriptionHtml": "<p>This diagram illustrates the progression of acute severe bronchial asthma to <strong>impending respiratory failure</strong>, emphasizing the critical clinical sign of a <strong>silent chest</strong>. It highlights key warning features including severe dyspnea, accessory muscle use, inability to speak in full sentences, tachypnea, hypoxemia, and clinical deterioration despite bronchodilator therapy. The diagram demonstrates the pathophysiological sequence from bronchoconstriction and mucus plugging to severe airway obstruction, resulting in minimal airflow and absent breath sounds. It also underscores that disappearance of wheeze in a severely ill asthmatic patient is a <strong>danger sign indicating near-complete airway obstruction</strong>, requiring urgent escalation of care and possible ventilatory support.</p>",
     "images": [
       {
         "filename": "image1.png",

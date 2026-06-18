@@ -66,80 +66,139 @@
     "subtopic": "Psoriasis",
     "mcqTitle": "Classification & Variants - Scalp Psoriasis – First-Line Management"
   },
-  "featureTableName": "Scalp Psoriasis – First-Line Management",
-  "differentialDiagnosisTableName": "Scalp Psoriasis – First-Line Management Differential Diagnosis of Scalp Psoriasis",
-  "featureTable": [
-    {
-      "feature": "Lesion Characteristics",
-      "featureHtml": "<p>Lesion Characteristics</p>",
-      "description": "Thick,\nscaly,\nwell-demarcated plaques on the scalp",
-      "descriptionHtml": "<ul><li>Thick, </li><li>scaly, </li><li>well-demarcated plaques on the scalp</li></ul>",
-      "clinicalImportance": "Often associated with itching;\nconfined to scalp in mild cases",
-      "clinicalImportanceHtml": "<ul><li>Often associated with itching; </li><li>confined to scalp in mild cases</li></ul>"
-    },
-    {
-      "feature": "First-Line Treatment",
-      "featureHtml": "<p>First-Line Treatment</p>",
-      "description": "Topical corticosteroid shampoo",
-      "descriptionHtml": "<ul><li>Topical corticosteroid shampoo</li></ul>",
-      "clinicalImportance": "Reduces inflammation and scaling;\nsafe for short- to medium-term use",
-      "clinicalImportanceHtml": "<ul><li>Reduces inflammation and scaling; </li><li>safe for short- to medium-term use</li></ul>"
-    },
-    {
-      "feature": "Adjunct Measures",
-      "featureHtml": "<p>Adjunct Measures</p>",
-      "description": "Keratolytic agents (e.g., salicylic acid)",
-      "descriptionHtml": "<ul><li>Keratolytic agents (e.g., salicylic acid)</li></ul>",
-      "clinicalImportance": "Helps remove thick scales and\nenhances steroid penetration",
-      "clinicalImportanceHtml": "<ul><li>Helps remove thick scales and </li><li>enhances steroid penetration</li></ul>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Seborrheic Dermatitis",
-      "conditionHtml": "<p>Seborrheic Dermatitis</p>",
-      "distinguishingFeatures": "Greasy, yellowish scales;\nmild erythema",
-      "distinguishingFeaturesHtml": "<ul><li>Greasy, yellowish scales; </li><li>mild erythema</li></ul>",
-      "keyDifferences": "Less well-demarcated, often involves eyebrows, nasolabial folds;\nresponds to antifungal shampoos",
-      "keyDifferencesHtml": "<ul><li>Less well-demarcated, often involves eyebrows, nasolabial folds; </li><li>responds to antifungal shampoos</li></ul>"
-    },
-    {
-      "condition": "Tinea Capitis",
-      "conditionHtml": "<p>Tinea Capitis</p>",
-      "distinguishingFeatures": "Scaly patches with hair loss,\nbroken hairs,\nsometimes pustules",
-      "distinguishingFeaturesHtml": "<ul><li>Scaly patches with hair loss, </li><li>broken hairs, </li><li>sometimes pustules</li></ul>",
-      "keyDifferences": "Fungal etiology; confirmed by KOH prep or culture;\nmore common in children",
-      "keyDifferencesHtml": "<ul><li>Fungal etiology; confirmed by KOH prep or culture; </li><li>more common in children</li></ul>"
-    },
-    {
-      "condition": "Lichen Planopilaris",
-      "conditionHtml": "<p>Lichen Planopilaris</p>",
-      "distinguishingFeatures": "Scarring alopecia,\nperifollicular erythema",
-      "distinguishingFeaturesHtml": "<ul><li>Scarring alopecia, </li><li>perifollicular erythema</li></ul>",
-      "keyDifferences": "Leads to permanent hair loss;\nbiopsy shows lymphocytic infiltrate",
-      "keyDifferencesHtml": "<ul><li>Leads to permanent hair loss; </li><li>biopsy shows lymphocytic infiltrate</li></ul>"
-    },
-    {
-      "condition": "Atopic Dermatitis (Scalp)",
-      "conditionHtml": "<p>Atopic Dermatitis (Scalp)</p>",
-      "distinguishingFeatures": "Erythematous,\nitchy patches",
-      "distinguishingFeaturesHtml": "<ul><li>Erythematous,</li><li>itchy patches</li></ul>",
-      "keyDifferences": "Usually associated with personal/family history of atopy; more diffuse scaling",
-      "keyDifferencesHtml": "<ul><li>Usually associated with personal/family history of atopy; more diffuse scaling</li></ul>"
-    },
-    {
-      "condition": "Contact Dermatitis",
-      "conditionHtml": "<p>Contact Dermatitis</p>",
-      "distinguishingFeatures": "Localized erythema and scaling,\nsometimes vesicles",
-      "distinguishingFeaturesHtml": "<ul><li>Localized erythema and scaling, </li><li>sometimes vesicles</li></ul>",
-      "keyDifferences": "History of exposure to irritants/allergens;\nresolves on avoidance",
-      "keyDifferencesHtml": "<ul><li>History of exposure to irritants/allergens; </li><li>resolves on avoidance</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Scalp Psoriasis – First-Line Management",
+    "headingHtml": "<p><u><strong>Scalp Psoriasis – First-Line Management</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Details",
+      "Notes / Key Points"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Details</strong></p>",
+      "<p><strong>Notes / Key Points</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Lesion Characteristics",
+          "Thick,\nscaly,\nwell-demarcated plaques on the scalp",
+          "Often associated with itching;\nconfined to scalp in mild cases"
+        ],
+        "cellsHtml": [
+          "<p>Lesion Characteristics</p>",
+          "<ul><li>Thick, </li><li>scaly, </li><li>well-demarcated plaques on the scalp</li></ul>",
+          "<ul><li>Often associated with itching; </li><li>confined to scalp in mild cases</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "First-Line Treatment",
+          "Topical corticosteroid shampoo",
+          "Reduces inflammation and scaling;\nsafe for short- to medium-term use"
+        ],
+        "cellsHtml": [
+          "<p>First-Line Treatment</p>",
+          "<ul><li>Topical corticosteroid shampoo</li></ul>",
+          "<ul><li>Reduces inflammation and scaling; </li><li>safe for short- to medium-term use</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Adjunct Measures",
+          "Keratolytic agents (e.g., salicylic acid)",
+          "Helps remove thick scales and\nenhances steroid penetration"
+        ],
+        "cellsHtml": [
+          "<p>Adjunct Measures</p>",
+          "<ul><li>Keratolytic agents (e.g., salicylic acid)</li></ul>",
+          "<ul><li>Helps remove thick scales and </li><li>enhances steroid penetration</li></ul>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Scalp Psoriasis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Scalp Psoriasis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "Distinguishing Points from Scalp Psoriasis"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Distinguishing Points from Scalp Psoriasis</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Seborrheic Dermatitis",
+          "Greasy, yellowish scales;\nmild erythema",
+          "Less well-demarcated, often involves eyebrows, nasolabial folds;\nresponds to antifungal shampoos"
+        ],
+        "cellsHtml": [
+          "<p>Seborrheic Dermatitis</p>",
+          "<ul><li>Greasy, yellowish scales; </li><li>mild erythema</li></ul>",
+          "<ul><li>Less well-demarcated, often involves eyebrows, nasolabial folds; </li><li>responds to antifungal shampoos</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Tinea Capitis",
+          "Scaly patches with hair loss,\nbroken hairs,\nsometimes pustules",
+          "Fungal etiology; confirmed by KOH prep or culture;\nmore common in children"
+        ],
+        "cellsHtml": [
+          "<p>Tinea Capitis</p>",
+          "<ul><li>Scaly patches with hair loss, </li><li>broken hairs, </li><li>sometimes pustules</li></ul>",
+          "<ul><li>Fungal etiology; confirmed by KOH prep or culture; </li><li>more common in children</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Lichen Planopilaris",
+          "Scarring alopecia,\nperifollicular erythema",
+          "Leads to permanent hair loss;\nbiopsy shows lymphocytic infiltrate"
+        ],
+        "cellsHtml": [
+          "<p>Lichen Planopilaris</p>",
+          "<ul><li>Scarring alopecia, </li><li>perifollicular erythema</li></ul>",
+          "<ul><li>Leads to permanent hair loss; </li><li>biopsy shows lymphocytic infiltrate</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Atopic Dermatitis (Scalp)",
+          "Erythematous,\nitchy patches",
+          "Usually associated with personal/family history of atopy; more diffuse scaling"
+        ],
+        "cellsHtml": [
+          "<p>Atopic Dermatitis (Scalp)</p>",
+          "<ul><li>Erythematous,</li><li>itchy patches</li></ul>",
+          "<ul><li>Usually associated with personal/family history of atopy; more diffuse scaling</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Contact Dermatitis",
+          "Localized erythema and scaling,\nsometimes vesicles",
+          "History of exposure to irritants/allergens;\nresolves on avoidance"
+        ],
+        "cellsHtml": [
+          "<p>Contact Dermatitis</p>",
+          "<ul><li>Localized erythema and scaling, </li><li>sometimes vesicles</li></ul>",
+          "<ul><li>History of exposure to irritants/allergens; </li><li>resolves on avoidance</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Scalp Psoriasis – First-Line Management",
-    "caption": "The diagram illustrates mild-to-moderate, localized scalp psoriasis with thick, scaly plaques. It highlights topical corticosteroid shampoo as the first-line treatment, supported by keratolytic agents to remove scales. It also emphasizes avoiding systemic therapies like oral medications, phototherapy, or biologics in mild, localized cases. Visual labels clearly show key features, treatment, and adjunct measures",
-    "captionHtml": "<p>The diagram illustrates <strong>mild-to-moderate, localized scalp psoriasis</strong> with thick, scaly plaques. It highlights <strong>topical corticosteroid shampoo</strong> as the first-line treatment, supported by <strong>keratolytic agents</strong> to remove scales. It also emphasizes avoiding systemic therapies like oral medications, phototherapy, or biologics in mild, localized cases. Visual labels clearly show key features, treatment, and adjunct measures</p>",
+    "heading": "Scalp Psoriasis – First-Line Management",
+    "headingHtml": "<p><u><strong>Scalp Psoriasis – First-Line Management</strong></u></p>",
+    "description": "The diagram illustrates mild-to-moderate, localized scalp psoriasis with thick, scaly plaques. It highlights topical corticosteroid shampoo as the first-line treatment, supported by keratolytic agents to remove scales. It also emphasizes avoiding systemic therapies like oral medications, phototherapy, or biologics in mild, localized cases. Visual labels clearly show key features, treatment, and adjunct measures",
+    "descriptionHtml": "<p>The diagram illustrates <strong>mild-to-moderate, localized scalp psoriasis</strong> with thick, scaly plaques. It highlights <strong>topical corticosteroid shampoo</strong> as the first-line treatment, supported by <strong>keratolytic agents</strong> to remove scales. It also emphasizes avoiding systemic therapies like oral medications, phototherapy, or biologics in mild, localized cases. Visual labels clearly show key features, treatment, and adjunct measures</p>",
     "images": [
       {
         "filename": "image1.png",

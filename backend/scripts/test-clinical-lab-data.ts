@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import * as path from "node:path";
 import { convertFilesInParallel } from "../src/modules/question-builder/converter/convertDocx";
+import type { QuestionData } from "../src/modules/question-builder/converter/types";
 
 function walkDocx(dataDir: string): Array<{ buffer: Buffer; originalname: string; fullPath: string }> {
   const files: Array<{ buffer: Buffer; originalname: string; fullPath: string }> = [];
@@ -29,7 +30,7 @@ interface QualityCheck {
 
 function checkJsonQuality(dataDir: string, questionId: string, sourceName: string): QualityCheck {
   const jsonPath = path.join(dataDir, questionId, "question.json");
-  const data = JSON.parse(readFileSync(jsonPath, "utf-8")) as Record<string, unknown>;
+  const data = JSON.parse(readFileSync(jsonPath, "utf-8")) as QuestionData;
   const issues: string[] = [];
 
   const keywords = data.keywords as string[] | undefined;
@@ -44,24 +45,18 @@ function checkJsonQuality(dataDir: string, questionId: string, sourceName: strin
 
   if (!(data.keyConcept as string)?.trim()) issues.push("missing keyConcept");
 
-  const hasFeatureTable = Array.isArray(data.featureTable) && (data.featureTable as unknown[]).length > 0;
-  const hasDiffTable =
-    Array.isArray(data.differentialDiagnosisTable) &&
-    (data.differentialDiagnosisTable as unknown[]).length > 0;
-  const diagram = data.diagram as { images?: unknown[]; caption?: string } | undefined;
-  const hasImages = (diagram?.images?.length ?? 0) > 0;
+  const hasTable1 = (data.table1?.rows?.length ?? 0) > 0;
+  const hasTable2 = (data.table2?.rows?.length ?? 0) > 0;
+  const hasImages = (data.diagram?.images?.length ?? 0) > 0;
 
-  // Tables/images are optional per question — only flag if caption/name suggests missing extraction
-  if (data.featureTableName && !hasFeatureTable && !hasImages) {
-    issues.push(`featureTableName set but featureTable empty: ${data.featureTableName}`);
+  if (hasTable1 && !data.table1?.heading?.trim()) {
+    issues.push("table1 rows present but heading is empty");
   }
-  if (data.differentialDiagnosisTableName && !hasDiffTable) {
-    issues.push(
-      `differentialDiagnosisTableName set but table empty: ${data.differentialDiagnosisTableName}`,
-    );
+  if (hasTable2 && !data.table2?.heading?.trim()) {
+    issues.push("table2 rows present but heading is empty");
   }
-  if (diagram?.caption && !hasImages) {
-    issues.push("diagram caption present but no images extracted");
+  if (hasImages && !data.diagram?.description?.trim() && !data.diagram?.heading?.trim()) {
+    issues.push("diagram image present but heading/description missing");
   }
 
   return { file: sourceName, questionId, issues };

@@ -225,16 +225,24 @@ function buildMainExplanationBlocks(
     );
   }
 
-  if (data.featureTable?.length) {
-    const heading = data.featureTableName || "Feature Table";
-    blocks.push(textBlock(`### ${heading}`, order++));
+  if (data.table1?.rows?.length) {
+    const table = data.table1;
+    blocks.push(
+      richTextBlock(
+        `### ${table.heading}`,
+        table.headingHtml
+          ? `<h3>${table.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
+          : `<h3>${escapeHtml(table.heading)}</h3>`,
+        order++,
+      ),
+    );
     blocks.push(
       tableBlock(
         buildTableHtmlFromRows(
-          ["Feature", "Description", "Clinical Importance"],
-          data.featureTable.map((row) => ({
-            text: [row.feature, row.description, row.clinicalImportance],
-            html: [row.featureHtml, row.descriptionHtml, row.clinicalImportanceHtml],
+          table.columns,
+          table.rows.map((row) => ({
+            text: row.cells,
+            html: row.cellsHtml,
           })),
         ),
         order++,
@@ -242,20 +250,24 @@ function buildMainExplanationBlocks(
     );
   }
 
-  if (data.differentialDiagnosisTable?.length) {
-    const heading = data.differentialDiagnosisTableName || "Differential Diagnosis";
-    blocks.push(textBlock(`### ${heading}`, order++));
+  if (data.table2?.rows?.length) {
+    const table = data.table2;
+    blocks.push(
+      richTextBlock(
+        `### ${table.heading}`,
+        table.headingHtml
+          ? `<h3>${table.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
+          : `<h3>${escapeHtml(table.heading)}</h3>`,
+        order++,
+      ),
+    );
     blocks.push(
       tableBlock(
         buildTableHtmlFromRows(
-          ["Condition", "Distinguishing Features", "Key Differences"],
-          data.differentialDiagnosisTable.map((row) => ({
-            text: [row.condition, row.distinguishingFeatures, row.keyDifferences],
-            html: [
-              row.conditionHtml,
-              row.distinguishingFeaturesHtml,
-              row.keyDifferencesHtml,
-            ],
+          table.columns,
+          table.rows.map((row) => ({
+            text: row.cells,
+            html: row.cellsHtml,
           })),
         ),
         order++,
@@ -268,21 +280,30 @@ function buildMainExplanationBlocks(
       const url = imageUrls[img.filename];
       if (url) {
         blocks.push(
-          imageBlock(url, data.diagram?.name || img.filename, order++),
+          imageBlock(url, data.diagram?.heading || img.filename, order++),
         );
       }
     }
   }
 
-  if (data.diagram?.name) {
-    blocks.push(textBlock(`### ${data.diagram.name}`, order++));
-  }
-
-  if (data.diagram?.caption) {
+  if (data.diagram?.heading) {
     blocks.push(
       richTextBlock(
-        data.diagram.caption,
-        data.diagram.captionHtml || `<p>${escapeHtml(data.diagram.caption)}</p>`,
+        `### ${data.diagram.heading}`,
+        data.diagram.headingHtml
+          ? `<h3>${data.diagram.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
+          : `<h3>${escapeHtml(data.diagram.heading)}</h3>`,
+        order++,
+      ),
+    );
+  }
+
+  if (data.diagram?.description) {
+    blocks.push(
+      richTextBlock(
+        data.diagram.description,
+        data.diagram.descriptionHtml ||
+          `<p>${escapeHtml(data.diagram.description)}</p>`,
         order++,
       ),
     );

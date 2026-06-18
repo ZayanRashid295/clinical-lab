@@ -72,120 +72,199 @@
     "clinicalSkill": "Interpretation",
     "difficultyLevel": "Moderate"
   },
-  "featureTableName": "Psoriasis – Chronic Plaque Psoriasis",
-  "differentialDiagnosisTableName": "Psoriasis – Chronic Plaque Psoriasis Differential Diagnosis of Chronic Plaque Psoriasis",
-  "featureTable": [
-    {
-      "feature": "Definition",
-      "featureHtml": "<p><strong>Definition</strong></p>",
-      "description": "Chronic,\nimmune-mediated skin disorder characterized by well-demarcated erythematous plaques with silvery scales",
-      "descriptionHtml": "<ul><li>Chronic, </li><li>immune-mediated skin disorder characterized by well-demarcated erythematous plaques with silvery scales</li></ul>",
-      "clinicalImportance": "Most common type of psoriasis (~80–90% cases)",
-      "clinicalImportanceHtml": "<p>Most common type of psoriasis (~80–90% cases)</p>"
-    },
-    {
-      "feature": "Typical Sites",
-      "featureHtml": "<p><strong>Typical Sites</strong></p>",
-      "description": "Extensor surfaces (elbows, knees),\nscalp,\nsacral area",
-      "descriptionHtml": "<ul><li>Extensor surfaces (elbows, knees), </li><li>scalp, </li><li>sacral area</li></ul>",
-      "clinicalImportance": "Helps in clinical recognition and diagnosis",
-      "clinicalImportanceHtml": "<p>Helps in clinical recognition and diagnosis</p>"
-    },
-    {
-      "feature": "Lesion Morphology",
-      "featureHtml": "<p><strong>Lesion Morphology</strong></p>",
-      "description": "Erythematous, raised plaques with silvery-white scales;\nAuspitz sign may be present",
-      "descriptionHtml": "<ul><li>Erythematous, raised plaques with silvery-white scales; </li><li>Auspitz sign may be present</li></ul>",
-      "clinicalImportance": "Key diagnostic feature for physical examination",
-      "clinicalImportanceHtml": "<p>Key diagnostic feature for physical examination</p>"
-    },
-    {
-      "feature": "Pathophysiology",
-      "featureHtml": "<p><strong>Pathophysiology</strong></p>",
-      "description": "Dysregulated T-cell mediated inflammation → keratinocyte hyperproliferation and angiogenesis",
-      "descriptionHtml": "<ul><li>Dysregulated T-cell mediated inflammation → keratinocyte hyperproliferation and angiogenesis</li></ul>",
-      "clinicalImportance": "Explains rationale for immunomodulatory treatment",
-      "clinicalImportanceHtml": "<p>Explains rationale for immunomodulatory treatment</p>"
-    },
-    {
-      "feature": "Trigger Factors",
-      "featureHtml": "<p><strong>Trigger Factors</strong></p>",
-      "description": "Stress,\ninfections (e.g., streptococcal),\ntrauma (Koebner phenomenon),\ndrugs",
-      "descriptionHtml": "<ul><li>Stress, </li><li>infections (e.g., streptococcal), </li><li>trauma (Koebner phenomenon), </li><li>drugs</li></ul>",
-      "clinicalImportance": "Guides prevention and patient counseling",
-      "clinicalImportanceHtml": "<p>Guides prevention and patient counseling</p>"
-    },
-    {
-      "feature": "Associated Findings",
-      "featureHtml": "<p><strong>Associated Findings</strong></p>",
-      "description": "Nail changes (pitting, onycholysis),\narthritis (psoriatic arthritis)",
-      "descriptionHtml": "<ul><li>Nail changes (pitting, onycholysis), </li><li>arthritis (psoriatic arthritis)</li></ul>",
-      "clinicalImportance": "Important for systemic evaluation",
-      "clinicalImportanceHtml": "<p>Important for systemic evaluation</p>"
-    },
-    {
-      "feature": "Management Overview",
-      "featureHtml": "<p><strong>Management Overview</strong></p>",
-      "description": "Topical corticosteroids,\nvitamin D analogues,\nphototherapy, s\nystemic agents (methotrexate, biologics)",
-      "descriptionHtml": "<ul><li>Topical corticosteroids, </li><li>vitamin D analogues, </li><li>phototherapy, s</li><li>ystemic agents (methotrexate, biologics)</li></ul>",
-      "clinicalImportance": "Stepwise treatment based on severity and extent",
-      "clinicalImportanceHtml": "<p>Stepwise treatment based on severity and extent</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Eczema (Chronic Atopic/Dermatitis)",
-      "conditionHtml": "<p><strong>Eczema (Chronic Atopic/Dermatitis)</strong></p>",
-      "distinguishingFeatures": "Itchy, ill-defined erythematous plaques;\nlichenification common",
-      "distinguishingFeaturesHtml": "<ul><li>Itchy, ill-defined erythematous plaques; </li><li>lichenification common</li></ul>",
-      "keyDifferences": "Usually more pruritic, less well-demarcated;\nscales are not silvery;\nAuspitz sign absent",
-      "keyDifferencesHtml": "<ul><li>Usually <strong>more pruritic</strong>, less well-demarcated; </li><li>scales are not silvery; </li><li><strong>Auspitz sign absent</strong></li></ul>"
-    },
-    {
-      "condition": "Lichen Planus",
-      "conditionHtml": "<p><strong>Lichen Planus</strong></p>",
-      "distinguishingFeatures": "Violaceous, flat-topped, polygonal papules;\nWickham striae on mucosa",
-      "distinguishingFeaturesHtml": "<ul><li>Violaceous, flat-topped, polygonal papules; </li><li>Wickham striae on mucosa</li></ul>",
-      "keyDifferences": "Color (violaceous),\nmucosal involvement,\nWickham striae present,\nno Auspitz sign",
-      "keyDifferencesHtml": "<ul><li><strong>Color (violaceous), </strong></li><li><strong>mucosal involvement</strong>, </li><li>Wickham striae present, </li><li>no Auspitz sign</li></ul>"
-    },
-    {
-      "condition": "Tinea Corporis (Fungal Infection)",
-      "conditionHtml": "<p><strong>Tinea Corporis (Fungal Infection)</strong></p>",
-      "distinguishingFeatures": "Annular plaques with central clearing, active borders;\nscaling",
-      "distinguishingFeaturesHtml": "<ul><li>Annular plaques with central clearing, active borders; </li><li>scaling</li></ul>",
-      "keyDifferences": "Fungal hyphae on KOH,\ncentral clearing,\nless sharply demarcated",
-      "keyDifferencesHtml": "<ul><li><strong>Fungal hyphae on KOH</strong>, </li><li>central clearing, </li><li>less sharply demarcated</li></ul>"
-    },
-    {
-      "condition": "Seborrheic Dermatitis",
-      "conditionHtml": "<p><strong>Seborrheic Dermatitis</strong></p>",
-      "distinguishingFeatures": "Greasy, yellowish scales;\ncommonly scalp, nasolabial folds",
-      "distinguishingFeaturesHtml": "<ul><li>Greasy, yellowish scales;</li><li>commonly scalp, nasolabial folds</li></ul>",
-      "keyDifferences": "Greasy yellow scales,\ndistribution differs,\nless well-demarcated,\nAuspitz sign absent",
-      "keyDifferencesHtml": "<ul><li><strong>Greasy yellow scales</strong>, </li><li>distribution differs, </li><li>less well-demarcated, </li><li>Auspitz sign absent</li></ul>"
-    },
-    {
-      "condition": "Pityriasis Rubra Pilaris",
-      "conditionHtml": "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
-      "distinguishingFeatures": "Follicular papules,\norange-red plaques with islands of sparing",
-      "distinguishingFeaturesHtml": "<ul><li>Follicular papules, </li><li>orange-red plaques with islands of sparing</li></ul>",
-      "keyDifferences": "Follicular involvement,\n“islands of sparing”,\nless common,\nhistology differs",
-      "keyDifferencesHtml": "<ul><li><strong>Follicular involvement</strong>, </li><li><strong>“islands of sparing”</strong>, </li><li>less common, </li><li>histology differs</li></ul>"
-    },
-    {
-      "condition": "Cutaneous T-cell Lymphoma (Patch Stage)",
-      "conditionHtml": "<p><strong>Cutaneous T-cell Lymphoma (Patch Stage)</strong></p>",
-      "distinguishingFeatures": "Erythematous patches/plaques with scaling,\nchronic course",
-      "distinguishingFeaturesHtml": "<ul><li>Erythematous patches/plaques with scaling, </li><li>chronic course</li></ul>",
-      "keyDifferences": "Progressive,\npatchy,\noften asymmetrical,\nbiopsy shows atypical lymphocytes,\nno Auspitz sign",
-      "keyDifferencesHtml": "<ul><li><strong>Progressive, </strong></li><li><strong>patchy, </strong></li><li><strong>often asymmetrical</strong>, </li><li>biopsy shows atypical lymphocytes, </li><li>no Auspitz sign</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Psoriasis – Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Psoriasis – Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Description",
+      "Clinical Relevance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Description</strong></p>",
+      "<p><strong>Clinical Relevance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Definition",
+          "Chronic,\nimmune-mediated skin disorder characterized by well-demarcated erythematous plaques with silvery scales",
+          "Most common type of psoriasis (~80–90% cases)"
+        ],
+        "cellsHtml": [
+          "<p><strong>Definition</strong></p>",
+          "<ul><li>Chronic, </li><li>immune-mediated skin disorder characterized by well-demarcated erythematous plaques with silvery scales</li></ul>",
+          "<p>Most common type of psoriasis (~80–90% cases)</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Typical Sites",
+          "Extensor surfaces (elbows, knees),\nscalp,\nsacral area",
+          "Helps in clinical recognition and diagnosis"
+        ],
+        "cellsHtml": [
+          "<p><strong>Typical Sites</strong></p>",
+          "<ul><li>Extensor surfaces (elbows, knees), </li><li>scalp, </li><li>sacral area</li></ul>",
+          "<p>Helps in clinical recognition and diagnosis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Lesion Morphology",
+          "Erythematous, raised plaques with silvery-white scales;\nAuspitz sign may be present",
+          "Key diagnostic feature for physical examination"
+        ],
+        "cellsHtml": [
+          "<p><strong>Lesion Morphology</strong></p>",
+          "<ul><li>Erythematous, raised plaques with silvery-white scales; </li><li>Auspitz sign may be present</li></ul>",
+          "<p>Key diagnostic feature for physical examination</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pathophysiology",
+          "Dysregulated T-cell mediated inflammation → keratinocyte hyperproliferation and angiogenesis",
+          "Explains rationale for immunomodulatory treatment"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pathophysiology</strong></p>",
+          "<ul><li>Dysregulated T-cell mediated inflammation → keratinocyte hyperproliferation and angiogenesis</li></ul>",
+          "<p>Explains rationale for immunomodulatory treatment</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Trigger Factors",
+          "Stress,\ninfections (e.g., streptococcal),\ntrauma (Koebner phenomenon),\ndrugs",
+          "Guides prevention and patient counseling"
+        ],
+        "cellsHtml": [
+          "<p><strong>Trigger Factors</strong></p>",
+          "<ul><li>Stress, </li><li>infections (e.g., streptococcal), </li><li>trauma (Koebner phenomenon), </li><li>drugs</li></ul>",
+          "<p>Guides prevention and patient counseling</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Associated Findings",
+          "Nail changes (pitting, onycholysis),\narthritis (psoriatic arthritis)",
+          "Important for systemic evaluation"
+        ],
+        "cellsHtml": [
+          "<p><strong>Associated Findings</strong></p>",
+          "<ul><li>Nail changes (pitting, onycholysis), </li><li>arthritis (psoriatic arthritis)</li></ul>",
+          "<p>Important for systemic evaluation</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Management Overview",
+          "Topical corticosteroids,\nvitamin D analogues,\nphototherapy, s\nystemic agents (methotrexate, biologics)",
+          "Stepwise treatment based on severity and extent"
+        ],
+        "cellsHtml": [
+          "<p><strong>Management Overview</strong></p>",
+          "<ul><li>Topical corticosteroids, </li><li>vitamin D analogues, </li><li>phototherapy, s</li><li>ystemic agents (methotrexate, biologics)</li></ul>",
+          "<p>Stepwise treatment based on severity and extent</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "Distinguishing Point from Psoriasis"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Distinguishing Point from Psoriasis</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Eczema (Chronic Atopic/Dermatitis)",
+          "Itchy, ill-defined erythematous plaques;\nlichenification common",
+          "Usually more pruritic, less well-demarcated;\nscales are not silvery;\nAuspitz sign absent"
+        ],
+        "cellsHtml": [
+          "<p><strong>Eczema (Chronic Atopic/Dermatitis)</strong></p>",
+          "<ul><li>Itchy, ill-defined erythematous plaques; </li><li>lichenification common</li></ul>",
+          "<ul><li>Usually <strong>more pruritic</strong>, less well-demarcated; </li><li>scales are not silvery; </li><li><strong>Auspitz sign absent</strong></li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Lichen Planus",
+          "Violaceous, flat-topped, polygonal papules;\nWickham striae on mucosa",
+          "Color (violaceous),\nmucosal involvement,\nWickham striae present,\nno Auspitz sign"
+        ],
+        "cellsHtml": [
+          "<p><strong>Lichen Planus</strong></p>",
+          "<ul><li>Violaceous, flat-topped, polygonal papules; </li><li>Wickham striae on mucosa</li></ul>",
+          "<ul><li><strong>Color (violaceous), </strong></li><li><strong>mucosal involvement</strong>, </li><li>Wickham striae present, </li><li>no Auspitz sign</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Tinea Corporis (Fungal Infection)",
+          "Annular plaques with central clearing, active borders;\nscaling",
+          "Fungal hyphae on KOH,\ncentral clearing,\nless sharply demarcated"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tinea Corporis (Fungal Infection)</strong></p>",
+          "<ul><li>Annular plaques with central clearing, active borders; </li><li>scaling</li></ul>",
+          "<ul><li><strong>Fungal hyphae on KOH</strong>, </li><li>central clearing, </li><li>less sharply demarcated</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Seborrheic Dermatitis",
+          "Greasy, yellowish scales;\ncommonly scalp, nasolabial folds",
+          "Greasy yellow scales,\ndistribution differs,\nless well-demarcated,\nAuspitz sign absent"
+        ],
+        "cellsHtml": [
+          "<p><strong>Seborrheic Dermatitis</strong></p>",
+          "<ul><li>Greasy, yellowish scales;</li><li>commonly scalp, nasolabial folds</li></ul>",
+          "<ul><li><strong>Greasy yellow scales</strong>, </li><li>distribution differs, </li><li>less well-demarcated, </li><li>Auspitz sign absent</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Pityriasis Rubra Pilaris",
+          "Follicular papules,\norange-red plaques with islands of sparing",
+          "Follicular involvement,\n“islands of sparing”,\nless common,\nhistology differs"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
+          "<ul><li>Follicular papules, </li><li>orange-red plaques with islands of sparing</li></ul>",
+          "<ul><li><strong>Follicular involvement</strong>, </li><li><strong>“islands of sparing”</strong>, </li><li>less common, </li><li>histology differs</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Cutaneous T-cell Lymphoma (Patch Stage)",
+          "Erythematous patches/plaques with scaling,\nchronic course",
+          "Progressive,\npatchy,\noften asymmetrical,\nbiopsy shows atypical lymphocytes,\nno Auspitz sign"
+        ],
+        "cellsHtml": [
+          "<p><strong>Cutaneous T-cell Lymphoma (Patch Stage)</strong></p>",
+          "<ul><li>Erythematous patches/plaques with scaling, </li><li>chronic course</li></ul>",
+          "<ul><li><strong>Progressive, </strong></li><li><strong>patchy, </strong></li><li><strong>often asymmetrical</strong>, </li><li>biopsy shows atypical lymphocytes, </li><li>no Auspitz sign</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Psoriasis – Chronic Plaque Psoriasis",
-    "caption": "The diagram provides a comprehensive, medical graduate-level overview of chronic plaque psoriasis. It illustrates a typical scaly plaque on the elbow, highlighting the Auspitz sign (pinpoint bleeding after scale removal). It also shows common sites of involvement (scalp, knees, lower back), triggers (stress, infections, trauma, medications), nail changes (pitting, onycholysis), and psoriatic arthritis features. This visual is designed to help identify key clinical features, sites, and systemic associations of chronic plaque psoriasis for diagnosis.",
-    "captionHtml": "<p>The diagram provides a <strong>comprehensive, medical graduate-level overview of chronic plaque psoriasis</strong>. It illustrates a <strong>typical scaly plaque on the elbow</strong>, highlighting the <strong>Auspitz sign (pinpoint bleeding after scale removal)</strong>. It also shows <strong>common sites of involvement</strong> (scalp, knees, lower back), <strong>triggers</strong> (stress, infections, trauma, medications), <strong>nail changes</strong> (pitting, onycholysis), and <strong>psoriatic arthritis</strong> features. This visual is designed to help <strong>identify key clinical features, sites, and systemic associations</strong> of chronic plaque psoriasis for <strong>diagnosis</strong><strong>.</strong></p>",
+    "heading": "Psoriasis – Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Psoriasis – Chronic Plaque Psoriasis</strong></u></p>",
+    "description": "The diagram provides a comprehensive, medical graduate-level overview of chronic plaque psoriasis. It illustrates a typical scaly plaque on the elbow, highlighting the Auspitz sign (pinpoint bleeding after scale removal). It also shows common sites of involvement (scalp, knees, lower back), triggers (stress, infections, trauma, medications), nail changes (pitting, onycholysis), and psoriatic arthritis features. This visual is designed to help identify key clinical features, sites, and systemic associations of chronic plaque psoriasis for diagnosis.",
+    "descriptionHtml": "<p>The diagram provides a <strong>comprehensive, medical graduate-level overview of chronic plaque psoriasis</strong>. It illustrates a <strong>typical scaly plaque on the elbow</strong>, highlighting the <strong>Auspitz sign (pinpoint bleeding after scale removal)</strong>. It also shows <strong>common sites of involvement</strong> (scalp, knees, lower back), <strong>triggers</strong> (stress, infections, trauma, medications), <strong>nail changes</strong> (pitting, onycholysis), and <strong>psoriatic arthritis</strong> features. This visual is designed to help <strong>identify key clinical features, sites, and systemic associations</strong> of chronic plaque psoriasis for <strong>diagnosis</strong><strong>.</strong></p>",
     "images": [
       {
         "filename": "image1.png",

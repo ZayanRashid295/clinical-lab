@@ -82,104 +82,175 @@
   "classicTriad": "Drooling + muffled voice + floor of mouth swelling → airway-threatening deep neck infection",
   "classicTriadHtml": "<p><strong>Drooling + muffled voice + floor of mouth swelling → airway-threatening deep neck infection</strong></p>",
   "classicTriadTitle": "Classic Triad (important red flag set)",
-  "featureTableName": "Ludwig Angina – Odontogenic Deep Neck Space Infection with Airway Compromise",
-  "differentialDiagnosisTableName": "Clinical Features of Ludwig Angina Differential Diagnosis of Ludwig Angina",
-  "featureTable": [
-    {
-      "feature": "Etiology",
-      "featureHtml": "<p><strong>Etiology</strong></p>",
-      "description": "• Odontogenic infection• Usually from lower molar tooth• Polymicrobial bacterial infection",
-      "descriptionHtml": "<p>• Odontogenic infection<br/>• Usually from lower molar tooth<br/>• Polymicrobial bacterial infection</p>",
-      "clinicalImportance": "Indicates oral source spreading to deep neck spaces",
-      "clinicalImportanceHtml": "<p>Indicates oral source spreading to deep neck spaces</p>"
-    },
-    {
-      "feature": "Onset &\nProgression",
-      "featureHtml": "<p><strong>Onset &amp; </strong></p><p><strong>Progression</strong></p>",
-      "description": "• Acute onset• Rapidly progressive swelling• Fever present",
-      "descriptionHtml": "<p>• Acute onset<br/>• Rapidly progressive swelling<br/>• Fever present</p>",
-      "clinicalImportance": "Suggests aggressive deep tissue infection",
-      "clinicalImportanceHtml": "<p>Suggests aggressive deep tissue infection</p>"
-    },
-    {
-      "feature": "Oral Findings",
-      "featureHtml": "<p><strong>Oral Findings</strong></p>",
-      "description": "• Floor of mouth swelling• Tongue elevation• Firm “woody” induration",
-      "descriptionHtml": "<p>• Floor of mouth swelling<br/>• Tongue elevation<br/>• Firm “woody” induration</p>",
-      "clinicalImportance": "Classic sublingual + submandibular space involvement",
-      "clinicalImportanceHtml": "<p>Classic sublingual + submandibular space involvement</p>"
-    },
-    {
-      "feature": "Airway\nSymptoms",
-      "featureHtml": "<p><strong>Airway </strong></p><p><strong>Symptoms</strong></p>",
-      "description": "• Drooling• Muffled (“hot potato”) voice• Dyspnea",
-      "descriptionHtml": "<p>• Drooling<br/>• Muffled (“hot potato”) voice<br/>• Dyspnea</p>",
-      "clinicalImportance": "Red flag signs of impending airway obstruction",
-      "clinicalImportanceHtml": "<p><strong>Red flag signs of impending airway obstruction</strong></p>"
-    },
-    {
-      "feature": "Neck Findings",
-      "featureHtml": "<p><strong>Neck Findings</strong></p>",
-      "description": "• Bilateral submandibular swelling• Tenderness• Firm induration (not fluctuant)",
-      "descriptionHtml": "<p>• Bilateral submandibular swelling<br/>• Tenderness<br/>• Firm induration (not fluctuant)</p>",
-      "clinicalImportance": "Distinguishes from localized abscess",
-      "clinicalImportanceHtml": "<p>Distinguishes from localized abscess</p>"
-    },
-    {
-      "feature": "Systemic\nFeatures",
-      "featureHtml": "<p><strong>Systemic </strong></p><p><strong>Features</strong></p>",
-      "description": "• Fever• Toxic appearance",
-      "descriptionHtml": "<p>• Fever<br/>• Toxic appearance</p>",
-      "clinicalImportance": "Suggests severe systemic infection",
-      "clinicalImportanceHtml": "<p>Suggests severe systemic infection</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Peritonsillar\nabscess",
-      "conditionHtml": "<p><strong>Peritonsillar </strong></p><p><strong>abscess</strong></p>",
-      "distinguishingFeatures": "• Severe sore throat• Trismus• Uvula deviation• Unilateral swelling",
-      "distinguishingFeaturesHtml": "<p>• Severe sore throat<br/>• Trismus<br/>• Uvula deviation<br/>• Unilateral swelling</p>",
-      "keyDifferences": "Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling",
-      "keyDifferencesHtml": "<p>Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling</p>"
-    },
-    {
-      "condition": "Retropharyngeal\nabscess",
-      "conditionHtml": "<p><strong>Retropharyngeal </strong></p><p><strong>abscess</strong></p>",
-      "distinguishingFeatures": "• Neck stiffness• Dysphagia• Stridor• Posterior pharyngeal bulge",
-      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/>• Dysphagia<br/>• Stridor<br/>• Posterior pharyngeal bulge</p>",
-      "keyDifferences": "Posterior space involvement, not submandibular",
-      "keyDifferencesHtml": "<p>Posterior space involvement, not submandibular</p>"
-    },
-    {
-      "condition": "Submandibular\nsialadenitis",
-      "conditionHtml": "<p><strong>Submandibular </strong></p><p><strong>sialadenitis</strong></p>",
-      "distinguishingFeatures": "• Painful salivary gland swelling• Worse with meals• Pus from duct",
-      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling<br/>• Worse with meals<br/>• Pus from duct</p>",
-      "keyDifferences": "Gland-specific infection without tongue elevation",
-      "keyDifferencesHtml": "<p>Gland-specific infection without tongue elevation</p>"
-    },
-    {
-      "condition": "Acute necrotizing\nulcerative gingivitis",
-      "conditionHtml": "<p><strong>Acute necrotizing </strong></p><p><strong>ulcerative gingivitis</strong></p>",
-      "distinguishingFeatures": "• Bleeding gums• Halitosis• Gingival necrosis",
-      "distinguishingFeaturesHtml": "<p>• Bleeding gums<br/>• Halitosis<br/>• Gingival necrosis</p>",
-      "keyDifferences": "Superficial gingival disease, no deep neck spread",
-      "keyDifferencesHtml": "<p>Superficial gingival disease, no deep neck spread</p>"
-    },
-    {
-      "condition": "Oral cavity infections\n(HSV, Candida)",
-      "conditionHtml": "<p><strong>Oral cavity infections </strong></p><p><strong>(HSV, Candida)</strong></p>",
-      "distinguishingFeatures": "• Ulcers or white plaques• Mucosal involvement",
-      "distinguishingFeaturesHtml": "<p>• Ulcers or white plaques<br/>• Mucosal involvement</p>",
-      "keyDifferences": "Superficial lesions without airway compromise",
-      "keyDifferencesHtml": "<p>Superficial lesions without airway compromise</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Clinical Features of Ludwig Angina",
+    "headingHtml": "<p><u><strong>Clinical Features of Ludwig Angina</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Clinical Description",
+      "Key Diagnostic Significance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Clinical Description</strong></p>",
+      "<p><strong>Key Diagnostic Significance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Etiology",
+          "• Odontogenic infection• Usually from lower molar tooth• Polymicrobial bacterial infection",
+          "Indicates oral source spreading to deep neck spaces"
+        ],
+        "cellsHtml": [
+          "<p><strong>Etiology</strong></p>",
+          "<p>• Odontogenic infection<br/>• Usually from lower molar tooth<br/>• Polymicrobial bacterial infection</p>",
+          "<p>Indicates oral source spreading to deep neck spaces</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Onset &\nProgression",
+          "• Acute onset• Rapidly progressive swelling• Fever present",
+          "Suggests aggressive deep tissue infection"
+        ],
+        "cellsHtml": [
+          "<p><strong>Onset &amp; </strong></p><p><strong>Progression</strong></p>",
+          "<p>• Acute onset<br/>• Rapidly progressive swelling<br/>• Fever present</p>",
+          "<p>Suggests aggressive deep tissue infection</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral Findings",
+          "• Floor of mouth swelling• Tongue elevation• Firm “woody” induration",
+          "Classic sublingual + submandibular space involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Oral Findings</strong></p>",
+          "<p>• Floor of mouth swelling<br/>• Tongue elevation<br/>• Firm “woody” induration</p>",
+          "<p>Classic sublingual + submandibular space involvement</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Airway\nSymptoms",
+          "• Drooling• Muffled (“hot potato”) voice• Dyspnea",
+          "Red flag signs of impending airway obstruction"
+        ],
+        "cellsHtml": [
+          "<p><strong>Airway </strong></p><p><strong>Symptoms</strong></p>",
+          "<p>• Drooling<br/>• Muffled (“hot potato”) voice<br/>• Dyspnea</p>",
+          "<p><strong>Red flag signs of impending airway obstruction</strong></p>"
+        ]
+      },
+      {
+        "cells": [
+          "Neck Findings",
+          "• Bilateral submandibular swelling• Tenderness• Firm induration (not fluctuant)",
+          "Distinguishes from localized abscess"
+        ],
+        "cellsHtml": [
+          "<p><strong>Neck Findings</strong></p>",
+          "<p>• Bilateral submandibular swelling<br/>• Tenderness<br/>• Firm induration (not fluctuant)</p>",
+          "<p>Distinguishes from localized abscess</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Systemic\nFeatures",
+          "• Fever• Toxic appearance",
+          "Suggests severe systemic infection"
+        ],
+        "cellsHtml": [
+          "<p><strong>Systemic </strong></p><p><strong>Features</strong></p>",
+          "<p>• Fever<br/>• Toxic appearance</p>",
+          "<p>Suggests severe systemic infection</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Ludwig Angina Deep Neck Swelling with Airway Symptoms",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of Ludwig Angina</strong></u></p><p><u><strong>Deep Neck Swelling with Airway Symptoms</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "How it differs from\nLudwig angina"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>How it differs from </strong></p><p><strong>Ludwig angina</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Peritonsillar\nabscess",
+          "• Severe sore throat• Trismus• Uvula deviation• Unilateral swelling",
+          "Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling"
+        ],
+        "cellsHtml": [
+          "<p><strong>Peritonsillar </strong></p><p><strong>abscess</strong></p>",
+          "<p>• Severe sore throat<br/>• Trismus<br/>• Uvula deviation<br/>• Unilateral swelling</p>",
+          "<p>Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Retropharyngeal\nabscess",
+          "• Neck stiffness• Dysphagia• Stridor• Posterior pharyngeal bulge",
+          "Posterior space involvement, not submandibular"
+        ],
+        "cellsHtml": [
+          "<p><strong>Retropharyngeal </strong></p><p><strong>abscess</strong></p>",
+          "<p>• Neck stiffness<br/>• Dysphagia<br/>• Stridor<br/>• Posterior pharyngeal bulge</p>",
+          "<p>Posterior space involvement, not submandibular</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Submandibular\nsialadenitis",
+          "• Painful salivary gland swelling• Worse with meals• Pus from duct",
+          "Gland-specific infection without tongue elevation"
+        ],
+        "cellsHtml": [
+          "<p><strong>Submandibular </strong></p><p><strong>sialadenitis</strong></p>",
+          "<p>• Painful salivary gland swelling<br/>• Worse with meals<br/>• Pus from duct</p>",
+          "<p>Gland-specific infection without tongue elevation</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Acute necrotizing\nulcerative gingivitis",
+          "• Bleeding gums• Halitosis• Gingival necrosis",
+          "Superficial gingival disease, no deep neck spread"
+        ],
+        "cellsHtml": [
+          "<p><strong>Acute necrotizing </strong></p><p><strong>ulcerative gingivitis</strong></p>",
+          "<p>• Bleeding gums<br/>• Halitosis<br/>• Gingival necrosis</p>",
+          "<p>Superficial gingival disease, no deep neck spread</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral cavity infections\n(HSV, Candida)",
+          "• Ulcers or white plaques• Mucosal involvement",
+          "Superficial lesions without airway compromise"
+        ],
+        "cellsHtml": [
+          "<p><strong>Oral cavity infections </strong></p><p><strong>(HSV, Candida)</strong></p>",
+          "<p>• Ulcers or white plaques<br/>• Mucosal involvement</p>",
+          "<p>Superficial lesions without airway compromise</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Ludwig Angina – Odontogenic Deep Neck Space Infection with Airway Compromise",
-    "caption": "This diagram illustrates the pathogenesis, anatomical spread, clinical features, airway compromise, and management principles of Ludwig angina. It demonstrates how infection from a lower molar tooth spreads into the submandibular, sublingual, and submental spaces, leading to tongue elevation and potential airway obstruction. Key emergency signs such as drooling, muffled voice, bilateral submandibular swelling, and respiratory distress are highlighted along with the importance of early airway management and intravenous antibiotic therapy.",
-    "captionHtml": "<p>This diagram illustrates the pathogenesis, anatomical spread, clinical features, airway compromise, and management principles of Ludwig angina. It demonstrates how infection from a lower molar tooth spreads into the submandibular, sublingual, and submental spaces, leading to tongue elevation and potential airway obstruction. Key emergency signs such as drooling, muffled voice, bilateral submandibular swelling, and respiratory distress are highlighted along with the importance of early airway management and intravenous antibiotic therapy.</p>",
+    "heading": "Ludwig Angina – Odontogenic Deep Neck Space Infection with Airway Compromise",
+    "headingHtml": "<p><u><strong>Ludwig Angina – Odontogenic Deep Neck Space Infection </strong></u></p><p><u><strong>with Airway Compromise</strong></u></p>",
+    "description": "This diagram illustrates the pathogenesis, anatomical spread, clinical features, airway compromise, and management principles of Ludwig angina. It demonstrates how infection from a lower molar tooth spreads into the submandibular, sublingual, and submental spaces, leading to tongue elevation and potential airway obstruction. Key emergency signs such as drooling, muffled voice, bilateral submandibular swelling, and respiratory distress are highlighted along with the importance of early airway management and intravenous antibiotic therapy.",
+    "descriptionHtml": "<p>This diagram illustrates the pathogenesis, anatomical spread, clinical features, airway compromise, and management principles of Ludwig angina. It demonstrates how infection from a lower molar tooth spreads into the submandibular, sublingual, and submental spaces, leading to tongue elevation and potential airway obstruction. Key emergency signs such as drooling, muffled voice, bilateral submandibular swelling, and respiratory distress are highlighted along with the importance of early airway management and intravenous antibiotic therapy.</p>",
     "images": [
       {
         "filename": "image1.png",

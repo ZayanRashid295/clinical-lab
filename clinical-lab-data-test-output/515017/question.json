@@ -71,112 +71,187 @@
   "classicTriad": "Erythema + Well-defined plaques + Silvery scales",
   "classicTriadHtml": "<p>Erythema + Well-defined plaques + Silvery scales</p>",
   "classicTriadTitle": "Psoriasis Morphological Triad",
-  "featureTableName": "Chronic Plaque Psoriasis",
-  "differentialDiagnosisTableName": "Chronic Plaque Psoriasis Differential Diagnosis of Chronic Plaque Psoriasis",
-  "featureTable": [
-    {
-      "feature": "Morphology",
-      "featureHtml": "<p>Morphology</p>",
-      "description": "Well-demarcated erythematous plaques with thick silvery scales",
-      "descriptionHtml": "<p>Well-demarcated erythematous plaques with thick silvery scales</p>",
-      "clinicalImportance": "Classic appearance;\nhelps differentiate from other dermatoses",
-      "clinicalImportanceHtml": "<ul><li>Classic appearance; </li><li>helps differentiate from other dermatoses</li></ul>"
-    },
-    {
-      "feature": "Distribution",
-      "featureHtml": "<p>Distribution</p>",
-      "description": "Symmetrical,\nmainly extensor surfaces (elbows, knees),\nscalp,\nlumbosacral area",
-      "descriptionHtml": "<ul><li>Symmetrical, </li><li>mainly <strong>extensor surfaces</strong> (elbows, knees), </li><li>scalp, </li><li>lumbosacral area</li></ul>",
-      "clinicalImportance": "Extensor predominance is hallmark;\nhelps in diagnosis",
-      "clinicalImportanceHtml": "<ul><li>Extensor predominance is hallmark;</li><li>helps in diagnosis</li></ul>"
-    },
-    {
-      "feature": "Chronicity & Course",
-      "featureHtml": "<p>Chronicity &amp; Course</p>",
-      "description": "Long-standing,\nrecurrent,\nnon-itchy lesions",
-      "descriptionHtml": "<ul><li>Long-standing, </li><li>recurrent, </li><li>non-itchy lesions</li></ul>",
-      "clinicalImportance": "Chronic nature differentiates from acute dermatoses",
-      "clinicalImportanceHtml": "<p>Chronic nature differentiates from acute dermatoses</p>"
-    },
-    {
-      "feature": "Mucosal Involvement",
-      "featureHtml": "<p>Mucosal Involvement</p>",
-      "description": "Usually absent",
-      "descriptionHtml": "<ul><li>Usually absent</li></ul>",
-      "clinicalImportance": "Helps distinguish from lichen planus or other mucosal disorders",
-      "clinicalImportanceHtml": "<p>Helps distinguish from lichen planus or other mucosal disorders</p>"
-    },
-    {
-      "feature": "Triggers / Associations",
-      "featureHtml": "<p>Triggers / Associations</p>",
-      "description": "Stress,\ninfections,\ntrauma (Koebner phenomenon),\nmedications,\nmetabolic syndrome",
-      "descriptionHtml": "<ul><li>Stress, </li><li>infections, </li><li>trauma (Koebner phenomenon), </li><li>medications, </li><li>metabolic syndrome</li></ul>",
-      "clinicalImportance": "Important for management and patient counseling",
-      "clinicalImportanceHtml": "<p>Important for management and patient counseling</p>"
-    },
-    {
-      "feature": "Complications",
-      "featureHtml": "<p>Complications</p>",
-      "description": "Psoriatic arthritis,\nnail involvement,\nsecondary infections",
-      "descriptionHtml": "<ul><li>Psoriatic arthritis, </li><li>nail involvement, </li><li>secondary infections</li></ul>",
-      "clinicalImportance": "Guides monitoring and referral to rheumatology if needed",
-      "clinicalImportanceHtml": "<p>Guides monitoring and referral to rheumatology if needed</p>"
-    },
-    {
-      "feature": "Treatment Overview",
-      "featureHtml": "<p>Treatment Overview</p>",
-      "description": "Topical corticosteroids,\nvitamin D analogs,\nphototherapy,\nsystemic agents (methotrexate, biologics)",
-      "descriptionHtml": "<ul><li>Topical corticosteroids, </li><li>vitamin D analogs, </li><li>phototherapy, </li><li>systemic agents (methotrexate, biologics)</li></ul>",
-      "clinicalImportance": "Treatment tailored by severity and extent",
-      "clinicalImportanceHtml": "<p>Treatment tailored by severity and extent</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Lichen planus",
-      "conditionHtml": "<p><strong>Lichen planus</strong></p>",
-      "distinguishingFeatures": "Violaceous, flat-topped, pruritic papules;\ncommonly on flexor surfaces;\nmucosal involvement (Wickham striae)",
-      "distinguishingFeaturesHtml": "<ul><li>Violaceous, flat-topped, pruritic papules; </li><li>commonly on <strong>flexor surfaces</strong>; </li><li>mucosal involvement (Wickham striae)</li></ul>",
-      "keyDifferences": "Color,\nflexor distribution,\npruritus,\nmucosal lesions help differentiate",
-      "keyDifferencesHtml": "<ul><li>Color, </li><li>flexor distribution, </li><li>pruritus, </li><li>mucosal lesions help differentiate</li></ul>"
-    },
-    {
-      "condition": "Tinea corporis",
-      "conditionHtml": "<p><strong>Tinea corporis</strong></p>",
-      "distinguishingFeatures": "Annular lesions with central clearing, active scaly border;\nusually itchy;\nasymmetrical",
-      "distinguishingFeaturesHtml": "<ul><li>Annular lesions with central clearing, active scaly border; </li><li>usually itchy; </li><li>asymmetrical</li></ul>",
-      "keyDifferences": "Fungal infection confirmed by KOH prep;\ncentral clearing unlike uniform plaques",
-      "keyDifferencesHtml": "<ul><li>Fungal infection confirmed by KOH prep; </li><li>central clearing unlike uniform plaques</li></ul>"
-    },
-    {
-      "condition": "Seborrheic dermatitis",
-      "conditionHtml": "<p><strong>Seborrheic dermatitis</strong></p>",
-      "distinguishingFeatures": "Greasy yellow scales;\ncommonly affects scalp, face, chest;\nextensor surfaces usually spared",
-      "distinguishingFeaturesHtml": "<ul><li>Greasy yellow scales; </li><li>commonly affects scalp, face, chest; </li><li>extensor surfaces usually spared</li></ul>",
-      "keyDifferences": "Scale type and distribution differ;\noften mild erythema",
-      "keyDifferencesHtml": "<ul><li>Scale type and distribution differ; </li><li>often mild erythema</li></ul>"
-    },
-    {
-      "condition": "Pityriasis rosea",
-      "conditionHtml": "<p><strong>Pityriasis rosea</strong></p>",
-      "distinguishingFeatures": "Acute, self-limiting;\nherald patch followed by “Christmas tree” pattern on trunk",
-      "distinguishingFeaturesHtml": "<ul><li>Acute, self-limiting; </li><li>herald patch followed by “Christmas tree” pattern on trunk</li></ul>",
-      "keyDifferences": "Acute onset,\ntrunk distribution,\nshort duration (6–8 weeks)",
-      "keyDifferencesHtml": "<ul><li>Acute onset, </li><li>trunk distribution, </li><li>short duration (6–8 weeks)</li></ul>"
-    },
-    {
-      "condition": "Eczema / Atopic dermatitis",
-      "conditionHtml": "<p><strong>Eczema / Atopic dermatitis</strong></p>",
-      "distinguishingFeatures": "Pruritic, ill-defined erythematous patches;\noften on flexor surfaces; chronic relapsing",
-      "distinguishingFeaturesHtml": "<ul><li>Pruritic, ill-defined erythematous patches; </li><li>often on flexor surfaces; chronic relapsing</li></ul>",
-      "keyDifferences": "Intense itching,\nflexor predilection,\nhistory of atopy",
-      "keyDifferencesHtml": "<ul><li>Intense itching, </li><li>flexor predilection, </li><li>history of atopy</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Description",
+      "Key Points / Clinical Relevance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Description</strong></p>",
+      "<p><strong>Key Points / Clinical Relevance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Morphology",
+          "Well-demarcated erythematous plaques with thick silvery scales",
+          "Classic appearance;\nhelps differentiate from other dermatoses"
+        ],
+        "cellsHtml": [
+          "<p>Morphology</p>",
+          "<p>Well-demarcated erythematous plaques with thick silvery scales</p>",
+          "<ul><li>Classic appearance; </li><li>helps differentiate from other dermatoses</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Distribution",
+          "Symmetrical,\nmainly extensor surfaces (elbows, knees),\nscalp,\nlumbosacral area",
+          "Extensor predominance is hallmark;\nhelps in diagnosis"
+        ],
+        "cellsHtml": [
+          "<p>Distribution</p>",
+          "<ul><li>Symmetrical, </li><li>mainly <strong>extensor surfaces</strong> (elbows, knees), </li><li>scalp, </li><li>lumbosacral area</li></ul>",
+          "<ul><li>Extensor predominance is hallmark;</li><li>helps in diagnosis</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Chronicity & Course",
+          "Long-standing,\nrecurrent,\nnon-itchy lesions",
+          "Chronic nature differentiates from acute dermatoses"
+        ],
+        "cellsHtml": [
+          "<p>Chronicity &amp; Course</p>",
+          "<ul><li>Long-standing, </li><li>recurrent, </li><li>non-itchy lesions</li></ul>",
+          "<p>Chronic nature differentiates from acute dermatoses</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Mucosal Involvement",
+          "Usually absent",
+          "Helps distinguish from lichen planus or other mucosal disorders"
+        ],
+        "cellsHtml": [
+          "<p>Mucosal Involvement</p>",
+          "<ul><li>Usually absent</li></ul>",
+          "<p>Helps distinguish from lichen planus or other mucosal disorders</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Triggers / Associations",
+          "Stress,\ninfections,\ntrauma (Koebner phenomenon),\nmedications,\nmetabolic syndrome",
+          "Important for management and patient counseling"
+        ],
+        "cellsHtml": [
+          "<p>Triggers / Associations</p>",
+          "<ul><li>Stress, </li><li>infections, </li><li>trauma (Koebner phenomenon), </li><li>medications, </li><li>metabolic syndrome</li></ul>",
+          "<p>Important for management and patient counseling</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complications",
+          "Psoriatic arthritis,\nnail involvement,\nsecondary infections",
+          "Guides monitoring and referral to rheumatology if needed"
+        ],
+        "cellsHtml": [
+          "<p>Complications</p>",
+          "<ul><li>Psoriatic arthritis, </li><li>nail involvement, </li><li>secondary infections</li></ul>",
+          "<p>Guides monitoring and referral to rheumatology if needed</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Treatment Overview",
+          "Topical corticosteroids,\nvitamin D analogs,\nphototherapy,\nsystemic agents (methotrexate, biologics)",
+          "Treatment tailored by severity and extent"
+        ],
+        "cellsHtml": [
+          "<p>Treatment Overview</p>",
+          "<ul><li>Topical corticosteroids, </li><li>vitamin D analogs, </li><li>phototherapy, </li><li>systemic agents (methotrexate, biologics)</li></ul>",
+          "<p>Treatment tailored by severity and extent</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Distinguishing Features",
+      "Key Points / How to Differentiate from Psoriasis"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Distinguishing Features</strong></p>",
+      "<p><strong>Key Points / How to Differentiate from Psoriasis</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Lichen planus",
+          "Violaceous, flat-topped, pruritic papules;\ncommonly on flexor surfaces;\nmucosal involvement (Wickham striae)",
+          "Color,\nflexor distribution,\npruritus,\nmucosal lesions help differentiate"
+        ],
+        "cellsHtml": [
+          "<p><strong>Lichen planus</strong></p>",
+          "<ul><li>Violaceous, flat-topped, pruritic papules; </li><li>commonly on <strong>flexor surfaces</strong>; </li><li>mucosal involvement (Wickham striae)</li></ul>",
+          "<ul><li>Color, </li><li>flexor distribution, </li><li>pruritus, </li><li>mucosal lesions help differentiate</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Tinea corporis",
+          "Annular lesions with central clearing, active scaly border;\nusually itchy;\nasymmetrical",
+          "Fungal infection confirmed by KOH prep;\ncentral clearing unlike uniform plaques"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tinea corporis</strong></p>",
+          "<ul><li>Annular lesions with central clearing, active scaly border; </li><li>usually itchy; </li><li>asymmetrical</li></ul>",
+          "<ul><li>Fungal infection confirmed by KOH prep; </li><li>central clearing unlike uniform plaques</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Seborrheic dermatitis",
+          "Greasy yellow scales;\ncommonly affects scalp, face, chest;\nextensor surfaces usually spared",
+          "Scale type and distribution differ;\noften mild erythema"
+        ],
+        "cellsHtml": [
+          "<p><strong>Seborrheic dermatitis</strong></p>",
+          "<ul><li>Greasy yellow scales; </li><li>commonly affects scalp, face, chest; </li><li>extensor surfaces usually spared</li></ul>",
+          "<ul><li>Scale type and distribution differ; </li><li>often mild erythema</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Pityriasis rosea",
+          "Acute, self-limiting;\nherald patch followed by “Christmas tree” pattern on trunk",
+          "Acute onset,\ntrunk distribution,\nshort duration (6–8 weeks)"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pityriasis rosea</strong></p>",
+          "<ul><li>Acute, self-limiting; </li><li>herald patch followed by “Christmas tree” pattern on trunk</li></ul>",
+          "<ul><li>Acute onset, </li><li>trunk distribution, </li><li>short duration (6–8 weeks)</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Eczema / Atopic dermatitis",
+          "Pruritic, ill-defined erythematous patches;\noften on flexor surfaces; chronic relapsing",
+          "Intense itching,\nflexor predilection,\nhistory of atopy"
+        ],
+        "cellsHtml": [
+          "<p><strong>Eczema / Atopic dermatitis</strong></p>",
+          "<ul><li>Pruritic, ill-defined erythematous patches; </li><li>often on flexor surfaces; chronic relapsing</li></ul>",
+          "<ul><li>Intense itching, </li><li>flexor predilection, </li><li>history of atopy</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Chronic Plaque Psoriasis",
-    "caption": "This diagram illustrates the classical clinical features of chronic plaque psoriasis, highlighting well-demarcated erythematous plaques with thick silvery scales on extensor surfaces. It also depicts common associations such as nail changes, psoriatic arthritis, the Koebner phenomenon, major triggers, and an overview of treatment options.",
-    "captionHtml": "<p>This diagram illustrates the <strong>classical clinical features of chronic plaque psoriasis</strong>, highlighting <strong>well-demarcated erythematous plaques with thick silvery scales</strong> on <strong>extensor surfaces</strong>. It also depicts common <strong>associations</strong> such as <strong>nail changes</strong>, <strong>psoriatic arthritis</strong>, the <strong>Koebner phenomenon</strong>, major <strong>triggers</strong>, and an overview of <strong>treatment options</strong><strong>.</strong></p>",
+    "heading": "Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "description": "This diagram illustrates the classical clinical features of chronic plaque psoriasis, highlighting well-demarcated erythematous plaques with thick silvery scales on extensor surfaces. It also depicts common associations such as nail changes, psoriatic arthritis, the Koebner phenomenon, major triggers, and an overview of treatment options.",
+    "descriptionHtml": "<p>This diagram illustrates the <strong>classical clinical features of chronic plaque psoriasis</strong>, highlighting <strong>well-demarcated erythematous plaques with thick silvery scales</strong> on <strong>extensor surfaces</strong>. It also depicts common <strong>associations</strong> such as <strong>nail changes</strong>, <strong>psoriatic arthritis</strong>, the <strong>Koebner phenomenon</strong>, major <strong>triggers</strong>, and an overview of <strong>treatment options</strong><strong>.</strong></p>",
     "images": [
       {
         "filename": "image1.png",

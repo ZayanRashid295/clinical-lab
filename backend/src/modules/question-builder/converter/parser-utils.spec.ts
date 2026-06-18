@@ -3,6 +3,7 @@ import {
   findPrimaryKeyConceptIndex,
   isClassicTriadHeadingLine,
   isKeyConceptHeading,
+  isProseParagraph,
   isSystemInvolvedHeading,
   parseOptionLine,
   splitStemAndOptionTexts,
@@ -29,6 +30,21 @@ describe("parser-utils", () => {
 
     it("rejects inline key concept lines inside explanations", () => {
       expect(isKeyConceptHeading("Key concept: The anemia is due to inability")).toBe(false);
+    });
+  });
+
+  describe("isProseParagraph", () => {
+    it("treats parenthetical subtitle lines as headings", () => {
+      expect(isProseParagraph("(Microcytic Hypochromic Anemia)")).toBe(false);
+      expect(isProseParagraph("(Scrapable White Lesions in Diabetic Patient)")).toBe(false);
+    });
+
+    it("detects explanatory prose between tables", () => {
+      expect(
+        isProseParagraph(
+          "Severe acute asthma is defined by marked tachypnea (>30/min), inability to speak full sentences.",
+        ),
+      ).toBe(true);
     });
   });
 

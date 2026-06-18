@@ -83,96 +83,163 @@
   "classicTriad": "Diabetes + Antibiotics + Scrapable white plaques",
   "classicTriadHtml": "<p><strong>Diabetes + Antibiotics + Scrapable white plaques</strong></p>",
   "classicTriadTitle": "Classic Triad",
-  "featureTableName": "Oral Candidiasis (Pseudomembranous Candidiasis) – Recognition & Diagnosis of White Scrapable Oral Lesions in Immunocompromised Patients",
-  "differentialDiagnosisTableName": "Oral Cavity – Pseudomembranous Oral Candidiasis (Scrapable White Lesions in Diabetic Patient) Differential Diagnosis of White Oral Lesions",
-  "featureTable": [
-    {
-      "feature": "Oral white lesions",
-      "featureHtml": "<p>Oral white lesions</p>",
-      "description": "• White, curd-like plaques• Soft pseudomembrane formation• Easily removable on scraping",
-      "descriptionHtml": "<p>• White, curd-like plaques<br/>• Soft pseudomembrane formation<br/>• Easily removable on scraping</p>",
-      "clinicalImportance": "Suggests superficial fungal colonization rather than epithelial dysplasia",
-      "clinicalImportanceHtml": "<p>Suggests superficial fungal colonization rather than epithelial dysplasia</p>"
-    },
-    {
-      "feature": "Scrapability",
-      "featureHtml": "<p>Scrapability</p>",
-      "description": "• Plaques easily scraped off• Leaves erythematous base• Underlying mucosal irritation",
-      "descriptionHtml": "<p>• Plaques easily scraped off<br/>• Leaves erythematous base<br/>• Underlying mucosal irritation</p>",
-      "clinicalImportance": "Key diagnostic hallmark of candidiasis",
-      "clinicalImportanceHtml": "<p>Key diagnostic hallmark of candidiasis</p>"
-    },
-    {
-      "feature": "Risk factors",
-      "featureHtml": "<p>Risk factors</p>",
-      "description": "• Poorly controlled diabetes mellitus• Recent broad-spectrum antibiotic use• Possible immunosuppression",
-      "descriptionHtml": "<p>• Poorly controlled diabetes mellitus<br/>• Recent broad-spectrum antibiotic use<br/>• Possible immunosuppression</p>",
-      "clinicalImportance": "Promotes Candida overgrowth due to altered oral flora",
-      "clinicalImportanceHtml": "<p>Promotes Candida overgrowth due to altered oral flora</p>"
-    },
-    {
-      "feature": "Symptoms",
-      "featureHtml": "<p>Symptoms</p>",
-      "description": "• Oral discomfort• Burning sensation• “Cotton-like” feeling",
-      "descriptionHtml": "<p>• Oral discomfort<br/>• Burning sensation<br/>• “Cotton-like” feeling</p>",
-      "clinicalImportance": "Typical symptomatic fungal mucositis",
-      "clinicalImportanceHtml": "<p>Typical symptomatic fungal mucositis</p>"
-    },
-    {
-      "feature": "Mucosal appearance\nafter scraping",
-      "featureHtml": "<p>Mucosal appearance</p><p> after scraping</p>",
-      "description": "• Red inflamed mucosa• Possible mild bleeding• Raw epithelial surface",
-      "descriptionHtml": "<p>• Red inflamed mucosa<br/>• Possible mild bleeding<br/>• Raw epithelial surface</p>",
-      "clinicalImportance": "Confirms superficial mucosal involvement",
-      "clinicalImportanceHtml": "<p>Confirms superficial mucosal involvement</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Oral candidiasis",
-      "conditionHtml": "<p>Oral candidiasis</p>",
-      "distinguishingFeatures": "• Scrapable white plaques• Erythematous base after removal• Associated with diabetes, antibiotics",
-      "distinguishingFeaturesHtml": "<p>• Scrapable white plaques<br/>• Erythematous base after removal<br/>• Associated with diabetes, antibiotics</p>",
-      "keyDifferences": "Only lesion that is scrapable with red base exposure",
-      "keyDifferencesHtml": "<p>Only lesion that is <strong>scrapable with red base exposure</strong></p>"
-    },
-    {
-      "condition": "Oral leukoplakia",
-      "conditionHtml": "<p>Oral leukoplakia</p>",
-      "distinguishingFeatures": "• Persistent white patch• Non-scrapable• Linked to smoking, chronic irritation",
-      "distinguishingFeaturesHtml": "<p>• Persistent white patch<br/>• Non-scrapable<br/>• Linked to smoking, chronic irritation</p>",
-      "keyDifferences": "Premalignant, firmly adherent lesion",
-      "keyDifferencesHtml": "<p>Premalignant, <strong>firmly adherent lesion</strong></p>"
-    },
-    {
-      "condition": "Oral lichen planus",
-      "conditionHtml": "<p>Oral lichen planus</p>",
-      "distinguishingFeatures": "• White lacy reticular pattern (Wickham striae)• Bilateral distribution• Chronic immune-mediated condition",
-      "distinguishingFeaturesHtml": "<p>• White lacy reticular pattern (Wickham striae)<br/>• Bilateral distribution<br/>• Chronic immune-mediated condition</p>",
-      "keyDifferences": "Characteristic lace-like pattern, not plaque-like",
-      "keyDifferencesHtml": "<p>Characteristic <strong>lace-like pattern</strong>, not plaque-like</p>"
-    },
-    {
-      "condition": "Oral hairy\nleukoplakia",
-      "conditionHtml": "<p>Oral hairy </p><p>leukoplakia</p>",
-      "distinguishingFeatures": "• Corrugated white plaques• Lateral tongue involvement• EBV association, HIV patients",
-      "distinguishingFeaturesHtml": "<p>• Corrugated white plaques<br/>• Lateral tongue involvement<br/>• EBV association, HIV patients</p>",
-      "keyDifferences": "Non-scrapable + immunocompromised (HIV)",
-      "keyDifferencesHtml": "<p><strong>Non-scrapable + immunocompromised (HIV)</strong></p>"
-    },
-    {
-      "condition": "Oral squamous cell\ncarcinoma",
-      "conditionHtml": "<p>Oral squamous cell</p><p> carcinoma</p>",
-      "distinguishingFeatures": "• Non-healing ulcer• Indurated mass• May be red-white mixed lesion",
-      "distinguishingFeaturesHtml": "<p>• Non-healing ulcer<br/>• Indurated mass<br/>• May be red-white mixed lesion</p>",
-      "keyDifferences": "Progressive malignant lesion, not removable",
-      "keyDifferencesHtml": "<p><strong>Progressive malignant lesion, not removable</strong></p>"
-    }
-  ],
+  "table1": {
+    "heading": "Oral Cavity – Pseudomembranous Oral Candidiasis (Scrapable White Lesions in Diabetic Patient)",
+    "headingHtml": "<p><u><strong>Oral Cavity – Pseudomembranous Oral Candidiasis </strong></u></p><p><u><strong>(Scrapable White Lesions in Diabetic Patient)</strong></u></p>",
+    "columns": [
+      "Clinical Feature",
+      "Description",
+      "Clinical Significance"
+    ],
+    "columnsHtml": [
+      "<p><strong>Clinical Feature</strong></p>",
+      "<p><strong>Description </strong></p>",
+      "<p><strong>Clinical Significance</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Oral white lesions",
+          "• White, curd-like plaques• Soft pseudomembrane formation• Easily removable on scraping",
+          "Suggests superficial fungal colonization rather than epithelial dysplasia"
+        ],
+        "cellsHtml": [
+          "<p>Oral white lesions</p>",
+          "<p>• White, curd-like plaques<br/>• Soft pseudomembrane formation<br/>• Easily removable on scraping</p>",
+          "<p>Suggests superficial fungal colonization rather than epithelial dysplasia</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Scrapability",
+          "• Plaques easily scraped off• Leaves erythematous base• Underlying mucosal irritation",
+          "Key diagnostic hallmark of candidiasis"
+        ],
+        "cellsHtml": [
+          "<p>Scrapability</p>",
+          "<p>• Plaques easily scraped off<br/>• Leaves erythematous base<br/>• Underlying mucosal irritation</p>",
+          "<p>Key diagnostic hallmark of candidiasis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Risk factors",
+          "• Poorly controlled diabetes mellitus• Recent broad-spectrum antibiotic use• Possible immunosuppression",
+          "Promotes Candida overgrowth due to altered oral flora"
+        ],
+        "cellsHtml": [
+          "<p>Risk factors</p>",
+          "<p>• Poorly controlled diabetes mellitus<br/>• Recent broad-spectrum antibiotic use<br/>• Possible immunosuppression</p>",
+          "<p>Promotes Candida overgrowth due to altered oral flora</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Symptoms",
+          "• Oral discomfort• Burning sensation• “Cotton-like” feeling",
+          "Typical symptomatic fungal mucositis"
+        ],
+        "cellsHtml": [
+          "<p>Symptoms</p>",
+          "<p>• Oral discomfort<br/>• Burning sensation<br/>• “Cotton-like” feeling</p>",
+          "<p>Typical symptomatic fungal mucositis</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Mucosal appearance\nafter scraping",
+          "• Red inflamed mucosa• Possible mild bleeding• Raw epithelial surface",
+          "Confirms superficial mucosal involvement"
+        ],
+        "cellsHtml": [
+          "<p>Mucosal appearance</p><p> after scraping</p>",
+          "<p>• Red inflamed mucosa<br/>• Possible mild bleeding<br/>• Raw epithelial surface</p>",
+          "<p>Confirms superficial mucosal involvement</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of White Oral Lesions",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>White Oral Lesions </strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "How to Differentiate"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features </strong></p>",
+      "<p><strong>How to Differentiate</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Oral candidiasis",
+          "• Scrapable white plaques• Erythematous base after removal• Associated with diabetes, antibiotics",
+          "Only lesion that is scrapable with red base exposure"
+        ],
+        "cellsHtml": [
+          "<p>Oral candidiasis</p>",
+          "<p>• Scrapable white plaques<br/>• Erythematous base after removal<br/>• Associated with diabetes, antibiotics</p>",
+          "<p>Only lesion that is <strong>scrapable with red base exposure</strong></p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral leukoplakia",
+          "• Persistent white patch• Non-scrapable• Linked to smoking, chronic irritation",
+          "Premalignant, firmly adherent lesion"
+        ],
+        "cellsHtml": [
+          "<p>Oral leukoplakia</p>",
+          "<p>• Persistent white patch<br/>• Non-scrapable<br/>• Linked to smoking, chronic irritation</p>",
+          "<p>Premalignant, <strong>firmly adherent lesion</strong></p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral lichen planus",
+          "• White lacy reticular pattern (Wickham striae)• Bilateral distribution• Chronic immune-mediated condition",
+          "Characteristic lace-like pattern, not plaque-like"
+        ],
+        "cellsHtml": [
+          "<p>Oral lichen planus</p>",
+          "<p>• White lacy reticular pattern (Wickham striae)<br/>• Bilateral distribution<br/>• Chronic immune-mediated condition</p>",
+          "<p>Characteristic <strong>lace-like pattern</strong>, not plaque-like</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral hairy\nleukoplakia",
+          "• Corrugated white plaques• Lateral tongue involvement• EBV association, HIV patients",
+          "Non-scrapable + immunocompromised (HIV)"
+        ],
+        "cellsHtml": [
+          "<p>Oral hairy </p><p>leukoplakia</p>",
+          "<p>• Corrugated white plaques<br/>• Lateral tongue involvement<br/>• EBV association, HIV patients</p>",
+          "<p><strong>Non-scrapable + immunocompromised (HIV)</strong></p>"
+        ]
+      },
+      {
+        "cells": [
+          "Oral squamous cell\ncarcinoma",
+          "• Non-healing ulcer• Indurated mass• May be red-white mixed lesion",
+          "Progressive malignant lesion, not removable"
+        ],
+        "cellsHtml": [
+          "<p>Oral squamous cell</p><p> carcinoma</p>",
+          "<p>• Non-healing ulcer<br/>• Indurated mass<br/>• May be red-white mixed lesion</p>",
+          "<p><strong>Progressive malignant lesion, not removable</strong></p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Immunocompromised Patients",
-    "caption": "This diagram illustrates the clinical recognition, pathogenesis, diagnosis, and management of oral candidiasis (oral thrush), a common opportunistic fungal infection caused by Candida albicans. It highlights major risk factors such as diabetes mellitus, recent broad-spectrum antibiotic use, immunosuppression, and poor oral hygiene. The hallmark feature demonstrated is the presence of white curd-like oral plaques that can be scraped off to reveal an erythematous base. The infographic also summarizes diagnostic confirmation with KOH mount showing budding yeast and pseudohyphae, along with antifungal treatment approaches including topical and systemic therapy.",
-    "captionHtml": "<p>This diagram illustrates the clinical recognition, pathogenesis, diagnosis, and management of oral candidiasis (oral thrush), a common opportunistic fungal infection caused by <em>Candida albicans</em>. It highlights major risk factors such as diabetes mellitus, recent broad-spectrum antibiotic use, immunosuppression, and poor oral hygiene. The hallmark feature demonstrated is the presence of white curd-like oral plaques that can be scraped off to reveal an erythematous base. The infographic also summarizes diagnostic confirmation with KOH mount showing budding yeast and pseudohyphae, along with antifungal treatment approaches including topical and systemic therapy.</p>",
+    "heading": "Oral Candidiasis (Pseudomembranous Candidiasis) – Recognition & Diagnosis of White Scrapable Oral Lesions in Immunocompromised Patients",
+    "headingHtml": "<p><u><strong>Oral Candidiasis (Pseudomembranous Candidiasis) – </strong></u></p><p><u><strong>Recognition &amp; Diagnosis of White Scrapable Oral Lesions in </strong></u></p><p><u><strong>Immunocompromised Patients</strong></u></p>",
+    "description": "This diagram illustrates the clinical recognition, pathogenesis, diagnosis, and management of oral candidiasis (oral thrush), a common opportunistic fungal infection caused by Candida albicans. It highlights major risk factors such as diabetes mellitus, recent broad-spectrum antibiotic use, immunosuppression, and poor oral hygiene. The hallmark feature demonstrated is the presence of white curd-like oral plaques that can be scraped off to reveal an erythematous base. The infographic also summarizes diagnostic confirmation with KOH mount showing budding yeast and pseudohyphae, along with antifungal treatment approaches including topical and systemic therapy.",
+    "descriptionHtml": "<p>This diagram illustrates the clinical recognition, pathogenesis, diagnosis, and management of oral candidiasis (oral thrush), a common opportunistic fungal infection caused by <em>Candida albicans</em>. It highlights major risk factors such as diabetes mellitus, recent broad-spectrum antibiotic use, immunosuppression, and poor oral hygiene. The hallmark feature demonstrated is the presence of white curd-like oral plaques that can be scraped off to reveal an erythematous base. The infographic also summarizes diagnostic confirmation with KOH mount showing budding yeast and pseudohyphae, along with antifungal treatment approaches including topical and systemic therapy.</p>",
     "images": [
       {
         "filename": "image1.png",

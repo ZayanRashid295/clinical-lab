@@ -77,104 +77,175 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
-  "featureTableName": "Psoriasis – Systemic Therapy: Methotrexate Pre-treatment Monitoring",
-  "differentialDiagnosisTableName": "Psoriasis – Systemic Therapy – Methotrexate Pre-treatment Monitoring Differential Diagnosis of Chronic Plaque Psoriasis",
-  "featureTable": [
-    {
-      "feature": "Liver function tests (LFTs)",
-      "featureHtml": "<p>Liver function tests (LFTs)</p>",
-      "description": "Detect baseline liver disease;\nprevent hepatotoxicity",
-      "descriptionHtml": "<ul><li>Detect baseline liver disease; </li><li>prevent hepatotoxicity</li></ul>",
-      "clinicalImportance": "Hepatobiliary / Liver",
-      "clinicalImportanceHtml": "<p>Hepatobiliary / Liver</p>"
-    },
-    {
-      "feature": "Complete blood count (CBC)",
-      "featureHtml": "<p>Complete blood count (CBC)</p>",
-      "description": "Identify baseline cytopenias;\nmonitor bone marrow suppression",
-      "descriptionHtml": "<ul><li>Identify baseline cytopenias; </li><li>monitor bone marrow suppression</li></ul>",
-      "clinicalImportance": "Hematologic",
-      "clinicalImportanceHtml": "<p>Hematologic</p>"
-    },
-    {
-      "feature": "Renal function tests (RFTs)",
-      "featureHtml": "<p>Renal function tests (RFTs)</p>",
-      "description": "Assess methotrexate excretion;\nprevent toxicity",
-      "descriptionHtml": "<ul><li>Assess methotrexate excretion; </li><li>prevent toxicity</li></ul>",
-      "clinicalImportance": "Renal / Urinary",
-      "clinicalImportanceHtml": "<p>Renal / Urinary</p>"
-    },
-    {
-      "feature": "Chest X-ray",
-      "featureHtml": "<p>Chest X-ray</p>",
-      "description": "Screen for pulmonary disease (rare complication)",
-      "descriptionHtml": "<p>Screen for pulmonary disease (rare complication)</p>",
-      "clinicalImportance": "Respiratory",
-      "clinicalImportanceHtml": "<p>Respiratory</p>"
-    },
-    {
-      "feature": "Viral hepatitis screening",
-      "featureHtml": "<p>Viral hepatitis screening</p>",
-      "description": "Detect chronic hepatitis B or C before immunosuppressive therapy",
-      "descriptionHtml": "<p>Detect chronic hepatitis B or C before immunosuppressive therapy</p>",
-      "clinicalImportance": "Hepatobiliary / Liver",
-      "clinicalImportanceHtml": "<p>Hepatobiliary / Liver</p>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Eczema (Chronic Atopic / Lichenified Dermatitis)",
-      "conditionHtml": "<p><strong>Eczema (Chronic Atopic / Lichenified Dermatitis)</strong></p>",
-      "distinguishingFeatures": "Intense pruritus,\npoorly demarcated erythematous plaques,\nlichenification",
-      "distinguishingFeaturesHtml": "<ul><li>Intense pruritus, </li><li>poorly demarcated erythematous plaques, </li><li>lichenification</li></ul>",
-      "keyDifferences": "Dermatology / Skin",
-      "keyDifferencesHtml": "<p>Dermatology / Skin</p>"
-    },
-    {
-      "condition": "Seborrheic Dermatitis",
-      "conditionHtml": "<p><strong>Seborrheic Dermatitis</strong></p>",
-      "distinguishingFeatures": "Greasy,\nyellowish scales,\ncommonly on scalp,\nnasolabial folds,\nmild erythema",
-      "distinguishingFeaturesHtml": "<ul><li>Greasy, </li><li>yellowish scales, </li><li>commonly on scalp, </li><li>nasolabial folds, </li><li>mild erythema</li></ul>",
-      "keyDifferences": "Dermatology / Skin",
-      "keyDifferencesHtml": "<p>Dermatology / Skin</p>"
-    },
-    {
-      "condition": "Tinea Corporis (Fungal Infection)",
-      "conditionHtml": "<p><strong>Tinea Corporis (Fungal Infection)</strong></p>",
-      "distinguishingFeatures": "Annular plaques with central clearing, scaling at edges,\npositive KOH test",
-      "distinguishingFeaturesHtml": "<ul><li>Annular plaques with central clearing, scaling at edges, </li><li>positive KOH test</li></ul>",
-      "keyDifferences": "Dermatology / Skin / Infectious",
-      "keyDifferencesHtml": "<p>Dermatology / Skin / Infectious</p>"
-    },
-    {
-      "condition": "Lichen Planus",
-      "conditionHtml": "<p><strong>Lichen Planus</strong></p>",
-      "distinguishingFeatures": "Violaceous,\nflat-topped papules,\noften pruritic,\nfine white lines (Wickham striae)",
-      "distinguishingFeaturesHtml": "<ul><li>Violaceous, </li><li>flat-topped papules, </li><li>often pruritic, </li><li>fine white lines (Wickham striae)</li></ul>",
-      "keyDifferences": "Dermatology / Skin",
-      "keyDifferencesHtml": "<p>Dermatology / Skin</p>"
-    },
-    {
-      "condition": "Pityriasis Rubra Pilaris (PRP)",
-      "conditionHtml": "<p><strong>Pityriasis Rubra Pilaris (PRP)</strong></p>",
-      "distinguishingFeatures": "Orange-red plaques with islands of sparing,\nfollicular papules,\npalmoplantar keratoderma",
-      "distinguishingFeaturesHtml": "<ul><li>Orange-red plaques with islands of sparing, </li><li>follicular papules, </li><li>palmoplantar keratoderma</li></ul>",
-      "keyDifferences": "Dermatology / Skin",
-      "keyDifferencesHtml": "<p>Dermatology / Skin</p>"
-    },
-    {
-      "condition": "Secondary Syphilis",
-      "conditionHtml": "<p><strong>Secondary Syphilis</strong></p>",
-      "distinguishingFeatures": "Copper-colored maculopapular rash,\nmay involve palms and soles,\npositive serology",
-      "distinguishingFeaturesHtml": "<ul><li>Copper-colored maculopapular rash, </li><li>may involve palms and soles, </li><li>positive serology</li></ul>",
-      "keyDifferences": "Dermatology / Skin / Infectious",
-      "keyDifferencesHtml": "<p>Dermatology / Skin / Infectious</p>"
-    }
-  ],
+  "table1": {
+    "heading": "Psoriasis – Systemic Therapy – Methotrexate Pre-treatment Monitoring",
+    "headingHtml": "<p><u><strong>Psoriasis – Systemic Therapy – </strong></u></p><p><u><strong>Methotrexate Pre-treatment Monitoring</strong></u></p>",
+    "columns": [
+      "Investigation",
+      "Purpose / Rationale",
+      "System Involved"
+    ],
+    "columnsHtml": [
+      "<p><strong>Investigation</strong></p>",
+      "<p><strong>Purpose / Rationale</strong></p>",
+      "<p><strong>System Involved</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Liver function tests (LFTs)",
+          "Detect baseline liver disease;\nprevent hepatotoxicity",
+          "Hepatobiliary / Liver"
+        ],
+        "cellsHtml": [
+          "<p>Liver function tests (LFTs)</p>",
+          "<ul><li>Detect baseline liver disease; </li><li>prevent hepatotoxicity</li></ul>",
+          "<p>Hepatobiliary / Liver</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Complete blood count (CBC)",
+          "Identify baseline cytopenias;\nmonitor bone marrow suppression",
+          "Hematologic"
+        ],
+        "cellsHtml": [
+          "<p>Complete blood count (CBC)</p>",
+          "<ul><li>Identify baseline cytopenias; </li><li>monitor bone marrow suppression</li></ul>",
+          "<p>Hematologic</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Renal function tests (RFTs)",
+          "Assess methotrexate excretion;\nprevent toxicity",
+          "Renal / Urinary"
+        ],
+        "cellsHtml": [
+          "<p>Renal function tests (RFTs)</p>",
+          "<ul><li>Assess methotrexate excretion; </li><li>prevent toxicity</li></ul>",
+          "<p>Renal / Urinary</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Chest X-ray",
+          "Screen for pulmonary disease (rare complication)",
+          "Respiratory"
+        ],
+        "cellsHtml": [
+          "<p>Chest X-ray</p>",
+          "<p>Screen for pulmonary disease (rare complication)</p>",
+          "<p>Respiratory</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Viral hepatitis screening",
+          "Detect chronic hepatitis B or C before immunosuppressive therapy",
+          "Hepatobiliary / Liver"
+        ],
+        "cellsHtml": [
+          "<p>Viral hepatitis screening</p>",
+          "<p>Detect chronic hepatitis B or C before immunosuppressive therapy</p>",
+          "<p>Hepatobiliary / Liver</p>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features / Differentiating Points",
+      "Notes / System Involved"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features / Differentiating Points</strong></p>",
+      "<p><strong>Notes / System Involved</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Eczema (Chronic Atopic / Lichenified Dermatitis)",
+          "Intense pruritus,\npoorly demarcated erythematous plaques,\nlichenification",
+          "Dermatology / Skin"
+        ],
+        "cellsHtml": [
+          "<p><strong>Eczema (Chronic Atopic / Lichenified Dermatitis)</strong></p>",
+          "<ul><li>Intense pruritus, </li><li>poorly demarcated erythematous plaques, </li><li>lichenification</li></ul>",
+          "<p>Dermatology / Skin</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Seborrheic Dermatitis",
+          "Greasy,\nyellowish scales,\ncommonly on scalp,\nnasolabial folds,\nmild erythema",
+          "Dermatology / Skin"
+        ],
+        "cellsHtml": [
+          "<p><strong>Seborrheic Dermatitis</strong></p>",
+          "<ul><li>Greasy, </li><li>yellowish scales, </li><li>commonly on scalp, </li><li>nasolabial folds, </li><li>mild erythema</li></ul>",
+          "<p>Dermatology / Skin</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Tinea Corporis (Fungal Infection)",
+          "Annular plaques with central clearing, scaling at edges,\npositive KOH test",
+          "Dermatology / Skin / Infectious"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tinea Corporis (Fungal Infection)</strong></p>",
+          "<ul><li>Annular plaques with central clearing, scaling at edges, </li><li>positive KOH test</li></ul>",
+          "<p>Dermatology / Skin / Infectious</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Lichen Planus",
+          "Violaceous,\nflat-topped papules,\noften pruritic,\nfine white lines (Wickham striae)",
+          "Dermatology / Skin"
+        ],
+        "cellsHtml": [
+          "<p><strong>Lichen Planus</strong></p>",
+          "<ul><li>Violaceous, </li><li>flat-topped papules, </li><li>often pruritic, </li><li>fine white lines (Wickham striae)</li></ul>",
+          "<p>Dermatology / Skin</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Pityriasis Rubra Pilaris (PRP)",
+          "Orange-red plaques with islands of sparing,\nfollicular papules,\npalmoplantar keratoderma",
+          "Dermatology / Skin"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pityriasis Rubra Pilaris (PRP)</strong></p>",
+          "<ul><li>Orange-red plaques with islands of sparing, </li><li>follicular papules, </li><li>palmoplantar keratoderma</li></ul>",
+          "<p>Dermatology / Skin</p>"
+        ]
+      },
+      {
+        "cells": [
+          "Secondary Syphilis",
+          "Copper-colored maculopapular rash,\nmay involve palms and soles,\npositive serology",
+          "Dermatology / Skin / Infectious"
+        ],
+        "cellsHtml": [
+          "<p><strong>Secondary Syphilis</strong></p>",
+          "<ul><li>Copper-colored maculopapular rash, </li><li>may involve palms and soles, </li><li>positive serology</li></ul>",
+          "<p>Dermatology / Skin / Infectious</p>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Psoriasis – Systemic Therapy: Methotrexate Pre-treatment Monitoring",
-    "caption": "This diagram illustrates the essential baseline investigations required before initiating methotrexate in patients with psoriasis, emphasizing patient safety and toxicity prevention. It highlights the key organ systems affected by methotrexate—particularly the liver, bone marrow, kidneys, and lungs—and reinforces guideline-based pre-treatment assessment for medical graduates and exam preparation.",
-    "captionHtml": "<p>This diagram illustrates the <strong>essential baseline investigations required before initiating methotrexate</strong> in patients with psoriasis, emphasizing <strong>patient safety and toxicity prevention</strong>. It highlights the key organ systems affected by methotrexate—particularly the <strong>liver, bone marrow, kidneys, and lungs</strong>—and reinforces guideline-based pre-treatment assessment for medical graduates and exam preparation.</p>",
+    "heading": "Psoriasis – Systemic Therapy: Methotrexate Pre-treatment Monitoring",
+    "headingHtml": "<p><u><strong>Psoriasis – Systemic Therapy: </strong></u></p><p><u><strong>Methotrexate Pre-treatment Monitoring</strong></u></p>",
+    "description": "This diagram illustrates the essential baseline investigations required before initiating methotrexate in patients with psoriasis, emphasizing patient safety and toxicity prevention. It highlights the key organ systems affected by methotrexate—particularly the liver, bone marrow, kidneys, and lungs—and reinforces guideline-based pre-treatment assessment for medical graduates and exam preparation.",
+    "descriptionHtml": "<p>This diagram illustrates the <strong>essential baseline investigations required before initiating methotrexate</strong> in patients with psoriasis, emphasizing <strong>patient safety and toxicity prevention</strong>. It highlights the key organ systems affected by methotrexate—particularly the <strong>liver, bone marrow, kidneys, and lungs</strong>—and reinforces guideline-based pre-treatment assessment for medical graduates and exam preparation.</p>",
     "images": [
       {
         "filename": "image1.png",

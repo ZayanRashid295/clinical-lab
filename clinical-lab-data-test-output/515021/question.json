@@ -71,88 +71,151 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
-  "featureTableName": "Psoriasis – Chronic Plaque Psoriasis: Moderate Disease Management",
-  "differentialDiagnosisTableName": "Psoriasis – Chronic Plaque Psoriasis Moderate Disease Management Differential Diagnosis of Chronic Plaque Psoriasis",
-  "featureTable": [
-    {
-      "feature": "BSA Involvement",
-      "featureHtml": "<p><strong>BSA Involvement</strong></p>",
-      "description": "10–30% of body surface area",
-      "descriptionHtml": "<p>10–30% of body surface area</p>",
-      "clinicalImportance": "Classified as moderate psoriasis;\nguides escalation from topical therapy",
-      "clinicalImportanceHtml": "<ul><li>Classified as <strong>moderate psoriasis</strong>; </li><li>guides escalation from topical therapy</li></ul>"
-    },
-    {
-      "feature": "Response to Topicals",
-      "featureHtml": "<p><strong>Response to Topicals</strong></p>",
-      "description": "Poor or minimal improvement",
-      "descriptionHtml": "<p>Poor or minimal improvement</p>",
-      "clinicalImportance": "Indicates need for:\nsystemic therapy or\nphototherapy",
-      "clinicalImportanceHtml": "<p>Indicates <strong>need for</strong><strong>:</strong></p><ul><li><strong>systemic therapy or </strong></li><li><strong>phototherapy</strong></li></ul>"
-    },
-    {
-      "feature": "Treatment Options",
-      "featureHtml": "<p><strong>Treatment Options</strong></p>",
-      "description": "Phototherapy (narrowband UVB),\nsystemic agents (methotrexate, acitretin, biologics)",
-      "descriptionHtml": "<ul><li>Phototherapy (narrowband UVB), </li><li>systemic agents (methotrexate, acitretin, biologics)</li></ul>",
-      "clinicalImportance": "Choice depends on:\ncomorbidities,\nseverity,\npatient preference, and\nguideline recommendations",
-      "clinicalImportanceHtml": "<p>Choice depends on:</p><ul><li><strong>comorbidities, </strong></li><li><strong>severity, </strong></li><li><strong>patient preference, and </strong></li><li><strong>guideline recommendations</strong></li></ul>"
-    }
-  ],
-  "differentialDiagnosisTable": [
-    {
-      "condition": "Eczema / Atopic Dermatitis",
-      "conditionHtml": "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
-      "distinguishingFeatures": "Itchy,\nerythematous patches,\noften flexural",
-      "distinguishingFeaturesHtml": "<ul><li>Itchy, </li><li>erythematous patches, </li><li>often flexural</li></ul>",
-      "keyDifferences": "Usually less well-demarcated,\noozing/crusting,\nhistory of atopy",
-      "keyDifferencesHtml": "<ul><li>Usually <strong>less well-demarcated</strong>, </li><li>oozing/crusting, </li><li>history of atopy</li></ul>"
-    },
-    {
-      "condition": "Seborrheic Dermatitis",
-      "conditionHtml": "<p><strong>Seborrheic Dermatitis</strong></p>",
-      "distinguishingFeatures": "Greasy,\nyellowish scales,\noften on scalp, face, chest",
-      "distinguishingFeaturesHtml": "<ul><li>Greasy, </li><li>yellowish scales, </li><li>often on scalp, face, chest</li></ul>",
-      "keyDifferences": "Greasy scales,\ninvolvement of seborrheic areas,\nless sharply demarcated",
-      "keyDifferencesHtml": "<ul><li><strong>Greasy scales</strong>, </li><li>involvement of <strong>seborrheic areas</strong>, </li><li>less sharply demarcated</li></ul>"
-    },
-    {
-      "condition": "Tinea corporis (Fungal infection)",
-      "conditionHtml": "<p><strong>Tinea corporis (Fungal infection)</strong></p>",
-      "distinguishingFeatures": "Annular lesions with central clearing",
-      "distinguishingFeaturesHtml": "<ul><li>Annular lesions with central clearing</li></ul>",
-      "keyDifferences": "Positive KOH prep,\nresponds to antifungals",
-      "keyDifferencesHtml": "<ul><li>Positive <strong>KOH prep</strong>, </li><li>responds to <strong>antifungals</strong></li></ul>"
-    },
-    {
-      "condition": "Pityriasis Rubra Pilaris",
-      "conditionHtml": "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
-      "distinguishingFeatures": "Follicular papules with orange-red plaques,\npalmoplantar keratoderma",
-      "distinguishingFeaturesHtml": "<ul><li>Follicular papules with orange-red plaques, </li><li>palmoplantar keratoderma</li></ul>",
-      "keyDifferences": "Island of sparing pattern,\nwidespread involvement",
-      "keyDifferencesHtml": "<ul><li><strong>Island of sparing</strong> pattern, </li><li>widespread involvement</li></ul>"
-    },
-    {
-      "condition": "Lichen Planus",
-      "conditionHtml": "<p><strong>Lichen Planus</strong></p>",
-      "distinguishingFeatures": "Purple, polygonal,\nflat-topped papules,\noften on wrists/ankles",
-      "distinguishingFeaturesHtml": "<ul><li>Purple, polygonal, </li><li>flat-topped papules, </li><li>often on wrists/ankles</li></ul>",
-      "keyDifferences": "Wickham striae,\nmucosal involvement",
-      "keyDifferencesHtml": "<ul><li><strong>Wickham striae</strong>, </li><li>mucosal involvement</li></ul>"
-    },
-    {
-      "condition": "Cutaneous Lupus Erythematosus",
-      "conditionHtml": "<p><strong>Cutaneous Lupus Erythematosus</strong></p>",
-      "distinguishingFeatures": "Erythematous plaques,\noften sun-exposed areas",
-      "distinguishingFeaturesHtml": "<ul><li>Erythematous plaques, </li><li>often sun-exposed areas</li></ul>",
-      "keyDifferences": "Photosensitivity,\nlab markers positive,\nchronic scarring",
-      "keyDifferencesHtml": "<ul><li><strong>Photosensitivity</strong>, </li><li>lab markers positive, </li><li>chronic scarring</li></ul>"
-    }
-  ],
+  "table1": {
+    "heading": "Psoriasis – Chronic Plaque Psoriasis Moderate Disease Management",
+    "headingHtml": "<p><u><strong>Psoriasis – Chronic Plaque Psoriasis </strong></u></p><p><u><strong>Moderate Disease Management</strong></u></p>",
+    "columns": [
+      "Feature",
+      "Details",
+      "Management / Notes"
+    ],
+    "columnsHtml": [
+      "<p><strong>Feature</strong></p>",
+      "<p><strong>Details</strong></p>",
+      "<p><strong>Management / Notes</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "BSA Involvement",
+          "10–30% of body surface area",
+          "Classified as moderate psoriasis;\nguides escalation from topical therapy"
+        ],
+        "cellsHtml": [
+          "<p><strong>BSA Involvement</strong></p>",
+          "<p>10–30% of body surface area</p>",
+          "<ul><li>Classified as <strong>moderate psoriasis</strong>; </li><li>guides escalation from topical therapy</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Response to Topicals",
+          "Poor or minimal improvement",
+          "Indicates need for:\nsystemic therapy or\nphototherapy"
+        ],
+        "cellsHtml": [
+          "<p><strong>Response to Topicals</strong></p>",
+          "<p>Poor or minimal improvement</p>",
+          "<p>Indicates <strong>need for</strong><strong>:</strong></p><ul><li><strong>systemic therapy or </strong></li><li><strong>phototherapy</strong></li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Treatment Options",
+          "Phototherapy (narrowband UVB),\nsystemic agents (methotrexate, acitretin, biologics)",
+          "Choice depends on:\ncomorbidities,\nseverity,\npatient preference, and\nguideline recommendations"
+        ],
+        "cellsHtml": [
+          "<p><strong>Treatment Options</strong></p>",
+          "<ul><li>Phototherapy (narrowband UVB), </li><li>systemic agents (methotrexate, acitretin, biologics)</li></ul>",
+          "<p>Choice depends on:</p><ul><li><strong>comorbidities, </strong></li><li><strong>severity, </strong></li><li><strong>patient preference, and </strong></li><li><strong>guideline recommendations</strong></li></ul>"
+        ]
+      }
+    ]
+  },
+  "table2": {
+    "heading": "Differential Diagnosis of Chronic Plaque Psoriasis",
+    "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+    "columns": [
+      "Condition",
+      "Key Features",
+      "Distinguishing Points"
+    ],
+    "columnsHtml": [
+      "<p><strong>Condition</strong></p>",
+      "<p><strong>Key Features</strong></p>",
+      "<p><strong>Distinguishing Points</strong></p>"
+    ],
+    "rows": [
+      {
+        "cells": [
+          "Eczema / Atopic Dermatitis",
+          "Itchy,\nerythematous patches,\noften flexural",
+          "Usually less well-demarcated,\noozing/crusting,\nhistory of atopy"
+        ],
+        "cellsHtml": [
+          "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
+          "<ul><li>Itchy, </li><li>erythematous patches, </li><li>often flexural</li></ul>",
+          "<ul><li>Usually <strong>less well-demarcated</strong>, </li><li>oozing/crusting, </li><li>history of atopy</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Seborrheic Dermatitis",
+          "Greasy,\nyellowish scales,\noften on scalp, face, chest",
+          "Greasy scales,\ninvolvement of seborrheic areas,\nless sharply demarcated"
+        ],
+        "cellsHtml": [
+          "<p><strong>Seborrheic Dermatitis</strong></p>",
+          "<ul><li>Greasy, </li><li>yellowish scales, </li><li>often on scalp, face, chest</li></ul>",
+          "<ul><li><strong>Greasy scales</strong>, </li><li>involvement of <strong>seborrheic areas</strong>, </li><li>less sharply demarcated</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Tinea corporis (Fungal infection)",
+          "Annular lesions with central clearing",
+          "Positive KOH prep,\nresponds to antifungals"
+        ],
+        "cellsHtml": [
+          "<p><strong>Tinea corporis (Fungal infection)</strong></p>",
+          "<ul><li>Annular lesions with central clearing</li></ul>",
+          "<ul><li>Positive <strong>KOH prep</strong>, </li><li>responds to <strong>antifungals</strong></li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Pityriasis Rubra Pilaris",
+          "Follicular papules with orange-red plaques,\npalmoplantar keratoderma",
+          "Island of sparing pattern,\nwidespread involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
+          "<ul><li>Follicular papules with orange-red plaques, </li><li>palmoplantar keratoderma</li></ul>",
+          "<ul><li><strong>Island of sparing</strong> pattern, </li><li>widespread involvement</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Lichen Planus",
+          "Purple, polygonal,\nflat-topped papules,\noften on wrists/ankles",
+          "Wickham striae,\nmucosal involvement"
+        ],
+        "cellsHtml": [
+          "<p><strong>Lichen Planus</strong></p>",
+          "<ul><li>Purple, polygonal, </li><li>flat-topped papules, </li><li>often on wrists/ankles</li></ul>",
+          "<ul><li><strong>Wickham striae</strong>, </li><li>mucosal involvement</li></ul>"
+        ]
+      },
+      {
+        "cells": [
+          "Cutaneous Lupus Erythematosus",
+          "Erythematous plaques,\noften sun-exposed areas",
+          "Photosensitivity,\nlab markers positive,\nchronic scarring"
+        ],
+        "cellsHtml": [
+          "<p><strong>Cutaneous Lupus Erythematosus</strong></p>",
+          "<ul><li>Erythematous plaques, </li><li>often sun-exposed areas</li></ul>",
+          "<ul><li><strong>Photosensitivity</strong>, </li><li>lab markers positive, </li><li>chronic scarring</li></ul>"
+        ]
+      }
+    ]
+  },
   "diagram": {
-    "name": "Psoriasis – Chronic Plaque Psoriasis: Moderate Disease Management",
-    "caption": "This diagram illustrates the management approach for moderate chronic plaque psoriasis, defined by 10–30% body surface area involvement with poor response to topical therapy. It emphasizes treatment escalation to phototherapy (narrowband UVB) or systemic agents (e.g., methotrexate, acitretin, biologics), guided by disease severity, comorbidities, patient preference, and clinical guidelines.",
-    "captionHtml": "<p>This diagram illustrates the <strong>management approach for moderate chronic plaque psoriasis</strong>, defined by <strong>10–30% body surface area involvement</strong> with <strong>poor response to topical therapy</strong>. It emphasizes <strong>treatment escalation</strong> to <strong>phototherapy (narrowband UVB)</strong> or <strong>systemic agents</strong> (e.g., methotrexate, acitretin, biologics), guided by <strong>disease severity, comorbidities, patient preference, and clinical guidelines</strong>.</p>",
+    "heading": "Psoriasis – Chronic Plaque Psoriasis: Moderate Disease Management",
+    "headingHtml": "<p><u><strong>Psoriasis – Chronic Plaque Psoriasis: </strong></u></p><p><u><strong>Moderate Disease Management</strong></u></p>",
+    "description": "This diagram illustrates the management approach for moderate chronic plaque psoriasis, defined by 10–30% body surface area involvement with poor response to topical therapy. It emphasizes treatment escalation to phototherapy (narrowband UVB) or systemic agents (e.g., methotrexate, acitretin, biologics), guided by disease severity, comorbidities, patient preference, and clinical guidelines.",
+    "descriptionHtml": "<p>This diagram illustrates the <strong>management approach for moderate chronic plaque psoriasis</strong>, defined by <strong>10–30% body surface area involvement</strong> with <strong>poor response to topical therapy</strong>. It emphasizes <strong>treatment escalation</strong> to <strong>phototherapy (narrowband UVB)</strong> or <strong>systemic agents</strong> (e.g., methotrexate, acitretin, biologics), guided by <strong>disease severity, comorbidities, patient preference, and clinical guidelines</strong>.</p>",
     "images": [
       {
         "filename": "image1.png",
