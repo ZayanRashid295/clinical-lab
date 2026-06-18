@@ -25,9 +25,7 @@
     "This combination immediately points toward Option A: Immediate reperfusion therapy for STEMI."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“ST-segment elevation in leads V2–V5”</strong> – Classic ECG finding of STEMI (anteroseptal wall).</li></ol>",
-    "<ol><li><strong>“Elevated troponin”</strong> – Confirms myocardial injury (NSTEMI or STEMI; with ST elevation → STEMI).</li></ol>",
-    "<ol><li><strong>“Sudden-onset severe central chest pain with diaphoresis”</strong> – Classic symptom of acute myocardial infarction.</li></ol>",
+    "<ol><li><strong>“ST-segment elevation in leads V2–V5”</strong> – Classic ECG finding of STEMI (anteroseptal wall).</li><li><strong>“Elevated troponin”</strong> – Confirms myocardial injury (NSTEMI or STEMI; with ST elevation → STEMI).</li><li><strong>“Sudden-onset severe central chest pain with diaphoresis”</strong> – Classic symptom of acute myocardial infarction.</li></ol>",
     "<p>This combination immediately points toward <strong>Option A: Immediate reperfusion therapy for STEMI</strong>.</p>"
   ],
   "explanations": {
@@ -73,6 +71,7 @@
   },
   "classicTriad": "Chest pain + ST elevation + elevated troponin → Triad strongly indicating STEMI.",
   "classicTriadHtml": "<ul><li><strong>Chest pain + ST elevation + elevated troponin</strong> → Triad strongly indicating <strong>STEMI</strong>.</li></ul>",
+  "classicTriadTitle": "Classic triad in stem",
   "featureTableName": "STEMI (ST-Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – STEMI Differential Diagnosis of STEMI (ST-Elevation Myocardial Infarction)",
   "featureTable": [

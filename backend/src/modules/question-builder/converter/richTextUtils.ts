@@ -346,6 +346,43 @@ export function singleParagraphHtml(paragraph: FormattedParagraph): string {
   return `<p>${paragraph.innerHtml}</p>`;
 }
 
+/** Merge consecutive list paragraphs into shared lists (fixes Word's 1. 1. 1. numbering). */
+export function buildGroupedHtmlFragments(paragraphs: FormattedParagraph[]): string[] {
+  const fragments: string[] = [];
+  let batch: FormattedParagraph[] = [];
+
+  const flushBatch = () => {
+    if (!batch.length) return;
+    fragments.push(joinFormattedHtml(batch));
+    batch = [];
+  };
+
+  for (const paragraph of paragraphs) {
+    if (paragraph.isListItem) {
+      batch.push(paragraph);
+    } else {
+      flushBatch();
+      const html = singleParagraphHtml(paragraph);
+      if (html) fragments.push(html);
+    }
+  }
+  flushBatch();
+  return fragments;
+}
+
+/** Collapse adjacent duplicate list wrappers produced by per-paragraph HTML. */
+export function mergeAdjacentListHtml(html: string): string {
+  let merged = html;
+  let previous = "";
+  while (merged !== previous) {
+    previous = merged;
+    merged = merged
+      .replace(/<\/ol>\s*<ol>/g, "")
+      .replace(/<\/ul>\s*<ul>/g, "");
+  }
+  return merged;
+}
+
 export function joinFormattedText(paragraphs: FormattedParagraph[]): string {
   return paragraphs.map((p) => p.text).join("\n").trim();
 }

@@ -24,9 +24,7 @@
     "Normal ferritin – rules out iron deficiency anemia."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Microcytic anemia</strong> – indicates small RBCs, narrows differential to microcytic anemias.</li></ol>",
-    "<ol><li><strong>Normal RDW</strong> – classic clue for <strong>thalassemia minor</strong>, as all RBCs are uniformly small.</li></ol>",
-    "<ol><li><strong>Normal ferritin</strong> – rules out iron deficiency anemia.</li></ol>"
+    "<ol><li><strong>Microcytic anemia</strong> – indicates small RBCs, narrows differential to microcytic anemias.</li><li><strong>Normal RDW</strong> – classic clue for <strong>thalassemia minor</strong>, as all RBCs are uniformly small.</li><li><strong>Normal ferritin</strong> – rules out iron deficiency anemia.</li></ol>"
   ],
   "explanations": {
     "B": {
@@ -71,6 +69,7 @@
   },
   "classicTriad": "Microcytosis + Normal RDW + Normal Ferritin → highly suggestive of beta-thalassemia minor.",
   "classicTriadHtml": "<ul><li><strong>Microcytosis + Normal RDW + Normal Ferritin</strong> → highly suggestive of <strong>beta-thalassemia minor</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad in Stem (for Beta-thalassemia minor suspicion)",
   "featureTableName": "Microcytic Anemia: Iron Deficiency Anemia vs Beta-Thalassemia Minor – Response to Oral Iron Therapy",
   "differentialDiagnosisTableName": "Microcytic Anemia – Beta-Thalassemia Minor Differential Diagnosis of Microcytic Anemia with Normal RDW and Ferritin",
   "featureTable": [

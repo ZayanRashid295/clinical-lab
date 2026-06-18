@@ -21,18 +21,10 @@
   "keywords": [
     "Well-demarcated erythematous plaques with thick silvery scales→ Classic morphological hallmark of chronic plaque psoriasis.",
     "Extensor surfaces (elbows and knees), symmetrical distribution→ Typical site and pattern strongly favors psoriasis over other dermatoses.",
-    "Chronic, recurrent course with no mucosal involvement→ Supports psoriasis and helps exclude lichen planus.",
-    "Psoriasis Morphological Triad:",
-    "Erythema + Well-defined plaques + Silvery scales",
-    "Presence of this triad in an extensor distribution clinches the diagnosis of chronic plaque psoriasis."
+    "Chronic, recurrent course with no mucosal involvement→ Supports psoriasis and helps exclude lichen planus."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Well-demarcated erythematous plaques with thick silvery scales</strong><br/><em>Classic morphological hallmark of chronic plaque psoriasis.</em></li></ol>",
-    "<ol><li><strong>Extensor surfaces (elbows and knees), symmetrical distribution</strong><br/><em>Typical site and pattern strongly favors psoriasis over other dermatoses.</em></li></ol>",
-    "<ol><li><strong>Chronic, recurrent course with no mucosal involvement</strong><br/><em>Supports psoriasis and helps exclude lichen planus.</em></li></ol>",
-    "<p><u><strong>Psoriasis Morphological Triad:</strong></u></p>",
-    "<p>Erythema + Well-defined plaques + Silvery scales</p>",
-    "<p>Presence of this triad in an extensor distribution <strong>clinches the diagnosis of chronic plaque psoriasis</strong>.</p>"
+    "<ol><li><strong>Well-demarcated erythematous plaques with thick silvery scales</strong><br/><em>Classic morphological hallmark of chronic plaque psoriasis.</em></li><li><strong>Extensor surfaces (elbows and knees), symmetrical distribution</strong><br/><em>Typical site and pattern strongly favors psoriasis over other dermatoses.</em></li><li><strong>Chronic, recurrent course with no mucosal involvement</strong><br/><em>Supports psoriasis and helps exclude lichen planus.</em></li></ol>"
   ],
   "explanations": {
     "A": {
@@ -75,6 +67,9 @@
     "clinicalSkill": "Reasoning",
     "difficultyLevel": "Moderate"
   },
+  "classicTriad": "Erythema + Well-defined plaques + Silvery scales",
+  "classicTriadHtml": "<p>Erythema + Well-defined plaques + Silvery scales</p>",
+  "classicTriadTitle": "Psoriasis Morphological Triad",
   "featureTableName": "Chronic Plaque Psoriasis",
   "differentialDiagnosisTableName": "Chronic Plaque Psoriasis Differential Diagnosis of Chronic Plaque Psoriasis",
   "featureTable": [

@@ -13,6 +13,7 @@ import type {
 } from "./types";
 import { validateDocxFromBuffer } from "./validateDocx";
 import {
+  buildGroupedHtmlFragments,
   collectFormattedParagraphEntries,
   collectFormattedTables,
   joinFormattedHtml,
@@ -24,22 +25,25 @@ import {
 } from "./richTextUtils";
 import {
   ANSWER_RE,
-  CLASSIC_TRIAD_RE,
   COMPETENCY_DOMAIN_VALUES,
   DIAGRAM_RE,
   QUESTION_NUM_RE,
+  QUESTION_ID_RE,
   findQuestionContentEnd,
   findQuestionId,
   findSectionIndex,
   findFirstKeyConceptIndex,
   findPrimaryKeyConceptIndex,
+  isClassicTriadHeadingLine,
   isKeyConceptHeading,
+  isKeywordsSectionFooterLine,
+  isLikelyTriadContentLine,
   isMetadataLine,
   normalizeQuestionId,
   normalizeStemText,
+  normalizeTriadTitle,
   parseOptionLine,
   splitStemAndOptionTexts,
-  QUESTION_ID_RE,
 } from "./parser-utils";
 
 const METADATA_FIELDS: Record<string, keyof QuestionMetadata> = {
@@ -835,9 +839,10 @@ function parseKeywords(
 ) {
   const paragraphs = entries.map((entry) => entry.formatted.text);
   const keywords: string[] = [];
-  const keywordsHtml: string[] = [];
+  const keywordParagraphs: FormattedParagraph[] = [];
   let classicTriad: string | undefined;
   let classicTriadHtml: string | undefined;
+  let classicTriadTitle: string | undefined;
   let index = startIndex;
 
   while (index < endIndex) {
@@ -845,33 +850,81 @@ function parseKeywords(
     const paragraph = paragraphs[index];
     if (paragraph.toLowerCase().startsWith("explanation")) break;
 
-    if (CLASSIC_TRIAD_RE.test(paragraph)) {
-      const colonIndex = paragraph.indexOf(":");
-      const inline = colonIndex >= 0 ? paragraph.slice(colonIndex + 1).trim() : "";
-      if (inline) {
-        classicTriad = inline;
-        const inlineOffset = colonIndex >= 0 ? colonIndex + 1 : 0;
+    if (isClassicTriadHeadingLine(paragraph)) {
+      const title = normalizeTriadTitle(paragraph);
+      classicTriadTitle = classicTriadTitle ? `${classicTriadTitle} — ${title}` : title;
+
+      const colonIndex = paragraph.lastIndexOf(":");
+      const inline =
+        colonIndex >= 0 && colonIndex < paragraph.length - 1
+          ? paragraph.slice(colonIndex + 1).trim()
+          : "";
+      if (inline && isLikelyTriadContentLine(inline)) {
+        classicTriad = classicTriad ? `${classicTriad}\n${inline}` : inline;
+        const inlineOffset = colonIndex + 1;
         const inlineHtml = sliceParagraphHtml(entry.raw, inlineOffset).trim();
-        classicTriadHtml = inlineHtml ? `<p>${inlineHtml}</p>` : undefined;
+        const htmlPart = inlineHtml ? `<p>${inlineHtml}</p>` : `<p>${inline}</p>`;
+        classicTriadHtml = classicTriadHtml ? `${classicTriadHtml}${htmlPart}` : htmlPart;
         index += 1;
-      } else if (index + 1 < endIndex) {
-        classicTriad = paragraphs[index + 1].trim();
-        const nextHtml = singleParagraphHtml(entries[index + 1].formatted);
-        classicTriadHtml = nextHtml || undefined;
-        index += 2;
-      } else {
+        continue;
+      }
+
+      index += 1;
+      const contentLines: FormattedParagraph[] = [];
+      while (index < endIndex) {
+        const nextParagraph = paragraphs[index]?.trim() ?? "";
+        if (!nextParagraph) {
+          index += 1;
+          continue;
+        }
+        if (nextParagraph.toLowerCase().startsWith("explanation")) break;
+        if (isKeywordsSectionFooterLine(nextParagraph)) break;
+
+        if (isClassicTriadHeadingLine(nextParagraph)) {
+          const subtitle = normalizeTriadTitle(nextParagraph);
+          classicTriadTitle = classicTriadTitle
+            ? `${classicTriadTitle} — ${subtitle}`
+            : subtitle;
+          index += 1;
+          continue;
+        }
+
+        contentLines.push(entries[index].formatted);
         index += 1;
+
+        if (isLikelyTriadContentLine(nextParagraph) && /\s\+\s/.test(nextParagraph)) {
+          break;
+        }
+      }
+
+      if (contentLines.length > 0) {
+        const text = contentLines
+          .map((line) => line.text)
+          .filter(Boolean)
+          .join("\n")
+          .trim();
+        const html = joinFormattedHtml(contentLines);
+        classicTriad = classicTriad ? `${classicTriad}\n${text}` : text;
+        classicTriadHtml = classicTriadHtml
+          ? `${classicTriadHtml}${html || ""}`
+          : html || undefined;
       }
       continue;
     }
 
+    if (isKeywordsSectionFooterLine(paragraph)) {
+      index += 1;
+      continue;
+    }
+
     keywords.push(paragraph.trim());
-    const keywordHtml = singleParagraphHtml(entry.formatted);
-    keywordsHtml.push(keywordHtml || `<p>${entry.formatted.innerHtml}</p>`);
+    keywordParagraphs.push(entry.formatted);
     index += 1;
   }
 
-  return { keywords, keywordsHtml, classicTriad, classicTriadHtml };
+  const keywordsHtml = buildGroupedHtmlFragments(keywordParagraphs);
+
+  return { keywords, keywordsHtml, classicTriad, classicTriadHtml, classicTriadTitle };
 }
 
 function parseExplanations(
@@ -1086,6 +1139,7 @@ async function parseDocxFromBuffer(
   if (keywordData.classicTriad) {
     result.classicTriad = keywordData.classicTriad;
     if (keywordData.classicTriadHtml) result.classicTriadHtml = keywordData.classicTriadHtml;
+    if (keywordData.classicTriadTitle) result.classicTriadTitle = keywordData.classicTriadTitle;
   }
   if (tableNames.featureTableName) result.featureTableName = tableNames.featureTableName;
   if (tableNames.differentialDiagnosisTableName) {

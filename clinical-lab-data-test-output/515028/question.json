@@ -24,9 +24,7 @@
     "Leukocytosis – confirms active systemic inflammation, reinforcing need for urgent systemic treatment."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Widespread pustular eruptions on erythematous background</strong> – indicates <strong>generalized pustular psoriasis</strong>, not localized disease.</li></ol>",
-    "<ol><li><strong>Fever and malaise</strong> – classic sign of <strong>systemic involvement</strong>, necessitating hospitalization and systemic therapy.</li></ol>",
-    "<ol><li><strong>Leukocytosis</strong> – confirms <strong>active systemic inflammation</strong>, reinforcing need for urgent systemic treatment.</li></ol>"
+    "<ol><li><strong>Widespread pustular eruptions on erythematous background</strong> – indicates <strong>generalized pustular psoriasis</strong>, not localized disease.</li><li><strong>Fever and malaise</strong> – classic sign of <strong>systemic involvement</strong>, necessitating hospitalization and systemic therapy.</li><li><strong>Leukocytosis</strong> – confirms <strong>active systemic inflammation</strong>, reinforcing need for urgent systemic treatment.</li></ol>"
   ],
   "explanations": {
     "E": {
@@ -71,6 +69,7 @@
   },
   "classicTriad": "Widespread pustules + Fever + Malaise → classic triad indicating generalized pustular psoriasis with systemic involvement.",
   "classicTriadHtml": "<ul><li><strong>Widespread pustules + Fever + Malaise</strong> → classic triad indicating <strong>generalized pustular psoriasis with systemic involvement</strong>.</li></ul>",
+  "classicTriadTitle": "Classic triad in stem",
   "featureTableName": "Pustular Psoriasis – Generalized (Acute) Management",
   "differentialDiagnosisTableName": "Pustular Psoriasis – Generalized (Acute) Management Differential Diagnosis of Generalized Pustular Eruptions with Systemic Symptoms",
   "featureTable": [

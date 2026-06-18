@@ -23,8 +23,7 @@
     "“ST-segment elevation in II, III, aVF” – Indicates inferior wall STEMI caused by complete coronary artery occlusion."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“Crushing chest pain”</strong> – Classic symptom of <strong>acute myocardial infarction</strong>.</li></ol>",
-    "<ol><li><strong>“ST-segment elevation in II, III, aVF”</strong> – Indicates <strong>inferior wall STEMI</strong> caused by <strong>complete coronary artery occlusion</strong>.</li></ol>"
+    "<ol><li><strong>“Crushing chest pain”</strong> – Classic symptom of <strong>acute myocardial infarction</strong>.</li><li><strong>“ST-segment elevation in II, III, aVF”</strong> – Indicates <strong>inferior wall STEMI</strong> caused by <strong>complete coronary artery occlusion</strong>.</li></ol>"
   ],
   "explanations": {
     "A": {
@@ -69,6 +68,7 @@
   },
   "classicTriad": "Chest pain + ECG ST elevation + typical radiation (left arm/jaw) → classic STEMI triad.",
   "classicTriadHtml": "<ul><li><strong>Chest pain + ECG ST elevation + typical radiation (left arm/jaw)</strong> → classic STEMI triad.</li></ul>",
+  "classicTriadTitle": "Classic triad",
   "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – STEMI (Inferior Wall MI) Differential Diagnosis of Inferior Wall STEMI",
   "featureTable": [

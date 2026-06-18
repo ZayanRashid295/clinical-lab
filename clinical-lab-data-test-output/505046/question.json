@@ -24,9 +24,7 @@
     "Accessory muscle use + distress → indicates marked bronchospasm with severe exacerbation."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>RR 32/min (tachypnea)</strong> → indicates significant respiratory distress and increased work of breathing. </li></ol>",
-    "<ol><li><strong>Speaking in short phrases only</strong> → classic marker of <strong>severe airflow limitation in acute asthma</strong>. </li></ol>",
-    "<ol><li><strong>Accessory muscle use + distress</strong> → indicates <strong>marked bronchospasm with severe exacerbation</strong>. </li></ol>"
+    "<ol><li><strong>RR 32/min (tachypnea)</strong> → indicates significant respiratory distress and increased work of breathing. </li><li><strong>Speaking in short phrases only</strong> → classic marker of <strong>severe airflow limitation in acute asthma</strong>. </li><li><strong>Accessory muscle use + distress</strong> → indicates <strong>marked bronchospasm with severe exacerbation</strong>. </li></ol>"
   ],
   "explanations": {
     "C": {
@@ -63,6 +61,7 @@
   },
   "classicTriad": "Tachypnea + speech limitation + accessory muscle use",
   "classicTriadHtml": "<p><strong>T</strong><strong>achypnea + speech limitation + accessory muscle use</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Acute Severe Asthma Exacerbation – Clinical Severity Classification (GINA-Based Emergency Assessment)",
   "differentialDiagnosisTableName": "System/ Title: Pulmonology Acute Severe Asthma Exacerbation – Clinical Severity Features Key Clinical Interpretation Differential Diagnosis of Acute Severe Shortness of Breath",
   "featureTable": [

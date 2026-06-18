@@ -21,18 +21,10 @@
   "keywords": [
     "Heavy menstrual bleeding → Indicates chronic blood loss, the most common cause of iron deficiency anemia in reproductive-age women.",
     "Ferritin 5 ng/mL → Definitive marker of depleted iron stores; the most specific lab for iron deficiency.",
-    "Dysphagia for solids → Suggests Plummer–Vinson syndrome, strongly linked with long-standing iron deficiency.",
-    "Iron deficiency anemia",
-    "Dysphagia (esophageal webs)",
-    "Glossitis (not mentioned but 2/3 findings still strongly suggest the condition)"
+    "Dysphagia for solids → Suggests Plummer–Vinson syndrome, strongly linked with long-standing iron deficiency."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Heavy menstrual bleeding</strong><strong> </strong>→ Indicates <strong>chronic blood loss</strong>, the most common cause of iron deficiency anemia in reproductive-age women.</li></ol>",
-    "<ol><li><strong>Ferritin 5 ng/mL</strong><strong> </strong>→ <strong>Definitive marker of depleted iron stores</strong>; the most specific lab for iron deficiency.</li></ol>",
-    "<ol><li><strong>Dysphagia for solids</strong><strong> </strong>→ Suggests <strong>Plummer–Vinson syndrome</strong>, strongly linked with long-standing iron deficiency.</li></ol>",
-    "<ul><li><strong>Iron deficiency anemia</strong></li></ul>",
-    "<ul><li><strong>Dysphagia (esophageal webs)</strong></li></ul>",
-    "<ul><li><strong>Glossitis</strong> (not mentioned but 2/3 findings still strongly suggest the condition)</li></ul>"
+    "<ol><li><strong>Heavy menstrual bleeding</strong><strong> </strong>→ Indicates <strong>chronic blood loss</strong>, the most common cause of iron deficiency anemia in reproductive-age women.</li><li><strong>Ferritin 5 ng/mL</strong><strong> </strong>→ <strong>Definitive marker of depleted iron stores</strong>; the most specific lab for iron deficiency.</li><li><strong>Dysphagia for solids</strong><strong> </strong>→ Suggests <strong>Plummer–Vinson syndrome</strong>, strongly linked with long-standing iron deficiency.</li></ol>"
   ],
   "explanations": {
     "A": {
@@ -75,8 +67,9 @@
     "clinicalSkill": "Reasoning",
     "difficultyLevel": "Easy"
   },
-  "classicTriad": "Plummer–Vinson Syndrome Triad",
-  "classicTriadHtml": "<p><strong>Plummer–Vinson Syndrome Triad</strong></p>",
+  "classicTriad": "Iron deficiency anemia\nDysphagia (esophageal webs)\nGlossitis (not mentioned but 2/3 findings still strongly suggest the condition)",
+  "classicTriadHtml": "<ul><li><strong>Iron deficiency anemia</strong></li><li><strong>Dysphagia (esophageal webs)</strong></li><li><strong>Glossitis</strong> (not mentioned but 2/3 findings still strongly suggest the condition)</li></ul>",
+  "classicTriadTitle": "Classic Triad Identified in This Stem — Plummer–Vinson Syndrome Triad",
   "featureTableName": "Microcytic Anemia – Iron Deficiency Anemia (Clinical Overview Diagram)",
   "differentialDiagnosisTableName": "Microcytic Anemia – Iron Deficiency Anemia (Clinical Hematology) Differential Diagnosis of Microcytic Anemia",
   "featureTable": [

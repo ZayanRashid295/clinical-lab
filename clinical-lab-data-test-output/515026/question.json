@@ -24,9 +24,7 @@
     "Morning stiffness improving with activity – Indicates inflammatory arthritis pattern rather than OA or gout."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>History of psoriasis</strong> – Strong clue linking joint symptoms to psoriatic arthritis.</li></ol>",
-    "<ol><li><strong>DIP joint swelling</strong> – Classic site of involvement in psoriatic arthritis (helps distinguish from RA).</li></ol>",
-    "<ol><li><strong>Morning stiffness improving with activity</strong> – Indicates <strong>inflammatory arthritis pattern</strong> rather than OA or gout.</li></ol>"
+    "<ol><li><strong>History of psoriasis</strong> – Strong clue linking joint symptoms to psoriatic arthritis.</li><li><strong>DIP joint swelling</strong> – Classic site of involvement in psoriatic arthritis (helps distinguish from RA).</li><li><strong>Morning stiffness improving with activity</strong> – Indicates <strong>inflammatory arthritis pattern</strong> rather than OA or gout.</li></ol>"
   ],
   "explanations": {
     "C": {
@@ -71,6 +69,7 @@
   },
   "classicTriad": "Psoriasis + DIP involvement + Inflammatory joint stiffness → Triad suggestive of Psoriatic Arthritis.",
   "classicTriadHtml": "<ul><li><strong>Psoriasis + DIP involvement + Inflammatory joint stiffness</strong> → Triad suggestive of <strong>Psoriatic Arthritis</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad in Stem",
   "featureTableName": "Psoriatic Arthritis in Psoriasis Patients",
   "differentialDiagnosisTableName": "Psoriatic Arthritis in Psoriasis Patients Differential Diagnosis of Psoriatic Arthritis",
   "featureTable": [

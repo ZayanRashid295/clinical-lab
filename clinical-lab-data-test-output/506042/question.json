@@ -24,9 +24,7 @@
     "Irregular ulcer with undermined edges + granular base → classic description of tuberculous ulcer"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Known pulmonary tuberculosis (untreated)</strong> → suggests possible hematogenous or direct spread to oral cavity </li></ol>",
-    "<ol><li><strong>Painful chronic oral ulcer (5 weeks) with fever + weight loss</strong> → indicates infectious systemic disease rather than malignancy alone </li></ol>",
-    "<ol><li><strong>Irregular ulcer with undermined edges + granular base</strong> → classic description of tuberculous ulcer </li></ol>"
+    "<ol><li><strong>Known pulmonary tuberculosis (untreated)</strong> → suggests possible hematogenous or direct spread to oral cavity </li><li><strong>Painful chronic oral ulcer (5 weeks) with fever + weight loss</strong> → indicates infectious systemic disease rather than malignancy alone </li><li><strong>Irregular ulcer with undermined edges + granular base</strong> → classic description of tuberculous ulcer </li></ol>"
   ],
   "explanations": {
     "D": {
@@ -83,6 +81,7 @@
   },
   "classicTriad": "chronic ulcer + systemic symptoms (fever, weight loss) + TB history → strongly favors oral TB",
   "classicTriadHtml": "<p><strong>chronic ulcer + systemic symptoms (fever, weight loss) + TB history</strong> → strongly favors oral TB </p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Oral Tuberculosis – Extrapulmonary Tuberculosis (Head & Neck Manifestations): Recognition & Diagnosis",
   "differentialDiagnosisTableName": "Oral Tuberculosis (Chronic Tuberculous Oral Ulcer) Differential Diagnosis of Chronic Non-Healing Oral Ulcer",
   "featureTable": [

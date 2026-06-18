@@ -21,17 +21,10 @@
   "keywords": [
     "Psoriasis – Indicates underlying systemic disease associated with arthritis; points toward psoriatic arthritis rather than other autoimmune arthropathies.",
     "Joint pain and morning stiffness – Highlights musculoskeletal involvement, suggesting the need for joint imaging rather than skin or blood tests.",
-    "(Optional classic triad if considered)",
-    "Psoriasis + distal joint pain + morning stiffness – Represents the typical presentation of psoriatic arthritis, directing toward X-ray for assessment.",
-    "Reason",
     "These keywords signal that the question is about assessing the extent of joint involvement in a patient with psoriasis, making X-ray of joints the most appropriate initial investigation."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Psoriasis</strong> – Indicates underlying systemic disease associated with arthritis; points toward <strong>psoriatic arthritis</strong> rather than other autoimmune arthropathies.</li></ol>",
-    "<ol><li><strong>Joint pain and morning stiffness</strong> – Highlights <strong>musculoskeletal involvement</strong>, suggesting the need for <strong>joint imaging</strong> rather than skin or blood tests.</li></ol>",
-    "<p><u><strong>(Optional classic triad if considered)</strong></u></p>",
-    "<p><strong>Psoriasis + distal joint pain + morning stiffness</strong> – Represents the <strong>typical presentation of psoriatic arthritis</strong>, directing toward <strong>X-ray</strong> for assessment.</p>",
-    "<p><u><strong>Reason</strong></u></p>",
+    "<ol><li><strong>Psoriasis</strong> – Indicates underlying systemic disease associated with arthritis; points toward <strong>psoriatic arthritis</strong> rather than other autoimmune arthropathies.</li><li><strong>Joint pain and morning stiffness</strong> – Highlights <strong>musculoskeletal involvement</strong>, suggesting the need for <strong>joint imaging</strong> rather than skin or blood tests.</li></ol>",
     "<p>These keywords signal that the question is about <strong>assessing the extent of joint involvement</strong> in a patient with psoriasis, making <strong>X-ray of joints</strong> the most appropriate initial investigation.</p>"
   ],
   "explanations": {
@@ -85,6 +78,9 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
+  "classicTriad": "Psoriasis + distal joint pain + morning stiffness – Represents the typical presentation of psoriatic arthritis, directing toward X-ray for assessment.",
+  "classicTriadHtml": "<p><strong>Psoriasis + distal joint pain + morning stiffness</strong> – Represents the <strong>typical presentation of psoriatic arthritis</strong>, directing toward <strong>X-ray</strong> for assessment.</p>",
+  "classicTriadTitle": "(Optional classic triad if considered)",
   "featureTableName": "Psoriatic Arthritis – Initial Investigation of Joint Involvement",
   "differentialDiagnosisTableName": "Psoriatic Arthritis – Initial Investigation of Joint Involvement Differential Diagnosis of Psoriatic Arthritis",
   "featureTable": [

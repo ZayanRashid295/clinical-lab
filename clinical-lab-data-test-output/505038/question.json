@@ -25,10 +25,7 @@
     "Normal exam between episodes → intermittent disease (not structural lung disease)"
   ],
   "keywordsHtml": [
-    "<ol><li>Recurrent wheezing + dyspnea → suggests <strong>episodic obstructive airway disease</strong> </li></ol>",
-    "<ol><li>Night + early morning worsening → <strong>classic circadian bronchial asthma pattern</strong> </li></ol>",
-    "<ol><li>Asymptomatic between attacks → <strong>reversible airway obstruction</strong> </li></ol>",
-    "<ol><li>Normal exam between episodes → <strong>intermittent disease (not structural lung disease)</strong> </li></ol>"
+    "<ol><li>Recurrent wheezing + dyspnea → suggests <strong>episodic obstructive airway disease</strong> </li><li>Night + early morning worsening → <strong>classic circadian bronchial asthma pattern</strong> </li><li>Asymptomatic between attacks → <strong>reversible airway obstruction</strong> </li><li>Normal exam between episodes → <strong>intermittent disease (not structural lung disease)</strong> </li></ol>"
   ],
   "explanations": {
     "E": {
@@ -77,6 +74,7 @@
   },
   "classicTriad": "Nocturnal symptoms + episodic wheeze + complete reversibility → Bronchial asthma",
   "classicTriadHtml": "<p><strong>Nocturnal symptoms + episodic wheeze + complete reversibility → Bronchial asthma</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Bronchial Asthma – Clinical Diagnosis (Episodic Nocturnal Wheeze Pattern)",
   "differentialDiagnosisTableName": "System/ Title: Pulmonology Clinical Features of Bronchial Asthma Differential Diagnosis of Episodic Wheezing and Recurrent Dyspnea",
   "featureTable": [

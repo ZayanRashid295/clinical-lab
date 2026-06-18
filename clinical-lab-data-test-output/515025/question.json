@@ -21,16 +21,10 @@
   "keywords": [
     "“Worsening of psoriasis lesions” – Indicates drug-induced exacerbation of chronic plaque psoriasis.",
     "“Started on a new medication for hypertension” – Suggests the trigger is a cardiovascular drug recently initiated.",
-    "“Over the next few weeks” – Highlights the temporal relationship between drug initiation and psoriasis flare.",
-    "Introduction of a new drug",
-    "Temporal worsening of lesions"
+    "“Over the next few weeks” – Highlights the temporal relationship between drug initiation and psoriasis flare."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“Worsening of psoriasis lesions”</strong> – Indicates <strong>drug-induced exacerbation</strong> of chronic plaque psoriasis.</li></ol>",
-    "<ol><li><strong>“Started on a new medication for hypertension”</strong> – Suggests the trigger is a <strong>cardiovascular drug</strong> recently initiated.</li></ol>",
-    "<ol><li><strong>“Over the next few weeks”</strong> – Highlights the <strong>temporal relationship</strong> between drug initiation and psoriasis flare.</li></ol>",
-    "<ol><li><strong>Introduction of a new drug</strong></li></ol>",
-    "<ol><li><strong>Temporal worsening of lesions</strong></li></ol>"
+    "<ol><li><strong>“Worsening of psoriasis lesions”</strong> – Indicates <strong>drug-induced exacerbation</strong> of chronic plaque psoriasis.</li><li><strong>“Started on a new medication for hypertension”</strong> – Suggests the trigger is a <strong>cardiovascular drug</strong> recently initiated.</li><li><strong>“Over the next few weeks”</strong> – Highlights the <strong>temporal relationship</strong> between drug initiation and psoriasis flare.</li></ol>"
   ],
   "explanations": {
     "E": {
@@ -75,8 +69,9 @@
     "clinicalSkill": "Reasoning",
     "difficultyLevel": "Moderate"
   },
-  "classicTriad": "Pre-existing psoriasis (stable)",
-  "classicTriadHtml": "<ol><li><strong>Pre-existing psoriasis</strong> (stable)</li></ol>",
+  "classicTriad": "Pre-existing psoriasis (stable)\nIntroduction of a new drug\nTemporal worsening of lesions",
+  "classicTriadHtml": "<ol><li><strong>Pre-existing psoriasis</strong> (stable)</li><li><strong>Introduction of a new drug</strong></li><li><strong>Temporal worsening of lesions</strong></li></ol>",
+  "classicTriadTitle": "Classic triad in stem (if any)",
   "featureTableName": "Drug-Induced Exacerbation of Psoriasis",
   "differentialDiagnosisTableName": "Drug-Induced Exacerbation of Psoriasis Differential Diagnosis of Psoriasis Exacerbation",
   "featureTable": [

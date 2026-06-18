@@ -1,6 +1,7 @@
 import {
   findFirstKeyConceptIndex,
   findPrimaryKeyConceptIndex,
+  isClassicTriadHeadingLine,
   isKeyConceptHeading,
   parseOptionLine,
   splitStemAndOptionTexts,
@@ -93,6 +94,14 @@ describe("parser-utils", () => {
         "Feature",
       ];
       expect(findPrimaryKeyConceptIndex(paragraphs, 0)).toBe(2);
+    });
+  });
+
+  describe("isClassicTriadHeadingLine", () => {
+    it("matches common triad heading variants", () => {
+      expect(isClassicTriadHeadingLine("Classic Triad in Stem (typical for ACS):")).toBe(true);
+      expect(isClassicTriadHeadingLine("Classic Triad Identified in This Stem")).toBe(true);
+      expect(isClassicTriadHeadingLine("Psoriasis Morphological Triad:")).toBe(true);
     });
   });
 });

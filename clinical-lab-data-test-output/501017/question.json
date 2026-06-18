@@ -24,9 +24,7 @@
     "Progressive fatigue over 3 months – Points to a chronic process, classic for slow GI bleeding."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Adult male</strong> – Indicates gender; rules out menorrhagia and pregnancy.</li></ol>",
-    "<ol><li><strong>Iron deficiency anemia (microcytic, low ferritin, high TIBC)</strong> – Suggests chronic blood loss rather than dietary deficiency in men.</li></ol>",
-    "<ol><li><strong>Progressive fatigue over 3 months</strong> – Points to a <strong>chronic process</strong>, classic for slow GI bleeding.</li></ol>"
+    "<ol><li><strong>Adult male</strong> – Indicates gender; rules out menorrhagia and pregnancy.</li><li><strong>Iron deficiency anemia (microcytic, low ferritin, high TIBC)</strong> – Suggests chronic blood loss rather than dietary deficiency in men.</li><li><strong>Progressive fatigue over 3 months</strong> – Points to a <strong>chronic process</strong>, classic for slow GI bleeding.</li></ol>"
   ],
   "explanations": {
     "B": {
@@ -71,6 +69,7 @@
   },
   "classicTriad": "Adult male + Microcytic anemia + Chronic fatigue → Highly suggestive of chronic GI blood loss, guiding to option B.",
   "classicTriadHtml": "<ul><li><strong>Adult male + Microcytic anemia + Chronic fatigue</strong> → Highly suggestive of <strong>chronic GI blood loss</strong>, guiding to option <strong>B</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Microcytic Anemia – Iron Deficiency Anemia in Adult Males (Chronic GI Blood Loss Focus)",
   "differentialDiagnosisTableName": "Iron Deficiency Anemia in Adult Males Differential Diagnosis of Microcytic Anemia in Adult Males",
   "featureTable": [

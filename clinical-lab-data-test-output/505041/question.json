@@ -24,9 +24,7 @@
     "House dust trigger → strong environmental allergen linked to atopy"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Known asthmatic + sudden wheeze after dust exposure</strong> → classic trigger-response pattern suggesting allergic asthma exacerbation </li></ol>",
-    "<ol><li><strong>Minutes after exposure (rapid onset)</strong> → indicates <strong>early-phase hypersensitivity reaction (Type I IgE-mediated)</strong> </li></ol>",
-    "<ol><li><strong>House dust trigger</strong> → strong environmental allergen linked to atopy</li></ol>"
+    "<ol><li><strong>Known asthmatic + sudden wheeze after dust exposure</strong> → classic trigger-response pattern suggesting allergic asthma exacerbation </li><li><strong>Minutes after exposure (rapid onset)</strong> → indicates <strong>early-phase hypersensitivity reaction (Type I IgE-mediated)</strong> </li><li><strong>House dust trigger</strong> → strong environmental allergen linked to atopy</li></ol>"
   ],
   "explanations": {
     "D": {
@@ -75,6 +73,7 @@
   },
   "classicTriad": "Asthma + Allergen exposure + Rapid onset bronchospasm)",
   "classicTriadHtml": "<p><strong>Asthma + Allergen exposure + Rapid onset bronchospasm)</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Acute Allergic Asthma – Pathophysiology (Type I Hypersensitivity Mechanism)",
   "differentialDiagnosisTableName": "System/ Title: Pulmonology Bronchial Asthma – Acute Allergic (Type I Hypersensitivity) Pathophysiology Clinical Features – Mechanism Correlation – Key Pathophysiology Differential Diagnosis of Acute Wheeze Following Environmental Exposure",
   "featureTable": [

@@ -24,9 +24,7 @@
     "Fatigue & pallor – Non-specific but supports anemia; part of the classic triad of iron deficiency anemia (Fatigue + Pallor + Koilonychia)."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Microcytic hypochromic anemia</strong> – Indicates <strong>iron deficiency anemia or other microcytic causes</strong>; helps narrow lab pattern.</li></ol>",
-    "<ol><li><strong>Brittle nails</strong> – Classic <strong>physical sign of iron deficiency</strong> (koilonychia).</li></ol>",
-    "<ol><li><strong>Fatigue &amp; pallor</strong> – Non-specific but <strong>supports anemia</strong>; part of the <strong>classic triad of iron deficiency anemia</strong> (Fatigue + Pallor + Koilonychia).</li></ol>"
+    "<ol><li><strong>Microcytic hypochromic anemia</strong> – Indicates <strong>iron deficiency anemia or other microcytic causes</strong>; helps narrow lab pattern.</li><li><strong>Brittle nails</strong> – Classic <strong>physical sign of iron deficiency</strong> (koilonychia).</li><li><strong>Fatigue &amp; pallor</strong> – Non-specific but <strong>supports anemia</strong>; part of the <strong>classic triad of iron deficiency anemia</strong> (Fatigue + Pallor + Koilonychia).</li></ol>"
   ],
   "explanations": {
     "A": {
@@ -67,6 +65,7 @@
   },
   "classicTriad": "Fatigue + Pallor + Brittle nails (Koilonychia) → suggests iron deficiency anemia, guiding the choice of low serum iron, high TIBC, low ferritin.",
   "classicTriadHtml": "<ul><li><strong>Fatigue + Pallor + Brittle nails (Koilonychia)</strong> → suggests <strong>iron deficiency anemia</strong>, guiding the choice of <strong>low serum iron, high TIBC, low ferritin</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad in Stem",
   "featureTableName": "Laboratory Diagnosis",
   "featureTable": [
     {

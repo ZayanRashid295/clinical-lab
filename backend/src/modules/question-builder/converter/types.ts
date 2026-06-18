@@ -70,6 +70,7 @@ export interface QuestionData {
   metadata: QuestionMetadata;
   classicTriad?: string;
   classicTriadHtml?: string;
+  classicTriadTitle?: string;
   featureTableName?: string;
   featureTable?: FeatureRow[];
   differentialDiagnosisTableName?: string;

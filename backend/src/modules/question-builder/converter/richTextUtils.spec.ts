@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import * as path from "node:path";
 import {
+  buildGroupedHtmlFragments,
   collectFormattedParagraphEntries,
   joinFormattedHtml,
   parseRichXml,
@@ -74,5 +75,37 @@ describe("richTextUtils", () => {
     const sliced = sliceParagraphHtml(paragraph, offset);
     expect(sliced).toContain("<strong>Classic Distribution</strong>");
     expect(stripHtml(sliced)).toBe("Classic Distribution: details");
+  });
+
+  it("groups consecutive ordered-list keyword paragraphs into one ol", () => {
+    const fragments = buildGroupedHtmlFragments([
+      {
+        text: "First keyword",
+        innerHtml: "<strong>First keyword</strong>",
+        isListItem: true,
+        listOrdered: true,
+        listLevel: 0,
+      },
+      {
+        text: "Second keyword",
+        innerHtml: "<strong>Second keyword</strong>",
+        isListItem: true,
+        listOrdered: true,
+        listLevel: 0,
+      },
+      {
+        text: "Summary line",
+        innerHtml: "Summary line",
+        isListItem: false,
+        listOrdered: false,
+        listLevel: 0,
+      },
+    ]);
+
+    expect(fragments).toHaveLength(2);
+    expect(fragments[0]).toBe(
+      "<ol><li><strong>First keyword</strong></li><li><strong>Second keyword</strong></li></ol>",
+    );
+    expect(fragments[1]).toBe("<p>Summary line</p>");
   });
 });

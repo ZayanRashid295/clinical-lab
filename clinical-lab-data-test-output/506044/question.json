@@ -21,16 +21,10 @@
   "keywords": [
     "Non-healing ulcer >4 weeks → red flag duration strongly suggests malignancy (oral SCC until proven otherwise).",
     "Indurated firm lesion on lateral tongue → classic feature of invasive epithelial malignancy.",
-    "30-year smoking history → major risk factor for oral squamous cell carcinoma, increases pre-test probability.",
-    "Classic pattern",
-    "Chronic ulcer + induration + tobacco exposure = high suspicion OSCC"
+    "30-year smoking history → major risk factor for oral squamous cell carcinoma, increases pre-test probability."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Non-healing ulcer &gt;4 weeks</strong> → red flag duration strongly suggests malignancy (oral SCC until proven otherwise). </li></ol>",
-    "<ol><li><strong>Indurated firm lesion on lateral tongue</strong> → classic feature of invasive epithelial malignancy. </li></ol>",
-    "<ol><li><strong>30-year smoking history</strong> → major risk factor for oral squamous cell carcinoma, increases pre-test probability. </li></ol>",
-    "<p><u><strong>Classic pattern </strong></u></p>",
-    "<p><strong>Chronic ulcer + induration + tobacco exposure = high suspicion OSCC</strong></p>"
+    "<ol><li><strong>Non-healing ulcer &gt;4 weeks</strong> → red flag duration strongly suggests malignancy (oral SCC until proven otherwise). </li><li><strong>Indurated firm lesion on lateral tongue</strong> → classic feature of invasive epithelial malignancy. </li><li><strong>30-year smoking history</strong> → major risk factor for oral squamous cell carcinoma, increases pre-test probability. </li></ol>"
   ],
   "explanations": {
     "E": {
@@ -85,6 +79,9 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
+  "classicTriad": "Chronic ulcer + induration + tobacco exposure = high suspicion OSCC",
+  "classicTriadHtml": "<p><strong>Chronic ulcer + induration + tobacco exposure = high suspicion OSCC</strong></p>",
+  "classicTriadTitle": "Classic pattern",
   "featureTableName": "Oral Squamous Cell Carcinoma – Diagnostic Approach to Chronic Non-Healing Tongue Ulcer",
   "diagram": {
     "name": "Oral Squamous Cell Carcinoma – Diagnostic Approach to Chronic Non-Healing Tongue Ulcer",

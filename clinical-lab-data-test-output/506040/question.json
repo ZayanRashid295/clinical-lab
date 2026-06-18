@@ -24,9 +24,7 @@
     "Poor dental hygiene + rapid progression (2 days) → odontogenic polymicrobial infection spreading rapidly"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Floor of mouth swelling + bilateral induration</strong> → classic deep neck space infection involving sublingual/submandibular spaces </li></ol>",
-    "<ol><li><strong>Tongue elevation + drooling + hot potato voice</strong> → airway compromise from posterior displacement of tongue </li></ol>",
-    "<ol><li><strong>Poor dental hygiene + rapid progression (2 days)</strong> → odontogenic polymicrobial infection spreading rapidly </li></ol>"
+    "<ol><li><strong>Floor of mouth swelling + bilateral induration</strong> → classic deep neck space infection involving sublingual/submandibular spaces </li><li><strong>Tongue elevation + drooling + hot potato voice</strong> → airway compromise from posterior displacement of tongue </li><li><strong>Poor dental hygiene + rapid progression (2 days)</strong> → odontogenic polymicrobial infection spreading rapidly </li></ol>"
   ],
   "explanations": {
     "B": {
@@ -81,6 +79,7 @@
   },
   "classicTriad": "Drooling + dysphagia + muffled voice suggests impending airway obstruction",
   "classicTriadHtml": "<p>Drooling + dysphagia + muffled voice suggests impending airway obstruction </p>",
+  "classicTriadTitle": "Classic Triad (clinical cluster)",
   "featureTableName": "Ludwig Angina – Deep Neck Space Infection of the Floor of Mouth",
   "differentialDiagnosisTableName": "Ludwig Angina (Deep Neck Space Infection / Floor of Mouth Cellulitis) Differential Diagnosis of Ludwig Angina",
   "featureTable": [

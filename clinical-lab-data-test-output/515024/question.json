@@ -24,9 +24,7 @@
     "Contraindicated / teratogenicity – Directly points to drugs that can cause fetal malformations."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Woman of childbearing age</strong> – Indicates pregnancy considerations and teratogenic risk.</li></ol>",
-    "<ol><li><strong>Systemic therapy</strong> – Narrows focus to drugs affecting the whole body, not topical/local treatments.</li></ol>",
-    "<ol><li><strong>Contraindicated / teratogenicity</strong> – Directly points to drugs that can cause fetal malformations.</li></ol>"
+    "<ol><li><strong>Woman of childbearing age</strong> – Indicates pregnancy considerations and teratogenic risk.</li><li><strong>Systemic therapy</strong> – Narrows focus to drugs affecting the whole body, not topical/local treatments.</li><li><strong>Contraindicated / teratogenicity</strong> – Directly points to drugs that can cause fetal malformations.</li></ol>"
   ],
   "explanations": {
     "C": {
@@ -81,6 +79,7 @@
   },
   "classicTriad": "Childbearing age + Systemic therapy + Teratogenicity → This “triad” immediately signals that acitretin is the drug to avoid.",
   "classicTriadHtml": "<ul><li><strong>Childbearing age + Systemic therapy + Teratogenicity</strong> → This “triad” immediately signals that <strong>acitretin</strong> is the drug to avoid.</li></ul>",
+  "classicTriadTitle": "Classic Triad in Stem",
   "featureTableName": "Systemic Therapy of Psoriasis – Drug Safety in Women of Childbearing Age Systemic Therapy of Psoriasis",
   "featureTable": [
     {

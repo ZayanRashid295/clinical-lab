@@ -25,10 +25,7 @@
     "Painful floor of mouth + induration → Indicates cellulitis of sublingual/submandibular spaces"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Fever + drooling + muffled voice</strong> → Suggests upper airway compromise from deep neck infection </li></ol>",
-    "<ol><li><strong>Bilateral submandibular swelling + tongue elevation</strong> → Classic sign of submandibular space infection </li></ol>",
-    "<ol><li><strong>Recent lower molar infection</strong> → Odontogenic source spreading to deep neck space </li></ol>",
-    "<ol><li><strong>Painful floor of mouth + induration</strong> → Indicates cellulitis of sublingual/submandibular spaces </li></ol>"
+    "<ol><li><strong>Fever + drooling + muffled voice</strong> → Suggests upper airway compromise from deep neck infection </li><li><strong>Bilateral submandibular swelling + tongue elevation</strong> → Classic sign of submandibular space infection </li><li><strong>Recent lower molar infection</strong> → Odontogenic source spreading to deep neck space </li><li><strong>Painful floor of mouth + induration</strong> → Indicates cellulitis of sublingual/submandibular spaces </li></ol>"
   ],
   "explanations": {
     "B": {
@@ -85,6 +82,7 @@
   },
   "classicTriad": "Drooling + muffled voice + floor of mouth swelling → airway-threatening deep neck infection",
   "classicTriadHtml": "<p><strong>Drooling + muffled voice + floor of mouth swelling → airway-threatening deep neck infection</strong></p>",
+  "classicTriadTitle": "Classic Triad (important red flag set)",
   "featureTableName": "Ludwig Angina – Odontogenic Deep Neck Space Infection with Airway Compromise",
   "differentialDiagnosisTableName": "Clinical Features of Ludwig Angina Differential Diagnosis of Ludwig Angina",
   "featureTable": [

@@ -4,6 +4,45 @@ export const QUESTION_NUM_RE = /^Q\s*([\dA]+):\s*(.+)$/i;
 export const DIAGRAM_RE =
   /^(?:This (?:medical educational )?|The )diagram (?:illustrates|highlights|shows|depicts|provides)\b/i;
 export const CLASSIC_TRIAD_RE = /^Classic Triad/i;
+
+export function isClassicTriadHeadingLine(paragraph: string): boolean {
+  const trimmed = paragraph.trim();
+  const lower = trimmed.toLowerCase();
+  if (!trimmed) return false;
+  if (/^classic triad\b/i.test(trimmed)) return true;
+  if (/^classic pattern\b/i.test(trimmed)) return true;
+  if (/^optional classic triad\b/i.test(trimmed)) return true;
+  if (/triad in stem/i.test(trimmed)) return true;
+  if (/morphological triad/i.test(trimmed)) return true;
+  if (/syndrome triad/i.test(trimmed)) return true;
+  if (/^classic triad identified/i.test(trimmed)) return true;
+  if (lower.includes("classic triad") && trimmed.length <= 120) return true;
+  return false;
+}
+
+export function isKeywordsSectionFooterLine(paragraph: string): boolean {
+  const trimmed = paragraph.trim();
+  if (!trimmed) return false;
+  if (/^these keywords together\b/i.test(trimmed)) return true;
+  if (/^reason\b/i.test(trimmed)) return true;
+  if (/^presence of this triad\b/i.test(trimmed)) return true;
+  return false;
+}
+
+export function isLikelyTriadContentLine(paragraph: string): boolean {
+  const trimmed = paragraph.trim();
+  if (!trimmed) return false;
+  if (isClassicTriadHeadingLine(trimmed)) return false;
+  if (isKeywordsSectionFooterLine(trimmed)) return false;
+  if (/\s\+\s/.test(trimmed)) return true;
+  if (/→/.test(trimmed)) return true;
+  if (/^[-•]\s/.test(trimmed)) return true;
+  return false;
+}
+
+export function normalizeTriadTitle(paragraph: string): string {
+  return paragraph.trim().replace(/:+\s*$/, "").trim();
+}
 export const STEM_ID_SUFFIX_RE = /\s*\(Question Id:\s*\S+\)\s*$/i;
 
 export const METADATA_LABELS = [

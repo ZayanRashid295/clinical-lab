@@ -23,8 +23,7 @@
     "“High-sensitivity troponin I is elevated” – Confirms myocardial injury; distinguishes NSTEMI from unstable angina."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“ECG shows no ST-segment elevation”</strong> – Rules out STEMI, points toward NSTEMI or unstable angina.</li></ol>",
-    "<ol><li><strong>“High-sensitivity troponin I is elevated”</strong> – Confirms myocardial injury; distinguishes NSTEMI from unstable angina.</li></ol>"
+    "<ol><li><strong>“ECG shows no ST-segment elevation”</strong> – Rules out STEMI, points toward NSTEMI or unstable angina.</li><li><strong>“High-sensitivity troponin I is elevated”</strong> – Confirms myocardial injury; distinguishes NSTEMI from unstable angina.</li></ol>"
   ],
   "explanations": {
     "B": {
@@ -67,8 +66,6 @@
     "clinicalSkill": "Interpretation",
     "difficultyLevel": "Moderate"
   },
-  "classicTriad": "Chest pain + normal ECG + elevated troponin → Classic triad for NSTEMI.",
-  "classicTriadHtml": "<ul><li><strong>Chest pain + normal ECG + elevated troponin</strong> → Classic triad for <strong>NSTEMI</strong>.</li></ul>",
   "featureTableName": "NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI Differential Diagnosis of NSTEMI",
   "featureTable": [

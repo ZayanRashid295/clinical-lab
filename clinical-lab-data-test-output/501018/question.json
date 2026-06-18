@@ -24,9 +24,7 @@
     "Microcytic hypochromic anemia – Lab hallmark indicating impaired hemoglobin synthesis."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Spoon-shaped nails (koilonychia)</strong> – Classic physical sign of <strong>chronic iron deficiency</strong>.</li></ol>",
-    "<ol><li><strong>Pica</strong> – Craving for non-food items; strongly suggests <strong>iron deficiency anemia</strong>.</li></ol>",
-    "<ol><li><strong>Microcytic hypochromic anemia</strong> – Lab hallmark indicating <strong>impaired hemoglobin synthesis</strong>.</li></ol>"
+    "<ol><li><strong>Spoon-shaped nails (koilonychia)</strong> – Classic physical sign of <strong>chronic iron deficiency</strong>.</li><li><strong>Pica</strong> – Craving for non-food items; strongly suggests <strong>iron deficiency anemia</strong>.</li><li><strong>Microcytic hypochromic anemia</strong> – Lab hallmark indicating <strong>impaired hemoglobin synthesis</strong>.</li></ol>"
   ],
   "explanations": {
     "C": {
@@ -71,6 +69,7 @@
   },
   "classicTriad": "Fatigue + Spoon-shaped nails + Pica → Highly suggestive of iron deficiency anemia.",
   "classicTriadHtml": "<ul><li><strong>Fatigue + Spoon-shaped nails + Pica</strong> → Highly suggestive of <strong>iron deficiency anemia</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad (if considered)",
   "featureTableName": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia)",
   "differentialDiagnosisTableName": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia) Differential Diagnosis of Microcytic Hypochromic Anemia",
   "featureTable": [

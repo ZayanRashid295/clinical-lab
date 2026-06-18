@@ -20,13 +20,10 @@
   "correctAnswer": "B",
   "keywords": [
     "Methotrexate – Indicates the drug in question; points directly to its major toxicity profile (hepatotoxicity).",
-    "Ensure patient safety / before initiating treatment – Suggests a baseline investigation to prevent adverse effects.",
-    "These keywords together lead directly to Liver function tests as the correct option."
+    "Ensure patient safety / before initiating treatment – Suggests a baseline investigation to prevent adverse effects."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Methotrexate</strong> – Indicates the drug in question; points directly to its major <strong>toxicity profile (hepatotoxicity)</strong>.</li></ol>",
-    "<ol><li><strong>Ensure patient safety / before initiating treatment</strong> – Suggests a <strong>baseline investigation</strong> to prevent adverse effects.</li></ol>",
-    "<p>These keywords together lead directly to <strong>Liver function tests</strong> as the correct option.</p>"
+    "<ol><li><strong>Methotrexate</strong> – Indicates the drug in question; points directly to its major <strong>toxicity profile (hepatotoxicity)</strong>.</li><li><strong>Ensure patient safety / before initiating treatment</strong> – Suggests a <strong>baseline investigation</strong> to prevent adverse effects.</li></ol>"
   ],
   "explanations": {
     "B": {

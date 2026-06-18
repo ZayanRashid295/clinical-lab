@@ -24,9 +24,7 @@
     "Spirometry before and after bronchodilator → diagnostic test to assess reversibility (asthma vs COPD differentiation)."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Episodic wheezing + nocturnal breathlessness</strong> → classic pattern of variable airway obstruction suggesting asthma. </li></ol>",
-    "<ol><li><strong>Relief with salbutamol</strong> → indicates reversibility of bronchoconstriction (key asthma feature). </li></ol>",
-    "<ol><li><strong>Spirometry before and after bronchodilator</strong> → diagnostic test to assess reversibility (asthma vs COPD differentiation). </li></ol>"
+    "<ol><li><strong>Episodic wheezing + nocturnal breathlessness</strong> → classic pattern of variable airway obstruction suggesting asthma. </li><li><strong>Relief with salbutamol</strong> → indicates reversibility of bronchoconstriction (key asthma feature). </li><li><strong>Spirometry before and after bronchodilator</strong> → diagnostic test to assess reversibility (asthma vs COPD differentiation). </li></ol>"
   ],
   "explanations": {
     "D": {
@@ -65,6 +63,7 @@
   },
   "classicTriad": "Episodic wheeze + nocturnal symptoms + bronchodilator responsiveness",
   "classicTriadHtml": "<p><strong>Episodic wheeze + nocturnal symptoms + bronchodilator responsiveness</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Bronchial Asthma vs COPD – Spirometric Reversibility and Diagnostic Differentiation",
   "differentialDiagnosisTableName": "System/ Title: Pulmonology Bronchial Asthma vs COPD – Spirometric Reversibility and Diagnostic Differentiation Differential Diagnosis of Episodic Wheeze and Airflow Obstruction",
   "featureTable": [

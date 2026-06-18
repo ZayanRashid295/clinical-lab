@@ -24,9 +24,7 @@
     "No fever, no productive cough, no rash/exposure history → Rules out infection and allergic systemic causes"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Known asthmatic patient</strong> → Strong baseline risk for asthma flare </li></ol>",
-    "<ol><li><strong>Sudden worsening dyspnea + diffuse wheeze + ↓ PEF</strong> → Classic acute bronchial obstruction pattern (asthma exacerbation triad) </li></ol>",
-    "<ol><li><strong>No fever, no productive cough, no rash/exposure history</strong> → Rules out infection and allergic systemic causes </li></ol>"
+    "<ol><li><strong>Known asthmatic patient</strong> → Strong baseline risk for asthma flare </li><li><strong>Sudden worsening dyspnea + diffuse wheeze + ↓ PEF</strong> → Classic acute bronchial obstruction pattern (asthma exacerbation triad) </li><li><strong>No fever, no productive cough, no rash/exposure history</strong> → Rules out infection and allergic systemic causes </li></ol>"
   ],
   "explanations": {
     "C": {
@@ -75,6 +73,7 @@
   },
   "classicTriad": "Wheeze + dyspnea + reduced PEF → Acute bronchospasm pattern",
   "classicTriadHtml": "<p>Wheeze + dyspnea + reduced PEF → <strong>Acute bronchospasm pattern</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Acute Asthma Exacerbation – Diagnosis and Clinical Features",
   "differentialDiagnosisTableName": "System/ Title: Pulmonology Acute Asthma Exacerbation – Clinical Features, Pathophysiology & Diagnosis Differential Diagnosis of Acute Wheeze and Sudden Dyspnea",
   "featureTable": [

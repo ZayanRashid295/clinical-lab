@@ -23,8 +23,7 @@
     "“Iron deficiency anemia” – Confirms the type of anemia and points to chronic blood loss, usually gastrointestinal in the elderly."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“72-year-old / elderly patient”</strong> – Age is the strongest clue; iron deficiency anemia in elderly is most often due to <strong>colon carcinoma</strong>.</li></ol>",
-    "<ol><li><strong>“Iron deficiency anemia”</strong> – Confirms the type of anemia and points to <strong>chronic blood loss</strong>, usually gastrointestinal in the elderly.</li></ol>"
+    "<ol><li><strong>“72-year-old / elderly patient”</strong> – Age is the strongest clue; iron deficiency anemia in elderly is most often due to <strong>colon carcinoma</strong>.</li><li><strong>“Iron deficiency anemia”</strong> – Confirms the type of anemia and points to <strong>chronic blood loss</strong>, usually gastrointestinal in the elderly.</li></ol>"
   ],
   "explanations": {
     "E": {
@@ -69,6 +68,7 @@
   },
   "classicTriad": "No classic triad in this stem; it’s an age + iron deficiency + absence of overt bleeding scenario, which is itself a high-yield pattern for occult colon cancer.",
   "classicTriadHtml": "<ul><li>No classic triad in this stem; it’s an <strong>age + iron deficiency + absence of overt bleeding</strong> scenario, which is itself a high-yield pattern for occult colon cancer.</li></ul>",
+  "classicTriadTitle": "Classic triad",
   "featureTableName": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation",
   "differentialDiagnosisTableName": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation Differential Diagnosis of Iron Deficiency Anemia in the Elderly – Gastrointestinal Causes",
   "featureTable": [

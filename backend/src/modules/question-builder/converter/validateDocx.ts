@@ -12,7 +12,9 @@ import {
   findFirstKeyConceptIndex,
   findMetadataBlockStart,
   findPrimaryKeyConceptIndex,
+  isClassicTriadHeadingLine,
   isKeyConceptHeading,
+  isKeywordsSectionFooterLine,
   isMetadataLine,
   parseOptionLine,
   splitStemAndOptionTexts,
@@ -117,7 +119,11 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
         (p) => !p.toLowerCase().startsWith("explanation"),
       );
       const contentLines = keywordLines.filter(
-        (p) => !CLASSIC_TRIAD_RE.test(p) && p !== "Classic Triad",
+        (p) =>
+          !isClassicTriadHeadingLine(p) &&
+          !isKeywordsSectionFooterLine(p) &&
+          !CLASSIC_TRIAD_RE.test(p) &&
+          p !== "Classic Triad",
       );
       if (contentLines.length === 0) {
         addWarning(

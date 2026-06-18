@@ -71,6 +71,7 @@
   },
   "classicTriad": "Chest pain at rest + Elevated troponin + No ST elevation→ This combination directly points to NSTEMI due to subendocardial ischemia.",
   "classicTriadHtml": "<p><strong>Chest pain at rest + Elevated troponin + No ST elevation</strong><br/><strong>NSTEMI due to subendocardial ischemia</strong>.</p>",
+  "classicTriadTitle": "Classic Triad (NSTEMI) Present in the Stem",
   "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI (Non–ST Elevation MI) Differential Diagnosis of NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "featureTable": [

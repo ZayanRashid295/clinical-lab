@@ -116,6 +116,34 @@ function buildPerAnswerMarkdown(exp: {
   return parts.join("\n\n");
 }
 
+function keywordsMarkdownFromData(data: QuestionData): string {
+  const heading = "### Keywords in the Stem to Identify the Correct Option\n\n";
+  const usesOrderedList = data.keywordsHtml?.some((html) => html.includes("<ol")) ?? false;
+  if (usesOrderedList) {
+    return heading + data.keywords.map((keyword, index) => `${index + 1}. ${keyword}`).join("\n");
+  }
+  return heading + data.keywords.map((keyword) => `- ${keyword}`).join("\n");
+}
+
+function keywordsHtmlFromData(data: QuestionData): string {
+  const heading = "<h3>Keywords in the Stem to Identify the Correct Option</h3>";
+  const body =
+    data.keywordsHtml?.length
+      ? mergeAdjacentListHtml(data.keywordsHtml.join(""))
+      : `<ul>${data.keywords.map((keyword) => `<li>${escapeHtml(keyword)}</li>`).join("")}</ul>`;
+  return heading + body;
+}
+
+function mergeAdjacentListHtml(html: string): string {
+  let merged = html;
+  let previous = "";
+  while (merged !== previous) {
+    previous = merged;
+    merged = merged.replace(/<\/ol>\s*<ol>/g, "").replace(/<\/ul>\s*<ul>/g, "");
+  }
+  return merged;
+}
+
 function buildMainExplanationBlocks(
   data: QuestionData,
   imageUrls: Record<string, string>,
@@ -124,23 +152,24 @@ function buildMainExplanationBlocks(
   let order = 0;
 
   if (data.keywords.length > 0) {
-    const keywordsMarkdown =
-      "### Keywords in the Stem to Identify the Correct Option\n\n" +
-      data.keywords.map((keyword) => `- ${keyword}`).join("\n");
-    const keywordsHtml =
-      "<h3>Keywords in the Stem to Identify the Correct Option</h3>" +
-      (data.keywordsHtml?.length
-        ? data.keywordsHtml.join("")
-        : `<ul>${data.keywords.map((keyword) => `<li>${escapeHtml(keyword)}</li>`).join("")}</ul>`);
-    blocks.push(richTextBlock(keywordsMarkdown, keywordsHtml, order++));
+    blocks.push(
+      richTextBlock(
+        keywordsMarkdownFromData(data),
+        keywordsHtmlFromData(data),
+        order++,
+      ),
+    );
   }
 
   if (data.classicTriad) {
+    const triadTitle = data.classicTriadTitle?.trim() || "Classic Triad";
+    const triadBodyHtml =
+      data.classicTriadHtml?.trim() ||
+      `<p>${escapeHtml(data.classicTriad)}</p>`;
     blocks.push(
       richTextBlock(
-        `### Classic Triad\n\n${data.classicTriad}`,
-        data.classicTriadHtml ||
-          `<h3>Classic Triad</h3><p>${escapeHtml(data.classicTriad)}</p>`,
+        `### ${triadTitle}\n\n${data.classicTriad}`,
+        `<h3>${escapeHtml(triadTitle)}</h3>${triadBodyHtml}`,
         order++,
       ),
     );

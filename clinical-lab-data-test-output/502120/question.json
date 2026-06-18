@@ -21,14 +21,10 @@
   "keywords": [
     "“No persistent ST-segment elevation” – Indicates it is not STEMI, helps narrow to NSTEMI or unstable angina.",
     "“Troponin I is markedly elevated above the 99th percentile” – Confirms myocardial injury, differentiating NSTEMI from unstable angina.",
-    "“Chest pain radiating to left arm” – Classic ischemic chest pain symptom, supporting ACS diagnosis.",
-    "These keywords together point directly to NSTEMI."
+    "“Chest pain radiating to left arm” – Classic ischemic chest pain symptom, supporting ACS diagnosis."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“No persistent ST-segment elevation”</strong> – Indicates it is <strong>not STEMI</strong>, helps narrow to NSTEMI or unstable angina.</li></ol>",
-    "<ol><li><strong>“Troponin I is markedly elevated above the 99th percentile”</strong> – Confirms <strong>myocardial injury</strong>, differentiating <strong>NSTEMI from unstable angina</strong>.</li></ol>",
-    "<ol><li><strong>“Chest pain radiating to left arm”</strong> – Classic <strong>ischemic chest pain symptom</strong>, supporting ACS diagnosis.</li></ol>",
-    "<p>These keywords together <strong>point directly to NSTEMI</strong>.</p>"
+    "<ol><li><strong>“No persistent ST-segment elevation”</strong> – Indicates it is <strong>not STEMI</strong>, helps narrow to NSTEMI or unstable angina.</li><li><strong>“Troponin I is markedly elevated above the 99th percentile”</strong> – Confirms <strong>myocardial injury</strong>, differentiating <strong>NSTEMI from unstable angina</strong>.</li><li><strong>“Chest pain radiating to left arm”</strong> – Classic <strong>ischemic chest pain symptom</strong>, supporting ACS diagnosis.</li></ol>"
   ],
   "explanations": {
     "C": {
@@ -73,6 +69,7 @@
   },
   "classicTriad": "Chest pain + Radiation to left arm + Diaphoresis/anxiety – Suggestive of acute coronary syndrome.",
   "classicTriadHtml": "<ul><li><strong>Chest pain + Radiation to left arm + Diaphoresis/anxiety</strong> – Suggestive of <strong>acute coronary syndrome</strong>.</li></ul>",
+  "classicTriadTitle": "Classic Triad in Stem (typical for ACS)",
   "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI Differential Diagnosis of NSTEMI",
   "featureTable": [

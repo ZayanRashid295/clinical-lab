@@ -24,9 +24,7 @@
     "Day 2 deterioration despite IV antibiotics → indicates complication, not primary infection"
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Ludwig’s angina</strong> → deep neck space infection with risk of downward spread </li></ol>",
-    "<ol><li><strong>Crepitus extending to chest + worsening sepsis</strong> → suggests gas-forming infection spreading into mediastinum </li></ol>",
-    "<ol><li><strong>Day 2 deterioration despite IV antibiotics</strong> → indicates complication, not primary infection </li></ol>"
+    "<ol><li><strong>Ludwig’s angina</strong> → deep neck space infection with risk of downward spread </li><li><strong>Crepitus extending to chest + worsening sepsis</strong> → suggests gas-forming infection spreading into mediastinum </li><li><strong>Day 2 deterioration despite IV antibiotics</strong> → indicates complication, not primary infection </li></ol>"
   ],
   "explanations": {
     "A": {
@@ -73,6 +71,7 @@
   },
   "classicTriad": "fever + chest pain + toxic sepsis (with neck crepitus) → suggests mediastinal extension",
   "classicTriadHtml": "<p><strong>fever + chest pain + toxic sepsis (with neck crepitus)</strong> → suggests mediastinal extension</p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Ludwig’s Angina – Descending Necrotizing Mediastinitis",
   "differentialDiagnosisTableName": "Mediastinitis (Complication-Based Differential Diagnosis) Clinical Features & Key Differentiation Table Differential Diagnosis Chest Pain in a Patient with Ludwig’s Angina and Sepsis",
   "featureTable": [

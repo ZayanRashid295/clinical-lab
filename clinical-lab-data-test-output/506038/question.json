@@ -24,9 +24,7 @@
     "“White plaques that are easily scraped off leaving erythematous base” → classic diagnostic feature of pseudomembranous oral candidiasis."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>“Poorly controlled diabetes mellitus”</strong> → strong risk factor for opportunistic fungal infection (immunocompromised state). </li></ol>",
-    "<ol><li><strong>“Recent broad-spectrum antibiotics”</strong> → disrupt normal oral flora → overgrowth of Candida species. </li></ol>",
-    "<ol><li><strong>“White plaques that are easily scraped off leaving erythematous base”</strong> → classic diagnostic feature of pseudomembranous oral candidiasis. </li></ol>"
+    "<ol><li><strong>“Poorly controlled diabetes mellitus”</strong> → strong risk factor for opportunistic fungal infection (immunocompromised state). </li><li><strong>“Recent broad-spectrum antibiotics”</strong> → disrupt normal oral flora → overgrowth of Candida species. </li><li><strong>“White plaques that are easily scraped off leaving erythematous base”</strong> → classic diagnostic feature of pseudomembranous oral candidiasis. </li></ol>"
   ],
   "explanations": {
     "A": {
@@ -83,6 +81,7 @@
   },
   "classicTriad": "Diabetes + Antibiotics + Scrapable white plaques",
   "classicTriadHtml": "<p><strong>Diabetes + Antibiotics + Scrapable white plaques</strong></p>",
+  "classicTriadTitle": "Classic Triad",
   "featureTableName": "Oral Candidiasis (Pseudomembranous Candidiasis) – Recognition & Diagnosis of White Scrapable Oral Lesions in Immunocompromised Patients",
   "differentialDiagnosisTableName": "Oral Cavity – Pseudomembranous Oral Candidiasis (Scrapable White Lesions in Diabetic Patient) Differential Diagnosis of White Oral Lesions",
   "featureTable": [

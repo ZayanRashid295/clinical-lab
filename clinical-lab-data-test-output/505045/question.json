@@ -24,9 +24,7 @@
     "No cyanosis, confusion, or exhaustion → Rules out severe and life-threatening asthma."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>PEF 45% predicted</strong> → Indicates <strong>moderate airway obstruction (40–69%)</strong>, key severity classifier for asthma. </li></ol>",
-    "<ol><li><strong>Speaks in short phrases</strong> → Suggests <strong>moderate to severe exacerbation</strong>, but not life-threatening (no single-word speech). </li></ol>",
-    "<ol><li><strong>No cyanosis, confusion, or exhaustion</strong> → Rules out <strong>severe and life-threatening asthma</strong>.</li></ol>"
+    "<ol><li><strong>PEF 45% predicted</strong> → Indicates <strong>moderate airway obstruction (40–69%)</strong>, key severity classifier for asthma. </li><li><strong>Speaks in short phrases</strong> → Suggests <strong>moderate to severe exacerbation</strong>, but not life-threatening (no single-word speech). </li><li><strong>No cyanosis, confusion, or exhaustion</strong> → Rules out <strong>severe and life-threatening asthma</strong>.</li></ol>"
   ],
   "explanations": {
     "B": {
