@@ -29,8 +29,10 @@
   "explanations": {
     "C": {
       "title": "Severe acute asthma exacerbation",
-      "body": "Severe acute asthma is characterized by RR >30/min, inability to complete full sentences, marked respiratory distress, and use of accessory muscles. These features reflect significant bronchial narrowing and high airway resistance. Patients are at high risk of progression to respiratory failure if not treated urgently.\nThis patient fulfills all key diagnostic criteria for severe exacerbation, especially tachypnea (32/min) and speech limitation to phrases, which are hallmark indicators. Immediate treatment with high-dose inhaled bronchodilators, systemic corticosteroids, and oxygen is required.",
-      "bodyHtml": "<p>Severe acute asthma is characterized by <strong>RR &gt;30/min, inability to complete full sentences, marked respiratory distress, and use of accessory muscles</strong>. These features reflect significant bronchial narrowing and high airway resistance. Patients are at high risk of progression to respiratory failure if not treated urgently.</p><p>This patient fulfills all key diagnostic criteria for severe exacerbation, especially <strong>tachypnea (32/min) and speech limitation to phrases</strong>, which are hallmark indicators. Immediate treatment with high-dose inhaled bronchodilators, systemic corticosteroids, and oxygen is required.</p>"
+      "body": "This patient presents with acute deterioration of asthma characterized by marked respiratory distress, tachypnea, and inability to speak full sentences, which aligns with severe acute asthma exacerbation. The presence of accessory muscle use further supports significant airflow obstruction. However, there are no features of respiratory failure (e.g., confusion, silent chest, cyanosis), so it does not meet life-threatening criteria.\nSevere acute asthma is defined clinically by RR > 30/min, inability to complete sentences, and marked work of breathing, indicating critically reduced airway caliber requiring urgent bronchodilator therapy and systemic corticosteroids.",
+      "bodyHtml": "<p>This patient presents with <strong>acute deterioration of asthma characterized by marked respiratory distress, tachypnea, and inability to speak full sentences</strong>, which aligns with <strong>severe acute asthma exacerbation</strong>. The presence of accessory muscle use further supports significant airflow obstruction. However, there are no features of respiratory failure (e.g., confusion, silent chest, cyanosis), so it does not meet life-threatening criteria.</p><p>Severe acute asthma is defined clinically by <strong>RR &gt; 30/min, inability to complete sentences, and marked work of breathing</strong>, indicating critically reduced airway caliber requiring urgent bronchodilator therapy and systemic corticosteroids.</p>",
+      "systemInvolved": "Respiratory System (Pulmonology – Bronchial Asthma)",
+      "systemInvolvedHtml": "<p>Respiratory System (Pulmonology – Bronchial Asthma)</p>"
     },
     "A": {
       "title": "Mild acute asthma exacerbation",
@@ -55,6 +57,7 @@
   },
   "keyConcept": "Acute asthma severity is primarily classified based on speech ability, respiratory rate, and work of breathing. Inability to complete sentences with RR >30/min indicates severe acute asthma, while silent chest or altered consciousness indicates life-threatening disease.",
   "keyConceptHtml": "<p>Acute asthma severity is primarily classified based on <strong>speech ability, respiratory rate, and work of breathing</strong>. Inability to complete sentences with RR &gt;30/min indicates <strong>severe acute asthma</strong>, while silent chest or altered consciousness indicates life-threatening disease.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"
@@ -85,7 +88,7 @@
       "feature": "Work of Breathing",
       "featureHtml": "<p><strong>Work of Breathing</strong></p>",
       "description": "• Accessory muscle use• Visible distress",
-      "descriptionHtml": "<p>• Accessory muscle use<br/></p>",
+      "descriptionHtml": "<p>• Accessory muscle use<br/>• Visible distress</p>",
       "clinicalImportance": "Indicates significant bronchospasm and increased respiratory effort",
       "clinicalImportanceHtml": "<p>Indicates significant bronchospasm and increased respiratory effort</p>"
     },
@@ -119,7 +122,7 @@
       "condition": "Acute Severe Asthma",
       "conditionHtml": "<p><strong>Acute Severe Asthma</strong></p>",
       "distinguishingFeatures": "• Wheeze• Prolonged expiration• Speech limitation• Tachypnea",
-      "distinguishingFeaturesHtml": "<p>• Wheeze<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Wheeze<br/>• Prolonged expiration<br/>• Speech limitation<br/>• Tachypnea</p>",
       "keyDifferences": "Reversible airway obstruction with wheeze present",
       "keyDifferencesHtml": "<p>Reversible airway obstruction with wheeze present</p>"
     },
@@ -127,7 +130,7 @@
       "condition": "COPD Exacerbation",
       "conditionHtml": "<p><strong>COPD Exacerbation</strong></p>",
       "distinguishingFeatures": "• Chronic smoker• Productive cough• Barrel chest",
-      "distinguishingFeaturesHtml": "<p>• Chronic smoker<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoker<br/>• Productive cough<br/>• Barrel chest</p>",
       "keyDifferences": "Fixed airflow limitation, older age group, chronic symptoms",
       "keyDifferencesHtml": "<p>Fixed airflow limitation, older age group, chronic symptoms</p>"
     },
@@ -135,7 +138,7 @@
       "condition": "Anaphylaxis",
       "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
       "distinguishingFeatures": "• Urticaria• Hypotension• Facial swelling",
-      "distinguishingFeaturesHtml": "<p>• Urticaria<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Urticaria<br/>• Hypotension<br/>• Facial swelling</p>",
       "keyDifferences": "Systemic allergic features + airway edema rather than bronchospasm alone",
       "keyDifferencesHtml": "<p>Systemic allergic features + airway edema rather than bronchospasm alone</p>"
     },
@@ -143,7 +146,7 @@
       "condition": "Pneumothorax",
       "conditionHtml": "<p><strong>Pneumothorax</strong></p>",
       "distinguishingFeatures": "• Sudden unilateral chest pain• Absent breath sounds on one side",
-      "distinguishingFeaturesHtml": "<p>• Sudden unilateral chest pain<br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden unilateral chest pain<br/>• Absent breath sounds on one side</p>",
       "keyDifferences": "No wheeze; unilateral lung collapse signs",
       "keyDifferencesHtml": "<p>No wheeze; unilateral lung collapse signs</p>"
     },
@@ -151,7 +154,7 @@
       "condition": "Pulmonary Embolism",
       "conditionHtml": "<p><strong>Pulmonary Embolism</strong></p>",
       "distinguishingFeatures": "• Sudden dyspnea• Pleuritic chest pain• Risk factors (DVT)",
-      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Risk factors (DVT)</p>",
       "keyDifferences": "Clear lungs, no wheeze; vascular origin not airway obstruction",
       "keyDifferencesHtml": "<p>Clear lungs, no wheeze; vascular origin not airway obstruction</p>"
     },
@@ -159,7 +162,7 @@
       "condition": "Heart Failure\n(Pulmonary Edema)",
       "conditionHtml": "<p><strong>Heart Failure </strong></p><p><strong>(Pulmonary Edema)</strong></p>",
       "distinguishingFeatures": "• Crackles• Orthopnea• Pink frothy sputum",
-      "distinguishingFeaturesHtml": "<p>• Crackles<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Crackles<br/>• Orthopnea<br/>• Pink frothy sputum</p>",
       "keyDifferences": "Fluid overload signs instead of bronchospasm",
       "keyDifferencesHtml": "<p>Fluid overload signs instead of bronchospasm</p>"
     }

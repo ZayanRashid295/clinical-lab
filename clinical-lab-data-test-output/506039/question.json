@@ -57,6 +57,7 @@
   },
   "keyConcept": "Primary herpetic gingivostomatitis classically presents with fever, malaise, painful oral vesicles, gingivitis, and shallow ulcers caused by HSV-1 infection. Gingival involvement and vesicular lesions help distinguish it from aphthous ulcers and other oral mucosal diseases.",
   "keyConceptHtml": "<p>Primary herpetic gingivostomatitis classically presents with fever, malaise, painful oral vesicles, gingivitis, and shallow ulcers caused by HSV-1 infection. Gingival involvement and vesicular lesions help distinguish it from aphthous ulcers and other oral mucosal diseases.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -76,15 +77,15 @@
       "feature": "Etiology",
       "featureHtml": "<p><strong>Etiology</strong></p>",
       "description": "• Caused by HSV-1 infection • Occasionally HSV-2 • Primary oral herpes infection",
-      "descriptionHtml": "<p>• Caused by HSV-1 infection <br/><br/></p>",
+      "descriptionHtml": "<p>• Caused by HSV-1 infection <br/>• Occasionally HSV-2 <br/>• Primary oral herpes infection</p>",
       "clinicalImportance": "• Common acute viral oral infection • Highly contagious",
-      "clinicalImportanceHtml": "<p>• Common acute viral oral infection <br/></p>"
+      "clinicalImportanceHtml": "<p>• Common acute viral oral infection <br/>• Highly contagious</p>"
     },
     {
       "feature": "Age Group",
       "featureHtml": "<p><strong>Age Group</strong></p>",
       "description": "• Common in children • Can occur in young adults",
-      "descriptionHtml": "<p>• Common in children <br/></p>",
+      "descriptionHtml": "<p>• Common in children <br/>• Can occur in young adults</p>",
       "clinicalImportance": "• Young adults may present with severe symptomatic disease",
       "clinicalImportanceHtml": "<p>• Young adults may present with severe symptomatic disease</p>"
     },
@@ -92,7 +93,7 @@
       "feature": "Prodromal Symptoms",
       "featureHtml": "<p><strong>Prodromal Symptoms</strong></p>",
       "description": "• Fever • Malaise • Irritability • Sore throat",
-      "descriptionHtml": "<p>• Fever <br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Fever <br/>• Malaise <br/>• Irritability <br/>• Sore throat</p>",
       "clinicalImportance": "• Helps differentiate from aphthous ulcers",
       "clinicalImportanceHtml": "<p>• Helps differentiate from aphthous ulcers</p>"
     },
@@ -100,7 +101,7 @@
       "feature": "Oral Lesions",
       "featureHtml": "<p><strong>Oral Lesions</strong></p>",
       "description": "• Multiple painful vesicles • Vesicles rupture into shallow ulcers • Erythematous base",
-      "descriptionHtml": "<p>• Multiple painful vesicles <br/><br/></p>",
+      "descriptionHtml": "<p>• Multiple painful vesicles <br/>• Vesicles rupture into shallow ulcers <br/>• Erythematous base</p>",
       "clinicalImportance": "• Vesicular stage is highly characteristic",
       "clinicalImportanceHtml": "<p>• Vesicular stage is highly characteristic</p>"
     },
@@ -108,7 +109,7 @@
       "feature": "Site of\nInvolvement",
       "featureHtml": "<p><strong>Site of </strong></p><p><strong>Involvement</strong></p>",
       "description": "• Lips • Gingiva • Buccal mucosa • Tongue",
-      "descriptionHtml": "<p>• Lips <br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Lips <br/>• Gingiva <br/>• Buccal mucosa <br/>• Tongue</p>",
       "clinicalImportance": "• Gingival involvement strongly favors HSV",
       "clinicalImportanceHtml": "<p>• Gingival involvement strongly favors HSV</p>"
     },
@@ -116,7 +117,7 @@
       "feature": "Gingival Findings",
       "featureHtml": "<p><strong>Gingival Findings</strong></p>",
       "description": "• Diffuse gingivitis • Swollen gums • Friable gums • Bleeding tendency",
-      "descriptionHtml": "<p>• Diffuse gingivitis <br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Diffuse gingivitis <br/>• Swollen gums <br/>• Friable gums <br/>• Bleeding tendency</p>",
       "clinicalImportance": "• Important distinguishing feature",
       "clinicalImportanceHtml": "<p>• Important distinguishing feature</p>"
     },
@@ -124,7 +125,7 @@
       "feature": "Pain",
       "featureHtml": "<p><strong>Pain</strong></p>",
       "description": "• Severe oral pain • Odynophagia • Difficulty eating/drinking",
-      "descriptionHtml": "<p>• Severe oral pain <br/><br/></p>",
+      "descriptionHtml": "<p>• Severe oral pain <br/>• Odynophagia <br/>• Difficulty eating/drinking</p>",
       "clinicalImportance": "• May cause dehydration",
       "clinicalImportanceHtml": "<p>• May cause dehydration</p>"
     },
@@ -140,7 +141,7 @@
       "feature": "Diagnosis",
       "featureHtml": "<p><strong>Diagnosis</strong></p>",
       "description": "• Usually clinical • PCR if uncertain • Viral culture occasionally used",
-      "descriptionHtml": "<p>• Usually clinical <br/><br/></p>",
+      "descriptionHtml": "<p>• Usually clinical <br/>• PCR if uncertain <br/>• Viral culture occasionally used</p>",
       "clinicalImportance": "• Clinical diagnosis is most common",
       "clinicalImportanceHtml": "<p>• Clinical diagnosis is most common</p>"
     },
@@ -148,7 +149,7 @@
       "feature": "Treatment",
       "featureHtml": "<p><strong>Treatment</strong></p>",
       "description": "• Hydration • Analgesics • Oral acyclovir in severe cases",
-      "descriptionHtml": "<p>• Hydration <br/><br/></p>",
+      "descriptionHtml": "<p>• Hydration <br/>• Analgesics <br/>• Oral acyclovir in severe cases</p>",
       "clinicalImportance": "• Early antiviral therapy shortens illness",
       "clinicalImportanceHtml": "<p>• Early antiviral therapy shortens illness</p>"
     },
@@ -156,7 +157,7 @@
       "feature": "Complications",
       "featureHtml": "<p><strong>Complications</strong></p>",
       "description": "• Dehydration • Secondary bacterial infection • Recurrent herpes labialis",
-      "descriptionHtml": "<p>• Dehydration <br/><br/></p>",
+      "descriptionHtml": "<p>• Dehydration <br/>• Secondary bacterial infection <br/>• Recurrent herpes labialis</p>",
       "clinicalImportance": "• Important in severe disease",
       "clinicalImportanceHtml": "<p>• Important in severe disease</p>"
     },
@@ -164,7 +165,7 @@
       "feature": "System Involved",
       "featureHtml": "<p><strong>System Involved</strong></p>",
       "description": "• Gastrointestinal system • Oral cavity • Infectious diseases",
-      "descriptionHtml": "<p>• Gastrointestinal system <br/><br/></p>",
+      "descriptionHtml": "<p>• Gastrointestinal system <br/>• Oral cavity <br/>• Infectious diseases</p>",
       "clinicalImportance": "• Common oral mucosal infection",
       "clinicalImportanceHtml": "<p>• Common oral mucosal infection</p>"
     }
@@ -174,23 +175,23 @@
       "condition": "Recurrent aphthous\nstomatitis",
       "conditionHtml": "<p><strong>Recurrent aphthous </strong></p><p><strong>stomatitis</strong></p>",
       "distinguishingFeatures": "• Painful shallow ulcers • Nonkeratinized mucosa • No vesicles • No fever",
-      "distinguishingFeaturesHtml": "<p>• Painful shallow ulcers <br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Painful shallow ulcers <br/>• Nonkeratinized mucosa <br/>• No vesicles <br/>• No fever</p>",
       "keyDifferences": "• Absence of vesicular stage • No gingivitis • No systemic symptoms",
-      "keyDifferencesHtml": "<p>• Absence of vesicular stage <br/><br/></p>"
+      "keyDifferencesHtml": "<p>• Absence of vesicular stage <br/>• No gingivitis <br/>• No systemic symptoms</p>"
     },
     {
       "condition": "Herpangina",
       "conditionHtml": "<p><strong>Herpangina</strong></p>",
       "distinguishingFeatures": "• Coxsackie virus infection • Fever • Posterior oral ulcers • Soft palate involvement",
-      "distinguishingFeaturesHtml": "<p>• Coxsackie virus infection <br/><br/>• Posterior oral ulcers <br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Coxsackie virus infection <br/>• Fever <br/>• Posterior oral ulcers <br/>• Soft palate involvement</p>",
       "keyDifferences": "• Lesions mainly posterior • Gingiva usually spared",
-      "keyDifferencesHtml": "<p>• Lesions mainly posterior <br/></p>"
+      "keyDifferencesHtml": "<p>• Lesions mainly posterior <br/>• Gingiva usually spared</p>"
     },
     {
       "condition": "Hand-foot-and-mouth\ndisease",
       "conditionHtml": "<p><strong>Hand-foot-and-mouth </strong></p><p><strong>disease</strong></p>",
       "distinguishingFeatures": "• Oral ulcers • Vesicular rash on hands/feet • Enteroviral infection",
-      "distinguishingFeaturesHtml": "<p>• Oral ulcers <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Oral ulcers <br/>• Vesicular rash on hands/feet <br/>• Enteroviral infection</p>",
       "keyDifferences": "• Characteristic extremity rash present",
       "keyDifferencesHtml": "<p>• Characteristic extremity rash present</p>"
     },
@@ -198,41 +199,41 @@
       "condition": "Oral candidiasis",
       "conditionHtml": "<p><strong>Oral candidiasis</strong></p>",
       "distinguishingFeatures": "• White curd-like plaques • Scrapable lesions • Burning sensation",
-      "distinguishingFeaturesHtml": "<p>• White curd-like plaques <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• White curd-like plaques <br/>• Scrapable lesions <br/>• Burning sensation</p>",
       "keyDifferences": "• No vesicles • No diffuse gingivitis",
-      "keyDifferencesHtml": "<p>• No vesicles <br/></p>"
+      "keyDifferencesHtml": "<p>• No vesicles <br/>• No diffuse gingivitis</p>"
     },
     {
       "condition": "Oral lichen planus",
       "conditionHtml": "<p><strong>Oral lichen planus</strong></p>",
       "distinguishingFeatures": "• Chronic course • Wickham striae • Reticular white lesions",
-      "distinguishingFeaturesHtml": "<p>• Chronic course <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic course <br/>• Wickham striae <br/>• Reticular white lesions</p>",
       "keyDifferences": "• Chronic inflammatory condition • No fever or vesicles",
-      "keyDifferencesHtml": "<p>• Chronic inflammatory condition <br/></p>"
+      "keyDifferencesHtml": "<p>• Chronic inflammatory condition <br/>• No fever or vesicles</p>"
     },
     {
       "condition": "Behçet disease",
       "conditionHtml": "<p><strong>Behçet disease</strong></p>",
       "distinguishingFeatures": "• Recurrent oral ulcers • Genital ulcers • Uveitis",
-      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis</p>",
       "keyDifferences": "• Multisystem disease • No vesicular eruption",
-      "keyDifferencesHtml": "<p>• Multisystem disease <br/></p>"
+      "keyDifferencesHtml": "<p>• Multisystem disease <br/>• No vesicular eruption</p>"
     },
     {
       "condition": "Stevens–Johnson\nsyndrome",
       "conditionHtml": "<p><strong>Stevens–Johnson </strong></p><p><strong>syndrome</strong></p>",
       "distinguishingFeatures": "• Painful mucosal erosions • Skin lesions • Drug association",
-      "distinguishingFeaturesHtml": "<p>• Painful mucosal erosions <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Painful mucosal erosions <br/>• Skin lesions <br/>• Drug association</p>",
       "keyDifferences": "• Severe systemic illness • Extensive skin involvement",
-      "keyDifferencesHtml": "<p>• Severe systemic illness <br/></p>"
+      "keyDifferencesHtml": "<p>• Severe systemic illness <br/>• Extensive skin involvement</p>"
     },
     {
       "condition": "Oral squamous cell\ncarcinoma",
       "conditionHtml": "<p><strong>Oral squamous cell </strong></p><p><strong>carcinoma</strong></p>",
       "distinguishingFeatures": "• Nonhealing ulcer • Indurated margins • Chronic progression",
-      "distinguishingFeaturesHtml": "<p>• Nonhealing ulcer <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Nonhealing ulcer <br/>• Indurated margins <br/>• Chronic progression</p>",
       "keyDifferences": "• Chronic malignant lesion • No acute febrile illness",
-      "keyDifferencesHtml": "<p>• Chronic malignant lesion <br/></p>"
+      "keyDifferencesHtml": "<p>• Chronic malignant lesion <br/>• No acute febrile illness</p>"
     }
   ],
   "diagram": {

@@ -60,6 +60,33 @@ describe("richTextUtils", () => {
     expect(html).toBe("<ul><li><strong>Item one</strong></li><li>Item two</li></ul>");
   });
 
+  it("preserves text in runs that combine line breaks with content", () => {
+    const paragraph = {
+      "w:r": [
+        {
+          "w:rPr": { "w:b": {} },
+          "w:t": "Clinical reasoning:",
+        },
+        {
+          "w:br": {},
+          "w:t": "This patient has classic HSV presentation.",
+        },
+      ],
+    };
+    const entries = collectFormattedParagraphEntries(
+      { "w:document": { "w:body": { "w:p": paragraph } } },
+      undefined,
+    );
+    expect(entries).toHaveLength(1);
+    expect(entries[0].formatted.innerHtml).toContain(
+      "<strong>Clinical reasoning:</strong><br/>This patient has classic HSV presentation.",
+    );
+
+    const offset = "Clinical reasoning:".length;
+    const sliced = sliceParagraphHtml(paragraph, offset);
+    expect(stripHtml(sliced)).toBe("This patient has classic HSV presentation.");
+  });
+
   it("slices paragraph HTML by plain-text offset", () => {
     const paragraph = {
       "w:r": [

@@ -42,6 +42,7 @@ import {
   normalizeQuestionId,
   normalizeStemText,
   normalizeTriadTitle,
+  isSystemInvolvedHeading,
   parseOptionLine,
   splitStemAndOptionTexts,
 } from "./parser-utils";
@@ -927,6 +928,24 @@ function parseKeywords(
   return { keywords, keywordsHtml, classicTriad, classicTriadHtml, classicTriadTitle };
 }
 
+function mergeExplanations(existing: Explanation, incoming: Explanation): Explanation {
+  const merged: Explanation = { ...incoming };
+  if (!merged.title.trim() && existing.title.trim()) merged.title = existing.title;
+  if ((existing.body?.length ?? 0) > (merged.body?.length ?? 0)) {
+    merged.body = existing.body;
+    if (existing.bodyHtml) merged.bodyHtml = existing.bodyHtml;
+  }
+  if (!merged.clinicalReasoning && existing.clinicalReasoning) {
+    merged.clinicalReasoning = existing.clinicalReasoning;
+    if (existing.clinicalReasoningHtml) merged.clinicalReasoningHtml = existing.clinicalReasoningHtml;
+  }
+  if (!merged.systemInvolved && existing.systemInvolved) {
+    merged.systemInvolved = existing.systemInvolved;
+    if (existing.systemInvolvedHtml) merged.systemInvolvedHtml = existing.systemInvolvedHtml;
+  }
+  return merged;
+}
+
 function parseExplanations(
   entries: FormattedParagraphEntry[],
   startIndex: number,
@@ -940,7 +959,7 @@ function parseExplanations(
   let reasoningParagraphs: FormattedParagraph[] = [];
   let systemInvolved: string | undefined;
   let systemInvolvedHtml: string | undefined;
-  let mode: "body" | "reasoning" = "body";
+  let mode: "body" | "reasoning" | "system" = "body";
 
   const flush = () => {
     if (!currentLetter) return;
@@ -962,7 +981,8 @@ function parseExplanations(
       entry.systemInvolved = systemInvolved;
       if (systemInvolvedHtml) entry.systemInvolvedHtml = systemInvolvedHtml;
     }
-    explanations[currentLetter] = entry;
+    const prior = explanations[currentLetter];
+    explanations[currentLetter] = prior ? mergeExplanations(prior, entry) : entry;
     currentLetter = null;
     currentTitle = null;
     bodyParagraphs = [];
@@ -1000,11 +1020,24 @@ function parseExplanations(
       }
       continue;
     }
-    if (lowered.startsWith("system involved:") || lowered.startsWith("system:")) {
-      systemInvolved = afterFirstColon(paragraph);
-      const offset = paragraph.indexOf(":") + 1;
-      const html = sliceParagraphHtml(entries[index].raw, offset).trim();
-      systemInvolvedHtml = html ? `<p>${html}</p>` : undefined;
+    if (isSystemInvolvedHeading(paragraph)) {
+      mode = "body";
+      const inline = afterFirstColon(paragraph);
+      if (inline) {
+        systemInvolved = inline;
+        const offset = paragraph.indexOf(":") + 1;
+        const html = sliceParagraphHtml(entries[index].raw, offset).trim();
+        systemInvolvedHtml = html ? `<p>${html}</p>` : undefined;
+      } else {
+        mode = "system";
+      }
+      continue;
+    }
+
+    if (mode === "system") {
+      systemInvolved = paragraph.trim();
+      const html = singleParagraphHtml(formatted);
+      systemInvolvedHtml = html ? `<p>${html.replace(/^<p>|<\/p>$/g, "")}</p>` : undefined;
       mode = "body";
       continue;
     }

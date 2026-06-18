@@ -67,6 +67,7 @@
   },
   "keyConcept": "Oral candidiasis is an opportunistic fungal infection seen in immunocompromised states such as diabetes mellitus and after antibiotic use. Its hallmark feature is scrapable white curd-like plaques with an erythematous base, which differentiates it from leukoplakia and other non-scrapable oral white lesions.",
   "keyConceptHtml": "<p>Oral candidiasis is an opportunistic fungal infection seen in immunocompromised states such as diabetes mellitus and after antibiotic use. Its hallmark feature is <strong>scrapable white curd-like plaques with an erythematous base</strong>, which differentiates it from leukoplakia and other non-scrapable oral white lesions.</p>",
+  "keyConceptTitle": "Key Concept (MCQ Insight)",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -89,7 +90,7 @@
       "feature": "Oral white lesions",
       "featureHtml": "<p>Oral white lesions</p>",
       "description": "• White, curd-like plaques• Soft pseudomembrane formation• Easily removable on scraping",
-      "descriptionHtml": "<p>• White, curd-like plaques<br/>pseudomembrane formation<br/></p>",
+      "descriptionHtml": "<p>• White, curd-like plaques<br/>• Soft pseudomembrane formation<br/>• Easily removable on scraping</p>",
       "clinicalImportance": "Suggests superficial fungal colonization rather than epithelial dysplasia",
       "clinicalImportanceHtml": "<p>Suggests superficial fungal colonization rather than epithelial dysplasia</p>"
     },
@@ -97,7 +98,7 @@
       "feature": "Scrapability",
       "featureHtml": "<p>Scrapability</p>",
       "description": "• Plaques easily scraped off• Leaves erythematous base• Underlying mucosal irritation",
-      "descriptionHtml": "<p>• Plaques easily scraped off<br/><br/></p>",
+      "descriptionHtml": "<p>• Plaques easily scraped off<br/>• Leaves erythematous base<br/>• Underlying mucosal irritation</p>",
       "clinicalImportance": "Key diagnostic hallmark of candidiasis",
       "clinicalImportanceHtml": "<p>Key diagnostic hallmark of candidiasis</p>"
     },
@@ -105,7 +106,7 @@
       "feature": "Risk factors",
       "featureHtml": "<p>Risk factors</p>",
       "description": "• Poorly controlled diabetes mellitus• Recent broad-spectrum antibiotic use• Possible immunosuppression",
-      "descriptionHtml": "<p>• Poorly controlled diabetes mellitus<br/><br/></p>",
+      "descriptionHtml": "<p>• Poorly controlled diabetes mellitus<br/>• Recent broad-spectrum antibiotic use<br/>• Possible immunosuppression</p>",
       "clinicalImportance": "Promotes Candida overgrowth due to altered oral flora",
       "clinicalImportanceHtml": "<p>Promotes Candida overgrowth due to altered oral flora</p>"
     },
@@ -113,7 +114,7 @@
       "feature": "Symptoms",
       "featureHtml": "<p>Symptoms</p>",
       "description": "• Oral discomfort• Burning sensation• “Cotton-like” feeling",
-      "descriptionHtml": "<p>• Oral discomfort<br/><br/></p>",
+      "descriptionHtml": "<p>• Oral discomfort<br/>• Burning sensation<br/>• “Cotton-like” feeling</p>",
       "clinicalImportance": "Typical symptomatic fungal mucositis",
       "clinicalImportanceHtml": "<p>Typical symptomatic fungal mucositis</p>"
     },
@@ -121,7 +122,7 @@
       "feature": "Mucosal appearance\nafter scraping",
       "featureHtml": "<p>Mucosal appearance</p><p> after scraping</p>",
       "description": "• Red inflamed mucosa• Possible mild bleeding• Raw epithelial surface",
-      "descriptionHtml": "<p>• Red inflamed mucosa<br/><br/></p>",
+      "descriptionHtml": "<p>• Red inflamed mucosa<br/>• Possible mild bleeding<br/>• Raw epithelial surface</p>",
       "clinicalImportance": "Confirms superficial mucosal involvement",
       "clinicalImportanceHtml": "<p>Confirms superficial mucosal involvement</p>"
     }
@@ -131,7 +132,7 @@
       "condition": "Oral candidiasis",
       "conditionHtml": "<p>Oral candidiasis</p>",
       "distinguishingFeatures": "• Scrapable white plaques• Erythematous base after removal• Associated with diabetes, antibiotics",
-      "distinguishingFeaturesHtml": "<p>• Scrapable white plaques<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Scrapable white plaques<br/>• Erythematous base after removal<br/>• Associated with diabetes, antibiotics</p>",
       "keyDifferences": "Only lesion that is scrapable with red base exposure",
       "keyDifferencesHtml": "<p>Only lesion that is <strong>scrapable with red base exposure</strong></p>"
     },
@@ -139,7 +140,7 @@
       "condition": "Oral leukoplakia",
       "conditionHtml": "<p>Oral leukoplakia</p>",
       "distinguishingFeatures": "• Persistent white patch• Non-scrapable• Linked to smoking, chronic irritation",
-      "distinguishingFeaturesHtml": "<p>• Persistent white patch<br/>Non-scrapable<br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Persistent white patch<br/>• Non-scrapable<br/>• Linked to smoking, chronic irritation</p>",
       "keyDifferences": "Premalignant, firmly adherent lesion",
       "keyDifferencesHtml": "<p>Premalignant, <strong>firmly adherent lesion</strong></p>"
     },
@@ -147,7 +148,7 @@
       "condition": "Oral lichen planus",
       "conditionHtml": "<p>Oral lichen planus</p>",
       "distinguishingFeatures": "• White lacy reticular pattern (Wickham striae)• Bilateral distribution• Chronic immune-mediated condition",
-      "distinguishingFeaturesHtml": "<p>• White lacy reticular pattern (Wickham striae)<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• White lacy reticular pattern (Wickham striae)<br/>• Bilateral distribution<br/>• Chronic immune-mediated condition</p>",
       "keyDifferences": "Characteristic lace-like pattern, not plaque-like",
       "keyDifferencesHtml": "<p>Characteristic <strong>lace-like pattern</strong>, not plaque-like</p>"
     },
@@ -155,7 +156,7 @@
       "condition": "Oral hairy\nleukoplakia",
       "conditionHtml": "<p>Oral hairy </p><p>leukoplakia</p>",
       "distinguishingFeatures": "• Corrugated white plaques• Lateral tongue involvement• EBV association, HIV patients",
-      "distinguishingFeaturesHtml": "<p>• Corrugated white plaques<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Corrugated white plaques<br/>• Lateral tongue involvement<br/>• EBV association, HIV patients</p>",
       "keyDifferences": "Non-scrapable + immunocompromised (HIV)",
       "keyDifferencesHtml": "<p><strong>Non-scrapable + immunocompromised (HIV)</strong></p>"
     },
@@ -163,7 +164,7 @@
       "condition": "Oral squamous cell\ncarcinoma",
       "conditionHtml": "<p>Oral squamous cell</p><p> carcinoma</p>",
       "distinguishingFeatures": "• Non-healing ulcer• Indurated mass• May be red-white mixed lesion",
-      "distinguishingFeaturesHtml": "<p>• Non-healing ulcer<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Non-healing ulcer<br/>• Indurated mass<br/>• May be red-white mixed lesion</p>",
       "keyDifferences": "Progressive malignant lesion, not removable",
       "keyDifferencesHtml": "<p><strong>Progressive malignant lesion, not removable</strong></p>"
     }

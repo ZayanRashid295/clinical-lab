@@ -67,6 +67,7 @@
   },
   "keyConcept": "Asthma is diagnosed clinically by episodic respiratory symptoms (wheeze, dyspnea) that vary over time, often triggered by allergens like dust and worse at night, with normal examination between attacks. The defining diagnostic feature is reversible airflow obstruction on spirometry (significant improvement in FEV₁ after bronchodilator), which distinguishes it from COPD and other chronic lung diseases.",
   "keyConceptHtml": "<p>Asthma is diagnosed clinically by <strong>episodic respiratory symptoms (wheeze, dyspnea) that vary over time</strong>, often triggered by allergens like dust and worse at night, with <strong>normal examination between attacks</strong>. The defining diagnostic feature is <strong>reversible airflow obstruction on spirometry (significant improvement in FEV₁ after bronchodilator)</strong>, which distinguishes it from COPD and other chronic lung diseases.</p>",
+  "keyConceptTitle": "Key Concept of MCQ",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"

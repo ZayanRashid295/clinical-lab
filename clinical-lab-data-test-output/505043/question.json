@@ -57,6 +57,7 @@
   },
   "keyConcept": "Asthma is diagnosed by reversible airflow obstruction on spirometry, demonstrated by significant improvement in FEV₁ after bronchodilator. COPD, in contrast, shows fixed or minimally reversible obstruction with progressive decline and often reduced DLCO in emphysema.",
   "keyConceptHtml": "<p>Asthma is diagnosed by <strong>reversible airflow obstruction on spirometry</strong>, demonstrated by significant improvement in FEV₁ after bronchodilator. COPD, in contrast, shows <strong>fixed or minimally reversible obstruction with progressive decline and often reduced DLCO in emphysema</strong>.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"
@@ -71,57 +72,57 @@
       "feature": "Airflow obstruction\npattern",
       "featureHtml": "<p><strong>Airflow obstruction </strong></p><p><strong>pattern</strong></p>",
       "description": "• Variable obstruction• Episodic airflow limitation• Reversible bronchoconstriction",
-      "descriptionHtml": "<p>• Variable obstruction<br/><br/></p>",
+      "descriptionHtml": "<p>• Variable obstruction<br/>• Episodic airflow limitation<br/>• Reversible bronchoconstriction</p>",
       "clinicalImportance": "• Persistent obstruction• Progressive airflow limitation• Poor reversibility",
-      "clinicalImportanceHtml": "<p>• Persistent obstruction<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Persistent obstruction<br/>• Progressive airflow limitation<br/>• Poor reversibility</p>"
     },
     {
       "feature": "FEV₁ response to\nbronchodilator",
       "featureHtml": "<p><strong>FEV₁ response to </strong></p><p><strong>bronchodilator</strong></p>",
       "description": "• Significant improvement• ≥12% and ≥200 mL increase• Marked reversibility present",
-      "descriptionHtml": "<p>• Significant improvement<br/><br/></p>",
+      "descriptionHtml": "<p>• Significant improvement<br/>• ≥12% and ≥200 mL increase<br/>• Marked reversibility present</p>",
       "clinicalImportance": "• Minimal or no reversibility• Fixed or partially reversible obstruction• Poor bronchodilator response",
-      "clinicalImportanceHtml": "<p>• Minimal or no reversibility<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Minimal or no reversibility<br/>• Fixed or partially reversible obstruction<br/>• Poor bronchodilator response</p>"
     },
     {
       "feature": "FEV₁/FVC ratio",
       "featureHtml": "<p><strong>FEV₁/FVC ratio</strong></p>",
       "description": "• Reduced during attack• May normalize between episodes• Variable over time",
-      "descriptionHtml": "<p>• Reduced during attack<br/><br/></p>",
+      "descriptionHtml": "<p>• Reduced during attack<br/>• May normalize between episodes<br/>• Variable over time</p>",
       "clinicalImportance": "• Persistently reduced• Does not normalize• Progressive decline",
-      "clinicalImportanceHtml": "<p>• Persistently reduced<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Persistently reduced<br/>• Does not normalize<br/>• Progressive decline</p>"
     },
     {
       "feature": "DLCO\n(Diffusing capacity)",
       "featureHtml": "<p><strong>DLCO </strong></p><p><strong>(Diffusing capacity)</strong></p>",
       "description": "• Normal or increased• Intact alveolar-capillary membrane• No structural destruction",
-      "descriptionHtml": "<p>• Normal or increased<br/><br/></p>",
+      "descriptionHtml": "<p>• Normal or increased<br/>• Intact alveolar-capillary membrane<br/>• No structural destruction</p>",
       "clinicalImportance": "• Reduced in emphysema• Normal in chronic bronchitis• Reflects alveolar destruction",
-      "clinicalImportanceHtml": "<p>• Reduced in emphysema<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Reduced in emphysema<br/>• Normal in chronic bronchitis<br/>• Reflects alveolar destruction</p>"
     },
     {
       "feature": "Symptoms\npattern",
       "featureHtml": "<p><strong>Symptoms </strong></p><p><strong>pattern</strong></p>",
       "description": "• Episodic wheeze• Nocturnal symptoms• Trigger-induced attacks",
-      "descriptionHtml": "<p>• Episodic wheeze<br/><br/></p>",
+      "descriptionHtml": "<p>• Episodic wheeze<br/>• Nocturnal symptoms<br/>• Trigger-induced attacks</p>",
       "clinicalImportance": "• Chronic productive cough• Progressive dyspnea• Persistent symptoms",
-      "clinicalImportanceHtml": "<p>• Chronic productive cough<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Chronic productive cough<br/>• Progressive dyspnea<br/>• Persistent symptoms</p>"
     },
     {
       "feature": "Disease course",
       "featureHtml": "<p><strong>Disease course</strong></p>",
       "description": "• Reversible, variable• Often intermittent• Good treatment response",
-      "descriptionHtml": "<p>• Reversible, variable<br/><br/></p>",
+      "descriptionHtml": "<p>• Reversible, variable<br/>• Often intermittent<br/>• Good treatment response</p>",
       "clinicalImportance": "• Progressive and irreversible• Slowly worsening over years• Limited reversibility",
-      "clinicalImportanceHtml": "<p>• Progressive and irreversible<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Progressive and irreversible<br/>• Slowly worsening over years<br/>• Limited reversibility</p>"
     },
     {
       "feature": "Risk factors",
       "featureHtml": "<p><strong>Risk factors</strong></p>",
       "description": "• Atopy, allergens, exercise• Family history• Environmental triggers",
-      "descriptionHtml": "<p>• Atopy, allergens, exercise<br/><br/></p>",
+      "descriptionHtml": "<p>• Atopy, allergens, exercise<br/>• Family history<br/>• Environmental triggers</p>",
       "clinicalImportance": "• Smoking (major)• Biomass exposure• Occupational exposure",
-      "clinicalImportanceHtml": "<p>• Smoking (major)<br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Smoking (major)<br/>• Biomass exposure<br/>• Occupational exposure</p>"
     }
   ],
   "differentialDiagnosisTable": [
@@ -129,41 +130,41 @@
       "condition": "Bronchial Asthma",
       "conditionHtml": "<p><strong>Bronchial Asthma</strong></p>",
       "distinguishingFeatures": "• Episodic wheeze• Night symptoms• Reversible obstruction",
-      "distinguishingFeaturesHtml": "<p>• Episodic wheeze<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Episodic wheeze<br/>• Night symptoms<br/>• Reversible obstruction</p>",
       "keyDifferences": "• Positive bronchodilator response• Normal DLCO• Trigger-related symptoms",
-      "keyDifferencesHtml": "<p>• Positive bronchodilator response<br/><br/></p>"
+      "keyDifferencesHtml": "<p>• Positive bronchodilator response<br/>• Normal DLCO<br/>• Trigger-related symptoms</p>"
     },
     {
       "condition": "COPD\n(Chronic\nBronchitis/Emphysema)",
       "conditionHtml": "<p><strong>COPD </strong></p><p><strong>(Chronic </strong></p><p><strong>Bronchitis/Emphysema)</strong></p>",
       "distinguishingFeatures": "• Chronic dyspnea• Productive cough• Irreversible obstruction",
-      "distinguishingFeaturesHtml": "<p>• Chronic dyspnea<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic dyspnea<br/>• Productive cough<br/>• Irreversible obstruction</p>",
       "keyDifferences": "• Smoking history• Reduced DLCO (emphysema)• Poor reversibility",
-      "keyDifferencesHtml": "<p>• Smoking history<br/><br/></p>"
+      "keyDifferencesHtml": "<p>• Smoking history<br/>• Reduced DLCO (emphysema)<br/>• Poor reversibility</p>"
     },
     {
       "condition": "Bronchiectasis",
       "conditionHtml": "<p><strong>Bronchiectasis</strong></p>",
       "distinguishingFeatures": "• Chronic cough with sputum• Recurrent infections• Wheeze possible",
-      "distinguishingFeaturesHtml": "<p>• Chronic cough with sputum<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic cough with sputum<br/>• Recurrent infections<br/>• Wheeze possible</p>",
       "keyDifferences": "• High-resolution CT changes• Copious purulent sputum• Clubbing",
-      "keyDifferencesHtml": "<p>• High-resolution CT changes<br/><br/></p>"
+      "keyDifferencesHtml": "<p>• High-resolution CT changes<br/>• Copious purulent sputum<br/>• Clubbing</p>"
     },
     {
       "condition": "Vocal Cord\nDysfunction",
       "conditionHtml": "<p><strong>Vocal Cord </strong></p><p><strong>Dysfunction</strong></p>",
       "distinguishingFeatures": "• Episodic breathlessness• Inspiratory stridor• Mimics asthma",
-      "distinguishingFeaturesHtml": "<p>• Episodic breathlessness<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Episodic breathlessness<br/>• Inspiratory stridor<br/>• Mimics asthma</p>",
       "keyDifferences": "• Normal spirometry• Poor response to bronchodilators• Laryngoscopy diagnostic",
-      "keyDifferencesHtml": "<p>• Normal spirometry<br/><br/></p>"
+      "keyDifferencesHtml": "<p>• Normal spirometry<br/>• Poor response to bronchodilators<br/>• Laryngoscopy diagnostic</p>"
     },
     {
       "condition": "Heart Failure\n(Cardiac Asthma)",
       "conditionHtml": "<p><strong>Heart Failure </strong></p><p><strong>(Cardiac Asthma)</strong></p>",
       "distinguishingFeatures": "• Nocturnal dyspnea• Wheeze due to pulmonary edema",
-      "distinguishingFeaturesHtml": "<p>• Nocturnal dyspnea<br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Nocturnal dyspnea<br/>• Wheeze due to pulmonary edema</p>",
       "keyDifferences": "• Cardiomegaly• S3 gallop• BNP elevated",
-      "keyDifferencesHtml": "<p>• Cardiomegaly<br/><br/></p>"
+      "keyDifferencesHtml": "<p>• Cardiomegaly<br/>• S3 gallop<br/>• BNP elevated</p>"
     }
   ],
   "diagram": {

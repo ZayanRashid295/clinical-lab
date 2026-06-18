@@ -32,39 +32,40 @@
       "body": "A rapidly progressive, life-threatening cellulitis of the submandibular, sublingual, and submental spaces, usually arising from infected lower molars. It causes bilateral, “board-like” induration of the floor of mouth, posterior displacement of the tongue, drooling, dysphagia, and airway compromise. It is a surgical emergency due to risk of asphyxiation and often requires airway protection plus IV antibiotics. Infection is typically polymicrobial (oral anaerobes + streptococci). The hallmark is bilateral submandibular space involvement without abscess formation in early stages, distinguishing it from localized abscesses.",
       "bodyHtml": "<p>A rapidly progressive, life-threatening cellulitis of the submandibular, sublingual, and submental spaces, usually arising from infected lower molars. It causes bilateral, “board-like” induration of the floor of mouth, posterior displacement of the tongue, drooling, dysphagia, and airway compromise. It is a surgical emergency due to risk of asphyxiation and often requires airway protection plus IV antibiotics. Infection is typically polymicrobial (oral anaerobes + streptococci). The hallmark is <strong>bilateral submandibular space involvement without abscess formation in early stages</strong>, distinguishing it from localized abscesses.</p>",
       "clinicalReasoning": "The combination of rapid onset, bilateral floor-of-mouth swelling, tongue elevation, and dental source strongly localizes to a deep neck space cellulitis rather than a focal abscess or pharyngeal infection. Airway displacement signs make Ludwig angina the best fit.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>The combination of rapid onset, bilateral floor-of-mouth swelling, tongue elevation, and dental source strongly localizes to a deep neck space cellulitis rather than a focal abscess or pharyngeal infection. Airway displacement signs make Ludwig angina the best fit.</p>"
     },
     "A": {
       "title": "Acute epiglottitis",
       "body": "An acute bacterial infection (classically *H. influenzae type b in children, now also streptococci/staphylococci in adults) affecting the epiglottis, leading to rapid airway obstruction. Patients present with high fever, severe sore throat, drooling, dysphagia, and tripod positioning. However, oral cavity examination is usually relatively unremarkable, and there is no floor-of-mouth induration.",
       "bodyHtml": "<p>An acute bacterial infection (classically *H. influenzae type b in children, now also streptococci/staphylococci in adults) affecting the epiglottis, leading to rapid airway obstruction. Patients present with high fever, severe sore throat, drooling, dysphagia, and tripod positioning. However, oral cavity examination is usually relatively unremarkable, and there is no floor-of-mouth induration.</p>",
       "clinicalReasoning": "Although drooling and muffled voice overlap, absence of floor-of-mouth induration and presence of localized epiglottic inflammation (not dental source) makes it less likely.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Although drooling and muffled voice overlap, absence of floor-of-mouth induration and presence of localized epiglottic inflammation (not dental source) makes it less likely.</p>"
     },
     "C": {
       "title": "Peritonsillar abscess",
       "body": "A localized pus collection between the tonsillar capsule and pharyngeal muscles, usually following tonsillitis. Presents with unilateral throat pain, uvular deviation, trismus, and muffled voice. Swelling is peritonsillar, not submandibular or floor-of-mouth.",
       "bodyHtml": "<p>A localized pus collection between the tonsillar capsule and pharyngeal muscles, usually following tonsillitis. Presents with unilateral throat pain, uvular deviation, trismus, and muffled voice. Swelling is peritonsillar, not submandibular or floor-of-mouth.</p>",
       "clinicalReasoning": "Unilateral tonsillar findings and uvular deviation are absent here. Bilateral floor-of-mouth involvement excludes this diagnosis.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Unilateral tonsillar findings and uvular deviation are absent here. Bilateral floor-of-mouth involvement excludes this diagnosis.</p>"
     },
     "D": {
       "title": "Retropharyngeal abscess",
       "body": "Deep neck infection in the retropharyngeal space, more common in children. Presents with fever, neck stiffness, dysphagia, and sometimes respiratory distress. Posterior pharyngeal wall bulging may be seen.",
       "bodyHtml": "<p>Deep neck infection in the retropharyngeal space, more common in children. Presents with fever, neck stiffness, dysphagia, and sometimes respiratory distress. Posterior pharyngeal wall bulging may be seen.</p>",
       "clinicalReasoning": "No posterior pharyngeal wall symptoms or neck stiffness are described. Oral floor involvement points away from retropharyngeal space.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>No posterior pharyngeal wall symptoms or neck stiffness are described. Oral floor involvement points away from retropharyngeal space.</p>"
     },
     "E": {
       "title": "Parapharyngeal abscess",
       "body": "A deep neck space infection lateral to the pharynx, often secondary to tonsillar or dental infections. It presents with fever, trismus, neck swelling, and sometimes cranial nerve involvement.",
       "bodyHtml": "<p>A deep neck space infection lateral to the pharynx, often secondary to tonsillar or dental infections. It presents with fever, trismus, neck swelling, and sometimes cranial nerve involvement.</p>",
       "clinicalReasoning": "Although related to dental infection, it typically causes lateral neck swelling and trismus, not bilateral floor-of-mouth induration or tongue elevation.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Although related to dental infection, it typically causes lateral neck swelling and trismus, not bilateral floor-of-mouth induration or tongue elevation.</p>"
     }
   },
   "keyConcept": "Rapidly progressive bilateral submandibular infection from dental source causing airway compromise = Ludwig angina\nDistinguished by floor-of-mouth elevation + tongue displacement + drooling\nSurgical emergency requiring airway protection",
   "keyConceptHtml": "<ul><li>Rapidly progressive bilateral submandibular infection from dental source causing airway compromise = <strong>Ludwig angina</strong> </li><li>Distinguished by <strong>floor-of-mouth elevation + tongue displacement + drooling</strong> </li><li>Surgical emergency requiring airway protection </li></ul>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -87,7 +88,7 @@
       "feature": "Definition",
       "featureHtml": "<p><strong>Definition</strong></p>",
       "description": "• Rapidly progressive cellulitis involving:• Sublingual space• Submandibular space• Submental space• Usually bilateral",
-      "descriptionHtml": "<p>• Rapidly progressive cellulitis involving:<br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Rapidly progressive cellulitis involving:<br/>• Sublingual space<br/>• Submandibular space<br/>• Submental space<br/>• Usually bilateral</p>",
       "clinicalImportance": "• Causes life-threatening airway compromise",
       "clinicalImportanceHtml": "<p>• Causes life-threatening airway compromise</p>"
     },
@@ -95,7 +96,7 @@
       "feature": "Etiology",
       "featureHtml": "<p><strong>Etiology</strong></p>",
       "description": "• Odontogenic infection (most common)• Lower second/third molar infection• Oral trauma• Dental extraction• Mandibular fracture",
-      "descriptionHtml": "<p>• Odontogenic infection (most common)<br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Odontogenic infection (most common)<br/>• Lower second/third molar infection<br/>• Oral trauma<br/>• Dental extraction<br/>• Mandibular fracture</p>",
       "clinicalImportance": "• Dental infections are the classic source",
       "clinicalImportanceHtml": "<p>• Dental infections are the classic source</p>"
     },
@@ -103,7 +104,7 @@
       "feature": "Common\nOrganisms",
       "featureHtml": "<p><strong>Common </strong></p><p><strong>Organisms</strong></p>",
       "description": "• Polymicrobial infection• Streptococci• Anaerobes• Bacteroides• Fusobacterium",
-      "descriptionHtml": "<p>• Polymicrobial infection<br/><br/><br/>• Bacteroides<br/></p>",
+      "descriptionHtml": "<p>• Polymicrobial infection<br/>• Streptococci<br/>• Anaerobes<br/>• Bacteroides<br/>• Fusobacterium</p>",
       "clinicalImportance": "• Broad-spectrum antibiotic coverage required",
       "clinicalImportanceHtml": "<p>• Broad-spectrum antibiotic coverage required</p>"
     },
@@ -111,7 +112,7 @@
       "feature": "Risk Factors",
       "featureHtml": "<p><strong>Risk Factors</strong></p>",
       "description": "• Poor dental hygiene• Diabetes mellitus• Immunocompromised state• Malnutrition• Alcoholism",
-      "descriptionHtml": "<p>• Poor dental hygiene<br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Poor dental hygiene<br/>• Diabetes mellitus<br/>• Immunocompromised state<br/>• Malnutrition<br/>• Alcoholism</p>",
       "clinicalImportance": "• Increased risk of rapid spread",
       "clinicalImportanceHtml": "<p>• Increased risk of rapid spread</p>"
     },
@@ -119,7 +120,7 @@
       "feature": "Symptoms",
       "featureHtml": "<p><strong>Symptoms</strong></p>",
       "description": "• Fever• Severe mouth pain• Dysphagia• Odynophagia• Drooling• Muffled “hot potato” voice• Dyspnea",
-      "descriptionHtml": "<p>• Fever<br/><br/><br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Fever<br/>• Severe mouth pain<br/>• Dysphagia<br/>• Odynophagia<br/>• Drooling<br/>• Muffled “hot potato” voice<br/>• Dyspnea</p>",
       "clinicalImportance": "• Suggest evolving airway obstruction",
       "clinicalImportanceHtml": "<p>• Suggest evolving airway obstruction</p>"
     },
@@ -127,7 +128,7 @@
       "feature": "Examination\nFindings",
       "featureHtml": "<p><strong>Examination </strong></p><p><strong>Findings</strong></p>",
       "description": "• Bilateral submandibular swelling• Woody/board-like induration• Elevated tongue• Tender floor of mouth• Neck swelling• Trismus may occur",
-      "descriptionHtml": "<p>• Bilateral submandibular swelling<br/><br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Bilateral submandibular swelling<br/>• Woody/board-like induration<br/>• Elevated tongue<br/>• Tender floor of mouth<br/>• Neck swelling<br/>• Trismus may occur</p>",
       "clinicalImportance": "• Tongue elevation is highly characteristic",
       "clinicalImportanceHtml": "<p>• Tongue elevation is highly characteristic</p>"
     },
@@ -135,7 +136,7 @@
       "feature": "Airway Signs",
       "featureHtml": "<p><strong>Airway Signs</strong></p>",
       "description": "• Stridor• Drooling• Respiratory distress• Difficulty handling secretions• Cyanosis (late sign)",
-      "descriptionHtml": "<p>• Stridor<br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Stridor<br/>• Drooling<br/>• Respiratory distress<br/>• Difficulty handling secretions<br/>• Cyanosis (late sign)</p>",
       "clinicalImportance": "• Immediate airway management may be needed",
       "clinicalImportanceHtml": "<p>• Immediate airway management may be needed</p>"
     },
@@ -143,7 +144,7 @@
       "feature": "Diagnosis",
       "featureHtml": "<p><strong>Diagnosis</strong></p>",
       "description": "• Clinical diagnosis primarily• Contrast CT neck• CBC showing leukocytosis• Blood cultures if septic",
-      "descriptionHtml": "<p>• Clinical diagnosis primarily<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Clinical diagnosis primarily<br/>• Contrast CT neck<br/>• CBC showing leukocytosis<br/>• Blood cultures if septic</p>",
       "clinicalImportance": "• CT helps define spread/abscess formation",
       "clinicalImportanceHtml": "<p>• CT helps define spread/abscess formation</p>"
     },
@@ -151,7 +152,7 @@
       "feature": "Complications",
       "featureHtml": "<p><strong>Complications</strong></p>",
       "description": "• Airway obstruction• Mediastinitis• Sepsis• Aspiration• Internal jugular thrombosis",
-      "descriptionHtml": "<p>• Airway obstruction<br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Airway obstruction<br/>• Mediastinitis<br/>• Sepsis<br/>• Aspiration<br/>• Internal jugular thrombosis</p>",
       "clinicalImportance": "• Mortality increases if airway delayed",
       "clinicalImportanceHtml": "<p>• Mortality increases if airway delayed</p>"
     },
@@ -159,7 +160,7 @@
       "feature": "Treatment",
       "featureHtml": "<p><strong>Treatment</strong></p>",
       "description": "• Secure airway first• IV broad-spectrum antibiotics• Surgical drainage if abscess develops• Dental source control",
-      "descriptionHtml": "<p>• Secure airway first<br/><br/>develops<br/></p>",
+      "descriptionHtml": "<p>• Secure airway first<br/>• IV broad-spectrum antibiotics<br/>• Surgical drainage if abscess develops<br/>• Dental source control</p>",
       "clinicalImportance": "• Airway stabilization is top priority",
       "clinicalImportanceHtml": "<p>• Airway stabilization is top priority</p>"
     },
@@ -167,7 +168,7 @@
       "feature": "Prognosis",
       "featureHtml": "<p><strong>Prognosis</strong></p>",
       "description": "• Good with early treatment• Fatal if airway compromise untreated",
-      "descriptionHtml": "<p>• Good with early treatment<br/></p>",
+      "descriptionHtml": "<p>• Good with early treatment<br/>• Fatal if airway compromise untreated</p>",
       "clinicalImportance": "• Early recognition is critical",
       "clinicalImportanceHtml": "<p>• Early recognition is critical</p>"
     }
@@ -177,15 +178,15 @@
       "condition": "Peritonsillar\nAbscess",
       "conditionHtml": "<p><strong>Peritonsillar </strong></p><p><strong>Abscess</strong></p>",
       "distinguishingFeatures": "• Unilateral throat pain• Uvular deviation• Trismus• Tonsillar swelling",
-      "distinguishingFeaturesHtml": "<p>• Unilateral throat pain<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Unilateral throat pain<br/>• Uvular deviation<br/>• Trismus<br/>• Tonsillar swelling</p>",
       "keyDifferences": "• Usually unilateral• No bilateral floor-of-mouth induration",
-      "keyDifferencesHtml": "<p>• Usually unilateral<br/></p>"
+      "keyDifferencesHtml": "<p>• Usually unilateral<br/>• No bilateral floor-of-mouth induration</p>"
     },
     {
       "condition": "Retropharyngeal\nAbscess",
       "conditionHtml": "<p><strong>Retropharyngeal </strong></p><p><strong>Abscess</strong></p>",
       "distinguishingFeatures": "• Neck stiffness• Posterior pharyngeal wall bulge• Fever• Dysphagia",
-      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/>• Posterior pharyngeal wall bulge<br/>• Fever<br/>• Dysphagia</p>",
       "keyDifferences": "• Retropharyngeal involvement rather than submandibular spaces",
       "keyDifferencesHtml": "<p>• Retropharyngeal involvement rather than submandibular spaces</p>"
     },
@@ -193,7 +194,7 @@
       "condition": "Parapharyngeal\nAbscess",
       "conditionHtml": "<p><strong>Parapharyngeal </strong></p><p><strong>Abscess</strong></p>",
       "distinguishingFeatures": "• Lateral neck swelling• Trismus• Fever• Cranial nerve involvement possible",
-      "distinguishingFeaturesHtml": "<p>• Lateral neck swelling<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Lateral neck swelling<br/>• Trismus<br/>• Fever<br/>• Cranial nerve involvement possible</p>",
       "keyDifferences": "• More lateral neck disease rather than floor-of-mouth cellulitis",
       "keyDifferencesHtml": "<p>• More lateral neck disease rather than floor-of-mouth cellulitis</p>"
     },
@@ -201,7 +202,7 @@
       "condition": "Acute\nEpiglottitis",
       "conditionHtml": "<p><strong>Acute </strong></p><p><strong>Epiglottitis</strong></p>",
       "distinguishingFeatures": "• Severe sore throat• Drooling• Stridor• Tripod posture",
-      "distinguishingFeaturesHtml": "<p>• Severe sore throat<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Severe sore throat<br/>• Drooling<br/>• Stridor<br/>• Tripod posture</p>",
       "keyDifferences": "• No submandibular swelling or tongue elevation",
       "keyDifferencesHtml": "<p>• No submandibular swelling or tongue elevation</p>"
     },
@@ -209,7 +210,7 @@
       "condition": "Submandibular\nSialadenitis",
       "conditionHtml": "<p><strong>Submandibular </strong></p><p><strong>Sialadenitis</strong></p>",
       "distinguishingFeatures": "• Painful salivary gland swelling• Worse with meals• Purulent duct discharge",
-      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling<br/>• Worse with meals<br/>• Purulent duct discharge</p>",
       "keyDifferences": "• Localized salivary gland infection without deep neck cellulitis",
       "keyDifferencesHtml": "<p>• Localized salivary gland infection without deep neck cellulitis</p>"
     },
@@ -217,7 +218,7 @@
       "condition": "Dental Abscess",
       "conditionHtml": "<p><strong>Dental Abscess</strong></p>",
       "distinguishingFeatures": "• Localized tooth pain• Gingival swelling• Facial pain",
-      "distinguishingFeaturesHtml": "<p>• Localized tooth pain<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Localized tooth pain<br/>• Gingival swelling<br/>• Facial pain</p>",
       "keyDifferences": "• More localized infection without diffuse bilateral spread",
       "keyDifferencesHtml": "<p>• More localized infection without diffuse bilateral spread</p>"
     },
@@ -225,7 +226,7 @@
       "condition": "Angioedema",
       "conditionHtml": "<p><strong>Angioedema</strong></p>",
       "distinguishingFeatures": "• Rapid soft tissue swelling• Allergic trigger• Noninfectious",
-      "distinguishingFeaturesHtml": "<p>• Rapid soft tissue swelling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Rapid soft tissue swelling<br/>• Allergic trigger<br/>• Noninfectious</p>",
       "keyDifferences": "• No fever or infectious signs",
       "keyDifferencesHtml": "<p>• No fever or infectious signs</p>"
     },
@@ -233,7 +234,7 @@
       "condition": "Oral Cellulitis",
       "conditionHtml": "<p><strong>Oral Cellulitis</strong></p>",
       "distinguishingFeatures": "• Localized oral soft tissue inflammation• Erythema• Tenderness",
-      "distinguishingFeaturesHtml": "<p>• Localized oral soft tissue inflammation<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Localized oral soft tissue inflammation<br/>• Erythema<br/>• Tenderness</p>",
       "keyDifferences": "• Lacks classic bilateral deep neck involvement",
       "keyDifferencesHtml": "<p>• Lacks classic bilateral deep neck involvement</p>"
     }

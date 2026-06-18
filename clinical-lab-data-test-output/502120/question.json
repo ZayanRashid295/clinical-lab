@@ -55,6 +55,7 @@
   },
   "keyConcept": "NSTEMI is diagnosed in patients with ischemic chest pain and elevated cardiac biomarkers without persistent ST-segment elevation. Differentiation from unstable angina depends on troponin elevation, and from STEMI on ECG changes.",
   "keyConceptHtml": "<p><strong>NSTEMI</strong> is diagnosed in patients with <strong>ischemic chest pain and elevated cardiac biomarkers</strong> without persistent ST-segment elevation. Differentiation from unstable angina depends on <strong>troponin elevation</strong>, and from STEMI on <strong>ECG changes</strong>.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

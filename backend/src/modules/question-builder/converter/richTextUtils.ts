@@ -44,13 +44,17 @@ function hasElement(obj: XmlObject | undefined, key: string): boolean {
 }
 
 function runToHtml(run: XmlObject): string {
-  if (hasElement(run, "w:br")) return "<br/>";
-  if (hasElement(run, "w:tab")) return "&emsp;";
-
+  const hasBr = hasElement(run, "w:br");
+  const hasTab = hasElement(run, "w:tab");
   const text = getTextContent(run["w:t"]);
-  if (!text) return "";
 
-  let html = escapeHtml(text);
+  let html = "";
+  if (hasBr) html += "<br/>";
+  if (hasTab) html += "&emsp;";
+
+  if (!text) return html;
+
+  let textHtml = escapeHtml(text);
   const rPr = run["w:rPr"] as XmlObject | undefined;
   const tags: string[] = [];
   if (rPr) {
@@ -63,8 +67,8 @@ function runToHtml(run: XmlObject): string {
     if (vertVal === "superscript") tags.push("sup");
     if (vertVal === "subscript") tags.push("sub");
   }
-  for (const tag of tags) html = `<${tag}>${html}</${tag}>`;
-  return html;
+  for (const tag of tags) textHtml = `<${tag}>${textHtml}</${tag}>`;
+  return html + textHtml;
 }
 
 function wrapRunText(html: string, text: string): string {

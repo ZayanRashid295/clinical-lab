@@ -32,7 +32,7 @@
       "body": "This option directly reflects the hallmark feature of bronchial asthma—circadian variation in airway tone with worsening symptoms at night and early morning. It reflects underlying airway hyperresponsiveness and inflammation. In asthma, nocturnal bronchoconstriction occurs due to increased vagal tone, decreased cortisol levels, and circadian inflammatory mediator variation. This makes nocturnal symptoms a highly specific diagnostic clue.",
       "bodyHtml": "<p>This option directly reflects the hallmark feature of bronchial asthma—circadian variation in airway tone with worsening symptoms at night and early morning. It reflects underlying airway hyperresponsiveness and inflammation. In asthma, nocturnal bronchoconstriction occurs due to increased vagal tone, decreased cortisol levels, and circadian inflammatory mediator variation. This makes nocturnal symptoms a highly specific diagnostic clue.</p>",
       "clinicalReasoning": "Nocturnal symptom pattern is one of the most sensitive clinical indicators of bronchial asthma. It distinguishes asthma from COPD, infection, and structural lung disease. The episodic nature with normal interictal examination further strengthens the diagnosis. This is a classic pattern-recognition finding used in NRE-1 MCQs.",
-      "clinicalReasoningHtml": "<p><br/></p>",
+      "clinicalReasoningHtml": "<p><br/>Nocturnal symptom pattern is one of the most sensitive clinical indicators of bronchial asthma. It distinguishes asthma from COPD, infection, and structural lung disease. The episodic nature with normal interictal examination further strengthens the diagnosis. This is a classic pattern-recognition finding used in NRE-1 MCQs.</p>",
       "systemInvolved": "Respiratory system (Airways – Bronchial tree)",
       "systemInvolvedHtml": "<p>Respiratory system (Airways – Bronchial tree)</p>"
     },
@@ -41,32 +41,33 @@
       "body": "This represents abnormal lung parenchymal or airway secretions, commonly seen in pneumonia, bronchiectasis, or pulmonary edema. It indicates fluid or secretions in larger airways rather than reversible bronchospasm. Not consistent with intermittent symptom pattern.",
       "bodyHtml": "<p>This represents abnormal lung parenchymal or airway secretions, commonly seen in pneumonia, bronchiectasis, or pulmonary edema. It indicates fluid or secretions in larger airways rather than reversible bronchospasm. Not consistent with intermittent symptom pattern.</p>",
       "clinicalReasoning": "Asthma typically produces wheezing rather than coarse crackles. The presence of coarse inspiratory crackles suggests fixed or infective pathology. This finding lacks episodic variability, making asthma less likely. It is more aligned with infectious or structural lung disease.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Asthma typically produces wheezing rather than coarse crackles. The presence of coarse inspiratory crackles suggests fixed or infective pathology. This finding lacks episodic variability, making asthma less likely. It is more aligned with infectious or structural lung disease.</p>"
     },
     "C": {
       "title": "Gradually progressive exertional dyspnea",
       "body": "This describes a chronic and steadily worsening respiratory limitation seen in COPD, interstitial lung disease, or cardiac causes. It reflects progressive structural or functional impairment rather than reversibility.",
       "bodyHtml": "<p>This describes a chronic and steadily worsening respiratory limitation seen in COPD, interstitial lung disease, or cardiac causes. It reflects progressive structural or functional impairment rather than reversibility.</p>",
       "clinicalReasoning": "Asthma is characteristically reversible and episodic, not steadily progressive. Progressive dyspnea suggests fixed airflow limitation or restrictive pathology. This option does not explain nocturnal symptom predominance. Hence, it is not consistent with asthma physiology.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Asthma is characteristically reversible and episodic, not steadily progressive. Progressive dyspnea suggests fixed airflow limitation or restrictive pathology. This option does not explain nocturnal symptom predominance. Hence, it is not consistent with asthma physiology.</p>"
     },
     "D": {
       "title": "Persistent productive cough with fever",
       "body": "This indicates an acute or chronic infectious process such as pneumonia or bronchitis. Fever suggests systemic inflammatory or infective etiology rather than allergic airway disease.",
       "bodyHtml": "<p>This indicates an acute or chronic infectious process such as pneumonia or bronchitis. Fever suggests systemic inflammatory or infective etiology rather than allergic airway disease.</p>",
       "clinicalReasoning": "Asthma is typically non-infective and presents with dry cough or variable wheeze. Persistent productive cough with fever is inconsistent with asthma’s intermittent pattern. This option suggests infection rather than airway hyperreactivity.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Asthma is typically non-infective and presents with dry cough or variable wheeze. Persistent productive cough with fever is inconsistent with asthma’s intermittent pattern. This option suggests infection rather than airway hyperreactivity.</p>"
     },
     "E": {
       "title": "Weight loss with hemoptysis",
       "body": "This is a red-flag combination suggestive of tuberculosis or malignancy. It reflects chronic systemic disease with structural lung involvement.",
       "bodyHtml": "<p>This is a red-flag combination suggestive of tuberculosis or malignancy. It reflects chronic systemic disease with structural lung involvement.</p>",
       "clinicalReasoning": "Asthma does not cause hemoptysis or constitutional weight loss. These features indicate destructive lung pathology rather than reversible bronchospasm. This option is completely inconsistent with the episodic nocturnal pattern described in the stem.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Asthma does not cause hemoptysis or constitutional weight loss. These features indicate destructive lung pathology rather than reversible bronchospasm. This option is completely inconsistent with the episodic nocturnal pattern described in the stem.</p>"
     }
   },
   "keyConcept": "Bronchial asthma is characterized by episodic, reversible airway obstruction with nocturnal and early morning symptom worsening due to circadian variation in airway inflammation and bronchomotor tone. Recognition of this pattern is crucial for differentiating asthma from infectious, structural, and chronic progressive lung diseases.",
   "keyConceptHtml": "<p>Bronchial asthma is characterized by <strong>episodic, reversible airway obstruction with nocturnal and early morning symptom worsening</strong> due to circadian variation in airway inflammation and bronchomotor tone. Recognition of this pattern is crucial for differentiating asthma from infectious, structural, and chronic progressive lung diseases.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"

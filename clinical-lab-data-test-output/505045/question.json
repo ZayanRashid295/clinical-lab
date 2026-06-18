@@ -32,7 +32,7 @@
       "body": "The patient shows clinical and objective features consistent with a moderate asthma attack. PEF is 45% of predicted, which falls into the 40–69% range defining moderate severity. Speech is limited to short phrases, and respiratory rate is elevated (28/min), but there are no signs of impending respiratory failure such as cyanosis or altered mental status. This combination places the patient firmly in the moderate exacerbation category requiring urgent bronchodilator therapy and close monitoring.",
       "bodyHtml": "<p>The patient shows clinical and objective features consistent with a <strong>moderate asthma attack</strong>. PEF is 45% of predicted, which falls into the 40–69% range defining moderate severity. Speech is limited to short phrases, and respiratory rate is elevated (28/min), but there are no signs of impending respiratory failure such as cyanosis or altered mental status. This combination places the patient firmly in the <strong>moderate exacerbation category requiring urgent bronchodilator therapy and close monitoring</strong>.</p>",
       "clinicalReasoning": "Moderate exacerbation is characterized by PEF 40–69%, speaking in phrases, and tachypnea. Oxygenation is usually preserved, and no signs of exhaustion or altered sensorium are present. These patients respond to inhaled β2-agonists and systemic corticosteroids. Early treatment prevents progression to severe asthma.",
-      "clinicalReasoningHtml": "<p><br/></p>",
+      "clinicalReasoningHtml": "<p><br/>Moderate exacerbation is characterized by PEF 40–69%, speaking in phrases, and tachypnea. Oxygenation is usually preserved, and no signs of exhaustion or altered sensorium are present. These patients respond to inhaled β2-agonists and systemic corticosteroids. Early treatment prevents progression to severe asthma.</p>",
       "systemInvolved": "Respiratory system (Lower airways – Bronchi)",
       "systemInvolvedHtml": "<p>Respiratory system (Lower airways – Bronchi)</p>"
     },
@@ -41,32 +41,33 @@
       "body": "Mild exacerbation typically presents with minimal dyspnea and the patient can speak in full sentences. PEF is usually >70% predicted. Respiratory rate is near normal or mildly elevated. This patient’s reduced speech and PEF of 45% clearly exceed mild severity.",
       "bodyHtml": "<p>Mild exacerbation typically presents with minimal dyspnea and the patient can speak in full sentences. PEF is usually &gt;70% predicted. Respiratory rate is near normal or mildly elevated. This patient’s reduced speech and PEF of 45% clearly exceed mild severity.</p>",
       "clinicalReasoning": "Mild asthma does not produce speech limitation or significant tachypnea. Airflow obstruction is mild and reversible with inhaled bronchodilators alone. The given case shows clear objective worsening beyond mild classification.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Mild asthma does not produce speech limitation or significant tachypnea. Airflow obstruction is mild and reversible with inhaled bronchodilators alone. The given case shows clear objective worsening beyond mild classification.</p>"
     },
     "C": {
       "title": "Severe acute asthma exacerbation",
       "body": "Severe asthma is associated with PEF <40%, inability to complete sentences, marked tachypnea (>30/min), and possible use of accessory muscles. This patient still speaks in short phrases and has PEF 45%, which is above severe threshold.",
       "bodyHtml": "<p>Severe asthma is associated with PEF &lt;40%, inability to complete sentences, marked tachypnea (&gt;30/min), and possible use of accessory muscles. This patient still speaks in short phrases and has PEF 45%, which is above severe threshold.</p>",
       "clinicalReasoning": "Although respiratory distress is present, absence of cyanosis, exhaustion, or very low PEF excludes severe classification. Severe cases often require intensive care monitoring and frequent bronchodilators with possible IV therapy.",
-      "clinicalReasoningHtml": "<p><br/>excludes severe classification. Severe cases often require intensive care monitoring and frequent bronchodilators with possible IV therapy.</p>"
+      "clinicalReasoningHtml": "<p><br/>Although respiratory distress is present, absence of cyanosis, exhaustion, or very low PEF excludes severe classification. Severe cases often require intensive care monitoring and frequent bronchodilators with possible IV therapy.</p>"
     },
     "D": {
       "title": "Life-threatening asthma exacerbation",
       "body": "Life-threatening asthma includes silent chest, bradycardia, hypotension, cyanosis, or altered consciousness. PEF is often <33%. This patient has none of these features.",
       "bodyHtml": "<p>Life-threatening asthma includes silent chest, bradycardia, hypotension, cyanosis, or altered consciousness. PEF is often &lt;33%. This patient has none of these features.</p>",
       "clinicalReasoning": "The patient is alert, without hypoxia or exhaustion. Airflow is still measurable (PEF 45%), which excludes this category. This stage requires immediate ICU care and possible ventilatory support.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>The patient is alert, without hypoxia or exhaustion. Airflow is still measurable (PEF 45%), which excludes this category. This stage requires immediate ICU care and possible ventilatory support.</p>"
     },
     "E": {
       "title": "Respiratory arrest imminent (near-fatal asthma)",
       "body": "This represents the extreme end of asthma severity with impending respiratory collapse, often with silent chest, exhaustion, rising CO₂, and confusion. None of these are present.",
       "bodyHtml": "<p>This represents the extreme end of asthma severity with impending respiratory collapse, often with silent chest, exhaustion, rising CO₂, and confusion. None of these are present.</p>",
       "clinicalReasoning": "Patients are usually drowsy, exhausted, and unable to speak. This case shows preserved consciousness and measurable airflow, ruling out near-fatal asthma.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Patients are usually drowsy, exhausted, and unable to speak. This case shows preserved consciousness and measurable airflow, ruling out near-fatal asthma.</p>"
     }
   },
   "keyConcept": "Asthma severity in acute exacerbation is classified using PEF, speech ability, respiratory rate, and signs of hypoxia or exhaustion.PEF 40–69% with ability to speak in phrases indicates moderate acute asthma exacerbation.Absence of cyanosis or altered mental status excludes severe and life-threatening categories.",
-  "keyConceptHtml": "<p>Asthma severity in acute exacerbation is classified using <strong>PEF, speech ability, respiratory rate, and signs of hypoxia or exhaustion</strong>.<br/><strong>moderate acute asthma exacerbation</strong>.<br/></p>",
+  "keyConceptHtml": "<p>Asthma severity in acute exacerbation is classified using <strong>PEF, speech ability, respiratory rate, and signs of hypoxia or exhaustion</strong>.<br/>PEF 40–69% with ability to speak in phrases indicates <strong>moderate acute asthma exacerbation</strong>.<br/>Absence of cyanosis or altered mental status excludes severe and life-threatening categories.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"

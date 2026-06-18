@@ -57,6 +57,7 @@
   },
   "keyConcept": "ST-segment elevation on ECG with elevated troponin in a patient with acute chest pain defines STEMI, which requires immediate reperfusion therapy (primary PCI or thrombolysis). Differentiating STEMI from NSTEMI, unstable angina, Prinzmetal angina, and pericarditis relies on integration of ECG findings, biomarkers, and clinical presentation.",
   "keyConceptHtml": "<p>ST-segment elevation on ECG with elevated troponin in a patient with acute chest pain <strong>defines STEMI</strong>, which requires <strong>immediate reperfusion therapy</strong> (primary PCI or thrombolysis). Differentiating STEMI from NSTEMI, unstable angina, Prinzmetal angina, and pericarditis relies on <strong>integration of ECG findings, biomarkers, and clinical presentation</strong>.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

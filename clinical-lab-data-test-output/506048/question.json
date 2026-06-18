@@ -32,10 +32,8 @@
       "title": "Ludwig angina",
       "body": "This is a rapidly progressive, life-threatening cellulitis of the submandibular, sublingual, and submental spaces. It classically arises from lower molar infections and causes elevation of the tongue due to sublingual space involvement. Airway obstruction is the major risk and requires emergency management. The presentation with drooling, muffled voice, and bilateral submandibular swelling is highly characteristic.",
       "bodyHtml": "<p>This is a rapidly progressive, life-threatening cellulitis of the submandibular, sublingual, and submental spaces. It classically arises from lower molar infections and causes elevation of the tongue due to sublingual space involvement. Airway obstruction is the major risk and requires emergency management. The presentation with drooling, muffled voice, and bilateral submandibular swelling is highly characteristic.</p>",
-      "clinicalReasoning": "Odontogenic infection spreads to submandibular spaces\nCauses “woody” induration of floor of mouth\nLeads to posterior tongue displacement → airway compromise\nRequires emergency airway protection + IV antibiotics",
-      "clinicalReasoningHtml": "<ul><li>Odontogenic infection spreads to submandibular spaces </li><li>Causes “woody” induration of floor of mouth </li><li>Leads to posterior tongue displacement → airway compromise </li><li>Requires emergency airway protection + IV antibiotics </li></ul>",
-      "systemInvolved": "Head & Neck / Oral Cavity / Upper Airway",
-      "systemInvolvedHtml": "<p>Head &amp; Neck / Oral Cavity / Upper Airway</p>"
+      "clinicalReasoning": "Odontogenic infection spreads to submandibular spaces\nCauses “woody” induration of floor of mouth\nLeads to posterior tongue displacement → airway compromise\nRequires emergency airway protection + IV antibiotics\nSystem: Head & Neck / Oral Cavity / Upper Airway",
+      "clinicalReasoningHtml": "<ul><li>Odontogenic infection spreads to submandibular spaces </li><li>Causes “woody” induration of floor of mouth </li><li>Leads to posterior tongue displacement → airway compromise </li><li>Requires emergency airway protection + IV antibiotics </li></ul><p><strong>System:</strong> Head &amp; Neck / Oral Cavity / Upper Airway </p>"
     },
     "A": {
       "title": "Acute necrotizing ulcerative gingivitis",
@@ -68,6 +66,7 @@
   },
   "keyConcept": "This question tests recognition of deep neck space infection originating from odontogenic source, specifically Ludwig angina. Key diagnostic clues are submandibular swelling, floor of mouth induration, tongue elevation, and airway symptoms (drooling, muffled voice), which indicate an emergency airway-threatening condition requiring immediate intervention.",
   "keyConceptHtml": "<p>This question tests recognition of <strong>deep neck space infection originating from odontogenic source</strong>, specifically Ludwig angina. Key diagnostic clues are submandibular swelling, floor of mouth induration, tongue elevation, and airway symptoms (drooling, muffled voice), which indicate an emergency airway-threatening condition requiring immediate intervention.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -90,7 +89,7 @@
       "feature": "Etiology",
       "featureHtml": "<p><strong>Etiology</strong></p>",
       "description": "• Odontogenic infection• Usually from lower molar tooth• Polymicrobial bacterial infection",
-      "descriptionHtml": "<p>• Odontogenic infection<br/><br/></p>",
+      "descriptionHtml": "<p>• Odontogenic infection<br/>• Usually from lower molar tooth<br/>• Polymicrobial bacterial infection</p>",
       "clinicalImportance": "Indicates oral source spreading to deep neck spaces",
       "clinicalImportanceHtml": "<p>Indicates oral source spreading to deep neck spaces</p>"
     },
@@ -98,7 +97,7 @@
       "feature": "Onset &\nProgression",
       "featureHtml": "<p><strong>Onset &amp; </strong></p><p><strong>Progression</strong></p>",
       "description": "• Acute onset• Rapidly progressive swelling• Fever present",
-      "descriptionHtml": "<p>• Acute onset<br/><br/></p>",
+      "descriptionHtml": "<p>• Acute onset<br/>• Rapidly progressive swelling<br/>• Fever present</p>",
       "clinicalImportance": "Suggests aggressive deep tissue infection",
       "clinicalImportanceHtml": "<p>Suggests aggressive deep tissue infection</p>"
     },
@@ -106,7 +105,7 @@
       "feature": "Oral Findings",
       "featureHtml": "<p><strong>Oral Findings</strong></p>",
       "description": "• Floor of mouth swelling• Tongue elevation• Firm “woody” induration",
-      "descriptionHtml": "<p>• Floor of mouth swelling<br/><br/></p>",
+      "descriptionHtml": "<p>• Floor of mouth swelling<br/>• Tongue elevation<br/>• Firm “woody” induration</p>",
       "clinicalImportance": "Classic sublingual + submandibular space involvement",
       "clinicalImportanceHtml": "<p>Classic sublingual + submandibular space involvement</p>"
     },
@@ -114,7 +113,7 @@
       "feature": "Airway\nSymptoms",
       "featureHtml": "<p><strong>Airway </strong></p><p><strong>Symptoms</strong></p>",
       "description": "• Drooling• Muffled (“hot potato”) voice• Dyspnea",
-      "descriptionHtml": "<p>• Drooling<br/><br/></p>",
+      "descriptionHtml": "<p>• Drooling<br/>• Muffled (“hot potato”) voice<br/>• Dyspnea</p>",
       "clinicalImportance": "Red flag signs of impending airway obstruction",
       "clinicalImportanceHtml": "<p><strong>Red flag signs of impending airway obstruction</strong></p>"
     },
@@ -122,7 +121,7 @@
       "feature": "Neck Findings",
       "featureHtml": "<p><strong>Neck Findings</strong></p>",
       "description": "• Bilateral submandibular swelling• Tenderness• Firm induration (not fluctuant)",
-      "descriptionHtml": "<p>• Bilateral submandibular swelling<br/><br/></p>",
+      "descriptionHtml": "<p>• Bilateral submandibular swelling<br/>• Tenderness<br/>• Firm induration (not fluctuant)</p>",
       "clinicalImportance": "Distinguishes from localized abscess",
       "clinicalImportanceHtml": "<p>Distinguishes from localized abscess</p>"
     },
@@ -130,7 +129,7 @@
       "feature": "Systemic\nFeatures",
       "featureHtml": "<p><strong>Systemic </strong></p><p><strong>Features</strong></p>",
       "description": "• Fever• Toxic appearance",
-      "descriptionHtml": "<p>• Fever<br/></p>",
+      "descriptionHtml": "<p>• Fever<br/>• Toxic appearance</p>",
       "clinicalImportance": "Suggests severe systemic infection",
       "clinicalImportanceHtml": "<p>Suggests severe systemic infection</p>"
     }
@@ -140,7 +139,7 @@
       "condition": "Peritonsillar\nabscess",
       "conditionHtml": "<p><strong>Peritonsillar </strong></p><p><strong>abscess</strong></p>",
       "distinguishingFeatures": "• Severe sore throat• Trismus• Uvula deviation• Unilateral swelling",
-      "distinguishingFeaturesHtml": "<p>• Severe sore throat<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Severe sore throat<br/>• Trismus<br/>• Uvula deviation<br/>• Unilateral swelling</p>",
       "keyDifferences": "Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling",
       "keyDifferencesHtml": "<p>Unilateral tonsillar region involvement; no bilateral floor-of-mouth swelling</p>"
     },
@@ -148,7 +147,7 @@
       "condition": "Retropharyngeal\nabscess",
       "conditionHtml": "<p><strong>Retropharyngeal </strong></p><p><strong>abscess</strong></p>",
       "distinguishingFeatures": "• Neck stiffness• Dysphagia• Stridor• Posterior pharyngeal bulge",
-      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/>• Dysphagia<br/>• Stridor<br/>• Posterior pharyngeal bulge</p>",
       "keyDifferences": "Posterior space involvement, not submandibular",
       "keyDifferencesHtml": "<p>Posterior space involvement, not submandibular</p>"
     },
@@ -156,7 +155,7 @@
       "condition": "Submandibular\nsialadenitis",
       "conditionHtml": "<p><strong>Submandibular </strong></p><p><strong>sialadenitis</strong></p>",
       "distinguishingFeatures": "• Painful salivary gland swelling• Worse with meals• Pus from duct",
-      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Painful salivary gland swelling<br/>• Worse with meals<br/>• Pus from duct</p>",
       "keyDifferences": "Gland-specific infection without tongue elevation",
       "keyDifferencesHtml": "<p>Gland-specific infection without tongue elevation</p>"
     },
@@ -164,7 +163,7 @@
       "condition": "Acute necrotizing\nulcerative gingivitis",
       "conditionHtml": "<p><strong>Acute necrotizing </strong></p><p><strong>ulcerative gingivitis</strong></p>",
       "distinguishingFeatures": "• Bleeding gums• Halitosis• Gingival necrosis",
-      "distinguishingFeaturesHtml": "<p>• Bleeding gums<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Bleeding gums<br/>• Halitosis<br/>• Gingival necrosis</p>",
       "keyDifferences": "Superficial gingival disease, no deep neck spread",
       "keyDifferencesHtml": "<p>Superficial gingival disease, no deep neck spread</p>"
     },
@@ -172,7 +171,7 @@
       "condition": "Oral cavity infections\n(HSV, Candida)",
       "conditionHtml": "<p><strong>Oral cavity infections </strong></p><p><strong>(HSV, Candida)</strong></p>",
       "distinguishingFeatures": "• Ulcers or white plaques• Mucosal involvement",
-      "distinguishingFeaturesHtml": "<p>• Ulcers or white plaques<br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Ulcers or white plaques<br/>• Mucosal involvement</p>",
       "keyDifferences": "Superficial lesions without airway compromise",
       "keyDifferencesHtml": "<p>Superficial lesions without airway compromise</p>"
     }

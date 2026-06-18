@@ -3,11 +3,24 @@ import {
   findPrimaryKeyConceptIndex,
   isClassicTriadHeadingLine,
   isKeyConceptHeading,
+  isSystemInvolvedHeading,
   parseOptionLine,
   splitStemAndOptionTexts,
 } from "./parser-utils";
 
 describe("parser-utils", () => {
+  describe("isSystemInvolvedHeading", () => {
+    it("matches System involved lines in answer explanations", () => {
+      expect(isSystemInvolvedHeading("System involved: Oral cavity")).toBe(true);
+      expect(isSystemInvolvedHeading("System Involved: Respiratory System")).toBe(true);
+      expect(isSystemInvolvedHeading("System involved")).toBe(true);
+    });
+
+    it("rejects question-level System metadata lines", () => {
+      expect(isSystemInvolvedHeading("System: Hematology")).toBe(false);
+    });
+  });
+
   describe("isKeyConceptHeading", () => {
     it("matches standalone Key Concept heading", () => {
       expect(isKeyConceptHeading("Key Concept")).toBe(true);

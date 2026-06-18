@@ -57,6 +57,7 @@
   },
   "keyConcept": "Ludwig’s angina can progress via deep cervical fascial planes into the mediastinum, causing descending necrotizing mediastinitis, a fatal complication characterized by fever, chest pain, sepsis, and subcutaneous emphysema (crepitus). Early recognition and surgical drainage are critical for survival.",
   "keyConceptHtml": "<p>Ludwig’s angina can progress via deep cervical fascial planes into the mediastinum, causing <strong>descending necrotizing mediastinitis</strong>, a fatal complication characterized by <strong>fever, chest pain, sepsis, and subcutaneous emphysema (crepitus)</strong>. Early recognition and surgical drainage are critical for survival.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -79,49 +80,49 @@
       "feature": "Source of\ndisease",
       "featureHtml": "<p><strong>Source of </strong></p><p><strong>disease</strong></p>",
       "description": "• Odontogenic infection• Lower molar infection• Spreads from deep neck spaces",
-      "descriptionHtml": "<p>• Odontogenic infection<br/><br/></p>",
+      "descriptionHtml": "<p>• Odontogenic infection<br/>• Lower molar infection<br/>• Spreads from deep neck spaces</p>",
       "clinicalImportance": "• Cardiac ischemia (MI)• Aspiration of gastric contents• Thromboembolism• Viral/bacterial pericardial inflammation",
-      "clinicalImportanceHtml": "<p>• Cardiac ischemia (MI)<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• Cardiac ischemia (MI)<br/>• Aspiration of gastric contents<br/>• Thromboembolism<br/>• Viral/bacterial pericardial inflammation</p>"
     },
     {
       "feature": "Key clinical\nclues",
       "featureHtml": "<p><strong>Key clinical </strong></p><p><strong>clues</strong></p>",
       "description": "• Ludwig’s angina history• Neck infection progression• Chest pain + toxic sepsis• Subcutaneous crepitus, gas in tissues",
-      "descriptionHtml": "<p>• Ludwig’s angina history<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Ludwig’s angina history<br/>• Neck infection progression<br/>• Chest pain + toxic sepsis<br/>• Subcutaneous crepitus, gas in tissues</p>",
       "clinicalImportance": "• MI: crushing chest pain, radiation, diaphoresis• Aspiration: cough, fever, infiltrates• PE: sudden dyspnea, pleuritic pain• Pericarditis: positional chest pain, rub",
-      "clinicalImportanceHtml": "<p>• MI: crushing chest pain, radiation, diaphoresis<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• MI: crushing chest pain, radiation, diaphoresis<br/>• Aspiration: cough, fever, infiltrates<br/>• PE: sudden dyspnea, pleuritic pain<br/>• Pericarditis: positional chest pain, rub</p>"
     },
     {
       "feature": "Progression\npattern",
       "featureHtml": "<p><strong>Progression </strong></p><p><strong>pattern</strong></p>",
       "description": "• Rapid spread from neck → mediastinum• Worsening despite antibiotics• High mortality if untreated",
-      "descriptionHtml": "<p>• Rapid spread from neck → mediastinum<br/><br/></p>",
+      "descriptionHtml": "<p>• Rapid spread from neck → mediastinum<br/>• Worsening despite antibiotics<br/>• High mortality if untreated</p>",
       "clinicalImportance": "• MI: coronary occlusion• Aspiration: acute lung inflammation• PE: embolic vascular blockage• Pericarditis: inflammatory pericardial involvement",
-      "clinicalImportanceHtml": "<p>• MI: coronary occlusion<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• MI: coronary occlusion<br/>• Aspiration: acute lung inflammation<br/>• PE: embolic vascular blockage<br/>• Pericarditis: inflammatory pericardial involvement</p>"
     },
     {
       "feature": "Physical\nfindings",
       "featureHtml": "<p><strong>Physical </strong></p><p><strong>findings</strong></p>",
       "description": "• Crepitus over neck/chest• Severe sepsis• Toxic appearance• Neck swelling",
-      "descriptionHtml": "<p>• Crepitus over neck/chest<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Crepitus over neck/chest<br/>• Severe sepsis<br/>• Toxic appearance<br/>• Neck swelling</p>",
       "clinicalImportance": "• MI: S4, ECG changes• Aspiration: crackles, wheeze• PE: tachycardia, hypoxia• Pericarditis: pericardial rub",
-      "clinicalImportanceHtml": "<p>• MI: S4, ECG changes<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• MI: S4, ECG changes<br/>• Aspiration: crackles, wheeze<br/>• PE: tachycardia, hypoxia<br/>• Pericarditis: pericardial rub</p>"
     },
     {
       "feature": "Imaging\nfindings",
       "featureHtml": "<p><strong>Imaging </strong></p><p><strong>findings</strong></p>",
       "description": "• CT: mediastinal air + fluid collections• Fascial plane spread",
-      "descriptionHtml": "<p>• CT: mediastinal air + fluid collections<br/></p>",
+      "descriptionHtml": "<p>• CT: mediastinal air + fluid collections<br/>• Fascial plane spread</p>",
       "clinicalImportance": "• MI: ECG/troponin elevation• Aspiration: infiltrates in dependent lobes• PE: wedge infarct, CT angiography clot• Pericarditis: pericardial effusion",
-      "clinicalImportanceHtml": "<p>• MI: ECG/troponin elevation<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• MI: ECG/troponin elevation<br/>• Aspiration: infiltrates in dependent lobes<br/>• PE: wedge infarct, CT angiography clot<br/>• Pericarditis: pericardial effusion</p>"
     },
     {
       "feature": "Mortality\nrisk",
       "featureHtml": "<p><strong>Mortality </strong></p><p><strong>risk</strong></p>",
       "description": "• Very high without surgery• Surgical emergency",
-      "descriptionHtml": "<p>• Very high without surgery<br/></p>",
+      "descriptionHtml": "<p>• Very high without surgery<br/>• Surgical emergency</p>",
       "clinicalImportance": "• MI: high without reperfusion• PE: variable risk• Aspiration: moderate risk• Pericarditis: usually low",
-      "clinicalImportanceHtml": "<p>• MI: high without reperfusion<br/><br/><br/></p>"
+      "clinicalImportanceHtml": "<p>• MI: high without reperfusion<br/>• PE: variable risk<br/>• Aspiration: moderate risk<br/>• Pericarditis: usually low</p>"
     }
   ],
   "differentialDiagnosisTable": [
@@ -129,7 +130,7 @@
       "condition": "Descending\nnecrotizing\nmediastinitis",
       "conditionHtml": "<p><strong>Descending </strong></p><p><strong>necrotizing </strong></p><p><strong>mediastinitis </strong></p>",
       "distinguishingFeatures": "• Odontogenic infection• Neck-to-chest spread• Crepitus, gas formation• Severe sepsis, chest pain",
-      "distinguishingFeaturesHtml": "<p>• Odontogenic infection<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Odontogenic infection<br/>• Neck-to-chest spread<br/>• Crepitus, gas formation<br/>• Severe sepsis, chest pain</p>",
       "keyDifferences": "Direct extension of deep neck infection through fascial planes into mediastinum → explains full clinical picture including crepitus and deterioration",
       "keyDifferencesHtml": "<p>Direct extension of deep neck infection through fascial planes into mediastinum → explains full clinical picture including crepitus and deterioration</p>"
     },
@@ -137,7 +138,7 @@
       "condition": "Acute myocardial\ninfarction",
       "conditionHtml": "<p><strong>Acute myocardial </strong></p><p><strong>infarction</strong></p>",
       "distinguishingFeatures": "• Crushing chest pain• Radiation to arm/jaw• Diaphoresis, ECG changes",
-      "distinguishingFeaturesHtml": "<p>• Crushing chest pain<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Crushing chest pain<br/>• Radiation to arm/jaw<br/>• Diaphoresis, ECG changes</p>",
       "keyDifferences": "Cardiac ischemia unrelated to infection or neck findings; no crepitus or sepsis link",
       "keyDifferencesHtml": "<p>Cardiac ischemia unrelated to infection or neck findings; no crepitus or sepsis link</p>"
     },
@@ -145,7 +146,7 @@
       "condition": "Aspiration\npneumonia",
       "conditionHtml": "<p><strong>Aspiration </strong></p><p><strong>pneumonia</strong></p>",
       "distinguishingFeatures": "• Fever, cough• Basal lung infiltrates• Post-aspiration setting",
-      "distinguishingFeaturesHtml": "<p>• Fever, cough<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Fever, cough<br/>• Basal lung infiltrates<br/>• Post-aspiration setting</p>",
       "keyDifferences": "Pulmonary infection but lacks mediastinal spread or subcutaneous emphysema",
       "keyDifferencesHtml": "<p>Pulmonary infection but lacks mediastinal spread or subcutaneous emphysema</p>"
     },
@@ -153,7 +154,7 @@
       "condition": "Pulmonary\nembolism",
       "conditionHtml": "<p><strong>Pulmonary </strong></p><p><strong>embolism</strong></p>",
       "distinguishingFeatures": "• Sudden dyspnea• Pleuritic chest pain• Tachycardia, hypoxia",
-      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Tachycardia, hypoxia</p>",
       "keyDifferences": "Vascular obstruction; no infection spread or neck involvement",
       "keyDifferencesHtml": "<p>Vascular obstruction; no infection spread or neck involvement</p>"
     },
@@ -161,7 +162,7 @@
       "condition": "Acute\npericarditis",
       "conditionHtml": "<p><strong>Acute </strong></p><p><strong>pericarditis</strong></p>",
       "distinguishingFeatures": "• Positional chest pain• Pericardial rub• Viral/infectious causes",
-      "distinguishingFeaturesHtml": "<p>• Positional chest pain<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Positional chest pain<br/>• Pericardial rub<br/>• Viral/infectious causes</p>",
       "keyDifferences": "Inflammatory pericardial process; does not originate from neck infection",
       "keyDifferencesHtml": "<p>Inflammatory pericardial process; does not originate from neck infection</p>"
     }

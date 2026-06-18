@@ -54,6 +54,7 @@
   },
   "keyConcept": "NSTEMI is diagnosed in patients with elevated cardiac biomarkers (troponin) without ST-segment elevation. High-sensitivity troponin is more sensitive than CK-MB. Unstable angina occurs with normal biomarkers, and STEMI requires ECG changes.",
   "keyConceptHtml": "<p>NSTEMI is diagnosed in patients with <strong>elevated cardiac biomarkers</strong> (troponin) <strong>without ST-segment elevation</strong>. High-sensitivity troponin is more sensitive than CK-MB. <strong>Unstable angina occurs with normal biomarkers</strong>, and STEMI requires ECG changes.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

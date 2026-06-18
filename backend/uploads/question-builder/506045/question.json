@@ -2,6 +2,7 @@
   "questionId": "506045",
   "questionNumber": "07",
   "stem": "A 45-year-old man with poorly controlled diabetes presents with white, curd-like plaques on the tongue and buccal mucosa that can be easily scraped off, leaving an erythematous base. He reports mild oral discomfort but no fever or systemic symptoms. What is the most appropriate first-line treatment?",
+  "stemHtml": "<p>A 45-year-old man with poorly controlled diabetes presents with white, curd-like plaques on the tongue and buccal mucosa that can be easily scraped off, leaving an erythematous base. He reports mild oral discomfort but no fever or systemic symptoms. What is the most appropriate first-line treatment?<strong> </strong><strong>(Question Id: 5060</strong><strong>45</strong><strong>)</strong></p>",
   "options": [
     "Topical nystatin suspension",
     "Topical clotrimazole troches",
@@ -9,41 +10,64 @@
     "High-dose intravenous fluconazole",
     "Intravenous amphotericin B"
   ],
+  "optionsHtml": [
+    "<p>Topical nystatin suspension</p>",
+    "<p>Topical clotrimazole troches</p>",
+    "<p>Oral fluconazole therapy</p>",
+    "<p>High-dose intravenous fluconazole</p>",
+    "<p>Intravenous amphotericin B</p>"
+  ],
   "correctAnswer": "A",
   "keywords": [
     "White curd-like plaques that scrape off leaving erythematous base → classic pseudomembranous candidiasis (oral thrush).",
     "Poorly controlled diabetes mellitus → immunocompromised state predisposing to Candida overgrowth.",
     "No fever/systemic symptoms → indicates localized mild infection suitable for topical therapy."
   ],
+  "keywordsHtml": [
+    "<ol><li><strong>White curd-like plaques that scrape off leaving erythematous base</strong> → classic pseudomembranous candidiasis (oral thrush). </li><li><strong>Poorly controlled diabetes mellitus</strong> → immunocompromised state predisposing to Candida overgrowth. </li><li><strong>No fever/systemic symptoms</strong> → indicates localized mild infection suitable for topical therapy.</li></ol>"
+  ],
   "explanations": {
     "A": {
       "title": "Topical nystatin suspension",
       "body": "Presents a localized antifungal treatment used for mild oral candidiasis. It acts directly on oral mucosa without systemic absorption. It is especially effective in uncomplicated cases like diabetic patients without systemic involvement. This is the first-line treatment for mild pseudomembranous candidiasis.",
+      "bodyHtml": "<p>Presents a localized antifungal treatment used for mild oral candidiasis. It acts directly on oral mucosa without systemic absorption. It is especially effective in uncomplicated cases like diabetic patients without systemic involvement. This is the <strong>first-line treatment for mild pseudomembranous candidiasis</strong>.</p>",
       "clinicalReasoning": "This patient has localized oral thrush without systemic signs. Topical antifungal therapy is sufficient because infection is confined to mucosal surfaces. Nystatin binds to fungal cell membrane ergosterol leading to cell death. It is safe, effective, and preferred initial therapy in uncomplicated cases.",
-      "systemInvolved": "Oral cavity (mucosal immune system / GI tract – upper digestive tract)"
+      "clinicalReasoningHtml": "<p><br/>This patient has localized oral thrush without systemic signs. Topical antifungal therapy is sufficient because infection is confined to mucosal surfaces. Nystatin binds to fungal cell membrane ergosterol leading to cell death. It is safe, effective, and preferred initial therapy in uncomplicated cases.</p>",
+      "systemInvolved": "Oral cavity (mucosal immune system / GI tract – upper digestive tract)",
+      "systemInvolvedHtml": "<p>Oral cavity (mucosal immune system / GI tract – upper digestive tract)</p>"
     },
     "B": {
       "title": "Topical clotrimazole troches",
       "body": "Another topical antifungal option used for oral candidiasis. It dissolves slowly in the mouth and provides local antifungal action. It is effective in mild to moderate oral Candida infections.",
-      "clinicalReasoning": "Clotrimazole is an alternative topical agent but not always first-line depending on guideline preference. It requires patient compliance with slow dissolving troches. It is equally effective but nystatin is more commonly preferred in initial management."
+      "bodyHtml": "<p>Another topical antifungal option used for oral candidiasis. It dissolves slowly in the mouth and provides local antifungal action. It is effective in mild to moderate oral Candida infections.</p>",
+      "clinicalReasoning": "Clotrimazole is an alternative topical agent but not always first-line depending on guideline preference. It requires patient compliance with slow dissolving troches. It is equally effective but nystatin is more commonly preferred in initial management.",
+      "clinicalReasoningHtml": "<p><br/>Clotrimazole is an alternative topical agent but not always first-line depending on guideline preference. It requires patient compliance with slow dissolving troches. It is equally effective but nystatin is more commonly preferred in initial management.</p>"
     },
     "C": {
       "title": "Oral fluconazole therapy",
       "body": "Systemic antifungal agent used for moderate to severe oral candidiasis or failure of topical therapy. It has excellent bioavailability and systemic distribution.",
-      "clinicalReasoning": "This option is unnecessary in mild localized disease without systemic symptoms. Fluconazole is reserved for immunocompromised patients with extensive disease or refractory infection. Using systemic therapy here would be overtreatment."
+      "bodyHtml": "<p>Systemic antifungal agent used for moderate to severe oral candidiasis or failure of topical therapy. It has excellent bioavailability and systemic distribution.</p>",
+      "clinicalReasoning": "This option is unnecessary in mild localized disease without systemic symptoms. Fluconazole is reserved for immunocompromised patients with extensive disease or refractory infection. Using systemic therapy here would be overtreatment.",
+      "clinicalReasoningHtml": "<p><br/>This option is unnecessary in mild localized disease without systemic symptoms. Fluconazole is reserved for immunocompromised patients with extensive disease or refractory infection. Using systemic therapy here would be overtreatment.</p>"
     },
     "D": {
       "title": "High-dose intravenous fluconazole",
       "body": "Aggressive systemic antifungal therapy reserved for severe disseminated Candida infections or immunocompromised patients with poor oral absorption.",
-      "clinicalReasoning": "This is inappropriate for simple oral thrush. IV therapy is reserved for severe systemic candidiasis or critically ill patients. There is no indication for such escalation in this clinical scenario."
+      "bodyHtml": "<p>Aggressive systemic antifungal therapy reserved for severe disseminated Candida infections or immunocompromised patients with poor oral absorption.</p>",
+      "clinicalReasoning": "This is inappropriate for simple oral thrush. IV therapy is reserved for severe systemic candidiasis or critically ill patients. There is no indication for such escalation in this clinical scenario.",
+      "clinicalReasoningHtml": "<p><br/>This is inappropriate for simple oral thrush. IV therapy is reserved for severe systemic candidiasis or critically ill patients. There is no indication for such escalation in this clinical scenario.</p>"
     },
     "E": {
       "title": "Intravenous amphotericin B",
       "body": "Broad-spectrum antifungal with high toxicity profile used for life-threatening systemic fungal infections.",
-      "clinicalReasoning": "This drug is reserved for invasive fungal infections such as candidemia or disseminated candidiasis. It is not indicated in localized oral lesions. Its toxicity makes it inappropriate for mild disease."
+      "bodyHtml": "<p>Broad-spectrum antifungal with high toxicity profile used for life-threatening systemic fungal infections.</p>",
+      "clinicalReasoning": "This drug is reserved for invasive fungal infections such as candidemia or disseminated candidiasis. It is not indicated in localized oral lesions. Its toxicity makes it inappropriate for mild disease.",
+      "clinicalReasoningHtml": "<p><br/>This drug is reserved for invasive fungal infections such as candidemia or disseminated candidiasis. It is not indicated in localized oral lesions. Its toxicity makes it inappropriate for mild disease.</p>"
     }
   },
   "keyConcept": "Pseudomembranous oral candidiasis (thrush) in an immunocompromised patient (e.g., poorly controlled diabetes) presents as scrapable white plaques with an erythematous base. In mild, localized disease without systemic symptoms, first-line management is topical antifungal therapy (nystatin or clotrimazole). Systemic antifungals like fluconazole are reserved for severe, recurrent, or immunocompromised refractory cases. The core principle is severity-based stepwise antifungal therapy selection.",
+  "keyConceptHtml": "<p>Pseudomembranous oral candidiasis (thrush) in an immunocompromised patient (e.g., poorly controlled diabetes) presents as scrapable white plaques with an erythematous base. In mild, localized disease without systemic symptoms, <strong>first-line management is topical antifungal therapy (nystatin or clotrimazole)</strong>. Systemic antifungals like fluconazole are reserved for severe, recurrent, or immunocompromised refractory cases. The core principle is <strong>severity-based stepwise antifungal therapy selection</strong>.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -56,50 +80,128 @@
     "clinicalSkill": "Reasoning, Guideline-based decision making",
     "difficultyLevel": "Easy"
   },
+  "featureTableName": "Oral Candidiasis (Pseudomembranous Candidiasis) First-line Antifungal Therapy in Immunocompromised Patients",
+  "differentialDiagnosisTableName": "Oral Candidiasis (Pseudomembranous Type) – Clinical Features, Diagnosis & Management Differential Diagnosis of White Oral Lesions",
   "featureTable": [
     {
       "feature": "Etiology",
+      "featureHtml": "<p><strong>Etiology</strong></p>",
       "description": "• Candida albicans overgrowth• Opportunistic fungal infection",
-      "clinicalImportance": "• Normal oral flora becomes pathogenic in immunosuppression"
+      "descriptionHtml": "<p>• Candida albicans overgrowth<br/>• Opportunistic fungal infection</p>",
+      "clinicalImportance": "• Normal oral flora becomes pathogenic in immunosuppression",
+      "clinicalImportanceHtml": "<p>• Normal oral flora becomes pathogenic in immunosuppression</p>"
     },
     {
       "feature": "Risk Factors",
+      "featureHtml": "<p><strong>Risk Factors</strong></p>",
       "description": "• Diabetes mellitus (poor control)• Immunosuppression, HIV• Antibiotic use, steroids",
-      "clinicalImportance": "• Predisposes to fungal proliferation due to reduced host immunity"
+      "descriptionHtml": "<p>• Diabetes mellitus (poor control)<br/>• Immunosuppression, HIV<br/>• Antibiotic use, steroids</p>",
+      "clinicalImportance": "• Predisposes to fungal proliferation due to reduced host immunity",
+      "clinicalImportanceHtml": "<p>• Predisposes to fungal proliferation due to reduced host immunity</p>"
     },
     {
       "feature": "Clinical Lesions",
+      "featureHtml": "<p><strong>Clinical Lesions</strong></p>",
       "description": "• White, curd-like plaques• Scrapable lesions• Erythematous base after removal",
-      "clinicalImportance": "• Classic hallmark of pseudomembranous candidiasis"
+      "descriptionHtml": "<p>• White, curd-like plaques<br/>• Scrapable lesions<br/>• Erythematous base after removal</p>",
+      "clinicalImportance": "• Classic hallmark of pseudomembranous candidiasis",
+      "clinicalImportanceHtml": "<p>• Classic hallmark of pseudomembranous candidiasis</p>"
     },
     {
       "feature": "Symptoms",
+      "featureHtml": "<p><strong>Symptoms</strong></p>",
       "description": "• Mild oral discomfort• Burning sensation• Dysgeusia (sometimes)",
-      "clinicalImportance": "• Usually mild unless severe immunosuppression"
+      "descriptionHtml": "<p>• Mild oral discomfort<br/>• Burning sensation<br/>• Dysgeusia (sometimes)</p>",
+      "clinicalImportance": "• Usually mild unless severe immunosuppression",
+      "clinicalImportanceHtml": "<p>• Usually mild unless severe immunosuppression</p>"
     },
     {
       "feature": "Systemic Signs",
+      "featureHtml": "<p><strong>Systemic Signs</strong></p>",
       "description": "• Usually absent• No fever",
-      "clinicalImportance": "• Helps differentiate from invasive infections"
+      "descriptionHtml": "<p>• Usually absent<br/>• No fever</p>",
+      "clinicalImportance": "• Helps differentiate from invasive infections",
+      "clinicalImportanceHtml": "<p>• Helps differentiate from invasive infections</p>"
     },
     {
       "feature": "Diagnosis",
+      "featureHtml": "<p><strong>Diagnosis</strong></p>",
       "description": "• Clinical diagnosis• KOH mount: pseudohyphae",
-      "clinicalImportance": "• Usually no biopsy needed"
+      "descriptionHtml": "<p>• Clinical diagnosis<br/>• KOH mount: pseudohyphae</p>",
+      "clinicalImportance": "• Usually no biopsy needed",
+      "clinicalImportanceHtml": "<p>• Usually no biopsy needed</p>"
     },
     {
-      "feature": "First-line Treatment",
+      "feature": "First-line\nTreatment",
+      "featureHtml": "<p><strong>First-line </strong></p><p><strong>Treatment</strong></p>",
       "description": "• Topical nystatin suspension• Topical clotrimazole",
-      "clinicalImportance": "• Effective for mild localized disease"
+      "descriptionHtml": "<p>• Topical nystatin suspension<br/>• Topical clotrimazole</p>",
+      "clinicalImportance": "• Effective for mild localized disease",
+      "clinicalImportanceHtml": "<p>• Effective for mild localized disease</p>"
     },
     {
-      "feature": "Escalation Therapy",
+      "feature": "Escalation\nTherapy",
+      "featureHtml": "<p><strong>Escalation </strong></p><p><strong>Therapy</strong></p>",
       "description": "• Oral fluconazole• IV antifungals (rare cases)",
-      "clinicalImportance": "• Reserved for severe or refractory disease"
+      "descriptionHtml": "<p>• Oral fluconazole<br/>• IV antifungals (rare cases)</p>",
+      "clinicalImportance": "• Reserved for severe or refractory disease",
+      "clinicalImportanceHtml": "<p>• Reserved for severe or refractory disease</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Oral Candidiasis\n(Thrush)",
+      "conditionHtml": "<p><strong>Oral Candidiasis </strong></p><p><strong>(Thrush)</strong></p>",
+      "distinguishingFeatures": "• Scrapable white plaques• Erythematous base• Diabetes, immunosuppression",
+      "distinguishingFeaturesHtml": "<p>• Scrapable white plaques<br/>• Erythematous base<br/>• Diabetes, immunosuppression</p>",
+      "keyDifferences": "• Lesions removable on scraping• Fungal etiology (Candida)",
+      "keyDifferencesHtml": "<p>• Lesions removable on scraping<br/>• Fungal etiology (Candida)</p>"
+    },
+    {
+      "condition": "Oral Leukoplakia",
+      "conditionHtml": "<p><strong>Oral Leukoplakia</strong></p>",
+      "distinguishingFeatures": "• Non-scrapable white patch• Chronic smokers• Premalignant lesion",
+      "distinguishingFeaturesHtml": "<p>• Non-scrapable white patch<br/>• Chronic smokers<br/>• Premalignant lesion</p>",
+      "keyDifferences": "• Firm, adherent lesion• No erythematous base after scraping",
+      "keyDifferencesHtml": "<p>• Firm, adherent lesion<br/>• No erythematous base after scraping</p>"
+    },
+    {
+      "condition": "Oral Lichen Planus",
+      "conditionHtml": "<p><strong>Oral Lichen Planus</strong></p>",
+      "distinguishingFeatures": "• Lacy white streaks (Wickham striae)• Bilateral buccal mucosa involvement",
+      "distinguishingFeaturesHtml": "<p>• Lacy white streaks (Wickham striae)<br/>• Bilateral buccal mucosa involvement</p>",
+      "keyDifferences": "• Autoimmune, chronic course• Not scrapable",
+      "keyDifferencesHtml": "<p>• Autoimmune, chronic course<br/>• Not scrapable</p>"
+    },
+    {
+      "condition": "Hairy Leukoplakia",
+      "conditionHtml": "<p><strong>Hairy Leukoplakia</strong></p>",
+      "distinguishingFeatures": "• Corrugated white patches on tongue• Associated with EBV, HIV",
+      "distinguishingFeaturesHtml": "<p>• Corrugated white patches on tongue<br/>• Associated with EBV, HIV</p>",
+      "keyDifferences": "• Lateral tongue involvement• Not scrapable",
+      "keyDifferencesHtml": "<p>• Lateral tongue involvement<br/>• Not scrapable</p>"
+    },
+    {
+      "condition": "Diphtheria\n(oral pseudomembrane)",
+      "conditionHtml": "<p><strong>Diphtheria </strong></p><p><strong>(oral pseudomembrane)</strong></p>",
+      "distinguishingFeatures": "• Gray-white membrane• Bleeds on removal• Fever, sore throat",
+      "distinguishingFeaturesHtml": "<p>• Gray-white membrane<br/>• Bleeds on removal<br/>• Fever, sore throat</p>",
+      "keyDifferences": "• Systemic toxicity present• Corynebacterium diphtheriae",
+      "keyDifferencesHtml": "<p>• Systemic toxicity present<br/>• Corynebacterium diphtheriae</p>"
+    },
+    {
+      "condition": "Chemical / Thermal\nBurn",
+      "conditionHtml": "<p><strong>Chemical / Thermal </strong></p><p><strong>Burn</strong></p>",
+      "distinguishingFeatures": "• White slough-like lesion• History of irritant exposure",
+      "distinguishingFeaturesHtml": "<p>• White slough-like lesion<br/>• History of irritant exposure</p>",
+      "keyDifferences": "• Acute onset after exposure",
+      "keyDifferencesHtml": "<p>• Acute onset after exposure</p>"
     }
   ],
   "diagram": {
+    "name": "First-line Antifungal Therapy in Immunocompromised Patients",
     "caption": "This diagram illustrates the classic presentation, pathogenesis, clinical features, diagnosis, and management of pseudomembranous oral candidiasis (oral thrush). It highlights characteristic scrapable white curd-like plaques with an erythematous base, common predisposing factors such as diabetes and immunosuppression, and the stepwise antifungal treatment approach from topical agents to systemic therapy based on disease severity.",
+    "captionHtml": "<p>This diagram illustrates the classic presentation, pathogenesis, clinical features, diagnosis, and management of pseudomembranous oral candidiasis (oral thrush). It highlights characteristic scrapable white curd-like plaques with an erythematous base, common predisposing factors such as diabetes and immunosuppression, and the stepwise antifungal treatment approach from topical agents to systemic therapy based on disease severity.</p>",
     "images": [
       {
         "filename": "image1.png",

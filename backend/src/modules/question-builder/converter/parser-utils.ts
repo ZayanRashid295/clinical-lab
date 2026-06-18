@@ -167,6 +167,13 @@ export function findQuestionContentEnd(
   return paragraphs.length;
 }
 
+/** Per-answer "System involved:" heading (not question-level metadata "System:"). */
+export function isSystemInvolvedHeading(paragraph: string): boolean {
+  const trimmed = paragraph.trim();
+  if (/^system involved\s*:/i.test(trimmed)) return true;
+  return /^system involved\s*$/i.test(trimmed);
+}
+
 export function parseOptionLine(paragraph: string): { letter: string; title: string } | null {
   const parenMatch = paragraph.match(/^\(Option ([A-E0O])\)\s*[.:]?\s*(.+?):?\s*$/);
   if (parenMatch) {

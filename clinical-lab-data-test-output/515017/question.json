@@ -24,7 +24,7 @@
     "Chronic, recurrent course with no mucosal involvement→ Supports psoriasis and helps exclude lichen planus."
   ],
   "keywordsHtml": [
-    "<ol><li><strong>Well-demarcated erythematous plaques with thick silvery scales</strong><br/><em>Classic morphological hallmark of chronic plaque psoriasis.</em></li><li><strong>Extensor surfaces (elbows and knees), symmetrical distribution</strong><br/><em>Typical site and pattern strongly favors psoriasis over other dermatoses.</em></li><li><strong>Chronic, recurrent course with no mucosal involvement</strong><br/><em>Supports psoriasis and helps exclude lichen planus.</em></li></ol>"
+    "<ol><li><strong>Well-demarcated erythematous plaques with thick silvery scales</strong><br/>→ <em>Classic morphological hallmark of chronic plaque psoriasis.</em></li><li><strong>Extensor surfaces (elbows and knees), symmetrical distribution</strong><br/>→ <em>Typical site and pattern strongly favors psoriasis over other dermatoses.</em></li><li><strong>Chronic, recurrent course with no mucosal involvement</strong><br/>→ <em>Supports psoriasis and helps exclude lichen planus.</em></li></ol>"
   ],
   "explanations": {
     "A": {
@@ -55,6 +55,7 @@
   },
   "keyConcept": "Chronic plaque psoriasis presents with long-standing, symmetrical, well-defined erythematous plaques with silvery scales on extensor surfaces, and minimal mucosal involvement. Recognition of distribution, scale type, and chronicity is crucial for diagnosis.",
   "keyConceptHtml": "<p>Chronic plaque psoriasis presents with <strong>long-standing, symmetrical, well-defined erythematous plaques with silvery scales on extensor surfaces</strong>, and <strong>minimal mucosal involvement</strong>. Recognition of <strong>distribution, scale type, and chronicity</strong> is crucial for diagnosis.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

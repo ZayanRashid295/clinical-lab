@@ -57,6 +57,7 @@
   },
   "keyConcept": "Localized scalp psoriasis should initially be treated with topical therapy, preferably corticosteroid shampoo.\nSystemic therapy is reserved for extensive, severe, or refractory cases.\nTreatment choice depends on disease severity, extent, and site rather than patient age or duration alone.",
   "keyConceptHtml": "<ul><li><strong>Localized scalp psoriasis</strong> should initially be treated with <strong>topical therapy</strong>, preferably corticosteroid shampoo.</li><li><strong>Systemic therapy</strong> is reserved for <strong>extensive, severe, or refractory cases</strong>.</li><li>Treatment choice depends on <strong>disease severity, extent, and site</strong> rather than patient age or duration alone.</li></ul>",
+  "keyConceptTitle": "Key Concept of MCQ",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

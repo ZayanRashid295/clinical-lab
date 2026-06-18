@@ -14,6 +14,34 @@ function escapeHtml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function isMeaningfulHtml(html?: string): boolean {
+  if (!html?.trim()) return false;
+  const stripped = html
+    .replace(/<br\s*\/?>/gi, "")
+    .replace(/<\/?p>/gi, "")
+    .replace(/&nbsp;/gi, " ")
+    .trim();
+  return stripped.length > 0;
+}
+
+function labeledRichTextBlock(
+  label: string,
+  text: string | undefined,
+  html: string | undefined,
+  order: number,
+): ContentBlock {
+  const markdown = `${label} ${text ?? ""}`.trim();
+  const bodyHtml = isMeaningfulHtml(html)
+    ? html!.replace(/^<p>|<\/p>$/g, "").replace(/^<br\s*\/?>/i, "").trim()
+    : text
+      ? escapeHtml(text)
+      : "";
+  const blockHtml = bodyHtml
+    ? `<p><strong>${label}</strong> ${bodyHtml}</p>`
+    : "";
+  return richTextBlock(markdown, blockHtml || undefined, order);
+}
+
 function textBlock(markdown: string, order: number, html = ""): ContentBlock {
   return {
     id: generateBlockId(),
@@ -80,18 +108,24 @@ function buildPerAnswerBlocks(exp: {
     blocks.push(richTextBlock(exp.body, exp.bodyHtml, order++));
   }
   if (exp.clinicalReasoning || exp.clinicalReasoningHtml) {
-    const markdown = `Clinical reasoning: ${exp.clinicalReasoning ?? ""}`.trim();
-    const html = exp.clinicalReasoningHtml
-      ? `<p><strong>Clinical reasoning:</strong> ${exp.clinicalReasoningHtml.replace(/^<p>|<\/p>$/g, "")}</p>`
-      : "";
-    blocks.push(richTextBlock(markdown, html || undefined, order++));
+    blocks.push(
+      labeledRichTextBlock(
+        "Clinical reasoning:",
+        exp.clinicalReasoning,
+        exp.clinicalReasoningHtml,
+        order++,
+      ),
+    );
   }
   if (exp.systemInvolved || exp.systemInvolvedHtml) {
-    const markdown = `System involved: ${exp.systemInvolved ?? ""}`.trim();
-    const html = exp.systemInvolvedHtml
-      ? `<p><strong>System involved:</strong> ${exp.systemInvolvedHtml.replace(/^<p>|<\/p>$/g, "")}</p>`
-      : "";
-    blocks.push(richTextBlock(markdown, html || undefined, order++));
+    blocks.push(
+      labeledRichTextBlock(
+        "System involved:",
+        exp.systemInvolved,
+        exp.systemInvolvedHtml,
+        order++,
+      ),
+    );
   }
 
   return blocks.length

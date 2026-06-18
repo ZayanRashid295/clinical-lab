@@ -57,6 +57,7 @@
   },
   "keyConcept": "NSTEMI occurs due to incomplete coronary artery occlusion, producing subendocardial ischemia with elevated troponin but no ST elevation. Coronary angiography typically shows partial obstruction, distinguishing it from STEMI and stable angina.",
   "keyConceptHtml": "<p>NSTEMI occurs due to <strong>incomplete coronary artery occlusion</strong>, producing <strong>subendocardial ischemia</strong> with <strong>elevated troponin but no ST elevation</strong>. Coronary angiography typically shows <strong>partial obstruction</strong>, distinguishing it from STEMI and stable angina.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -70,7 +71,7 @@
     "difficultyLevel": "Moderate"
   },
   "classicTriad": "Chest pain at rest + Elevated troponin + No ST elevation→ This combination directly points to NSTEMI due to subendocardial ischemia.",
-  "classicTriadHtml": "<p><strong>Chest pain at rest + Elevated troponin + No ST elevation</strong><br/><strong>NSTEMI due to subendocardial ischemia</strong>.</p>",
+  "classicTriadHtml": "<p><strong>Chest pain at rest + Elevated troponin + No ST elevation</strong><br/>→ This combination directly points to <strong>NSTEMI due to subendocardial ischemia</strong>.</p>",
   "classicTriadTitle": "Classic Triad (NSTEMI) Present in the Stem",
   "featureTableName": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
   "differentialDiagnosisTableName": "Acute Coronary Syndrome – NSTEMI (Non–ST Elevation MI) Differential Diagnosis of NSTEMI (Non–ST Elevation Myocardial Infarction)",

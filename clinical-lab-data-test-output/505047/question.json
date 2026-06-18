@@ -32,7 +32,7 @@
       "body": "Silent chest refers to markedly reduced or absent breath sounds due to minimal airflow through severely obstructed airways. It is a critical warning sign in acute severe asthma. This finding indicates that airflow is so severely compromised that wheezing may no longer be audible. It reflects impending respiratory muscle fatigue and risk of respiratory arrest. This is a pre-terminal clinical sign requiring immediate escalation such as ICU care and possible intubation.",
       "bodyHtml": "<p>Silent chest refers to markedly reduced or absent breath sounds due to minimal airflow through severely obstructed airways. It is a critical warning sign in acute severe asthma. This finding indicates that airflow is so severely compromised that wheezing may no longer be audible. It reflects impending respiratory muscle fatigue and risk of respiratory arrest. This is a pre-terminal clinical sign requiring immediate escalation such as ICU care and possible intubation.</p>",
       "clinicalReasoning": "This is the most dangerous finding in severe asthma because absence of wheeze does NOT mean improvement—it means air movement has nearly stopped. It reflects near-complete airway obstruction and respiratory muscle exhaustion. This is a classic pre-respiratory arrest sign.",
-      "clinicalReasoningHtml": "<p><br/><strong>most dangerous finding in severe asthma</strong> because absence of wheeze does NOT mean improvement—it means air movement has nearly stopped. It reflects near-complete airway obstruction and respiratory muscle exhaustion. This is a classic pre-respiratory arrest sign.</p>",
+      "clinicalReasoningHtml": "<p><br/>This is the <strong>most dangerous finding in severe asthma</strong> because absence of wheeze does NOT mean improvement—it means air movement has nearly stopped. It reflects near-complete airway obstruction and respiratory muscle exhaustion. This is a classic pre-respiratory arrest sign.</p>",
       "systemInvolved": "Respiratory System",
       "systemInvolvedHtml": "<p>Respiratory System</p>"
     },
@@ -41,32 +41,33 @@
       "body": "This finding represents mild bronchoconstriction where air still moves adequately through the airways. Wheeze is present due to narrowed bronchi but ventilation is preserved. Good air entry indicates that airway obstruction is not severe. This pattern is seen in mild or early asthma exacerbations rather than critical illness.",
       "bodyHtml": "<p>This finding represents mild bronchoconstriction where air still moves adequately through the airways. Wheeze is present due to narrowed bronchi but ventilation is preserved. Good air entry indicates that airway obstruction is not severe. This pattern is seen in mild or early asthma exacerbations rather than critical illness.</p>",
       "clinicalReasoning": "This is a stable or early-stage asthma finding, not associated with respiratory failure. Airflow is still adequate, so there is no immediate risk of exhaustion or collapse.",
-      "clinicalReasoningHtml": "<p><br/><strong>stable or early-stage asthma finding</strong>, not associated with respiratory failure. Airflow is still adequate, so there is no immediate risk of exhaustion or collapse.</p>"
+      "clinicalReasoningHtml": "<p><br/>This is a <strong>stable or early-stage asthma finding</strong>, not associated with respiratory failure. Airflow is still adequate, so there is no immediate risk of exhaustion or collapse.</p>"
     },
     "B": {
       "title": "Persistent coughing with chest tightness",
       "body": "Cough and chest tightness are common symptoms of asthma due to airway irritation and bronchospasm. However, they are nonspecific and do not reliably reflect severity of airflow obstruction. This presentation may occur in mild, moderate, or severe asthma.",
       "bodyHtml": "<p>Cough and chest tightness are common symptoms of asthma due to airway irritation and bronchospasm. However, they are nonspecific and do not reliably reflect severity of airflow obstruction. This presentation may occur in mild, moderate, or severe asthma.</p>",
       "clinicalReasoning": "This is a symptom-based option, not a severity marker. It lacks prognostic value for respiratory failure and is therefore a weak distractor.",
-      "clinicalReasoningHtml": "<p><br/><strong>symptom-based option</strong>, not a severity marker. It lacks prognostic value for respiratory failure and is therefore a weak distractor.</p>"
+      "clinicalReasoningHtml": "<p><br/>This is a <strong>symptom-based option</strong>, not a severity marker. It lacks prognostic value for respiratory failure and is therefore a weak distractor.</p>"
     },
     "D": {
       "title": "Tachypnea with bilateral wheeze",
       "body": "Tachypnea reflects increased respiratory effort due to airflow limitation. Bilateral wheeze indicates widespread but still present airflow through narrowed bronchi. This pattern is commonly seen in moderate to severe asthma exacerbations where air movement is still preserved.",
       "bodyHtml": "<p>Tachypnea reflects increased respiratory effort due to airflow limitation. Bilateral wheeze indicates widespread but still present airflow through narrowed bronchi. This pattern is commonly seen in moderate to severe asthma exacerbations where air movement is still preserved.</p>",
       "clinicalReasoning": "Although this indicates respiratory distress, airflow is still present, so it does not yet represent impending respiratory arrest. It is a compensatory phase before fatigue sets in.",
-      "clinicalReasoningHtml": "<p><br/><strong>airflow is still present</strong>, so it does not yet represent impending respiratory arrest. It is a compensatory phase before fatigue sets in.</p>"
+      "clinicalReasoningHtml": "<p><br/>Although this indicates respiratory distress, <strong>airflow is still present</strong>, so it does not yet represent impending respiratory arrest. It is a compensatory phase before fatigue sets in.</p>"
     },
     "E": {
       "title": "Prolonged expiration with scattered wheeze",
       "body": "Prolonged expiration occurs due to airflow obstruction during exhalation. Scattered wheeze suggests patchy but present airway narrowing. This is typically seen in moderate asthma severity where bronchospasm is present but reversible airflow is still maintained.",
       "bodyHtml": "<p>Prolonged expiration occurs due to airflow obstruction during exhalation. Scattered wheeze suggests patchy but present airway narrowing. This is typically seen in moderate asthma severity where bronchospasm is present but reversible airflow is still maintained.</p>",
       "clinicalReasoning": "This reflects moderate obstruction, not failure. Air is still moving, and there is no sign of ventilatory collapse or exhaustion.",
-      "clinicalReasoningHtml": "<p><br/><strong>moderate obstruction</strong>, not failure. Air is still moving, and there is no sign of ventilatory collapse or exhaustion.</p>"
+      "clinicalReasoningHtml": "<p><br/>This reflects <strong>moderate obstruction</strong>, not failure. Air is still moving, and there is no sign of ventilatory collapse or exhaustion.</p>"
     }
   },
   "keyConcept": "Silent chest in acute severe asthma is a critical warning sign of near-complete airway obstruction and impending respiratory failure. It indicates that wheeze may disappear due to minimal airflow, not improvement. This requires immediate escalation to advanced airway management and intensive care support.",
   "keyConceptHtml": "<p>Silent chest in acute severe asthma is a critical warning sign of <strong>near-complete airway obstruction and impending respiratory failure</strong>. It indicates that wheeze may disappear due to minimal airflow, not improvement. This requires immediate escalation to advanced airway management and intensive care support.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"
@@ -78,7 +79,7 @@
       "feature": "Severe dyspnea",
       "featureHtml": "<p><strong>Severe dyspnea</strong></p>",
       "description": "• Marked shortness of breath• Progressive worsening despite bronchodilator therapy",
-      "descriptionHtml": "<p>• Marked shortness of breath<br/></p>",
+      "descriptionHtml": "<p>• Marked shortness of breath<br/>• Progressive worsening despite bronchodilator therapy</p>",
       "clinicalImportance": "Indicates severe airflow limitation and poor response to treatment",
       "clinicalImportanceHtml": "<p>Indicates severe airflow limitation and poor response to treatment</p>"
     },
@@ -86,7 +87,7 @@
       "feature": "Accessory\nmuscle use",
       "featureHtml": "<p><strong>Accessory </strong></p><p><strong>muscle use</strong></p>",
       "description": "• Sternocleidomastoid contraction• Intercostal retractions",
-      "descriptionHtml": "<p>• Sternocleidomastoid contraction<br/></p>",
+      "descriptionHtml": "<p>• Sternocleidomastoid contraction<br/>• Intercostal retractions</p>",
       "clinicalImportance": "Sign of increased work of breathing and respiratory distress",
       "clinicalImportanceHtml": "<p>Sign of increased work of breathing and respiratory distress</p>"
     },
@@ -94,7 +95,7 @@
       "feature": "Inability to speak\nfull sentences",
       "featureHtml": "<p><strong>Inability to speak </strong></p><p><strong>full sentences</strong></p>",
       "description": "• Speaks in words only• Interrupted speech due to dyspnea",
-      "descriptionHtml": "<p>• Speaks in words only<br/></p>",
+      "descriptionHtml": "<p>• Speaks in words only<br/>• Interrupted speech due to dyspnea</p>",
       "clinicalImportance": "Marker of severe obstruction and reduced tidal volume",
       "clinicalImportanceHtml": "<p>Marker of severe obstruction and reduced tidal volume</p>"
     },
@@ -102,7 +103,7 @@
       "feature": "Silent chest",
       "featureHtml": "<p><strong>Silent chest</strong></p>",
       "description": "• Absent or minimal breath sounds• No audible wheeze despite obstruction",
-      "descriptionHtml": "<p>• Absent or minimal breath sounds<br/></p>",
+      "descriptionHtml": "<p>• Absent or minimal breath sounds<br/>• No audible wheeze despite obstruction</p>",
       "clinicalImportance": "Critical sign of near-complete airway obstruction and impending respiratory failure",
       "clinicalImportanceHtml": "<p><strong>Critical sign of near-complete airway obstruction and impending respiratory failure</strong></p>"
     },
@@ -110,7 +111,7 @@
       "feature": "Tachypnea",
       "featureHtml": "<p><strong>Tachypnea</strong></p>",
       "description": "• Increased respiratory rate• Rapid shallow breathing",
-      "descriptionHtml": "<p>• Increased respiratory rate<br/></p>",
+      "descriptionHtml": "<p>• Increased respiratory rate<br/>• Rapid shallow breathing</p>",
       "clinicalImportance": "Compensatory response to hypoxia and hypercapnia",
       "clinicalImportanceHtml": "<p>Compensatory response to hypoxia and hypercapnia</p>"
     },
@@ -118,7 +119,7 @@
       "feature": "Wheeze\n(early/moderate)",
       "featureHtml": "<p><strong>Wheeze </strong></p><p><strong>(early/moderate)</strong></p>",
       "description": "• Expiratory wheeze• Prolonged expiration",
-      "descriptionHtml": "<p>• Expiratory wheeze<br/></p>",
+      "descriptionHtml": "<p>• Expiratory wheeze<br/>• Prolonged expiration</p>",
       "clinicalImportance": "Indicates partially patent airways with airflow turbulence",
       "clinicalImportanceHtml": "<p>Indicates partially patent airways with airflow turbulence</p>"
     }
@@ -128,7 +129,7 @@
       "condition": "Acute severe\nbronchial asthma",
       "conditionHtml": "<p><strong>Acute severe </strong></p><p><strong>bronchial asthma</strong></p>",
       "distinguishingFeatures": "• Wheeze (may disappear in silent chest)• History of asthma• Reversible airflow obstruction",
-      "distinguishingFeaturesHtml": "<p>• Wheeze (may disappear in silent chest)<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Wheeze (may disappear in silent chest)<br/>• History of asthma<br/>• Reversible airflow obstruction</p>",
       "keyDifferences": "Improves with bronchodilators and steroids",
       "keyDifferencesHtml": "<p>Improves with bronchodilators and steroids</p>"
     },
@@ -136,7 +137,7 @@
       "condition": "COPD\nexacerbation",
       "conditionHtml": "<p><strong>COPD </strong></p><p><strong>exacerbation</strong></p>",
       "distinguishingFeatures": "• Chronic smoking history• Chronic cough and sputum• Reduced baseline lung function",
-      "distinguishingFeaturesHtml": "<p>• Chronic smoking history<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoking history<br/>• Chronic cough and sputum<br/>• Reduced baseline lung function</p>",
       "keyDifferences": "Older age group, less reversibility",
       "keyDifferencesHtml": "<p>Older age group, less reversibility</p>"
     },
@@ -144,7 +145,7 @@
       "condition": "Tension\npneumothorax",
       "conditionHtml": "<p><strong>Tension </strong></p><p><strong>pneumothorax</strong></p>",
       "distinguishingFeatures": "• Sudden unilateral breath sounds loss• Tracheal deviation• Hypotension",
-      "distinguishingFeaturesHtml": "<p>• Sudden unilateral breath sounds loss<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden unilateral breath sounds loss<br/>• Tracheal deviation<br/>• Hypotension</p>",
       "keyDifferences": "Unilateral findings + mediastinal shift",
       "keyDifferencesHtml": "<p>Unilateral findings + mediastinal shift</p>"
     },
@@ -152,7 +153,7 @@
       "condition": "Foreign body\nairway obstruction",
       "conditionHtml": "<p><strong>Foreign body </strong></p><p><strong>airway obstruction</strong></p>",
       "distinguishingFeatures": "• Sudden onset choking• Localized wheeze or silence• History of aspiration",
-      "distinguishingFeaturesHtml": "<p>• Sudden onset choking<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden onset choking<br/>• Localized wheeze or silence<br/>• History of aspiration</p>",
       "keyDifferences": "Acute onset, often unilateral airflow loss",
       "keyDifferencesHtml": "<p>Acute onset, often unilateral airflow loss</p>"
     },
@@ -160,7 +161,7 @@
       "condition": "Anaphylaxis",
       "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
       "distinguishingFeatures": "• Wheeze + urticaria• Hypotension• Rapid onset after allergen exposure",
-      "distinguishingFeaturesHtml": "<p>• Wheeze + urticaria<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Wheeze + urticaria<br/>• Hypotension<br/>• Rapid onset after allergen exposure</p>",
       "keyDifferences": "Systemic allergic signs present",
       "keyDifferencesHtml": "<p>Systemic allergic signs present</p>"
     }

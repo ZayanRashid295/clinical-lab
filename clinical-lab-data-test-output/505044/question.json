@@ -67,6 +67,7 @@
   },
   "keyConcept": "Acute asthma exacerbation is diagnosed in a known asthmatic patient who presents with sudden onset dyspnea, diffuse wheeze, and reduced peak expiratory flow rate, especially in the absence of infective or systemic allergic features. The key discriminator is reversible airway obstruction demonstrated by decreased PEF in a typical clinical context.",
   "keyConceptHtml": "<p>Acute asthma exacerbation is diagnosed in a known asthmatic patient who presents with sudden onset dyspnea, diffuse wheeze, and reduced peak expiratory flow rate, especially in the absence of infective or systemic allergic features. The key discriminator is <strong>reversible airway obstruction demonstrated by decreased PEF in a typical clinical context</strong>.</p>",
+  "keyConceptTitle": "Key Concept (MCQ Core Idea)",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied"
@@ -81,7 +82,7 @@
       "feature": "Definition",
       "featureHtml": "<p><strong>Definition</strong></p>",
       "description": "• Acute worsening of bronchial asthma• Reversible airway obstruction• Triggered by inflammation or bronchospasm",
-      "descriptionHtml": "<p>• Acute worsening of bronchial asthma<br/><br/>• Triggered by inflammation or bronchospasm</p>",
+      "descriptionHtml": "<p>• Acute worsening of bronchial asthma<br/>• Reversible airway obstruction<br/>• Triggered by inflammation or bronchospasm</p>",
       "clinicalImportance": "Sudden deterioration in known or previously undiagnosed asthmatic due to airway narrowing",
       "clinicalImportanceHtml": "<p>Sudden deterioration in known or previously undiagnosed asthmatic due to airway narrowing</p>"
     },
@@ -89,7 +90,7 @@
       "feature": "Key Symptoms",
       "featureHtml": "<p><strong>Key Symptoms</strong></p>",
       "description": "• Sudden dyspnea• Diffuse wheeze• Chest tightness• Cough (may be dry)",
-      "descriptionHtml": "<p>• Sudden dyspnea<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Sudden dyspnea<br/>• Diffuse wheeze<br/>• Chest tightness<br/>• Cough (may be dry)</p>",
       "clinicalImportance": "Classic triad: wheeze + dyspnea + chest tightness indicates airflow obstruction",
       "clinicalImportanceHtml": "<p>Classic triad: wheeze + dyspnea + chest tightness indicates airflow obstruction</p>"
     },
@@ -97,7 +98,7 @@
       "feature": "Objective Findings",
       "featureHtml": "<p><strong>Objective Findings</strong></p>",
       "description": "• ↓ Peak Expiratory Flow (PEF)• ↓ FEV1• Prolonged expiration",
-      "descriptionHtml": "<p>• ↓ Peak Expiratory Flow (PEF)<br/><br/></p>",
+      "descriptionHtml": "<p>• ↓ Peak Expiratory Flow (PEF)<br/>• ↓ FEV1<br/>• Prolonged expiration</p>",
       "clinicalImportance": "PEF reduction reflects severity and helps monitor response to treatment",
       "clinicalImportanceHtml": "<p>PEF reduction reflects severity and helps monitor response to treatment</p>"
     },
@@ -105,7 +106,7 @@
       "feature": "Triggers",
       "featureHtml": "<p><strong>Triggers</strong></p>",
       "description": "• Viral infections• Allergens, dust• Exercise, cold air• NSAIDs (in some patients)",
-      "descriptionHtml": "<p>• Viral infections<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Viral infections<br/>• Allergens, dust<br/>• Exercise, cold air<br/>• NSAIDs (in some patients)</p>",
       "clinicalImportance": "Triggers cause airway hyperreactivity leading to bronchospasm",
       "clinicalImportanceHtml": "<p>Triggers cause airway hyperreactivity leading to bronchospasm</p>"
     },
@@ -113,7 +114,7 @@
       "feature": "Pathophysiology",
       "featureHtml": "<p><strong>Pathophysiology</strong></p>",
       "description": "• Bronchial smooth muscle constriction• Mucosal edema• Mucus plugging",
-      "descriptionHtml": "<p>• Bronchial smooth muscle constriction<br/><br/></p>",
+      "descriptionHtml": "<p>• Bronchial smooth muscle constriction<br/>• Mucosal edema<br/>• Mucus plugging</p>",
       "clinicalImportance": "Leads to reversible airflow obstruction, unlike COPD",
       "clinicalImportanceHtml": "<p>Leads to reversible airflow obstruction, unlike COPD</p>"
     },
@@ -121,7 +122,7 @@
       "feature": "Severity Indicators",
       "featureHtml": "<p><strong>Severity Indicators</strong></p>",
       "description": "• Silent chest• Hypoxia• Exhaustion• Rising CO₂",
-      "descriptionHtml": "<p>• Silent chest<br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Silent chest<br/>• Hypoxia<br/>• Exhaustion<br/>• Rising CO₂</p>",
       "clinicalImportance": "Indicates impending respiratory failure and need for ICU care",
       "clinicalImportanceHtml": "<p>Indicates impending respiratory failure and need for ICU care</p>"
     }
@@ -131,7 +132,7 @@
       "condition": "Acute COPD\nexacerbation",
       "conditionHtml": "<p><strong>Acute COPD </strong></p><p><strong>exacerbation</strong></p>",
       "distinguishingFeatures": "• Chronic smoking history• Progressive dyspnea• Increased sputum• Wheeze",
-      "distinguishingFeaturesHtml": "<p>• Chronic smoking history<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoking history<br/>• Progressive dyspnea<br/>• Increased sputum<br/>• Wheeze</p>",
       "keyDifferences": "Older patient, non-reversible airflow limitation, infective trigger common",
       "keyDifferencesHtml": "<p>Older patient, non-reversible airflow limitation, infective trigger common</p>"
     },
@@ -139,7 +140,7 @@
       "condition": "Acute bronchitis",
       "conditionHtml": "<p><strong>Acute bronchitis</strong></p>",
       "distinguishingFeatures": "• Productive cough• Mild wheeze• Post-viral illness• Low-grade fever",
-      "distinguishingFeaturesHtml": "<p>• Productive cough<br/><br/>• Post-viral illness<br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Productive cough<br/>• Mild wheeze<br/>• Post-viral illness<br/>• Low-grade fever</p>",
       "keyDifferences": "Cough predominant; no significant PEF reduction",
       "keyDifferencesHtml": "<p>Cough predominant; no significant PEF reduction</p>"
     },
@@ -147,7 +148,7 @@
       "condition": "Pneumothorax",
       "conditionHtml": "<p><strong>Pneumothorax</strong></p>",
       "distinguishingFeatures": "• Sudden unilateral chest pain• Absent breath sounds• Decreased chest expansion• Possible tracheal deviation",
-      "distinguishingFeaturesHtml": "<p>• Sudden unilateral chest pain<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden unilateral chest pain<br/>• Absent breath sounds<br/>• Decreased chest expansion<br/>• Possible tracheal deviation</p>",
       "keyDifferences": "Unilateral findings, no diffuse wheeze",
       "keyDifferencesHtml": "<p>Unilateral findings, no diffuse wheeze</p>"
     },
@@ -155,7 +156,7 @@
       "condition": "Pulmonary\nembolism",
       "conditionHtml": "<p><strong>Pulmonary </strong></p><p><strong>embolism</strong></p>",
       "distinguishingFeatures": "• Sudden dyspnea• Pleuritic chest pain• Tachycardia• Hypoxia",
-      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Tachycardia<br/>• Hypoxia</p>",
       "keyDifferences": "Vascular origin, clear lungs, no wheeze usually",
       "keyDifferencesHtml": "<p>Vascular origin, clear lungs, no wheeze usually</p>"
     },
@@ -163,7 +164,7 @@
       "condition": "Vocal cord\ndysfunction",
       "conditionHtml": "<p><strong>Vocal cord </strong></p><p><strong>dysfunction</strong></p>",
       "distinguishingFeatures": "• Inspiratory stridor• Normal oxygen saturation• Episodic dyspnea• Anxiety association",
-      "distinguishingFeaturesHtml": "<p>• Inspiratory stridor<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Inspiratory stridor<br/>• Normal oxygen saturation<br/>• Episodic dyspnea<br/>• Anxiety association</p>",
       "keyDifferences": "Upper airway obstruction mimic, normal PEF or inconsistent results",
       "keyDifferencesHtml": "<p>Upper airway obstruction mimic, normal PEF or inconsistent results</p>"
     }

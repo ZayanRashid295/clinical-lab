@@ -67,6 +67,7 @@
   },
   "keyConcept": "In Ludwig's angina, the most critical and immediate priority is airway protection before antibiotics or imaging. In a patient with stridor and tongue elevation, the safest definitive early airway strategy is awake fiberoptic intubation, as it maintains spontaneous respiration and prevents sudden airway collapse during intervention.",
   "keyConceptHtml": "<p>In Ludwig's angina, the <strong>most critical and immediate priority is airway protection before antibiotics or imaging</strong>. In a patient with stridor and tongue elevation, the safest definitive early airway strategy is <strong>awake fiberoptic intubation</strong>, as it maintains spontaneous respiration and prevents sudden airway collapse during intervention.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -86,7 +87,7 @@
       "feature": "Etiology",
       "featureHtml": "<p><strong>Etiology</strong></p>",
       "description": "• Odontogenic infection• Mandibular molar infection (2nd, 3rd molars)• Polymicrobial (aerobes, anaerobes)",
-      "descriptionHtml": "<p>• Odontogenic infection<br/><br/></p>",
+      "descriptionHtml": "<p>• Odontogenic infection<br/>• Mandibular molar infection (2nd, 3rd molars)<br/>• Polymicrobial (aerobes, anaerobes)</p>",
       "clinicalImportance": "Infection spreads from dental source into deep neck spaces rapidly",
       "clinicalImportanceHtml": "<p>Infection spreads from dental source into deep neck spaces rapidly</p>"
     },
@@ -94,7 +95,7 @@
       "feature": "Anatomical\ninvolvement",
       "featureHtml": "<p><strong>Anatomical </strong></p><p><strong>involvement</strong></p>",
       "description": "• Submandibular space• Sublingual space• Submental space",
-      "descriptionHtml": "<p>• Submandibular space<br/><br/></p>",
+      "descriptionHtml": "<p>• Submandibular space<br/>• Sublingual space<br/>• Submental space</p>",
       "clinicalImportance": "Causes firm “woody” floor of mouth swelling",
       "clinicalImportanceHtml": "<p>Causes firm “woody” floor of mouth swelling</p>"
     },
@@ -102,7 +103,7 @@
       "feature": "Airway compromise\nsigns",
       "featureHtml": "<p><strong>Airway compromise </strong></p><p><strong>signs</strong></p>",
       "description": "• Stridor, drooling, muffled voice• Dysphagia, dyspnea• Tongue elevation",
-      "descriptionHtml": "<p>• Stridor, drooling, muffled voice<br/><br/></p>",
+      "descriptionHtml": "<p>• Stridor, drooling, muffled voice<br/>• Dysphagia, dyspnea<br/>• Tongue elevation</p>",
       "clinicalImportance": "Indicates impending airway obstruction requiring urgent intervention",
       "clinicalImportanceHtml": "<p>Indicates impending airway obstruction requiring urgent intervention</p>"
     },
@@ -110,7 +111,7 @@
       "feature": "Systemic features",
       "featureHtml": "<p><strong>Systemic features</strong></p>",
       "description": "• Fever, toxic appearance• Tachycardia, anxiety• Malaise",
-      "descriptionHtml": "<p>• Fever, toxic appearance<br/><br/></p>",
+      "descriptionHtml": "<p>• Fever, toxic appearance<br/>• Tachycardia, anxiety<br/>• Malaise</p>",
       "clinicalImportance": "Suggests severe spreading infection and possible sepsis",
       "clinicalImportanceHtml": "<p>Suggests severe spreading infection and possible sepsis</p>"
     },
@@ -126,7 +127,7 @@
       "feature": "Immediate\npriority",
       "featureHtml": "<p><strong>Immediate </strong></p><p><strong>priority</strong></p>",
       "description": "• Airway protection first• Awake fiberoptic intubation preferred• Avoid sedation before airway secured",
-      "descriptionHtml": "<p>• Airway protection first<br/><br/></p>",
+      "descriptionHtml": "<p>• Airway protection first<br/>• Awake fiberoptic intubation preferred<br/>• Avoid sedation before airway secured</p>",
       "clinicalImportance": "Prevents sudden complete airway collapse due to loss of muscle tone",
       "clinicalImportanceHtml": "<p>Prevents sudden complete airway collapse due to loss of muscle tone</p>"
     },
@@ -134,7 +135,7 @@
       "feature": "Definitive\nmanagement",
       "featureHtml": "<p><strong>Definitive </strong></p><p><strong>management</strong></p>",
       "description": "• IV broad-spectrum antibiotics• Surgical drainage if abscess forms• ICU monitoring",
-      "descriptionHtml": "<p>• IV broad-spectrum antibiotics<br/><br/></p>",
+      "descriptionHtml": "<p>• IV broad-spectrum antibiotics<br/>• Surgical drainage if abscess forms<br/>• ICU monitoring</p>",
       "clinicalImportance": "Infection control after airway stabilization",
       "clinicalImportanceHtml": "<p>Infection control after airway stabilization</p>"
     },
@@ -142,7 +143,7 @@
       "feature": "Imaging role",
       "featureHtml": "<p><strong>Imaging role</strong></p>",
       "description": "• Contrast-enhanced CT neck• Evaluate extent of infection• Post-airway stabilization only",
-      "descriptionHtml": "<p>• Contrast-enhanced CT neck<br/><br/></p>",
+      "descriptionHtml": "<p>• Contrast-enhanced CT neck<br/>• Evaluate extent of infection<br/>• Post-airway stabilization only</p>",
       "clinicalImportance": "Diagnostic, not initial emergency step",
       "clinicalImportanceHtml": "<p>Diagnostic, not initial emergency step</p>"
     }
@@ -152,7 +153,7 @@
       "condition": "Ludwig's angina",
       "conditionHtml": "<p><strong>Ludwig's angina</strong></p>",
       "distinguishingFeatures": "• Bilateral submandibular swelling• Tongue elevation• Drooling, muffled voice• Rapid progression",
-      "distinguishingFeaturesHtml": "<p>• Bilateral submandibular swelling<br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Bilateral submandibular swelling<br/>• Tongue elevation<br/>• Drooling, muffled voice<br/>• Rapid progression</p>",
       "keyDifferences": "Firm, non-fluctuant floor-of-mouth infection with high airway risk",
       "keyDifferencesHtml": "<p>Firm, non-fluctuant floor-of-mouth infection with high airway risk</p>"
     },
@@ -160,7 +161,7 @@
       "condition": "Peritonsillar abscess",
       "conditionHtml": "<p><strong>Peritonsillar abscess</strong></p>",
       "distinguishingFeatures": "• Unilateral sore throat• Uvular deviation• Trismus, “hot potato voice”",
-      "distinguishingFeaturesHtml": "<p>• Unilateral sore throat<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Unilateral sore throat<br/>• Uvular deviation<br/>• Trismus, “hot potato voice”</p>",
       "keyDifferences": "Unilateral peritonsillar infection, not floor-of-mouth swelling",
       "keyDifferencesHtml": "<p>Unilateral peritonsillar infection, not floor-of-mouth swelling</p>"
     },
@@ -168,7 +169,7 @@
       "condition": "Retropharyngeal\nabscess",
       "conditionHtml": "<p><strong>Retropharyngeal </strong></p><p><strong>abscess</strong></p>",
       "distinguishingFeatures": "• Neck stiffness• Dysphagia, fever• Posterior pharyngeal bulge",
-      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Neck stiffness<br/>• Dysphagia, fever<br/>• Posterior pharyngeal bulge</p>",
       "keyDifferences": "Posterior deep neck infection, common in children",
       "keyDifferencesHtml": "<p>Posterior deep neck infection, common in children</p>"
     },
@@ -176,7 +177,7 @@
       "condition": "Epiglottitis",
       "conditionHtml": "<p><strong>Epiglottitis</strong></p>",
       "distinguishingFeatures": "• Drooling• Stridor, tripod posture• Severe sore throat",
-      "distinguishingFeaturesHtml": "<p>• Drooling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Drooling<br/>• Stridor, tripod posture<br/>• Severe sore throat</p>",
       "keyDifferences": "Supraglottic inflammation, normal oral cavity exam",
       "keyDifferencesHtml": "<p>Supraglottic inflammation, normal oral cavity exam</p>"
     },
@@ -184,7 +185,7 @@
       "condition": "Angioedema",
       "conditionHtml": "<p><strong>Angioedema</strong></p>",
       "distinguishingFeatures": "• Rapid tongue/lip swelling• No fever• Allergic or drug-related history",
-      "distinguishingFeaturesHtml": "<p>• Rapid tongue/lip swelling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Rapid tongue/lip swelling<br/>• No fever<br/>• Allergic or drug-related history</p>",
       "keyDifferences": "Non-infectious, histamine or bradykinin mediated edema",
       "keyDifferencesHtml": "<p>Non-infectious, histamine or bradykinin mediated edema</p>"
     },
@@ -192,7 +193,7 @@
       "condition": "Submandibular\ncellulitis (early stage)",
       "conditionHtml": "<p><strong>Submandibular </strong></p><p><strong>cellulitis (early stage)</strong></p>",
       "distinguishingFeatures": "• Painful swelling• Fever• No airway compromise initially",
-      "distinguishingFeaturesHtml": "<p>• Painful swelling<br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Painful swelling<br/>• Fever<br/>• No airway compromise initially</p>",
       "keyDifferences": "Early infection before abscess or airway obstruction develops",
       "keyDifferencesHtml": "<p>Early infection before abscess or airway obstruction develops</p>"
     }

@@ -66,6 +66,7 @@
   },
   "keyConcept": "Psoriatic arthritis is a seronegative inflammatory arthritis associated with psoriasis.\nInitial assessment of joint involvement is best done with X-ray, as it shows characteristic erosions, joint space narrowing, and bony proliferation.\nBlood tests (RF, ANA, ESR) or skin biopsy are supportive, but not primary for assessing joints.",
   "keyConceptHtml": "<ul><li>Psoriatic arthritis is a <strong>seronegative inflammatory arthritis</strong> associated with psoriasis.</li><li><strong>Initial assessment of joint involvement</strong> is best done with <strong>X-ray</strong>, as it shows characteristic erosions, joint space narrowing, and bony proliferation.</li><li>Blood tests (RF, ANA, ESR) or skin biopsy are <strong>supportive</strong>, but not primary for assessing joints.</li></ul>",
+  "keyConceptTitle": "Key Concept of MCQ",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",

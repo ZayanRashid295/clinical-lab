@@ -32,7 +32,7 @@
       "body": "A chronic infectious ulcer of the oral cavity caused by Mycobacterium tuberculosis. It often occurs secondary to pulmonary TB via autoinoculation or hematogenous spread. Lesions are typically painful, irregular, and show undermined edges with a granular base. Systemic symptoms like fever and weight loss are common.",
       "bodyHtml": "<p>A chronic infectious ulcer of the oral cavity caused by Mycobacterium tuberculosis. It often occurs secondary to pulmonary TB via autoinoculation or hematogenous spread. Lesions are typically painful, irregular, and show undermined edges with a granular base. Systemic symptoms like fever and weight loss are common.</p>",
       "clinicalReasoning": "This patient has untreated pulmonary TB with systemic symptoms (fever, weight loss) and a characteristic painful oral ulcer. The ulcer morphology (undermined edges + granular base) strongly supports oral tuberculosis. Cervical lymph node tenderness further supports infectious spread rather than malignancy.",
-      "clinicalReasoningHtml": "<p><br/></p>",
+      "clinicalReasoningHtml": "<p><br/>This patient has untreated pulmonary TB with systemic symptoms (fever, weight loss) and a characteristic painful oral ulcer. The ulcer morphology (undermined edges + granular base) strongly supports oral tuberculosis. Cervical lymph node tenderness further supports infectious spread rather than malignancy.</p>",
       "systemInvolved": "Oral cavity (GIT – Head & Neck region), Infectious disease (Pulmonary tuberculosis with extrapulmonary spread)",
       "systemInvolvedHtml": "<p>Oral cavity (GIT – Head &amp; Neck region), Infectious disease (Pulmonary tuberculosis with extrapulmonary spread)</p>"
     },
@@ -41,32 +41,33 @@
       "body": "A malignant epithelial tumor commonly affecting the tongue, especially in smokers and alcohol users. It usually presents as a non-healing ulcer or mass with indurated borders. Early lesions are often painless and gradually progress.",
       "bodyHtml": "<p>A malignant epithelial tumor commonly affecting the tongue, especially in smokers and alcohol users. It usually presents as a non-healing ulcer or mass with indurated borders. Early lesions are often painless and gradually progress.</p>",
       "clinicalReasoning": "Although tongue location and chronicity are consistent, SCC typically lacks systemic infectious symptoms like fever. The presence of untreated TB and constitutional symptoms favors infection over malignancy. SCC remains an important differential but is less likely here.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Although tongue location and chronicity are consistent, SCC typically lacks systemic infectious symptoms like fever. The presence of untreated TB and constitutional symptoms favors infection over malignancy. SCC remains an important differential but is less likely here.</p>"
     },
     "B": {
       "title": "Tertiary syphilitic gumma",
       "body": "A late manifestation of syphilis characterized by granulomatous lesions affecting skin, bone, and mucosa. Oral gummas are usually painless and slowly progressive with a destructive ulcerative pattern.",
       "bodyHtml": "<p>A late manifestation of syphilis characterized by granulomatous lesions affecting skin, bone, and mucosa. Oral gummas are usually painless and slowly progressive with a destructive ulcerative pattern.</p>",
       "clinicalReasoning": "This option is less likely due to absence of painless chronic course and lack of syphilis history. Additionally, systemic TB features better explain the presentation. Gumma ulcers are typically deeper but not associated with fever and acute systemic decline.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>This option is less likely due to absence of painless chronic course and lack of syphilis history. Additionally, systemic TB features better explain the presentation. Gumma ulcers are typically deeper but not associated with fever and acute systemic decline.</p>"
     },
     "C": {
       "title": "Deep fungal infection (Histoplasmosis)",
       "body": "A systemic fungal infection that can involve the oral cavity, especially in immunocompromised patients. Oral lesions may appear as ulcers or ulceroproliferative masses.",
       "bodyHtml": "<p>A systemic fungal infection that can involve the oral cavity, especially in immunocompromised patients. Oral lesions may appear as ulcers or ulceroproliferative masses.</p>",
       "clinicalReasoning": "Histoplasmosis usually occurs in severe immunosuppression and often presents with multiple lesions. The patient’s presentation is more consistent with TB, and there is no clear immunocompromised state described.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>Histoplasmosis usually occurs in severe immunosuppression and often presents with multiple lesions. The patient’s presentation is more consistent with TB, and there is no clear immunocompromised state described.</p>"
     },
     "E": {
       "title": "Chronic traumatic ulcer",
       "body": "A benign ulcer caused by repeated mechanical irritation (sharp teeth, dentures). It is typically localized, shallow, and resolves once the trauma is removed.",
       "bodyHtml": "<p>A benign ulcer caused by repeated mechanical irritation (sharp teeth, dentures). It is typically localized, shallow, and resolves once the trauma is removed.</p>",
       "clinicalReasoning": "This is unlikely because there is no history of local trauma, and systemic symptoms (fever, weight loss) are not explained. Additionally, ulcer morphology is more aggressive and infectious in nature rather than reactive.",
-      "clinicalReasoningHtml": "<p><br/></p>"
+      "clinicalReasoningHtml": "<p><br/>This is unlikely because there is no history of local trauma, and systemic symptoms (fever, weight loss) are not explained. Additionally, ulcer morphology is more aggressive and infectious in nature rather than reactive.</p>"
     }
   },
   "keyConcept": "Oral tuberculosis presents as a painful chronic non-healing ulcer with undermined edges and granular base, often secondary to pulmonary TB. It is associated with systemic symptoms like fever, weight loss, and lymphadenopathy. It mimics malignancy but is differentiated by infectious systemic features and TB history.",
   "keyConceptHtml": "<p>Oral tuberculosis presents as a <strong>painful chronic non-healing ulcer with undermined edges and granular base</strong>, often secondary to pulmonary TB. It is associated with <strong>systemic symptoms like fever, weight loss, and lymphadenopathy</strong>. It mimics malignancy but is differentiated by infectious systemic features and TB history.</p>",
+  "keyConceptTitle": "Key Concept",
   "metadata": {
     "category": "FCPS-1/ JCAT",
     "product": "Medicine & Allied",
@@ -89,7 +90,7 @@
       "feature": "Definition",
       "featureHtml": "<p><strong>Definition</strong></p>",
       "description": "• Chronic granulomatous infection of oral cavity caused by Mycobacterium tuberculosis • Usually secondary to pulmonary TB",
-      "descriptionHtml": "<p>• Chronic granulomatous infection of oral cavity caused by <em>Mycobacterium tuberculosis</em> <br/></p>",
+      "descriptionHtml": "<p>• Chronic granulomatous infection of oral cavity caused by <em>Mycobacterium tuberculosis</em> <br/>• Usually secondary to pulmonary TB</p>",
       "clinicalImportance": "• Important extrapulmonary manifestation of TB",
       "clinicalImportanceHtml": "<p>• Important extrapulmonary manifestation of TB</p>"
     },
@@ -97,7 +98,7 @@
       "feature": "Etiology / Spread",
       "featureHtml": "<p><strong>Etiology / Spread</strong></p>",
       "description": "• Direct inoculation from infected sputum • Hematogenous spread • Secondary spread from pulmonary TB",
-      "descriptionHtml": "<p>• Direct inoculation from infected sputum <br/><br/></p>",
+      "descriptionHtml": "<p>• Direct inoculation from infected sputum <br/>• Hematogenous spread <br/>• Secondary spread from pulmonary TB</p>",
       "clinicalImportance": "• Usually occurs in patients with active pulmonary disease",
       "clinicalImportanceHtml": "<p>• Usually occurs in patients with active pulmonary disease</p>"
     },
@@ -105,7 +106,7 @@
       "feature": "Common Sites",
       "featureHtml": "<p><strong>Common Sites</strong></p>",
       "description": "• Tongue (most common) • Buccal mucosa • Gingiva • Palate • Lips",
-      "descriptionHtml": "<p>• Tongue (most common) <br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Tongue (most common) <br/>• Buccal mucosa <br/>• Gingiva <br/>• Palate <br/>• Lips</p>",
       "clinicalImportance": "• Tongue lesions are highly characteristic",
       "clinicalImportanceHtml": "<p>• Tongue lesions are highly characteristic</p>"
     },
@@ -113,7 +114,7 @@
       "feature": "Morphology of\nUlcer",
       "featureHtml": "<p><strong>Morphology of </strong></p><p><strong>Ulcer</strong></p>",
       "description": "• Chronic non-healing ulcer • Painful lesion • Irregular margins • Undermined edges • Granular base",
-      "descriptionHtml": "<p>• Chronic non-healing ulcer <br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Chronic non-healing ulcer <br/>• Painful lesion <br/>• Irregular margins <br/>• Undermined edges <br/>• Granular base</p>",
       "clinicalImportance": "• Helps differentiate from traumatic ulcer and SCC",
       "clinicalImportanceHtml": "<p>• Helps differentiate from traumatic ulcer and SCC</p>"
     },
@@ -121,7 +122,7 @@
       "feature": "Symptoms",
       "featureHtml": "<p><strong>Symptoms</strong></p>",
       "description": "• Pain during swallowing • Fever • Weight loss • Malaise • Cough may coexist",
-      "descriptionHtml": "<p>• Pain during swallowing <br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Pain during swallowing <br/>• Fever <br/>• Weight loss <br/>• Malaise <br/>• Cough may coexist</p>",
       "clinicalImportance": "• Constitutional symptoms suggest systemic infection",
       "clinicalImportanceHtml": "<p>• Constitutional symptoms suggest systemic infection</p>"
     },
@@ -129,7 +130,7 @@
       "feature": "Lymph Nodes",
       "featureHtml": "<p><strong>Lymph Nodes</strong></p>",
       "description": "• Cervical lymphadenopathy • Tender nodes may occur",
-      "descriptionHtml": "<p>• Cervical lymphadenopathy <br/></p>",
+      "descriptionHtml": "<p>• Cervical lymphadenopathy <br/>• Tender nodes may occur</p>",
       "clinicalImportance": "• Supports infectious etiology",
       "clinicalImportanceHtml": "<p>• Supports infectious etiology</p>"
     },
@@ -137,7 +138,7 @@
       "feature": "Histopathology",
       "featureHtml": "<p><strong>Histopathology</strong></p>",
       "description": "• Caseating granulomas • Epithelioid histiocytes • Langhans giant cells",
-      "descriptionHtml": "<p>• Caseating granulomas <br/><br/></p>",
+      "descriptionHtml": "<p>• Caseating granulomas <br/>• Epithelioid histiocytes <br/>• Langhans giant cells</p>",
       "clinicalImportance": "• Diagnostic hallmark",
       "clinicalImportanceHtml": "<p>• Diagnostic hallmark</p>"
     },
@@ -145,7 +146,7 @@
       "feature": "Investigations",
       "featureHtml": "<p><strong>Investigations</strong></p>",
       "description": "• Biopsy of ulcer • Ziehl–Neelsen stain • Sputum AFB • Chest X-ray • PCR for TB",
-      "descriptionHtml": "<p>• Biopsy of ulcer <br/><br/><br/><br/></p>",
+      "descriptionHtml": "<p>• Biopsy of ulcer <br/>• Ziehl–Neelsen stain <br/>• Sputum AFB <br/>• Chest X-ray <br/>• PCR for TB</p>",
       "clinicalImportance": "• Confirms diagnosis and systemic involvement",
       "clinicalImportanceHtml": "<p>• Confirms diagnosis and systemic involvement</p>"
     },
@@ -153,7 +154,7 @@
       "feature": "Complications",
       "featureHtml": "<p><strong>Complications</strong></p>",
       "description": "• Persistent painful ulceration • Secondary infection • Delayed diagnosis due to resemblance to SCC",
-      "descriptionHtml": "<p>• Persistent painful ulceration <br/><br/></p>",
+      "descriptionHtml": "<p>• Persistent painful ulceration <br/>• Secondary infection <br/>• Delayed diagnosis due to resemblance to SCC</p>",
       "clinicalImportance": "• Often mistaken for malignancy",
       "clinicalImportanceHtml": "<p>• Often mistaken for malignancy</p>"
     },
@@ -161,7 +162,7 @@
       "feature": "Treatment",
       "featureHtml": "<p><strong>Treatment</strong></p>",
       "description": "• Standard anti-tuberculous therapy (ATT) • Nutritional support • Oral hygiene maintenance",
-      "descriptionHtml": "<p>• Standard anti-tuberculous therapy (ATT) <br/><br/></p>",
+      "descriptionHtml": "<p>• Standard anti-tuberculous therapy (ATT) <br/>• Nutritional support <br/>• Oral hygiene maintenance</p>",
       "clinicalImportance": "• Lesions usually improve with ATT",
       "clinicalImportanceHtml": "<p>• Lesions usually improve with ATT</p>"
     },
@@ -169,7 +170,7 @@
       "feature": "Prognosis",
       "featureHtml": "<p><strong>Prognosis</strong></p>",
       "description": "• Good with early diagnosis and treatment • Delayed treatment may prolong ulceration",
-      "descriptionHtml": "<p>• Good with early diagnosis and treatment <br/></p>",
+      "descriptionHtml": "<p>• Good with early diagnosis and treatment <br/>• Delayed treatment may prolong ulceration</p>",
       "clinicalImportance": "• Early recognition prevents complications",
       "clinicalImportanceHtml": "<p>• Early recognition prevents complications</p>"
     }
@@ -179,55 +180,55 @@
       "condition": "Squamous Cell\nCarcinoma (SCC)",
       "conditionHtml": "<p><strong>Squamous Cell </strong></p><p><strong>Carcinoma (SCC)</strong></p>",
       "distinguishingFeatures": "• Indurated ulcer • Irregular margins • Smoking/alcohol history • May bleed",
-      "distinguishingFeaturesHtml": "<p>• Indurated ulcer <br/><br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Indurated ulcer <br/>• Irregular margins <br/>• Smoking/alcohol history <br/>• May bleed</p>",
       "keyDifferences": "• Usually painless early • No infectious constitutional symptoms initially",
-      "keyDifferencesHtml": "<p>• Usually painless early <br/></p>"
+      "keyDifferencesHtml": "<p>• Usually painless early <br/>• No infectious constitutional symptoms initially</p>"
     },
     {
       "condition": "Chronic Traumatic\nUlcer",
       "conditionHtml": "<p><strong>Chronic Traumatic </strong></p><p><strong>Ulcer</strong></p>",
       "distinguishingFeatures": "• Repeated local trauma • Sharp tooth/denture history • Localized lesion",
-      "distinguishingFeaturesHtml": "<p>• Repeated local trauma <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Repeated local trauma <br/>• Sharp tooth/denture history <br/>• Localized lesion</p>",
       "keyDifferences": "• Resolves after removal of trauma • No fever or weight loss",
-      "keyDifferencesHtml": "<p>• Resolves after removal of trauma <br/></p>"
+      "keyDifferencesHtml": "<p>• Resolves after removal of trauma <br/>• No fever or weight loss</p>"
     },
     {
       "condition": "Tertiary Syphilitic\nGumma",
       "conditionHtml": "<p><strong>Tertiary Syphilitic </strong></p><p><strong>Gumma</strong></p>",
       "distinguishingFeatures": "• Granulomatous ulcer • Painless lesion • Late syphilis manifestation",
-      "distinguishingFeaturesHtml": "<p>• Granulomatous ulcer <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Granulomatous ulcer <br/>• Painless lesion <br/>• Late syphilis manifestation</p>",
       "keyDifferences": "• Syphilis serology positive • Usually painless",
-      "keyDifferencesHtml": "<p>• Syphilis serology positive <br/></p>"
+      "keyDifferencesHtml": "<p>• Syphilis serology positive <br/>• Usually painless</p>"
     },
     {
       "condition": "Deep Fungal Infection\n(Histoplasmosis)",
       "conditionHtml": "<p><strong>Deep Fungal Infection </strong></p><p><strong>(Histoplasmosis)</strong></p>",
       "distinguishingFeatures": "• Chronic oral ulcer • Immunocompromised host • May have pulmonary symptoms",
-      "distinguishingFeaturesHtml": "<p>• Chronic oral ulcer <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic oral ulcer <br/>• Immunocompromised host <br/>• May have pulmonary symptoms</p>",
       "keyDifferences": "• Fungal stain/culture positive • Usually associated with immunosuppression",
-      "keyDifferencesHtml": "<p>• Fungal stain/culture positive <br/></p>"
+      "keyDifferencesHtml": "<p>• Fungal stain/culture positive <br/>• Usually associated with immunosuppression</p>"
     },
     {
       "condition": "Aphthous Ulcer",
       "conditionHtml": "<p><strong>Aphthous Ulcer</strong></p>",
       "distinguishingFeatures": "• Recurrent painful ulcers • Shallow lesions • Heal spontaneously",
-      "distinguishingFeaturesHtml": "<p>• Recurrent painful ulcers <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Recurrent painful ulcers <br/>• Shallow lesions <br/>• Heal spontaneously</p>",
       "keyDifferences": "• Short duration • No systemic TB findings",
-      "keyDifferencesHtml": "<p>• Short duration <br/></p>"
+      "keyDifferencesHtml": "<p>• Short duration <br/>• No systemic TB findings</p>"
     },
     {
       "condition": "Herpetic Ulcer\n(HSV)",
       "conditionHtml": "<p><strong>Herpetic Ulcer </strong></p><p><strong>(HSV)</strong></p>",
       "distinguishingFeatures": "• Vesicles preceding ulcers • Acute painful lesions • Fever possible",
-      "distinguishingFeaturesHtml": "<p>• Vesicles preceding ulcers <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Vesicles preceding ulcers <br/>• Acute painful lesions <br/>• Fever possible</p>",
       "keyDifferences": "• Multiple grouped vesicles/ulcers • Acute course rather than chronic",
-      "keyDifferencesHtml": "<p>• Multiple grouped vesicles/ulcers <br/></p>"
+      "keyDifferencesHtml": "<p>• Multiple grouped vesicles/ulcers <br/>• Acute course rather than chronic</p>"
     },
     {
       "condition": "Crohn Disease Oral\nUlcer",
       "conditionHtml": "<p><strong>Crohn Disease Oral </strong></p><p><strong>Ulcer</strong></p>",
       "distinguishingFeatures": "• Chronic oral ulcers • GI symptoms • Lip swelling/cobblestoning",
-      "distinguishingFeaturesHtml": "<p>• Chronic oral ulcers <br/><br/>cobblestoning</p>",
+      "distinguishingFeaturesHtml": "<p>• Chronic oral ulcers <br/>• GI symptoms <br/>• Lip swelling/cobblestoning</p>",
       "keyDifferences": "• Associated intestinal manifestations",
       "keyDifferencesHtml": "<p>• Associated intestinal manifestations</p>"
     },
@@ -235,7 +236,7 @@
       "condition": "Behçet Disease",
       "conditionHtml": "<p><strong>Behçet Disease</strong></p>",
       "distinguishingFeatures": "• Recurrent oral ulcers • Genital ulcers • Uveitis",
-      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers <br/><br/></p>",
+      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis</p>",
       "keyDifferences": "• Multisystem vasculitic disease pattern",
       "keyDifferencesHtml": "<p>• Multisystem vasculitic disease pattern</p>"
     }
