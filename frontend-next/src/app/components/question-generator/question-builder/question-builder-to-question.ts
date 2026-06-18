@@ -178,10 +178,14 @@ function buildMainExplanationBlocks(
   blocks.push(perAnswerPlaceholder(order++));
 
   if (data.keyConcept) {
+    const keyConceptTitle = data.keyConceptTitle?.trim() || "Key Concept";
+    const keyConceptBodyHtml =
+      data.keyConceptHtml?.trim() ||
+      `<p>${escapeHtml(data.keyConcept)}</p>`;
     blocks.push(
       richTextBlock(
-        `### Key Concept\n\n${data.keyConcept}`,
-        data.keyConceptHtml || `<h3>Key Concept</h3><p>${escapeHtml(data.keyConcept)}</p>`,
+        `### ${keyConceptTitle}\n\n${data.keyConcept}`,
+        `<h3>${escapeHtml(keyConceptTitle)}</h3>${keyConceptBodyHtml}`,
         order++,
       ),
     );

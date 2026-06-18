@@ -1088,7 +1088,12 @@ async function parseDocxFromBuffer(
 
   let keyConcept = "";
   let keyConceptHtml: string | undefined;
+  let keyConceptTitle: string | undefined;
   if (firstKeyConceptIndex < paragraphs.length && metadataStart !== null) {
+    const heading = paragraphs[firstKeyConceptIndex]?.trim();
+    if (heading && isKeyConceptHeading(heading)) {
+      keyConceptTitle = normalizeTriadTitle(heading);
+    }
     const keyConceptData = parseKeyConceptText(entries, firstKeyConceptIndex, metadataStart);
     keyConcept = keyConceptData.text;
     keyConceptHtml = keyConceptData.html;
@@ -1133,6 +1138,7 @@ async function parseDocxFromBuffer(
     explanations,
     keyConcept,
     ...(keyConceptHtml ? { keyConceptHtml } : {}),
+    ...(keyConceptTitle ? { keyConceptTitle } : {}),
     metadata,
   };
 

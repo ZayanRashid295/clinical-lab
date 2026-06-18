@@ -98,6 +98,7 @@ export interface QuestionData {
   explanations: Record<string, Explanation>;
   keyConcept: string;
   keyConceptHtml?: string;
+  keyConceptTitle?: string;
   metadata: QuestionMetadata;
   classicTriad?: string;
   classicTriadHtml?: string;
