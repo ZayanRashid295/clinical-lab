@@ -1,0 +1,181 @@
+{
+  "questionId": "505046",
+  "questionNumber": "09",
+  "stem": "A 22-year-old known asthmatic patient presents to the emergency department with sudden worsening shortness of breath for the past 2 hours. He is tachypneic with a respiratory rate of 32/min and is speaking in short phrases only. There is no fever, chest pain, or productive cough. On examination, he is alert but visibly distressed with use of accessory muscles. Based on clinical severity criteria, what is the most appropriate classification of this asthma exacerbation?",
+  "stemHtml": "<p>A 22-year-old known asthmatic patient presents to the emergency department with sudden worsening shortness of breath for the past 2 hours. He is tachypneic with a respiratory rate of 32/min and is speaking in short phrases only. There is no fever, chest pain, or productive cough. On examination, he is alert but visibly distressed with use of accessory muscles. Based on clinical severity criteria, what is the most appropriate classification of this asthma exacerbation?  <strong>(Question Id: 5050</strong><strong>4</strong><strong>6</strong><strong>)</strong></p>",
+  "options": [
+    "Mild acute asthma exacerbation",
+    "Moderate acute asthma exacerbation",
+    "Severe acute asthma exacerbation",
+    "Life-threatening acute asthma exacerbation",
+    "Near-fatal acute asthma exacerbation"
+  ],
+  "optionsHtml": [
+    "<p>Mild acute asthma exacerbation</p>",
+    "<p>Moderate acute asthma exacerbation</p>",
+    "<p>Severe acute asthma exacerbation</p>",
+    "<p>Life-threatening acute asthma exacerbation</p>",
+    "<p>Near-fatal acute asthma exacerbation</p>"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "RR 32/min (tachypnea) → indicates significant respiratory distress and increased work of breathing.",
+    "Speaking in short phrases only → classic marker of severe airflow limitation in acute asthma.",
+    "Accessory muscle use + distress → indicates marked bronchospasm with severe exacerbation."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>RR 32/min (tachypnea)</strong> → indicates significant respiratory distress and increased work of breathing. </li></ol>",
+    "<ol><li><strong>Speaking in short phrases only</strong> → classic marker of <strong>severe airflow limitation in acute asthma</strong>. </li></ol>",
+    "<ol><li><strong>Accessory muscle use + distress</strong> → indicates <strong>marked bronchospasm with severe exacerbation</strong>. </li></ol>"
+  ],
+  "explanations": {
+    "C": {
+      "title": "Severe acute asthma exacerbation",
+      "body": "Severe acute asthma is characterized by RR >30/min, inability to complete full sentences, marked respiratory distress, and use of accessory muscles. These features reflect significant bronchial narrowing and high airway resistance. Patients are at high risk of progression to respiratory failure if not treated urgently.\nThis patient fulfills all key diagnostic criteria for severe exacerbation, especially tachypnea (32/min) and speech limitation to phrases, which are hallmark indicators. Immediate treatment with high-dose inhaled bronchodilators, systemic corticosteroids, and oxygen is required.",
+      "bodyHtml": "<p>Severe acute asthma is characterized by <strong>RR &gt;30/min, inability to complete full sentences, marked respiratory distress, and use of accessory muscles</strong>. These features reflect significant bronchial narrowing and high airway resistance. Patients are at high risk of progression to respiratory failure if not treated urgently.</p><p>This patient fulfills all key diagnostic criteria for severe exacerbation, especially <strong>tachypnea (32/min) and speech limitation to phrases</strong>, which are hallmark indicators. Immediate treatment with high-dose inhaled bronchodilators, systemic corticosteroids, and oxygen is required.</p>"
+    },
+    "A": {
+      "title": "Mild acute asthma exacerbation",
+      "body": "Mild acute asthma is characterized by minimal breathlessness, normal or near-normal speech, and little or no accessory muscle use. Patients are usually able to complete sentences and are not in significant respiratory distress. Respiratory rate is typically normal or only mildly increased. Oxygen saturation is usually normal. This option reflects the lowest severity level of asthma exacerbation.\nIn this case, the patient has severe tachypnea and speech limitation, which clearly excludes mild disease. There is significant airway obstruction, making this option clinically inconsistent.",
+      "bodyHtml": "<p>Mild acute asthma is characterized by minimal breathlessness, normal or near-normal speech, and little or no accessory muscle use. Patients are usually able to complete sentences and are not in significant respiratory distress. Respiratory rate is typically normal or only mildly increased. Oxygen saturation is usually normal. This option reflects the lowest severity level of asthma exacerbation.</p><p>In this case, the patient has severe tachypnea and speech limitation, which clearly excludes mild disease. There is significant airway obstruction, making this option clinically inconsistent.</p>"
+    },
+    "B": {
+      "title": "Moderate acute asthma exacerbation",
+      "body": "Moderate exacerbations involve increased work of breathing but patients can still speak in full sentences. Tachypnea may be present but is usually less severe than in this case. There may be wheeze and mild accessory muscle use.\nAlthough this stage shows clinical worsening, it does not include inability to complete sentences. Since this patient can only speak in short phrases, the severity exceeds moderate level, making this option incorrect.",
+      "bodyHtml": "<p>Moderate exacerbations involve increased work of breathing but patients can still speak in full sentences. Tachypnea may be present but is usually less severe than in this case. There may be wheeze and mild accessory muscle use.</p><p>Although this stage shows clinical worsening, it does not include inability to complete sentences. Since this patient can only speak in short phrases, the severity exceeds moderate level, making this option incorrect.</p>"
+    },
+    "D": {
+      "title": "Life-threatening acute asthma exacerbation",
+      "body": "Life-threatening asthma includes features such as silent chest, cyanosis, exhaustion, hypotension, bradycardia, or altered mental status. These indicate impending respiratory arrest.\nThis patient is alert, able to speak in phrases, and has audible respiratory distress. There are no signs of hypoxia-induced confusion or silent chest. Therefore, while severe, the condition has not yet progressed to life-threatening stage.",
+      "bodyHtml": "<p>Life-threatening asthma includes features such as <strong>silent chest, cyanosis, exhaustion, hypotension, bradycardia, or altered mental status</strong>. These indicate impending respiratory arrest.</p><p>This patient is alert, able to speak in phrases, and has audible respiratory distress. There are no signs of hypoxia-induced confusion or silent chest. Therefore, while severe, the condition has not yet progressed to life-threatening stage.</p>"
+    },
+    "E": {
+      "title": "Near-fatal acute asthma exacerbation",
+      "body": "Near-fatal asthma refers to cases requiring mechanical ventilation or with history of raised PaCO₂, respiratory arrest, or ICU-level failure. It represents the extreme end of the spectrum.\nThis patient has no evidence of CO₂ retention, coma, or ventilatory failure. He is still conscious and maintaining spontaneous ventilation, making this classification incorrect.",
+      "bodyHtml": "<p>Near-fatal asthma refers to cases requiring mechanical ventilation or with history of <strong>raised PaCO₂, respiratory arrest, or ICU-level failure</strong>. It represents the extreme end of the spectrum.</p><p>This patient has no evidence of CO₂ retention, coma, or ventilatory failure. He is still conscious and maintaining spontaneous ventilation, making this classification incorrect.</p>"
+    }
+  },
+  "keyConcept": "Acute asthma severity is primarily classified based on speech ability, respiratory rate, and work of breathing. Inability to complete sentences with RR >30/min indicates severe acute asthma, while silent chest or altered consciousness indicates life-threatening disease.",
+  "keyConceptHtml": "<p>Acute asthma severity is primarily classified based on <strong>speech ability, respiratory rate, and work of breathing</strong>. Inability to complete sentences with RR &gt;30/min indicates <strong>severe acute asthma</strong>, while silent chest or altered consciousness indicates life-threatening disease.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied"
+  },
+  "classicTriad": "Tachypnea + speech limitation + accessory muscle use",
+  "classicTriadHtml": "<p><strong>T</strong><strong>achypnea + speech limitation + accessory muscle use</strong></p>",
+  "featureTableName": "Acute Severe Asthma Exacerbation – Clinical Severity Classification (GINA-Based Emergency Assessment)",
+  "differentialDiagnosisTableName": "System/ Title: Pulmonology Acute Severe Asthma Exacerbation – Clinical Severity Features Key Clinical Interpretation Differential Diagnosis of Acute Severe Shortness of Breath",
+  "featureTable": [
+    {
+      "feature": "Respiratory Rate",
+      "featureHtml": "<p><strong>Respiratory Rate</strong></p>",
+      "description": "• RR 32/min",
+      "descriptionHtml": "<p>• RR 32/min</p>",
+      "clinicalImportance": "Indicates severe tachypnea due to airway narrowing and increased work of breathing",
+      "clinicalImportanceHtml": "<p>Indicates severe tachypnea due to airway narrowing and increased work of breathing</p>"
+    },
+    {
+      "feature": "Speech Ability",
+      "featureHtml": "<p><strong>Speech Ability</strong></p>",
+      "description": "• Speaks in short phrases only",
+      "descriptionHtml": "<p>• Speaks in short phrases only</p>",
+      "clinicalImportance": "Classic marker of severe airflow limitation and reduced tidal volume",
+      "clinicalImportanceHtml": "<p>Classic marker of severe airflow limitation and reduced tidal volume</p>"
+    },
+    {
+      "feature": "Work of Breathing",
+      "featureHtml": "<p><strong>Work of Breathing</strong></p>",
+      "description": "• Accessory muscle use• Visible distress",
+      "descriptionHtml": "<p>• Accessory muscle use<br/></p>",
+      "clinicalImportance": "Indicates significant bronchospasm and increased respiratory effort",
+      "clinicalImportanceHtml": "<p>Indicates significant bronchospasm and increased respiratory effort</p>"
+    },
+    {
+      "feature": "Oxygenation Status",
+      "featureHtml": "<p><strong>Oxygenation Status</strong></p>",
+      "description": "• Not mentioned (likely normal or borderline in early severe stage)",
+      "descriptionHtml": "<p>• Not mentioned (likely normal or borderline in early severe stage)</p>",
+      "clinicalImportance": "Oxygen status may still be preserved in severe but deteriorating asthma",
+      "clinicalImportanceHtml": "<p>Oxygen status may still be preserved in severe but deteriorating asthma</p>"
+    },
+    {
+      "feature": "Mental Status",
+      "featureHtml": "<p><strong>Mental Status</strong></p>",
+      "description": "• Alert",
+      "descriptionHtml": "<p>• Alert</p>",
+      "clinicalImportance": "Excludes life-threatening stage (no hypoxia-induced confusion)",
+      "clinicalImportanceHtml": "<p>Excludes life-threatening stage (no hypoxia-induced confusion)</p>"
+    },
+    {
+      "feature": "System Involved",
+      "featureHtml": "<p><strong>System Involved</strong></p>",
+      "description": "• Respiratory system",
+      "descriptionHtml": "<p>• Respiratory system</p>",
+      "clinicalImportance": "Bronchial hyperresponsiveness causing reversible airway obstruction",
+      "clinicalImportanceHtml": "<p>Bronchial hyperresponsiveness causing reversible airway obstruction</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Acute Severe Asthma",
+      "conditionHtml": "<p><strong>Acute Severe Asthma</strong></p>",
+      "distinguishingFeatures": "• Wheeze• Prolonged expiration• Speech limitation• Tachypnea",
+      "distinguishingFeaturesHtml": "<p>• Wheeze<br/><br/><br/></p>",
+      "keyDifferences": "Reversible airway obstruction with wheeze present",
+      "keyDifferencesHtml": "<p>Reversible airway obstruction with wheeze present</p>"
+    },
+    {
+      "condition": "COPD Exacerbation",
+      "conditionHtml": "<p><strong>COPD Exacerbation</strong></p>",
+      "distinguishingFeatures": "• Chronic smoker• Productive cough• Barrel chest",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoker<br/><br/></p>",
+      "keyDifferences": "Fixed airflow limitation, older age group, chronic symptoms",
+      "keyDifferencesHtml": "<p>Fixed airflow limitation, older age group, chronic symptoms</p>"
+    },
+    {
+      "condition": "Anaphylaxis",
+      "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
+      "distinguishingFeatures": "• Urticaria• Hypotension• Facial swelling",
+      "distinguishingFeaturesHtml": "<p>• Urticaria<br/><br/></p>",
+      "keyDifferences": "Systemic allergic features + airway edema rather than bronchospasm alone",
+      "keyDifferencesHtml": "<p>Systemic allergic features + airway edema rather than bronchospasm alone</p>"
+    },
+    {
+      "condition": "Pneumothorax",
+      "conditionHtml": "<p><strong>Pneumothorax</strong></p>",
+      "distinguishingFeatures": "• Sudden unilateral chest pain• Absent breath sounds on one side",
+      "distinguishingFeaturesHtml": "<p>• Sudden unilateral chest pain<br/></p>",
+      "keyDifferences": "No wheeze; unilateral lung collapse signs",
+      "keyDifferencesHtml": "<p>No wheeze; unilateral lung collapse signs</p>"
+    },
+    {
+      "condition": "Pulmonary Embolism",
+      "conditionHtml": "<p><strong>Pulmonary Embolism</strong></p>",
+      "distinguishingFeatures": "• Sudden dyspnea• Pleuritic chest pain• Risk factors (DVT)",
+      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea<br/><br/></p>",
+      "keyDifferences": "Clear lungs, no wheeze; vascular origin not airway obstruction",
+      "keyDifferencesHtml": "<p>Clear lungs, no wheeze; vascular origin not airway obstruction</p>"
+    },
+    {
+      "condition": "Heart Failure\n(Pulmonary Edema)",
+      "conditionHtml": "<p><strong>Heart Failure </strong></p><p><strong>(Pulmonary Edema)</strong></p>",
+      "distinguishingFeatures": "• Crackles• Orthopnea• Pink frothy sputum",
+      "distinguishingFeaturesHtml": "<p>• Crackles<br/><br/></p>",
+      "keyDifferences": "Fluid overload signs instead of bronchospasm",
+      "keyDifferencesHtml": "<p>Fluid overload signs instead of bronchospasm</p>"
+    }
+  ],
+  "diagram": {
+    "name": "Acute Severe Asthma Exacerbation – Clinical Severity Classification (GINA-Based Emergency Assessment)",
+    "caption": "This diagram illustrates the clinical severity spectrum of acute asthma exacerbations based on GINA emergency assessment criteria, ranging from mild to near-fatal disease. It highlights key bedside indicators including speech ability, respiratory rate, accessory muscle use, oxygen saturation, mental status, auscultatory findings, and risk of respiratory arrest. The diagram emphasizes rapid recognition of severe and life-threatening asthma, where inability to speak full sentences, marked tachypnea, hypoxemia, exhaustion, or a silent chest require immediate escalation of treatment. It serves as a concise visual guide for medical students and clinicians to classify exacerbation severity and guide urgent management decisions in the emergency setting.",
+    "captionHtml": "<p>This diagram illustrates the clinical severity spectrum of acute asthma exacerbations based on GINA emergency assessment criteria, ranging from mild to near-fatal disease. It highlights key bedside indicators including speech ability, respiratory rate, accessory muscle use, oxygen saturation, mental status, auscultatory findings, and risk of respiratory arrest. The diagram emphasizes rapid recognition of severe and life-threatening asthma, where inability to speak full sentences, marked tachypnea, hypoxemia, exhaustion, or a silent chest require immediate escalation of treatment. It serves as a concise visual guide for medical students and clinicians to classify exacerbation severity and guide urgent management decisions in the emergency setting.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

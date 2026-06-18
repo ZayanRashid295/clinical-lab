@@ -1,0 +1,173 @@
+{
+  "questionId": "505042",
+  "questionNumber": "05",
+  "stem": "A 24-year-old known asthmatic presents with episodic wheezing and chest tightness triggered by exposure to dust. Spirometry shows reduced FEV₁ with significant reversibility after bronchodilator therapy. The acute airflow limitation is due to reversible narrowing of the conducting airways. Which of the following mechanisms best explains this reversible airway obstruction?",
+  "stemHtml": "<p>A 24-year-old known asthmatic presents with episodic wheezing and chest tightness triggered by exposure to dust. Spirometry shows reduced FEV₁ with significant reversibility after bronchodilator therapy. The acute airflow limitation is due to reversible narrowing of the conducting airways. Which of the following mechanisms best explains this reversible airway obstruction? <strong>(Question Id: 5050</strong><strong>4</strong><strong>2</strong><strong>)</strong></p>",
+  "options": [
+    "Bronchial smooth muscle contraction",
+    "Airway mucosal edema due to inflammation",
+    "Mucus hypersecretion with airway plugging",
+    "Leukotriene-mediated bronchoconstriction",
+    "Mast cell–mediated early-phase hypersensitivity reaction"
+  ],
+  "optionsHtml": [
+    "<p>Bronchial smooth muscle contraction</p>",
+    "<p>Airway mucosal edema due to inflammation</p>",
+    "<p>Mucus hypersecretion with airway plugging</p>",
+    "<p>Leukotriene-mediated bronchoconstriction</p>",
+    "<p>Mast cell–mediated early-phase hypersensitivity reaction</p>"
+  ],
+  "correctAnswer": "A",
+  "keywords": [
+    "Asthmatic patient + dust trigger → classic allergen-induced bronchospasm",
+    "Reduced FEV₁ with reversibility → confirms reversible airway obstruction (asthma physiology)",
+    "Conducting airway narrowing → points to bronchial smooth muscle + inflammatory mediator pathway"
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Asthmatic patient + dust trigger</strong> → classic allergen-induced bronchospasm </li></ol>",
+    "<ol><li><strong>Reduced FEV₁ with reversibility</strong> → confirms <strong>reversible airway obstruction (asthma physiology)</strong> </li></ol>",
+    "<ol><li><strong>Conducting airway narrowing</strong> → points to <strong>bronchial smooth muscle + inflammatory mediator pathway</strong></li></ol>"
+  ],
+  "explanations": {
+    "A": {
+      "title": "Bronchial smooth muscle contraction",
+      "body": "This is the most direct and immediate mechanism of reversible airway obstruction in asthma. It occurs due to activation of airway smooth muscle by mediators like histamine and leukotrienes. This leads to rapid bronchoconstriction, which is the hallmark of acute asthma attacks. It directly reduces airway caliber, especially in conducting bronchi. This mechanism explains the acute wheeze and reversible airflow limitation seen in spirometry.",
+      "bodyHtml": "<p>This is the <strong>most direct and immediate mechanism of reversible airway obstruction in asthma</strong>. It occurs due to activation of airway smooth muscle by mediators like histamine and leukotrienes. This leads to rapid bronchoconstriction, which is the hallmark of acute asthma attacks. It directly reduces airway caliber, especially in conducting bronchi. This mechanism explains the acute wheeze and reversible airflow limitation seen in spirometry.</p>",
+      "clinicalReasoning": "This is the primary effector mechanism responsible for acute bronchospasm in asthma. It is rapid, reversible, and directly causes airflow limitation, making it the best answer.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "B": {
+      "title": "Airway mucosal edema due to inflammation",
+      "body": "This refers to swelling of the bronchial wall due to inflammatory mediator release (e.g., cytokines, histamine). It contributes to airway narrowing but develops slightly more gradually compared to smooth muscle contraction. It is part of the late-phase asthma response. It increases airway resistance by reducing lumen diameter. However, it is not the most immediate cause of acute wheeze.",
+      "bodyHtml": "<p>This refers to swelling of the bronchial wall due to inflammatory mediator release (e.g., cytokines, histamine). It contributes to airway narrowing but develops slightly more gradually compared to smooth muscle contraction. It is part of the late-phase asthma response. It increases airway resistance by reducing lumen diameter. However, it is not the most immediate cause of acute wheeze.</p>",
+      "clinicalReasoning": "Important contributor to airflow obstruction but secondary to bronchoconstriction in acute episodes.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "C": {
+      "title": "Mucus hypersecretion with airway plugging",
+      "body": "This involves excessive mucus production by goblet cells and submucosal glands in asthma. It can cause partial or complete airway obstruction, especially in severe or prolonged attacks. It is more prominent in chronic or severe asthma. However, it is not the primary mechanism of sudden reversible airflow limitation. It often worsens ventilation-perfusion mismatch.",
+      "bodyHtml": "<p>This involves excessive mucus production by goblet cells and submucosal glands in asthma. It can cause partial or complete airway obstruction, especially in severe or prolonged attacks. It is more prominent in chronic or severe asthma. However, it is not the primary mechanism of sudden reversible airflow limitation. It often worsens ventilation-perfusion mismatch.</p>",
+      "clinicalReasoning": "Contributes significantly in severe asthma but not the primary mechanism of acute reversible obstruction.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "D": {
+      "title": "Leukotriene-mediated bronchoconstriction",
+      "body": "Leukotrienes (especially LTC₄, LTD₄, LTE₄) are inflammatory mediators that cause sustained bronchoconstriction, mucus secretion, and edema. They play a key role in asthma pathophysiology. However, this is a mediator-level explanation rather than the direct final mechanical event causing airway narrowing. It acts upstream of smooth muscle contraction.",
+      "bodyHtml": "<p>Leukotrienes (especially LTC₄, LTD₄, LTE₄) are inflammatory mediators that cause sustained bronchoconstriction, mucus secretion, and edema. They play a key role in asthma pathophysiology. However, this is a <strong>mediator-level explanation rather than the direct final mechanical event</strong> causing airway narrowing. It acts upstream of smooth muscle contraction.</p>",
+      "clinicalReasoning": "Correct mediator pathway but not the direct structural mechanism of airflow obstruction.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "E": {
+      "title": "Mast cell–mediated early-phase hypersensitivity reaction",
+      "body": "This represents the IgE-mediated allergic response occurring within minutes of allergen exposure. Mast cells release histamine, leukotrienes, and prostaglandins. This initiates bronchoconstriction, edema, and mucus secretion. It explains the trigger mechanism but not the final mechanical cause of airflow narrowing. It is the initiating immunologic event in asthma.",
+      "bodyHtml": "<p>This represents the <strong>IgE-mediated allergic response</strong> occurring within minutes of allergen exposure. Mast cells release histamine, leukotrienes, and prostaglandins. This initiates bronchoconstriction, edema, and mucus secretion. It explains the trigger mechanism but not the final mechanical cause of airflow narrowing. It is the initiating immunologic event in asthma.</p>",
+      "clinicalReasoning": "Important upstream immunologic trigger but not the direct mechanism of airway narrowing.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    }
+  },
+  "keyConcept": "Asthma causes reversible airflow obstruction primarily due to bronchial smooth muscle contraction triggered by IgE-mediated mast cell activation and inflammatory mediators. This leads to episodic wheeze, chest tightness, and reversible reduction in FEV₁. Airway inflammation and mucus further contribute but are secondary mechanisms.",
+  "keyConceptHtml": "<p>Asthma causes reversible airflow obstruction primarily due to <strong>bronchial smooth muscle contraction triggered by IgE-mediated mast cell activation and inflammatory mediators</strong>. This leads to episodic wheeze, chest tightness, and reversible reduction in FEV₁. Airway inflammation and mucus further contribute but are secondary mechanisms. </p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied"
+  },
+  "featureTableName": "Bronchial Asthma – Mechanism of Reversible Airflow Obstruction",
+  "differentialDiagnosisTableName": "System/ Title: Pulmonology Bronchial Asthma – Mechanism of Reversible Airflow Obstruction (Asthma Pathophysiology) Differential Diagnosis of Asthma-like Reversible Airflow Obstruction",
+  "featureTable": [
+    {
+      "feature": "Bronchial smooth\nmuscle contraction",
+      "featureHtml": "<p><strong>Bronchial smooth </strong></p><p><strong>muscle contraction</strong></p>",
+      "description": "• Sudden bronchoconstriction• Mediated by histamine, leukotrienes• Triggered by allergens (dust, pollen)• Reversible with bronchodilators",
+      "descriptionHtml": "<p>• Sudden bronchoconstriction<br/><br/><br/></p>",
+      "clinicalImportance": "Primary and most immediate cause of acute airflow obstruction in asthma. Leads to episodic wheeze and rapid FEV₁ reduction with reversibility after bronchodilator therapy.",
+      "clinicalImportanceHtml": "<p>Primary and most immediate cause of acute airflow obstruction in asthma. Leads to episodic wheeze and rapid FEV₁ reduction with reversibility after bronchodilator therapy.</p>"
+    },
+    {
+      "feature": "Airway mucosal\nedema\n(inflammation)",
+      "featureHtml": "<p><strong>Airway mucosal </strong></p><p><strong>edema </strong></p><p><strong>(inflammation)</strong></p>",
+      "description": "• Swollen bronchial wall• Cytokine-mediated inflammation• Increased vascular permeability• Narrowed airway lumen",
+      "descriptionHtml": "<p>• Swollen bronchial wall<br/><br/>permeability<br/></p>",
+      "clinicalImportance": "Contributes to persistent airflow limitation in asthma. More prominent in late-phase reaction and chronic inflammation.",
+      "clinicalImportanceHtml": "<p>Contributes to persistent airflow limitation in asthma. More prominent in late-phase reaction and chronic inflammation.</p>"
+    },
+    {
+      "feature": "Mucus hypersecretion\nwith airway plugging",
+      "featureHtml": "<p><strong>Mucus hypersecretion </strong></p><p><strong>with airway plugging</strong></p>",
+      "description": "• Excess goblet cell secretion• Thick mucus plugs• Airway obstruction• Worsens V/Q mismatch",
+      "descriptionHtml": "<p>• Excess goblet cell secretion<br/><br/><br/></p>",
+      "clinicalImportance": "Seen in moderate to severe asthma attacks. Can cause patchy ventilation and prolonged symptoms.",
+      "clinicalImportanceHtml": "<p>Seen in moderate to severe asthma attacks. Can cause patchy ventilation and prolonged symptoms.</p>"
+    },
+    {
+      "feature": "Leukotriene-mediated\nbronchoconstriction",
+      "featureHtml": "<p><strong>Leukotriene-mediated </strong></p><p><strong>bronchoconstriction</strong></p>",
+      "description": "• LTC₄, LTD₄, LTE₄ release• Potent smooth muscle contraction• Mucus secretion, edema• Sustained airway narrowing",
+      "descriptionHtml": "<p>• LTC₄, LTD₄, LTE₄ release<br/><br/><br/></p>",
+      "clinicalImportance": "Key inflammatory pathway driving bronchospasm and mucus production. Acts upstream of final airway narrowing.",
+      "clinicalImportanceHtml": "<p>Key inflammatory pathway driving bronchospasm and mucus production. Acts upstream of final airway narrowing.</p>"
+    },
+    {
+      "feature": "Mast cell–mediated\nearly-phase\nhypersensitivity\nreaction",
+      "featureHtml": "<p><strong>Mast cell–mediated </strong></p><p><strong>early-phase </strong></p><p><strong>hypersensitivity </strong></p><p><strong>reaction</strong></p>",
+      "description": "• IgE-mediated activation• Histamine release• Immediate bronchospasm• Triggered by allergens (dust)",
+      "descriptionHtml": "<p>• IgE-mediated activation<br/><br/><br/></p>",
+      "clinicalImportance": "Initiating immunologic event in asthma. Leads to downstream bronchoconstriction, edema, and mucus production within minutes.",
+      "clinicalImportanceHtml": "<p>Initiating immunologic event in asthma. Leads to downstream bronchoconstriction, edema, and mucus production within minutes.</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Chronic Obstructive\nPulmonary Disease\n(COPD)",
+      "conditionHtml": "<p><strong>Chronic Obstructive </strong></p><p><strong>Pulmonary Disease </strong></p><p><strong>(COPD)</strong></p>",
+      "distinguishingFeatures": "• Chronic smoker history• Progressive dyspnea• Irreversible airflow limitation• Emphysematous changes",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoker history<br/><br/>limitation<br/></p>",
+      "keyDifferences": "Unlike asthma, COPD shows fixed, non-reversible obstruction and is not allergen-triggered in early life.",
+      "keyDifferencesHtml": "<p>Unlike asthma, COPD shows <strong>fixed, non-reversible obstruction</strong> and is not allergen-triggered in early life.</p>"
+    },
+    {
+      "condition": "Vocal Cord Dysfunction\n(Inducible laryngeal\nobstruction)",
+      "conditionHtml": "<p><strong>Vocal Cord Dysfunction </strong></p><p><strong>(Inducible laryngeal </strong></p><p><strong>obstruction)</strong></p>",
+      "distinguishingFeatures": "• Inspiratory stridor• Normal spirometry between attacks• No bronchodilator response• Triggered by stress/exercise",
+      "distinguishingFeaturesHtml": "<p>• Inspiratory stridor<br/><br/><br/></p>",
+      "keyDifferences": "Mimics asthma but obstruction is at laryngeal level, not bronchi. No true bronchodilator reversibility.",
+      "keyDifferencesHtml": "<p>Mimics asthma but obstruction is at <strong>laryngeal level, not bronchi</strong>. No true bronchodilator reversibility.</p>"
+    },
+    {
+      "condition": "Heart Failure\n(Cardiac asthma)",
+      "conditionHtml": "<p><strong>Heart Failure </strong></p><p><strong>(Cardiac asthma)</strong></p>",
+      "distinguishingFeatures": "• Orthopnea• Basal crackles• Pulmonary edema• S3 gallop",
+      "distinguishingFeaturesHtml": "<p>• Orthopnea<br/><br/><br/></p>",
+      "keyDifferences": "Wheeze due to pulmonary congestion, not bronchospasm. Improves with diuretics, not bronchodilators.",
+      "keyDifferencesHtml": "<p>Wheeze due to pulmonary congestion, not bronchospasm. Improves with diuretics, not bronchodilators.</p>"
+    },
+    {
+      "condition": "Foreign Body\nAspiration",
+      "conditionHtml": "<p><strong>Foreign Body </strong></p><p><strong>Aspiration</strong></p>",
+      "distinguishingFeatures": "• Sudden onset wheeze• Unilateral decreased breath sounds• History of choking• Air trapping on imaging",
+      "distinguishingFeaturesHtml": "<p>• Sudden onset wheeze<br/><br/><br/></p>",
+      "keyDifferences": "Localized obstruction, not diffuse reversible airway narrowing like asthma.",
+      "keyDifferencesHtml": "<p>Localized obstruction, not diffuse reversible airway narrowing like asthma.</p>"
+    },
+    {
+      "condition": "Bronchiectasis",
+      "conditionHtml": "<p><strong>Bronchiectasis</strong></p>",
+      "distinguishingFeatures": "• Chronic productive cough• Recurrent infections• Coarse crackles• Sputum production",
+      "distinguishingFeaturesHtml": "<p>• Chronic productive cough<br/><br/><br/></p>",
+      "keyDifferences": "Persistent structural airway dilation, not reversible obstruction.",
+      "keyDifferencesHtml": "<p>Persistent structural airway dilation, not reversible obstruction.</p>"
+    }
+  ],
+  "diagram": {
+    "name": "Bronchial Asthma – Mechanism of Reversible Airflow Obstruction",
+    "caption": "This diagram illustrates the pathophysiology of bronchial asthma, showing how exposure to triggers such as dust and allergens activates mast cells and inflammatory mediators. These mediators cause bronchial smooth muscle contraction, airway mucosal edema, and mucus hypersecretion, leading to reversible narrowing of the conducting airways. The figure also demonstrates improvement in airway caliber after bronchodilator therapy, highlighting the reversible nature of airflow obstruction in asthma.",
+    "captionHtml": "<p>This diagram illustrates the pathophysiology of bronchial asthma, showing how exposure to triggers such as dust and allergens activates mast cells and inflammatory mediators. These mediators cause bronchial smooth muscle contraction, airway mucosal edema, and mucus hypersecretion, leading to reversible narrowing of the conducting airways. The figure also demonstrates improvement in airway caliber after bronchodilator therapy, highlighting the reversible nature of airflow obstruction in asthma.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

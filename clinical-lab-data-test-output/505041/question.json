@@ -1,0 +1,161 @@
+{
+  "questionId": "505041",
+  "questionNumber": "04",
+  "stem": "A known asthmatic patient develops sudden onset wheeze within minutes of exposure to house dust while cleaning a room. The episode is rapid in onset and consistent with an acute asthma exacerbation. What is the most likely underlying mechanism responsible for this reaction?",
+  "stemHtml": "<p>A known asthmatic patient develops sudden onset wheeze within minutes of exposure to house dust while cleaning a room. The episode is rapid in onset and consistent with an acute asthma exacerbation. What is the most likely underlying mechanism responsible for this reaction?<strong> </strong><strong>(Question Id: 5050</strong><strong>41</strong><strong>)</strong></p>",
+  "options": [
+    "Airway hyperreactivity due to direct irritant stimulation",
+    "Vagal reflex–mediated bronchoconstriction",
+    "Delayed-type (Type IV) hypersensitivity reaction",
+    "IgE-mediated mast cell degranulation causing bronchoconstriction",
+    "Airway smooth muscle hypertrophy causing fixed obstruction"
+  ],
+  "optionsHtml": [
+    "<p>Airway hyperreactivity due to direct irritant stimulation</p>",
+    "<p>Vagal reflex–mediated bronchoconstriction</p>",
+    "<p>Delayed-type (Type IV) hypersensitivity reaction</p>",
+    "<p>IgE-mediated mast cell degranulation causing bronchoconstriction</p>",
+    "<p>Airway smooth muscle hypertrophy causing fixed obstruction</p>"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "Known asthmatic + sudden wheeze after dust exposure → classic trigger-response pattern suggesting allergic asthma exacerbation",
+    "Minutes after exposure (rapid onset) → indicates early-phase hypersensitivity reaction (Type I IgE-mediated)",
+    "House dust trigger → strong environmental allergen linked to atopy"
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Known asthmatic + sudden wheeze after dust exposure</strong> → classic trigger-response pattern suggesting allergic asthma exacerbation </li></ol>",
+    "<ol><li><strong>Minutes after exposure (rapid onset)</strong> → indicates <strong>early-phase hypersensitivity reaction (Type I IgE-mediated)</strong> </li></ol>",
+    "<ol><li><strong>House dust trigger</strong> → strong environmental allergen linked to atopy</li></ol>"
+  ],
+  "explanations": {
+    "D": {
+      "title": "IgE-mediated mast cell degranulation causing bronchoconstriction",
+      "body": "This option describes the classic immunological mechanism of allergic asthma. Upon exposure to house dust allergens, sensitized individuals have IgE bound to mast cells in airway mucosa. Cross-linking of IgE triggers mast cell degranulation, releasing histamine, leukotrienes, and prostaglandins, leading to acute bronchoconstriction, mucus secretion, and airway edema. This represents the early-phase asthmatic response occurring within minutes, which perfectly matches the clinical stem.",
+      "bodyHtml": "<p>This option describes the classic immunological mechanism of allergic asthma. Upon exposure to house dust allergens, sensitized individuals have IgE bound to mast cells in airway mucosa. Cross-linking of IgE triggers mast cell degranulation, releasing histamine, leukotrienes, and prostaglandins, leading to acute bronchoconstriction, mucus secretion, and airway edema. This represents the <strong>early-phase asthmatic response occurring within minutes</strong>, which perfectly matches the clinical stem.</p>",
+      "clinicalReasoning": "This is the most direct and textbook mechanism of acute asthma exacerbation in atopic individuals. The rapid onset within minutes strongly excludes delayed hypersensitivity or chronic structural changes. Dust acts as an allergen, not an irritant, in this context. Therefore, IgE-mediated mast cell activation is the dominant and most tested mechanism exams.",
+      "clinicalReasoningHtml": "<p>This is the <strong>most direct and textbook mechanism</strong> of acute asthma exacerbation in atopic individuals. The rapid onset within minutes strongly excludes delayed hypersensitivity or chronic structural changes. Dust acts as an allergen, not an irritant, in this context. Therefore, IgE-mediated mast cell activation is the dominant and most tested mechanism exams.</p>",
+      "systemInvolved": "Respiratory System (Airways – Bronchial Tree)",
+      "systemInvolvedHtml": "<p>Respiratory System (Airways – Bronchial Tree)</p>"
+    },
+    "A": {
+      "title": "Airway hyperreactivity due to direct irritant stimulation",
+      "body": "This option refers to non-allergic asthma mechanisms where inhaled irritants directly stimulate airway epithelial cells leading to nonspecific bronchoconstriction. This is often seen with smoke, chemicals, or pollutants rather than allergen exposure. It does not require prior sensitization and is usually less specific than IgE-mediated responses.",
+      "bodyHtml": "<p>This option refers to non-allergic asthma mechanisms where inhaled irritants directly stimulate airway epithelial cells leading to nonspecific bronchoconstriction. This is often seen with smoke, chemicals, or pollutants rather than allergen exposure. It does not require prior sensitization and is usually less specific than IgE-mediated responses.</p>",
+      "clinicalReasoning": "Although asthma patients have airway hyperreactivity, dust in a known asthmatic with immediate onset more strongly supports an allergic mechanism rather than a direct irritant effect. This option is plausible but less specific than IgE-mediated allergy in this context.",
+      "clinicalReasoningHtml": "<p>Although asthma patients have airway hyperreactivity, dust in a known asthmatic with immediate onset more strongly supports an allergic mechanism rather than a direct irritant effect. This option is plausible but less specific than IgE-mediated allergy in this context.</p>"
+    },
+    "B": {
+      "title": "Vagal reflex–mediated bronchoconstriction",
+      "body": "This mechanism involves stimulation of airway irritant receptors leading to parasympathetic (vagal) reflex bronchoconstriction. It is typically associated with cold air, smoke, or mechanical irritation. It does not involve immune hypersensitivity pathways.",
+      "bodyHtml": "<p>This mechanism involves stimulation of airway irritant receptors leading to parasympathetic (vagal) reflex bronchoconstriction. It is typically associated with cold air, smoke, or mechanical irritation. It does not involve immune hypersensitivity pathways.</p>",
+      "clinicalReasoning": "While vagal reflexes can contribute to bronchoconstriction, they are not the primary mechanism in allergen-triggered asthma. The presence of house dust exposure and known asthma strongly favors immunologic rather than neural reflex pathways.",
+      "clinicalReasoningHtml": "<p>While vagal reflexes can contribute to bronchoconstriction, they are not the primary mechanism in allergen-triggered asthma. The presence of house dust exposure and known asthma strongly favors immunologic rather than neural reflex pathways.</p>"
+    },
+    "C": {
+      "title": "Delayed-type (Type IV) hypersensitivity reaction",
+      "body": "Type IV hypersensitivity is T-cell mediated and typically presents 24–72 hours after exposure. It is commonly associated with contact dermatitis and chronic inflammatory responses, not acute bronchospasm.",
+      "bodyHtml": "<p>Type IV hypersensitivity is T-cell mediated and typically presents 24–72 hours after exposure. It is commonly associated with contact dermatitis and chronic inflammatory responses, not acute bronchospasm.</p>",
+      "clinicalReasoning": "The rapid onset within minutes completely rules out Type IV hypersensitivity. This is a classic distractor used to test understanding of hypersensitivity timing rather than mechanism.",
+      "clinicalReasoningHtml": "<p>The rapid onset within minutes completely rules out Type IV hypersensitivity. This is a classic distractor used to test understanding of hypersensitivity timing rather than mechanism.</p>"
+    },
+    "E": {
+      "title": "Airway smooth muscle hypertrophy causing fixed obstruction",
+      "body": "This represents a chronic structural change in long-standing asthma, known as airway remodeling. It leads to persistent airflow limitation rather than acute episodic wheezing.",
+      "bodyHtml": "<p>This represents a chronic structural change in long-standing asthma, known as airway remodeling. It leads to persistent airflow limitation rather than acute episodic wheezing.</p>",
+      "clinicalReasoning": "This option is incorrect because it describes a chronic outcome, not an acute mechanism. It cannot explain immediate symptoms after allergen exposure.",
+      "clinicalReasoningHtml": "<p>This option is incorrect because it describes a <strong>chronic outcome</strong>, not an acute mechanism. It cannot explain immediate symptoms after allergen exposure.</p>"
+    }
+  },
+  "keyConcept": "Acute asthma exacerbation in a known atopic individual after allergen exposure within minutes is mediated by Type I hypersensitivity, where IgE-bound mast cells degranulate and release bronchoconstrictive mediators such as histamine and leukotrienes. This leads to rapid reversible airway narrowing characteristic of early-phase asthmatic response.",
+  "keyConceptHtml": "<p>Acute asthma exacerbation in a known atopic individual after allergen exposure within minutes is mediated by <strong>Type I hypersensitivity</strong>, where IgE-bound mast cells degranulate and release bronchoconstrictive mediators such as histamine and leukotrienes. This leads to rapid reversible airway narrowing characteristic of early-phase asthmatic response.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied"
+  },
+  "classicTriad": "Asthma + Allergen exposure + Rapid onset bronchospasm)",
+  "classicTriadHtml": "<p><strong>Asthma + Allergen exposure + Rapid onset bronchospasm)</strong></p>",
+  "featureTableName": "Acute Allergic Asthma – Pathophysiology (Type I Hypersensitivity Mechanism)",
+  "differentialDiagnosisTableName": "System/ Title: Pulmonology Bronchial Asthma – Acute Allergic (Type I Hypersensitivity) Pathophysiology Clinical Features – Mechanism Correlation – Key Pathophysiology Differential Diagnosis of Acute Wheeze Following Environmental Exposure",
+  "featureTable": [
+    {
+      "feature": "• Known asthmatic• Sudden wheeze• Minutes after house dust exposure• Episodic dyspnea, chest tightness",
+      "featureHtml": "<p>• Known asthmatic<br/><br/><br/></p>",
+      "description": "• IgE-mediated mast cell degranulation• Histamine, leukotrienes release• Bronchial smooth muscle contraction• Airway edema + mucus secretion",
+      "descriptionHtml": "<p>• IgE-mediated mast cell degranulation<br/><br/><br/></p>",
+      "clinicalImportance": "Rapid exposure to allergen triggers Type I hypersensitivity reaction in sensitized individuals. Cross-linking of IgE on mast cells leads to immediate release of mediators causing acute reversible airway obstruction typical of early-phase asthma.",
+      "clinicalImportanceHtml": "<p>Rapid exposure to allergen triggers <strong>Type I hypersensitivity reaction</strong> in sensitized individuals. Cross-linking of IgE on mast cells leads to immediate release of mediators causing <strong>acute reversible airway obstruction</strong> typical of early-phase asthma.</p>"
+    },
+    {
+      "feature": "• Reversible airflow obstruction• Expiratory wheeze• Trigger-dependent symptoms",
+      "featureHtml": "<p>• Reversible airflow obstruction<br/><br/></p>",
+      "description": "• Bronchoconstriction of conducting airways• Increased airway resistance",
+      "descriptionHtml": "<p>• Bronchoconstriction of conducting airways<br/></p>",
+      "clinicalImportance": "Airflow limitation is due to smooth muscle contraction, not structural airway disease, making it rapidly reversible with bronchodilators.",
+      "clinicalImportanceHtml": "<p>Airflow limitation is due to <strong>smooth muscle contraction</strong>, not structural airway disease, making it rapidly reversible with bronchodilators.</p>"
+    },
+    {
+      "feature": "• Atopic background (implied in known asthmatic)",
+      "featureHtml": "<p>• Atopic background (implied in known asthmatic)</p>",
+      "description": "• Th2-mediated immune response• IL-4, IL-5, IL-13 activation",
+      "descriptionHtml": "<p>• Th2-mediated immune response<br/></p>",
+      "clinicalImportance": "Atopy predisposes to IgE production against environmental allergens like dust mites, forming basis of allergic asthma phenotype.",
+      "clinicalImportanceHtml": "<p>Atopy predisposes to IgE production against environmental allergens like dust mites, forming basis of allergic asthma phenotype.</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Acute Allergic\nAsthma\n(IgE-mediated)",
+      "conditionHtml": "<p><strong>Acute Allergic </strong></p><p><strong>Asthma </strong></p><p><strong>(IgE-mediated)</strong></p>",
+      "distinguishingFeatures": "• Rapid onset, minutes• House dust exposure• Wheeze, chest tightness• Known asthmatic",
+      "distinguishingFeaturesHtml": "<p>• Rapid onset, minutes<br/><br/><br/></p>",
+      "keyDifferences": "Most likely cause. IgE-mediated mast cell degranulation leads to immediate bronchoconstriction. Strong temporal relationship with allergen exposure.",
+      "keyDifferencesHtml": "<p>Most likely cause. IgE-mediated mast cell degranulation leads to immediate bronchoconstriction. Strong temporal relationship with allergen exposure.</p>"
+    },
+    {
+      "condition": "Irritant-induced\nbronchospasm",
+      "conditionHtml": "<p><strong>Irritant-induced </strong></p><p><strong>bronchospasm</strong></p>",
+      "distinguishingFeatures": "• Smoke exposure• Chemical fumes• Non-immunologic trigger",
+      "distinguishingFeaturesHtml": "<p>• Smoke exposure<br/><br/></p>",
+      "keyDifferences": "Occurs without IgE involvement. Trigger is irritant rather than allergen; less specific immune response.",
+      "keyDifferencesHtml": "<p>Occurs without IgE involvement. Trigger is irritant rather than allergen; less specific immune response.</p>"
+    },
+    {
+      "condition": "COPD exacerbation\n(less likely in young\nasthmatic)",
+      "conditionHtml": "<p><strong>COPD exacerbation </strong></p><p><strong>(less likely in young </strong></p><p><strong>asthmatic)</strong></p>",
+      "distinguishingFeatures": "• Chronic cough, sputum• Progressive dyspnea• Smoking history",
+      "distinguishingFeaturesHtml": "<p>• Chronic cough, sputum<br/><br/></p>",
+      "keyDifferences": "Typically chronic disease with irreversible component; not acute allergen-triggered in young known asthmatic.",
+      "keyDifferencesHtml": "<p>Typically chronic disease with irreversible component; not acute allergen-triggered in young known asthmatic.</p>"
+    },
+    {
+      "condition": "Anaphylaxis\n(systemic allergic\nreaction)",
+      "conditionHtml": "<p><strong>Anaphylaxis </strong></p><p><strong>(systemic allergic </strong></p><p><strong>reaction)</strong></p>",
+      "distinguishingFeatures": "• Hypotension, urticaria• Multi-system involvement• Airway compromise",
+      "distinguishingFeaturesHtml": "<p>• Hypotension, urticaria<br/><br/></p>",
+      "keyDifferences": "More severe systemic involvement; asthma symptoms may be part but not isolated wheeze only.",
+      "keyDifferencesHtml": "<p>More severe systemic involvement; asthma symptoms may be part but not isolated wheeze only.</p>"
+    },
+    {
+      "condition": "Vocal cord\ndysfunction",
+      "conditionHtml": "<p><strong>Vocal cord </strong></p><p><strong>dysfunction</strong></p>",
+      "distinguishingFeatures": "• Inspiratory stridor• Poor response to bronchodilators• Psychogenic trigger",
+      "distinguishingFeaturesHtml": "<p>• Inspiratory stridor<br/><br/></p>",
+      "keyDifferences": "Upper airway problem mimicking asthma; lacks true bronchial obstruction and allergen linkage.",
+      "keyDifferencesHtml": "<p>Upper airway problem mimicking asthma; lacks true bronchial obstruction and allergen linkage.</p>"
+    }
+  ],
+  "diagram": {
+    "name": "Acute Allergic Asthma – Pathophysiology (Type I Hypersensitivity Mechanism)",
+    "caption": "This diagram illustrates the immunopathogenesis of acute allergic bronchial asthma. Initial allergen exposure leads to Th2-mediated IgE production and sensitization of mast cells in airway mucosa. Upon re-exposure to allergens such as house dust mites, IgE cross-linking triggers mast cell degranulation with release of histamine, leukotrienes, and prostaglandins, causing bronchoconstriction, airway edema, mucus hypersecretion, and acute reversible airflow obstruction within minutes (early-phase asthmatic response).",
+    "captionHtml": "<p>This diagram illustrates the immunopathogenesis of acute allergic bronchial asthma. Initial allergen exposure leads to Th2-mediated IgE production and sensitization of mast cells in airway mucosa. Upon re-exposure to allergens such as house dust mites, IgE cross-linking triggers mast cell degranulation with release of histamine, leukotrienes, and prostaglandins, causing bronchoconstriction, airway edema, mucus hypersecretion, and acute reversible airflow obstruction within minutes (early-phase asthmatic response).</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

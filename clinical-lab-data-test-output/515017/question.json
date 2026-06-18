@@ -1,0 +1,193 @@
+{
+  "questionId": "515017",
+  "questionNumber": "14",
+  "stem": "A 29-year-old man presents with a 5-year history of recurrent, non-itchy skin lesions. On examination, there are symmetrically distributed, well-demarcated erythematous plaques with thick silvery scales involving the extensor surfaces of the elbows and knees. Oral and genital mucosa are normal, and there is no history of recent infection or drug intake. Based on the clinical pattern and lesion morphology, what is the most likely diagnosis?",
+  "stemHtml": "<p><strong>Q 01:</strong> A 29-year-old man presents with a 5-year history of recurrent, non-itchy skin lesions. On examination, there are symmetrically distributed, well-demarcated erythematous plaques with thick silvery scales involving the extensor surfaces of the elbows and knees. Oral and genital mucosa are normal, and there is no history of recent infection or drug intake. Based on the clinical pattern and lesion morphology, what is the most likely diagnosis? <strong>(</strong><strong>Question Id: 515017)</strong></p>",
+  "options": [
+    "Chronic plaque psoriasis",
+    "Lichen planus",
+    "Tinea corporis",
+    "Seborrheic dermatitis",
+    "Pityriasis rosea"
+  ],
+  "optionsHtml": [
+    "<p>Chronic plaque psoriasis</p>",
+    "<p>Lichen planus</p>",
+    "<p>Tinea corporis</p>",
+    "<p>Seborrheic dermatitis</p>",
+    "<p>Pityriasis rosea</p>"
+  ],
+  "correctAnswer": "A",
+  "keywords": [
+    "Well-demarcated erythematous plaques with thick silvery scales→ Classic morphological hallmark of chronic plaque psoriasis.",
+    "Extensor surfaces (elbows and knees), symmetrical distribution→ Typical site and pattern strongly favors psoriasis over other dermatoses.",
+    "Chronic, recurrent course with no mucosal involvement→ Supports psoriasis and helps exclude lichen planus.",
+    "Psoriasis Morphological Triad:",
+    "Erythema + Well-defined plaques + Silvery scales",
+    "Presence of this triad in an extensor distribution clinches the diagnosis of chronic plaque psoriasis."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Well-demarcated erythematous plaques with thick silvery scales</strong><br/><em>Classic morphological hallmark of chronic plaque psoriasis.</em></li></ol>",
+    "<ol><li><strong>Extensor surfaces (elbows and knees), symmetrical distribution</strong><br/><em>Typical site and pattern strongly favors psoriasis over other dermatoses.</em></li></ol>",
+    "<ol><li><strong>Chronic, recurrent course with no mucosal involvement</strong><br/><em>Supports psoriasis and helps exclude lichen planus.</em></li></ol>",
+    "<p><u><strong>Psoriasis Morphological Triad:</strong></u></p>",
+    "<p>Erythema + Well-defined plaques + Silvery scales</p>",
+    "<p>Presence of this triad in an extensor distribution <strong>clinches the diagnosis of chronic plaque psoriasis</strong>.</p>"
+  ],
+  "explanations": {
+    "A": {
+      "title": "Chronic plaque psoriasis",
+      "body": "Chronic plaque psoriasis (Psoriasis Vulgaris) is a chronic inflammatory skin condition characterized by well-demarcated, erythematous (red) plaques covered with characteristic silvery-white scales.\nClassic Distribution: It typically affects the extensor surfaces, such as the elbows and knees, the scalp, and the lumbosacral region.\nAuspitz Sign: If these scales are scraped off, pinpoint bleeding points often appear, which is a classic clinical sign.\nSymmetry: The lesions are usually symmetrically distributed on the body.\nChronic Nature: This patient has a 5-year history, which aligns with the relapsing-remitting nature of the disease. Unlike other inflammatory conditions, it is often asymptomatic or only mildly itchy, rather than intensely pruritic.\nMucosal involvement is uncommon, which supports this diagnosis.",
+      "bodyHtml": "<p>Chronic plaque psoriasis (Psoriasis Vulgaris) is a chronic inflammatory skin condition characterized by well-demarcated, erythematous (red) plaques covered with characteristic <strong>silvery-white scales</strong>.</p><ul><li><strong>Classic Distribution:</strong> It typically affects the <strong>extensor surfaces</strong>, such as the elbows and knees, the scalp, and the lumbosacral region.</li><li><strong>Auspitz Sign:</strong> If these scales are scraped off, pinpoint bleeding points often appear, which is a classic clinical sign.</li><li><strong>Symmetry:</strong> The lesions are usually symmetrically distributed on the body.</li><li><strong>Chronic Nature:</strong> This patient has a 5-year history, which aligns with the relapsing-remitting nature of the disease. Unlike other inflammatory conditions, it is often asymptomatic or only mildly itchy, rather than intensely pruritic.</li><li><strong>Mucosal involvement is uncommon</strong>, which supports this diagnosis.</li></ul>"
+    },
+    "B": {
+      "title": "Lichen planus",
+      "body": "Typically presents with violaceous, flat-topped, pruritic papules.\nFrequently involves oral and genital mucosa (Wickham striae).\nLesions are more common on flexor surfaces, not extensor areas.❌ Morphology and distribution do not match.",
+      "bodyHtml": "<ul><li>Typically presents with <strong>violaceous, flat-topped, pruritic papules</strong>.</li><li>Frequently involves <strong>oral and genital mucosa</strong> (Wickham striae).</li><li>Lesions are more common on <strong>flexor surfaces</strong>, not extensor areas.<br/>❌ <strong>Morphology and distribution do not match.</strong></li></ul>"
+    },
+    "C": {
+      "title": "Tinea corporis",
+      "body": "Fungal infection presenting as annular lesions with central clearing and an active scaly border.\nUsually itchy and asymmetrical.\nChronic symmetric plaques with silvery scale are not typical.❌ Fungal pattern absent.",
+      "bodyHtml": "<ul><li>Fungal infection presenting as <strong>annular lesions with central clearing</strong> and an <strong>active scaly border</strong>.</li><li>Usually <strong>itchy</strong> and asymmetrical.</li><li>Chronic symmetric plaques with silvery scale are not typical.<br/>❌ <strong>Fungal pattern absent.</strong></li></ul>"
+    },
+    "D": {
+      "title": "Seborrheic dermatitis",
+      "body": "Involves seborrheic areas (scalp, face, chest).\nLesions have greasy yellow scales, not thick silvery scales.\nExtensor surfaces like elbows and knees are usually spared.❌ Distribution and scale type inconsistent.",
+      "bodyHtml": "<ul><li>Involves <strong>seborrheic areas</strong> (scalp, face, chest).</li><li>Lesions have <strong>greasy yellow scales</strong>, not thick silvery scales.</li><li>Extensor surfaces like elbows and knees are usually spared.<br/>❌ <strong>Distribution and scale type inconsistent.</strong></li></ul>"
+    },
+    "E": {
+      "title": "Pityriasis rosea",
+      "body": "Acute, self-limiting condition starting with a herald patch, followed by a Christmas-tree pattern rash.\nCommonly affects the trunk, not extensor surfaces.\nUsually resolves within 6–8 weeks, not chronic for years.❌ Time course and morphology mismatch.",
+      "bodyHtml": "<ul><li>Acute, self-limiting condition starting with a <strong>herald patch</strong>, followed by a <strong>Christmas-tree pattern</strong> rash.</li><li>Commonly affects the <strong>trunk</strong>, not extensor surfaces.</li><li>Usually resolves within <strong>6–8 weeks</strong>, not chronic for years.<br/>❌ <strong>Time course and morphology mismatch.</strong></li></ul>"
+    }
+  },
+  "keyConcept": "Chronic plaque psoriasis presents with long-standing, symmetrical, well-defined erythematous plaques with silvery scales on extensor surfaces, and minimal mucosal involvement. Recognition of distribution, scale type, and chronicity is crucial for diagnosis.",
+  "keyConceptHtml": "<p>Chronic plaque psoriasis presents with <strong>long-standing, symmetrical, well-defined erythematous plaques with silvery scales on extensor surfaces</strong>, and <strong>minimal mucosal involvement</strong>. Recognition of <strong>distribution, scale type, and chronicity</strong> is crucial for diagnosis.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Recognition & Diagnosis - Chronic Plaque Psoriasis",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Chronic Plaque Psoriasis",
+  "differentialDiagnosisTableName": "Chronic Plaque Psoriasis Differential Diagnosis of Chronic Plaque Psoriasis",
+  "featureTable": [
+    {
+      "feature": "Morphology",
+      "featureHtml": "<p>Morphology</p>",
+      "description": "Well-demarcated erythematous plaques with thick silvery scales",
+      "descriptionHtml": "<p>Well-demarcated erythematous plaques with thick silvery scales</p>",
+      "clinicalImportance": "Classic appearance;\nhelps differentiate from other dermatoses",
+      "clinicalImportanceHtml": "<ul><li>Classic appearance; </li><li>helps differentiate from other dermatoses</li></ul>"
+    },
+    {
+      "feature": "Distribution",
+      "featureHtml": "<p>Distribution</p>",
+      "description": "Symmetrical,\nmainly extensor surfaces (elbows, knees),\nscalp,\nlumbosacral area",
+      "descriptionHtml": "<ul><li>Symmetrical, </li><li>mainly <strong>extensor surfaces</strong> (elbows, knees), </li><li>scalp, </li><li>lumbosacral area</li></ul>",
+      "clinicalImportance": "Extensor predominance is hallmark;\nhelps in diagnosis",
+      "clinicalImportanceHtml": "<ul><li>Extensor predominance is hallmark;</li><li>helps in diagnosis</li></ul>"
+    },
+    {
+      "feature": "Chronicity & Course",
+      "featureHtml": "<p>Chronicity &amp; Course</p>",
+      "description": "Long-standing,\nrecurrent,\nnon-itchy lesions",
+      "descriptionHtml": "<ul><li>Long-standing, </li><li>recurrent, </li><li>non-itchy lesions</li></ul>",
+      "clinicalImportance": "Chronic nature differentiates from acute dermatoses",
+      "clinicalImportanceHtml": "<p>Chronic nature differentiates from acute dermatoses</p>"
+    },
+    {
+      "feature": "Mucosal Involvement",
+      "featureHtml": "<p>Mucosal Involvement</p>",
+      "description": "Usually absent",
+      "descriptionHtml": "<ul><li>Usually absent</li></ul>",
+      "clinicalImportance": "Helps distinguish from lichen planus or other mucosal disorders",
+      "clinicalImportanceHtml": "<p>Helps distinguish from lichen planus or other mucosal disorders</p>"
+    },
+    {
+      "feature": "Triggers / Associations",
+      "featureHtml": "<p>Triggers / Associations</p>",
+      "description": "Stress,\ninfections,\ntrauma (Koebner phenomenon),\nmedications,\nmetabolic syndrome",
+      "descriptionHtml": "<ul><li>Stress, </li><li>infections, </li><li>trauma (Koebner phenomenon), </li><li>medications, </li><li>metabolic syndrome</li></ul>",
+      "clinicalImportance": "Important for management and patient counseling",
+      "clinicalImportanceHtml": "<p>Important for management and patient counseling</p>"
+    },
+    {
+      "feature": "Complications",
+      "featureHtml": "<p>Complications</p>",
+      "description": "Psoriatic arthritis,\nnail involvement,\nsecondary infections",
+      "descriptionHtml": "<ul><li>Psoriatic arthritis, </li><li>nail involvement, </li><li>secondary infections</li></ul>",
+      "clinicalImportance": "Guides monitoring and referral to rheumatology if needed",
+      "clinicalImportanceHtml": "<p>Guides monitoring and referral to rheumatology if needed</p>"
+    },
+    {
+      "feature": "Treatment Overview",
+      "featureHtml": "<p>Treatment Overview</p>",
+      "description": "Topical corticosteroids,\nvitamin D analogs,\nphototherapy,\nsystemic agents (methotrexate, biologics)",
+      "descriptionHtml": "<ul><li>Topical corticosteroids, </li><li>vitamin D analogs, </li><li>phototherapy, </li><li>systemic agents (methotrexate, biologics)</li></ul>",
+      "clinicalImportance": "Treatment tailored by severity and extent",
+      "clinicalImportanceHtml": "<p>Treatment tailored by severity and extent</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Lichen planus",
+      "conditionHtml": "<p><strong>Lichen planus</strong></p>",
+      "distinguishingFeatures": "Violaceous, flat-topped, pruritic papules;\ncommonly on flexor surfaces;\nmucosal involvement (Wickham striae)",
+      "distinguishingFeaturesHtml": "<ul><li>Violaceous, flat-topped, pruritic papules; </li><li>commonly on <strong>flexor surfaces</strong>; </li><li>mucosal involvement (Wickham striae)</li></ul>",
+      "keyDifferences": "Color,\nflexor distribution,\npruritus,\nmucosal lesions help differentiate",
+      "keyDifferencesHtml": "<ul><li>Color, </li><li>flexor distribution, </li><li>pruritus, </li><li>mucosal lesions help differentiate</li></ul>"
+    },
+    {
+      "condition": "Tinea corporis",
+      "conditionHtml": "<p><strong>Tinea corporis</strong></p>",
+      "distinguishingFeatures": "Annular lesions with central clearing, active scaly border;\nusually itchy;\nasymmetrical",
+      "distinguishingFeaturesHtml": "<ul><li>Annular lesions with central clearing, active scaly border; </li><li>usually itchy; </li><li>asymmetrical</li></ul>",
+      "keyDifferences": "Fungal infection confirmed by KOH prep;\ncentral clearing unlike uniform plaques",
+      "keyDifferencesHtml": "<ul><li>Fungal infection confirmed by KOH prep; </li><li>central clearing unlike uniform plaques</li></ul>"
+    },
+    {
+      "condition": "Seborrheic dermatitis",
+      "conditionHtml": "<p><strong>Seborrheic dermatitis</strong></p>",
+      "distinguishingFeatures": "Greasy yellow scales;\ncommonly affects scalp, face, chest;\nextensor surfaces usually spared",
+      "distinguishingFeaturesHtml": "<ul><li>Greasy yellow scales; </li><li>commonly affects scalp, face, chest; </li><li>extensor surfaces usually spared</li></ul>",
+      "keyDifferences": "Scale type and distribution differ;\noften mild erythema",
+      "keyDifferencesHtml": "<ul><li>Scale type and distribution differ; </li><li>often mild erythema</li></ul>"
+    },
+    {
+      "condition": "Pityriasis rosea",
+      "conditionHtml": "<p><strong>Pityriasis rosea</strong></p>",
+      "distinguishingFeatures": "Acute, self-limiting;\nherald patch followed by “Christmas tree” pattern on trunk",
+      "distinguishingFeaturesHtml": "<ul><li>Acute, self-limiting; </li><li>herald patch followed by “Christmas tree” pattern on trunk</li></ul>",
+      "keyDifferences": "Acute onset,\ntrunk distribution,\nshort duration (6–8 weeks)",
+      "keyDifferencesHtml": "<ul><li>Acute onset, </li><li>trunk distribution, </li><li>short duration (6–8 weeks)</li></ul>"
+    },
+    {
+      "condition": "Eczema / Atopic dermatitis",
+      "conditionHtml": "<p><strong>Eczema / Atopic dermatitis</strong></p>",
+      "distinguishingFeatures": "Pruritic, ill-defined erythematous patches;\noften on flexor surfaces; chronic relapsing",
+      "distinguishingFeaturesHtml": "<ul><li>Pruritic, ill-defined erythematous patches; </li><li>often on flexor surfaces; chronic relapsing</li></ul>",
+      "keyDifferences": "Intense itching,\nflexor predilection,\nhistory of atopy",
+      "keyDifferencesHtml": "<ul><li>Intense itching, </li><li>flexor predilection, </li><li>history of atopy</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Chronic Plaque Psoriasis",
+    "caption": "This diagram illustrates the classical clinical features of chronic plaque psoriasis, highlighting well-demarcated erythematous plaques with thick silvery scales on extensor surfaces. It also depicts common associations such as nail changes, psoriatic arthritis, the Koebner phenomenon, major triggers, and an overview of treatment options.",
+    "captionHtml": "<p>This diagram illustrates the <strong>classical clinical features of chronic plaque psoriasis</strong>, highlighting <strong>well-demarcated erythematous plaques with thick silvery scales</strong> on <strong>extensor surfaces</strong>. It also depicts common <strong>associations</strong> such as <strong>nail changes</strong>, <strong>psoriatic arthritis</strong>, the <strong>Koebner phenomenon</strong>, major <strong>triggers</strong>, and an overview of <strong>treatment options</strong><strong>.</strong></p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

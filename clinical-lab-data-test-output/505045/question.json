@@ -1,0 +1,183 @@
+{
+  "questionId": "505045",
+  "questionNumber": "08",
+  "stem": "A 24-year-old man with a known history of bronchial asthma presents to the emergency department with acute onset shortness of breath for 2 hours. He is able to speak only in short phrases. His respiratory rate is 28/min, and peak expiratory flow rate (PEF) is 45% of predicted. There is no cyanosis, confusion, or exhaustion. Based on these findings, what is the most appropriate classification of the severity of this acute asthma exacerbation?",
+  "stemHtml": "<p>A 24-year-old man with a known history of bronchial asthma presents to the emergency department with acute onset shortness of breath for 2 hours. He is able to speak only in short phrases. His respiratory rate is 28/min, and peak expiratory flow rate (PEF) is 45% of predicted. There is no cyanosis, confusion, or exhaustion. Based on these findings, what is the most appropriate classification of the severity of this acute asthma exacerbation? <strong>(Question Id: 5050</strong><strong>4</strong><strong>5</strong><strong>)</strong></p>",
+  "options": [
+    "Mild acute asthma exacerbation",
+    "Moderate acute asthma exacerbation",
+    "Severe acute asthma exacerbation",
+    "Life-threatening asthma exacerbation",
+    "Respiratory arrest imminent (near-fatal asthma)"
+  ],
+  "optionsHtml": [
+    "<p>Mild acute asthma exacerbation</p>",
+    "<p>Moderate acute asthma exacerbation</p>",
+    "<p>Severe acute asthma exacerbation</p>",
+    "<p>Life-threatening asthma exacerbation</p>",
+    "<p>Respiratory arrest imminent (near-fatal asthma)</p>"
+  ],
+  "correctAnswer": "B",
+  "keywords": [
+    "PEF 45% predicted → Indicates moderate airway obstruction (40–69%), key severity classifier for asthma.",
+    "Speaks in short phrases → Suggests moderate to severe exacerbation, but not life-threatening (no single-word speech).",
+    "No cyanosis, confusion, or exhaustion → Rules out severe and life-threatening asthma."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>PEF 45% predicted</strong> → Indicates <strong>moderate airway obstruction (40–69%)</strong>, key severity classifier for asthma. </li></ol>",
+    "<ol><li><strong>Speaks in short phrases</strong> → Suggests <strong>moderate to severe exacerbation</strong>, but not life-threatening (no single-word speech). </li></ol>",
+    "<ol><li><strong>No cyanosis, confusion, or exhaustion</strong> → Rules out <strong>severe and life-threatening asthma</strong>.</li></ol>"
+  ],
+  "explanations": {
+    "B": {
+      "title": "Moderate acute asthma exacerbation",
+      "body": "The patient shows clinical and objective features consistent with a moderate asthma attack. PEF is 45% of predicted, which falls into the 40–69% range defining moderate severity. Speech is limited to short phrases, and respiratory rate is elevated (28/min), but there are no signs of impending respiratory failure such as cyanosis or altered mental status. This combination places the patient firmly in the moderate exacerbation category requiring urgent bronchodilator therapy and close monitoring.",
+      "bodyHtml": "<p>The patient shows clinical and objective features consistent with a <strong>moderate asthma attack</strong>. PEF is 45% of predicted, which falls into the 40–69% range defining moderate severity. Speech is limited to short phrases, and respiratory rate is elevated (28/min), but there are no signs of impending respiratory failure such as cyanosis or altered mental status. This combination places the patient firmly in the <strong>moderate exacerbation category requiring urgent bronchodilator therapy and close monitoring</strong>.</p>",
+      "clinicalReasoning": "Moderate exacerbation is characterized by PEF 40–69%, speaking in phrases, and tachypnea. Oxygenation is usually preserved, and no signs of exhaustion or altered sensorium are present. These patients respond to inhaled β2-agonists and systemic corticosteroids. Early treatment prevents progression to severe asthma.",
+      "clinicalReasoningHtml": "<p><br/></p>",
+      "systemInvolved": "Respiratory system (Lower airways – Bronchi)",
+      "systemInvolvedHtml": "<p>Respiratory system (Lower airways – Bronchi)</p>"
+    },
+    "A": {
+      "title": "Mild acute asthma exacerbation",
+      "body": "Mild exacerbation typically presents with minimal dyspnea and the patient can speak in full sentences. PEF is usually >70% predicted. Respiratory rate is near normal or mildly elevated. This patient’s reduced speech and PEF of 45% clearly exceed mild severity.",
+      "bodyHtml": "<p>Mild exacerbation typically presents with minimal dyspnea and the patient can speak in full sentences. PEF is usually &gt;70% predicted. Respiratory rate is near normal or mildly elevated. This patient’s reduced speech and PEF of 45% clearly exceed mild severity.</p>",
+      "clinicalReasoning": "Mild asthma does not produce speech limitation or significant tachypnea. Airflow obstruction is mild and reversible with inhaled bronchodilators alone. The given case shows clear objective worsening beyond mild classification.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "C": {
+      "title": "Severe acute asthma exacerbation",
+      "body": "Severe asthma is associated with PEF <40%, inability to complete sentences, marked tachypnea (>30/min), and possible use of accessory muscles. This patient still speaks in short phrases and has PEF 45%, which is above severe threshold.",
+      "bodyHtml": "<p>Severe asthma is associated with PEF &lt;40%, inability to complete sentences, marked tachypnea (&gt;30/min), and possible use of accessory muscles. This patient still speaks in short phrases and has PEF 45%, which is above severe threshold.</p>",
+      "clinicalReasoning": "Although respiratory distress is present, absence of cyanosis, exhaustion, or very low PEF excludes severe classification. Severe cases often require intensive care monitoring and frequent bronchodilators with possible IV therapy.",
+      "clinicalReasoningHtml": "<p><br/>excludes severe classification. Severe cases often require intensive care monitoring and frequent bronchodilators with possible IV therapy.</p>"
+    },
+    "D": {
+      "title": "Life-threatening asthma exacerbation",
+      "body": "Life-threatening asthma includes silent chest, bradycardia, hypotension, cyanosis, or altered consciousness. PEF is often <33%. This patient has none of these features.",
+      "bodyHtml": "<p>Life-threatening asthma includes silent chest, bradycardia, hypotension, cyanosis, or altered consciousness. PEF is often &lt;33%. This patient has none of these features.</p>",
+      "clinicalReasoning": "The patient is alert, without hypoxia or exhaustion. Airflow is still measurable (PEF 45%), which excludes this category. This stage requires immediate ICU care and possible ventilatory support.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "E": {
+      "title": "Respiratory arrest imminent (near-fatal asthma)",
+      "body": "This represents the extreme end of asthma severity with impending respiratory collapse, often with silent chest, exhaustion, rising CO₂, and confusion. None of these are present.",
+      "bodyHtml": "<p>This represents the extreme end of asthma severity with impending respiratory collapse, often with silent chest, exhaustion, rising CO₂, and confusion. None of these are present.</p>",
+      "clinicalReasoning": "Patients are usually drowsy, exhausted, and unable to speak. This case shows preserved consciousness and measurable airflow, ruling out near-fatal asthma.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    }
+  },
+  "keyConcept": "Asthma severity in acute exacerbation is classified using PEF, speech ability, respiratory rate, and signs of hypoxia or exhaustion.PEF 40–69% with ability to speak in phrases indicates moderate acute asthma exacerbation.Absence of cyanosis or altered mental status excludes severe and life-threatening categories.",
+  "keyConceptHtml": "<p>Asthma severity in acute exacerbation is classified using <strong>PEF, speech ability, respiratory rate, and signs of hypoxia or exhaustion</strong>.<br/><strong>moderate acute asthma exacerbation</strong>.<br/></p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied"
+  },
+  "featureTableName": "Bronchial Asthma – Acute Exacerbation Severity Classification (PEF-based Clinical Grading)",
+  "differentialDiagnosisTableName": "System/ Title: Pulmonology Acute Asthma Exacerbation – Severity Classification (PEF-Based Clinical Grading) Differential Diagnosis of Acute Asthma-Like Presentation",
+  "featureTable": [
+    {
+      "feature": "Mild acute asthma exacerbation",
+      "featureHtml": "<p><strong>Mild acute asthma exacerbation</strong></p>",
+      "description": "• Patient speaks full sentences\n• Mild dyspnea\n• Minimal accessory muscle use\n• RR usually <25/min\n• No hypoxia or distress",
+      "descriptionHtml": "<p>• Patient speaks full sentences </p><p>• Mild dyspnea </p><p>• Minimal accessory muscle use </p><p>• RR usually &lt;25/min </p><p>• No hypoxia or distress</p>",
+      "clinicalImportance": "• PEF >70% predicted\n• Near-normal airflow limitation\n• Responds well to inhaled SABA",
+      "clinicalImportanceHtml": "<p>• PEF &gt;70% predicted </p><p>• Near-normal airflow limitation </p><p>• Responds well to inhaled SABA</p>"
+    },
+    {
+      "feature": "Moderate acute\nasthma exacerbation",
+      "featureHtml": "<p><strong>Moderate acute </strong></p><p><strong>asthma exacerbation</strong></p>",
+      "description": "• Speaks in short phrases\n• Moderate dyspnea\n• RR 25–30/min • Mild accessory muscle use may be present\n• Alert, no cyanosis",
+      "descriptionHtml": "<p>• Speaks in short phrases </p><p>• Moderate dyspnea </p><p>• RR 25–30/min • Mild accessory muscle use may be present </p><p>• Alert, no cyanosis</p>",
+      "clinicalImportance": "• PEF 40–69% predicted\n• This case: PEF 45% → Moderate",
+      "clinicalImportanceHtml": "<p>• PEF 40–69% predicted </p><p>• <strong>This case: PEF 45% → Moderate</strong></p>"
+    },
+    {
+      "feature": "Severe acute\nasthma exacerbation",
+      "featureHtml": "<p><strong>Severe acute </strong></p><p><strong>asthma exacerbation</strong></p>",
+      "description": "• Speaks in words only (not phrases)\n• Marked respiratory distress\n• RR >30/min\n• Accessory muscle use\n• Tachycardia common",
+      "descriptionHtml": "<p>• Speaks in words only (not phrases) </p><p>• Marked respiratory distress </p><p>• RR &gt;30/min </p><p>• Accessory muscle use </p><p>• Tachycardia common</p>",
+      "clinicalImportance": "• PEF <40% predicted •\nHigh risk of respiratory failure",
+      "clinicalImportanceHtml": "<p>• PEF &lt;40% predicted •</p><p> High risk of respiratory failure</p>"
+    },
+    {
+      "feature": "Life-threatening\nasthma exacerbation",
+      "featureHtml": "<p><strong>Life-threatening </strong></p><p><strong>asthma exacerbation</strong></p>",
+      "description": "• Silent chest or minimal air entry\n• Cyanosis\n• Bradycardia or hypotension\n• Altered consciousness\n• Exhaustion",
+      "descriptionHtml": "<p>• Silent chest or minimal air entry </p><p>• Cyanosis </p><p>• Bradycardia or hypotension </p><p>• Altered consciousness </p><p>• Exhaustion</p>",
+      "clinicalImportance": "• PEF <33% predicted\n• Impending ventilatory collapse",
+      "clinicalImportanceHtml": "<p>• PEF &lt;33% predicted </p><p>• Impending ventilatory collapse</p>"
+    },
+    {
+      "feature": "Near-fatal\n(respiratory arrest\nimminent)",
+      "featureHtml": "<p><strong>Near-fatal </strong></p><p><strong>(respiratory arrest </strong></p><p><strong>imminent)</strong></p>",
+      "description": "• Exhaustion\n• Confusion/coma\n• Silent chest\n• Poor respiratory effort\n• Agonal breathing",
+      "descriptionHtml": "<p>• Exhaustion </p><p>• Confusion/coma </p><p>• Silent chest </p><p>• Poor respiratory effort </p><p>• Agonal breathing</p>",
+      "clinicalImportance": "• Very low or unrecordable PEF\n• CO₂ retention (rising PaCO₂)",
+      "clinicalImportanceHtml": "<p>• Very low or unrecordable PEF </p><p>• CO₂ retention (rising PaCO₂)</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Acute asthma\nexacerbation",
+      "conditionHtml": "<p><strong>Acute asthma </strong></p><p><strong>exacerbation</strong></p>",
+      "distinguishingFeatures": "• Episodic wheeze\n• Reversible airflow obstruction\n• History of asthma\n• Trigger exposure\n• Tachypnea, dyspnea",
+      "distinguishingFeaturesHtml": "<p>• Episodic wheeze </p><p>• Reversible airflow obstruction </p><p>• History of asthma </p><p>• Trigger exposure </p><p>• Tachypnea, dyspnea</p>",
+      "keyDifferences": "• PEF improves after bronchodilator\n• Reversible obstruction\n• Atopy history common",
+      "keyDifferencesHtml": "<p>• PEF improves after bronchodilator </p><p>• Reversible obstruction </p><p>• Atopy history common</p>"
+    },
+    {
+      "condition": "COPD\nexacerbation",
+      "conditionHtml": "<p><strong>COPD </strong></p><p><strong>exacerbation</strong></p>",
+      "distinguishingFeatures": "• Chronic smoker\n• Progressive dyspnea\n• Productive cough\n• Wheeze may be present",
+      "distinguishingFeaturesHtml": "<p>• Chronic smoker </p><p>• Progressive dyspnea </p><p>• Productive cough </p><p>• Wheeze may be present</p>",
+      "keyDifferences": "• Irreversible airflow limitation\n• Older age group\n• Poor bronchodilator reversibility",
+      "keyDifferencesHtml": "<p>• Irreversible airflow limitation </p><p>• Older age group </p><p>• Poor bronchodilator reversibility</p>"
+    },
+    {
+      "condition": "Anaphylaxis",
+      "conditionHtml": "<p><strong>Anaphylaxis</strong></p>",
+      "distinguishingFeatures": "• Sudden dyspnea\n• Wheeze + urticaria\n• Hypotension\n• Angioedema",
+      "distinguishingFeaturesHtml": "<p>• Sudden dyspnea </p><p>• Wheeze + urticaria </p><p>• Hypotension </p><p>• Angioedema</p>",
+      "keyDifferences": "• Multisystem involvement\n• Rapid response to epinephrine\n• Skin/mucosal signs present",
+      "keyDifferencesHtml": "<p>• Multisystem involvement </p><p>• Rapid response to epinephrine </p><p>• Skin/mucosal signs present</p>"
+    },
+    {
+      "condition": "Foreign body\naspiration",
+      "conditionHtml": "<p><strong>Foreign body </strong></p><p><strong>aspiration</strong></p>",
+      "distinguishingFeatures": "• Sudden onset dyspnea\n• Focal wheeze\n• Choking history",
+      "distinguishingFeaturesHtml": "<p>• Sudden onset dyspnea </p><p>• Focal wheeze </p><p>• Choking history</p>",
+      "keyDifferences": "• Asymmetric breath sounds\n• Sudden onset in previously stable patient",
+      "keyDifferencesHtml": "<p>• Asymmetric breath sounds </p><p>• Sudden onset in previously stable patient</p>"
+    },
+    {
+      "condition": "Pneumothorax",
+      "conditionHtml": "<p><strong>Pneumothorax</strong></p>",
+      "distinguishingFeatures": "• Sudden chest pain + dyspnea\n• Reduced unilateral breath sounds",
+      "distinguishingFeaturesHtml": "<p>• Sudden chest pain + dyspnea </p><p>• Reduced unilateral breath sounds</p>",
+      "keyDifferences": "• Tracheal deviation (if tension)\n• No wheeze typically",
+      "keyDifferencesHtml": "<p>• Tracheal deviation (if tension) </p><p>• No wheeze typically</p>"
+    },
+    {
+      "condition": "Heart failure\n(cardiac asthma)",
+      "conditionHtml": "<p><strong>Heart failure </strong></p><p><strong>(cardiac asthma)</strong></p>",
+      "distinguishingFeatures": "• Dyspnea + orthopnea\n• Basal crackles\n• Pink frothy sputum",
+      "distinguishingFeaturesHtml": "<p>• Dyspnea + orthopnea </p><p>• Basal crackles </p><p>• Pink frothy sputum</p>",
+      "keyDifferences": "• Cardiomegaly\n• Pulmonary edema on CXR",
+      "keyDifferencesHtml": "<p>• Cardiomegaly </p><p>• Pulmonary edema on CXR</p>"
+    }
+  ],
+  "diagram": {
+    "name": "Bronchial Asthma – Acute Exacerbation Severity Classification (PEF-based Clinical Grading)",
+    "caption": "This diagram illustrates the clinical grading of acute bronchial asthma exacerbations using peak expiratory flow (PEF) values along with key bedside findings such as speech ability, respiratory rate, oxygenation status, and signs of respiratory distress. It demonstrates the progression from mild to near-fatal asthma and highlights how worsening airflow obstruction correlates with increasing clinical severity and risk of respiratory failure.",
+    "captionHtml": "<p>This diagram illustrates the clinical grading of acute bronchial asthma exacerbations using peak expiratory flow (PEF) values along with key bedside findings such as speech ability, respiratory rate, oxygenation status, and signs of respiratory distress. It demonstrates the progression from mild to near-fatal asthma and highlights how worsening airflow obstruction correlates with increasing clinical severity and risk of respiratory failure.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

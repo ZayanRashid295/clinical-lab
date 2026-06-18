@@ -9,9 +9,13 @@ import {
   collectMetadataPresence,
   findQuestionId,
   findSectionIndex,
+  findFirstKeyConceptIndex,
+  findMetadataBlockStart,
+  findPrimaryKeyConceptIndex,
   isKeyConceptHeading,
   isMetadataLine,
   parseOptionLine,
+  splitStemAndOptionTexts,
 } from "./parser-utils";
 
 function issue(
@@ -74,15 +78,12 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
         "Add ANSWER: A (or B, C, D, E) immediately after the five options.",
       );
     } else {
-      const options = paragraphs
-        .slice(stemIndex + 1, answerIndex)
-        .map((p) => p.trim())
-        .filter(Boolean);
-      if (options.length !== 5) {
+      const { optionTexts } = splitStemAndOptionTexts(paragraphs, stemIndex, answerIndex);
+      if (optionTexts.length !== 5) {
         addError(
           "OPTION_COUNT",
           "Options",
-          `Expected exactly 5 options, found ${options.length}.`,
+          `Expected exactly 5 options, found ${optionTexts.length}.`,
           "Place exactly five option lines between the stem and ANSWER: (one per paragraph).",
         );
       }
@@ -138,13 +139,7 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
       "Add a paragraph with exactly: Explanation",
     );
   } else {
-    let firstKeyConcept = paragraphs.length;
-    for (let i = explanationStart + 1; i < paragraphs.length; i += 1) {
-      if (isKeyConceptHeading(paragraphs[i])) {
-        firstKeyConcept = i;
-        break;
-      }
-    }
+    const firstKeyConcept = findPrimaryKeyConceptIndex(paragraphs, explanationStart);
 
     const foundOptions = new Set<string>();
     for (const paragraph of paragraphs.slice(explanationStart + 1, firstKeyConcept)) {
@@ -164,8 +159,9 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
     }
   }
 
-  const keyConceptIndex = paragraphs.findIndex((p) => isKeyConceptHeading(p));
-  if (keyConceptIndex === -1) {
+  const keyConceptSearchFrom = explanationStart ?? 0;
+  const keyConceptIndex = findPrimaryKeyConceptIndex(paragraphs, keyConceptSearchFrom);
+  if (keyConceptIndex >= paragraphs.length) {
     addError(
       "MISSING_KEY_CONCEPT",
       "Key Concept",
@@ -173,12 +169,9 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
       "Add a paragraph: Key Concept — then the summary text on the next line(s).",
     );
   } else {
-    let metadataStart: number | null = null;
-    for (let i = keyConceptIndex + 1; i < paragraphs.length; i += 1) {
-      if (isMetadataLine(paragraphs[i])) {
-        metadataStart = i;
-        break;
-      }
+    let metadataStart = findMetadataBlockStart(paragraphs, keyConceptIndex + 1);
+    if (metadataStart === null) {
+      metadataStart = findMetadataBlockStart(paragraphs, keyConceptSearchFrom + 1);
     }
     if (metadataStart === null) {
       addError(
@@ -204,17 +197,19 @@ function validateParagraphs(paragraphs: string[]): ValidationResult {
     }
   }
 
-  const { present: metadataPresent, hasCompetency } = collectMetadataPresence(paragraphs);
+  const { present: metadataPresent, hasCompetency, hasProductOrSubject } =
+    collectMetadataPresence(paragraphs);
 
   for (const label of REQUIRED_METADATA_LABELS) {
-    if (!metadataPresent.has(label)) {
-      addError(
-        `MISSING_META_${label.replace(/\s/g, "_").toUpperCase()}`,
-        "Metadata",
-        `Missing metadata field: ${label}: (Product may use Subject: instead)`,
-        `Add line: ${label}: [value]`,
-      );
-    }
+    if (metadataPresent.has(label)) continue;
+    if (label === "Category" && hasProductOrSubject) continue;
+    if (label === "System" && metadataPresent.has("Topic")) continue;
+    addError(
+      `MISSING_META_${label.replace(/\s/g, "_").toUpperCase()}`,
+      "Metadata",
+      `Missing metadata field: ${label}: (Product may use Subject: instead)`,
+      `Add line: ${label}: [value]`,
+    );
   }
 
   for (const label of METADATA_LABELS) {

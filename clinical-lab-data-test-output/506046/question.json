@@ -1,0 +1,221 @@
+{
+  "questionId": "506046",
+  "questionNumber": "08",
+  "stem": "A 22-year-old college student presents with fever, malaise, and painful oral lesions for 3 days. Examination shows multiple small vesicles and shallow ulcers on the lips, gingiva, and oral mucosa. The gums are swollen and bleed easily. The patient reports difficulty eating due to pain. What is the most appropriate treatment?",
+  "stemHtml": "<p>A 22-year-old college student presents with fever, malaise, and painful oral lesions for 3 days. Examination shows multiple small vesicles and shallow ulcers on the lips, gingiva, and oral mucosa. The gums are swollen and bleed easily. The patient reports difficulty eating due to pain. What is the most appropriate treatment? <strong>(Question Id: 5060</strong><strong>46</strong><strong>)</strong></p>",
+  "options": [
+    "Topical nystatin suspension",
+    "Oral fluconazole",
+    "Oral acyclovir",
+    "Oral amoxicillin",
+    "Chlorhexidine mouth rinse"
+  ],
+  "optionsHtml": [
+    "<p>Topical nystatin suspension</p>",
+    "<p>Oral fluconazole</p>",
+    "<p>Oral acyclovir</p>",
+    "<p>Oral amoxicillin</p>",
+    "<p>Chlorhexidine mouth rinse</p>"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "Vesicles + shallow ulcers + gingiva involvement → classic pattern of HSV primary infection (gingivostomatitis)",
+    "Fever + malaise + painful oral lesions → indicates acute viral systemic infection (not localized fungal disease)",
+    "Bleeding swollen gums → part of classic triad: fever + gingivitis + oral vesicles/ulcers (primary herpetic gingivostomatitis)"
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Vesicles + shallow ulcers + gingiva involvement</strong> → classic pattern of <strong>HSV primary infection (gingivostomatitis)</strong> </li></ol>",
+    "<ol><li><strong>Fever + malaise + painful oral lesions</strong> → indicates <strong>acute viral systemic infection (not localized fungal disease)</strong> </li></ol>",
+    "<ol><li><strong>Bleeding swollen gums</strong> → part of <strong>classic triad: fever + gingivitis + oral vesicles/ulcers (primary herpetic gingivostomatitis)</strong> </li></ol>"
+  ],
+  "explanations": {
+    "C": {
+      "title": "Oral acyclovir",
+      "body": "Primary antiviral therapy targeting herpes simplex virus infection. It is most effective when started early in acute disease. Reduces viral replication, symptom duration, and severity. Indicated in primary herpetic gingivostomatitis with systemic symptoms. Prevents complications and improves oral intake in severe cases.",
+      "bodyHtml": "<p>Primary antiviral therapy targeting herpes simplex virus infection. It is most effective when started early in acute disease. Reduces viral replication, symptom duration, and severity. Indicated in primary herpetic gingivostomatitis with systemic symptoms. Prevents complications and improves oral intake in severe cases.</p>",
+      "clinicalReasoning": "This patient has classic HSV presentation: fever, gingival inflammation, and vesicles progressing to ulcers. The presence of systemic symptoms indicates primary infection rather than mild recurrence. Acyclovir directly inhibits HSV DNA polymerase, stopping viral replication. It is the most appropriate and specific treatment.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "A": {
+      "title": "Topical nystatin suspension",
+      "body": "Antifungal medication used for oral candidiasis, especially pseudomembranous type. Works locally in the oral cavity. Effective against Candida species causing scrapable white plaques. Not effective against viral infections.",
+      "bodyHtml": "<p>Antifungal medication used for oral candidiasis, especially pseudomembranous type. Works locally in the oral cavity. Effective against Candida species causing scrapable white plaques. Not effective against viral infections.</p>",
+      "clinicalReasoning": "Although oral lesions are present, this case shows vesicles and ulcers, not scrapable white plaques. No immunosuppression-related fungal pattern is described. Therefore, antifungal therapy is inappropriate.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "B": {
+      "title": "Oral fluconazole",
+      "body": "Systemic antifungal used for moderate to severe oral or esophageal candidiasis. Used when topical therapy fails or disease is extensive. Targets fungal cell membrane synthesis. Reserved for resistant or systemic fungal infections.",
+      "bodyHtml": "<p>Systemic antifungal used for moderate to severe oral or esophageal candidiasis. Used when topical therapy fails or disease is extensive. Targets fungal cell membrane synthesis. Reserved for resistant or systemic fungal infections.</p>",
+      "clinicalReasoning": "This patient does not have fungal features such as curd-like plaques. Vesicular lesions and systemic symptoms strongly suggest viral etiology. Therefore, fluconazole is not indicated.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "D": {
+      "title": "Oral amoxicillin",
+      "body": "Broad-spectrum beta-lactam antibiotic used for bacterial infections. Effective against common Gram-positive and some Gram-negative organisms. Used in bacterial pharyngitis or dental infections. Does not act on viral pathogens.",
+      "bodyHtml": "<p>Broad-spectrum beta-lactam antibiotic used for bacterial infections. Effective against common Gram-positive and some Gram-negative organisms. Used in bacterial pharyngitis or dental infections. Does not act on viral pathogens.</p>",
+      "clinicalReasoning": "No evidence of bacterial infection such as purulence, localized abscess, or bacterial tonsillitis. Presence of vesicles and ulcers excludes bacterial etiology. Hence, antibiotics are inappropriate.",
+      "clinicalReasoningHtml": "<p><br/>tonsillitis. Presence of vesicles and ulcers excludes bacterial etiology. Hence, antibiotics are inappropriate.</p>"
+    },
+    "E": {
+      "title": "Chlorhexidine mouth rinse",
+      "body": "Antiseptic oral rinse used for plaque control and mild gingival disease. Reduces oral bacterial load. Often used as adjunct therapy in periodontal disease. Does not treat viral or fungal infections.",
+      "bodyHtml": "<p>Antiseptic oral rinse used for plaque control and mild gingival disease. Reduces oral bacterial load. Often used as adjunct therapy in periodontal disease. Does not treat viral or fungal infections.</p>",
+      "clinicalReasoning": "This may provide symptomatic relief but does not treat the underlying HSV infection. It is supportive only and not definitive therapy in acute primary HSV infection.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    }
+  },
+  "keyConcept": "Primary herpetic gingivostomatitis presents with fever, painful oral vesicles, and gingival inflammation. The treatment of choice is antiviral therapy, specifically acyclovir, which inhibits HSV DNA replication and reduces disease severity and duration. Supportive agents alone are insufficient in symptomatic primary infection.",
+  "keyConceptHtml": "<p>Primary herpetic gingivostomatitis presents with fever, painful oral vesicles, and gingival inflammation. The treatment of choice is antiviral therapy, specifically acyclovir, which inhibits HSV DNA replication and reduces disease severity and duration. Supportive agents alone are insufficient in symptomatic primary infection.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections – Management",
+    "mcqTitle": "Infections – Management - Primary Herpetic Gingivostomatitis (HSV-1 Infection)",
+    "domain": "Internal Medicine",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Diagnosis & Management (clinical decision-making)",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Clinical Features, Pathogenesis, and Management",
+  "differentialDiagnosisTableName": "Differential Diagnosis of Painful Oral Vesicles and Ulcers",
+  "featureTable": [
+    {
+      "feature": "Etiology",
+      "featureHtml": "<p><strong>Etiology</strong></p>",
+      "description": "• Herpes simplex virus type 1 (HSV-1)",
+      "descriptionHtml": "<p>• Herpes simplex virus type 1 (HSV-1)</p>",
+      "clinicalImportance": "• Primary infection in non-immune host",
+      "clinicalImportanceHtml": "<p>• Primary infection in non-immune host</p>"
+    },
+    {
+      "feature": "Age group",
+      "featureHtml": "<p><strong>Age group</strong></p>",
+      "description": "• Children,\nadolescents,\nyoung adults",
+      "descriptionHtml": "<p>• Children, </p><p>adolescents, </p><p>young adults</p>",
+      "clinicalImportance": "• Common in college students or close-contact settings",
+      "clinicalImportanceHtml": "<p>• Common in college students or close-contact settings</p>"
+    },
+    {
+      "feature": "Onset",
+      "featureHtml": "<p><strong>Onset</strong></p>",
+      "description": "• Acute, sudden onset",
+      "descriptionHtml": "<p>• Acute, sudden onset</p>",
+      "clinicalImportance": "• Rapid progression over 2–5 days",
+      "clinicalImportanceHtml": "<p>• Rapid progression over 2–5 days</p>"
+    },
+    {
+      "feature": "Systemic symptoms",
+      "featureHtml": "<p><strong>Systemic symptoms</strong></p>",
+      "description": "• Fever\n• malaise\n• anorexia",
+      "descriptionHtml": "<p>• Fever </p><p>• malaise </p><p>• anorexia</p>",
+      "clinicalImportance": "• Indicates primary viral infection",
+      "clinicalImportanceHtml": "<p>• Indicates primary viral infection</p>"
+    },
+    {
+      "feature": "Oral lesions",
+      "featureHtml": "<p><strong>Oral lesions</strong></p>",
+      "description": "• Vesicles\n• shallow ulcers\n• painful erosions",
+      "descriptionHtml": "<p>• Vesicles </p><p>• shallow ulcers </p><p>• painful erosions</p>",
+      "clinicalImportance": "• Vesicles rupture → ulcers",
+      "clinicalImportanceHtml": "<p>• Vesicles rupture → ulcers</p>"
+    },
+    {
+      "feature": "Gingival findings",
+      "featureHtml": "<p><strong>Gingival findings</strong></p>",
+      "description": "• Swollen gingiva\n• bleeding gums\n• erythematous gums",
+      "descriptionHtml": "<p>• Swollen gingiva </p><p>• bleeding gums </p><p>• erythematous gums</p>",
+      "clinicalImportance": "• Classic gingivostomatitis feature",
+      "clinicalImportanceHtml": "<p>• Classic gingivostomatitis feature</p>"
+    },
+    {
+      "feature": "Pain",
+      "featureHtml": "<p><strong>Pain</strong></p>",
+      "description": "• Severe oral pain\n• difficulty eating/drinking",
+      "descriptionHtml": "<p>• Severe oral pain </p><p>• difficulty eating/drinking</p>",
+      "clinicalImportance": "• Leads to dehydration risk",
+      "clinicalImportanceHtml": "<p>• Leads to dehydration risk</p>"
+    },
+    {
+      "feature": "Distribution",
+      "featureHtml": "<p><strong>Distribution</strong></p>",
+      "description": "• Lips\n• gingiva\n• buccal mucosa\n• oral cavity",
+      "descriptionHtml": "<p>• Lips </p><p>• gingiva </p><p>• buccal mucosa </p><p>• oral cavity</p>",
+      "clinicalImportance": "• Diffuse oral involvement (not localized)",
+      "clinicalImportanceHtml": "<p>• Diffuse oral involvement (not localized)</p>"
+    },
+    {
+      "feature": "Transmission",
+      "featureHtml": "<p><strong>Transmission</strong></p>",
+      "description": "• Saliva\n• close contact",
+      "descriptionHtml": "<p>• Saliva </p><p>• close contact</p>",
+      "clinicalImportance": "• Highly contagious infection",
+      "clinicalImportanceHtml": "<p>• Highly contagious infection</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Primary herpetic\ngingivostomatitis\n(HSV-1)",
+      "conditionHtml": "<p><strong>Primary herpetic </strong></p><p><strong>gingivostomatitis </strong></p><p><strong>(HSV-1)</strong></p>",
+      "distinguishingFeatures": "• Fever\n• vesicles\n• shallow ulcers\n• gingival bleeding",
+      "distinguishingFeaturesHtml": "<p>• Fever </p><p>• vesicles </p><p>• shallow ulcers </p><p>• gingival bleeding</p>",
+      "keyDifferences": "• Systemic symptoms + vesicles + diffuse oral involvement",
+      "keyDifferencesHtml": "<p>• Systemic symptoms + vesicles + diffuse oral involvement</p>"
+    },
+    {
+      "condition": "Recurrent herpes\nlabialis",
+      "conditionHtml": "<p><strong>Recurrent herpes </strong></p><p><strong>labialis</strong></p>",
+      "distinguishingFeatures": "• Localized lip vesicles\n• burning prodrome",
+      "distinguishingFeaturesHtml": "<p>• Localized lip vesicles </p><p>• burning prodrome</p>",
+      "keyDifferences": "• No fever\n• limited to lip margin",
+      "keyDifferencesHtml": "<p>• No fever </p><p>• limited to lip margin</p>"
+    },
+    {
+      "condition": "Oral candidiasis",
+      "conditionHtml": "<p><strong>Oral candidiasis</strong></p>",
+      "distinguishingFeatures": "• White curd-like plaques\n• scrapable lesions\n• erythematous base",
+      "distinguishingFeaturesHtml": "<p>• White curd-like plaques </p><p>• scrapable lesions </p><p>• erythematous base</p>",
+      "keyDifferences": "• No vesicles\n• fungal etiology",
+      "keyDifferencesHtml": "<p>• No vesicles </p><p>• fungal etiology</p>"
+    },
+    {
+      "condition": "Aphthous ulcers",
+      "conditionHtml": "<p><strong>Aphthous ulcers</strong></p>",
+      "distinguishingFeatures": "• Round painful ulcers\n• no vesicles\n• non-contagious",
+      "distinguishingFeaturesHtml": "<p>• Round painful ulcers </p><p>• no vesicles </p><p>• non-contagious</p>",
+      "keyDifferences": "• No systemic symptoms\n• isolated ulcers only",
+      "keyDifferencesHtml": "<p>• No systemic symptoms </p><p>• isolated ulcers only</p>"
+    },
+    {
+      "condition": "Hand-foot-mouth\ndisease",
+      "conditionHtml": "<p><strong>Hand-foot-mouth </strong></p><p><strong>disease</strong></p>",
+      "distinguishingFeatures": "• Oral ulcers\n• hand and foot rash\n• fever",
+      "distinguishingFeaturesHtml": "<p>• Oral ulcers </p><p>• hand and foot rash </p><p>• fever</p>",
+      "keyDifferences": "• Cutaneous rash differentiates",
+      "keyDifferencesHtml": "<p>• Cutaneous rash differentiates</p>"
+    },
+    {
+      "condition": "Behçet disease",
+      "conditionHtml": "<p><strong>Behçet disease</strong></p>",
+      "distinguishingFeatures": "• Recurrent oral ulcers\n• genital ulcers\n• uveitis",
+      "distinguishingFeaturesHtml": "<p>• Recurrent oral ulcers </p><p>• genital ulcers </p><p>• uveitis</p>",
+      "keyDifferences": "• Multisystem inflammatory disease",
+      "keyDifferencesHtml": "<p>• Multisystem inflammatory disease</p>"
+    }
+  ],
+  "diagram": {
+    "name": "Clinical Features, Pathogenesis, and Management",
+    "caption": "This diagram illustrates the key clinical presentation of primary herpetic gingivostomatitis caused by HSV-1, including painful oral vesicles, shallow ulcers, swollen bleeding gums, fever, and malaise. It demonstrates the viral pathogenesis from oral mucosal entry to trigeminal ganglion involvement, highlights classic diagnostic features, complications, and emphasizes oral acyclovir as first-line therapy along with supportive care measures.",
+    "captionHtml": "<p>This diagram illustrates the key clinical presentation of primary herpetic gingivostomatitis caused by HSV-1, including painful oral vesicles, shallow ulcers, swollen bleeding gums, fever, and malaise. It demonstrates the viral pathogenesis from oral mucosal entry to trigeminal ganglion involvement, highlights classic diagnostic features, complications, and emphasizes oral acyclovir as first-line therapy along with supportive care measures.</p>",
+    "images": [
+      {
+        "filename": "image1.jpeg",
+        "path": "images/image1.jpeg",
+        "sourceName": "image1.jpeg"
+      }
+    ],
+    "image": "images/image1.jpeg"
+  }
+}

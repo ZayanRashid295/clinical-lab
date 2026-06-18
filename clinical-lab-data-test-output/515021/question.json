@@ -1,0 +1,165 @@
+{
+  "questionId": "515021",
+  "questionNumber": "18",
+  "stem": "A patient with chronic plaque psoriasis presents with plaques covering 15% of body surface area. He has been on topical therapy for several weeks with minimal improvement. What is the next best step in management?",
+  "stemHtml": "<p>Q 05: A patient with chronic plaque psoriasis presents with plaques covering 15% of body surface area. He has been on topical therapy for several weeks with minimal improvement. What is the next best step in management?<strong> </strong><strong>(</strong><strong>Question Id: 515021)</strong></p>",
+  "options": [
+    "Continue topical therapy only",
+    "Add oral antihistamines",
+    "Use antibiotics",
+    "Cosmetic camouflage",
+    "Start phototherapy or systemic therapy"
+  ],
+  "optionsHtml": [
+    "<p>Continue topical therapy only</p>",
+    "<p>Add oral antihistamines</p>",
+    "<p>Use antibiotics</p>",
+    "<p>Cosmetic camouflage</p>",
+    "<p>Start phototherapy or systemic therapy</p>"
+  ],
+  "correctAnswer": "E",
+  "keywords": [
+    "Plaques covering 15% of body surface area (BSA) – Indicates moderate psoriasis, signaling that topical therapy alone is insufficient.",
+    "Minimal improvement with topical therapy – Shows treatment-refractory disease, pointing toward the need for phototherapy or systemic therapy.",
+    "These two keywords are sufficient to identify the correct next step (Option E)."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Plaques covering 15% of body surface area (BSA)</strong> – Indicates <strong>moderate psoriasis</strong>, signaling that <strong>topical therapy alone is insufficient</strong>.</li></ol>",
+    "<ol><li><strong>Minimal improvement with topical therapy</strong> – Shows <strong>treatment-refractory disease</strong>, pointing toward the need for <strong>phototherapy or systemic therapy</strong>.</li></ol>",
+    "<p>These two keywords are sufficient to identify the <strong>correct next step</strong> (Option E).</p>"
+  ],
+  "explanations": {
+    "E": {
+      "title": "Start phototherapy or systemic therapy",
+      "body": "When psoriasis involves >10% of the Body Surface Area (BSA) or is recalcitrant to topicals, it is classified as moderate-to-severe. The next line of treatment involves Narrowband UVB phototherapy or systemic agents (like Methotrexate, Cyclosporine, or Biologics).\nIn dermatology, we follow a \"stepped\" approach to psoriasis. When the disease covers more than 10% of the body, it is physically and psychologically burdensome.\nPhototherapy (NB-UVB): Uses specific wavelengths of light to slow down the rapid growth of skin cells and suppress the overactive immune response in the skin. It is often the preferred next step because it lacks the internal organ side effects of oral medications.\nSystemic Therapy: If phototherapy is unavailable or ineffective, systemic medications are used. These include traditional orals (Methotrexate) or newer Biologics (e.g., Adalimumab, Ustekinumab), which target specific inflammatory cytokines like TNF-alpha or IL-17.\nThese treatments target the immune-mediated pathophysiology of psoriasis, suppressing T-cell activation and keratinocyte hyperproliferation, leading to plaque improvement.",
+      "bodyHtml": "<ul><li>When psoriasis involves &gt;10% of the Body Surface Area (BSA) or is recalcitrant to topicals, it is classified as moderate-to-severe. The next line of treatment involves Narrowband UVB phototherapy or systemic agents (like Methotrexate, Cyclosporine, or Biologics).</li><li>In dermatology, we follow a &quot;stepped&quot; approach to psoriasis. When the disease covers more than 10% of the body, it is physically and psychologically burdensome.</li><li><strong>Phototherapy (NB-UVB):</strong> Uses specific wavelengths of light to slow down the rapid growth of skin cells and suppress the overactive immune response in the skin. It is often the preferred next step because it lacks the internal organ side effects of oral medications.</li><li><strong>Systemic Therapy:</strong> If phototherapy is unavailable or ineffective, systemic medications are used. These include traditional orals (Methotrexate) or newer <strong>Biologics</strong> (e.g., Adalimumab, Ustekinumab), which target specific inflammatory cytokines like TNF-alpha or IL-17.</li><li>These treatments <strong>target the immune-mediated pathophysiology</strong> of psoriasis, suppressing <strong>T-cell activation and keratinocyte hyperproliferation</strong>, leading to plaque improvement.</li></ul>"
+    },
+    "A": {
+      "title": "Continue topical therapy only",
+      "body": "Incorrect because the patient has moderate psoriasis (>10% BSA) and topical therapy alone is insufficient. Continuing the same treatment will not achieve adequate disease control.",
+      "bodyHtml": "<ul><li>Incorrect because the patient has <strong>moderate psoriasis</strong> (&gt;10% BSA) and <strong>topical therapy alone is insufficient</strong>. Continuing the same treatment will not achieve adequate disease control.</li></ul>",
+      "systemInvolved": "Skin (integumentary system).",
+      "systemInvolvedHtml": "<p>Skin (integumentary system).</p>"
+    },
+    "B": {
+      "title": "Add oral antihistamines",
+      "body": "Antihistamines are not disease-modifying in psoriasis; they only help with pruritus, which is symptomatic relief and does not treat plaques.",
+      "bodyHtml": "<ul><li>Antihistamines are <strong>not disease-modifying</strong> in psoriasis; they only help with <strong>pruritus</strong>, which is symptomatic relief and does not treat plaques.</li></ul>"
+    },
+    "C": {
+      "title": "Use antibiotics",
+      "body": "Psoriasis is not an infectious disease; antibiotics have no role unless there is a secondary bacterial infection, which is not mentioned here.",
+      "bodyHtml": "<ul><li>Psoriasis is <strong>not an infectious disease</strong>; antibiotics have no role unless there is a secondary bacterial infection, which is <strong>not mentioned</strong> here.</li></ul>"
+    },
+    "D": {
+      "title": "Cosmetic camouflage",
+      "body": "Cosmetic camouflage addresses appearance only and does not treat the underlying disease, so it is not appropriate for moderate-to-severe psoriasis requiring systemic control.",
+      "bodyHtml": "<ul><li>Cosmetic camouflage addresses <strong>appearance only</strong> and <strong>does not treat the underlying disease</strong>, so it is not appropriate for moderate-to-severe psoriasis requiring systemic control.</li></ul>"
+    }
+  },
+  "keyConcept": "Moderate-to-severe plaque psoriasis (BSA >10%) with poor response to topicals requires phototherapy or systemic therapy.\nTopicals are first-line for mild disease, but immune-modulating therapy is needed for larger BSA or refractory disease.\nSymptomatic treatments (antihistamines, camouflage) or antibiotics do not alter disease progression.",
+  "keyConceptHtml": "<ul><li><strong>Moderate-to-severe plaque psoriasis</strong> (BSA &gt;10%) with poor response to topicals <strong>requires phototherapy or systemic therapy</strong>.</li><li>Topicals are first-line for <strong>mild disease</strong>, but <strong>immune-modulating therapy</strong> is needed for larger BSA or refractory disease.</li><li>Symptomatic treatments (antihistamines, camouflage) or antibiotics <strong>do not alter disease progression</strong>.</li></ul>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Classification & Variants - Chronic Plaque Psoriasis – Moderate Disease Management",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Psoriasis – Chronic Plaque Psoriasis: Moderate Disease Management",
+  "differentialDiagnosisTableName": "Psoriasis – Chronic Plaque Psoriasis Moderate Disease Management Differential Diagnosis of Chronic Plaque Psoriasis",
+  "featureTable": [
+    {
+      "feature": "BSA Involvement",
+      "featureHtml": "<p><strong>BSA Involvement</strong></p>",
+      "description": "10–30% of body surface area",
+      "descriptionHtml": "<p>10–30% of body surface area</p>",
+      "clinicalImportance": "Classified as moderate psoriasis;\nguides escalation from topical therapy",
+      "clinicalImportanceHtml": "<ul><li>Classified as <strong>moderate psoriasis</strong>; </li><li>guides escalation from topical therapy</li></ul>"
+    },
+    {
+      "feature": "Response to Topicals",
+      "featureHtml": "<p><strong>Response to Topicals</strong></p>",
+      "description": "Poor or minimal improvement",
+      "descriptionHtml": "<p>Poor or minimal improvement</p>",
+      "clinicalImportance": "Indicates need for:\nsystemic therapy or\nphototherapy",
+      "clinicalImportanceHtml": "<p>Indicates <strong>need for</strong><strong>:</strong></p><ul><li><strong>systemic therapy or </strong></li><li><strong>phototherapy</strong></li></ul>"
+    },
+    {
+      "feature": "Treatment Options",
+      "featureHtml": "<p><strong>Treatment Options</strong></p>",
+      "description": "Phototherapy (narrowband UVB),\nsystemic agents (methotrexate, acitretin, biologics)",
+      "descriptionHtml": "<ul><li>Phototherapy (narrowband UVB), </li><li>systemic agents (methotrexate, acitretin, biologics)</li></ul>",
+      "clinicalImportance": "Choice depends on:\ncomorbidities,\nseverity,\npatient preference, and\nguideline recommendations",
+      "clinicalImportanceHtml": "<p>Choice depends on:</p><ul><li><strong>comorbidities, </strong></li><li><strong>severity, </strong></li><li><strong>patient preference, and </strong></li><li><strong>guideline recommendations</strong></li></ul>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Eczema / Atopic Dermatitis",
+      "conditionHtml": "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
+      "distinguishingFeatures": "Itchy,\nerythematous patches,\noften flexural",
+      "distinguishingFeaturesHtml": "<ul><li>Itchy, </li><li>erythematous patches, </li><li>often flexural</li></ul>",
+      "keyDifferences": "Usually less well-demarcated,\noozing/crusting,\nhistory of atopy",
+      "keyDifferencesHtml": "<ul><li>Usually <strong>less well-demarcated</strong>, </li><li>oozing/crusting, </li><li>history of atopy</li></ul>"
+    },
+    {
+      "condition": "Seborrheic Dermatitis",
+      "conditionHtml": "<p><strong>Seborrheic Dermatitis</strong></p>",
+      "distinguishingFeatures": "Greasy,\nyellowish scales,\noften on scalp, face, chest",
+      "distinguishingFeaturesHtml": "<ul><li>Greasy, </li><li>yellowish scales, </li><li>often on scalp, face, chest</li></ul>",
+      "keyDifferences": "Greasy scales,\ninvolvement of seborrheic areas,\nless sharply demarcated",
+      "keyDifferencesHtml": "<ul><li><strong>Greasy scales</strong>, </li><li>involvement of <strong>seborrheic areas</strong>, </li><li>less sharply demarcated</li></ul>"
+    },
+    {
+      "condition": "Tinea corporis (Fungal infection)",
+      "conditionHtml": "<p><strong>Tinea corporis (Fungal infection)</strong></p>",
+      "distinguishingFeatures": "Annular lesions with central clearing",
+      "distinguishingFeaturesHtml": "<ul><li>Annular lesions with central clearing</li></ul>",
+      "keyDifferences": "Positive KOH prep,\nresponds to antifungals",
+      "keyDifferencesHtml": "<ul><li>Positive <strong>KOH prep</strong>, </li><li>responds to <strong>antifungals</strong></li></ul>"
+    },
+    {
+      "condition": "Pityriasis Rubra Pilaris",
+      "conditionHtml": "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
+      "distinguishingFeatures": "Follicular papules with orange-red plaques,\npalmoplantar keratoderma",
+      "distinguishingFeaturesHtml": "<ul><li>Follicular papules with orange-red plaques, </li><li>palmoplantar keratoderma</li></ul>",
+      "keyDifferences": "Island of sparing pattern,\nwidespread involvement",
+      "keyDifferencesHtml": "<ul><li><strong>Island of sparing</strong> pattern, </li><li>widespread involvement</li></ul>"
+    },
+    {
+      "condition": "Lichen Planus",
+      "conditionHtml": "<p><strong>Lichen Planus</strong></p>",
+      "distinguishingFeatures": "Purple, polygonal,\nflat-topped papules,\noften on wrists/ankles",
+      "distinguishingFeaturesHtml": "<ul><li>Purple, polygonal, </li><li>flat-topped papules, </li><li>often on wrists/ankles</li></ul>",
+      "keyDifferences": "Wickham striae,\nmucosal involvement",
+      "keyDifferencesHtml": "<ul><li><strong>Wickham striae</strong>, </li><li>mucosal involvement</li></ul>"
+    },
+    {
+      "condition": "Cutaneous Lupus Erythematosus",
+      "conditionHtml": "<p><strong>Cutaneous Lupus Erythematosus</strong></p>",
+      "distinguishingFeatures": "Erythematous plaques,\noften sun-exposed areas",
+      "distinguishingFeaturesHtml": "<ul><li>Erythematous plaques, </li><li>often sun-exposed areas</li></ul>",
+      "keyDifferences": "Photosensitivity,\nlab markers positive,\nchronic scarring",
+      "keyDifferencesHtml": "<ul><li><strong>Photosensitivity</strong>, </li><li>lab markers positive, </li><li>chronic scarring</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Psoriasis – Chronic Plaque Psoriasis: Moderate Disease Management",
+    "caption": "This diagram illustrates the management approach for moderate chronic plaque psoriasis, defined by 10–30% body surface area involvement with poor response to topical therapy. It emphasizes treatment escalation to phototherapy (narrowband UVB) or systemic agents (e.g., methotrexate, acitretin, biologics), guided by disease severity, comorbidities, patient preference, and clinical guidelines.",
+    "captionHtml": "<p>This diagram illustrates the <strong>management approach for moderate chronic plaque psoriasis</strong>, defined by <strong>10–30% body surface area involvement</strong> with <strong>poor response to topical therapy</strong>. It emphasizes <strong>treatment escalation</strong> to <strong>phototherapy (narrowband UVB)</strong> or <strong>systemic agents</strong> (e.g., methotrexate, acitretin, biologics), guided by <strong>disease severity, comorbidities, patient preference, and clinical guidelines</strong>.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

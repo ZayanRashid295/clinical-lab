@@ -1,0 +1,179 @@
+{
+  "questionId": "515025",
+  "questionNumber": "22",
+  "stem": "A 52-year-old patient with stable chronic plaque psoriasis has been well-controlled on topical therapy. Recently, the patient was started on a new medication for hypertension. Over the next few weeks, the psoriasis lesions worsen, with increased erythema and scaling. Which of the following drugs is most likely responsible?",
+  "stemHtml": "<p>Q 09:<strong> </strong>A 52-year-old patient with stable chronic plaque psoriasis has been well-controlled on topical therapy. Recently, the patient was started on a new medication for hypertension. Over the next few weeks, the psoriasis lesions worsen, with increased erythema and scaling. Which of the following drugs is most likely responsible?<strong> </strong><strong>(</strong><strong>Question Id: 515025)</strong></p>",
+  "options": [
+    "ACE inhibitor",
+    "Calcium channel blocker",
+    "Thiazide diuretic",
+    "Statin",
+    "Beta-blocker"
+  ],
+  "optionsHtml": [
+    "<p>ACE inhibitor</p>",
+    "<p>Calcium channel blocker</p>",
+    "<p>Thiazide diuretic</p>",
+    "<p>Statin</p>",
+    "<p>Beta-blocker</p>"
+  ],
+  "correctAnswer": "E",
+  "keywords": [
+    "“Worsening of psoriasis lesions” – Indicates drug-induced exacerbation of chronic plaque psoriasis.",
+    "“Started on a new medication for hypertension” – Suggests the trigger is a cardiovascular drug recently initiated.",
+    "“Over the next few weeks” – Highlights the temporal relationship between drug initiation and psoriasis flare.",
+    "Introduction of a new drug",
+    "Temporal worsening of lesions"
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>“Worsening of psoriasis lesions”</strong> – Indicates <strong>drug-induced exacerbation</strong> of chronic plaque psoriasis.</li></ol>",
+    "<ol><li><strong>“Started on a new medication for hypertension”</strong> – Suggests the trigger is a <strong>cardiovascular drug</strong> recently initiated.</li></ol>",
+    "<ol><li><strong>“Over the next few weeks”</strong> – Highlights the <strong>temporal relationship</strong> between drug initiation and psoriasis flare.</li></ol>",
+    "<ol><li><strong>Introduction of a new drug</strong></li></ol>",
+    "<ol><li><strong>Temporal worsening of lesions</strong></li></ol>"
+  ],
+  "explanations": {
+    "E": {
+      "title": "Beta-blocker",
+      "body": "Beta-blockers are well-known to exacerbate or trigger psoriasis in susceptible individuals.\nMechanism: When these receptors are blocked, there is a decrease in intracellular cyclic adenosine monophosphate (cAMP) levels. Lower cAMP levels lead to increased keratinocyte proliferation and a decrease in differentiation, which directly fuels the formation of the thick, scaly plaques characteristic of psoriasis. This reaction can occur weeks or even months after starting the medication.\nTiming: usually weeks after initiation, as described in the case.",
+      "bodyHtml": "<ul><li><strong>Beta-blockers</strong> are well-known to <strong>exacerbate or trigger psoriasis</strong> in susceptible individuals.</li><li><strong>Mechanism:</strong> When these receptors are blocked, there is a decrease in intracellular <strong>cyclic adenosine monophosphate (cAMP)</strong> levels. Lower cAMP levels lead to increased keratinocyte proliferation and a decrease in differentiation, which directly fuels the formation of the thick, scaly plaques characteristic of psoriasis. This reaction can occur weeks or even months after starting the medication.</li><li><strong>Timing:</strong> usually <strong>weeks after initiation</strong>, as described in the case.</li></ul>",
+      "systemInvolved": "Dermatologic / Skin (Psoriasis exacerbation)",
+      "systemInvolvedHtml": "<p>Dermatologic / Skin (Psoriasis exacerbation)</p>"
+    },
+    "A": {
+      "title": "ACE inhibitor",
+      "body": "Rarely associated with drug-induced psoriasis.\nMore commonly linked to angioedema, cough, hyperkalemia.\nLess likely the culprit in psoriasis flare.",
+      "bodyHtml": "<ul><li>Rarely associated with drug-induced psoriasis.</li><li>More commonly linked to <strong>angioedema, cough, hyperkalemia</strong>.</li><li>Less likely the culprit in psoriasis flare.</li></ul>"
+    },
+    "B": {
+      "title": "Calcium channel blocker",
+      "body": "Generally safe regarding psoriasis.\nMain adverse effects: edema, hypotension, bradycardia.\nNot commonly implicated in worsening psoriasis.",
+      "bodyHtml": "<ul><li>Generally safe regarding psoriasis.</li><li>Main adverse effects: <strong>edema, hypotension, bradycardia</strong>.</li><li>Not commonly implicated in worsening psoriasis.</li></ul>"
+    },
+    "C": {
+      "title": "Thiazide diuretic",
+      "body": "Can cause photosensitivity, electrolyte disturbances, and sometimes skin rashes.\nPsoriasis exacerbation is uncommon.",
+      "bodyHtml": "<ul><li>Can cause <strong>photosensitivity, electrolyte disturbances</strong>, and sometimes skin rashes.</li><li>Psoriasis exacerbation is uncommon.</li></ul>"
+    },
+    "D": {
+      "title": "Statin",
+      "body": "Mostly used for dyslipidemia.\nCan rarely cause skin reactions like rash or pruritus, but psoriasis worsening is not typical.",
+      "bodyHtml": "<ul><li>Mostly used for dyslipidemia.</li><li>Can rarely cause skin reactions like <strong>rash or pruritus</strong>, but psoriasis worsening is <strong>not typical</strong>.</li></ul>"
+    }
+  },
+  "keyConcept": "Beta-blockers are a common cause of drug-induced psoriasis exacerbation. When psoriasis worsens after starting a new medication, especially for cardiovascular conditions, always consider beta-blockers first. Recognizing drug triggers is important for dermatologic and systemic management.",
+  "keyConceptHtml": "<p>Beta-blockers are a common cause of <strong>drug-induced psoriasis exacerbation</strong>. When psoriasis worsens after starting a new medication, especially for cardiovascular conditions, always consider <strong>beta-blockers first</strong>. Recognizing <strong>drug triggers</strong> is important for <strong>dermatologic and systemic management</strong>.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Dermatology",
+    "topic": "Skin Diseases",
+    "subtopic": "Psoriasis",
+    "mcqTitle": "Classification & Variants - Drug-Induced Exacerbation of Psoriasis",
+    "competencyDomain": "Diagnosis",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Reasoning",
+    "difficultyLevel": "Moderate"
+  },
+  "classicTriad": "Pre-existing psoriasis (stable)",
+  "classicTriadHtml": "<ol><li><strong>Pre-existing psoriasis</strong> (stable)</li></ol>",
+  "featureTableName": "Drug-Induced Exacerbation of Psoriasis",
+  "differentialDiagnosisTableName": "Drug-Induced Exacerbation of Psoriasis Differential Diagnosis of Psoriasis Exacerbation",
+  "featureTable": [
+    {
+      "feature": "Beta-blockers",
+      "featureHtml": "<p>Beta-blockers</p>",
+      "description": "Propranolol,\nMetoprolol,\nAtenolol",
+      "descriptionHtml": "<ul><li>Propranolol, </li><li>Metoprolol, </li><li>Atenolol</li></ul>",
+      "clinicalImportance": "Can worsen existing psoriasis or trigger new lesions;\ndecreases cAMP in keratinocytes, increasing proliferation",
+      "clinicalImportanceHtml": "<ul><li>Can worsen existing psoriasis or trigger new lesions; </li><li>decreases cAMP in keratinocytes, increasing proliferation</li></ul>"
+    },
+    {
+      "feature": "ACE inhibitors",
+      "featureHtml": "<p>ACE inhibitors</p>",
+      "description": "Enalapril,\nLisinopril",
+      "descriptionHtml": "<ul><li>Enalapril, </li><li>Lisinopril</li></ul>",
+      "clinicalImportance": "Rarely exacerbate psoriasis;\nmore associated with skin rashes or angioedema",
+      "clinicalImportanceHtml": "<ul><li>Rarely exacerbate psoriasis; </li><li>more associated with skin rashes or angioedema</li></ul>"
+    },
+    {
+      "feature": "Thiazide diuretics",
+      "featureHtml": "<p>Thiazide diuretics</p>",
+      "description": "Hydrochlorothiazide,\nChlorthalidone",
+      "descriptionHtml": "<ul><li>Hydrochlorothiazide, </li><li>Chlorthalidone</li></ul>",
+      "clinicalImportance": "Occasionally trigger psoriasis flare;\nmay cause photosensitivity and mild skin reactions",
+      "clinicalImportanceHtml": "<ul><li>Occasionally trigger psoriasis flare; </li><li>may cause photosensitivity and mild skin reactions</li></ul>"
+    },
+    {
+      "feature": "Lithium",
+      "featureHtml": "<p>Lithium</p>",
+      "description": "Lithium carbonate",
+      "descriptionHtml": "<ul><li>Lithium carbonate</li></ul>",
+      "clinicalImportance": "Well-known for triggering or worsening psoriasis;\nalters keratinocyte differentiation and immune response",
+      "clinicalImportanceHtml": "<ul><li>Well-known for triggering or worsening psoriasis; </li><li>alters keratinocyte differentiation and immune response</li></ul>"
+    },
+    {
+      "feature": "Antimalarials",
+      "featureHtml": "<p>Antimalarials</p>",
+      "description": "Chloroquine,\nHydroxychloroquine",
+      "descriptionHtml": "<ul><li>Chloroquine, </li><li>Hydroxychloroquine</li></ul>",
+      "clinicalImportance": "Can precipitate or worsen psoriasis;\nmechanism involves immune modulation",
+      "clinicalImportanceHtml": "<ul><li>Can precipitate or worsen psoriasis; </li><li>mechanism involves immune modulation</li></ul>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Plaque Psoriasis Progression",
+      "conditionHtml": "<p><strong>Plaque Psoriasis Progression</strong></p>",
+      "distinguishingFeatures": "Gradual worsening of chronic lesions",
+      "distinguishingFeaturesHtml": "<p>Gradual worsening of chronic lesions</p>",
+      "keyDifferences": "No temporal relation to new drug initiation",
+      "keyDifferencesHtml": "<p>No temporal relation to new drug initiation</p>"
+    },
+    {
+      "condition": "Eczema / Atopic Dermatitis",
+      "conditionHtml": "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
+      "distinguishingFeatures": "Itchy, ill-defined,\nsometimes vesicular lesions",
+      "distinguishingFeaturesHtml": "<ul><li>Itchy, ill-defined, </li><li>sometimes vesicular lesions</li></ul>",
+      "keyDifferences": "Usually more pruritic;\ndistribution different;\nchronic course without new drug trigger",
+      "keyDifferencesHtml": "<ul><li>Usually more pruritic; </li><li>distribution different; </li><li>chronic course without new drug trigger</li></ul>"
+    },
+    {
+      "condition": "Fungal Infection (Tinea corporis)",
+      "conditionHtml": "<p><strong>Fungal Infection (Tinea corporis)</strong></p>",
+      "distinguishingFeatures": "Ring-shaped erythematous lesions with scaling",
+      "distinguishingFeaturesHtml": "<p>Ring-shaped erythematous lesions with scaling</p>",
+      "keyDifferences": "Positive KOH/microscopy;\noften localized;\nnot related to drug initiation",
+      "keyDifferencesHtml": "<ul><li>Positive KOH/microscopy; </li><li>often localized; </li><li>not related to drug initiation</li></ul>"
+    },
+    {
+      "condition": "Pustular Psoriasis",
+      "conditionHtml": "<p><strong>Pustular Psoriasis</strong></p>",
+      "distinguishingFeatures": "Sudden widespread pustules,\nsystemic symptoms",
+      "distinguishingFeaturesHtml": "<ul><li>Sudden widespread pustules, </li><li>systemic symptoms</li></ul>",
+      "keyDifferences": "May be idiopathic or triggered by withdrawal of systemic therapy,\nnot specific antihypertensive drugs",
+      "keyDifferencesHtml": "<ul><li>May be idiopathic or triggered by withdrawal of systemic therapy, </li><li>not specific antihypertensive drugs</li></ul>"
+    },
+    {
+      "condition": "Other Drug Reactions (Exanthematous / DRESS)",
+      "conditionHtml": "<p><strong>Other Drug Reactions (</strong><strong>Exanthematous</strong><strong> / DRESS)</strong></p>",
+      "distinguishingFeatures": "Widespread rash,\nmay have systemic involvement",
+      "distinguishingFeaturesHtml": "<ul><li>Widespread rash, </li><li>may have systemic involvement</li></ul>",
+      "keyDifferences": "Usually accompanied by fever, eosinophilia, multi-organ involvement;\ntiming may vary",
+      "keyDifferencesHtml": "<ul><li>Usually accompanied by fever, eosinophilia, multi-organ involvement; </li><li>timing may vary</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Drug-Induced Exacerbation of Psoriasis",
+    "caption": "The diagram illustrates how certain medications, particularly beta-blockers, can trigger worsening of pre-existing plaque psoriasis. It shows a patient with flaring skin lesions and highlights the pathophysiology: increased inflammation and keratinocyte overgrowth. The flow emphasizes the temporal link between new drug initiation and lesion exacerbation, key clinical clues (recent drug change, timing), and management strategies (discontinue offending drug, adjust psoriasis therapy).",
+    "captionHtml": "<p>The diagram illustrates how certain medications, particularly <strong>beta-blockers</strong>, can trigger worsening of pre-existing plaque psoriasis. It shows a patient with <strong>flaring skin lesions</strong> and highlights the <strong>pathophysiology</strong>: increased inflammation and keratinocyte overgrowth. The flow emphasizes the <strong>temporal link between new drug initiation and lesion exacerbation</strong>, key <strong>clinical clues</strong> (recent drug change, timing), and <strong>management strategies</strong> (discontinue offending drug, adjust psoriasis therapy). </p>",
+    "images": [
+      {
+        "filename": "image1.jpeg",
+        "path": "images/image1.jpeg",
+        "sourceName": "image1.jpeg"
+      }
+    ],
+    "image": "images/image1.jpeg"
+  }
+}

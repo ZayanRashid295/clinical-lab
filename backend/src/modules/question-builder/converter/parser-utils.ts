@@ -41,7 +41,55 @@ export function findSectionIndex(paragraphs: string[], label: string): number | 
 }
 
 export function isKeyConceptHeading(paragraph: string): boolean {
-  return paragraph.toLowerCase().trim().startsWith("key concept");
+  const trimmed = paragraph.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower === "key concept" || lower === "key concept of mcq") return true;
+  if (/^key concept\s*\([^)]+\)/i.test(trimmed)) return true;
+  if (/^key concept\s*[—–-]\s*\S/i.test(trimmed) && !/^key concept\s*:/i.test(trimmed)) {
+    return true;
+  }
+  // Inline "Key concept: explanation..." inside an option block is not the section heading.
+  if (/^key concept\s*:/i.test(trimmed)) {
+    return trimmed.slice(trimmed.indexOf(":") + 1).trim().length === 0;
+  }
+  return false;
+}
+
+export function findMetadataBlockStart(paragraphs: string[], searchFrom: number): number | null {
+  for (let index = searchFrom; index < paragraphs.length; index += 1) {
+    if (isMetadataLine(paragraphs[index])) return index;
+  }
+  return null;
+}
+
+/** Prefer the Key Concept block that precedes metadata (not table-section "Key Concept" labels). */
+export function findPrimaryKeyConceptIndex(paragraphs: string[], explanationStart: number): number {
+  const metadataStart = findMetadataBlockStart(paragraphs, explanationStart + 1);
+  if (metadataStart !== null) {
+    for (let index = metadataStart - 1; index > explanationStart; index -= 1) {
+      const paragraph = paragraphs[index].trim();
+      if (!paragraph) continue;
+      if (isKeyConceptHeading(paragraph)) return index;
+    }
+  }
+
+  for (let index = explanationStart + 1; index < paragraphs.length; index += 1) {
+    const paragraph = paragraphs[index].trim();
+    if (!paragraph) continue;
+    const lower = paragraph.toLowerCase();
+    if (lower === "key concept of mcq" || /^key concept\s*\(mcq insight\)/i.test(paragraph)) {
+      return index;
+    }
+  }
+
+  return findFirstKeyConceptIndex(paragraphs, explanationStart + 1);
+}
+
+export function findFirstKeyConceptIndex(paragraphs: string[], searchFrom = 0): number {
+  for (let index = searchFrom; index < paragraphs.length; index += 1) {
+    if (isKeyConceptHeading(paragraphs[index])) return index;
+  }
+  return paragraphs.length;
 }
 
 export function isMetadataLine(paragraph: string): boolean {
@@ -81,11 +129,50 @@ export function findQuestionContentEnd(
 }
 
 export function parseOptionLine(paragraph: string): { letter: string; title: string } | null {
-  const match = paragraph.match(/^\(Option ([A-E0O])\)\s*[.:]?\s*(.+?):?\s*$/);
-  if (!match) return null;
-  let letter = match[1].toUpperCase();
-  if (letter === "0" || letter === "O") letter = "E";
-  return { letter, title: match[2].trim() };
+  const parenMatch = paragraph.match(/^\(Option ([A-E0O])\)\s*[.:]?\s*(.+?):?\s*$/);
+  if (parenMatch) {
+    let letter = parenMatch[1].toUpperCase();
+    if (letter === "0" || letter === "O") letter = "E";
+    return { letter, title: parenMatch[2].trim() };
+  }
+
+  const shortMatch = paragraph.match(/^([A-E])\)\s*(.+?)\s*$/);
+  if (shortMatch) {
+    return { letter: shortMatch[1], title: shortMatch[2].replace(/:$/, "").trim() };
+  }
+
+  return null;
+}
+
+export function splitStemAndOptionTexts(
+  paragraphs: string[],
+  stemIndex: number,
+  answerIndex: number,
+): { stemContinuations: string[]; optionTexts: string[] } {
+  const between = paragraphs
+    .slice(stemIndex + 1, answerIndex)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  if (between.length <= 5) {
+    return { stemContinuations: [], optionTexts: between };
+  }
+
+  const letterOptionStart = between.findIndex((line) => /^[A-E][.)]\s+\S/.test(line));
+  if (letterOptionStart >= 0) {
+    const optionTexts = between.slice(letterOptionStart);
+    if (optionTexts.length === 5) {
+      return {
+        stemContinuations: between.slice(0, letterOptionStart),
+        optionTexts,
+      };
+    }
+  }
+
+  return {
+    stemContinuations: between.slice(0, -5),
+    optionTexts: between.slice(-5),
+  };
 }
 
 export function normalizeStemText(raw: string): string {

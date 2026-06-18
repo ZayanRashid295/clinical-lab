@@ -1,0 +1,183 @@
+{
+  "questionId": "506050",
+  "questionNumber": "12",
+  "stem": "A 52-year-old woman with acute myeloid leukemia is receiving induction chemotherapy and has developed prolonged neutropenia. She presents with fever, oral pain, and difficulty swallowing for 3 days. Examination reveals extensive white plaques on the oral mucosa that bleed when scraped, along with erythema of the posterior pharynx. Despite oral hygiene measures, symptoms are worsening. What is the most appropriate initial pharmacologic management?",
+  "stemHtml": "<p>A 52-year-old woman with acute myeloid leukemia is receiving induction chemotherapy and has developed prolonged neutropenia. She presents with fever, oral pain, and difficulty swallowing for 3 days. Examination reveals extensive white plaques on the oral mucosa that bleed when scraped, along with erythema of the posterior pharynx. Despite oral hygiene measures, symptoms are worsening. What is the most appropriate initial pharmacologic management? <strong> (Question Id: 506050)</strong></p>",
+  "options": [
+    "Topical nystatin suspension",
+    "Oral clotrimazole troches",
+    "Oral fluconazole",
+    "Intravenous amphotericin B",
+    "Discontinuation of chemotherapy with supportive care only"
+  ],
+  "optionsHtml": [
+    "<p>Topical nystatin suspension</p>",
+    "<p>Oral clotrimazole troches</p>",
+    "<p>Oral fluconazole</p>",
+    "<p>Intravenous amphotericin B</p>",
+    "<p>Discontinuation of chemotherapy with supportive care only</p>"
+  ],
+  "correctAnswer": "C",
+  "keywords": [
+    "AML with prolonged neutropenia → indicates severely immunocompromised host at high risk of opportunistic fungal infections",
+    "Extensive oral white plaques that bleed on scraping → classic pseudomembranous candidiasis (Candida albicans)",
+    "Worsening despite oral hygiene → suggests need for systemic antifungal therapy escalation"
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>AML with prolonged neutropenia</strong> → indicates <strong>severely immunocompromised host at high risk of opportunistic fungal infections</strong> </li></ol>",
+    "<ol><li><strong>Extensive oral white plaques that bleed on scraping</strong> → classic <strong>pseudomembranous candidiasis (Candida albicans)</strong> </li></ol>",
+    "<ol><li><strong>Worsening despite oral hygiene</strong> → suggests <strong>need for systemic antifungal therapy escalation</strong></li></ol>"
+  ],
+  "explanations": {
+    "C": {
+      "title": "Oral fluconazole",
+      "body": "Patient has immunocompromised state (AML + neutropenia) with extensive oral candidiasis and upper pharyngeal involvement. This indicates moderate-to-severe mucosal candidiasis requiring systemic therapy.Fluconazole is a triazole antifungal that inhibits fungal ergosterol synthesis, making it first-line systemic therapy in stable immunocompromised patients without invasive disease.It has excellent oral bioavailability and is preferred over topical agents in neutropenic or chemotherapy patients.This is the most appropriate initial pharmacologic step before escalation to IV therapy if refractory.",
+      "bodyHtml": "<p>Patient has immunocompromised state (AML + neutropenia) with extensive oral candidiasis and upper pharyngeal involvement. This indicates <strong>moderate-to-severe mucosal candidiasis requiring systemic therapy</strong>.<br/>disease.<br/><br/></p>",
+      "clinicalReasoning": "Immunocompromised host + extensive mucosal disease → topical therapy ineffective → systemic azole indicated.",
+      "clinicalReasoningHtml": "<p><br/></p>",
+      "systemInvolved": "Oral cavity / Gastrointestinal mucosal system",
+      "systemInvolvedHtml": "<p>Oral cavity / Gastrointestinal mucosal system</p>"
+    },
+    "A": {
+      "title": "Topical nystatin suspension",
+      "body": "Nystatin is a polyene antifungal that acts locally in the oral cavity without systemic absorption. It is effective for mild oral thrush in immunocompetent or minimally immunocompromised patients.However, in neutropenic patients with extensive lesions and pharyngeal involvement, topical therapy is inadequate.It cannot prevent progression or treat deeper mucosal spread in immunosuppressed states.",
+      "bodyHtml": "<p>Nystatin is a polyene antifungal that acts locally in the oral cavity without systemic absorption. It is effective for mild oral thrush in immunocompetent or minimally immunocompromised patients.<br/><br/></p>",
+      "clinicalReasoning": "Limited to superficial oral disease → inadequate for immunocompromised host.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "B": {
+      "title": "Oral clotrimazole troches",
+      "body": "Clotrimazole acts locally by inhibiting fungal cell membrane synthesis. It is effective for mild oral candidiasis.However, its efficacy depends on adequate salivary contact and patient compliance, which is suboptimal in severe mucositis.Not suitable for neutropenic patients with extensive disease progression.",
+      "bodyHtml": "<p>Clotrimazole acts locally by inhibiting fungal cell membrane synthesis. It is effective for mild oral candidiasis.<br/><br/></p>",
+      "clinicalReasoning": "Local action only → insufficient for systemic immunosuppression-related infection.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "D": {
+      "title": "Intravenous amphotericin B",
+      "body": "Amphotericin B binds ergosterol causing fungal cell death and is reserved for invasive, disseminated, or refractory fungal infections.Although highly potent, it carries significant nephrotoxicity and infusion-related toxicity.This patient has mucocutaneous candidiasis, not invasive candidemia or organ involvement, so IV amphotericin is excessive as initial therapy.",
+      "bodyHtml": "<p>Amphotericin B binds ergosterol causing fungal cell death and is reserved for <strong>invasive, disseminated, or refractory fungal infections</strong>.<br/><br/></p>",
+      "clinicalReasoning": "Overtreatment for mucosal disease → reserved for severe systemic fungal infection.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    },
+    "E": {
+      "title": "Discontinuation of chemotherapy with supportive care only",
+      "body": "Stopping chemotherapy may reduce immunosuppression but does not treat active infection.This is not an immediate management step for candidiasis and would risk worsening malignancy control.Supportive care alone is inappropriate in active fungal infection.",
+      "bodyHtml": "<p>Stopping chemotherapy may reduce immunosuppression but does not treat active infection.<br/><br/></p>",
+      "clinicalReasoning": "Does not address causative organism → incorrect acute management approach.",
+      "clinicalReasoningHtml": "<p><br/></p>"
+    }
+  },
+  "keyConcept": "In immunocompromised patients (AML + neutropenia), extensive oral candidiasis requires systemic antifungal therapy (fluconazole) rather than topical agents. Treatment choice depends on severity: topical for mild disease, systemic azoles for moderate/severe mucosal disease, and amphotericin B for invasive infection.",
+  "keyConceptHtml": "<p>In immunocompromised patients (AML + neutropenia), <strong>extensive oral candidiasis requires systemic antifungal therapy (fluconazole)</strong> rather than topical agents. Treatment choice depends on severity: topical for mild disease, systemic azoles for moderate/severe mucosal disease, and amphotericin B for invasive infection.</p>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Gastroenterology (GIT)",
+    "topic": "Oral Cavity",
+    "subtopic": "Infections – Complications & Special Situations",
+    "mcqTitle": "Infections – Complications & Special Situations - Immunocompromised Host – Mucocutaneous Candidiasis (Neutropenia-associated Oral Thrush Management)",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Decision-making",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Immunocompromised Host – Mucocutaneous Candidiasis (Neutropenia-associated Oral Thrush Management)",
+  "differentialDiagnosisTableName": "Immunocompromised Host – Oral White Lesions with Neutropenia (AML) – Candidiasis vs Mimickers Differential Diagnosis of White Oral Lesions in Immunocompromised Patient",
+  "featureTable": [
+    {
+      "feature": "Immunocompromised\nstate",
+      "featureHtml": "<p><strong>Immunocompromised</strong></p><p><strong> state</strong></p>",
+      "description": "• AML• Induction chemotherapy• Prolonged neutropenia",
+      "descriptionHtml": "<p>• AML<br/><br/></p>",
+      "clinicalImportance": "Severe reduction in neutrophil-mediated fungal defense → high risk of opportunistic infections",
+      "clinicalImportanceHtml": "<p>Severe reduction in neutrophil-mediated fungal defense → high risk of opportunistic infections</p>"
+    },
+    {
+      "feature": "Oral white plaques",
+      "featureHtml": "<p><strong>Oral white plaques</strong></p>",
+      "description": "• White curd-like plaques• Easily scrapable• Bleeding after scraping",
+      "descriptionHtml": "<p>• White curd-like plaques<br/><br/></p>",
+      "clinicalImportance": "Classic pseudomembranous candidiasis due to Candida albicans overgrowth",
+      "clinicalImportanceHtml": "<p>Classic pseudomembranous candidiasis due to Candida albicans overgrowth</p>"
+    },
+    {
+      "feature": "Associated symptoms",
+      "featureHtml": "<p><strong>Associated symptoms</strong></p>",
+      "description": "• Oral pain• Dysphagia• Pharyngeal erythema",
+      "descriptionHtml": "<p>• Oral pain<br/><br/></p>",
+      "clinicalImportance": "Suggests extension beyond simple oral thrush → possible oropharyngeal/esophageal involvement",
+      "clinicalImportanceHtml": "<p>Suggests extension beyond simple oral thrush → possible oropharyngeal/esophageal involvement</p>"
+    },
+    {
+      "feature": "Clinical course",
+      "featureHtml": "<p><strong>Clinical course</strong></p>",
+      "description": "• Progressive worsening• No response to oral hygiene",
+      "descriptionHtml": "<p>• Progressive worsening<br/></p>",
+      "clinicalImportance": "Indicates failure of local control → need systemic antifungal therapy",
+      "clinicalImportanceHtml": "<p>Indicates failure of local control → need systemic antifungal therapy</p>"
+    },
+    {
+      "feature": "System involved",
+      "featureHtml": "<p><strong>System involved</strong></p>",
+      "description": "• Oral cavity• Oropharynx• Upper GI mucosa",
+      "descriptionHtml": "<p>• Oral cavity<br/><br/></p>",
+      "clinicalImportance": "Mucocutaneous fungal infection in immunosuppressed host",
+      "clinicalImportanceHtml": "<p>Mucocutaneous fungal infection in immunosuppressed host</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Oral candidiasis (Pseudomembranous)",
+      "conditionHtml": "<p><strong>Oral candidiasis (Pseudomembranous)</strong></p>",
+      "distinguishingFeatures": "• White plaques• Scrapes off• Bleeding base• Painful• Immunocompromised state",
+      "distinguishingFeaturesHtml": "<p>• White plaques<br/><br/><br/><br/></p>",
+      "keyDifferences": "Responds to antifungals;\nmost common in neutropenia/HIV",
+      "keyDifferencesHtml": "<ul><li>Responds to antifungals; </li><li>most common in neutropenia/HIV</li></ul>"
+    },
+    {
+      "condition": "Leukoplakia",
+      "conditionHtml": "<p>Leukoplakia</p>",
+      "distinguishingFeatures": "• White patch• Non-scrapable• Painless• Chronic smokers",
+      "distinguishingFeaturesHtml": "<p>• White patch<br/><br/><br/></p>",
+      "keyDifferences": "Premalignant lesion;\nno response to antifungals",
+      "keyDifferencesHtml": "<ul><li>Premalignant lesion; </li><li>no response to antifungals</li></ul>"
+    },
+    {
+      "condition": "Oral lichen planus",
+      "conditionHtml": "<p>Oral lichen planus</p>",
+      "distinguishingFeatures": "• Lacy white striations• Bilateral symmetry• Wickham striae",
+      "distinguishingFeaturesHtml": "<p>• Lacy white striations<br/><br/></p>",
+      "keyDifferences": "Autoimmune;\nnot scrapable;\nchronic course",
+      "keyDifferencesHtml": "<ul><li>Autoimmune; </li><li>not scrapable; </li><li>chronic course</li></ul>"
+    },
+    {
+      "condition": "Oral hairy leukoplakia",
+      "conditionHtml": "<p>Oral hairy leukoplakia</p>",
+      "distinguishingFeatures": "• Corrugated white lesion• Lateral tongue• EBV-related",
+      "distinguishingFeaturesHtml": "<p>• Corrugated white lesion<br/><br/></p>",
+      "keyDifferences": "Seen in HIV;\ndoes NOT scrape off",
+      "keyDifferencesHtml": "<ul><li>Seen in HIV; </li><li>does NOT scrape off</li></ul>"
+    },
+    {
+      "condition": "Diphtheria (oral form)",
+      "conditionHtml": "<p>Diphtheria (oral form)</p>",
+      "distinguishingFeatures": "• Gray pseudomembrane• Bleeds on removal• Systemic toxicity",
+      "distinguishingFeaturesHtml": "<p>• Gray pseudomembrane<br/><br/></p>",
+      "keyDifferences": "True bacterial toxin disease;\nthroat involvement with systemic illness",
+      "keyDifferencesHtml": "<ul><li>True bacterial toxin disease; </li><li>throat involvement with systemic illness</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Immunocompromised Host – Mucocutaneous Candidiasis (Neutropenia-associated Oral Thrush Management)",
+    "caption": "This diagram illustrates the pathogenesis, clinical features, and management approach of mucocutaneous candidiasis in immunocompromised patients, particularly those with chemotherapy-induced neutropenia. It highlights characteristic pseudomembranous oral thrush lesions, major risk factors, progression from localized mucosal infection to invasive disease, and the therapeutic decision pathway from topical antifungals to systemic fluconazole or intravenous amphotericin B based on disease severity.",
+    "captionHtml": "<p>This diagram illustrates the pathogenesis, clinical features, and management approach of mucocutaneous candidiasis in immunocompromised patients, particularly those with chemotherapy-induced neutropenia. It highlights characteristic pseudomembranous oral thrush lesions, major risk factors, progression from localized mucosal infection to invasive disease, and the therapeutic decision pathway from topical antifungals to systemic fluconazole or intravenous amphotericin B based on disease severity.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

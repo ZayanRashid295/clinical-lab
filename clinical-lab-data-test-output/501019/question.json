@@ -1,0 +1,192 @@
+{
+  "questionId": "501019",
+  "questionNumber": "04",
+  "stem": "A 35-year-old woman presents with fatigue, pallor, and brittle nails. Laboratory tests reveal microcytic hypochromic anemia. Which laboratory pattern is most consistent with the underlying cause of her anemia?",
+  "stemHtml": "<p>A 35-year-old woman presents with fatigue, pallor, and brittle nails. Laboratory tests reveal microcytic hypochromic anemia. Which laboratory pattern is most consistent with the underlying cause of her anemia? (<strong>Question Id: 501019)</strong></p>",
+  "options": [
+    "Low serum iron, high TIBC, low ferritin",
+    "Low serum iron, low TIBC, high ferritin",
+    "High serum iron, high ferritin, low TIBC",
+    "Low serum iron, normal TIBC, normal ferritin",
+    "High serum iron, low TIBC, high ferritin"
+  ],
+  "optionsHtml": [
+    "<p>Low serum iron, high TIBC, low ferritin</p>",
+    "<p>Low serum iron, low TIBC, high ferritin</p>",
+    "<p>High serum iron, high ferritin, low TIBC</p>",
+    "<p>Low serum iron, normal TIBC, normal ferritin</p>",
+    "<p>High serum iron, low TIBC, high ferritin</p>"
+  ],
+  "correctAnswer": "A",
+  "keywords": [
+    "Microcytic hypochromic anemia – Indicates iron deficiency anemia or other microcytic causes; helps narrow lab pattern.",
+    "Brittle nails – Classic physical sign of iron deficiency (koilonychia).",
+    "Fatigue & pallor – Non-specific but supports anemia; part of the classic triad of iron deficiency anemia (Fatigue + Pallor + Koilonychia)."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>Microcytic hypochromic anemia</strong> – Indicates <strong>iron deficiency anemia or other microcytic causes</strong>; helps narrow lab pattern.</li></ol>",
+    "<ol><li><strong>Brittle nails</strong> – Classic <strong>physical sign of iron deficiency</strong> (koilonychia).</li></ol>",
+    "<ol><li><strong>Fatigue &amp; pallor</strong> – Non-specific but <strong>supports anemia</strong>; part of the <strong>classic triad of iron deficiency anemia</strong> (Fatigue + Pallor + Koilonychia).</li></ol>"
+  ],
+  "explanations": {
+    "A": {
+      "title": "Low serum iron, high TIBC, low ferritin",
+      "body": "Why correct: This pattern is classic for iron deficiency anemia.\nLow serum iron → reduced circulating iron due to depletion.\nHigh TIBC → liver produces more transferrin to scavenge iron.\nLow ferritin → reflects depleted iron stores.\nPatients typically present with fatigue, pallor, brittle nails, and sometimes pica.",
+      "bodyHtml": "<ul><li><strong>Why correct:</strong> This pattern is <strong>classic for iron deficiency anemia</strong>.</li><ul><li>Low serum iron → reduced circulating iron due to depletion.</li><li>High TIBC → liver produces more transferrin to scavenge iron.</li><li>Low ferritin → reflects depleted iron stores.</li></ul><li>Patients typically present with <strong>fatigue, pallor, brittle nails, and sometimes pica</strong>.</li></ul>"
+    },
+    "B": {
+      "title": "Low serum iron, low TIBC, high ferritin",
+      "body": "Seen in anemia of chronic disease (ACD).\nIron is sequestered in storage; transferrin production is low → low TIBC.\nFerritin is normal or high (an acute-phase reactant), unlike iron deficiency.",
+      "bodyHtml": "<ul><li>Seen in <strong>anemia of chronic disease (ACD)</strong>.</li><li>Iron is sequestered in storage; transferrin production is low → low TIBC.</li><li>Ferritin is normal or high (an acute-phase reactant), unlike iron deficiency.</li></ul>"
+    },
+    "C": {
+      "title": "High serum iron, high ferritin, low TIBC",
+      "body": "Seen in iron overload states (e.g., hemochromatosis).\nNot consistent with microcytic anemia; usually leads to organ deposition.",
+      "bodyHtml": "<ul><li>Seen in <strong>iron overload states</strong> (e.g., hemochromatosis).</li><li>Not consistent with microcytic anemia; usually leads to <strong>organ deposition</strong>.</li></ul>"
+    },
+    "D": {
+      "title": "Low serum iron, normal TIBC, normal ferritin",
+      "body": "Could indicate early or mild iron deficiency, but classic lab pattern is high TIBC and low ferritin.\nLess likely as the “most consistent” pattern for iron deficiency anemia.",
+      "bodyHtml": "<ul><li>Could indicate <strong>early or mild iron deficiency</strong>, but classic lab pattern is high TIBC and low ferritin.</li><li>Less likely as the “most consistent” pattern for iron deficiency anemia.</li></ul>"
+    },
+    "E": {
+      "title": "High serum iron, low TIBC, high ferritin",
+      "body": "Seen in sideroblastic anemia or hemolytic anemia with iron release, not typical iron deficiency.",
+      "bodyHtml": "<ul><li>Seen in <strong>sideroblastic anemia</strong> or <strong>hemolytic anemia with iron release</strong>, not typical iron deficiency.</li></ul>"
+    }
+  },
+  "keyConcept": "Iron deficiency anemia is a microcytic hypochromic anemia characterized by low serum iron, high TIBC, and low ferritin, reflecting depleted iron stores and compensatory increase in transferrin.\nClinical presentation includes fatigue, pallor, brittle nails, spoon nails, and sometimes pica.",
+  "keyConceptHtml": "<ul><li><strong>Iron deficiency anemia</strong> is a <strong>microcytic hypochromic anemia</strong> characterized by <strong>low serum iron, high TIBC, and low ferritin</strong>, reflecting depleted iron stores and compensatory increase in transferrin.</li><li>Clinical presentation includes <strong>fatigue, pallor, brittle nails, spoon nails, and sometimes pica</strong>.</li></ul>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Hematology",
+    "topic": "Anemias - Microcytic Anemia",
+    "subtopic": "Iron Deficiency Anemia",
+    "mcqTitle": "Iron Deficiency Anemia – Laboratory Diagnosis"
+  },
+  "classicTriad": "Fatigue + Pallor + Brittle nails (Koilonychia) → suggests iron deficiency anemia, guiding the choice of low serum iron, high TIBC, low ferritin.",
+  "classicTriadHtml": "<ul><li><strong>Fatigue + Pallor + Brittle nails (Koilonychia)</strong> → suggests <strong>iron deficiency anemia</strong>, guiding the choice of <strong>low serum iron, high TIBC, low ferritin</strong>.</li></ul>",
+  "featureTableName": "Laboratory Diagnosis",
+  "featureTable": [
+    {
+      "feature": "Hemoglobin / Hematocrit",
+      "featureHtml": "<p>Hemoglobin / Hematocrit</p>",
+      "description": "Low",
+      "descriptionHtml": "<p>Low</p>",
+      "clinicalImportance": "Confirms presence of anemia",
+      "clinicalImportanceHtml": "<p>Confirms presence of anemia</p>"
+    },
+    {
+      "feature": "MCV (Mean Corpuscular Volume)",
+      "featureHtml": "<p>MCV (Mean Corpuscular Volume)</p>",
+      "description": "Low (microcytic)",
+      "descriptionHtml": "<p>Low (microcytic)</p>",
+      "clinicalImportance": "Red blood cells are smaller than normal",
+      "clinicalImportanceHtml": "<p>Red blood cells are smaller than normal</p>"
+    },
+    {
+      "feature": "MCH / MCHC",
+      "featureHtml": "<p>MCH / MCHC</p>",
+      "description": "Low (hypochromic)",
+      "descriptionHtml": "<p>Low (hypochromic)</p>",
+      "clinicalImportance": "Red blood cells have reduced hemoglobin content",
+      "clinicalImportanceHtml": "<p>Red blood cells have reduced hemoglobin content</p>"
+    },
+    {
+      "feature": "Serum Iron",
+      "featureHtml": "<p>Serum Iron</p>",
+      "description": "Low",
+      "descriptionHtml": "<p>Low</p>",
+      "clinicalImportance": "Reduced circulating iron",
+      "clinicalImportanceHtml": "<p>Reduced circulating iron</p>"
+    },
+    {
+      "feature": "TIBC (Total Iron Binding Capacity)",
+      "featureHtml": "<p>TIBC (Total Iron Binding Capacity)</p>",
+      "description": "High",
+      "descriptionHtml": "<p>High</p>",
+      "clinicalImportance": "Body increases transferrin to capture more iron",
+      "clinicalImportanceHtml": "<p>Body increases transferrin to capture more iron</p>"
+    },
+    {
+      "feature": "Ferritin",
+      "featureHtml": "<p>Ferritin</p>",
+      "description": "Low",
+      "descriptionHtml": "<p>Low</p>",
+      "clinicalImportance": "Reflects depleted iron stores",
+      "clinicalImportanceHtml": "<p>Reflects depleted iron stores</p>"
+    },
+    {
+      "feature": "Peripheral Smear",
+      "featureHtml": "<p>Peripheral Smear</p>",
+      "description": "Microcytic,\nhypochromic RBCs",
+      "descriptionHtml": "<ul><li>Microcytic, </li><li>hypochromic RBCs</li></ul>",
+      "clinicalImportance": "Classic morphology of iron deficiency",
+      "clinicalImportanceHtml": "<p>Classic morphology of iron deficiency</p>"
+    },
+    {
+      "feature": "Reticulocyte Count",
+      "featureHtml": "<p>Reticulocyte Count</p>",
+      "description": "Normal or low",
+      "descriptionHtml": "<p>Normal or low</p>",
+      "clinicalImportance": "Bone marrow response may be reduced if iron is deficient",
+      "clinicalImportanceHtml": "<p>Bone marrow response may be reduced if iron is deficient</p>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Iron Deficiency Anemia",
+      "conditionHtml": "<p>Iron Deficiency Anemia</p>",
+      "distinguishingFeatures": "Low serum iron,\nhigh TIBC,\nlow ferritin,\nmicrocytic hypochromic RBCs",
+      "distinguishingFeaturesHtml": "<ul><li>Low serum iron, </li><li>high TIBC, </li><li>low ferritin, </li><li>microcytic hypochromic RBCs</li></ul>",
+      "keyDifferences": "Classic iron depletion pattern",
+      "keyDifferencesHtml": "<p>Classic iron depletion pattern</p>"
+    },
+    {
+      "condition": "Anemia of Chronic Disease (ACD)",
+      "conditionHtml": "<p>Anemia of Chronic Disease (ACD)</p>",
+      "distinguishingFeatures": "Low serum iron,\nlow/normal TIBC,\nnormal/high ferritin",
+      "distinguishingFeaturesHtml": "<ul><li>Low serum iron, </li><li>low/normal TIBC, </li><li>normal/high ferritin</li></ul>",
+      "keyDifferences": "Iron sequestration due to chronic inflammation",
+      "keyDifferencesHtml": "<p>Iron sequestration due to chronic inflammation</p>"
+    },
+    {
+      "condition": "Thalassemia Trait",
+      "conditionHtml": "<p>Thalassemia Trait</p>",
+      "distinguishingFeatures": "Normal/high serum iron,\nnormal/high ferritin,\nmicrocytosis disproportionate to anemia",
+      "distinguishingFeaturesHtml": "<ul><li>Normal/high serum iron, </li><li>normal/high ferritin, </li><li>microcytosis disproportionate to anemia</li></ul>",
+      "keyDifferences": "Genetic hemoglobinopathy;\nRBC count may be high",
+      "keyDifferencesHtml": "<ul><li>Genetic hemoglobinopathy; </li><li>RBC count may be high</li></ul>"
+    },
+    {
+      "condition": "Sideroblastic Anemia",
+      "conditionHtml": "<p>Sideroblastic Anemia</p>",
+      "distinguishingFeatures": "Normal/high serum iron,\nhigh ferritin,\nlow TIBC,\nring sideroblasts on bone marrow",
+      "distinguishingFeaturesHtml": "<ul><li>Normal/high serum iron, </li><li>high ferritin, </li><li>low TIBC, </li><li>ring sideroblasts on bone marrow</li></ul>",
+      "keyDifferences": "Defective incorporation of iron into hemoglobin",
+      "keyDifferencesHtml": "<p>Defective incorporation of iron into hemoglobin</p>"
+    },
+    {
+      "condition": "Lead Poisoning",
+      "conditionHtml": "<p>Lead Poisoning</p>",
+      "distinguishingFeatures": "Normal/high serum iron,\nbasophilic stippling on smear,\nmicrocytosis",
+      "distinguishingFeaturesHtml": "<ul><li>Normal/high serum iron, </li><li>basophilic stippling on smear, </li><li>microcytosis</li></ul>",
+      "keyDifferences": "History of exposure;\nusually mild anemia",
+      "keyDifferencesHtml": "<ul><li>History of exposure; </li><li>usually mild anemia</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Laboratory Diagnosis",
+    "caption": "This diagram illustrates the characteristic laboratory findings of iron deficiency anemia, including low serum iron, high TIBC, and low ferritin, along with peripheral smear features showing microcytic, hypochromic red blood cells. It also correlates these findings with common clinical features such as fatigue, pallor, and brittle nails, helping in quick visual diagnosis and exam recall.",
+    "captionHtml": "<p>This diagram illustrates the characteristic laboratory findings of iron deficiency anemia, including <strong>low serum iron, high TIBC, and low ferritin</strong>, along with peripheral smear features showing <strong>microcytic, hypochromic red blood cells</strong>. It also correlates these findings with common clinical features such as <strong>fatigue, pallor, and brittle nails</strong>, helping in quick visual diagnosis and exam recall.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}

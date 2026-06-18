@@ -31,11 +31,15 @@ import {
   findQuestionContentEnd,
   findQuestionId,
   findSectionIndex,
+  findFirstKeyConceptIndex,
+  findPrimaryKeyConceptIndex,
   isKeyConceptHeading,
   isMetadataLine,
   normalizeQuestionId,
   normalizeStemText,
   parseOptionLine,
+  splitStemAndOptionTexts,
+  QUESTION_ID_RE,
 } from "./parser-utils";
 
 const METADATA_FIELDS: Record<string, keyof QuestionMetadata> = {
@@ -95,10 +99,17 @@ async function extractTablesFromBuffer(buffer: Buffer): Promise<string[][][]> {
   );
 }
 
+function normalizeTableHeaderCell(cell: string): string {
+  return cell.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
 function isDifferentialTableHeader(first: string, second: string, third: string): boolean {
   if (first.includes("differential diagnosis")) return true;
   const isConditionCol =
-    first === "condition" || first.startsWith("condition /") || first.startsWith("condition/");
+    first === "condition" ||
+    first.startsWith("condition /") ||
+    first.startsWith("condition/") ||
+    first.startsWith("condition (");
   if (!isConditionCol) return false;
   if (["differentiat", "distinguish", "differ"].some((token) => third.includes(token))) {
     return true;
@@ -115,21 +126,36 @@ function isDifferentialTableHeader(first: string, second: string, third: string)
 
 function classifyTable(rows: string[][]): "feature" | "differential" | null {
   if (!rows.length || rows[0].length < 3) return null;
-  const [first, second, third] = rows[0].slice(0, 3).map((cell) => cell.toLowerCase().trim());
+  const [first, second, third] = rows[0]
+    .slice(0, 3)
+    .map((cell) => normalizeTableHeaderCell(cell));
   if (isDifferentialTableHeader(first, second, third)) {
     return "differential";
   }
   if (
     first === "feature" ||
     first === "clinical feature" ||
+    first === "clinical features" ||
+    first === "mechanism" ||
+    first === "severity category" ||
     first === "aspect" ||
+    first === "parameter" ||
     first === "drug" ||
     first.includes("drug class") ||
     first.includes("investigation") ||
     second.includes("mechanism of action") ||
+    second.includes("mechanism explanation") ||
+    second === "key features" ||
+    second.includes("typical finding") ||
+    second.includes("expected change") ||
+    second.includes("findings in") ||
     second === "key points" ||
     second.includes("clinical details") ||
     second.includes("management approach") ||
+    third.includes("significance") ||
+    third.includes("clinical relevance") ||
+    third.includes("clinical importance") ||
+    third.includes("pathophysiology") ||
     ["description", "details", "clinical description"].includes(second)
   ) {
     return "feature";
@@ -702,7 +728,7 @@ function extractTableNamesAfterMetadata(
 }
 
 function optionPrefixOffset(text: string): number {
-  const match = text.match(/^[A-E]\.\s*/);
+  const match = text.match(/^[A-E][.)]\s*/);
   return match ? match[0].length : 0;
 }
 
@@ -713,6 +739,31 @@ function stemContentOffset(text: string, rawStem: string): number {
   const match = text.match(QUESTION_NUM_RE);
   if (match) return match[0].length;
   return 0;
+}
+
+function splitStemAndOptionEntries(
+  entries: FormattedParagraphEntry[],
+  stemIndex: number,
+  answerIndex: number,
+): { stemContinuationEntries: FormattedParagraphEntry[]; optionEntries: FormattedParagraphEntry[] } {
+  const betweenEntries = entries
+    .slice(stemIndex + 1, answerIndex)
+    .filter((entry) => Boolean(entry.formatted.text.trim()));
+
+  const paragraphs = entries.map((entry) => entry.formatted.text);
+  const { stemContinuations, optionTexts } = splitStemAndOptionTexts(
+    paragraphs,
+    stemIndex,
+    answerIndex,
+  );
+
+  if (stemContinuations.length === 0 && optionTexts.length === betweenEntries.length) {
+    return { stemContinuationEntries: [], optionEntries: betweenEntries };
+  }
+
+  const optionEntries = betweenEntries.slice(-optionTexts.length);
+  const stemContinuationEntries = betweenEntries.slice(0, betweenEntries.length - optionTexts.length);
+  return { stemContinuationEntries, optionEntries };
 }
 
 function parseQuestionBlock(entries: FormattedParagraphEntry[]) {
@@ -729,11 +780,14 @@ function parseQuestionBlock(entries: FormattedParagraphEntry[]) {
   const answerIndex = paragraphs.findIndex((paragraph) => ANSWER_RE.test(paragraph));
   if (answerIndex === -1) throw new Error("Could not find answer");
 
-  const optionEntries = entries.slice(stemIndex + 1, answerIndex).filter((entry) =>
-    Boolean(entry.formatted.text.trim()),
+  const { stemContinuationEntries, optionEntries } = splitStemAndOptionEntries(
+    entries,
+    stemIndex,
+    answerIndex,
   );
-  const options = optionEntries
-    .map((entry) => entry.formatted.text.trim().replace(/^[A-E]\.\s*/, ""));
+  const options = optionEntries.map((entry) =>
+    entry.formatted.text.trim().replace(/^[A-E][.)]\s*/, ""),
+  );
 
   if (options.length !== 5) {
     throw new Error(`Expected 5 options, found ${options.length}`);
@@ -745,7 +799,18 @@ function parseQuestionBlock(entries: FormattedParagraphEntry[]) {
   const stemEntry = entries[stemIndex];
   const stemOffset = stemContentOffset(stemEntry.formatted.text, stemMatch[2]);
   const stemInnerHtml = sliceParagraphHtml(stemEntry.raw, stemOffset);
-  const stemHtml = stemInnerHtml ? `<p>${stemInnerHtml}</p>` : undefined;
+  const stemHtmlParts: string[] = [];
+  if (stemInnerHtml) stemHtmlParts.push(`<p>${stemInnerHtml}</p>`);
+  for (const entry of stemContinuationEntries) {
+    const html = singleParagraphHtml(entry.formatted);
+    if (html) stemHtmlParts.push(html.startsWith("<") ? html : `<p>${html}</p>`);
+  }
+  const stemHtml = stemHtmlParts.length ? stemHtmlParts.join("") : undefined;
+  const stemTextParts = [
+    normalizeStemText(stemMatch[2]),
+    ...stemContinuationEntries.map((entry) => entry.formatted.text.trim()),
+  ].filter(Boolean);
+
   const optionsHtml = optionEntries.map((entry) => {
     const offset = optionPrefixOffset(entry.formatted.text);
     const inner = sliceParagraphHtml(entry.raw, offset);
@@ -755,7 +820,7 @@ function parseQuestionBlock(entries: FormattedParagraphEntry[]) {
   return {
     questionId,
     questionNumber: stemMatch[1],
-    stem: normalizeStemText(stemMatch[2]),
+    stem: stemTextParts.join("\n"),
     stemHtml,
     options,
     optionsHtml,
@@ -899,6 +964,25 @@ function parseExplanations(
   return explanations;
 }
 
+function enrichMetadata(metadata: QuestionMetadata, paragraphs: string[]): void {
+  if (!metadata.category) {
+    for (const paragraph of paragraphs.slice(0, 15)) {
+      const trimmed = paragraph.trim();
+      if (QUESTION_ID_RE.test(trimmed) || QUESTION_NUM_RE.test(trimmed)) continue;
+      if (/FCPS-?1|JCAT|NRE/i.test(trimmed)) {
+        metadata.category = "FCPS-1/ JCAT";
+        break;
+      }
+    }
+  }
+  if (!metadata.system && metadata.topic) {
+    const topicPath = `${metadata.topic} ${metadata.subtopic ?? ""}`;
+    if (/asthma|pulmon|respir|bronch/i.test(topicPath)) {
+      metadata.system = "Respiratory System (Pulmonology)";
+    }
+  }
+}
+
 function parseMetadata(paragraphs: string[], startIndex: number, endIndex: number): QuestionMetadata {
   const metadata: QuestionMetadata = {};
   for (const paragraph of paragraphs.slice(startIndex, endIndex)) {
@@ -923,6 +1007,7 @@ function parseMetadata(paragraphs: string[], startIndex: number, endIndex: numbe
       }
     }
   }
+  enrichMetadata(metadata, paragraphs);
   return metadata;
 }
 
@@ -943,13 +1028,7 @@ async function parseDocxFromBuffer(
   }
 
   const keywordData = parseKeywords(entries, keywordsStart + 1, explanationStart);
-  let firstKeyConceptIndex = paragraphs.length;
-  for (let index = explanationStart + 1; index < paragraphs.length; index += 1) {
-    if (isKeyConceptHeading(paragraphs[index])) {
-      firstKeyConceptIndex = index;
-      break;
-    }
-  }
+  const firstKeyConceptIndex = findPrimaryKeyConceptIndex(paragraphs, explanationStart);
 
   const explanations = parseExplanations(entries, explanationStart + 1, firstKeyConceptIndex);
   const [metadataStart, metadataEnd] = findMetadataRange(paragraphs, firstKeyConceptIndex + 1);

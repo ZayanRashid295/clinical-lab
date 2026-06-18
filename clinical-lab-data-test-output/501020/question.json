@@ -1,0 +1,171 @@
+{
+  "questionId": "501020",
+  "questionNumber": "05",
+  "stem": "A 28-year-old patient with iron deficiency anemia is started on oral iron therapy. After initiating treatment, which of the following laboratory or clinical changes would indicate the earliest adequate hematologic response?",
+  "stemHtml": "<p>A 28-year-old patient with iron deficiency anemia is started on oral iron therapy. After initiating treatment, which of the following laboratory or clinical changes would indicate the earliest adequate hematologic response? (<strong>Question Id: 501020)</strong></p>",
+  "options": [
+    "Ferritin increase within 2 days",
+    "MCV increase within 1 week",
+    "Koilonychia resolution within 1 week",
+    "Reticulocytosis within 1–2 weeks",
+    "Increase in Hb after 1 week"
+  ],
+  "optionsHtml": [
+    "<p>Ferritin increase within 2 days</p>",
+    "<p>MCV increase within 1 week</p>",
+    "<p>Koilonychia resolution within 1 week</p>",
+    "<p>Reticulocytosis within 1–2 weeks</p>",
+    "<p>Increase in Hb after 1 week</p>"
+  ],
+  "correctAnswer": "D",
+  "keywords": [
+    "“Earliest” – Indicates we are looking for the first measurable response after starting iron therapy.",
+    "“Hematologic response” – Focuses on blood/lab changes rather than clinical signs.",
+    "These keywords direct us to reticulocytosis as the correct option."
+  ],
+  "keywordsHtml": [
+    "<ol><li><strong>“Earliest”</strong> – Indicates we are looking for the <strong>first measurable response</strong> after starting iron therapy.</li></ol>",
+    "<ol><li><strong>“Hematologic response”</strong> – Focuses on <strong>blood/lab changes</strong> rather than clinical signs.</li></ol>",
+    "<p>These keywords direct us to <strong>reticulocytosis</strong> as the correct option.</p>"
+  ],
+  "explanations": {
+    "D": {
+      "title": "Reticulocytosis within 1–2 weeks",
+      "body": "Reticulocytes are immature red blood cells, that are released from the bone marrow into the peripheral blood and their count rises 7–10 days after starting iron therapy. This is the earliest hematologic response, reflecting effective erythropoiesis and iron utilization.\nAdditional explanation: Reticulocytosis occurs before hemoglobin rises, making it a sensitive early marker. A peak in reticulocyte count shows that the bone marrow has sufficient iron to produce new red cells, which precedes measurable changes in Hb or MCV.",
+      "bodyHtml": "<ul><li>Reticulocytes are <strong>immature red blood cells</strong>, that are released from the bone marrow into the peripheral blood and their count rises <strong>7–10 days</strong> after starting iron therapy. This is the <strong>earliest hematologic response</strong>, reflecting effective erythropoiesis and iron utilization.</li><li><strong>Additional explanation:</strong> Reticulocytosis occurs <strong>before hemoglobin rises</strong>, making it a sensitive early marker. A peak in reticulocyte count shows that the bone marrow has sufficient iron to produce new red cells, which precedes measurable changes in Hb or MCV.</li></ul>"
+    },
+    "A": {
+      "title": "Ferritin increase within 2 days",
+      "body": "Ferritin reflects iron storage, and while it may rise with therapy, a measurable increase usually takes weeks, not days.\nEarly ferritin changes are not a reliable indicator of response.",
+      "bodyHtml": "<ul><li>Ferritin reflects iron storage, and while it may rise with therapy, a measurable increase usually takes <strong>weeks</strong>, not days. </li><li>Early ferritin changes are not a reliable indicator of response.</li></ul>"
+    },
+    "B": {
+      "title": "MCV increase within 1 week",
+      "body": "Mean corpuscular volume (MCV) reflects red cell size.\nIt takes several weeks (2–4 weeks) for newly produced red cells to increase in size after iron therapy, so MCV rise is a later indicator.",
+      "bodyHtml": "<ul><li>Mean corpuscular volume (MCV) reflects red cell size. </li><li>It takes <strong>several weeks (2–4 weeks)</strong> for newly produced red cells to increase in size after iron therapy, so MCV rise is a <strong>later indicator</strong>.</li></ul>"
+    },
+    "C": {
+      "title": "Koilonychia resolution within 1 week",
+      "body": "Koilonychia (spoon nails) is a chronic clinical sign of iron deficiency.\nNail changes take months to improve, so it is not an early marker of treatment response.",
+      "bodyHtml": "<ul><li>Koilonychia (spoon nails) is a <strong>chronic clinical sign</strong> of iron deficiency. </li><li>Nail changes take <strong>months</strong> to improve, so it is <strong>not an early marker</strong> of treatment response.</li></ul>"
+    },
+    "E": {
+      "title": "Increase in Hb after 1 week",
+      "body": "Hemoglobin levels typically increase after 2–4 weeks of iron therapy, following the earlier rise in reticulocytes.\nSo Hb rise is a later indicator, not the earliest.",
+      "bodyHtml": "<ul><li>Hemoglobin levels typically increase <strong>after 2–4 weeks</strong> of iron therapy, following the earlier rise in reticulocytes. </li><li>So Hb rise is a <strong>later indicator</strong>, not the earliest.</li></ul>"
+    }
+  },
+  "keyConcept": "Earliest indicator of response to oral iron therapy is reticulocytosis (1–2 weeks).\nHemoglobin and MCV changes occur later, while clinical signs like koilonychia resolve months later.\nReticulocyte response reflects active erythropoiesis, making it the most sensitive early marker.",
+  "keyConceptHtml": "<ul><li><strong>Earliest indicator of response to oral iron therapy is reticulocytosis (1–2 weeks).</strong></li><li>Hemoglobin and MCV changes occur <strong>later</strong>, while clinical signs like koilonychia resolve <strong>months later</strong>.</li><li>Reticulocyte response reflects <strong>active erythropoiesis</strong>, making it the <strong>most sensitive early marker</strong>.</li></ul>",
+  "metadata": {
+    "category": "FCPS-1/ JCAT",
+    "product": "Medicine & Allied",
+    "system": "Hematology",
+    "topic": "Anemias - Microcytic Anemia",
+    "subtopic": "Iron Deficiency Anemia",
+    "mcqTitle": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
+    "competencyDomain": "Management",
+    "cognitiveLevel": "Application",
+    "clinicalSkill": "Interpretation",
+    "difficultyLevel": "Moderate"
+  },
+  "featureTableName": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
+  "differentialDiagnosisTableName": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy Differential Diagnosis of Iron Deficiency Anemia",
+  "featureTable": [
+    {
+      "feature": "Reticulocyte count",
+      "featureHtml": "<p>Reticulocyte count</p>",
+      "description": "Rises",
+      "descriptionHtml": "<p>Rises</p>",
+      "clinicalImportance": "Earliest hematologic response,\nusually within 1–2 weeks,\nindicates active erythropoiesis",
+      "clinicalImportanceHtml": "<ul><li>Earliest hematologic response, </li><li>usually within 1–2 weeks, </li><li>indicates active erythropoiesis</li></ul>"
+    },
+    {
+      "feature": "Hemoglobin (Hb)",
+      "featureHtml": "<p>Hemoglobin (Hb)</p>",
+      "description": "Gradual increase",
+      "descriptionHtml": "<p>Gradual increase</p>",
+      "clinicalImportance": "Follows reticulocytosis,\nusually noticeable after 2–4 weeks",
+      "clinicalImportanceHtml": "<ul><li>Follows reticulocytosis, </li><li>usually noticeable after 2–4 weeks</li></ul>"
+    },
+    {
+      "feature": "MCV (Mean Corpuscular Volume)",
+      "featureHtml": "<p>MCV (Mean Corpuscular Volume)</p>",
+      "description": "Gradual increase",
+      "descriptionHtml": "<p>Gradual increase</p>",
+      "clinicalImportance": "Reflects production of normal-sized RBCs,\ntakes 2–4 weeks to change",
+      "clinicalImportanceHtml": "<ul><li>Reflects production of normal-sized RBCs, </li><li>takes 2–4 weeks to change</li></ul>"
+    },
+    {
+      "feature": "Ferritin",
+      "featureHtml": "<p>Ferritin</p>",
+      "description": "Slow rise",
+      "descriptionHtml": "<p>Slow rise</p>",
+      "clinicalImportance": "Indicates replenishment of iron stores,\nusually after several weeks",
+      "clinicalImportanceHtml": "<ul><li>Indicates replenishment of iron stores, </li><li>usually after several weeks</li></ul>"
+    },
+    {
+      "feature": "Clinical signs (e.g., koilonychia)",
+      "featureHtml": "<p>Clinical signs (e.g., koilonychia)</p>",
+      "description": "Slow improvement",
+      "descriptionHtml": "<p>Slow improvement</p>",
+      "clinicalImportance": "May take months to resolve;\nnot an early marker",
+      "clinicalImportanceHtml": "<ul><li>May take months to resolve; </li><li>not an early marker</li></ul>"
+    }
+  ],
+  "differentialDiagnosisTable": [
+    {
+      "condition": "Anemia of Chronic Disease (ACD)",
+      "conditionHtml": "<p>Anemia of Chronic Disease (ACD)</p>",
+      "distinguishingFeatures": "Mild to moderate anemia,\nlow serum iron,\nlow TIBC,\nnormal/high ferritin",
+      "distinguishingFeaturesHtml": "<ul><li>Mild to moderate anemia, </li><li>low serum iron, </li><li>low TIBC, </li><li>normal/high ferritin</li></ul>",
+      "keyDifferences": "Ferritin is normal/high (not low),\nusually associated with chronic infection, inflammation, or malignancy",
+      "keyDifferencesHtml": "<ul><li>Ferritin is normal/high (not low), </li><li>usually associated with chronic infection, inflammation, or malignancy</li></ul>"
+    },
+    {
+      "condition": "Thalassemia Minor",
+      "conditionHtml": "<p>Thalassemia Minor</p>",
+      "distinguishingFeatures": "Microcytic anemia,\nnormal/high RBC count,\ntarget cells on smear",
+      "distinguishingFeaturesHtml": "<ul><li>Microcytic anemia, </li><li>normal/high RBC count, </li><li>target cells on smear</li></ul>",
+      "keyDifferences": "Iron therapy does not correct anemia,\nnormal/high ferritin",
+      "keyDifferencesHtml": "<ul><li>Iron therapy does not correct anemia, </li><li>normal/high ferritin</li></ul>"
+    },
+    {
+      "condition": "Sideroblastic Anemia",
+      "conditionHtml": "<p>Sideroblastic Anemia</p>",
+      "distinguishingFeatures": "Microcytic or normocytic anemia,\nring sideroblasts on marrow",
+      "distinguishingFeaturesHtml": "<ul><li>Microcytic or normocytic anemia, </li><li>ring sideroblasts on marrow</li></ul>",
+      "keyDifferences": "Iron overload present,\nnot responsive to oral iron",
+      "keyDifferencesHtml": "<ul><li>Iron overload present, </li><li>not responsive to oral iron</li></ul>"
+    },
+    {
+      "condition": "Lead Poisoning",
+      "conditionHtml": "<p>Lead Poisoning</p>",
+      "distinguishingFeatures": "Microcytic anemia,\nbasophilic stippling",
+      "distinguishingFeaturesHtml": "<ul><li>Microcytic anemia, </li><li>basophilic stippling</li></ul>",
+      "keyDifferences": "History of exposure,\niron therapy ineffective",
+      "keyDifferencesHtml": "<ul><li>History of exposure, </li><li>iron therapy ineffective</li></ul>"
+    },
+    {
+      "condition": "Vitamin B12 / Folate Deficiency (early stages)",
+      "conditionHtml": "<p>Vitamin B12 / Folate Deficiency (early stages)</p>",
+      "distinguishingFeatures": "Sometimes mild anemia before macrocytosis",
+      "distinguishingFeaturesHtml": "<ul><li>Sometimes mild anemia before macrocytosis</li></ul>",
+      "keyDifferences": "Usually normocytic initially,\nreticulocyte response differs",
+      "keyDifferencesHtml": "<ul><li>Usually normocytic initially, </li><li>reticulocyte response differs</li></ul>"
+    }
+  ],
+  "diagram": {
+    "name": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
+    "caption": "This diagram illustrates the timeline of hematologic response after initiating oral iron therapy in iron deficiency anemia. It highlights reticulocytosis as the earliest response (within 1–2 weeks), followed by a gradual rise in hemoglobin after 2–4 weeks, while MCV and iron stores improve later, and clinical signs like koilonychia take months to resolve.",
+    "captionHtml": "<p>This diagram illustrates the <strong>timeline of hematologic response</strong> after initiating oral iron therapy in iron deficiency anemia. It highlights <strong>reticulocytosis as the earliest response (within 1–2 weeks)</strong>, followed by a <strong>gradual rise in hemoglobin after 2–4 weeks</strong>, while <strong>MCV and iron stores improve later</strong>, and <strong>clinical signs like koilonychia take months to resolve</strong>.</p>",
+    "images": [
+      {
+        "filename": "image1.png",
+        "path": "images/image1.png",
+        "sourceName": "image1.png"
+      }
+    ],
+    "image": "images/image1.png"
+  }
+}
