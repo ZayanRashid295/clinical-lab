@@ -79,6 +79,172 @@
   "classicTriad": "Wheeze + dyspnea + reduced PEF → Acute bronchospasm pattern",
   "classicTriadHtml": "<p>Wheeze + dyspnea + reduced PEF → <strong>Acute bronchospasm pattern</strong></p>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Acute Asthma Exacerbation – Clinical Features, Pathophysiology & Diagnosis",
+      "headingHtml": "<p><u><strong>Acute Asthma Exacerbation – </strong></u></p><p><u><strong>Clinical Features, Pathophysiology &amp; Diagnosis</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Description",
+        "Brief Clinical Detail"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Description </strong></p>",
+        "<p><strong>Brief Clinical Detail</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition",
+            "• Acute worsening of bronchial asthma• Reversible airway obstruction• Triggered by inflammation or bronchospasm",
+            "Sudden deterioration in known or previously undiagnosed asthmatic due to airway narrowing"
+          ],
+          "cellsHtml": [
+            "<p><strong>Definition</strong></p>",
+            "<p>• Acute worsening of bronchial asthma<br/>• Reversible airway obstruction<br/>• Triggered by inflammation or bronchospasm</p>",
+            "<p>Sudden deterioration in known or previously undiagnosed asthmatic due to airway narrowing</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Key Symptoms",
+            "• Sudden dyspnea• Diffuse wheeze• Chest tightness• Cough (may be dry)",
+            "Classic triad: wheeze + dyspnea + chest tightness indicates airflow obstruction"
+          ],
+          "cellsHtml": [
+            "<p><strong>Key Symptoms</strong></p>",
+            "<p>• Sudden dyspnea<br/>• Diffuse wheeze<br/>• Chest tightness<br/>• Cough (may be dry)</p>",
+            "<p>Classic triad: wheeze + dyspnea + chest tightness indicates airflow obstruction</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Objective Findings",
+            "• ↓ Peak Expiratory Flow (PEF)• ↓ FEV1• Prolonged expiration",
+            "PEF reduction reflects severity and helps monitor response to treatment"
+          ],
+          "cellsHtml": [
+            "<p><strong>Objective Findings</strong></p>",
+            "<p>• ↓ Peak Expiratory Flow (PEF)<br/>• ↓ FEV1<br/>• Prolonged expiration</p>",
+            "<p>PEF reduction reflects severity and helps monitor response to treatment</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Triggers",
+            "• Viral infections• Allergens, dust• Exercise, cold air• NSAIDs (in some patients)",
+            "Triggers cause airway hyperreactivity leading to bronchospasm"
+          ],
+          "cellsHtml": [
+            "<p><strong>Triggers</strong></p>",
+            "<p>• Viral infections<br/>• Allergens, dust<br/>• Exercise, cold air<br/>• NSAIDs (in some patients)</p>",
+            "<p>Triggers cause airway hyperreactivity leading to bronchospasm</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pathophysiology",
+            "• Bronchial smooth muscle constriction• Mucosal edema• Mucus plugging",
+            "Leads to reversible airflow obstruction, unlike COPD"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pathophysiology</strong></p>",
+            "<p>• Bronchial smooth muscle constriction<br/>• Mucosal edema<br/>• Mucus plugging</p>",
+            "<p>Leads to reversible airflow obstruction, unlike COPD</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Severity Indicators",
+            "• Silent chest• Hypoxia• Exhaustion• Rising CO₂",
+            "Indicates impending respiratory failure and need for ICU care"
+          ],
+          "cellsHtml": [
+            "<p><strong>Severity Indicators</strong></p>",
+            "<p>• Silent chest<br/>• Hypoxia<br/>• Exhaustion<br/>• Rising CO₂</p>",
+            "<p>Indicates impending respiratory failure and need for ICU care</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Acute Wheeze and Sudden Dyspnea",
+      "headingHtml": "<p><strong>Differential Diagnosis of</strong></p><p><strong>Acute Wheeze and Sudden Dyspnea</strong></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Distinguishing Clinical Clues"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features </strong></p>",
+        "<p><strong>Distinguishing Clinical Clues</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Acute COPD\nexacerbation",
+            "• Chronic smoking history• Progressive dyspnea• Increased sputum• Wheeze",
+            "Older patient, non-reversible airflow limitation, infective trigger common"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute COPD </strong></p><p><strong>exacerbation</strong></p>",
+            "<p>• Chronic smoking history<br/>• Progressive dyspnea<br/>• Increased sputum<br/>• Wheeze</p>",
+            "<p>Older patient, non-reversible airflow limitation, infective trigger common</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Acute bronchitis",
+            "• Productive cough• Mild wheeze• Post-viral illness• Low-grade fever",
+            "Cough predominant; no significant PEF reduction"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute bronchitis</strong></p>",
+            "<p>• Productive cough<br/>• Mild wheeze<br/>• Post-viral illness<br/>• Low-grade fever</p>",
+            "<p>Cough predominant; no significant PEF reduction</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pneumothorax",
+            "• Sudden unilateral chest pain• Absent breath sounds• Decreased chest expansion• Possible tracheal deviation",
+            "Unilateral findings, no diffuse wheeze"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pneumothorax</strong></p>",
+            "<p>• Sudden unilateral chest pain<br/>• Absent breath sounds<br/>• Decreased chest expansion<br/>• Possible tracheal deviation</p>",
+            "<p>Unilateral findings, no diffuse wheeze</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pulmonary\nembolism",
+            "• Sudden dyspnea• Pleuritic chest pain• Tachycardia• Hypoxia",
+            "Vascular origin, clear lungs, no wheeze usually"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pulmonary </strong></p><p><strong>embolism</strong></p>",
+            "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Tachycardia<br/>• Hypoxia</p>",
+            "<p>Vascular origin, clear lungs, no wheeze usually</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Vocal cord\ndysfunction",
+            "• Inspiratory stridor• Normal oxygen saturation• Episodic dyspnea• Anxiety association",
+            "Upper airway obstruction mimic, normal PEF or inconsistent results"
+          ],
+          "cellsHtml": [
+            "<p><strong>Vocal cord </strong></p><p><strong>dysfunction</strong></p>",
+            "<p>• Inspiratory stridor<br/>• Normal oxygen saturation<br/>• Episodic dyspnea<br/>• Anxiety association</p>",
+            "<p>Upper airway obstruction mimic, normal PEF or inconsistent results</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Acute Asthma Exacerbation – Clinical Features, Pathophysiology & Diagnosis",
     "headingHtml": "<p><u><strong>Acute Asthma Exacerbation – </strong></u></p><p><u><strong>Clinical Features, Pathophysiology &amp; Diagnosis</strong></u></p>",
@@ -243,6 +409,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Acute Asthma Exacerbation – Diagnosis and Clinical Features",
+      "headingHtml": "<p><u><strong>Acute Asthma Exacerbation – Diagnosis and Clinical Features</strong></u></p>",
+      "description": "This diagram illustrates the pathophysiology, clinical presentation, and diagnostic evaluation of acute asthma exacerbation. It compares a normal airway with an asthmatic airway during an attack, highlighting bronchial smooth muscle constriction, mucosal edema, and mucus plugging leading to reversible airflow obstruction. The figure also summarizes common triggers, key clinical features, severity assessment using peak expiratory flow (PEF), and important diagnostic indicators used in emergency and internal medicine practice.",
+      "descriptionHtml": "<p>This diagram illustrates the pathophysiology, clinical presentation, and diagnostic evaluation of acute asthma exacerbation. It compares a normal airway with an asthmatic airway during an attack, highlighting bronchial smooth muscle constriction, mucosal edema, and mucus plugging leading to reversible airflow obstruction. The figure also summarizes common triggers, key clinical features, severity assessment using peak expiratory flow (PEF), and important diagnostic indicators used in emergency and internal medicine practice.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Acute Asthma Exacerbation – Diagnosis and Clinical Features",
     "headingHtml": "<p><u><strong>Acute Asthma Exacerbation – Diagnosis and Clinical Features</strong></u></p>",

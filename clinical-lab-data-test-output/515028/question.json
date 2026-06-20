@@ -71,6 +71,160 @@
   "classicTriad": "Widespread pustules + Fever + Malaise → classic triad indicating generalized pustular psoriasis with systemic involvement.",
   "classicTriadHtml": "<ul><li><strong>Widespread pustules + Fever + Malaise</strong> → classic triad indicating <strong>generalized pustular psoriasis with systemic involvement</strong>.</li></ul>",
   "classicTriadTitle": "Classic triad in stem",
+  "tables": [
+    {
+      "heading": "Pustular Psoriasis – Generalized (Acute) Management",
+      "headingHtml": "<p><u><strong>Pustular Psoriasis – </strong></u></p><p><u><strong>Generalized (Acute) Management</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Clinical Details",
+        "Management Approach"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Clinical Details</strong></p>",
+        "<p><strong>Management Approach</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Presentation",
+            "Widespread pustules on erythematous background,\nfever,\nmalaise,\nleukocytosis",
+            "Recognize as medical emergency requiring urgent assessment"
+          ],
+          "cellsHtml": [
+            "<p><strong>Presentation</strong></p>",
+            "<ul><li>Widespread pustules on erythematous background, </li><li>fever, </li><li>malaise, </li><li>leukocytosis</li></ul>",
+            "<p>Recognize as <strong>medical emergency</strong> requiring urgent assessment</p>"
+          ]
+        },
+        {
+          "cells": [
+            "System Involvement",
+            "Skin + systemic inflammatory response",
+            "Monitor vitals,\nlab parameters,\nfluids,\nelectrolytes"
+          ],
+          "cellsHtml": [
+            "<p><strong>System Involvement</strong></p>",
+            "<p>Skin + systemic inflammatory response</p>",
+            "<ul><li>Monitor vitals, </li><li>lab parameters, </li><li>fluids, </li><li>electrolytes</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Immediate Management",
+            "Hospitalization and systemic therapy",
+            "Systemic agents:\nacitretin, methotrexate, cyclosporine, biologics;\nsupportive care (hydration, infection control)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Immediate Management</strong></p>",
+            "<p>Hospitalization and systemic therapy</p>",
+            "<p>Systemic agents: </p><ul><li><strong>acitretin, methotrexate, cyclosporine, biologics</strong>; </li></ul><p>supportive care (hydration, infection control)</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Supportive Care",
+            "Pain relief,\nfever control,\nskin care",
+            "Topical emollients,\nantiseptic care,\nnutritional support"
+          ],
+          "cellsHtml": [
+            "<p><strong>Supportive Care</strong></p>",
+            "<ul><li>Pain relief, </li><li>fever control, </li><li>skin care</li></ul>",
+            "<ul><li>Topical emollients, </li><li>antiseptic care, </li><li>nutritional support</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Monitoring",
+            "Vital signs,\nlab trends,\ninfection risk",
+            "Frequent observation for complications (sepsis, organ dysfunction)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Monitoring</strong></p>",
+            "<ul><li>Vital signs, </li><li>lab trends, </li><li>infection risk</li></ul>",
+            "<p>Frequent observation for complications (sepsis, organ dysfunction)</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Generalized Pustular Eruptions with Systemic Symptoms",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Generalized Pustular Eruptions with Systemic Symptoms</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Clinical Features",
+        "Distinguishing Points from Generalized Pustular Psoriasis"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Clinical Features</strong></p>",
+        "<p><strong>Distinguishing Points from Generalized Pustular Psoriasis</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Acute Generalized Pustular Psoriasis (GPP)",
+            "Widespread sterile pustules on erythematous skin,\nfever,\nmalaise,\nleukocytosis",
+            "Often history of psoriasis;\nsterile pustules;\nsystemic inflammation"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute Generalized Pustular Psoriasis (GPP)</strong></p>",
+            "<ul><li>Widespread sterile pustules on erythematous skin, </li><li>fever, </li><li>malaise, </li><li>leukocytosis</li></ul>",
+            "<ul><li>Often history of psoriasis; </li><li>sterile pustules; </li><li>systemic inflammation</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Acute Generalized Exanthematous Pustulosis (AGEP)",
+            "Sudden onset pustular rash,\nfever,\nleukocytosis",
+            "Usually drug-induced;\nresolves rapidly after withdrawal of offending drug;\nmucous membranes often involved"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute Generalized Exanthematous Pustulosis (AGEP)</strong></p>",
+            "<ul><li>Sudden onset pustular rash, </li><li>fever, </li><li>leukocytosis</li></ul>",
+            "<ul><li>Usually drug-induced; </li><li>resolves rapidly after withdrawal of offending drug; </li><li>mucous membranes often involved</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Bacterial Skin Infection / Impetigo",
+            "Pustules with erythema,\nsometimes systemic signs",
+            "Positive bacterial culture;\nlocalized lesions;\nresponds to antibiotics"
+          ],
+          "cellsHtml": [
+            "<p><strong>Bacterial Skin Infection / Impetigo</strong></p>",
+            "<ul><li>Pustules with erythema, </li><li>sometimes systemic signs</li></ul>",
+            "<ul><li>Positive bacterial culture; </li><li>localized lesions; </li><li>responds to antibiotics</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Subcorneal Pustular Dermatosis (Sneddon-Wilkinson disease)",
+            "Chronic,\nrelapsing pustular eruptions,\nusually flexural areas",
+            "Usually lacks systemic symptoms;\nslower onset;\nless severe systemic involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Subcorneal Pustular Dermatosis (Sneddon-Wilkinson disease)</strong></p>",
+            "<ul><li>Chronic, </li><li>relapsing pustular eruptions, </li><li>usually flexural areas</li></ul>",
+            "<ul><li>Usually lacks systemic symptoms; </li><li>slower onset; </li><li>less severe systemic involvement</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Drug-induced Pustular Reactions",
+            "Pustular eruptions after new medication",
+            "Temporal relationship with drug;\nresolves on discontinuation; may mimic AGEP"
+          ],
+          "cellsHtml": [
+            "<p><strong>Drug-induced Pustular Reactions</strong></p>",
+            "<ul><li>Pustular eruptions after new medication</li></ul>",
+            "<ul><li>Temporal relationship with drug; </li><li>resolves on discontinuation; may mimic AGEP</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Pustular Psoriasis – Generalized (Acute) Management",
     "headingHtml": "<p><u><strong>Pustular Psoriasis – </strong></u></p><p><u><strong>Generalized (Acute) Management</strong></u></p>",
@@ -223,6 +377,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Pustular Psoriasis – Generalized (Acute) Management",
+      "headingHtml": "<p><u><strong>Pustular Psoriasis – Generalized (Acute) Management</strong></u></p>",
+      "description": "This diagram illustrates the stepwise acute management of generalized pustular psoriasis, highlighting it as a medical emergency. It shows recognition of widespread pustules with systemic symptoms, the need for immediate hospitalization, initiation of systemic therapy, and essential supportive care with continuous monitoring to prevent complications such as sepsis and electrolyte imbalance.",
+      "descriptionHtml": "<p>This diagram illustrates the <strong>stepwise acute management of generalized pustular psoriasis</strong>, highlighting it as a <strong>medical emergency</strong>. It shows recognition of <strong>widespread pustules with systemic symptoms</strong>, the need for <strong>immediate hospitalization</strong>, initiation of <strong>systemic therapy</strong>, and essential <strong>supportive care</strong> with continuous monitoring to prevent complications such as <strong>sepsis and electrolyte imbalance</strong>.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Pustular Psoriasis – Generalized (Acute) Management",
     "headingHtml": "<p><u><strong>Pustular Psoriasis – Generalized (Acute) Management</strong></u></p>",

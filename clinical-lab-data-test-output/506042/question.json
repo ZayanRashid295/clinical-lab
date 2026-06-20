@@ -83,6 +83,268 @@
   "classicTriad": "chronic ulcer + systemic symptoms (fever, weight loss) + TB history → strongly favors oral TB",
   "classicTriadHtml": "<p><strong>chronic ulcer + systemic symptoms (fever, weight loss) + TB history</strong> → strongly favors oral TB </p>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Oral Tuberculosis (Chronic Tuberculous Oral Ulcer)",
+      "headingHtml": "<p><u><strong>Oral Tuberculosis </strong></u></p><p><u><strong>(Chronic Tuberculous Oral Ulcer)</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Details",
+        "Clinical Importance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Details</strong></p>",
+        "<p><strong>Clinical Importance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition",
+            "• Chronic granulomatous infection of oral cavity caused by Mycobacterium tuberculosis • Usually secondary to pulmonary TB",
+            "• Important extrapulmonary manifestation of TB"
+          ],
+          "cellsHtml": [
+            "<p><strong>Definition</strong></p>",
+            "<p>• Chronic granulomatous infection of oral cavity caused by <em>Mycobacterium tuberculosis</em> <br/>• Usually secondary to pulmonary TB</p>",
+            "<p>• Important extrapulmonary manifestation of TB</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Etiology / Spread",
+            "• Direct inoculation from infected sputum • Hematogenous spread • Secondary spread from pulmonary TB",
+            "• Usually occurs in patients with active pulmonary disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Etiology / Spread</strong></p>",
+            "<p>• Direct inoculation from infected sputum <br/>• Hematogenous spread <br/>• Secondary spread from pulmonary TB</p>",
+            "<p>• Usually occurs in patients with active pulmonary disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Common Sites",
+            "• Tongue (most common) • Buccal mucosa • Gingiva • Palate • Lips",
+            "• Tongue lesions are highly characteristic"
+          ],
+          "cellsHtml": [
+            "<p><strong>Common Sites</strong></p>",
+            "<p>• Tongue (most common) <br/>• Buccal mucosa <br/>• Gingiva <br/>• Palate <br/>• Lips</p>",
+            "<p>• Tongue lesions are highly characteristic</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Morphology of\nUlcer",
+            "• Chronic non-healing ulcer • Painful lesion • Irregular margins • Undermined edges • Granular base",
+            "• Helps differentiate from traumatic ulcer and SCC"
+          ],
+          "cellsHtml": [
+            "<p><strong>Morphology of </strong></p><p><strong>Ulcer</strong></p>",
+            "<p>• Chronic non-healing ulcer <br/>• Painful lesion <br/>• Irregular margins <br/>• Undermined edges <br/>• Granular base</p>",
+            "<p>• Helps differentiate from traumatic ulcer and SCC</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Symptoms",
+            "• Pain during swallowing • Fever • Weight loss • Malaise • Cough may coexist",
+            "• Constitutional symptoms suggest systemic infection"
+          ],
+          "cellsHtml": [
+            "<p><strong>Symptoms</strong></p>",
+            "<p>• Pain during swallowing <br/>• Fever <br/>• Weight loss <br/>• Malaise <br/>• Cough may coexist</p>",
+            "<p>• Constitutional symptoms suggest systemic infection</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Lymph Nodes",
+            "• Cervical lymphadenopathy • Tender nodes may occur",
+            "• Supports infectious etiology"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lymph Nodes</strong></p>",
+            "<p>• Cervical lymphadenopathy <br/>• Tender nodes may occur</p>",
+            "<p>• Supports infectious etiology</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Histopathology",
+            "• Caseating granulomas • Epithelioid histiocytes • Langhans giant cells",
+            "• Diagnostic hallmark"
+          ],
+          "cellsHtml": [
+            "<p><strong>Histopathology</strong></p>",
+            "<p>• Caseating granulomas <br/>• Epithelioid histiocytes <br/>• Langhans giant cells</p>",
+            "<p>• Diagnostic hallmark</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Investigations",
+            "• Biopsy of ulcer • Ziehl–Neelsen stain • Sputum AFB • Chest X-ray • PCR for TB",
+            "• Confirms diagnosis and systemic involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Investigations</strong></p>",
+            "<p>• Biopsy of ulcer <br/>• Ziehl–Neelsen stain <br/>• Sputum AFB <br/>• Chest X-ray <br/>• PCR for TB</p>",
+            "<p>• Confirms diagnosis and systemic involvement</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Complications",
+            "• Persistent painful ulceration • Secondary infection • Delayed diagnosis due to resemblance to SCC",
+            "• Often mistaken for malignancy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Complications</strong></p>",
+            "<p>• Persistent painful ulceration <br/>• Secondary infection <br/>• Delayed diagnosis due to resemblance to SCC</p>",
+            "<p>• Often mistaken for malignancy</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Treatment",
+            "• Standard anti-tuberculous therapy (ATT) • Nutritional support • Oral hygiene maintenance",
+            "• Lesions usually improve with ATT"
+          ],
+          "cellsHtml": [
+            "<p><strong>Treatment</strong></p>",
+            "<p>• Standard anti-tuberculous therapy (ATT) <br/>• Nutritional support <br/>• Oral hygiene maintenance</p>",
+            "<p>• Lesions usually improve with ATT</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Prognosis",
+            "• Good with early diagnosis and treatment • Delayed treatment may prolong ulceration",
+            "• Early recognition prevents complications"
+          ],
+          "cellsHtml": [
+            "<p><strong>Prognosis</strong></p>",
+            "<p>• Good with early diagnosis and treatment <br/>• Delayed treatment may prolong ulceration</p>",
+            "<p>• Early recognition prevents complications</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Chronic Non-Healing Oral Ulcer",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Chronic Non-Healing Oral Ulcer</strong></u></p>",
+      "columns": [
+        "Differential Diagnosis",
+        "Key Features",
+        "Distinguishing Points from\nOral Tuberculosis"
+      ],
+      "columnsHtml": [
+        "<p><strong>Differential Diagnosis</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>Distinguishing Points from </strong></p><p><strong>Oral Tuberculosis</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Squamous Cell\nCarcinoma (SCC)",
+            "• Indurated ulcer • Irregular margins • Smoking/alcohol history • May bleed",
+            "• Usually painless early • No infectious constitutional symptoms initially"
+          ],
+          "cellsHtml": [
+            "<p><strong>Squamous Cell </strong></p><p><strong>Carcinoma (SCC)</strong></p>",
+            "<p>• Indurated ulcer <br/>• Irregular margins <br/>• Smoking/alcohol history <br/>• May bleed</p>",
+            "<p>• Usually painless early <br/>• No infectious constitutional symptoms initially</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Chronic Traumatic\nUlcer",
+            "• Repeated local trauma • Sharp tooth/denture history • Localized lesion",
+            "• Resolves after removal of trauma • No fever or weight loss"
+          ],
+          "cellsHtml": [
+            "<p><strong>Chronic Traumatic </strong></p><p><strong>Ulcer</strong></p>",
+            "<p>• Repeated local trauma <br/>• Sharp tooth/denture history <br/>• Localized lesion</p>",
+            "<p>• Resolves after removal of trauma <br/>• No fever or weight loss</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Tertiary Syphilitic\nGumma",
+            "• Granulomatous ulcer • Painless lesion • Late syphilis manifestation",
+            "• Syphilis serology positive • Usually painless"
+          ],
+          "cellsHtml": [
+            "<p><strong>Tertiary Syphilitic </strong></p><p><strong>Gumma</strong></p>",
+            "<p>• Granulomatous ulcer <br/>• Painless lesion <br/>• Late syphilis manifestation</p>",
+            "<p>• Syphilis serology positive <br/>• Usually painless</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Deep Fungal Infection\n(Histoplasmosis)",
+            "• Chronic oral ulcer • Immunocompromised host • May have pulmonary symptoms",
+            "• Fungal stain/culture positive • Usually associated with immunosuppression"
+          ],
+          "cellsHtml": [
+            "<p><strong>Deep Fungal Infection </strong></p><p><strong>(Histoplasmosis)</strong></p>",
+            "<p>• Chronic oral ulcer <br/>• Immunocompromised host <br/>• May have pulmonary symptoms</p>",
+            "<p>• Fungal stain/culture positive <br/>• Usually associated with immunosuppression</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Aphthous Ulcer",
+            "• Recurrent painful ulcers • Shallow lesions • Heal spontaneously",
+            "• Short duration • No systemic TB findings"
+          ],
+          "cellsHtml": [
+            "<p><strong>Aphthous Ulcer</strong></p>",
+            "<p>• Recurrent painful ulcers <br/>• Shallow lesions <br/>• Heal spontaneously</p>",
+            "<p>• Short duration <br/>• No systemic TB findings</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Herpetic Ulcer\n(HSV)",
+            "• Vesicles preceding ulcers • Acute painful lesions • Fever possible",
+            "• Multiple grouped vesicles/ulcers • Acute course rather than chronic"
+          ],
+          "cellsHtml": [
+            "<p><strong>Herpetic Ulcer </strong></p><p><strong>(HSV)</strong></p>",
+            "<p>• Vesicles preceding ulcers <br/>• Acute painful lesions <br/>• Fever possible</p>",
+            "<p>• Multiple grouped vesicles/ulcers <br/>• Acute course rather than chronic</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Crohn Disease Oral\nUlcer",
+            "• Chronic oral ulcers • GI symptoms • Lip swelling/cobblestoning",
+            "• Associated intestinal manifestations"
+          ],
+          "cellsHtml": [
+            "<p><strong>Crohn Disease Oral </strong></p><p><strong>Ulcer</strong></p>",
+            "<p>• Chronic oral ulcers <br/>• GI symptoms <br/>• Lip swelling/cobblestoning</p>",
+            "<p>• Associated intestinal manifestations</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Behçet Disease",
+            "• Recurrent oral ulcers • Genital ulcers • Uveitis",
+            "• Multisystem vasculitic disease pattern"
+          ],
+          "cellsHtml": [
+            "<p><strong>Behçet Disease</strong></p>",
+            "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis</p>",
+            "<p>• Multisystem vasculitic disease pattern</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Oral Tuberculosis (Chronic Tuberculous Oral Ulcer)",
     "headingHtml": "<p><u><strong>Oral Tuberculosis </strong></u></p><p><u><strong>(Chronic Tuberculous Oral Ulcer)</strong></u></p>",
@@ -343,6 +605,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Oral Tuberculosis – Extrapulmonary Tuberculosis (Head & Neck Manifestations): Recognition & Diagnosis",
+      "headingHtml": "<p><u><strong>Oral Tuberculosis – Extrapulmonary Tuberculosis </strong></u></p><p><u><strong>(Head &amp; Neck Manifestations): </strong></u></p><p><u><strong>Recognition &amp; Diagnosis</strong></u></p>",
+      "description": "This diagram illustrates the clinical presentation, pathogenesis, histopathology, investigations, management, and differential diagnosis of oral tuberculosis, an uncommon extrapulmonary manifestation of Mycobacterium tuberculosis. It highlights the characteristic chronic painful oral ulcer with undermined edges and granular base, commonly involving the tongue in patients with active pulmonary tuberculosis. The infographic also emphasizes important diagnostic tools such as biopsy, Ziehl–Neelsen staining, PCR testing, and chest imaging, while comparing oral TB with other chronic oral ulcerative lesions including squamous cell carcinoma, syphilitic gumma, fungal infections, aphthous ulcers, and HSV infection.",
+      "descriptionHtml": "<p>This diagram illustrates the clinical presentation, pathogenesis, histopathology, investigations, management, and differential diagnosis of oral tuberculosis, an uncommon extrapulmonary manifestation of <em>Mycobacterium tuberculosis</em>. It highlights the characteristic chronic painful oral ulcer with undermined edges and granular base, commonly involving the tongue in patients with active pulmonary tuberculosis. The infographic also emphasizes important diagnostic tools such as biopsy, Ziehl–Neelsen staining, PCR testing, and chest imaging, while comparing oral TB with other chronic oral ulcerative lesions including squamous cell carcinoma, syphilitic gumma, fungal infections, aphthous ulcers, and HSV infection.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Oral Tuberculosis – Extrapulmonary Tuberculosis (Head & Neck Manifestations): Recognition & Diagnosis",
     "headingHtml": "<p><u><strong>Oral Tuberculosis – Extrapulmonary Tuberculosis </strong></u></p><p><u><strong>(Head &amp; Neck Manifestations): </strong></u></p><p><u><strong>Recognition &amp; Diagnosis</strong></u></p>",

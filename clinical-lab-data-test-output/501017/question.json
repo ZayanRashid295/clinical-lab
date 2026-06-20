@@ -71,6 +71,184 @@
   "classicTriad": "Adult male + Microcytic anemia + Chronic fatigue → Highly suggestive of chronic GI blood loss, guiding to option B.",
   "classicTriadHtml": "<ul><li><strong>Adult male + Microcytic anemia + Chronic fatigue</strong> → Highly suggestive of <strong>chronic GI blood loss</strong>, guiding to option <strong>B</strong>.</li></ul>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Iron Deficiency Anemia in Adult Males",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia in Adult Males</strong></u></p>",
+      "columns": [
+        "Aspect",
+        "Details",
+        "Key Points / Notes"
+      ],
+      "columnsHtml": [
+        "<p><strong>Aspect</strong></p>",
+        "<p><strong>Details</strong></p>",
+        "<p><strong>Key Points / Notes</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition",
+            "A microcytic, hypochromic anemia caused by insufficient iron for hemoglobin synthesis",
+            "Most common nutritional deficiency worldwide;\nchronic blood loss most common in adult males"
+          ],
+          "cellsHtml": [
+            "<p>Definition</p>",
+            "<p>A microcytic, hypochromic anemia caused by insufficient iron for hemoglobin synthesis</p>",
+            "<ul><li>Most common nutritional deficiency worldwide; </li><li>chronic blood loss most common in adult males</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Etiology / Causes",
+            "Chronic gastrointestinal bleeding (ulcer, malignancy, angiodysplasia),\nmalabsorption (celiac disease),\nrare dietary deficiency",
+            "In adult males, always suspect GI blood loss until ruled out"
+          ],
+          "cellsHtml": [
+            "<p>Etiology / Causes</p>",
+            "<ul><li>Chronic gastrointestinal bleeding (ulcer, malignancy, angiodysplasia), </li><li>malabsorption (celiac disease), </li><li>rare dietary deficiency</li></ul>",
+            "<p>In adult males, always suspect <strong>GI blood loss</strong> until ruled out</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Clinical Features",
+            "Fatigue,\npallor,\nexertional dyspnea,\nbrittle nails,\npica,\nkoilonychia",
+            "Chronic onset;\nseverity depends on duration and iron loss"
+          ],
+          "cellsHtml": [
+            "<p>Clinical Features</p>",
+            "<ul><li>Fatigue, </li><li>pallor, </li><li>exertional dyspnea, </li><li>brittle nails, </li><li>pica, </li><li>koilonychia</li></ul>",
+            "<p>Chronic onset; </p><p>severity depends on duration and iron loss</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Laboratory Findings",
+            "Low hemoglobin,\nlow MCV (microcytic),\nlow MCH,\nlow serum ferritin,\nhigh TIBC,\nlow serum iron",
+            "Peripheral smear:\nmicrocytic,\nhypochromic RBCs;\nferritin <15 ng/mL usually diagnostic"
+          ],
+          "cellsHtml": [
+            "<p>Laboratory Findings</p>",
+            "<ul><li>Low hemoglobin, </li><li>low MCV (microcytic), </li><li>low MCH, </li><li>low serum ferritin, </li><li>high TIBC, </li><li>low serum iron</li></ul>",
+            "<p><strong>Peripheral smear: </strong></p><ul><li>microcytic, </li><li>hypochromic RBCs; </li></ul><p>ferritin &lt;15 ng/mL usually diagnostic</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Diagnosis",
+            "History,\nphysical exam,\nCBC,\niron studies,\nstool occult blood,\nendoscopy if GI bleeding suspected",
+            "Rule out malignancy in adult males"
+          ],
+          "cellsHtml": [
+            "<p>Diagnosis</p>",
+            "<ul><li>History, </li><li>physical exam, </li><li>CBC, </li><li>iron studies, </li><li>stool occult blood, </li><li>endoscopy if GI bleeding suspected</li></ul>",
+            "<p>Rule out malignancy in adult males</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Management",
+            "Treat underlying cause,\noral or IV iron supplementation,\ndietary counseling",
+            "Monitor hemoglobin and ferritin response;\nrefer to GI if bleeding source suspected"
+          ],
+          "cellsHtml": [
+            "<p>Management</p>",
+            "<ul><li>Treat underlying cause, </li><li>oral or IV iron supplementation, </li><li>dietary counseling</li></ul>",
+            "<ul><li>Monitor hemoglobin and ferritin response; </li><li>refer to GI if bleeding source suspected</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Complications",
+            "Severe anemia,\ncardiac strain (tachycardia, heart failure),\ndelayed wound healing",
+            "Chronic blood loss may mask underlying malignancy"
+          ],
+          "cellsHtml": [
+            "<p>Complications</p>",
+            "<ul><li>Severe anemia, </li><li>cardiac strain (tachycardia, heart failure), </li><li>delayed wound healing</li></ul>",
+            "<p>Chronic blood loss may mask underlying malignancy</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Microcytic Anemia in Adult Males",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Microcytic Anemia in Adult Males</strong></u></p>",
+      "columns": [
+        "Differential Diagnosis",
+        "Key Features / Clues",
+        "Distinguishing Points from IDA"
+      ],
+      "columnsHtml": [
+        "<p><strong>Differential Diagnosis</strong></p>",
+        "<p><strong>Key Features / Clues</strong></p>",
+        "<p><strong>Distinguishing Points from IDA</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Anemia of Chronic Disease (ACD)",
+            "Usually mild microcytosis,\nlow serum iron,\nlow TIBC,\nnormal/high ferritin",
+            "Ferritin is normal or high (inflammation marker) vs low in IDA"
+          ],
+          "cellsHtml": [
+            "<p><strong>Anemia of Chronic Disease (ACD)</strong></p>",
+            "<ul><li>Usually mild microcytosis, </li><li>low serum iron, </li><li>low TIBC, </li><li>normal/high ferritin</li></ul>",
+            "<p>Ferritin is normal or high (inflammation marker) vs low in IDA</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Thalassemia Minor",
+            "Microcytosis with normal/high RBC count,\nfamily history",
+            "RBC count high;\niron studies usually normal"
+          ],
+          "cellsHtml": [
+            "<p><strong>Thalassemia Minor</strong></p>",
+            "<ul><li>Microcytosis with normal/high RBC count, </li><li>family history</li></ul>",
+            "<ul><li>RBC count high; </li><li>iron studies usually normal</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Sideroblastic Anemia",
+            "Microcytic or normocytic anemia,\nringed sideroblasts in marrow",
+            "Iron stores normal or increased;\nnot due to iron deficiency"
+          ],
+          "cellsHtml": [
+            "<p><strong>Sideroblastic Anemia</strong></p>",
+            "<ul><li>Microcytic or normocytic anemia, </li><li>ringed sideroblasts in marrow</li></ul>",
+            "<ul><li>Iron stores normal or increased; </li><li>not due to iron deficiency</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Lead Poisoning",
+            "Microcytic anemia,\nbasophilic stippling,\noccupational exposure",
+            "History of exposure;\nnormal/high iron stores"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lead Poisoning</strong></p>",
+            "<ul><li>Microcytic anemia, </li><li>basophilic stippling, </li><li>occupational exposure</li></ul>",
+            "<ul><li>History of exposure; </li><li>normal/high iron stores</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Gastrointestinal Blood Loss from Malignancy or Ulcer",
+            "Chronic fatigue,\noccult bleeding",
+            "This is actually a cause of IDA, not separate entity"
+          ],
+          "cellsHtml": [
+            "<p><strong>Gastrointestinal Blood Loss from Malignancy or Ulcer</strong></p>",
+            "<ul><li>Chronic fatigue, </li><li>occult bleeding</li></ul>",
+            "<p>This is actually a <strong>cause of IDA</strong>, not separate entity</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Iron Deficiency Anemia in Adult Males",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia in Adult Males</strong></u></p>",
@@ -247,6 +425,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Microcytic Anemia – Iron Deficiency Anemia in Adult Males (Chronic GI Blood Loss Focus)",
+      "headingHtml": "<p><u><strong>Microcytic Anemia – Iron Deficiency Anemia in Adult Males </strong></u></p><p><u><strong>(Chronic GI Blood Loss Focus)</strong></u></p>",
+      "description": "This diagram illustrates iron deficiency anemia in adult males, emphasizing microcytic, hypochromic RBCs and characteristic lab findings (low ferritin, high TIBC). It highlights chronic gastrointestinal blood loss—such as from peptic ulcers and colorectal malignancy—as the most common cause. The flow also demonstrates the diagnostic approach, including fecal occult blood testing and endoscopy, stressing the need to rule out GI malignancy.",
+      "descriptionHtml": "<p>This diagram illustrates <strong>iron deficiency anemia in adult males</strong>, emphasizing <strong>microcytic, hypochromic RBCs</strong> and characteristic lab findings (low ferritin, high TIBC). It highlights <strong>chronic gastrointestinal blood loss</strong>—such as from <strong>peptic ulcers and colorectal malignancy</strong>—as the most common cause. The flow also demonstrates the <strong>diagnostic approach</strong>, including <strong>fecal occult blood testing and endoscopy</strong>, stressing the need to <strong>rule out GI malignancy</strong>.</p>",
+      "images": [
+        {
+          "filename": "image1.jpeg",
+          "path": "images/image1.jpeg",
+          "sourceName": "image1.jpeg"
+        }
+      ],
+      "image": "images/image1.jpeg"
+    }
+  ],
   "diagram": {
     "heading": "Microcytic Anemia – Iron Deficiency Anemia in Adult Males (Chronic GI Blood Loss Focus)",
     "headingHtml": "<p><u><strong>Microcytic Anemia – Iron Deficiency Anemia in Adult Males </strong></u></p><p><u><strong>(Chronic GI Blood Loss Focus)</strong></u></p>",

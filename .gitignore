@@ -47,3 +47,15 @@ thesis/
 thesis.zip
 *.docx
 !test_questions/**/*.docx
+
+# Generated question-builder / upload artifacts (runtime + test output)
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+clinical-lab-data-test-output/
+clinical-lab-data-test-output*/
+data1-output/
+data1-output*/
+data1/
+my-world-question-builder/

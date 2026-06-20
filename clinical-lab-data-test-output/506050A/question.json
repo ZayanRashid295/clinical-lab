@@ -80,6 +80,208 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Difficult"
   },
+  "tables": [
+    {
+      "heading": "Emergency Airway Management in Ludwig’s Angina (Deep Neck Space Infection) Clinical Features, Pathophysiology & Immediate Management",
+      "headingHtml": "<p><u><strong>Emergency Airway Management in Ludwig’s Angina </strong></u></p><p><u><strong>(Deep Neck Space Infection)</strong></u></p><p><strong>Clinical Features, Pathophysiology &amp; Immediate Management</strong></p>",
+      "columns": [
+        "Feature",
+        "Key Points",
+        "Clinical Interpretation /\nBrief Detail"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Key Points </strong></p>",
+        "<p><strong>Clinical Interpretation / </strong></p><p><strong>Brief Detail</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Etiology",
+            "• Odontogenic infection• Mandibular molar infection (2nd, 3rd molars)• Polymicrobial (aerobes, anaerobes)",
+            "Infection spreads from dental source into deep neck spaces rapidly"
+          ],
+          "cellsHtml": [
+            "<p><strong>Etiology</strong></p>",
+            "<p>• Odontogenic infection<br/>• Mandibular molar infection (2nd, 3rd molars)<br/>• Polymicrobial (aerobes, anaerobes)</p>",
+            "<p>Infection spreads from dental source into deep neck spaces rapidly</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Anatomical\ninvolvement",
+            "• Submandibular space• Sublingual space• Submental space",
+            "Causes firm “woody” floor of mouth swelling"
+          ],
+          "cellsHtml": [
+            "<p><strong>Anatomical </strong></p><p><strong>involvement</strong></p>",
+            "<p>• Submandibular space<br/>• Sublingual space<br/>• Submental space</p>",
+            "<p>Causes firm “woody” floor of mouth swelling</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Airway compromise\nsigns",
+            "• Stridor, drooling, muffled voice• Dysphagia, dyspnea• Tongue elevation",
+            "Indicates impending airway obstruction requiring urgent intervention"
+          ],
+          "cellsHtml": [
+            "<p><strong>Airway compromise </strong></p><p><strong>signs</strong></p>",
+            "<p>• Stridor, drooling, muffled voice<br/>• Dysphagia, dyspnea<br/>• Tongue elevation</p>",
+            "<p>Indicates impending airway obstruction requiring urgent intervention</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Systemic features",
+            "• Fever, toxic appearance• Tachycardia, anxiety• Malaise",
+            "Suggests severe spreading infection and possible sepsis"
+          ],
+          "cellsHtml": [
+            "<p><strong>Systemic features</strong></p>",
+            "<p>• Fever, toxic appearance<br/>• Tachycardia, anxiety<br/>• Malaise</p>",
+            "<p>Suggests severe spreading infection and possible sepsis</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Classic triad",
+            "• Bilateral submandibular swelling, tongue elevation, airway obstruction",
+            "Diagnostic hallmark of Ludwig's angina"
+          ],
+          "cellsHtml": [
+            "<p><strong>Classic triad</strong></p>",
+            "<p>• Bilateral submandibular swelling, tongue elevation, airway obstruction</p>",
+            "<p>Diagnostic hallmark of Ludwig's angina</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Immediate\npriority",
+            "• Airway protection first• Awake fiberoptic intubation preferred• Avoid sedation before airway secured",
+            "Prevents sudden complete airway collapse due to loss of muscle tone"
+          ],
+          "cellsHtml": [
+            "<p><strong>Immediate </strong></p><p><strong>priority</strong></p>",
+            "<p>• Airway protection first<br/>• Awake fiberoptic intubation preferred<br/>• Avoid sedation before airway secured</p>",
+            "<p>Prevents sudden complete airway collapse due to loss of muscle tone</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Definitive\nmanagement",
+            "• IV broad-spectrum antibiotics• Surgical drainage if abscess forms• ICU monitoring",
+            "Infection control after airway stabilization"
+          ],
+          "cellsHtml": [
+            "<p><strong>Definitive </strong></p><p><strong>management</strong></p>",
+            "<p>• IV broad-spectrum antibiotics<br/>• Surgical drainage if abscess forms<br/>• ICU monitoring</p>",
+            "<p>Infection control after airway stabilization</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Imaging role",
+            "• Contrast-enhanced CT neck• Evaluate extent of infection• Post-airway stabilization only",
+            "Diagnostic, not initial emergency step"
+          ],
+          "cellsHtml": [
+            "<p><strong>Imaging role</strong></p>",
+            "<p>• Contrast-enhanced CT neck<br/>• Evaluate extent of infection<br/>• Post-airway stabilization only</p>",
+            "<p>Diagnostic, not initial emergency step</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Deep Neck Swelling with Airway Symptoms",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Deep Neck Swelling with Airway Symptoms</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Clinical Distinction /\nBrief Detail"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features </strong></p>",
+        "<p><strong>Clinical Distinction / </strong></p><p><strong>Brief Detail</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Ludwig's angina",
+            "• Bilateral submandibular swelling• Tongue elevation• Drooling, muffled voice• Rapid progression",
+            "Firm, non-fluctuant floor-of-mouth infection with high airway risk"
+          ],
+          "cellsHtml": [
+            "<p><strong>Ludwig's angina</strong></p>",
+            "<p>• Bilateral submandibular swelling<br/>• Tongue elevation<br/>• Drooling, muffled voice<br/>• Rapid progression</p>",
+            "<p>Firm, non-fluctuant floor-of-mouth infection with high airway risk</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Peritonsillar abscess",
+            "• Unilateral sore throat• Uvular deviation• Trismus, “hot potato voice”",
+            "Unilateral peritonsillar infection, not floor-of-mouth swelling"
+          ],
+          "cellsHtml": [
+            "<p><strong>Peritonsillar abscess</strong></p>",
+            "<p>• Unilateral sore throat<br/>• Uvular deviation<br/>• Trismus, “hot potato voice”</p>",
+            "<p>Unilateral peritonsillar infection, not floor-of-mouth swelling</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Retropharyngeal\nabscess",
+            "• Neck stiffness• Dysphagia, fever• Posterior pharyngeal bulge",
+            "Posterior deep neck infection, common in children"
+          ],
+          "cellsHtml": [
+            "<p><strong>Retropharyngeal </strong></p><p><strong>abscess</strong></p>",
+            "<p>• Neck stiffness<br/>• Dysphagia, fever<br/>• Posterior pharyngeal bulge</p>",
+            "<p>Posterior deep neck infection, common in children</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Epiglottitis",
+            "• Drooling• Stridor, tripod posture• Severe sore throat",
+            "Supraglottic inflammation, normal oral cavity exam"
+          ],
+          "cellsHtml": [
+            "<p><strong>Epiglottitis</strong></p>",
+            "<p>• Drooling<br/>• Stridor, tripod posture<br/>• Severe sore throat</p>",
+            "<p>Supraglottic inflammation, normal oral cavity exam</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Angioedema",
+            "• Rapid tongue/lip swelling• No fever• Allergic or drug-related history",
+            "Non-infectious, histamine or bradykinin mediated edema"
+          ],
+          "cellsHtml": [
+            "<p><strong>Angioedema</strong></p>",
+            "<p>• Rapid tongue/lip swelling<br/>• No fever<br/>• Allergic or drug-related history</p>",
+            "<p>Non-infectious, histamine or bradykinin mediated edema</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Submandibular\ncellulitis (early stage)",
+            "• Painful swelling• Fever• No airway compromise initially",
+            "Early infection before abscess or airway obstruction develops"
+          ],
+          "cellsHtml": [
+            "<p><strong>Submandibular </strong></p><p><strong>cellulitis (early stage)</strong></p>",
+            "<p>• Painful swelling<br/>• Fever<br/>• No airway compromise initially</p>",
+            "<p>Early infection before abscess or airway obstruction develops</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Emergency Airway Management in Ludwig’s Angina (Deep Neck Space Infection) Clinical Features, Pathophysiology & Immediate Management",
     "headingHtml": "<p><u><strong>Emergency Airway Management in Ludwig’s Angina </strong></u></p><p><u><strong>(Deep Neck Space Infection)</strong></u></p><p><strong>Clinical Features, Pathophysiology &amp; Immediate Management</strong></p>",
@@ -280,6 +482,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Emergency Airway Management in Ludwig’s Angina (Deep Neck Space Infection)",
+      "headingHtml": "<p><u><strong>Emergency Airway Management in Ludwig’s Angina </strong></u></p><p><u><strong>(Deep Neck Space Infection)</strong></u></p>",
+      "description": "This medical educational diagram illustrates the pathophysiology, clinical features, anatomical spread, and emergency airway management of Ludwig's angina. It highlights the rapid progression of odontogenic infection into the submandibular and sublingual spaces, causing tongue elevation and life-threatening airway obstruction. The diagram emphasizes airway-first management, especially awake fiberoptic endotracheal intubation, along with rescue airway procedures, antibiotic therapy, and post-stabilization management steps.",
+      "descriptionHtml": "<p>This medical educational diagram illustrates the pathophysiology, clinical features, anatomical spread, and emergency airway management of Ludwig's angina. It highlights the rapid progression of odontogenic infection into the submandibular and sublingual spaces, causing tongue elevation and life-threatening airway obstruction. The diagram emphasizes airway-first management, especially awake fiberoptic endotracheal intubation, along with rescue airway procedures, antibiotic therapy, and post-stabilization management steps.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Emergency Airway Management in Ludwig’s Angina (Deep Neck Space Infection)",
     "headingHtml": "<p><u><strong>Emergency Airway Management in Ludwig’s Angina </strong></u></p><p><u><strong>(Deep Neck Space Infection)</strong></u></p>",

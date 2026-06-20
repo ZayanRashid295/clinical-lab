@@ -123,25 +123,33 @@ export default function QuestionBuilderUploader({
     data: QuestionData,
   ): Promise<Record<string, string>> => {
     const imageUrls: Record<string, string> = {};
-    for (const img of data.diagram?.images ?? []) {
-      try {
-        const blob = await questionBuilderService.fetchImageBlob(
-          questionId,
-          img.filename,
-        );
-        const file = new File([blob], img.filename, {
-          type: blob.type || "image/png",
-        });
-        let url: string | undefined;
+    const diagramSources =
+      data.diagrams?.length
+        ? data.diagrams
+        : data.diagram
+          ? [data.diagram]
+          : [];
+    for (const diagram of diagramSources) {
+      for (const img of diagram.images ?? []) {
         try {
-          const result = await questionsService.uploadImage(file);
-          url = result.url;
+          const blob = await questionBuilderService.fetchImageBlob(
+            questionId,
+            img.filename,
+          );
+          const file = new File([blob], img.filename, {
+            type: blob.type || "image/png",
+          });
+          let url: string | undefined;
+          try {
+            const result = await questionsService.uploadImage(file);
+            url = result.url;
+          } catch {
+            // Fall back to blob URL if permanent upload fails
+          }
+          imageUrls[img.filename] = url || URL.createObjectURL(blob);
         } catch {
-          // Fall back to blob URL if permanent upload fails
+          // Skip images that cannot be fetched
         }
-        imageUrls[img.filename] = url || URL.createObjectURL(blob);
-      } catch {
-        // Skip images that cannot be fetched
       }
     }
     return imageUrls;
@@ -282,6 +290,7 @@ export default function QuestionBuilderUploader({
         ...questionData,
         metadata: {
           ...questionData.metadata,
+          parsedCategoryName: coerceLabelString(questionData.metadata.parsedCategoryName),
           parsedProductName: coerceLabelString(questionData.metadata.parsedProductName),
           parsedTopicName: coerceLabelString(questionData.metadata.parsedTopicName),
           parsedSubtopicName: coerceLabelString(questionData.metadata.parsedSubtopicName),

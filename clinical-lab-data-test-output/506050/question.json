@@ -80,6 +80,160 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
+  "tables": [
+    {
+      "heading": "Immunocompromised Host – Oral White Lesions with Neutropenia (AML) – Candidiasis vs Mimickers",
+      "headingHtml": "<p><u><strong>Immunocompromised Host – Oral White Lesions with Neutropenia (AML) – Candidiasis vs Mimickers</strong></u></p>",
+      "columns": [
+        "Clinical Feature",
+        "Interpretation",
+        "Clinical Significance /\nDetail"
+      ],
+      "columnsHtml": [
+        "<p><strong>Clinical Feature</strong></p>",
+        "<p><strong>Interpretation </strong></p>",
+        "<p><strong>Clinical Significance / </strong></p><p><strong>Detail</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Immunocompromised\nstate",
+            "• AML• Induction chemotherapy• Prolonged neutropenia",
+            "Severe reduction in neutrophil-mediated fungal defense → high risk of opportunistic infections"
+          ],
+          "cellsHtml": [
+            "<p><strong>Immunocompromised</strong></p><p><strong> state</strong></p>",
+            "<p>• AML<br/>• Induction chemotherapy<br/>• Prolonged neutropenia</p>",
+            "<p>Severe reduction in neutrophil-mediated fungal defense → high risk of opportunistic infections</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral white plaques",
+            "• White curd-like plaques• Easily scrapable• Bleeding after scraping",
+            "Classic pseudomembranous candidiasis due to Candida albicans overgrowth"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral white plaques</strong></p>",
+            "<p>• White curd-like plaques<br/>• Easily scrapable<br/>• Bleeding after scraping</p>",
+            "<p>Classic pseudomembranous candidiasis due to Candida albicans overgrowth</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Associated symptoms",
+            "• Oral pain• Dysphagia• Pharyngeal erythema",
+            "Suggests extension beyond simple oral thrush → possible oropharyngeal/esophageal involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Associated symptoms</strong></p>",
+            "<p>• Oral pain<br/>• Dysphagia<br/>• Pharyngeal erythema</p>",
+            "<p>Suggests extension beyond simple oral thrush → possible oropharyngeal/esophageal involvement</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Clinical course",
+            "• Progressive worsening• No response to oral hygiene",
+            "Indicates failure of local control → need systemic antifungal therapy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Clinical course</strong></p>",
+            "<p>• Progressive worsening<br/>• No response to oral hygiene</p>",
+            "<p>Indicates failure of local control → need systemic antifungal therapy</p>"
+          ]
+        },
+        {
+          "cells": [
+            "System involved",
+            "• Oral cavity• Oropharynx• Upper GI mucosa",
+            "Mucocutaneous fungal infection in immunosuppressed host"
+          ],
+          "cellsHtml": [
+            "<p><strong>System involved</strong></p>",
+            "<p>• Oral cavity<br/>• Oropharynx<br/>• Upper GI mucosa</p>",
+            "<p>Mucocutaneous fungal infection in immunosuppressed host</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of White Oral Lesions in Immunocompromised Patient",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>White Oral Lesions in Immunocompromised Patient</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "How to Differentiate"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features </strong></p>",
+        "<p><strong>How to Differentiate</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Oral candidiasis (Pseudomembranous)",
+            "• White plaques• Scrapes off• Bleeding base• Painful• Immunocompromised state",
+            "Responds to antifungals;\nmost common in neutropenia/HIV"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral candidiasis (Pseudomembranous)</strong></p>",
+            "<p>• White plaques<br/>• Scrapes off<br/>• Bleeding base<br/>• Painful<br/>• Immunocompromised state</p>",
+            "<ul><li>Responds to antifungals; </li><li>most common in neutropenia/HIV</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Leukoplakia",
+            "• White patch• Non-scrapable• Painless• Chronic smokers",
+            "Premalignant lesion;\nno response to antifungals"
+          ],
+          "cellsHtml": [
+            "<p>Leukoplakia</p>",
+            "<p>• White patch<br/>• Non-scrapable<br/>• Painless<br/>• Chronic smokers</p>",
+            "<ul><li>Premalignant lesion; </li><li>no response to antifungals</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral lichen planus",
+            "• Lacy white striations• Bilateral symmetry• Wickham striae",
+            "Autoimmune;\nnot scrapable;\nchronic course"
+          ],
+          "cellsHtml": [
+            "<p>Oral lichen planus</p>",
+            "<p>• Lacy white striations<br/>• Bilateral symmetry<br/>• Wickham striae</p>",
+            "<ul><li>Autoimmune; </li><li>not scrapable; </li><li>chronic course</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral hairy leukoplakia",
+            "• Corrugated white lesion• Lateral tongue• EBV-related",
+            "Seen in HIV;\ndoes NOT scrape off"
+          ],
+          "cellsHtml": [
+            "<p>Oral hairy leukoplakia</p>",
+            "<p>• Corrugated white lesion<br/>• Lateral tongue<br/>• EBV-related</p>",
+            "<ul><li>Seen in HIV; </li><li>does NOT scrape off</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Diphtheria (oral form)",
+            "• Gray pseudomembrane• Bleeds on removal• Systemic toxicity",
+            "True bacterial toxin disease;\nthroat involvement with systemic illness"
+          ],
+          "cellsHtml": [
+            "<p>Diphtheria (oral form)</p>",
+            "<p>• Gray pseudomembrane<br/>• Bleeds on removal<br/>• Systemic toxicity</p>",
+            "<ul><li>True bacterial toxin disease; </li><li>throat involvement with systemic illness</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Immunocompromised Host – Oral White Lesions with Neutropenia (AML) – Candidiasis vs Mimickers",
     "headingHtml": "<p><u><strong>Immunocompromised Host – Oral White Lesions with Neutropenia (AML) – Candidiasis vs Mimickers</strong></u></p>",
@@ -232,6 +386,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Immunocompromised Host – Mucocutaneous Candidiasis (Neutropenia-associated Oral Thrush Management)",
+      "headingHtml": "<p><u><strong>Immunocompromised Host – Mucocutaneous Candidiasis </strong></u></p><p><u><strong>(Neutropenia-associated Oral Thrush Management)</strong></u></p>",
+      "description": "This diagram illustrates the pathogenesis, clinical features, and management approach of mucocutaneous candidiasis in immunocompromised patients, particularly those with chemotherapy-induced neutropenia. It highlights characteristic pseudomembranous oral thrush lesions, major risk factors, progression from localized mucosal infection to invasive disease, and the therapeutic decision pathway from topical antifungals to systemic fluconazole or intravenous amphotericin B based on disease severity.",
+      "descriptionHtml": "<p>This diagram illustrates the pathogenesis, clinical features, and management approach of mucocutaneous candidiasis in immunocompromised patients, particularly those with chemotherapy-induced neutropenia. It highlights characteristic pseudomembranous oral thrush lesions, major risk factors, progression from localized mucosal infection to invasive disease, and the therapeutic decision pathway from topical antifungals to systemic fluconazole or intravenous amphotericin B based on disease severity.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Immunocompromised Host – Mucocutaneous Candidiasis (Neutropenia-associated Oral Thrush Management)",
     "headingHtml": "<p><u><strong>Immunocompromised Host – Mucocutaneous Candidiasis </strong></u></p><p><u><strong>(Neutropenia-associated Oral Thrush Management)</strong></u></p>",

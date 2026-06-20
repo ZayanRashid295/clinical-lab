@@ -45,6 +45,12 @@ lerna-debug.log*
 /tmp
 /temp
 
+# Generated uploads (runtime) — keep directory, ignore contents
+/public/uploads/*
+!/public/uploads/.gitkeep
+/uploads/*
+!/uploads/.gitkeep
+
 # Runtime data
 pids
 *.pid

@@ -73,6 +73,232 @@
   "classicTriad": "Chest pain at rest + Elevated troponin + No ST elevation→ This combination directly points to NSTEMI due to subendocardial ischemia.",
   "classicTriadHtml": "<p><strong>Chest pain at rest + Elevated troponin + No ST elevation</strong><br/>→ This combination directly points to <strong>NSTEMI due to subendocardial ischemia</strong>.</p>",
   "classicTriadTitle": "Classic Triad (NSTEMI) Present in the Stem",
+  "tables": [
+    {
+      "heading": "Acute Coronary Syndrome – NSTEMI (Non–ST Elevation MI)",
+      "headingHtml": "<p><u><strong>Acute Coronary Syndrome – </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation MI)</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Key Points",
+        "Clinical Relevance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Key Points</strong></p>",
+        "<p><strong>Clinical Relevance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition",
+            "Myocardial infarction without ST elevation but with elevated troponins",
+            "Helps distinguish NSTEMI from unstable angina and STEMI"
+          ],
+          "cellsHtml": [
+            "<p><strong>Definition</strong></p>",
+            "<p>Myocardial infarction <strong>without ST elevation</strong> but with <strong>elevated troponins</strong></p>",
+            "<p>Helps distinguish NSTEMI from unstable angina and STEMI</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pathophysiology",
+            "Incomplete/partial coronary artery occlusion → subendocardial ischemia",
+            "Explains why ECG lacks ST elevation and why troponin rises"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pathophysiology</strong></p>",
+            "<p><strong>Incomplete/partial coronary artery occlusion</strong> → <strong>subendocardial ischemia</strong></p>",
+            "<p>Explains why ECG lacks ST elevation and why troponin rises</p>"
+          ]
+        },
+        {
+          "cells": [
+            "ECG Findings",
+            "No ST elevation;\nmay show ST depression/T-wave inversion",
+            "ECG alone cannot rule out MI → troponin is essential"
+          ],
+          "cellsHtml": [
+            "<p><strong>ECG Findings</strong></p>",
+            "<ul><li>No ST elevation; </li><li>may show ST depression/T-wave inversion</li></ul>",
+            "<p>ECG alone cannot rule out MI → troponin is essential</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Biomarkers",
+            "Elevated troponin I/T",
+            "Confirms myocardial necrosis"
+          ],
+          "cellsHtml": [
+            "<p><strong>Biomarkers</strong></p>",
+            "<p>Elevated troponin I/T</p>",
+            "<p>Confirms myocardial necrosis</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Symptoms",
+            "Chest pain at rest,\nprolonged discomfort,\nsimilar to STEMI",
+            "Key clinical clue pointing to ACS requiring urgent evaluation"
+          ],
+          "cellsHtml": [
+            "<p><strong>Symptoms</strong></p>",
+            "<ul><li>Chest pain at rest, </li><li>prolonged discomfort, </li><li>similar to STEMI</li></ul>",
+            "<p>Key clinical clue pointing to ACS requiring urgent evaluation</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Diagnosis",
+            "Symptoms + elevated troponin + non-ST elevation ECG + risk assessment",
+            "Standard criteria for ACS classification"
+          ],
+          "cellsHtml": [
+            "<p><strong>Diagnosis</strong></p>",
+            "<p>Symptoms + elevated troponin + non-ST elevation ECG + risk assessment</p>",
+            "<p>Standard criteria for ACS classification</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Management",
+            "Antiplatelets,\nanticoagulation,\nbeta-blockers,\nstatins;\nearly invasive strategy",
+            "Prevents progression to full MI;\nguideline-driven therapy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Management</strong></p>",
+            "<ul><li>Antiplatelets, </li><li>anticoagulation, </li><li>beta-blockers, </li><li>statins; </li><li>early invasive strategy</li></ul>",
+            "<ul><li>Prevents progression to full MI; </li><li>guideline-driven therapy</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Complications",
+            "Recurrent ischemia,\narrhythmias,\nprogression to STEMI",
+            "Requires close monitoring and follow-up"
+          ],
+          "cellsHtml": [
+            "<p><strong>Complications</strong></p>",
+            "<ul><li>Recurrent ischemia, </li><li>arrhythmias, </li><li>progression to STEMI</li></ul>",
+            "<p>Requires close monitoring and follow-up</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Prognosis",
+            "Moderate risk;\nbetter than STEMI but worse than unstable angina",
+            "Guides intensity of treatment and follow-up"
+          ],
+          "cellsHtml": [
+            "<p><strong>Prognosis</strong></p>",
+            "<ul><li>Moderate risk; </li><li>better than STEMI but worse than unstable angina</li></ul>",
+            "<p>Guides intensity of treatment and follow-up</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of NSTEMI (Non–ST Elevation Myocardial Infarction)",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation Myocardial Infarction)</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Why It Mimics NSTEMI",
+        "How It Differentiates"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Why It Mimics NSTEMI</strong></p>",
+        "<p><strong>How It Differentiates</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Unstable Angina",
+            "Chest pain at rest;\nischemic symptoms",
+            "Normal troponin,\nno myocardial necrosis"
+          ],
+          "cellsHtml": [
+            "<p><strong>Unstable Angina</strong></p>",
+            "<ul><li>Chest pain at rest; </li><li>ischemic symptoms</li></ul>",
+            "<ul><li><strong>Normal troponin</strong>, </li><li>no myocardial necrosis</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Myocarditis",
+            "Chest pain + elevated troponin",
+            "Normal coronary angiography;\nrecent viral illness"
+          ],
+          "cellsHtml": [
+            "<p><strong>Myocarditis</strong></p>",
+            "<ul><li>Chest pain + elevated troponin</li></ul>",
+            "<ul><li>Normal coronary angiography; </li><li>recent viral illness</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Takotsubo Cardiomyopathy (Stress Cardiomyopathy)",
+            "Troponin rise + chest pain",
+            "Apical ballooning on echo;\nnormal coronaries"
+          ],
+          "cellsHtml": [
+            "<p><strong>Takotsubo Cardiomyopathy (Stress Cardiomyopathy)</strong></p>",
+            "<ul><li>Troponin rise + chest pain</li></ul>",
+            "<ul><li>Apical ballooning on echo; </li><li>normal coronaries</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Aortic Dissection (with coronary involvement)",
+            "Chest pain;\ncan elevate troponins",
+            "Tearing pain,\npulse deficit;\nCT shows dissection"
+          ],
+          "cellsHtml": [
+            "<p><strong>Aortic Dissection (with coronary involvement)</strong></p>",
+            "<ul><li>Chest pain; </li><li>can elevate troponins</li></ul>",
+            "<ul><li>Tearing pain, </li><li>pulse deficit; </li><li>CT shows dissection</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Pulmonary Embolism",
+            "Chest pain + elevated troponin from RV strain",
+            "Dyspnea,\ntachycardia;\nCT-PA positive"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pulmonary Embolism</strong></p>",
+            "<p>Chest pain + elevated troponin from RV strain</p>",
+            "<ul><li>Dyspnea, </li><li>tachycardia; </li><li>CT-PA positive</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Severe Anemia / Hypoxia Demand Ischemia (Type 2 MI)",
+            "Troponin elevation without complete occlusion",
+            "Underlying cause (anemia/sepsis/tachycardia) present"
+          ],
+          "cellsHtml": [
+            "<p><strong>Severe Anemia / Hypoxia Demand Ischemia (Type 2 MI)</strong></p>",
+            "<p>Troponin elevation without complete occlusion</p>",
+            "<ul><li>Underlying cause (anemia/sepsis/tachycardia) present</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Chronic Kidney Disease (Troponin Leak)",
+            "Baseline elevated troponin",
+            "No dynamic change;\nno ischemic symptoms"
+          ],
+          "cellsHtml": [
+            "<p><strong>Chronic Kidney Disease (Troponin Leak)</strong></p>",
+            "<p>Baseline elevated troponin</p>",
+            "<ul><li>No dynamic change; </li><li>no ischemic symptoms</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Acute Coronary Syndrome – NSTEMI (Non–ST Elevation MI)",
     "headingHtml": "<p><u><strong>Acute Coronary Syndrome – </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation MI)</strong></u></p>",
@@ -297,6 +523,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
+      "headingHtml": "<p><u>Acute Coronary Syndrome </u></p><p><u>NSTEMI (Non–ST Elevation Myocardial Infarction)</u></p>",
+      "description": "This diagram illustrates the pathophysiology of NSTEMI, showing atherosclerotic plaque rupture leading to partial coronary artery occlusion and resulting in subendocardial ischemia and myocardial necrosis. It highlights key clinical features such as chest pain at rest, diagnostic findings including elevated troponin without ST elevation on ECG, and outlines core management strategies like antiplatelets, anticoagulation, and early invasive intervention.",
+      "descriptionHtml": "<p>This diagram illustrates the pathophysiology of NSTEMI, showing atherosclerotic plaque rupture leading to partial coronary artery occlusion and resulting in subendocardial ischemia and myocardial necrosis. It highlights key clinical features such as chest pain at rest, diagnostic findings including elevated troponin without ST elevation on ECG, and outlines core management strategies like antiplatelets, anticoagulation, and early invasive intervention.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
     "headingHtml": "<p><u>Acute Coronary Syndrome </u></p><p><u>NSTEMI (Non–ST Elevation Myocardial Infarction)</u></p>",

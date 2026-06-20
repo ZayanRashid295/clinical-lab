@@ -80,6 +80,172 @@
     "difficultyLevel": "Easy",
     "system": "Respiratory System (Pulmonology)"
   },
+  "tables": [
+    {
+      "heading": "Bronchial Asthma – Clinical Features, Triggers & Diagnostic Correlation",
+      "headingHtml": "<p><u><strong>Bronchial Asthma – </strong></u></p><p><u><strong>Clinical Features, Triggers &amp; Diagnostic Correlation</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Brief Detail",
+        "Clinical Significance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Brief Detail</strong></p>",
+        "<p><strong>Clinical Significance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Episodic symptoms",
+            "• Recurrent attacks of dyspnea\n• Wheezing\n• Chest tightness\n• Cough",
+            "Suggests variable airflow obstruction, not fixed disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Episodic symptoms</strong></p>",
+            "<p>• Recurrent attacks of dyspnea </p><p>• Wheezing </p><p>• Chest tightness </p><p>• Cough</p>",
+            "<p>Suggests <strong>variable airflow obstruction</strong>, not fixed disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Nocturnal worsening",
+            "• Symptoms worse at night\n• Early morning cough/wheeze",
+            "Due to circadian ↑ bronchial hyperreactivity and vagal tone"
+          ],
+          "cellsHtml": [
+            "<p><strong>Nocturnal worsening</strong></p>",
+            "<p>• Symptoms worse at night </p><p>• Early morning cough/wheeze</p>",
+            "<p>Due to circadian ↑ bronchial hyperreactivity and vagal tone</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Triggers",
+            "• Dust\n• Allergens\n• Exercise\n• Cold air\n• Smoke",
+            "Indicates bronchial hyperresponsiveness (Type I hypersensitivity)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Triggers</strong></p>",
+            "<p>• Dust </p><p>• Allergens </p><p>• Exercise </p><p>• Cold air </p><p>• Smoke</p>",
+            "<p>Indicates <strong>bronchial hyperresponsiveness (Type I hypersensitivity)</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Physical exam\nbetween attacks",
+            "• Normal chest exam\n• No wheeze at baseline",
+            "Confirms reversible/intermittent airway narrowing"
+          ],
+          "cellsHtml": [
+            "<p><strong>Physical exam </strong></p><p><strong>between attacks</strong></p>",
+            "<p>• Normal chest exam </p><p>• No wheeze at baseline</p>",
+            "<p>Confirms <strong>reversible/intermittent airway narrowing</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Spirometry finding",
+            "• ↓ FEV₁ during attack\n• Significant reversibility after bronchodilator",
+            "Diagnostic hallmark of reversible airflow obstruction"
+          ],
+          "cellsHtml": [
+            "<p><strong>Spirometry finding</strong></p>",
+            "<p>• ↓ FEV₁ during attack </p><p>• Significant reversibility after bronchodilator</p>",
+            "<p>Diagnostic hallmark of <strong>reversible airflow obstruction</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pathophysiology",
+            "• Airway inflammation\n• Bronchospasm\n• Mucus plugging\n• Eosinophils",
+            "Underlying chronic inflammatory airway disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pathophysiology</strong></p>",
+            "<p>• Airway inflammation </p><p>• Bronchospasm </p><p>• Mucus plugging </p><p>• Eosinophils</p>",
+            "<p>Underlying <strong>chronic inflammatory airway disease</strong></p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Episodic Wheeze & Dyspnea",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Episodic Wheeze &amp; Dyspnea</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Reason for\nInclusion / Exclusion"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>Reason for </strong></p><p><strong>Inclusion / Exclusion</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Bronchial asthma",
+            "• Episodic wheeze\n• Dust-triggered\n• Night symptoms\n• Reversible obstruction",
+            "Classic cause of reversible airway obstruction (Correct diagnosis)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Bronchial asthma</strong></p>",
+            "<p>• Episodic wheeze </p><p>• Dust-triggered </p><p>• Night symptoms </p><p>• Reversible obstruction</p>",
+            "<p><strong>Classic cause of reversible airway obstruction (Correct diagnosis)</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "COPD",
+            "• Chronic progressive dyspnea\n• Smoking history\n• Persistent symptoms\n• Poor reversibility",
+            "Excluded due to young age + reversibility + episodic pattern"
+          ],
+          "cellsHtml": [
+            "<p><strong>COPD</strong></p>",
+            "<p>• Chronic progressive dyspnea </p><p>• Smoking history </p><p>• Persistent symptoms </p><p>• Poor reversibility</p>",
+            "<p>Excluded due to <strong>young age + reversibility + episodic pattern</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Bronchiectasis",
+            "• Chronic productive cough\n• Recurrent infections\n• Copious sputum",
+            "Excluded due to absence of sputum + episodic reversibility"
+          ],
+          "cellsHtml": [
+            "<p><strong>Bronchiectasis</strong></p>",
+            "<p>• Chronic productive cough </p><p>• Recurrent infections </p><p>• Copious sputum</p>",
+            "<p>Excluded due to <strong>absence of sputum + episodic reversibility</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pneumonia",
+            "• Fever\n• Acute cough\n• Crepitations\n• Localized infection",
+            "Excluded due to no acute infection signs + recurrent pattern"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pneumonia</strong></p>",
+            "<p>• Fever </p><p>• Acute cough </p><p>• Crepitations </p><p>• Localized infection</p>",
+            "<p>Excluded due to <strong>no acute infection signs + recurrent pattern</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Tuberculosis",
+            "• Chronic cough\n• Weight loss\n• Night sweats\n• Upper lobe disease",
+            "Excluded due to no systemic symptoms + reversible spirometry"
+          ],
+          "cellsHtml": [
+            "<p><strong>Tuberculosis</strong></p>",
+            "<p>• Chronic cough </p><p>• Weight loss </p><p>• Night sweats </p><p>• Upper lobe disease</p>",
+            "<p>Excluded due to <strong>no systemic symptoms + reversible spirometry</strong></p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Bronchial Asthma – Clinical Features, Triggers & Diagnostic Correlation",
     "headingHtml": "<p><u><strong>Bronchial Asthma – </strong></u></p><p><u><strong>Clinical Features, Triggers &amp; Diagnostic Correlation</strong></u></p>",
@@ -244,6 +410,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Bronchial Asthma – Clinical Diagnosis with Spirometry Reversibility and Trigger-Based Episodic Wheeze",
+      "headingHtml": "<p><u><strong>Bronchial Asthma – Clinical Diagnosis with </strong></u></p><p><u><strong>Spirometry Reversibility and Trigger-Based Episodic Wheeze</strong></u></p>",
+      "description": "This diagram illustrates the clinical diagnosis of bronchial asthma using characteristic episodic respiratory symptoms and spirometric reversibility testing. It highlights common clinical features such as recurrent wheeze, nocturnal symptoms, and allergen-triggered dyspnea, along with the underlying pathophysiology of airway inflammation and reversible bronchoconstriction. The figure also demonstrates improvement in FEV₁ after bronchodilator administration, the key diagnostic hallmark distinguishing asthma from other respiratory diseases like COPD, bronchiectasis, pneumonia, and tuberculosis.",
+      "descriptionHtml": "<p>This diagram illustrates the clinical diagnosis of bronchial asthma using characteristic episodic respiratory symptoms and spirometric reversibility testing. It highlights common clinical features such as recurrent wheeze, nocturnal symptoms, and allergen-triggered dyspnea, along with the underlying pathophysiology of airway inflammation and reversible bronchoconstriction. The figure also demonstrates improvement in FEV₁ after bronchodilator administration, the key diagnostic hallmark distinguishing asthma from other respiratory diseases like COPD, bronchiectasis, pneumonia, and tuberculosis.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Bronchial Asthma – Clinical Diagnosis with Spirometry Reversibility and Trigger-Based Episodic Wheeze",
     "headingHtml": "<p><u><strong>Bronchial Asthma – Clinical Diagnosis with </strong></u></p><p><u><strong>Spirometry Reversibility and Trigger-Based Episodic Wheeze</strong></u></p>",

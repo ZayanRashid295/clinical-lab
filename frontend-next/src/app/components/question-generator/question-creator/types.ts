@@ -18,6 +18,7 @@ export interface QuestionMetadata {
   questionId?: string | null // Optional question ID stored in metadata/tags
   tags?: string[]
   /** Parsed labels from DOCX/Markdown before DB IDs are resolved */
+  parsedCategoryName?: string
   parsedProductName?: string
   parsedTopicName?: string
   parsedSubtopicName?: string

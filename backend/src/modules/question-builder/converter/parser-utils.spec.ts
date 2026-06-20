@@ -26,6 +26,8 @@ describe("parser-utils", () => {
     it("matches standalone Key Concept heading", () => {
       expect(isKeyConceptHeading("Key Concept")).toBe(true);
       expect(isKeyConceptHeading("Key Concept — Summary")).toBe(true);
+      expect(isKeyConceptHeading("Key Concept of MCQ")).toBe(true);
+      expect(isKeyConceptHeading("Key Concept of the MCQ")).toBe(true);
     });
 
     it("rejects inline key concept lines inside explanations", () => {
@@ -45,6 +47,14 @@ describe("parser-utils", () => {
           "Severe acute asthma is defined by marked tachypnea (>30/min), inability to speak full sentences.",
         ),
       ).toBe(true);
+    });
+
+    it("allows long table headings", () => {
+      expect(
+        isProseParagraph(
+          "Evaluation of Thunderclap Headache in an Anticoagulated Patient – Emergency Assessment for Suspected Subarachnoid Hemorrhage",
+        ),
+      ).toBe(false);
     });
   });
 

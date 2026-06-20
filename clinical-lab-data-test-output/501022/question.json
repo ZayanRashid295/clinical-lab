@@ -70,6 +70,160 @@
   "classicTriad": "No classic triad in this stem; it’s an age + iron deficiency + absence of overt bleeding scenario, which is itself a high-yield pattern for occult colon cancer.",
   "classicTriadHtml": "<ul><li>No classic triad in this stem; it’s an <strong>age + iron deficiency + absence of overt bleeding</strong> scenario, which is itself a high-yield pattern for occult colon cancer.</li></ul>",
   "classicTriadTitle": "Classic triad",
+  "tables": [
+    {
+      "heading": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia in the Elderly – </strong></u></p><p><u><strong>Gastrointestinal Source Evaluation</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Details",
+        "Clinical Relevance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Details</strong></p>",
+        "<p><strong>Clinical Relevance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Etiology",
+            "Most commonly occult gastrointestinal bleeding, especially colon carcinoma;\nother causes include peptic ulcer, angiodysplasia",
+            "Guides diagnostic evaluation in elderly patients"
+          ],
+          "cellsHtml": [
+            "<p><strong>Etiology</strong></p>",
+            "<ul><li>Most commonly <strong>occult gastrointestinal bleeding</strong>, especially <strong>colon carcinoma</strong>; </li><li>other causes include peptic ulcer, angiodysplasia</li></ul>",
+            "<p>Guides diagnostic evaluation in elderly patients</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Presentation",
+            "Fatigue,\npallor,\nweakness;\nusually no overt bleeding",
+            "Subtle presentation can delay diagnosis"
+          ],
+          "cellsHtml": [
+            "<p><strong>Presentation</strong></p>",
+            "<ul><li>Fatigue, </li><li>pallor, </li><li>weakness; </li><li>usually <strong>no overt bleeding</strong></li></ul>",
+            "<p>Subtle presentation can delay diagnosis</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Investigations",
+            "CBC (microcytic hypochromic anemia),\nIron studies (low serum iron, low ferritin),\nColonoscopy,\nOccult blood testing",
+            "Identifies cause and rules out malignancy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Investigations</strong></p>",
+            "<ul><li>CBC (microcytic hypochromic anemia), </li><li>Iron studies (low serum iron, low ferritin), </li><li>Colonoscopy, </li><li>Occult blood testing</li></ul>",
+            "<p>Identifies cause and rules out malignancy</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Management",
+            "Treat underlying cause (e.g., surgical removal of tumor),\niron supplementation",
+            "Corrects anemia and prevents complications"
+          ],
+          "cellsHtml": [
+            "<p><strong>Management</strong></p>",
+            "<ul><li>Treat underlying cause (e.g., surgical removal of tumor), </li><li>iron supplementation</li></ul>",
+            "<p>Corrects anemia and prevents complications</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Iron Deficiency Anemia in the Elderly – Gastrointestinal Causes",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Iron Deficiency Anemia in the Elderly – Gastrointestinal Causes</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features / Clues",
+        "Distinguishing Point"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features / Clues</strong></p>",
+        "<p><strong>Distinguishing Point</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Colon carcinoma",
+            "Chronic occult GI bleeding,\nelderly,\nprogressive anemia",
+            "Most common cause in elderly;\nmay have positive fecal occult blood"
+          ],
+          "cellsHtml": [
+            "<p><strong>Colon carcinoma</strong></p>",
+            "<ul><li>Chronic occult GI bleeding,</li><li>elderly, </li><li>progressive anemia</li></ul>",
+            "<ul><li>Most common cause in elderly; </li><li>may have positive fecal occult blood</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Peptic ulcer (duodenal/gastric ulcer)",
+            "Epigastric pain,\nhistory of NSAID use,\npossible melena",
+            "Often presents with pain or overt bleeding;\nless common than colon cancer in elderly"
+          ],
+          "cellsHtml": [
+            "<p><strong>Peptic ulcer (duodenal/gastric ulcer)</strong></p>",
+            "<ul><li>Epigastric pain, </li><li>history of NSAID use,</li><li>possible melena</li></ul>",
+            "<ul><li>Often presents with <strong>pain or overt bleeding</strong>; </li><li>less common than colon cancer in elderly</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Angiodysplasia",
+            "Painless bleeding,\nelderly,\nintermittent",
+            "Can cause iron deficiency anemia without symptoms;\ndiagnosed via colonoscopy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Angiodysplasia</strong></p>",
+            "<ul><li>Painless bleeding, </li><li>elderly, </li><li>intermittent</li></ul>",
+            "<ul><li>Can cause iron deficiency anemia without symptoms; </li><li>diagnosed via colonoscopy</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Gastrointestinal malignancies (other than colon)",
+            "Rare,\nmay cause chronic blood loss",
+            "Location-specific;\nless common"
+          ],
+          "cellsHtml": [
+            "<p><strong>Gastrointestinal malignancies (other than colon)</strong></p>",
+            "<ul><li>Rare, </li><li>may cause chronic blood loss</li></ul>",
+            "<ul><li>Location-specific;</li><li>less common</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Celiac disease",
+            "Malabsorption,\ndiarrhea,\nweight loss",
+            "Usually younger adults;\nuncommon new diagnosis in elderly"
+          ],
+          "cellsHtml": [
+            "<p><strong>Celiac disease</strong></p>",
+            "<ul><li>Malabsorption, </li><li>diarrhea, </li><li>weight loss</li></ul>",
+            "<ul><li>Usually younger adults; </li><li>uncommon new diagnosis in elderly</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Gastrointestinal bypass or surgery-related malabsorption",
+            "History of surgery,\nreduced absorption",
+            "Only relevant if prior surgery exists"
+          ],
+          "cellsHtml": [
+            "<p><strong>Gastrointestinal bypass or surgery-related malabsorption</strong></p>",
+            "<ul><li>History of surgery, </li><li>reduced absorption</li></ul>",
+            "<ul><li>Only relevant if prior surgery exists</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia in the Elderly – </strong></u></p><p><u><strong>Gastrointestinal Source Evaluation</strong></u></p>",
@@ -222,6 +376,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia in the Elderly – </strong></u></p><p><u><strong>Gastrointestinal Source Evaluation</strong></u></p>",
+      "description": "This diagram illustrates a stepwise clinical approach to evaluating iron deficiency anemia in elderly patients, emphasizing occult gastrointestinal blood loss as the primary cause. It highlights key pathways including initial laboratory confirmation, followed by targeted investigations such as colonoscopy to identify sources like colon carcinoma, along with other potential causes such as angiodysplasia and peptic ulcer disease.",
+      "descriptionHtml": "<p>This diagram illustrates a stepwise clinical approach to evaluating iron deficiency anemia in elderly patients, emphasizing occult gastrointestinal blood loss as the primary cause. It highlights key pathways including initial laboratory confirmation, followed by targeted investigations such as colonoscopy to identify sources like colon carcinoma, along with other potential causes such as angiodysplasia and peptic ulcer disease.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Iron Deficiency Anemia in the Elderly – Gastrointestinal Source Evaluation",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia in the Elderly – </strong></u></p><p><u><strong>Gastrointestinal Source Evaluation</strong></u></p>",

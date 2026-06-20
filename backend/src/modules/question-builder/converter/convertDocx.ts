@@ -14,7 +14,7 @@ import {
   collectOrderedBodyBlocks,
   findBlockContentEnd,
   findMetadataBlockRange,
-  parseTablesAndDiagramFromBlocks,
+  parseSupplementalContentFromBlocks,
   type BodyBlock,
 } from "./bodyBlockParser";
 import { validateDocxFromBuffer } from "./validateDocx";
@@ -93,13 +93,11 @@ async function extractParagraphsFromBuffer(buffer: Buffer): Promise<string[]> {
   return entries.map((entry) => entry.formatted.text);
 }
 
-function countDiagramImageBlocks(blocks: BodyBlock[], fromIndex: number, toIndex: number): number {
-  let sawTable = false;
+function countSupplementalImageBlocks(blocks: BodyBlock[], fromIndex: number, toIndex: number): number {
   let count = 0;
   for (let index = fromIndex; index < toIndex; index += 1) {
     const block = blocks[index];
-    if (block.kind === "table") sawTable = true;
-    if (sawTable && block.kind === "paragraph" && block.hasImage) count += 1;
+    if (block.kind === "paragraph" && block.hasImage) count += 1;
   }
   return count;
 }
@@ -576,13 +574,13 @@ async function parseDocxFromBuffer(
   const contentEndBlockIndex = metadataBlockRange
     ? findBlockContentEnd(bodyBlocks, question.questionId, metadataBlockRange.end)
     : bodyBlocks.length;
-  const supplemental = parseTablesAndDiagramFromBlocks(
+  const supplemental = parseSupplementalContentFromBlocks(
     bodyBlocks,
     contentEndBlockIndex,
     metadataSearchFrom,
   );
   const diagramImageCount = metadataBlockRange
-    ? countDiagramImageBlocks(bodyBlocks, metadataBlockRange.end, contentEndBlockIndex)
+    ? countSupplementalImageBlocks(bodyBlocks, metadataBlockRange.end, contentEndBlockIndex)
     : 0;
 
   const result: QuestionData = {
@@ -607,11 +605,38 @@ async function parseDocxFromBuffer(
     if (keywordData.classicTriadHtml) result.classicTriadHtml = keywordData.classicTriadHtml;
     if (keywordData.classicTriadTitle) result.classicTriadTitle = keywordData.classicTriadTitle;
   }
-  if (supplemental.table1) result.table1 = supplemental.table1;
-  if (supplemental.table2) result.table2 = supplemental.table2;
-  if (supplemental.diagram) result.diagram = supplemental.diagram;
+  if (supplemental.tables.length) {
+    result.tables = supplemental.tables;
+    if (supplemental.tables[0]) result.table1 = supplemental.tables[0];
+    if (supplemental.tables[1]) result.table2 = supplemental.tables[1];
+  }
+  if (supplemental.diagrams.length) {
+    result.diagrams = supplemental.diagrams;
+    result.diagram = supplemental.diagrams[0];
+  }
 
   return { questionData: result, diagramImageCount };
+}
+
+async function attachDiagramImages(
+  questionData: QuestionData,
+  images: ImageRef[],
+): Promise<void> {
+  if (!images.length) return;
+  const diagrams = questionData.diagrams?.length
+    ? questionData.diagrams
+    : questionData.diagram
+      ? [questionData.diagram]
+      : [];
+  if (!diagrams.length) return;
+
+  questionData.diagrams = diagrams.map((diagram, index) => ({
+    ...diagram,
+    ...(images[index]
+      ? { images: [images[index]], image: images[index].path }
+      : {}),
+  }));
+  questionData.diagram = questionData.diagrams[0];
 }
 
 async function convertFromBuffer(
@@ -624,9 +649,8 @@ async function convertFromBuffer(
   await mkdir(imagesDir, { recursive: true });
 
   const images = await extractImagesFromBuffer(buffer, imagesDir, diagramImageCount || undefined);
-  if (images.length > 0 && questionData.diagram) {
-    questionData.diagram.images = images;
-    questionData.diagram.image = images[0].path;
+  if (images.length > 0) {
+    await attachDiagramImages(questionData, images);
   }
 
   const jsonPath = path.join(questionDir, "question.json");

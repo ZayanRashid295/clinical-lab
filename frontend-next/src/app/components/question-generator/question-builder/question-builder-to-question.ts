@@ -225,8 +225,14 @@ function buildMainExplanationBlocks(
     );
   }
 
-  if (data.table1?.rows?.length) {
-    const table = data.table1;
+  const supplementalTables =
+    data.tables?.filter((table) => table.rows?.length) ??
+    [data.table1, data.table2].filter(
+      (table): table is NonNullable<typeof data.table1> =>
+        Boolean(table?.rows?.length),
+    );
+
+  for (const table of supplementalTables) {
     blocks.push(
       richTextBlock(
         `### ${table.heading}`,
@@ -250,63 +256,45 @@ function buildMainExplanationBlocks(
     );
   }
 
-  if (data.table2?.rows?.length) {
-    const table = data.table2;
-    blocks.push(
-      richTextBlock(
-        `### ${table.heading}`,
-        table.headingHtml
-          ? `<h3>${table.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
-          : `<h3>${escapeHtml(table.heading)}</h3>`,
-        order++,
-      ),
-    );
-    blocks.push(
-      tableBlock(
-        buildTableHtmlFromRows(
-          table.columns,
-          table.rows.map((row) => ({
-            text: row.cells,
-            html: row.cellsHtml,
-          })),
-        ),
-        order++,
-      ),
-    );
-  }
+  const supplementalDiagrams =
+    data.diagrams?.length
+      ? data.diagrams
+      : data.diagram
+        ? [data.diagram]
+        : [];
 
-  if (data.diagram?.images?.length) {
-    for (const img of data.diagram.images) {
-      const url = imageUrls[img.filename];
-      if (url) {
-        blocks.push(
-          imageBlock(url, data.diagram?.heading || img.filename, order++),
-        );
+  for (const diagram of supplementalDiagrams) {
+    if (diagram.images?.length) {
+      for (const img of diagram.images) {
+        const url = imageUrls[img.filename];
+        if (url) {
+          blocks.push(imageBlock(url, diagram.heading || img.filename, order++));
+        }
       }
     }
-  }
 
-  if (data.diagram?.heading) {
-    blocks.push(
-      richTextBlock(
-        `### ${data.diagram.heading}`,
-        data.diagram.headingHtml
-          ? `<h3>${data.diagram.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
-          : `<h3>${escapeHtml(data.diagram.heading)}</h3>`,
-        order++,
-      ),
-    );
-  }
+    if (diagram.heading) {
+      blocks.push(
+        richTextBlock(
+          `### ${diagram.heading}`,
+          diagram.headingHtml
+            ? `<h3>${diagram.headingHtml.replace(/^<p>|<\/p>$/g, "")}</h3>`
+            : `<h3>${escapeHtml(diagram.heading)}</h3>`,
+          order++,
+        ),
+      );
+    }
 
-  if (data.diagram?.description) {
-    blocks.push(
-      richTextBlock(
-        data.diagram.description,
-        data.diagram.descriptionHtml ||
-          `<p>${escapeHtml(data.diagram.description)}</p>`,
-        order++,
-      ),
-    );
+    if (diagram.description) {
+      blocks.push(
+        richTextBlock(
+          diagram.description,
+          diagram.descriptionHtml ||
+            `<p>${escapeHtml(diagram.description)}</p>`,
+          order++,
+        ),
+      );
+    }
   }
 
   return blocks;
@@ -351,6 +339,7 @@ export function convertQuestionBuilderToCreatorData(
     perAnswerExplanations,
     metadata: {
       subject: coerceLabelString(meta.category),
+      parsedCategoryName: coerceLabelString(meta.category),
       system: coerceLabelString(meta.system),
       title: coerceLabelString(meta.mcqTitle),
       parsedProductName: coerceLabelString(meta.product),

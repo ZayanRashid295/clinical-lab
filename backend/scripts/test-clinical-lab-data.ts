@@ -45,19 +45,29 @@ function checkJsonQuality(dataDir: string, questionId: string, sourceName: strin
 
   if (!(data.keyConcept as string)?.trim()) issues.push("missing keyConcept");
 
-  const hasTable1 = (data.table1?.rows?.length ?? 0) > 0;
-  const hasTable2 = (data.table2?.rows?.length ?? 0) > 0;
-  const hasImages = (data.diagram?.images?.length ?? 0) > 0;
+  const tables =
+    data.tables?.filter((table) => (table.rows?.length ?? 0) > 0) ??
+    [data.table1, data.table2].filter((table) => (table?.rows?.length ?? 0) > 0);
 
-  if (hasTable1 && !data.table1?.heading?.trim()) {
-    issues.push("table1 rows present but heading is empty");
-  }
-  if (hasTable2 && !data.table2?.heading?.trim()) {
-    issues.push("table2 rows present but heading is empty");
-  }
-  if (hasImages && !data.diagram?.description?.trim() && !data.diagram?.heading?.trim()) {
-    issues.push("diagram image present but heading/description missing");
-  }
+  tables.forEach((table, index) => {
+    if (!table?.heading?.trim()) {
+      issues.push(`table ${index + 1} rows present but heading is empty`);
+    }
+  });
+
+  const diagrams =
+    data.diagrams?.length
+      ? data.diagrams
+      : data.diagram
+        ? [data.diagram]
+        : [];
+
+  diagrams.forEach((diagram, index) => {
+    const hasImages = (diagram.images?.length ?? 0) > 0;
+    if (hasImages && !diagram.description?.trim() && !diagram.heading?.trim()) {
+      issues.push(`diagram ${index + 1} image present but heading/description missing`);
+    }
+  });
 
   return { file: sourceName, questionId, issues };
 }

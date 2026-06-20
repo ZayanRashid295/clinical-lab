@@ -97,14 +97,6 @@ export async function runAutoMatch(
   let matchedSubtopicId = "";
   let matchedCategoryId = "";
 
-  // Match Product → Product (fuzzy)
-  if (parsedProduct && products.length > 0) {
-    const matchedProduct = pickByName(products, parsedProduct);
-    if (matchedProduct) {
-      matchedProductId = matchedProduct.id;
-    }
-  }
-
   // Match Category → Category (fuzzy)
   if (parsedCategory && categories.length > 0) {
     const matchedCategory = pickByName(categories, parsedCategory);
@@ -113,9 +105,44 @@ export async function runAutoMatch(
     }
   }
 
-  // Match System → System (fuzzy)
+  const productPool =
+    matchedCategoryId && products.length > 0
+      ? products.filter(
+          (product: any) =>
+            product.categoryId === matchedCategoryId ||
+            product.category?.id === matchedCategoryId,
+        )
+      : products;
+
+  // Match Product → Product (prefer products under matched category)
+  if (parsedProduct && products.length > 0) {
+    const matchedProduct = pickByName(
+      productPool.length > 0 ? productPool : products,
+      parsedProduct,
+    );
+    if (matchedProduct) {
+      matchedProductId = matchedProduct.id;
+      if (!matchedCategoryId && matchedProduct.categoryId) {
+        matchedCategoryId = matchedProduct.categoryId;
+      }
+    }
+  }
+
+  const systemPool =
+    matchedProductId && systems.length > 0
+      ? systems.filter(
+          (system: any) =>
+            system.productId === matchedProductId ||
+            system.product?.id === matchedProductId,
+        )
+      : systems;
+
+  // Match System → System (prefer systems under matched product)
   if (parsedSystem && systems.length > 0) {
-    const matchedSystem = pickByName(systems, parsedSystem);
+    const matchedSystem = pickByName(
+      systemPool.length > 0 ? systemPool : systems,
+      parsedSystem,
+    );
     if (matchedSystem) {
       matchedSystemId = matchedSystem.id;
       matchedProductId =
@@ -123,32 +150,33 @@ export async function runAutoMatch(
         matchedSystem.productId ||
         matchedSystem.product?.id ||
         "";
-        
+      if (!matchedCategoryId && matchedSystem.product?.categoryId) {
+        matchedCategoryId = matchedSystem.product.categoryId;
+      }
+
       const systemTopics = await getTopicsForSystem(matchedSystemId);
       if (parsedTopic && systemTopics.length > 0) {
         const matchedTopic = pickByName(systemTopics, parsedTopic);
         if (matchedTopic) matchedTopicId = matchedTopic.id;
-        else if (systemTopics.length === 1) matchedTopicId = systemTopics[0].id;
-      } else if (systemTopics.length === 1) {
-        matchedTopicId = systemTopics[0].id;
       }
 
-      // If Topic was matched, resolve Subtopic
       if (matchedTopicId) {
         const topicSubtopics = await getSubtopicsForTopic(matchedTopicId);
         if (parsedSubtopic && topicSubtopics.length > 0) {
           const matchedSubtopic = pickByName(topicSubtopics, parsedSubtopic);
           if (matchedSubtopic) matchedSubtopicId = matchedSubtopic.id;
-          else if (topicSubtopics.length === 1) matchedSubtopicId = topicSubtopics[0].id;
-        } else if (topicSubtopics.length === 1) {
-          matchedSubtopicId = topicSubtopics[0].id;
         }
       }
     }
   }
 
-  // Fallback: if System didn't match System directly, try matching System → Product (exact only), then find System within that Product
-  if (!matchedSystemId && parsedSystem && products.length > 0) {
+  // Legacy fallback: system label equals a product name (only when system did not match)
+  if (
+    !matchedSystemId &&
+    !matchedProductId &&
+    parsedSystem &&
+    products.length > 0
+  ) {
     const normalizedSystem = normalizeName(parsedSystem);
     const matchedProduct = products.find(
       (p: any) => normalizeName(p.name) === normalizedSystem

@@ -69,6 +69,160 @@
     "clinicalSkill": "Interpretation",
     "difficultyLevel": "Moderate"
   },
+  "tables": [
+    {
+      "heading": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia – </strong></u></p><p><u><strong>Early Hematologic Response to Oral Iron Therapy</strong></u></p>",
+      "columns": [
+        "Parameter",
+        "Expected Change",
+        "Time Frame / Notes"
+      ],
+      "columnsHtml": [
+        "<p><strong>Parameter</strong></p>",
+        "<p><strong>Expected Change</strong></p>",
+        "<p><strong>Time Frame / Notes</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Reticulocyte count",
+            "Rises",
+            "Earliest hematologic response,\nusually within 1–2 weeks,\nindicates active erythropoiesis"
+          ],
+          "cellsHtml": [
+            "<p>Reticulocyte count</p>",
+            "<p>Rises</p>",
+            "<ul><li>Earliest hematologic response, </li><li>usually within 1–2 weeks, </li><li>indicates active erythropoiesis</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Hemoglobin (Hb)",
+            "Gradual increase",
+            "Follows reticulocytosis,\nusually noticeable after 2–4 weeks"
+          ],
+          "cellsHtml": [
+            "<p>Hemoglobin (Hb)</p>",
+            "<p>Gradual increase</p>",
+            "<ul><li>Follows reticulocytosis, </li><li>usually noticeable after 2–4 weeks</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "MCV (Mean Corpuscular Volume)",
+            "Gradual increase",
+            "Reflects production of normal-sized RBCs,\ntakes 2–4 weeks to change"
+          ],
+          "cellsHtml": [
+            "<p>MCV (Mean Corpuscular Volume)</p>",
+            "<p>Gradual increase</p>",
+            "<ul><li>Reflects production of normal-sized RBCs, </li><li>takes 2–4 weeks to change</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Ferritin",
+            "Slow rise",
+            "Indicates replenishment of iron stores,\nusually after several weeks"
+          ],
+          "cellsHtml": [
+            "<p>Ferritin</p>",
+            "<p>Slow rise</p>",
+            "<ul><li>Indicates replenishment of iron stores, </li><li>usually after several weeks</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Clinical signs (e.g., koilonychia)",
+            "Slow improvement",
+            "May take months to resolve;\nnot an early marker"
+          ],
+          "cellsHtml": [
+            "<p>Clinical signs (e.g., koilonychia)</p>",
+            "<p>Slow improvement</p>",
+            "<ul><li>May take months to resolve; </li><li>not an early marker</li></ul>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Iron Deficiency Anemia",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Iron Deficiency Anemia</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features / Clues",
+        "Distinguishing Points from Iron Deficiency Anemia"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features / Clues</strong></p>",
+        "<p><strong>Distinguishing Points from Iron Deficiency Anemia</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Anemia of Chronic Disease (ACD)",
+            "Mild to moderate anemia,\nlow serum iron,\nlow TIBC,\nnormal/high ferritin",
+            "Ferritin is normal/high (not low),\nusually associated with chronic infection, inflammation, or malignancy"
+          ],
+          "cellsHtml": [
+            "<p>Anemia of Chronic Disease (ACD)</p>",
+            "<ul><li>Mild to moderate anemia, </li><li>low serum iron, </li><li>low TIBC, </li><li>normal/high ferritin</li></ul>",
+            "<ul><li>Ferritin is normal/high (not low), </li><li>usually associated with chronic infection, inflammation, or malignancy</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Thalassemia Minor",
+            "Microcytic anemia,\nnormal/high RBC count,\ntarget cells on smear",
+            "Iron therapy does not correct anemia,\nnormal/high ferritin"
+          ],
+          "cellsHtml": [
+            "<p>Thalassemia Minor</p>",
+            "<ul><li>Microcytic anemia, </li><li>normal/high RBC count, </li><li>target cells on smear</li></ul>",
+            "<ul><li>Iron therapy does not correct anemia, </li><li>normal/high ferritin</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Sideroblastic Anemia",
+            "Microcytic or normocytic anemia,\nring sideroblasts on marrow",
+            "Iron overload present,\nnot responsive to oral iron"
+          ],
+          "cellsHtml": [
+            "<p>Sideroblastic Anemia</p>",
+            "<ul><li>Microcytic or normocytic anemia, </li><li>ring sideroblasts on marrow</li></ul>",
+            "<ul><li>Iron overload present, </li><li>not responsive to oral iron</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Lead Poisoning",
+            "Microcytic anemia,\nbasophilic stippling",
+            "History of exposure,\niron therapy ineffective"
+          ],
+          "cellsHtml": [
+            "<p>Lead Poisoning</p>",
+            "<ul><li>Microcytic anemia, </li><li>basophilic stippling</li></ul>",
+            "<ul><li>History of exposure, </li><li>iron therapy ineffective</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Vitamin B12 / Folate Deficiency (early stages)",
+            "Sometimes mild anemia before macrocytosis",
+            "Usually normocytic initially,\nreticulocyte response differs"
+          ],
+          "cellsHtml": [
+            "<p>Vitamin B12 / Folate Deficiency (early stages)</p>",
+            "<ul><li>Sometimes mild anemia before macrocytosis</li></ul>",
+            "<ul><li>Usually normocytic initially, </li><li>reticulocyte response differs</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia – </strong></u></p><p><u><strong>Early Hematologic Response to Oral Iron Therapy</strong></u></p>",
@@ -221,6 +375,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia – </strong></u></p><p><u><strong>Early Hematologic Response to Oral Iron Therapy</strong></u></p>",
+      "description": "This diagram illustrates the timeline of hematologic response after initiating oral iron therapy in iron deficiency anemia. It highlights reticulocytosis as the earliest response (within 1–2 weeks), followed by a gradual rise in hemoglobin after 2–4 weeks, while MCV and iron stores improve later, and clinical signs like koilonychia take months to resolve.",
+      "descriptionHtml": "<p>This diagram illustrates the <strong>timeline of hematologic response</strong> after initiating oral iron therapy in iron deficiency anemia. It highlights <strong>reticulocytosis as the earliest response (within 1–2 weeks)</strong>, followed by a <strong>gradual rise in hemoglobin after 2–4 weeks</strong>, while <strong>MCV and iron stores improve later</strong>, and <strong>clinical signs like koilonychia take months to resolve</strong>.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Iron Deficiency Anemia – Early Hematologic Response to Oral Iron Therapy",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia – </strong></u></p><p><u><strong>Early Hematologic Response to Oral Iron Therapy</strong></u></p>",

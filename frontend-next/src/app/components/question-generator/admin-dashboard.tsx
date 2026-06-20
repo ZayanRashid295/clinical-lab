@@ -829,6 +829,14 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       payload.categoryId = String(frontendQuestion.categoryId).trim()
     }
 
+    if (frontendQuestion.productId && String(frontendQuestion.productId).trim()) {
+      payload.productId = String(frontendQuestion.productId).trim()
+    }
+
+    if (frontendQuestion.systemId && String(frontendQuestion.systemId).trim()) {
+      payload.systemId = String(frontendQuestion.systemId).trim()
+    }
+
     if (frontendQuestion.title && String(frontendQuestion.title).trim()) {
       payload.title = String(frontendQuestion.title).trim()
     }
@@ -1077,11 +1085,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       setError(null)
 
       let metadata = questionData.metadata
-      if (!metadata.topicId) {
-        const resolved = await resolveCreatorMetadataIds(metadata)
-        metadata = mergeResolvedMetadata(metadata, resolved)
-        questionData = { ...questionData, metadata }
-      }
+      const resolved = await resolveCreatorMetadataIds(metadata)
+      metadata = mergeResolvedMetadata(metadata, resolved)
+      questionData = { ...questionData, metadata }
 
       if (!questionData.metadata.topicId) {
         const topicLabel = questionData.metadata.parsedTopicName

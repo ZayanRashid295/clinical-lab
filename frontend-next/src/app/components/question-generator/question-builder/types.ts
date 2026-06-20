@@ -99,7 +99,12 @@ export interface QuestionData {
   classicTriad?: string;
   classicTriadHtml?: string;
   classicTriadTitle?: string;
+  tables?: ParsedTable[];
+  diagrams?: Diagram[];
+  /** @deprecated Use tables[0] */
   table1?: ParsedTable;
+  /** @deprecated Use tables[1] */
   table2?: ParsedTable;
+  /** @deprecated Use diagrams[0] */
   diagram?: Diagram;
 }

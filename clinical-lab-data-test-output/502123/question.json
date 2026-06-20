@@ -67,6 +67,208 @@
     "clinicalSkill": "Interpretation",
     "difficultyLevel": "Moderate"
   },
+  "tables": [
+    {
+      "heading": "Acute Coronary Syndrome – NSTEMI",
+      "headingHtml": "<p><u><strong>Acute Coronary Syndrome – NSTEMI</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Details",
+        "Clinical Relevance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Details</strong></p>",
+        "<p><strong>Clinical Relevance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition",
+            "Myocardial ischemia with elevated cardiac biomarkers but no ST-segment elevation on ECG",
+            "Differentiates NSTEMI from STEMI and unstable angina"
+          ],
+          "cellsHtml": [
+            "<p>Definition</p>",
+            "<p>Myocardial ischemia with <strong>elevated cardiac biomarkers</strong> but <strong>no ST-segment elevation</strong> on ECG</p>",
+            "<p>Differentiates NSTEMI from STEMI and unstable angina</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Symptoms",
+            "Central chest pain,\noften at rest or minimal exertion,\nmay radiate to arm/jaw/back,\nassociated with sweating,\nnausea",
+            "Guides initial clinical suspicion"
+          ],
+          "cellsHtml": [
+            "<p>Symptoms</p>",
+            "<ul><li>Central chest pain, </li><li>often <strong>at rest or minimal exertion</strong>, </li><li>may radiate to arm/jaw/back, </li><li>associated with sweating, </li><li>nausea</li></ul>",
+            "<p>Guides initial clinical suspicion</p>"
+          ]
+        },
+        {
+          "cells": [
+            "ECG Findings",
+            "Normal or nonspecific ST/T changes,\nno ST elevation",
+            "Helps rule out STEMI"
+          ],
+          "cellsHtml": [
+            "<p>ECG Findings</p>",
+            "<ul><li><strong>Normal or nonspecific ST/T changes</strong>, </li><li>no ST elevation</li></ul>",
+            "<p>Helps rule out STEMI</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Biomarkers",
+            "High-sensitivity troponin I/T elevated,\nCK-MB may be normal or mildly raised",
+            "Confirms myocardial injury"
+          ],
+          "cellsHtml": [
+            "<p>Biomarkers</p>",
+            "<ul><li><strong>High-sensitivity troponin I/T elevated</strong>, </li><li>CK-MB may be normal or mildly raised</li></ul>",
+            "<p>Confirms myocardial injury</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Risk Factors",
+            "Hypertension,\ndiabetes,\nsmoking,\ndyslipidemia,\nolder age,\nmale sex",
+            "Important for prevention and prognosis"
+          ],
+          "cellsHtml": [
+            "<p>Risk Factors</p>",
+            "<ul><li>Hypertension, </li><li>diabetes, </li><li>smoking, </li><li>dyslipidemia, </li><li>older age, </li><li>male sex</li></ul>",
+            "<p>Important for prevention and prognosis</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Management",
+            "Antiplatelets (aspirin, P2Y12 inhibitor),\nanticoagulants,\nbeta-blockers,\nstatins,\nearly invasive strategy if high risk",
+            "Reduces morbidity and mortality"
+          ],
+          "cellsHtml": [
+            "<p>Management</p>",
+            "<ul><li>Antiplatelets (aspirin, P2Y12 inhibitor), </li><li>anticoagulants, </li><li>beta-blockers, </li><li>statins, </li><li>early invasive strategy if high risk</li></ul>",
+            "<p>Reduces morbidity and mortality</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Complications",
+            "Heart failure,\narrhythmias,\nrecurrent ischemia,\ncardiogenic shock",
+            "Requires monitoring and timely intervention"
+          ],
+          "cellsHtml": [
+            "<p>Complications</p>",
+            "<ul><li>Heart failure, </li><li>arrhythmias, </li><li>recurrent ischemia, </li><li>cardiogenic shock</li></ul>",
+            "<p>Requires monitoring and timely intervention</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of NSTEMI",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of NSTEMI</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Distinguishing Points from NSTEMI"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>Distinguishing Points from NSTEMI</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Unstable Angina",
+            "Chest pain at rest or minimal exertion",
+            "No elevation of cardiac biomarkers; ECG may show ST depression or T-wave inversion"
+          ],
+          "cellsHtml": [
+            "<p><strong>Unstable Angina</strong></p>",
+            "<p>Chest pain at rest or minimal exertion</p>",
+            "<p><strong>No elevation of cardiac biomarkers</strong>; ECG may show ST depression or T-wave inversion</p>"
+          ]
+        },
+        {
+          "cells": [
+            "STEMI",
+            "Chest pain with ST-segment elevation on ECG",
+            "ECG shows ST elevation, usually higher troponin rise"
+          ],
+          "cellsHtml": [
+            "<p><strong>STEMI</strong></p>",
+            "<p>Chest pain with ST-segment elevation on ECG</p>",
+            "<p>ECG shows <strong>ST elevation</strong>, usually higher troponin rise</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Myocarditis",
+            "Chest pain, viral prodrome, sometimes fever",
+            "Troponin elevated, ECG may show diffuse ST changes; cardiac MRI may help"
+          ],
+          "cellsHtml": [
+            "<p><strong>Myocarditis</strong></p>",
+            "<p>Chest pain, viral prodrome, sometimes fever</p>",
+            "<p>Troponin elevated, ECG may show diffuse ST changes; cardiac MRI may help</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pericarditis",
+            "Sharp chest pain, relieved by leaning forward",
+            "ECG shows diffuse ST elevation and PR depression, biomarkers may be mildly raised"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pericarditis</strong></p>",
+            "<p>Sharp chest pain, relieved by leaning forward</p>",
+            "<p>ECG shows <strong>diffuse ST elevation and PR depression</strong>, biomarkers may be mildly raised</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pulmonary Embolism",
+            "Sudden dyspnea, pleuritic chest pain, hypoxia",
+            "Troponin may rise, ECG may show S1Q3T3 pattern, imaging confirms PE"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pulmonary Embolism</strong></p>",
+            "<p>Sudden dyspnea, pleuritic chest pain, hypoxia</p>",
+            "<p>Troponin may rise, ECG may show <strong>S1Q3T3 pattern</strong>, imaging confirms PE</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Aortic Dissection",
+            "Sudden severe tearing chest/back pain, pulse deficit",
+            "Troponin may rise; CT angiography shows dissection"
+          ],
+          "cellsHtml": [
+            "<p><strong>Aortic Dissection</strong></p>",
+            "<p>Sudden severe tearing chest/back pain, pulse deficit</p>",
+            "<p>Troponin may rise; CT angiography shows dissection</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Severe Heart Failure / Tachyarrhythmias",
+            "Dyspnea, edema, palpitations",
+            "Troponin may rise due to demand ischemia; ECG and echo help differentiate"
+          ],
+          "cellsHtml": [
+            "<p><strong>Severe Heart Failure / Tachyarrhythmias</strong></p>",
+            "<p>Dyspnea, edema, palpitations</p>",
+            "<p>Troponin may rise due to demand ischemia; ECG and echo help differentiate</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Acute Coronary Syndrome – NSTEMI",
     "headingHtml": "<p><u><strong>Acute Coronary Syndrome – NSTEMI</strong></u></p>",
@@ -267,6 +469,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
+      "headingHtml": "<p><u><strong>Acute Coronary Syndrome </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation Myocardial Infarction)</strong></u></p>",
+      "description": "This diagram illustrates the pathophysiology of NSTEMI, showing partial coronary artery occlusion leading to subendocardial ischemia and myocardial necrosis. It highlights key clinical features, ECG findings (no ST elevation with possible ST depression/T-wave inversion), and the role of elevated troponin in diagnosis, along with an overview of initial management strategies.",
+      "descriptionHtml": "<p>This diagram illustrates the pathophysiology of NSTEMI, showing partial coronary artery occlusion leading to subendocardial ischemia and myocardial necrosis. It highlights key clinical features, ECG findings (no ST elevation with possible ST depression/T-wave inversion), and the role of elevated troponin in diagnosis, along with an overview of initial management strategies.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Acute Coronary Syndrome NSTEMI (Non–ST Elevation Myocardial Infarction)",
     "headingHtml": "<p><u><strong>Acute Coronary Syndrome </strong></u></p><p><u><strong>NSTEMI (Non–ST Elevation Myocardial Infarction)</strong></u></p>",

@@ -162,7 +162,12 @@ export function convertNewQuestionToOld(newData: QuestionCreatorData): any {
     subtopicId: newData.metadata.subtopicId,
     title: newData.metadata.title,
     categoryId: newData.metadata.categoryId,
-    productTagId: newData.metadata.categoryId || newData.metadata.productTagId || (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0 ? newData.metadata.productTagIds[0] : undefined),
+    productTagId:
+      newData.metadata.categoryId ||
+      newData.metadata.productTagId ||
+      (newData.metadata.productTagIds && newData.metadata.productTagIds.length > 0
+        ? newData.metadata.productTagIds[0]
+        : undefined),
     productTagIds: newData.metadata.productTagIds,
     tags: newData.metadata.tags || [],
     metadata: {

@@ -70,6 +70,280 @@
     "clinicalSkill": "Clinical Reasoning",
     "difficultyLevel": "Moderate"
   },
+  "tables": [
+    {
+      "heading": "Internal Medicine – Gastroenterology – Oral Cavity Infections – Primary Herpetic Gingivostomatitis",
+      "headingHtml": "<p><u><strong>Internal Medicine – Gastroenterology – Oral Cavity Infections – </strong></u></p><p><u><strong>Primary Herpetic Gingivostomatitis</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Description",
+        "Clinical Importance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Description</strong></p>",
+        "<p><strong>Clinical Importance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Etiology",
+            "• Caused by HSV-1 infection • Occasionally HSV-2 • Primary oral herpes infection",
+            "• Common acute viral oral infection • Highly contagious"
+          ],
+          "cellsHtml": [
+            "<p><strong>Etiology</strong></p>",
+            "<p>• Caused by HSV-1 infection <br/>• Occasionally HSV-2 <br/>• Primary oral herpes infection</p>",
+            "<p>• Common acute viral oral infection <br/>• Highly contagious</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Age Group",
+            "• Common in children • Can occur in young adults",
+            "• Young adults may present with severe symptomatic disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Age Group</strong></p>",
+            "<p>• Common in children <br/>• Can occur in young adults</p>",
+            "<p>• Young adults may present with severe symptomatic disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Prodromal Symptoms",
+            "• Fever • Malaise • Irritability • Sore throat",
+            "• Helps differentiate from aphthous ulcers"
+          ],
+          "cellsHtml": [
+            "<p><strong>Prodromal Symptoms</strong></p>",
+            "<p>• Fever <br/>• Malaise <br/>• Irritability <br/>• Sore throat</p>",
+            "<p>• Helps differentiate from aphthous ulcers</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral Lesions",
+            "• Multiple painful vesicles • Vesicles rupture into shallow ulcers • Erythematous base",
+            "• Vesicular stage is highly characteristic"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral Lesions</strong></p>",
+            "<p>• Multiple painful vesicles <br/>• Vesicles rupture into shallow ulcers <br/>• Erythematous base</p>",
+            "<p>• Vesicular stage is highly characteristic</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Site of\nInvolvement",
+            "• Lips • Gingiva • Buccal mucosa • Tongue",
+            "• Gingival involvement strongly favors HSV"
+          ],
+          "cellsHtml": [
+            "<p><strong>Site of </strong></p><p><strong>Involvement</strong></p>",
+            "<p>• Lips <br/>• Gingiva <br/>• Buccal mucosa <br/>• Tongue</p>",
+            "<p>• Gingival involvement strongly favors HSV</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Gingival Findings",
+            "• Diffuse gingivitis • Swollen gums • Friable gums • Bleeding tendency",
+            "• Important distinguishing feature"
+          ],
+          "cellsHtml": [
+            "<p><strong>Gingival Findings</strong></p>",
+            "<p>• Diffuse gingivitis <br/>• Swollen gums <br/>• Friable gums <br/>• Bleeding tendency</p>",
+            "<p>• Important distinguishing feature</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pain",
+            "• Severe oral pain • Odynophagia • Difficulty eating/drinking",
+            "• May cause dehydration"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pain</strong></p>",
+            "<p>• Severe oral pain <br/>• Odynophagia <br/>• Difficulty eating/drinking</p>",
+            "<p>• May cause dehydration</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Lymph Nodes",
+            "• Cervical lymphadenopathy may occur",
+            "• Supports infectious etiology"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lymph Nodes</strong></p>",
+            "<p>• Cervical lymphadenopathy may occur</p>",
+            "<p>• Supports infectious etiology</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Diagnosis",
+            "• Usually clinical • PCR if uncertain • Viral culture occasionally used",
+            "• Clinical diagnosis is most common"
+          ],
+          "cellsHtml": [
+            "<p><strong>Diagnosis</strong></p>",
+            "<p>• Usually clinical <br/>• PCR if uncertain <br/>• Viral culture occasionally used</p>",
+            "<p>• Clinical diagnosis is most common</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Treatment",
+            "• Hydration • Analgesics • Oral acyclovir in severe cases",
+            "• Early antiviral therapy shortens illness"
+          ],
+          "cellsHtml": [
+            "<p><strong>Treatment</strong></p>",
+            "<p>• Hydration <br/>• Analgesics <br/>• Oral acyclovir in severe cases</p>",
+            "<p>• Early antiviral therapy shortens illness</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Complications",
+            "• Dehydration • Secondary bacterial infection • Recurrent herpes labialis",
+            "• Important in severe disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Complications</strong></p>",
+            "<p>• Dehydration <br/>• Secondary bacterial infection <br/>• Recurrent herpes labialis</p>",
+            "<p>• Important in severe disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "System Involved",
+            "• Gastrointestinal system • Oral cavity • Infectious diseases",
+            "• Common oral mucosal infection"
+          ],
+          "cellsHtml": [
+            "<p><strong>System Involved</strong></p>",
+            "<p>• Gastrointestinal system <br/>• Oral cavity <br/>• Infectious diseases</p>",
+            "<p>• Common oral mucosal infection</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Primary Herpetic Gingivostomatitis",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Primary Herpetic Gingivostomatitis</strong></u></p>",
+      "columns": [
+        "Differential\nDiagnosis",
+        "Distinguishing\nFeatures",
+        "Key Differences from\nPrimary\nHerpetic Gingivostomatitis"
+      ],
+      "columnsHtml": [
+        "<p><strong>Differential </strong></p><p><strong>Diagnosis</strong></p>",
+        "<p><strong>Distinguishing </strong></p><p><strong>Features</strong></p>",
+        "<p><strong>Key Differences from </strong></p><p><strong>Primary </strong></p><p><strong>Herpetic Gingivostomatitis</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Recurrent aphthous\nstomatitis",
+            "• Painful shallow ulcers • Nonkeratinized mucosa • No vesicles • No fever",
+            "• Absence of vesicular stage • No gingivitis • No systemic symptoms"
+          ],
+          "cellsHtml": [
+            "<p><strong>Recurrent aphthous </strong></p><p><strong>stomatitis</strong></p>",
+            "<p>• Painful shallow ulcers <br/>• Nonkeratinized mucosa <br/>• No vesicles <br/>• No fever</p>",
+            "<p>• Absence of vesicular stage <br/>• No gingivitis <br/>• No systemic symptoms</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Herpangina",
+            "• Coxsackie virus infection • Fever • Posterior oral ulcers • Soft palate involvement",
+            "• Lesions mainly posterior • Gingiva usually spared"
+          ],
+          "cellsHtml": [
+            "<p><strong>Herpangina</strong></p>",
+            "<p>• Coxsackie virus infection <br/>• Fever <br/>• Posterior oral ulcers <br/>• Soft palate involvement</p>",
+            "<p>• Lesions mainly posterior <br/>• Gingiva usually spared</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Hand-foot-and-mouth\ndisease",
+            "• Oral ulcers • Vesicular rash on hands/feet • Enteroviral infection",
+            "• Characteristic extremity rash present"
+          ],
+          "cellsHtml": [
+            "<p><strong>Hand-foot-and-mouth </strong></p><p><strong>disease</strong></p>",
+            "<p>• Oral ulcers <br/>• Vesicular rash on hands/feet <br/>• Enteroviral infection</p>",
+            "<p>• Characteristic extremity rash present</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral candidiasis",
+            "• White curd-like plaques • Scrapable lesions • Burning sensation",
+            "• No vesicles • No diffuse gingivitis"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral candidiasis</strong></p>",
+            "<p>• White curd-like plaques <br/>• Scrapable lesions <br/>• Burning sensation</p>",
+            "<p>• No vesicles <br/>• No diffuse gingivitis</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral lichen planus",
+            "• Chronic course • Wickham striae • Reticular white lesions",
+            "• Chronic inflammatory condition • No fever or vesicles"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral lichen planus</strong></p>",
+            "<p>• Chronic course <br/>• Wickham striae <br/>• Reticular white lesions</p>",
+            "<p>• Chronic inflammatory condition <br/>• No fever or vesicles</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Behçet disease",
+            "• Recurrent oral ulcers • Genital ulcers • Uveitis",
+            "• Multisystem disease • No vesicular eruption"
+          ],
+          "cellsHtml": [
+            "<p><strong>Behçet disease</strong></p>",
+            "<p>• Recurrent oral ulcers <br/>• Genital ulcers <br/>• Uveitis</p>",
+            "<p>• Multisystem disease <br/>• No vesicular eruption</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Stevens–Johnson\nsyndrome",
+            "• Painful mucosal erosions • Skin lesions • Drug association",
+            "• Severe systemic illness • Extensive skin involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Stevens–Johnson </strong></p><p><strong>syndrome</strong></p>",
+            "<p>• Painful mucosal erosions <br/>• Skin lesions <br/>• Drug association</p>",
+            "<p>• Severe systemic illness <br/>• Extensive skin involvement</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oral squamous cell\ncarcinoma",
+            "• Nonhealing ulcer • Indurated margins • Chronic progression",
+            "• Chronic malignant lesion • No acute febrile illness"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oral squamous cell </strong></p><p><strong>carcinoma</strong></p>",
+            "<p>• Nonhealing ulcer <br/>• Indurated margins <br/>• Chronic progression</p>",
+            "<p>• Chronic malignant lesion <br/>• No acute febrile illness</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Internal Medicine – Gastroenterology – Oral Cavity Infections – Primary Herpetic Gingivostomatitis",
     "headingHtml": "<p><u><strong>Internal Medicine – Gastroenterology – Oral Cavity Infections – </strong></u></p><p><u><strong>Primary Herpetic Gingivostomatitis</strong></u></p>",
@@ -342,6 +616,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Primary Herpetic Gingivostomatitis – Recognition & Diagnosis",
+      "headingHtml": "<p><u><strong>Primary Herpetic Gingivostomatitis – </strong></u></p><p><u><strong>Recognition &amp; Diagnosis</strong></u></p>",
+      "description": "This diagram illustrates the clinical recognition and diagnostic approach to primary herpetic gingivostomatitis caused by HSV-1 infection. It highlights characteristic features including fever, malaise, painful oral vesicles, diffuse gingivitis, and shallow ulcers involving the lips and oral mucosa. The infographic also summarizes pathogenesis, common sites of involvement, differential diagnoses, diagnostic methods such as PCR and Tzanck smear, management strategies, and important complications.",
+      "descriptionHtml": "<p>This diagram illustrates the clinical recognition and diagnostic approach to primary herpetic gingivostomatitis caused by HSV-1 infection. It highlights characteristic features including fever, malaise, painful oral vesicles, diffuse gingivitis, and shallow ulcers involving the lips and oral mucosa. The infographic also summarizes pathogenesis, common sites of involvement, differential diagnoses, diagnostic methods such as PCR and Tzanck smear, management strategies, and important complications.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Primary Herpetic Gingivostomatitis – Recognition & Diagnosis",
     "headingHtml": "<p><u><strong>Primary Herpetic Gingivostomatitis – </strong></u></p><p><u><strong>Recognition &amp; Diagnosis</strong></u></p>",

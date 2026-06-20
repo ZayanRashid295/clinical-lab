@@ -251,9 +251,10 @@ function joinHeading(paragraphs: FormattedParagraph[]): {
   headingHtml?: string;
 } {
   const heading = paragraphs
-    .map((paragraph) => paragraph.text.trim())
+    .map((paragraph) => paragraph.text.trim().replace(/\s+/g, " "))
     .filter(Boolean)
     .join(" ")
+    .replace(/(\))([A-Za-z])/g, "$1 $2")
     .trim();
   const headingHtml = joinFormattedHtml(paragraphs) || undefined;
   return { heading, headingHtml };
@@ -304,13 +305,6 @@ export function blockIndexForParagraphOrder(blocks: BodyBlock[], paragraphOrder:
   return blocks.length;
 }
 
-function findNextTableIndex(blocks: BodyBlock[], fromIndex: number): number {
-  for (let index = fromIndex; index < blocks.length; index += 1) {
-    if (blocks[index].kind === "table") return index;
-  }
-  return -1;
-}
-
 function collectHeadingBeforeTable(blocks: BodyBlock[], tableIndex: number): FormattedParagraph[] {
   const paragraphs: FormattedParagraph[] = [];
   for (let index = tableIndex - 1; index >= 0; index -= 1) {
@@ -323,6 +317,19 @@ function collectHeadingBeforeTable(blocks: BodyBlock[], tableIndex: number): For
     paragraphs.unshift(block.entry.formatted);
   }
   return paragraphs;
+}
+
+function countSupplementalImageBlocks(
+  blocks: BodyBlock[],
+  fromIndex: number,
+  toIndex: number,
+): number {
+  let count = 0;
+  for (let index = fromIndex; index < toIndex; index += 1) {
+    const block = blocks[index];
+    if (block.kind === "paragraph" && block.hasImage) count += 1;
+  }
+  return count;
 }
 
 export function findBlockContentEnd(
@@ -341,6 +348,93 @@ export function findBlockContentEnd(
   return blocks.length;
 }
 
+export function parseSupplementalContentFromBlocks(
+  blocks: BodyBlock[],
+  contentEndIndex = blocks.length,
+  metadataSearchFrom = 0,
+): {
+  tables: ParsedTableContent[];
+  diagrams: ParsedDiagramContent[];
+} {
+  const scoped = blocks.slice(0, contentEndIndex);
+  const metadata = findMetadataBlockRange(scoped, metadataSearchFrom);
+  if (!metadata) return { tables: [], diagrams: [] };
+
+  const tables: ParsedTableContent[] = [];
+  const diagrams: ParsedDiagramContent[] = [];
+  let index = metadata.end + 1;
+
+  while (index < scoped.length) {
+    const block = scoped[index];
+
+    if (block.kind === "table") {
+      const content = tableBlockToContent(
+        collectHeadingBeforeTable(scoped, index),
+        block.rows,
+      );
+      if (content) tables.push(content);
+      index += 1;
+      continue;
+    }
+
+    if (block.kind === "paragraph" && block.hasImage) {
+      index += 1;
+      while (index < scoped.length) {
+        const skipBlock = scoped[index];
+        if (skipBlock.kind !== "paragraph") break;
+        if (!skipBlock.entry.formatted.text.trim()) {
+          index += 1;
+          continue;
+        }
+        break;
+      }
+
+      const diagramHeading: FormattedParagraph[] = [];
+      while (index < scoped.length) {
+        const headingBlock = scoped[index];
+        if (headingBlock.kind !== "paragraph") break;
+        const text = headingBlock.entry.formatted.text.trim();
+        if (!text) {
+          index += 1;
+          continue;
+        }
+        if (DIAGRAM_RE.test(text)) break;
+        if (headingBlock.hasImage || isMetadataLine(text)) break;
+        if (isInterimTableSectionHeading(text) || isProseParagraph(text)) break;
+        diagramHeading.push(headingBlock.entry.formatted);
+        index += 1;
+      }
+
+      let description: string | undefined;
+      let descriptionHtml: string | undefined;
+      const descriptionBlock = scoped[index];
+      if (descriptionBlock?.kind === "paragraph") {
+        const text = descriptionBlock.entry.formatted.text.trim();
+        if (DIAGRAM_RE.test(text)) {
+          description = text;
+          descriptionHtml =
+            joinFormattedHtml([descriptionBlock.entry.formatted]) || undefined;
+          index += 1;
+        }
+      }
+
+      const { heading, headingHtml } = joinHeading(diagramHeading);
+      if (heading || description) {
+        diagrams.push({
+          ...(heading ? { heading, headingHtml } : {}),
+          ...(description ? { description, descriptionHtml } : {}),
+        });
+      }
+      continue;
+    }
+
+    index += 1;
+  }
+
+  return { tables, diagrams };
+}
+
+/** @deprecated Use parseSupplementalContentFromBlocks */
 export function parseTablesAndDiagramFromBlocks(
   blocks: BodyBlock[],
   contentEndIndex = blocks.length,
@@ -350,97 +444,16 @@ export function parseTablesAndDiagramFromBlocks(
   table2?: ParsedTableContent;
   diagram?: ParsedDiagramContent;
 } {
-  const scoped = blocks.slice(0, contentEndIndex);
-  const metadata = findMetadataBlockRange(scoped, metadataSearchFrom);
-  if (!metadata) return {};
-
-  let index = metadata.end + 1;
-  const result: {
-    table1?: ParsedTableContent;
-    table2?: ParsedTableContent;
-    diagram?: ParsedDiagramContent;
-  } = {};
-
-  const table1Index = findNextTableIndex(scoped, index);
-  if (table1Index !== -1) {
-    const table1Block = scoped[table1Index];
-    if (table1Block.kind === "table") {
-      result.table1 = tableBlockToContent(
-        collectHeadingBeforeTable(scoped, table1Index),
-        table1Block.rows,
-      );
-      index = table1Index + 1;
-    }
-  }
-
-  const table2Index = findNextTableIndex(scoped, index);
-  if (table2Index !== -1) {
-    const table2Block = scoped[table2Index];
-    if (table2Block.kind === "table") {
-      result.table2 = tableBlockToContent(
-        collectHeadingBeforeTable(scoped, table2Index),
-        table2Block.rows,
-      );
-      index = table2Index + 1;
-    }
-  }
-
-  while (index < scoped.length) {
-    const block = scoped[index];
-    if (block.kind === "paragraph" && block.hasImage) break;
-    index += 1;
-  }
-
-  if (index >= scoped.length) return result;
-  const imageBlock = scoped[index];
-  if (imageBlock.kind !== "paragraph" || !imageBlock.hasImage) return result;
-
-  index += 1;
-  while (index < scoped.length) {
-    const block = scoped[index];
-    if (block.kind !== "paragraph") break;
-    if (!block.entry.formatted.text.trim()) {
-      index += 1;
-      continue;
-    }
-    break;
-  }
-
-  const diagramHeading: FormattedParagraph[] = [];
-  while (index < scoped.length) {
-    const block = scoped[index];
-    if (block.kind !== "paragraph") break;
-    const text = block.entry.formatted.text.trim();
-    if (!text) {
-      index += 1;
-      continue;
-    }
-    if (DIAGRAM_RE.test(text)) break;
-    diagramHeading.push(block.entry.formatted);
-    index += 1;
-  }
-
-  let description: string | undefined;
-  let descriptionHtml: string | undefined;
-  const descriptionBlock = scoped[index];
-  if (descriptionBlock?.kind === "paragraph") {
-    const text = descriptionBlock.entry.formatted.text.trim();
-    if (DIAGRAM_RE.test(text)) {
-      description = text;
-      descriptionHtml =
-        joinFormattedHtml([descriptionBlock.entry.formatted]) || undefined;
-    }
-  }
-
-  const { heading, headingHtml } = joinHeading(diagramHeading);
-  if (heading || description) {
-    result.diagram = {
-      ...(heading ? { heading, headingHtml } : {}),
-      ...(description ? { description, descriptionHtml } : {}),
-    };
-  }
-
-  return result;
+  const { tables, diagrams } = parseSupplementalContentFromBlocks(
+    blocks,
+    contentEndIndex,
+    metadataSearchFrom,
+  );
+  return {
+    ...(tables[0] ? { table1: tables[0] } : {}),
+    ...(tables[1] ? { table2: tables[1] } : {}),
+    ...(diagrams[0] ? { diagram: diagrams[0] } : {}),
+  };
 }
 
 export function findBlockIndexForParagraph(

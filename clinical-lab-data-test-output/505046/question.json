@@ -73,6 +73,184 @@
   "classicTriad": "Tachypnea + speech limitation + accessory muscle use",
   "classicTriadHtml": "<p><strong>T</strong><strong>achypnea + speech limitation + accessory muscle use</strong></p>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Acute Severe Asthma Exacerbation – Clinical Severity Features",
+      "headingHtml": "<p><u><strong>Acute Severe Asthma Exacerbation – </strong></u></p><p><u><strong>Clinical Severity Features</strong></u></p>",
+      "columns": [
+        "Clinical Feature",
+        "Findings in Severe Acute Asthma (This Case)",
+        "Clinical Interpretation"
+      ],
+      "columnsHtml": [
+        "<p><strong>Clinical Feature</strong></p>",
+        "<p><strong>Findings in Severe Acute Asthma (This Case)</strong></p>",
+        "<p><strong>Clinical Interpretation</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Respiratory Rate",
+            "• RR 32/min",
+            "Indicates severe tachypnea due to airway narrowing and increased work of breathing"
+          ],
+          "cellsHtml": [
+            "<p><strong>Respiratory Rate</strong></p>",
+            "<p>• RR 32/min</p>",
+            "<p>Indicates severe tachypnea due to airway narrowing and increased work of breathing</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Speech Ability",
+            "• Speaks in short phrases only",
+            "Classic marker of severe airflow limitation and reduced tidal volume"
+          ],
+          "cellsHtml": [
+            "<p><strong>Speech Ability</strong></p>",
+            "<p>• Speaks in short phrases only</p>",
+            "<p>Classic marker of severe airflow limitation and reduced tidal volume</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Work of Breathing",
+            "• Accessory muscle use• Visible distress",
+            "Indicates significant bronchospasm and increased respiratory effort"
+          ],
+          "cellsHtml": [
+            "<p><strong>Work of Breathing</strong></p>",
+            "<p>• Accessory muscle use<br/>• Visible distress</p>",
+            "<p>Indicates significant bronchospasm and increased respiratory effort</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Oxygenation Status",
+            "• Not mentioned (likely normal or borderline in early severe stage)",
+            "Oxygen status may still be preserved in severe but deteriorating asthma"
+          ],
+          "cellsHtml": [
+            "<p><strong>Oxygenation Status</strong></p>",
+            "<p>• Not mentioned (likely normal or borderline in early severe stage)</p>",
+            "<p>Oxygen status may still be preserved in severe but deteriorating asthma</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Mental Status",
+            "• Alert",
+            "Excludes life-threatening stage (no hypoxia-induced confusion)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Mental Status</strong></p>",
+            "<p>• Alert</p>",
+            "<p>Excludes life-threatening stage (no hypoxia-induced confusion)</p>"
+          ]
+        },
+        {
+          "cells": [
+            "System Involved",
+            "• Respiratory system",
+            "Bronchial hyperresponsiveness causing reversible airway obstruction"
+          ],
+          "cellsHtml": [
+            "<p><strong>System Involved</strong></p>",
+            "<p>• Respiratory system</p>",
+            "<p>Bronchial hyperresponsiveness causing reversible airway obstruction</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Acute Severe Shortness of Breath",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Acute Severe Shortness of Breath</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "How It Differs from\nSevere Asthma"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>How It Differs from </strong></p><p><strong>Severe Asthma</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Acute Severe Asthma",
+            "• Wheeze• Prolonged expiration• Speech limitation• Tachypnea",
+            "Reversible airway obstruction with wheeze present"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute Severe Asthma</strong></p>",
+            "<p>• Wheeze<br/>• Prolonged expiration<br/>• Speech limitation<br/>• Tachypnea</p>",
+            "<p>Reversible airway obstruction with wheeze present</p>"
+          ]
+        },
+        {
+          "cells": [
+            "COPD Exacerbation",
+            "• Chronic smoker• Productive cough• Barrel chest",
+            "Fixed airflow limitation, older age group, chronic symptoms"
+          ],
+          "cellsHtml": [
+            "<p><strong>COPD Exacerbation</strong></p>",
+            "<p>• Chronic smoker<br/>• Productive cough<br/>• Barrel chest</p>",
+            "<p>Fixed airflow limitation, older age group, chronic symptoms</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Anaphylaxis",
+            "• Urticaria• Hypotension• Facial swelling",
+            "Systemic allergic features + airway edema rather than bronchospasm alone"
+          ],
+          "cellsHtml": [
+            "<p><strong>Anaphylaxis</strong></p>",
+            "<p>• Urticaria<br/>• Hypotension<br/>• Facial swelling</p>",
+            "<p>Systemic allergic features + airway edema rather than bronchospasm alone</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pneumothorax",
+            "• Sudden unilateral chest pain• Absent breath sounds on one side",
+            "No wheeze; unilateral lung collapse signs"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pneumothorax</strong></p>",
+            "<p>• Sudden unilateral chest pain<br/>• Absent breath sounds on one side</p>",
+            "<p>No wheeze; unilateral lung collapse signs</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pulmonary Embolism",
+            "• Sudden dyspnea• Pleuritic chest pain• Risk factors (DVT)",
+            "Clear lungs, no wheeze; vascular origin not airway obstruction"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pulmonary Embolism</strong></p>",
+            "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Risk factors (DVT)</p>",
+            "<p>Clear lungs, no wheeze; vascular origin not airway obstruction</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Heart Failure\n(Pulmonary Edema)",
+            "• Crackles• Orthopnea• Pink frothy sputum",
+            "Fluid overload signs instead of bronchospasm"
+          ],
+          "cellsHtml": [
+            "<p><strong>Heart Failure </strong></p><p><strong>(Pulmonary Edema)</strong></p>",
+            "<p>• Crackles<br/>• Orthopnea<br/>• Pink frothy sputum</p>",
+            "<p>Fluid overload signs instead of bronchospasm</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Acute Severe Asthma Exacerbation – Clinical Severity Features",
     "headingHtml": "<p><u><strong>Acute Severe Asthma Exacerbation – </strong></u></p><p><u><strong>Clinical Severity Features</strong></u></p>",
@@ -249,6 +427,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Acute Severe Asthma Exacerbation – Clinical Severity Classification (GINA-Based Emergency Assessment)",
+      "headingHtml": "<p><u><strong>Acute Severe Asthma Exacerbation – Clinical Severity Classification </strong></u></p><p><u><strong>(GINA-Based Emergency Assessment)</strong></u></p>",
+      "description": "This diagram illustrates the clinical severity spectrum of acute asthma exacerbations based on GINA emergency assessment criteria, ranging from mild to near-fatal disease. It highlights key bedside indicators including speech ability, respiratory rate, accessory muscle use, oxygen saturation, mental status, auscultatory findings, and risk of respiratory arrest. The diagram emphasizes rapid recognition of severe and life-threatening asthma, where inability to speak full sentences, marked tachypnea, hypoxemia, exhaustion, or a silent chest require immediate escalation of treatment. It serves as a concise visual guide for medical students and clinicians to classify exacerbation severity and guide urgent management decisions in the emergency setting.",
+      "descriptionHtml": "<p>This diagram illustrates the clinical severity spectrum of acute asthma exacerbations based on GINA emergency assessment criteria, ranging from mild to near-fatal disease. It highlights key bedside indicators including speech ability, respiratory rate, accessory muscle use, oxygen saturation, mental status, auscultatory findings, and risk of respiratory arrest. The diagram emphasizes rapid recognition of severe and life-threatening asthma, where inability to speak full sentences, marked tachypnea, hypoxemia, exhaustion, or a silent chest require immediate escalation of treatment. It serves as a concise visual guide for medical students and clinicians to classify exacerbation severity and guide urgent management decisions in the emergency setting.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Acute Severe Asthma Exacerbation – Clinical Severity Classification (GINA-Based Emergency Assessment)",
     "headingHtml": "<p><u><strong>Acute Severe Asthma Exacerbation – Clinical Severity Classification </strong></u></p><p><u><strong>(GINA-Based Emergency Assessment)</strong></u></p>",

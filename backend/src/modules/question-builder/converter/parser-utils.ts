@@ -82,7 +82,9 @@ export function findSectionIndex(paragraphs: string[], label: string): number | 
 export function isKeyConceptHeading(paragraph: string): boolean {
   const trimmed = paragraph.trim();
   const lower = trimmed.toLowerCase();
-  if (lower === "key concept" || lower === "key concept of mcq") return true;
+  if (lower === "key concept" || /^key concept\s+of(?:\s+the)?\s+mcq$/i.test(trimmed)) {
+    return true;
+  }
   if (/^key concept\s*\([^)]+\)/i.test(trimmed)) return true;
   if (/^key concept\s*[—–-]\s*\S/i.test(trimmed) && !/^key concept\s*:/i.test(trimmed)) {
     return true;
@@ -115,10 +117,7 @@ export function findPrimaryKeyConceptIndex(paragraphs: string[], explanationStar
   for (let index = explanationStart + 1; index < paragraphs.length; index += 1) {
     const paragraph = paragraphs[index].trim();
     if (!paragraph) continue;
-    const lower = paragraph.toLowerCase();
-    if (lower === "key concept of mcq" || /^key concept\s*\(mcq insight\)/i.test(paragraph)) {
-      return index;
-    }
+    if (isKeyConceptHeading(paragraph)) return index;
   }
 
   return findFirstKeyConceptIndex(paragraphs, explanationStart + 1);
@@ -151,9 +150,8 @@ export function isProseParagraph(paragraph: string): boolean {
   const trimmed = paragraph.trim();
   if (!trimmed) return false;
   if (trimmed.startsWith("(") && trimmed.endsWith(")") && trimmed.length <= 120) return false;
-  if (trimmed.length > 100) return true;
   if (/\bis defined by\b/i.test(trimmed)) return true;
-  if (trimmed.length > 80 && trimmed.includes(", ")) return true;
+  if (trimmed.length > 80 && trimmed.includes(", ") && /\.\s/.test(trimmed)) return true;
   if (/^[a-z]/.test(trimmed) && trimmed.length > 30) return true;
   return /^(Used in|Target |Chosen after|The |This |Patients |Although |A known |A \d)/.test(trimmed);
 }

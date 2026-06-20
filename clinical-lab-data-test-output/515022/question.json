@@ -69,6 +69,136 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Moderate"
   },
+  "tables": [
+    {
+      "heading": "Psoriasis – Severe Chronic Plaque Psoriasis – Biologic Therapy",
+      "headingHtml": "<p><u><strong>Psoriasis – Severe Chronic Plaque Psoriasis – </strong></u></p><p><u><strong>Biologic Therapy</strong></u></p>",
+      "columns": [
+        "Drug Class / Biologic",
+        "Mechanism of Action",
+        "Clinical Use / Notes"
+      ],
+      "columnsHtml": [
+        "<p><strong>Drug Class / Biologic</strong></p>",
+        "<p><strong>Mechanism of Action</strong></p>",
+        "<p><strong>Clinical Use / Notes</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "TNF-α inhibitors (e.g., etanercept, adalimumab, infliximab)",
+            "Block tumor necrosis factor-alpha,\nreducing inflammation and keratinocyte proliferation",
+            "First-line biologic for severe or refractory plaque psoriasis;\nrapid and sustained plaque clearance"
+          ],
+          "cellsHtml": [
+            "<p>TNF-α inhibitors (e.g., etanercept, adalimumab, infliximab)</p>",
+            "<ul><li>Block tumor necrosis factor-alpha, </li><li>reducing inflammation and keratinocyte proliferation</li></ul>",
+            "<ul><li>First-line biologic for <strong>severe or refractory plaque psoriasis</strong>; </li><li>rapid and sustained plaque clearance</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "IL-12/23 inhibitors (e.g., ustekinumab)",
+            "Target interleukins 12 and 23,\nmodulating immune response",
+            "Used in moderate-to-severe psoriasis;\nalternative if TNF-α inhibitors fail or contraindicated"
+          ],
+          "cellsHtml": [
+            "<p>IL-12/23 inhibitors (e.g., ustekinumab)</p>",
+            "<ul><li>Target interleukins 12 and 23, </li><li>modulating immune response</li></ul>",
+            "<ul><li>Used in moderate-to-severe psoriasis; </li><li>alternative if TNF-α inhibitors fail or contraindicated</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "IL-17 inhibitors (e.g., secukinumab, ixekizumab)",
+            "Inhibit interleukin-17,\nreducing inflammatory cascade in skin",
+            "Highly effective in severe plaque psoriasis;\noption for refractory cases"
+          ],
+          "cellsHtml": [
+            "<p>IL-17 inhibitors (e.g., secukinumab, ixekizumab)</p>",
+            "<ul><li>Inhibit interleukin-17, </li><li>reducing inflammatory cascade in skin</li></ul>",
+            "<ul><li>Highly effective in severe plaque psoriasis; </li><li>option for refractory cases</li></ul>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Chronic Plaque Psoriasis",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Chronic Plaque Psoriasis</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Clinical Features",
+        "Distinguishing Points from Psoriasis"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Clinical Features</strong></p>",
+        "<p><strong>Distinguishing Points from Psoriasis</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Eczema / Atopic Dermatitis",
+            "Itchy,\nred,\nsometimes oozing plaques",
+            "Usually flexural distribution,\nintense pruritus,\nlacks well-demarcated silvery scales"
+          ],
+          "cellsHtml": [
+            "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
+            "<ul><li>Itchy, </li><li>red, </li><li>sometimes oozing plaques</li></ul>",
+            "<ul><li>Usually flexural distribution, </li><li>intense pruritus, </li><li>lacks well-demarcated silvery scales</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Seborrheic Dermatitis",
+            "Greasy,\nyellowish scales,\ncommonly on scalp,\nface, chest",
+            "Greasy rather than silvery scales,\noften less sharply demarcated"
+          ],
+          "cellsHtml": [
+            "<p><strong>Seborrheic Dermatitis</strong></p>",
+            "<ul><li>Greasy, </li><li>yellowish scales, </li><li>commonly on scalp, </li><li>face, chest</li></ul>",
+            "<ul><li>Greasy rather than silvery scales, </li><li>often less sharply demarcated</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Lichen Planus",
+            "Violaceous,\nflat-topped papules",
+            "Polygonal papules,\nWickham striae,\nmucosal involvement;\nno silvery plaques"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lichen Planus</strong></p>",
+            "<ul><li>Violaceous, </li><li>flat-topped papules</li></ul>",
+            "<ul><li>Polygonal papules, </li><li>Wickham striae, </li><li>mucosal involvement; </li><li>no silvery plaques</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Pityriasis Rubra Pilaris",
+            "Orange-red scaly plaques with islands of sparing",
+            "Diffuse involvement,\npalmoplantar keratoderma,\nlacks classic plaques and silvery scales"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pityriasis Rubra Pilaris</strong></p>",
+            "<ul><li>Orange-red scaly plaques with islands of sparing</li></ul>",
+            "<ul><li>Diffuse involvement, </li><li>palmoplantar keratoderma, </li><li>lacks classic plaques and silvery scales</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Tinea Corporis / Fungal Infection",
+            "Annular scaly plaques",
+            "Positive KOH examination,\ncentral clearing,\noften asymmetric"
+          ],
+          "cellsHtml": [
+            "<p><strong>Tinea Corporis / Fungal Infection</strong></p>",
+            "<ul><li>Annular scaly plaques</li></ul>",
+            "<ul><li>Positive KOH examination, </li><li>central clearing, </li><li>often asymmetric</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Psoriasis – Severe Chronic Plaque Psoriasis – Biologic Therapy",
     "headingHtml": "<p><u><strong>Psoriasis – Severe Chronic Plaque Psoriasis – </strong></u></p><p><u><strong>Biologic Therapy</strong></u></p>",
@@ -197,6 +327,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Severe Chronic Plaque Psoriasis – Biologic Therapy (Treatment Escalation Pathway)",
+      "headingHtml": "<p><u><strong>Severe Chronic Plaque Psoriasis – Biologic Therapy </strong></u></p><p><u><strong>(Treatment Escalation Pathway)</strong></u></p>",
+      "description": "The diagram illustrates the stepwise escalation of therapy in severe chronic plaque psoriasis after failure of methotrexate and UVB phototherapy, highlighting the role of biologic agents. It shows how targeted biologics—TNF-α inhibitors, IL-12/23 inhibitors, and IL-17 inhibitors—act on the immune system to suppress pathogenic cytokines, reduce inflammation, and improve skin clearance in refractory disease.",
+      "descriptionHtml": "<p>The diagram illustrates the <strong>stepwise escalation of therapy</strong> in severe chronic plaque psoriasis after <strong>failure of methotrexate and UVB phototherapy</strong>, highlighting the role of <strong>biologic agents</strong>. It shows how targeted biologics—<strong>TNF-α inhibitors, IL-12/23 inhibitors, and IL-17 inhibitors</strong>—act on the <strong>immune system</strong> to suppress pathogenic cytokines, reduce inflammation, and improve skin clearance in refractory disease.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Severe Chronic Plaque Psoriasis – Biologic Therapy (Treatment Escalation Pathway)",
     "headingHtml": "<p><u><strong>Severe Chronic Plaque Psoriasis – Biologic Therapy </strong></u></p><p><u><strong>(Treatment Escalation Pathway)</strong></u></p>",

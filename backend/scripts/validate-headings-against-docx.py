@@ -38,11 +38,9 @@ def is_prose_paragraph(text: str) -> bool:
         return False
     if trimmed.startswith("(") and trimmed.endswith(")") and len(trimmed) <= 120:
         return False
-    if len(trimmed) > 100:
-        return True
     if re.search(r"\bis defined by\b", trimmed, re.I):
         return True
-    if len(trimmed) > 80 and ", " in trimmed:
+    if len(trimmed) > 80 and ", " in trimmed and re.search(r"\.\s", trimmed):
         return True
     if len(trimmed) > 30 and trimmed[0].islower():
         return True
@@ -105,7 +103,22 @@ def find_key_concept_index(blocks) -> int | None:
     return candidates[-1] if candidates else None
 
 
-def extract_expected(doc: DocxDocument) -> dict:
+def find_content_end(blocks, question_id: str, search_from: int) -> int:
+    for index in range(search_from + 1, len(blocks)):
+        kind, text, _ = blocks[index]
+        if kind != "paragraph":
+            continue
+        if SECTION_RE.match(text):
+            return index
+        match = QUESTION_ID_RE.search(text)
+        if match:
+            qid = re.sub(r"[^\dA-Za-z]", "", match.group(1))
+            if qid != question_id:
+                return index
+    return len(blocks)
+
+
+def extract_expected(doc: DocxDocument, question_id: str) -> dict:
     raw_blocks = list(iter_body_blocks(doc))
     blocks: list[tuple[str, str, bool]] = []
     for kind, block in raw_blocks:
@@ -138,14 +151,9 @@ def extract_expected(doc: DocxDocument) -> dict:
     if meta_start is None:
         return {}
 
+    content_end = find_content_end(blocks, question_id, meta_end)
     index = meta_end + 1
-    result: dict = {}
-
-    def find_next_table(start: int) -> int:
-        for i in range(start, len(blocks)):
-            if blocks[i][0] == "table":
-                return i
-        return -1
+    result: dict = {"table_headings": [], "diagram_headings": [], "diagram_descriptions": []}
 
     def collect_heading_before_table(table_index: int) -> str:
         parts: list[str] = []
@@ -161,55 +169,48 @@ def extract_expected(doc: DocxDocument) -> dict:
                 break
             if is_interim_table_section(text) or is_prose_paragraph(text):
                 break
-            parts.insert(0, text)
+            parts.insert(0, re.sub(r"\s+", " ", text.strip()))
             i -= 1
         return normalize(" ".join(parts))
 
-    table1_index = find_next_table(index)
-    if table1_index != -1:
-        result["table1_heading"] = collect_heading_before_table(table1_index)
-        index = table1_index + 1
-
-    table2_index = find_next_table(index)
-    if table2_index != -1:
-        result["table2_heading"] = collect_heading_before_table(table2_index)
-        index = table2_index + 1
-
-    while index < len(blocks):
+    while index < content_end:
         kind, text, has_image = blocks[index]
+        if kind == "table":
+            result["table_headings"].append(collect_heading_before_table(index))
+            index += 1
+            continue
         if kind == "paragraph" and has_image:
-            break
-        index += 1
-
-    if index >= len(blocks):
-        return result
-
-    index += 1
-    while index < len(blocks):
-        kind, text, has_image = blocks[index]
-        if kind != "paragraph":
-            break
-        if not text:
             index += 1
+            while index < content_end:
+                skip_kind, skip_text, _ = blocks[index]
+                if skip_kind != "paragraph":
+                    break
+                if not skip_text:
+                    index += 1
+                    continue
+                break
+            diagram_parts: list[str] = []
+            while index < content_end:
+                d_kind, d_text, d_img = blocks[index]
+                if d_kind != "paragraph":
+                    break
+                if not d_text:
+                    index += 1
+                    continue
+                if DIAGRAM_RE.match(d_text):
+                    result["diagram_descriptions"].append(d_text)
+                    index += 1
+                    break
+                if d_img or is_metadata_line(d_text):
+                    break
+                if is_interim_table_section(d_text) or is_prose_paragraph(d_text):
+                    break
+                diagram_parts.append(re.sub(r"\s+", " ", d_text.strip()))
+                index += 1
+            if diagram_parts:
+                result["diagram_headings"].append(normalize(" ".join(diagram_parts)))
             continue
-        break
-
-    diagram_parts: list[str] = []
-    while index < len(blocks):
-        kind, text, has_image = blocks[index]
-        if kind != "paragraph":
-            break
-        if not text:
-            index += 1
-            continue
-        if DIAGRAM_RE.match(text):
-            result["diagram_description"] = text
-            break
-        diagram_parts.append(text)
         index += 1
-
-    if diagram_parts:
-        result["diagram_heading"] = normalize(" ".join(diagram_parts))
 
     return result
 
@@ -237,44 +238,59 @@ def main() -> int:
             continue
 
         data = json.loads(json_path.read_text())
-        expected = extract_expected(doc)
+        expected = extract_expected(doc, qid)
         checked += 1
         rel = docx_path.relative_to(DATA_DIR)
 
-        def check(field: str, json_key: str, nested: str = "heading"):
-            exp = expected.get(field, "")
-            got = normalize((data.get(json_key) or {}).get(nested))
-            if exp and not got:
-                mismatches.append(f"{qid} ({rel}): missing parsed {json_key}.{nested}; expected: {exp[:80]}")
-            elif got and not exp:
-                mismatches.append(f"{qid} ({rel}): unexpected {json_key}.{nested}: {got[:80]}")
-            elif exp and got and normalize(exp) != normalize(got):
+        tables = [t for t in (data.get("tables") or []) if t.get("rows")]
+        if not tables:
+            tables = [t for t in [data.get("table1"), data.get("table2")] if t and t.get("rows")]
+
+        diagrams = data.get("diagrams") or []
+        if not diagrams and data.get("diagram"):
+            diagrams = [data.get("diagram")]
+
+        exp_tables = expected.get("table_headings", [])
+        exp_diagrams = expected.get("diagram_headings", [])
+        exp_descs = expected.get("diagram_descriptions", [])
+
+        if len(exp_tables) != len(tables):
+            mismatches.append(
+                f"{qid} ({rel}): table count doc={len(exp_tables)} json={len(tables)}"
+            )
+
+        for idx, exp_heading in enumerate(exp_tables):
+            if idx >= len(tables):
+                break
+            got_heading = normalize(tables[idx].get("heading"))
+            if normalize(exp_heading) != got_heading:
                 mismatches.append(
-                    f"{qid} ({rel}): {json_key}.{nested}\n  expected: {exp}\n  got:      {got}"
+                    f"{qid} ({rel}): tables[{idx}].heading\n  expected: {exp_heading}\n  got:      {got_heading}"
                 )
 
-        check("table1_heading", "table1")
-        check("table2_heading", "table2")
-        check("diagram_heading", "diagram")
+        if len(exp_diagrams) != len(diagrams):
+            mismatches.append(
+                f"{qid} ({rel}): diagram count doc={len(exp_diagrams)} json={len(diagrams)}"
+            )
 
-        exp_desc = normalize(expected.get("diagram_description"))
-        got_desc = normalize(data.get("diagram") and data.get("diagram").get("description"))
-        if exp_desc and not got_desc:
-            mismatches.append(f"{qid} ({rel}): missing diagram.description; expected start: {exp_desc[:80]}")
-        elif exp_desc and got_desc and exp_desc != got_desc:
-            if not got_desc.startswith(exp_desc[:40]) and exp_desc[:40] not in got_desc:
+        for idx, exp_heading in enumerate(exp_diagrams):
+            if idx >= len(diagrams):
+                break
+            got_heading = normalize(diagrams[idx].get("heading"))
+            if normalize(exp_heading) != got_heading:
                 mismatches.append(
-                    f"{qid} ({rel}): diagram.description mismatch\n  expected: {exp_desc[:120]}\n  got:      {got_desc[:120]}"
+                    f"{qid} ({rel}): diagrams[{idx}].heading\n  expected: {exp_heading}\n  got:      {got_heading}"
                 )
 
-        has_table1_doc = "table1_heading" in expected
-        has_table2_doc = "table2_heading" in expected
-        has_table1_json = bool(data.get("table1", {}).get("rows"))
-        has_table2_json = bool(data.get("table2", {}).get("rows"))
-        if has_table1_doc != has_table1_json:
-            mismatches.append(f"{qid} ({rel}): table1 presence doc={has_table1_doc} json={has_table1_json}")
-        if has_table2_doc != has_table2_json:
-            mismatches.append(f"{qid} ({rel}): table2 presence doc={has_table2_doc} json={has_table2_json}")
+        for idx, exp_desc in enumerate(exp_descs):
+            if idx >= len(diagrams):
+                break
+            got_desc = normalize(diagrams[idx].get("description"))
+            if exp_desc and got_desc and normalize(exp_desc) != got_desc:
+                if not got_desc.startswith(exp_desc[:40]) and exp_desc[:40] not in got_desc:
+                    mismatches.append(
+                        f"{qid} ({rel}): diagrams[{idx}].description mismatch\n  expected: {exp_desc[:120]}\n  got:      {got_desc[:120]}"
+                    )
 
     print(f"Checked {checked} docx/json pairs")
     if missing_json:

@@ -73,6 +73,172 @@
   "classicTriad": "fever + chest pain + toxic sepsis (with neck crepitus) → suggests mediastinal extension",
   "classicTriadHtml": "<p><strong>fever + chest pain + toxic sepsis (with neck crepitus)</strong> → suggests mediastinal extension</p>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Mediastinitis (Complication-Based Differential Diagnosis) Clinical Features & Key Differentiation Table",
+      "headingHtml": "<p><u><strong>Mediastinitis (Complication-Based Differential Diagnosis)</strong></u></p><p><strong>Clinical Features &amp; Key Differentiation Table</strong></p>",
+      "columns": [
+        "Feature",
+        "Descending Necrotizing\nMediastinitis",
+        "Other Causes of Chest Pain\nin This Context\n(DDx group)"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Descending Necrotizing </strong></p><p><strong>Mediastinitis</strong></p>",
+        "<p><strong>Other Causes of Chest Pain </strong></p><p><strong>in This Context </strong></p><p><strong>(DDx group)</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Source of\ndisease",
+            "• Odontogenic infection• Lower molar infection• Spreads from deep neck spaces",
+            "• Cardiac ischemia (MI)• Aspiration of gastric contents• Thromboembolism• Viral/bacterial pericardial inflammation"
+          ],
+          "cellsHtml": [
+            "<p><strong>Source of </strong></p><p><strong>disease</strong></p>",
+            "<p>• Odontogenic infection<br/>• Lower molar infection<br/>• Spreads from deep neck spaces</p>",
+            "<p>• Cardiac ischemia (MI)<br/>• Aspiration of gastric contents<br/>• Thromboembolism<br/>• Viral/bacterial pericardial inflammation</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Key clinical\nclues",
+            "• Ludwig’s angina history• Neck infection progression• Chest pain + toxic sepsis• Subcutaneous crepitus, gas in tissues",
+            "• MI: crushing chest pain, radiation, diaphoresis• Aspiration: cough, fever, infiltrates• PE: sudden dyspnea, pleuritic pain• Pericarditis: positional chest pain, rub"
+          ],
+          "cellsHtml": [
+            "<p><strong>Key clinical </strong></p><p><strong>clues</strong></p>",
+            "<p>• Ludwig’s angina history<br/>• Neck infection progression<br/>• Chest pain + toxic sepsis<br/>• Subcutaneous crepitus, gas in tissues</p>",
+            "<p>• MI: crushing chest pain, radiation, diaphoresis<br/>• Aspiration: cough, fever, infiltrates<br/>• PE: sudden dyspnea, pleuritic pain<br/>• Pericarditis: positional chest pain, rub</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Progression\npattern",
+            "• Rapid spread from neck → mediastinum• Worsening despite antibiotics• High mortality if untreated",
+            "• MI: coronary occlusion• Aspiration: acute lung inflammation• PE: embolic vascular blockage• Pericarditis: inflammatory pericardial involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Progression </strong></p><p><strong>pattern</strong></p>",
+            "<p>• Rapid spread from neck → mediastinum<br/>• Worsening despite antibiotics<br/>• High mortality if untreated</p>",
+            "<p>• MI: coronary occlusion<br/>• Aspiration: acute lung inflammation<br/>• PE: embolic vascular blockage<br/>• Pericarditis: inflammatory pericardial involvement</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Physical\nfindings",
+            "• Crepitus over neck/chest• Severe sepsis• Toxic appearance• Neck swelling",
+            "• MI: S4, ECG changes• Aspiration: crackles, wheeze• PE: tachycardia, hypoxia• Pericarditis: pericardial rub"
+          ],
+          "cellsHtml": [
+            "<p><strong>Physical </strong></p><p><strong>findings</strong></p>",
+            "<p>• Crepitus over neck/chest<br/>• Severe sepsis<br/>• Toxic appearance<br/>• Neck swelling</p>",
+            "<p>• MI: S4, ECG changes<br/>• Aspiration: crackles, wheeze<br/>• PE: tachycardia, hypoxia<br/>• Pericarditis: pericardial rub</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Imaging\nfindings",
+            "• CT: mediastinal air + fluid collections• Fascial plane spread",
+            "• MI: ECG/troponin elevation• Aspiration: infiltrates in dependent lobes• PE: wedge infarct, CT angiography clot• Pericarditis: pericardial effusion"
+          ],
+          "cellsHtml": [
+            "<p><strong>Imaging </strong></p><p><strong>findings</strong></p>",
+            "<p>• CT: mediastinal air + fluid collections<br/>• Fascial plane spread</p>",
+            "<p>• MI: ECG/troponin elevation<br/>• Aspiration: infiltrates in dependent lobes<br/>• PE: wedge infarct, CT angiography clot<br/>• Pericarditis: pericardial effusion</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Mortality\nrisk",
+            "• Very high without surgery• Surgical emergency",
+            "• MI: high without reperfusion• PE: variable risk• Aspiration: moderate risk• Pericarditis: usually low"
+          ],
+          "cellsHtml": [
+            "<p><strong>Mortality </strong></p><p><strong>risk</strong></p>",
+            "<p>• Very high without surgery<br/>• Surgical emergency</p>",
+            "<p>• MI: high without reperfusion<br/>• PE: variable risk<br/>• Aspiration: moderate risk<br/>• Pericarditis: usually low</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis Chest Pain in a Patient with Ludwig’s Angina and Sepsis",
+      "headingHtml": "<p><u><strong>Differential Diagnosis</strong></u></p><p><u><strong>Chest Pain in a Patient with Ludwig’s Angina and Sepsis</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Clinical Reasoning"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features </strong></p>",
+        "<p><strong>Clinical Reasoning</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Descending\nnecrotizing\nmediastinitis",
+            "• Odontogenic infection• Neck-to-chest spread• Crepitus, gas formation• Severe sepsis, chest pain",
+            "Direct extension of deep neck infection through fascial planes into mediastinum → explains full clinical picture including crepitus and deterioration"
+          ],
+          "cellsHtml": [
+            "<p><strong>Descending </strong></p><p><strong>necrotizing </strong></p><p><strong>mediastinitis </strong></p>",
+            "<p>• Odontogenic infection<br/>• Neck-to-chest spread<br/>• Crepitus, gas formation<br/>• Severe sepsis, chest pain</p>",
+            "<p>Direct extension of deep neck infection through fascial planes into mediastinum → explains full clinical picture including crepitus and deterioration</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Acute myocardial\ninfarction",
+            "• Crushing chest pain• Radiation to arm/jaw• Diaphoresis, ECG changes",
+            "Cardiac ischemia unrelated to infection or neck findings; no crepitus or sepsis link"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute myocardial </strong></p><p><strong>infarction</strong></p>",
+            "<p>• Crushing chest pain<br/>• Radiation to arm/jaw<br/>• Diaphoresis, ECG changes</p>",
+            "<p>Cardiac ischemia unrelated to infection or neck findings; no crepitus or sepsis link</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Aspiration\npneumonia",
+            "• Fever, cough• Basal lung infiltrates• Post-aspiration setting",
+            "Pulmonary infection but lacks mediastinal spread or subcutaneous emphysema"
+          ],
+          "cellsHtml": [
+            "<p><strong>Aspiration </strong></p><p><strong>pneumonia</strong></p>",
+            "<p>• Fever, cough<br/>• Basal lung infiltrates<br/>• Post-aspiration setting</p>",
+            "<p>Pulmonary infection but lacks mediastinal spread or subcutaneous emphysema</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Pulmonary\nembolism",
+            "• Sudden dyspnea• Pleuritic chest pain• Tachycardia, hypoxia",
+            "Vascular obstruction; no infection spread or neck involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pulmonary </strong></p><p><strong>embolism</strong></p>",
+            "<p>• Sudden dyspnea<br/>• Pleuritic chest pain<br/>• Tachycardia, hypoxia</p>",
+            "<p>Vascular obstruction; no infection spread or neck involvement</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Acute\npericarditis",
+            "• Positional chest pain• Pericardial rub• Viral/infectious causes",
+            "Inflammatory pericardial process; does not originate from neck infection"
+          ],
+          "cellsHtml": [
+            "<p><strong>Acute </strong></p><p><strong>pericarditis</strong></p>",
+            "<p>• Positional chest pain<br/>• Pericardial rub<br/>• Viral/infectious causes</p>",
+            "<p>Inflammatory pericardial process; does not originate from neck infection</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Mediastinitis (Complication-Based Differential Diagnosis) Clinical Features & Key Differentiation Table",
     "headingHtml": "<p><u><strong>Mediastinitis (Complication-Based Differential Diagnosis)</strong></u></p><p><strong>Clinical Features &amp; Key Differentiation Table</strong></p>",
@@ -237,6 +403,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Ludwig’s Angina – Descending Necrotizing Mediastinitis",
+      "headingHtml": "<p><u><strong>Ludwig’s Angina – Descending Necrotizing Mediastinitis</strong></u></p>",
+      "description": "This diagram illustrates the progression of Ludwig’s angina from an odontogenic lower molar infection into the deep neck fascial spaces and downward extension into the mediastinum, resulting in descending necrotizing mediastinitis. It highlights the anatomical pathways of spread through the submandibular, parapharyngeal, retropharyngeal, and danger spaces, along with major clinical features such as chest pain, crepitus, severe sepsis, and respiratory compromise. The image also emphasizes the life-threatening nature of mediastinal extension and the need for urgent airway protection, broad-spectrum IV antibiotics, and surgical drainage.",
+      "descriptionHtml": "<p>This diagram illustrates the progression of Ludwig’s angina from an odontogenic lower molar infection into the deep neck fascial spaces and downward extension into the mediastinum, resulting in descending necrotizing mediastinitis. It highlights the anatomical pathways of spread through the submandibular, parapharyngeal, retropharyngeal, and danger spaces, along with major clinical features such as chest pain, crepitus, severe sepsis, and respiratory compromise. The image also emphasizes the life-threatening nature of mediastinal extension and the need for urgent airway protection, broad-spectrum IV antibiotics, and surgical drainage.</p>",
+      "images": [
+        {
+          "filename": "image1.jpeg",
+          "path": "images/image1.jpeg",
+          "sourceName": "image1.jpeg"
+        }
+      ],
+      "image": "images/image1.jpeg"
+    }
+  ],
   "diagram": {
     "heading": "Ludwig’s Angina – Descending Necrotizing Mediastinitis",
     "headingHtml": "<p><u><strong>Ludwig’s Angina – Descending Necrotizing Mediastinitis</strong></u></p>",

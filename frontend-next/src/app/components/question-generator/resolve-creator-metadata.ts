@@ -21,7 +21,9 @@ export interface ResolvedMetadataIds {
 export async function resolveCreatorMetadataIds(
   metadata: QuestionMetadata,
 ): Promise<ResolvedMetadataIds> {
-  const parsedCategory = coerceLabelString(metadata.subject);
+  const parsedCategory =
+    coerceLabelString(metadata.parsedCategoryName) ||
+    coerceLabelString(metadata.subject);
   const parsedProduct = coerceLabelString(metadata.parsedProductName);
   const parsedSystem =
     coerceLabelString(

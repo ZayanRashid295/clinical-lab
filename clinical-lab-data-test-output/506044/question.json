@@ -83,6 +83,22 @@
   "classicTriad": "Chronic ulcer + induration + tobacco exposure = high suspicion OSCC",
   "classicTriadHtml": "<p><strong>Chronic ulcer + induration + tobacco exposure = high suspicion OSCC</strong></p>",
   "classicTriadTitle": "Classic pattern",
+  "diagrams": [
+    {
+      "heading": "Oral Squamous Cell Carcinoma – Diagnostic Approach to Chronic Non-Healing Tongue Ulcer",
+      "headingHtml": "<p><u><strong>Oral Squamous Cell Carcinoma –</strong></u></p><p><u><strong>Diagnostic Approach to Chronic Non-Healing Tongue Ulcer</strong></u></p>",
+      "description": "This diagram illustrates the systematic diagnostic approach to a chronic non-healing tongue ulcer suspicious for oral squamous cell carcinoma (OSCC). It highlights key clinical red flags including persistent ulceration, induration, lateral tongue involvement, and tobacco exposure. The flowchart emphasizes the importance of thorough oral and cervical lymph node examination, followed by incisional biopsy as the gold standard for definitive diagnosis. Additional staging investigations such as contrast-enhanced imaging and FNAC of cervical lymph nodes are also demonstrated to assess local spread and metastasis.",
+      "descriptionHtml": "<p>This diagram illustrates the systematic diagnostic approach to a chronic non-healing tongue ulcer suspicious for oral squamous cell carcinoma (OSCC). It highlights key clinical red flags including persistent ulceration, induration, lateral tongue involvement, and tobacco exposure. The flowchart emphasizes the importance of thorough oral and cervical lymph node examination, followed by incisional biopsy as the gold standard for definitive diagnosis. Additional staging investigations such as contrast-enhanced imaging and FNAC of cervical lymph nodes are also demonstrated to assess local spread and metastasis.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Oral Squamous Cell Carcinoma – Diagnostic Approach to Chronic Non-Healing Tongue Ulcer",
     "headingHtml": "<p><u><strong>Oral Squamous Cell Carcinoma –</strong></u></p><p><u><strong>Diagnostic Approach to Chronic Non-Healing Tongue Ulcer</strong></u></p>",

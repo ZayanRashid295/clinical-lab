@@ -67,6 +67,196 @@
   "classicTriad": "Fatigue + Pallor + Brittle nails (Koilonychia) → suggests iron deficiency anemia, guiding the choice of low serum iron, high TIBC, low ferritin.",
   "classicTriadHtml": "<ul><li><strong>Fatigue + Pallor + Brittle nails (Koilonychia)</strong> → suggests <strong>iron deficiency anemia</strong>, guiding the choice of <strong>low serum iron, high TIBC, low ferritin</strong>.</li></ul>",
   "classicTriadTitle": "Classic Triad in Stem",
+  "tables": [
+    {
+      "heading": "Iron Deficiency Anemia – Laboratory Diagnosis",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia – Laboratory Diagnosis</strong></u></p>",
+      "columns": [
+        "Parameter",
+        "Typical Finding in Iron Deficiency Anemia",
+        "Comments / Significance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Parameter</strong></p>",
+        "<p><strong>Typical Finding in Iron Deficiency Anemia</strong></p>",
+        "<p><strong>Comments / Significance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Hemoglobin / Hematocrit",
+            "Low",
+            "Confirms presence of anemia"
+          ],
+          "cellsHtml": [
+            "<p>Hemoglobin / Hematocrit</p>",
+            "<p>Low</p>",
+            "<p>Confirms presence of anemia</p>"
+          ]
+        },
+        {
+          "cells": [
+            "MCV (Mean Corpuscular Volume)",
+            "Low (microcytic)",
+            "Red blood cells are smaller than normal"
+          ],
+          "cellsHtml": [
+            "<p>MCV (Mean Corpuscular Volume)</p>",
+            "<p>Low (microcytic)</p>",
+            "<p>Red blood cells are smaller than normal</p>"
+          ]
+        },
+        {
+          "cells": [
+            "MCH / MCHC",
+            "Low (hypochromic)",
+            "Red blood cells have reduced hemoglobin content"
+          ],
+          "cellsHtml": [
+            "<p>MCH / MCHC</p>",
+            "<p>Low (hypochromic)</p>",
+            "<p>Red blood cells have reduced hemoglobin content</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Serum Iron",
+            "Low",
+            "Reduced circulating iron"
+          ],
+          "cellsHtml": [
+            "<p>Serum Iron</p>",
+            "<p>Low</p>",
+            "<p>Reduced circulating iron</p>"
+          ]
+        },
+        {
+          "cells": [
+            "TIBC (Total Iron Binding Capacity)",
+            "High",
+            "Body increases transferrin to capture more iron"
+          ],
+          "cellsHtml": [
+            "<p>TIBC (Total Iron Binding Capacity)</p>",
+            "<p>High</p>",
+            "<p>Body increases transferrin to capture more iron</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Ferritin",
+            "Low",
+            "Reflects depleted iron stores"
+          ],
+          "cellsHtml": [
+            "<p>Ferritin</p>",
+            "<p>Low</p>",
+            "<p>Reflects depleted iron stores</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Peripheral Smear",
+            "Microcytic,\nhypochromic RBCs",
+            "Classic morphology of iron deficiency"
+          ],
+          "cellsHtml": [
+            "<p>Peripheral Smear</p>",
+            "<ul><li>Microcytic, </li><li>hypochromic RBCs</li></ul>",
+            "<p>Classic morphology of iron deficiency</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Reticulocyte Count",
+            "Normal or low",
+            "Bone marrow response may be reduced if iron is deficient"
+          ],
+          "cellsHtml": [
+            "<p>Reticulocyte Count</p>",
+            "<p>Normal or low</p>",
+            "<p>Bone marrow response may be reduced if iron is deficient</p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Iron Deficiency Anemia – Laboratory Diagnosis and Differential Diagnosis",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia – </strong></u></p><p><u><strong>Laboratory Diagnosis and Differential Diagnosis</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Laboratory Features / Differentiating Points",
+        "Comments"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Laboratory Features / Differentiating Points</strong></p>",
+        "<p><strong>Comments</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Iron Deficiency Anemia",
+            "Low serum iron,\nhigh TIBC,\nlow ferritin,\nmicrocytic hypochromic RBCs",
+            "Classic iron depletion pattern"
+          ],
+          "cellsHtml": [
+            "<p>Iron Deficiency Anemia</p>",
+            "<ul><li>Low serum iron, </li><li>high TIBC, </li><li>low ferritin, </li><li>microcytic hypochromic RBCs</li></ul>",
+            "<p>Classic iron depletion pattern</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Anemia of Chronic Disease (ACD)",
+            "Low serum iron,\nlow/normal TIBC,\nnormal/high ferritin",
+            "Iron sequestration due to chronic inflammation"
+          ],
+          "cellsHtml": [
+            "<p>Anemia of Chronic Disease (ACD)</p>",
+            "<ul><li>Low serum iron, </li><li>low/normal TIBC, </li><li>normal/high ferritin</li></ul>",
+            "<p>Iron sequestration due to chronic inflammation</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Thalassemia Trait",
+            "Normal/high serum iron,\nnormal/high ferritin,\nmicrocytosis disproportionate to anemia",
+            "Genetic hemoglobinopathy;\nRBC count may be high"
+          ],
+          "cellsHtml": [
+            "<p>Thalassemia Trait</p>",
+            "<ul><li>Normal/high serum iron, </li><li>normal/high ferritin, </li><li>microcytosis disproportionate to anemia</li></ul>",
+            "<ul><li>Genetic hemoglobinopathy; </li><li>RBC count may be high</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Sideroblastic Anemia",
+            "Normal/high serum iron,\nhigh ferritin,\nlow TIBC,\nring sideroblasts on bone marrow",
+            "Defective incorporation of iron into hemoglobin"
+          ],
+          "cellsHtml": [
+            "<p>Sideroblastic Anemia</p>",
+            "<ul><li>Normal/high serum iron, </li><li>high ferritin, </li><li>low TIBC, </li><li>ring sideroblasts on bone marrow</li></ul>",
+            "<p>Defective incorporation of iron into hemoglobin</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Lead Poisoning",
+            "Normal/high serum iron,\nbasophilic stippling on smear,\nmicrocytosis",
+            "History of exposure;\nusually mild anemia"
+          ],
+          "cellsHtml": [
+            "<p>Lead Poisoning</p>",
+            "<ul><li>Normal/high serum iron, </li><li>basophilic stippling on smear, </li><li>microcytosis</li></ul>",
+            "<ul><li>History of exposure; </li><li>usually mild anemia</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Iron Deficiency Anemia – Laboratory Diagnosis",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia – Laboratory Diagnosis</strong></u></p>",
@@ -255,6 +445,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Microcytic Anemia – Iron Deficiency Anemia: Laboratory Diagnosis",
+      "headingHtml": "<p><u><strong>Microcytic Anemia – Iron Deficiency Anemia: </strong></u></p><p><u><strong>Laboratory Diagnosis</strong></u></p>",
+      "description": "This diagram illustrates the characteristic laboratory findings of iron deficiency anemia, including low serum iron, high TIBC, and low ferritin, along with peripheral smear features showing microcytic, hypochromic red blood cells. It also correlates these findings with common clinical features such as fatigue, pallor, and brittle nails, helping in quick visual diagnosis and exam recall.",
+      "descriptionHtml": "<p>This diagram illustrates the characteristic laboratory findings of iron deficiency anemia, including <strong>low serum iron, high TIBC, and low ferritin</strong>, along with peripheral smear features showing <strong>microcytic, hypochromic red blood cells</strong>. It also correlates these findings with common clinical features such as <strong>fatigue, pallor, and brittle nails</strong>, helping in quick visual diagnosis and exam recall.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Microcytic Anemia – Iron Deficiency Anemia: Laboratory Diagnosis",
     "headingHtml": "<p><u><strong>Microcytic Anemia – Iron Deficiency Anemia: </strong></u></p><p><u><strong>Laboratory Diagnosis</strong></u></p>",

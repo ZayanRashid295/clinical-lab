@@ -84,6 +84,160 @@
   "classicTriad": "Nocturnal symptoms + episodic wheeze + complete reversibility → Bronchial asthma",
   "classicTriadHtml": "<p><strong>Nocturnal symptoms + episodic wheeze + complete reversibility → Bronchial asthma</strong></p>",
   "classicTriadTitle": "Classic Triad",
+  "tables": [
+    {
+      "heading": "Clinical Features of Bronchial Asthma",
+      "headingHtml": "<p><u><strong>Clinical Features of Bronchial Asthma</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Description",
+        "Clinical Significance"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Description</strong></p>",
+        "<p><strong>Clinical Significance</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Recurrent episodes",
+            "• Sudden onset wheezing\n• Breathlessness\n• Chest tightness",
+            "Indicates episodic airflow obstruction rather than chronic fixed disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Recurrent episodes</strong></p>",
+            "<p>• Sudden onset wheezing </p><p>• Breathlessness </p><p>• Chest tightness</p>",
+            "<p>Indicates <strong>episodic airflow obstruction</strong> rather than chronic fixed disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Nocturnal / early\nmorning worsening",
+            "• Symptoms worse at night\n• Early morning peak\n• Circadian variation in bronchial tone",
+            "Strongly suggests asthma due to circadian bronchial hyperreactivity"
+          ],
+          "cellsHtml": [
+            "<p><strong>Nocturnal / early </strong></p><p><strong>morning worsening</strong></p>",
+            "<p>• Symptoms worse at night </p><p>• Early morning peak </p><p>• Circadian variation in bronchial tone</p>",
+            "<p>Strongly suggests <strong>asthma due to circadian bronchial hyperreactivity</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Reversible\nsymptoms",
+            "• Complete resolution between attacks\n• Asymptomatic intervals\n• Normal physical exam",
+            "Confirms reversible airway obstruction (key diagnostic hallmark)"
+          ],
+          "cellsHtml": [
+            "<p><strong>Reversible </strong></p><p><strong>symptoms</strong></p>",
+            "<p>• Complete resolution between attacks </p><p>• Asymptomatic intervals </p><p>• Normal physical exam</p>",
+            "<p>Confirms <strong>reversible airway obstruction (key diagnostic hallmark)</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Airway\ninflammation",
+            "• Eosinophilic inflammation\n• Bronchial hyperresponsiveness\n• Trigger-induced bronchospasm",
+            "Underlying mechanism of variable airflow limitation"
+          ],
+          "cellsHtml": [
+            "<p><strong>Airway </strong></p><p><strong>inflammation</strong></p>",
+            "<p>• Eosinophilic inflammation </p><p>• Bronchial hyperresponsiveness </p><p>• Trigger-induced bronchospasm</p>",
+            "<p>Underlying mechanism of <strong>variable airflow limitation</strong></p>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Episodic Wheezing and Recurrent Dyspnea",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of</strong></u></p><p><u><strong>Episodic Wheezing and Recurrent Dyspnea</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "How it differs from Asthma"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>How it differs from Asthma</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Vocal cord\ndysfunction",
+            "• Inspiratory stridor\n• Throat tightness\n• Sudden episodes, often stress-related",
+            "Upper airway obstruction, no true expiratory wheeze, normal lung function"
+          ],
+          "cellsHtml": [
+            "<p><strong>Vocal cord </strong></p><p><strong>dysfunction</strong></p>",
+            "<p>• Inspiratory stridor </p><p>• Throat tightness </p><p>• Sudden episodes, often stress-related</p>",
+            "<p>Upper airway obstruction, <strong>no true expiratory wheeze</strong>, normal lung function</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Gastroesophageal\nreflux–induced\nbronchospasm",
+            "• Nocturnal cough\n• Heartburn, regurgitation\n• Supine worsening",
+            "Trigger-related bronchospasm, GERD symptoms present, not purely airway disease"
+          ],
+          "cellsHtml": [
+            "<p><strong>Gastroesophageal </strong></p><p><strong>reflux–induced </strong></p><p><strong>bronchospasm</strong></p>",
+            "<p>• Nocturnal cough </p><p>• Heartburn, regurgitation </p><p>• Supine worsening</p>",
+            "<p>Trigger-related bronchospasm, <strong>GERD symptoms present</strong>, not purely airway disease</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Hyperventilation\nsyndrome",
+            "• Dyspnea sensation\n• Paresthesia\n• Dizziness, anxiety",
+            "Functional disorder, no wheeze or bronchoconstriction"
+          ],
+          "cellsHtml": [
+            "<p><strong>Hyperventilation </strong></p><p><strong>syndrome</strong></p>",
+            "<p>• Dyspnea sensation </p><p>• Paresthesia </p><p>• Dizziness, anxiety</p>",
+            "<p>Functional disorder, <strong>no wheeze or bronchoconstriction</strong></p>"
+          ]
+        },
+        {
+          "cells": [
+            "Anxiety/panic\nattacks",
+            "• Episodic breathlessness\n• Palpitations\n• Fear, autonomic symptoms",
+            "No objective airway obstruction or wheezing"
+          ],
+          "cellsHtml": [
+            "<p><strong>Anxiety/panic </strong></p><p><strong>attacks</strong></p>",
+            "<p>• Episodic breathlessness </p><p>• Palpitations </p><p>• Fear, autonomic symptoms</p>",
+            "<p>No objective airway obstruction or wheezing</p>"
+          ]
+        },
+        {
+          "cells": [
+            "COPD\n(early or atypical)",
+            "• Chronic dyspnea\n• Smoking history\n• Progressive symptoms",
+            "Irreversible airflow limitation, not episodic/reversible"
+          ],
+          "cellsHtml": [
+            "<p><strong>COPD </strong></p><p><strong>(early or atypical)</strong></p>",
+            "<p>• Chronic dyspnea </p><p>• Smoking history </p><p>• Progressive symptoms</p>",
+            "<p><strong>Irreversible airflow limitation</strong>, not episodic/reversible</p>"
+          ]
+        },
+        {
+          "cells": [
+            "Cardiac asthma\n(HF)",
+            "• Nocturnal dyspnea\n• Orthopnea\n• Pulmonary edema signs",
+            "Cardiac cause, crackles instead of wheeze, fluid overload"
+          ],
+          "cellsHtml": [
+            "<p><strong>Cardiac asthma </strong></p><p><strong>(HF)</strong></p>",
+            "<p>• Nocturnal dyspnea </p><p>• Orthopnea </p><p>• Pulmonary edema signs</p>",
+            "<p>Cardiac cause, <strong>crackles instead of wheeze</strong>, fluid overload</p>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Clinical Features of Bronchial Asthma",
     "headingHtml": "<p><u><strong>Clinical Features of Bronchial Asthma</strong></u></p>",
@@ -236,6 +390,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Bronchial Asthma – Clinical Diagnosis (Episodic Nocturnal Wheeze Pattern)",
+      "headingHtml": "<p><u><strong>Bronchial Asthma – Clinical Diagnosis </strong></u></p><p><u><strong>(Episodic Nocturnal Wheeze Pattern)</strong></u></p>",
+      "description": "This diagram illustrates the classic clinical presentation and diagnostic pathway of bronchial asthma as an episodic, reversible airway disease. It highlights key features such as recurrent wheezing, shortness of breath, nocturnal and early morning worsening, and complete symptom-free intervals between attacks.",
+      "descriptionHtml": "<p>This diagram illustrates the classic clinical presentation and diagnostic pathway of <strong>bronchial asthma</strong> as an episodic, reversible airway disease. It highlights key features such as <strong>recurrent wheezing, shortness of breath, nocturnal and early morning worsening, and complete symptom-free intervals between attacks</strong>.</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Bronchial Asthma – Clinical Diagnosis (Episodic Nocturnal Wheeze Pattern)",
     "headingHtml": "<p><u><strong>Bronchial Asthma – Clinical Diagnosis </strong></u></p><p><u><strong>(Episodic Nocturnal Wheeze Pattern)</strong></u></p>",

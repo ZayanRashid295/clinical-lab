@@ -234,7 +234,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     ;(async () => {
       const match = await runAutoMatch(
         {
-          parsedCategory: m.subject,
+          parsedCategory: m.parsedCategoryName || m.subject,
           parsedProduct: m.parsedProductName,
           parsedSystem: typeof m.system === "string" ? m.system : undefined,
           parsedTopic: coerceLabelString(m.parsedTopicName),
@@ -1289,13 +1289,9 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     try {
       let metadataToSave = { ...metadata, questionId }
 
-      if (!metadataToSave.topicId) {
-        const resolved = await resolveCreatorMetadataIds(metadataToSave)
-        metadataToSave = mergeResolvedMetadata(metadataToSave, resolved)
-        if (resolved.topicId || resolved.systemId || resolved.categoryId) {
-          setMetadata((prev) => mergeResolvedMetadata(prev, resolved))
-        }
-      }
+      const resolved = await resolveCreatorMetadataIds(metadataToSave)
+      metadataToSave = mergeResolvedMetadata(metadataToSave, resolved)
+      setMetadata((prev) => mergeResolvedMetadata(prev, resolved))
 
       if (!metadataToSave.topicId) {
         const topicLabel = metadataToSave.parsedTopicName || parsedTopicName

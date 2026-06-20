@@ -68,6 +68,172 @@
     "clinicalSkill": "Decision-making",
     "difficultyLevel": "Easy"
   },
+  "tables": [
+    {
+      "heading": "Dermatology – Plaque Psoriasis – Mild / Limited Disease Management",
+      "headingHtml": "<p><u><strong>Dermatology – Plaque Psoriasis – </strong></u></p><p><u><strong>Mild / Limited Disease Management</strong></u></p>",
+      "columns": [
+        "Feature",
+        "Details",
+        "Notes / Key Points"
+      ],
+      "columnsHtml": [
+        "<p><strong>Feature</strong></p>",
+        "<p><strong>Details</strong></p>",
+        "<p><strong>Notes / Key Points</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Definition / Extent",
+            "Plaque psoriasis involving <5% body surface area",
+            "Usually limited to:\nelbows,\nknees,\nscalp"
+          ],
+          "cellsHtml": [
+            "<p><strong>Definition / Extent</strong></p>",
+            "<p>Plaque psoriasis involving &lt;5% body surface area</p>",
+            "<p>Usually limited to:</p><ul><li>elbows, </li><li>knees, </li><li>scalp</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Clinical Features",
+            "Small, well-demarcated, scaly plaques;\nmild itching",
+            "Common sites: extensor surfaces;\nno systemic involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Clinical Features</strong></p>",
+            "<ul><li>Small, well-demarcated, scaly plaques; </li><li>mild itching</li></ul>",
+            "<ul><li><strong>Common sites:</strong> extensor surfaces; </li><li>no systemic involvement</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "First-line Therapy",
+            "Topical corticosteroids",
+            "Low-to-medium potency for face/flexures;\nhigh potency for elbows/knees"
+          ],
+          "cellsHtml": [
+            "<p><strong>First-line Therapy</strong></p>",
+            "<ul><li>Topical corticosteroids</li></ul>",
+            "<ul><li>Low-to-medium potency for face/flexures; </li><li>high potency for elbows/knees</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Other Topical Options",
+            "Vitamin D analogs (calcipotriol),\ncoal tar,\nmoisturizers",
+            "Can be combined with corticosteroids for synergistic effect"
+          ],
+          "cellsHtml": [
+            "<p><strong>Other Topical Options</strong></p>",
+            "<ul><li>Vitamin D analogs (calcipotriol), </li><li>coal tar, </li><li>moisturizers</li></ul>",
+            "<ul><li>Can be combined with corticosteroids for synergistic effect</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Systemic / Advanced Therapy",
+            "Reserved for moderate to severe psoriasis",
+            "Methotrexate, biologics, PUVA;\nnot indicated for <5% BSA"
+          ],
+          "cellsHtml": [
+            "<p><strong>Systemic / Advanced Therapy</strong></p>",
+            "<ul><li>Reserved for moderate to severe psoriasis</li></ul>",
+            "<ul><li>Methotrexate, biologics, PUVA; </li><li>not indicated for &lt;5% BSA</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Follow-up / Monitoring",
+            "Assess response in 2–4 weeks;\nmonitor for side effects",
+            "Educate patient on intermittent use and adherence"
+          ],
+          "cellsHtml": [
+            "<p><strong>Follow-up / Monitoring</strong></p>",
+            "<ul><li>Assess response in 2–4 weeks; </li><li>monitor for side effects</li></ul>",
+            "<ul><li>Educate patient on intermittent use and adherence</li></ul>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Mild / Limited Plaque Psoriasis",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Mild / Limited Plaque Psoriasis</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Features",
+        "Differentiating Points from Plaque Psoriasis"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Features</strong></p>",
+        "<p><strong>Differentiating Points from Plaque Psoriasis</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Eczema / Atopic Dermatitis",
+            "Pruritic,\nerythematous,\nsometimes oozing plaques",
+            "Typically ill-defined borders,\nmore flexural involvement,\nacute flares"
+          ],
+          "cellsHtml": [
+            "<p><strong>Eczema / Atopic Dermatitis</strong></p>",
+            "<ul><li>Pruritic, </li><li>erythematous, </li><li>sometimes oozing plaques</li></ul>",
+            "<ul><li>Typically ill-defined borders, </li><li>more flexural involvement, </li><li>acute flares</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Tinea corporis (Fungal infection)",
+            "Annular,\nscaly plaques with central clearing",
+            "Positive KOH mount;\noften single or few lesions;\nresponds to antifungals"
+          ],
+          "cellsHtml": [
+            "<p><strong>Tinea corporis (Fungal infection)</strong></p>",
+            "<ul><li>Annular, </li><li>scaly plaques with central clearing</li></ul>",
+            "<ul><li>Positive KOH mount; </li><li>often single or few lesions; </li><li>responds to antifungals</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Lichen planus",
+            "Purple,\nflat-topped,\npolygonal papules",
+            "Violaceous color, Wickham striae;\nusually pruritic;\nmucosal involvement possible"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lichen planus</strong></p>",
+            "<ul><li>Purple, </li><li>flat-topped, </li><li>polygonal papules</li></ul>",
+            "<ul><li>Violaceous color, Wickham striae; </li><li>usually pruritic; </li><li>mucosal involvement possible</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Seborrheic dermatitis",
+            "Greasy,\nyellowish scales on scalp,\nface, chest",
+            "Distribution favors seborrheic areas;\nless sharply demarcated"
+          ],
+          "cellsHtml": [
+            "<p><strong>Seborrheic dermatitis</strong></p>",
+            "<ul><li>Greasy, </li><li>yellowish scales on scalp, </li><li>face, chest</li></ul>",
+            "<ul><li>Distribution favors seborrheic areas; </li><li>less sharply demarcated</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Pityriasis rosea",
+            "Herald patch followed by Christmas-tree pattern",
+            "Self-limiting;\ncharacteristic eruption pattern;\nusually trunk involvement"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pityriasis rosea</strong></p>",
+            "<ul><li>Herald patch followed by Christmas-tree pattern</li></ul>",
+            "<ul><li>Self-limiting; </li><li>characteristic eruption pattern; </li><li>usually trunk involvement</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Dermatology – Plaque Psoriasis – Mild / Limited Disease Management",
     "headingHtml": "<p><u><strong>Dermatology – Plaque Psoriasis – </strong></u></p><p><u><strong>Mild / Limited Disease Management</strong></u></p>",
@@ -232,6 +398,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Plaque Psoriasis: Mild / Limited Disease Management",
+      "headingHtml": "<p><u><strong>Plaque Psoriasis: Mild / Limited Disease Management</strong></u></p>",
+      "description": "The diagram illustrates mild plaque psoriasis (<5% BSA) with small, well-demarcated scaly plaques on elbows and knees, highlighting first-line treatment with topical corticosteroids, vitamin D analogs, and moisturizers. It also shows follow-up recommendations and indicates advanced therapies (methotrexate, biologics, PUVA) reserved for moderate to severe or uncontrolled disease (>10% BSA).",
+      "descriptionHtml": "<p>The diagram illustrates <strong>mild plaque psoriasis</strong> (&lt;5% BSA) with small, well-demarcated scaly plaques on elbows and knees, highlighting <strong>first-line treatment with topical corticosteroids, vitamin D analogs, and moisturizers</strong>. It also shows <strong>follow-up recommendations</strong> and indicates <strong>advanced therapies</strong> (methotrexate, biologics, PUVA) reserved for <strong>moderate to severe or uncontrolled disease</strong> (&gt;10% BSA).</p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Plaque Psoriasis: Mild / Limited Disease Management",
     "headingHtml": "<p><u><strong>Plaque Psoriasis: Mild / Limited Disease Management</strong></u></p>",

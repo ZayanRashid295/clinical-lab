@@ -71,6 +71,160 @@
   "classicTriad": "Fatigue + Spoon-shaped nails + Pica → Highly suggestive of iron deficiency anemia.",
   "classicTriadHtml": "<ul><li><strong>Fatigue + Spoon-shaped nails + Pica</strong> → Highly suggestive of <strong>iron deficiency anemia</strong>.</li></ul>",
   "classicTriadTitle": "Classic Triad (if considered)",
+  "tables": [
+    {
+      "heading": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia)",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia </strong></u></p><p><u><strong>(Microcytic Hypochromic Anemia)</strong></u></p>",
+      "columns": [
+        "Aspect",
+        "Key Points",
+        "Clinical/Lab Features"
+      ],
+      "columnsHtml": [
+        "<p><strong>Aspect</strong></p>",
+        "<p><strong>Key Points</strong></p>",
+        "<p><strong>Clinical/Lab Features</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Etiology / Cause",
+            "Chronic blood loss,\npoor dietary intake,\nmalabsorption,\nincreased requirement (pregnancy, growth)",
+            "Menstrual bleeding,\nGI bleeding,\nvegetarian diet,\npregnancy"
+          ],
+          "cellsHtml": [
+            "<p><strong>Etiology / Cause</strong></p>",
+            "<ul><li>Chronic blood loss, </li><li>poor dietary intake, </li><li>malabsorption, </li><li>increased requirement (pregnancy, growth)</li></ul>",
+            "<ul><li>Menstrual bleeding, </li><li>GI bleeding, </li><li>vegetarian diet, </li><li>pregnancy</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Pathophysiology / Mechanism",
+            "Impaired hemoglobin synthesis due to iron deficiency → microcytic,\nhypochromic RBCs",
+            "Low hemoglobin,\nlow hematocrit,\nmicrocytosis,\nhypochromia,\nlow ferritin,\nhigh TIBC"
+          ],
+          "cellsHtml": [
+            "<p><strong>Pathophysiology / Mechanism</strong></p>",
+            "<ul><li>Impaired hemoglobin synthesis due to iron deficiency → microcytic, </li><li>hypochromic RBCs</li></ul>",
+            "<ul><li>Low hemoglobin, </li><li>low hematocrit, </li><li>microcytosis, </li><li>hypochromia, </li><li>low ferritin, </li><li>high TIBC</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Clinical Features",
+            "Fatigue,\npallor,\npica, spoon-shaped nails (koilonychia),\nglossitis",
+            "Fatigue,\npallor,\nbrittle nails,\nangular cheilitis,\nspoon nails,\ncravings for non-food items"
+          ],
+          "cellsHtml": [
+            "<p><strong>Clinical Features</strong></p>",
+            "<ul><li>Fatigue, </li><li>pallor, </li><li>pica, spoon-shaped nails (koilonychia), </li><li>glossitis</li></ul>",
+            "<ul><li>Fatigue, </li><li>pallor, </li><li>brittle nails, </li><li>angular cheilitis, </li><li>spoon nails, </li><li>cravings for non-food items</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Investigation",
+            "CBC,\nperipheral smear,\nserum ferritin,\nserum iron,\nTIBC",
+            "Microcytic hypochromic anemia,\nanisopoikilocytosis,\nlow ferritin,\nhigh TIBC"
+          ],
+          "cellsHtml": [
+            "<p><strong>Investigation</strong></p>",
+            "<ul><li>CBC, </li><li>peripheral smear, </li><li>serum ferritin, </li><li>serum iron, </li><li>TIBC</li></ul>",
+            "<ul><li>Microcytic hypochromic anemia, </li><li>anisopoikilocytosis, </li><li>low ferritin, </li><li>high TIBC</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Management",
+            "Oral or IV iron supplementation,\ntreat underlying cause",
+            "Ferrous sulfate/or gluconate,\ndietary counseling,\ntreat bleeding source"
+          ],
+          "cellsHtml": [
+            "<p><strong>Management</strong></p>",
+            "<ul><li>Oral or IV iron supplementation, </li><li>treat underlying cause</li></ul>",
+            "<ul><li>Ferrous sulfate/or gluconate, </li><li>dietary counseling, </li><li>treat bleeding source</li></ul>"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Differential Diagnosis of Microcytic Hypochromic Anemia",
+      "headingHtml": "<p><u><strong>Differential Diagnosis of </strong></u></p><p><u><strong>Microcytic Hypochromic Anemia</strong></u></p>",
+      "columns": [
+        "Condition",
+        "Key Differentiating Features",
+        "Lab Findings"
+      ],
+      "columnsHtml": [
+        "<p><strong>Condition</strong></p>",
+        "<p><strong>Key Differentiating Features</strong></p>",
+        "<p><strong>Lab Findings</strong></p>"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Thalassemia (α or β)",
+            "Often asymptomatic or mild anemia;\nfamily history;\nno pica or koilonychia",
+            "Microcytosis with normal/high RBC count,\nnormal/high ferritin,\ntarget cells on smear"
+          ],
+          "cellsHtml": [
+            "<p><strong>Thalassemia (α or β)</strong></p>",
+            "<ul><li>Often asymptomatic or mild anemia; </li><li>family history; </li><li>no pica or koilonychia</li></ul>",
+            "<ul><li>Microcytosis with normal/high RBC count, </li><li>normal/high ferritin, </li><li>target cells on smear</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Anemia of Chronic Disease",
+            "Chronic infection,\ninflammation, or\nmalignancy;\nusually mild",
+            "Low serum iron,\nlow TIBC,\nnormal/high ferritin,\nnormocytic or mildly microcytic"
+          ],
+          "cellsHtml": [
+            "<p><strong>Anemia of Chronic Disease</strong></p>",
+            "<ul><li>Chronic infection, </li><li>inflammation, or </li><li>malignancy; </li><li>usually mild</li></ul>",
+            "<ul><li>Low serum iron, </li><li>low TIBC, </li><li>normal/high ferritin, </li><li>normocytic or mildly microcytic</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Sideroblastic Anemia",
+            "Rare;\nmay have congenital or acquired causes",
+            "Ring sideroblasts on bone marrow,\nhigh serum iron,\nnormal/high ferritin"
+          ],
+          "cellsHtml": [
+            "<p><strong>Sideroblastic Anemia</strong></p>",
+            "<ul><li>Rare; </li><li>may have congenital or acquired causes</li></ul>",
+            "<ul><li>Ring sideroblasts on bone marrow, </li><li>high serum iron, </li><li>normal/high ferritin</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Lead Poisoning",
+            "History of exposure;\nabdominal pain,\nneurologic symptoms",
+            "Microcytic anemia,\nbasophilic stippling,\nhigh serum lead"
+          ],
+          "cellsHtml": [
+            "<p><strong>Lead Poisoning</strong></p>",
+            "<ul><li>History of exposure; </li><li>abdominal pain, </li><li>neurologic symptoms</li></ul>",
+            "<ul><li>Microcytic anemia, </li><li>basophilic stippling, </li><li>high serum lead</li></ul>"
+          ]
+        },
+        {
+          "cells": [
+            "Copper Deficiency",
+            "Rare;\nneurological signs may predominate",
+            "Microcytic anemia,\nneutropenia,\nlow serum copper"
+          ],
+          "cellsHtml": [
+            "<p><strong>Copper Deficiency</strong></p>",
+            "<ul><li>Rare; </li><li>neurological signs may predominate</li></ul>",
+            "<ul><li>Microcytic anemia, </li><li>neutropenia, </li><li>low serum copper</li></ul>"
+          ]
+        }
+      ]
+    }
+  ],
   "table1": {
     "heading": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia)",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia </strong></u></p><p><u><strong>(Microcytic Hypochromic Anemia)</strong></u></p>",
@@ -223,6 +377,22 @@
       }
     ]
   },
+  "diagrams": [
+    {
+      "heading": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia)",
+      "headingHtml": "<p><u><strong>Iron Deficiency Anemia </strong></u></p><p><u><strong>(Microcytic Hypochromic Anemia)</strong></u></p>",
+      "description": "This diagram illustrates the pathophysiology of iron deficiency leading to impaired hemoglobin synthesis, resulting in microcytic hypochromic red blood cells. It highlights key clinical features (fatigue, pica, koilonychia), characteristic laboratory findings (low hemoglobin, low ferritin, high TIBC), and the mainstay of treatment with iron supplementation.",
+      "descriptionHtml": "<p><strong>This diagram illustrates the </strong><strong>pathophysiology of iron deficiency leading to impaired hemoglobin synthesis</strong><strong>, resulting in </strong><strong>microcytic hypochromic red blood cells</strong><strong>. It highlights key </strong><strong>clinical features</strong><strong> (fatigue, pica, koilonychia), characteristic </strong><strong>laboratory findings</strong><strong> (low hemoglobin, low ferritin, high TIBC), and the </strong><strong>mainstay of treatment</strong><strong> with iron supplementation.</strong></p>",
+      "images": [
+        {
+          "filename": "image1.png",
+          "path": "images/image1.png",
+          "sourceName": "image1.png"
+        }
+      ],
+      "image": "images/image1.png"
+    }
+  ],
   "diagram": {
     "heading": "Iron Deficiency Anemia (Microcytic Hypochromic Anemia)",
     "headingHtml": "<p><u><strong>Iron Deficiency Anemia </strong></u></p><p><u><strong>(Microcytic Hypochromic Anemia)</strong></u></p>",
