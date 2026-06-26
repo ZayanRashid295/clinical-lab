@@ -88,7 +88,7 @@ export default function QuestionList({
       {questions.map((question) => (
         <Card
           key={question.id}
-          className="p-5 sm:p-6 hover:shadow-md transition-shadow bg-card dark:bg-emerald-950/25 border-border/80 dark:border-emerald-900/50"
+          className="p-5 sm:p-6 hover:shadow-md transition-shadow bg-card dark:bg-gray-800/60 border-border/80 dark:border-gray-700"
         >
           {(() => {
             const plainStem = toPlainText(question.stem)
@@ -96,10 +96,10 @@ export default function QuestionList({
             const meta = (label: string, value: string | undefined) =>
               value ? (
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground dark:text-emerald-400/80">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground dark:text-gray-400">
                     {label}
                   </p>
-                  <p className="text-sm text-foreground dark:text-emerald-50/95 truncate" title={value}>
+                  <p className="text-sm text-foreground dark:text-gray-100 truncate" title={value}>
                     {value}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export default function QuestionList({
                           onClick={() => onView(question.id)}
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-muted-foreground hover:text-foreground dark:text-emerald-200/80 dark:hover:text-white"
+                          className="h-8 text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white"
                         >
                           View
                         </Button>
@@ -147,7 +147,7 @@ export default function QuestionList({
                         onClick={() => onEdit(question.id)}
                         variant="ghost"
                         size="sm"
-                        className="h-8 text-muted-foreground hover:text-foreground dark:text-emerald-200/80 dark:hover:text-white"
+                        className="h-8 text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white"
                       >
                         Edit
                       </Button>
@@ -163,7 +163,7 @@ export default function QuestionList({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 text-sm border-t border-border/60 dark:border-emerald-900/50 pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 text-sm border-t border-border/60 dark:border-gray-700 pt-4">
                     <div className="space-y-3 min-w-0">
                       {meta("Product", question.product)}
                       {meta("Topic", question.topicName)}
@@ -185,7 +185,7 @@ export default function QuestionList({
                           <Badge
                             key={tag}
                             variant="secondary"
-                            className="text-xs font-normal bg-muted/80 text-muted-foreground dark:bg-emerald-950/80 dark:text-emerald-200/90 dark:border-emerald-900/60"
+                            className="text-xs font-normal bg-muted/80 text-muted-foreground dark:bg-gray-800/80 dark:text-gray-300 dark:border-gray-700"
                           >
                             {tag}
                           </Badge>
@@ -193,15 +193,15 @@ export default function QuestionList({
                     </div>
                   )}
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border/60 dark:border-emerald-900/50">
-                    <p className="text-sm text-muted-foreground dark:text-emerald-300/80">
-                      <span className="font-medium text-foreground dark:text-emerald-50">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border/60 dark:border-gray-700">
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">
+                      <span className="font-medium text-foreground dark:text-gray-100">
                         {question.options.length}
                       </span>{" "}
                       options
                     </p>
                     {correct && (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm dark:bg-emerald-500">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
                         <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
                         Answer: {correct}
                       </span>

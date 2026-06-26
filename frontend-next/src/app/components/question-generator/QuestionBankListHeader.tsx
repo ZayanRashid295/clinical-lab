@@ -24,6 +24,11 @@ export interface QuestionBankListHeaderProps {
   onPresentationClick?: () => void;
 }
 
+const filterPillClass = (active: boolean) =>
+  active
+    ? "border-primary bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground dark:border-primary"
+    : "border-border bg-background text-muted-foreground hover:border-primary/40 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:border-primary/50";
+
 export function QuestionBankListHeader({
   title,
   subtitle,
@@ -42,7 +47,7 @@ export function QuestionBankListHeader({
           <h2 className="text-2xl font-bold tracking-tight text-foreground dark:text-gray-50">
             {title}
           </h2>
-          <p className="text-sm text-muted-foreground dark:text-emerald-200/70 mt-0.5">
+          <p className="text-sm text-muted-foreground dark:text-gray-400 mt-0.5">
             {subtitle}
           </p>
         </div>
@@ -52,16 +57,16 @@ export function QuestionBankListHeader({
         {statCards.map((card) => (
           <div
             key={card.id}
-            className="rounded-xl border border-border/80 dark:border-emerald-900/60 bg-card dark:bg-emerald-950/40 px-4 py-3 shadow-sm"
+            className="rounded-xl border border-border/80 dark:border-gray-700 bg-card dark:bg-gray-800/60 px-4 py-3 shadow-sm"
           >
-            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground dark:text-emerald-300/80 uppercase">
+            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground dark:text-gray-400 uppercase">
               {card.title}
             </p>
             <p className="text-2xl font-bold text-foreground dark:text-white mt-1 tabular-nums">
               {card.value}
             </p>
             {card.hint ? (
-              <p className="text-xs text-muted-foreground dark:text-emerald-400/90 mt-0.5 truncate">
+              <p className="text-xs text-muted-foreground dark:text-gray-400 mt-0.5 truncate">
                 {card.hint}
               </p>
             ) : null}
@@ -74,11 +79,7 @@ export function QuestionBankListHeader({
           <button
             type="button"
             onClick={() => onSystemChange("all")}
-            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              systemFilter === "all"
-                ? "border-emerald-600 bg-emerald-50 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-50 dark:border-emerald-500"
-                : "border-border bg-background text-muted-foreground hover:border-emerald-500/50 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200/80"
-            }`}
+            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${filterPillClass(systemFilter === "all")}`}
           >
             {allLabel}
           </button>
@@ -87,11 +88,7 @@ export function QuestionBankListHeader({
               key={name}
               type="button"
               onClick={() => onSystemChange(name)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors max-w-[200px] truncate ${
-                systemFilter === name
-                  ? "border-emerald-600 bg-emerald-50 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-50 dark:border-emerald-500"
-                  : "border-border bg-background text-muted-foreground hover:border-emerald-500/50 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200/80"
-              }`}
+              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors max-w-[200px] truncate ${filterPillClass(systemFilter === name)}`}
               title={name}
             >
               {name}
@@ -104,7 +101,7 @@ export function QuestionBankListHeader({
             variant="outline"
             size="sm"
             onClick={onPresentationClick}
-            className="shrink-0 gap-2 border-dashed dark:border-emerald-800 dark:text-emerald-200"
+            className="shrink-0 gap-2 border-dashed dark:border-gray-600 dark:text-gray-300"
           >
             <Filter className="h-4 w-4" aria-hidden />
             {presentationLabel}
