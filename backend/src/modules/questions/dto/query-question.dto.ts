@@ -87,6 +87,23 @@ export class QueryQuestionDto {
   categoryId?: string;
 
   @ApiProperty({
+    description: "Filter by system name (exact match)",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  systemName?: string;
+
+  @ApiProperty({
+    description: "Return list rows without heavy stem/explanation blocks (faster for admin lists)",
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === "true")
+  @IsBoolean()
+  summary?: boolean;
+
+  @ApiProperty({
     description: "Filter questions created from this date",
     example: "2024-01-01",
     required: false,

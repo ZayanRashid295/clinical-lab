@@ -77,7 +77,9 @@ export class QuestionsService {
         status,
         difficulty,
         subtopicId,
+        topicId,
         systemId,
+        systemName,
         productId,
         categoryId,
         dateFrom,
@@ -86,6 +88,7 @@ export class QuestionsService {
         limit = 10,
         sortBy = "createdAt",
         sortOrder = "asc",
+        summary = false,
       } = query;
 
       // Build where clause
@@ -114,9 +117,17 @@ export class QuestionsService {
         where.subtopicId = subtopicId;
       }
 
+      if (topicId) {
+        where.topicId = topicId;
+      }
+
       // Product tag ID filter
       if (systemId) {
         where.systemId = systemId;
+      }
+
+      if (systemName?.trim()) {
+        where.system = { name: systemName.trim() };
       }
 
       if (productId) {
@@ -149,23 +160,61 @@ export class QuestionsService {
       orderBy[sortBy] = sortOrder;
 
       // Get questions with pagination and sorting
-      const questions = await this.prisma.question.findMany({
-        where,
-        include: {
-          choices: { orderBy: { order: "asc" } },
-          questionStemBlocks: { orderBy: { order: "asc" } },
-          explanationBlocks: { orderBy: { order: "asc" } },
-          perAnswerExplanations: {
-            include: { blocks: { orderBy: { order: "asc" } } },
-          },
-          system: { include: { product: { select: { id: true, name: true } } } },
-          topic: true,
-          subtopic: true,
-        },
-        skip,
-        take: limit,
-        orderBy,
-      });
+      const questions = summary
+        ? await this.prisma.question.findMany({
+            where,
+            select: {
+              id: true,
+              title: true,
+              question: true,
+              tags: true,
+              difficulty: true,
+              points: true,
+              isActive: true,
+              createdAt: true,
+              updatedAt: true,
+              categoryId: true,
+              productId: true,
+              systemId: true,
+              topicId: true,
+              subtopicId: true,
+              choices: {
+                select: { id: true, text: true, isCorrect: true, order: true },
+                orderBy: { order: "asc" },
+              },
+              category: { select: { id: true, name: true } },
+              system: {
+                select: {
+                  id: true,
+                  name: true,
+                  product: { select: { id: true, name: true } },
+                },
+              },
+              topic: { select: { id: true, name: true } },
+              subtopic: { select: { id: true, name: true } },
+            },
+            skip,
+            take: limit,
+            orderBy,
+          })
+        : await this.prisma.question.findMany({
+            where,
+            include: {
+              choices: { orderBy: { order: "asc" as const } },
+              questionStemBlocks: { orderBy: { order: "asc" as const } },
+              explanationBlocks: { orderBy: { order: "asc" as const } },
+              perAnswerExplanations: {
+                include: { blocks: { orderBy: { order: "asc" as const } } },
+              },
+              category: { select: { id: true, name: true } },
+              system: { include: { product: { select: { id: true, name: true } } } },
+              topic: true,
+              subtopic: true,
+            },
+            skip,
+            take: limit,
+            orderBy,
+          });
 
       const totalPages = Math.ceil(total / limit);
 

@@ -55,6 +55,8 @@ export interface QuestionQueryParams {
   status?: "ACTIVE" | "INACTIVE";
   difficulty?: "easy" | "medium" | "hard";
   topicId?: string;
+  systemName?: string;
+  summary?: boolean;
   dateFrom?: string;
   dateTo?: string;
   _t?: string | number; // Cache buster parameter

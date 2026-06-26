@@ -34,6 +34,91 @@ import {
   mergeResolvedMetadata,
   resolveCreatorMetadataIds,
 } from "./resolve-creator-metadata"
+import { SystemsService } from "@/app/services/systems/systems.service"
+
+const PAGE_SIZE = 50
+const SEARCH_DEBOUNCE_MS = 350
+
+function parseQuestionTags(tags: unknown): {
+  storedQuestionId: string | null
+  storedProductName: string | null
+  storedMcqTitle: string | null
+  filteredTags: string[]
+} {
+  let storedQuestionId: string | null = null
+  let storedProductName: string | null = null
+  let storedMcqTitle: string | null = null
+  const filteredTags: string[] = []
+  const tagList = Array.isArray(tags) ? tags : []
+
+  for (const tag of tagList) {
+    if (typeof tag !== "string") continue
+    if (tag.startsWith("__questionId:")) {
+      storedQuestionId = tag.replace("__questionId:", "")
+    } else if (tag.startsWith("__product:")) {
+      storedProductName = tag.replace("__product:", "").trim()
+    } else if (tag.startsWith("__mcqTitle:")) {
+      storedMcqTitle = tag.replace("__mcqTitle:", "").trim()
+    } else if (!tag.startsWith("__")) {
+      filteredTags.push(tag)
+    }
+  }
+
+  return { storedQuestionId, storedProductName, storedMcqTitle, filteredTags }
+}
+
+/** Fast path for admin list rows — skips heavy block/explanation transforms. */
+function transformBackendToListItem(backendQuestion: any): Question {
+  const choices = backendQuestion.choices || []
+  const options = choices.map((choice: any, index: number) => ({
+    label: String.fromCharCode(65 + index),
+    text: choice.text,
+    correct: choice.isCorrect,
+    value: String.fromCharCode(65 + index),
+  }))
+
+  const { storedQuestionId, storedProductName, storedMcqTitle, filteredTags } =
+    parseQuestionTags(backendQuestion.tags)
+
+  const topicName = backendQuestion.topic?.name ?? ""
+  const subtopicName = backendQuestion.subtopic?.name ?? ""
+  const subjectDisplay = backendQuestion.category?.name ?? ""
+  const categoryDisplay = backendQuestion.category?.name ?? subjectDisplay
+  const productDisplay =
+    backendQuestion.system?.product?.name ?? storedProductName ?? ""
+
+  return {
+    id: backendQuestion.id,
+    questionId: storedQuestionId || backendQuestion.questionId || null,
+    stem: backendQuestion.question || "",
+    questionStemBlocks: [],
+    options,
+    choices,
+    subject: subjectDisplay,
+    category: categoryDisplay,
+    product: productDisplay,
+    system:
+      typeof backendQuestion.system === "string"
+        ? backendQuestion.system
+        : backendQuestion.system?.name || "",
+    systemId: backendQuestion.systemId || backendQuestion.system?.id || "",
+    subtopicName,
+    mcqTitle: storedMcqTitle || backendQuestion.title || "",
+    chapterId: "",
+    categoryId: backendQuestion.categoryId || "",
+    productId: backendQuestion.system?.product?.id || backendQuestion.productId || "",
+    chapterName: "",
+    topicName,
+    productTagId: backendQuestion.categoryId || "",
+    explanation: [],
+    perAnswerExplanations: {},
+    tags: filteredTags,
+    createdAt: backendQuestion.createdAt,
+    topicId: backendQuestion.topicId,
+    subtopicId: backendQuestion.subtopicId || "",
+    topic: backendQuestion.topic,
+  }
+}
 
 interface Question {
   id: string
@@ -84,7 +169,23 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [showBulkDocxUploader, setShowBulkDocxUploader] = useState(false)
   const [showQuestionBuilder, setShowQuestionBuilder] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
   const [systemFilter, setSystemFilter] = useState<"all" | string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: PAGE_SIZE,
+    total: 0,
+    totalPages: 0,
+  })
+  const [bankSystems, setBankSystems] = useState<string[]>([])
+  const [questionStats, setQuestionStats] = useState<{
+    total: number
+    active: number
+    inactive: number
+  } | null>(null)
+  const [detailQuestion, setDetailQuestion] = useState<Question | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -93,7 +194,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [isSelectMode, setIsSelectMode] = useState(false)
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
+  const loadRequestIdRef = useRef(0)
+  const filtersRef = useRef({ currentPage, debouncedSearchTerm, systemFilter })
+  filtersRef.current = { currentPage, debouncedSearchTerm, systemFilter }
   const questionsService = useMemo(() => new QuestionsService(), [])
+  const systemsService = useMemo(() => new SystemsService(), [])
   const layoutHeader = useLayoutHeaderLeading()
 
   const showListSearchInHeader =
@@ -958,8 +1063,12 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     } as any
   }
 
-  const loadQuestions = useCallback(async (options?: { silent?: boolean }) => {
+  const loadQuestions = useCallback(async (options?: { silent?: boolean; page?: number }) => {
     const silent = options?.silent === true
+    const { debouncedSearchTerm: search, systemFilter: system, currentPage: pageDefault } =
+      filtersRef.current
+    const pageToLoad = options?.page ?? pageDefault
+    const requestId = ++loadRequestIdRef.current
     try {
       if (silent) {
         setIsRefreshing(true)
@@ -967,53 +1076,40 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         setLoading(true)
       }
       setError(null)
-      
-      // Load all questions using pagination (like student mode)
-      const cacheBuster = Date.now()
-      let page = 1
-      const limit = 100
-      let hasMore = true
-      let allQuestions: any[] = []
 
-      while (hasMore && page <= 50) { // Increased max pages to 50 (5000 questions max)
+      const response = await questionsService.getQuestions({
+        status: "ACTIVE",
+        page: pageToLoad,
+        limit: PAGE_SIZE,
+        summary: true,
+        search: search.trim() || undefined,
+        systemName: system !== "all" ? system : undefined,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+        _t: Date.now(),
+      })
 
-        const response = await questionsService.getQuestions({ 
-          status: "ACTIVE",
-          page,
-          limit,
-          sortBy: "createdAt",
-          sortOrder: "desc", // Show newest first in admin
-          _t: cacheBuster,
-        })
-        
-        const questionsData = Array.isArray(response) 
-          ? response 
-          : (response as any)?.data || []
-        
-        allQuestions = [...allQuestions, ...questionsData]
-        
-        if (Array.isArray(response)) {
-          hasMore = questionsData.length === limit
-        } else {
-          const pagination = (response as any)?.pagination
-          if (pagination) {
-            hasMore = page < pagination.totalPages
-          } else {
-            hasMore = questionsData.length === limit
-          }
-        }
-        
-        if (questionsData.length === 0) {
-          hasMore = false
-        }
-        
-        page++
-      }
-      
-      const transformedQuestions = allQuestions.map(transformBackendToFrontend)
-      
+      if (requestId !== loadRequestIdRef.current) return
+
+      const questionsData = Array.isArray(response)
+        ? response
+        : (response as any)?.data || []
+
+      const transformedQuestions = questionsData.map(transformBackendToListItem)
       setQuestions(transformedQuestions)
+
+      if (!Array.isArray(response) && (response as any)?.pagination) {
+        setPagination((response as any).pagination)
+      } else {
+        setPagination({
+          page: pageToLoad,
+          limit: PAGE_SIZE,
+          total: transformedQuestions.length,
+          totalPages: transformedQuestions.length > 0 ? 1 : 0,
+        })
+      }
     } catch (err: unknown) {
+      if (requestId !== loadRequestIdRef.current) return
       console.error("Failed to load questions:", err)
 
       if (ApiHttpError.is(err) && err.status === 401) {
@@ -1028,6 +1124,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         setQuestions([])
       }
     } finally {
+      if (requestId !== loadRequestIdRef.current) return
       if (silent) {
         setIsRefreshing(false)
       } else {
@@ -1036,16 +1133,83 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     }
   }, [questionsService])
 
+  const loadQuestionDetail = useCallback(async (id: string) => {
+    setDetailLoading(true)
+    try {
+      const full = await questionsService.getQuestion(id)
+      const transformed = transformBackendToFrontend(full)
+      setDetailQuestion(transformed)
+      setQuestions((prev) => prev.map((q) => (q.id === id ? transformed : q)))
+    } catch (err: unknown) {
+      console.error("Failed to load question detail:", err)
+      toast({
+        title: "Failed to load question",
+        description: getApiErrorMessage(err, "Could not load full question data."),
+        variant: "destructive",
+      })
+      setEditingId(null)
+      setViewingId(null)
+      setDetailQuestion(null)
+    } finally {
+      setDetailLoading(false)
+    }
+  }, [questionsService, toast])
+
+  const searchInitializedRef = useRef(false)
+
   useEffect(() => {
-    // Check authentication before loading questions
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+      if (searchInitializedRef.current) {
+        setCurrentPage(1)
+      } else {
+        searchInitializedRef.current = true
+      }
+    }, SEARCH_DEBOUNCE_MS)
+    return () => window.clearTimeout(timer)
+  }, [searchTerm])
+
+  useEffect(() => {
+    if (!authService.isAuthenticated()) return
+    const deferredId = window.setTimeout(() => {
+      systemsService
+        .getSystems({ status: "ACTIVE", listAll: true })
+        .then((response) => {
+          const rows = Array.isArray(response) ? response : (response as any)?.data ?? []
+          const names = rows
+            .map((s: any) => String(s?.name ?? "").trim())
+            .filter(Boolean)
+            .sort((a: string, b: string) => a.localeCompare(b))
+          setBankSystems(names)
+        })
+        .catch(() => setBankSystems([]))
+
+      questionsService
+        .getQuestionStats()
+        .then((stats) => setQuestionStats(stats))
+        .catch(() => setQuestionStats(null))
+    }, 0)
+    return () => window.clearTimeout(deferredId)
+  }, [questionsService, systemsService])
+
+  useEffect(() => {
     if (authService.isAuthenticated()) {
-      loadQuestions()
+      void loadQuestions({ page: currentPage })
     } else {
       setLoading(false)
       setError("Please log in to access the admin dashboard.")
       setQuestions([])
     }
-  }, [loadQuestions])
+  }, [loadQuestions, currentPage, debouncedSearchTerm, systemFilter])
+
+  useEffect(() => {
+    const detailId = editingId || viewingId
+    if (!detailId) {
+      setDetailQuestion(null)
+      return
+    }
+    void loadQuestionDetail(detailId)
+  }, [editingId, viewingId, loadQuestionDetail])
 
   // Listen for question updates from other tabs/components
   useEffect(() => {
@@ -1442,8 +1606,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     setShowNewQuestionMenu(false)
   }
 
-  const editingQuestion = editingId ? questions.find((q) => q.id === editingId) : null
-  const viewingQuestion = viewingId ? questions.find((q) => q.id === viewingId) : null
+  const editingQuestion =
+    editingId && detailQuestion?.id === editingId ? detailQuestion : null
+  const viewingQuestion =
+    viewingId && detailQuestion?.id === viewingId ? detailQuestion : null
 
   // Notify parent when viewing/editing changes
   useEffect(() => {
@@ -1486,64 +1652,22 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       window.removeEventListener("editQuestion", handleEditQuestion as EventListener)
     }
   }, [onQuestionViewChange])
-  const searchFilteredQuestions = useMemo(() => {
-    if (!searchTerm || searchTerm.trim() === "") {
-      return questions
-    }
-    const searchLower = searchTerm.toLowerCase()
-    return questions.filter((q) => {
-      const stem = (q.stem || "").toLowerCase()
-      const category = (q.category || "").toLowerCase()
-      const product = (q.product || "").toLowerCase()
-      const system = (q.system || "").toLowerCase()
-      const topicName = (q.topicName || "").toLowerCase()
-      const subtopicName = (q.subtopicName || "").toLowerCase()
-      const mcqTitle = (q.mcqTitle || "").toLowerCase()
-      return (
-        stem.includes(searchLower) ||
-        category.includes(searchLower) ||
-        product.includes(searchLower) ||
-        system.includes(searchLower) ||
-        topicName.includes(searchLower) ||
-        subtopicName.includes(searchLower) ||
-        mcqTitle.includes(searchLower)
-      )
-    })
-  }, [questions, searchTerm])
-
-  const bankSystems = useMemo(() => {
-    const names = new Set<string>()
-    questions.forEach((q) => {
-      const s = (q.system || "").trim()
-      if (s) names.add(s)
-    })
-    return [...names].sort((a, b) => a.localeCompare(b))
-  }, [questions])
-
-  useEffect(() => {
-    if (systemFilter === "all") return
-    if (!bankSystems.includes(systemFilter)) {
-      setSystemFilter("all")
-    }
-  }, [bankSystems, systemFilter])
-
-  const displayedQuestions = useMemo(() => {
-    if (systemFilter === "all") return searchFilteredQuestions
-    return searchFilteredQuestions.filter((q) => (q.system || "").trim() === systemFilter)
-  }, [searchFilteredQuestions, systemFilter])
+  const displayedQuestions = questions
 
   const bankStatCards = useMemo(() => {
-    const n = questions.length
-    const systems = new Set<string>()
-    const products = new Set<string>()
+    const n = questionStats?.active ?? pagination.total
     let optionSum = 0
     questions.forEach((q) => {
-      if (q.system?.trim()) systems.add(q.system.trim())
-      if (q.product?.trim()) products.add(q.product.trim())
       optionSum += q.options?.length ?? 0
     })
     const avg =
-      n === 0 ? 0 : Math.round((optionSum / n) * 10) / 10
+      questions.length === 0 ? 0 : Math.round((optionSum / questions.length) * 10) / 10
+    const systemsOnPage = new Set<string>()
+    const productsOnPage = new Set<string>()
+    questions.forEach((q) => {
+      if (q.system?.trim()) systemsOnPage.add(q.system.trim())
+      if (q.product?.trim()) productsOnPage.add(q.product.trim())
+    })
     return [
       {
         id: "total",
@@ -1554,7 +1678,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       {
         id: "systems",
         title: t("questionGenerator.statSystems"),
-        value: String(systems.size),
+        value: String(bankSystems.length || systemsOnPage.size),
       },
       {
         id: "avgOptions",
@@ -1565,12 +1689,12 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       {
         id: "products",
         title: t("questionGenerator.statProducts"),
-        value: String(products.size),
+        value: String(productsOnPage.size),
       },
     ]
-  }, [questions, t])
+  }, [questions, t, questionStats, pagination.total, bankSystems.length])
 
-  if (loading) {
+  if (loading && questions.length === 0 && !error) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
@@ -1669,6 +1793,11 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       {/* Editor, View, or List */}
       {showNewQuestion || editingId ? (
         <div className="flex-1 min-h-0" style={{ paddingTop: 0, marginTop: 0 }}>
+          {detailLoading && editingId ? (
+            <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+              <p className="text-center text-muted-foreground dark:text-gray-400">Loading question…</p>
+            </Card>
+          ) : (
           <QuestionCreator
             initialData={
               editingId && editingQuestion
@@ -1697,9 +1826,15 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             }}
             onPreviewModeChange={onEditorPreviewModeChange}
           />
+          )}
         </div>
       ) : viewingId ? (
         <div className="flex-1 min-h-0" style={{ paddingTop: 0, marginTop: 0 }}>
+          {detailLoading ? (
+            <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
+              <p className="text-center text-muted-foreground dark:text-gray-400">Loading question…</p>
+            </Card>
+          ) : (
           <AdminQuestionView
             question={viewingQuestion}
             onEdit={() => {
@@ -1710,6 +1845,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
               setViewingId(null)
           }}
         />
+          )}
         </div>
       ) : !showMarkdownUploader && !showBulkUploader && !showDocxUploader && !showBulkDocxUploader && !showQuestionBuilder ? (
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
@@ -1719,18 +1855,22 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             statCards={bankStatCards}
             systems={bankSystems}
             systemFilter={systemFilter}
-            onSystemChange={setSystemFilter}
+            onSystemChange={(value) => {
+              setSystemFilter(value)
+              setCurrentPage(1)
+            }}
             allLabel={t("questionGenerator.filterAll")}
             presentationLabel={t("questionGenerator.filterPresentation")}
           />
           {/* Toolbar: always show on list view so Create / Select stay available with zero questions */}
           <div className="mb-4 flex flex-nowrap items-center justify-between gap-3 min-w-0 pt-1">
             <p className="text-sm text-muted-foreground dark:text-gray-400 min-w-0 shrink">
-              {questions.length === 0
+              {isRefreshing ? "Refreshing…" : null}
+              {pagination.total === 0
                 ? "No questions yet"
                 : displayedQuestions.length === 0
                   ? "No questions match your search or system filter"
-                  : `Showing ${displayedQuestions.length} of ${questions.length} questions`}
+                  : `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} questions`}
             </p>
             <div className="flex flex-nowrap items-center gap-3 sm:gap-4 shrink-0 pl-2">
               <div className="relative isolate" ref={menuRef}>
@@ -1855,6 +1995,32 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
               selectedIds={selectedQuestionIds}
               onSelectionChange={setSelectedQuestionIds}
             />
+          )}
+
+          {pagination.totalPages > 1 && (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPage <= 1 || loading || isRefreshing}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground dark:text-gray-400">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPage >= pagination.totalPages || loading || isRefreshing}
+                onClick={() => setCurrentPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
           )}
         </div>
       ) : null}
