@@ -12,11 +12,13 @@ import {
 
 export class CreateQuestionDto {
   @ApiProperty({
-    description: "Subtopic ID this question belongs to",
+    description: "Subtopic ID this question belongs to (optional)",
     example: "cmguoh2dg000hlj45zxmb3rsl",
+    required: false,
   })
+  @IsOptional()
   @IsString()
-  subtopicId: string;
+  subtopicId?: string;
 
   @ApiProperty({
     description: "Topic ID (optional/legacy)",

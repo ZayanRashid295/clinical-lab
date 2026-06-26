@@ -63,7 +63,6 @@ export const REQUIRED_METADATA_LABELS = [
   "Product",
   "System",
   "Topic",
-  "Subtopic",
   "MCQ Title",
 ] as const;
 

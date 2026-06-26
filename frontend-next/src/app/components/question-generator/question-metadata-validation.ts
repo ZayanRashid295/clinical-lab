@@ -35,7 +35,6 @@ export function getMissingMetadataFields(
   if (!m.productId?.trim()) missing.push("product");
   if (!m.systemId?.trim()) missing.push("system");
   if (!m.topicId?.trim()) missing.push("topic");
-  if (!m.subtopicId?.trim()) missing.push("subtopic");
 
   const title = (m.title || parsedTitle || "").trim();
   if (!title) missing.push("mcqTitle");

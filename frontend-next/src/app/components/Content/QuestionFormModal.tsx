@@ -139,9 +139,6 @@ export default function QuestionFormModal({
   };
 
   const validateForm = (): string | null => {
-    if (!formData.subtopicId?.trim()) {
-      return "Subtopic is required";
-    }
     if (!formData.question.trim()) {
       return "Question text is required";
     }
@@ -164,8 +161,7 @@ export default function QuestionFormModal({
     try {
       if (isCreateMode) {
         const createData: CreateQuestionDto = {
-          subtopicId: formData.subtopicId,
-          topicId: formData.subtopicId, // Provide topicId for backend compatibility if required
+          ...(formData.subtopicId?.trim() ? { subtopicId: formData.subtopicId.trim() } : {}),
           question: formData.question,
           explanation: formData.explanation,
           difficulty: formData.difficulty,
@@ -196,8 +192,9 @@ export default function QuestionFormModal({
         }, 1000);
       } else if (question) {
         const updateData: UpdateQuestionDto = {
-          subtopicId: formData.subtopicId,
-          topicId: formData.subtopicId, // Provide topicId for backend compatibility if required
+          ...(formData.subtopicId?.trim()
+            ? { subtopicId: formData.subtopicId.trim() }
+            : { subtopicId: undefined }),
           question: formData.question,
           explanation: formData.explanation,
           difficulty: formData.difficulty,

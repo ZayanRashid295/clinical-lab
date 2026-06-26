@@ -41,7 +41,7 @@ model Subtopic {
 
 model Question {
   id          String   @id @default(cuid())
-  subtopicId  String
+  subtopicId  String?
   categoryId  String?
   productId   String?
   systemId    String?
@@ -57,7 +57,7 @@ model Question {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  subtopic               Subtopic                @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  subtopic               Subtopic?               @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
   category               Category?               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   product                Product?                @relation(fields: [productId], references: [id], onDelete: SetNull)
   system                 System?                 @relation(fields: [systemId], references: [id], onDelete: SetNull)

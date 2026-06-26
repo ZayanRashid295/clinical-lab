@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeRaw from "rehype-raw"
@@ -11,6 +11,7 @@ import rehypeStringify from "rehype-stringify"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { ExternalLink } from "lucide-react"
+import { Dialog, DialogContent } from "@/shared/ui/dialog"
 import { normalizeStemToParagraphs } from "./stem-blocks-utils"
 
 interface ContentItem {
@@ -28,8 +29,36 @@ interface RichContentRendererProps {
   stemMode?: boolean
 }
 
+const PreviewImageContext = createContext<((url: string) => void) | null>(null)
+
+function PreviewImageLightbox({
+  url,
+  onClose,
+}: {
+  url: string | null
+  onClose: () => void
+}) {
+  return (
+    <Dialog open={!!url} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="max-w-[min(95vw,1200px)] w-auto max-h-[95vh] overflow-hidden p-2 sm:max-w-[min(95vw,1200px)]"
+        showCloseButton
+      >
+        {url ? (
+          <img
+            src={url}
+            alt="Image preview"
+            className="mx-auto max-h-[85vh] max-w-full rounded-md object-contain"
+          />
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function RichContentRenderer({ content, perAnswerExplanations = {}, options = [], selectedAnswer = null, stemMode = false }: RichContentRendererProps) {
   const [isDark, setIsDark] = useState(false)
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -61,7 +90,7 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
           return renderTable(item, isDark)
         case "images":
         case "image":
-          return renderImages(item)
+          return <RenderImages key={item.id} item={item} />
         case "internal-link":
           return renderInternalLink(item)
         case "external-link":
@@ -73,7 +102,12 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
       }
     })
 
-  return <div className="space-y-1">{renderedContent}</div>
+  return (
+    <PreviewImageContext.Provider value={setPreviewImageUrl}>
+      <div className="space-y-1">{renderedContent}</div>
+      <PreviewImageLightbox url={previewImageUrl} onClose={() => setPreviewImageUrl(null)} />
+    </PreviewImageContext.Provider>
+  )
 }
 
 function renderInternalLink(item: ContentItem) {
@@ -174,6 +208,19 @@ function fixListItemFormatting(html: string): string {
 // Component to render HTML with sanitization
 function HtmlRenderer({ html, itemId, paragraphFlow = "pre-wrap" }: { html: string; itemId: number | string; paragraphFlow?: "normal" | "pre-wrap" }) {
   const [sanitizedHtml, setSanitizedHtml] = useState<string>(html)
+  const openPreviewImage = useContext(PreviewImageContext)
+
+  const handlePreviewImageClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement
+    if (target.closest("a")) return
+    const img = target.closest("img")
+    if (!img) return
+    const src = img.getAttribute("src")
+    if (src && openPreviewImage) {
+      event.preventDefault()
+      openPreviewImage(src)
+    }
+  }
 
   useEffect(() => {
     // Sanitize HTML using unified pipeline
@@ -691,8 +738,9 @@ function HtmlRenderer({ html, itemId, paragraphFlow = "pre-wrap" }: { html: stri
           [&_strong]:font-semibold 
           [&_em]:italic 
           [&_li]:text-sm
-          [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-2 [&_img]:max-w-full [&_img]:h-auto`}
+          [&_img]:rounded-lg [&_img]:border [&_img]:border-border dark:[&_img]:border-gray-700 [&_img]:my-2 [&_img]:max-w-full [&_img]:h-auto [&_img]:cursor-pointer`}
         dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+        onClick={handlePreviewImageClick}
       />
     </div>
   )
@@ -2066,7 +2114,8 @@ function renderPerAnswerExplanations(
   )
 }
 
-function renderImages(item: ContentItem) {
+function RenderImages({ item }: { item: ContentItem }) {
+  const openPreviewImage = useContext(PreviewImageContext)
   const { count } = item.data
   let images: string[] = []
   
@@ -2104,7 +2153,7 @@ function renderImages(item: ContentItem) {
                   src={imageUrl || "/placeholder.svg"}
                   alt={`Explanation image ${idx + 1}`}
                   className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => window.open(imageUrl, '_blank')}
+                  onClick={() => openPreviewImage?.(imageUrl)}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement
                     target.src = "/placeholder.svg"

@@ -475,6 +475,20 @@ export class QuestionsService {
           // Forcefully override topicId to guarantee hierarchy integrity
           finalTopicId = subtopic.topicId;
         }
+      } else if (finalTopicId) {
+        const topic = await this.prisma.topic.findUnique({
+          where: { id: finalTopicId },
+          include: {
+            system: {
+              include: { product: { select: { id: true, categoryId: true, name: true } } },
+            },
+          },
+        });
+        if (topic?.system) {
+          questionCore.systemId = topic.systemId;
+          questionCore.productId = topic.system.productId;
+          questionCore.categoryId = topic.system.product?.categoryId ?? null;
+        }
       }
 
       // Prepare tags as JSON if provided
@@ -675,6 +689,20 @@ export class QuestionsService {
         questionCore.categoryId = subtopic.topic.system.product?.categoryId ?? null;
         finalTopicId = subtopic.topicId;
       }
+    } else if (finalTopicId) {
+      const topic = await this.prisma.topic.findUnique({
+        where: { id: finalTopicId },
+        include: {
+          system: {
+            include: { product: { select: { id: true, categoryId: true, name: true } } },
+          },
+        },
+      });
+      if (topic?.system) {
+        questionCore.systemId = topic.systemId;
+        questionCore.productId = topic.system.productId;
+        questionCore.categoryId = topic.system.product?.categoryId ?? null;
+      }
     }
 
     const { subject: _subject, system: _system, chapterId: _chapterId, productTagId: _productTagId, ...cleanedQuestionCore } = questionCore;
@@ -685,8 +713,8 @@ export class QuestionsService {
     if (Array.isArray(tags)) {
       data.tags = tags as unknown as any;
     }
-    if (subtopicId) {
-      data.subtopicId = subtopicId;
+    if (subtopicId !== undefined) {
+      data.subtopicId = subtopicId || null;
     }
     if (finalTopicId) {
       data.topicId = finalTopicId;

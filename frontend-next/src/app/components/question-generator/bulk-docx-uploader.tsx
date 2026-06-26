@@ -1188,13 +1188,16 @@ export default function BulkDocxUploader({
           }
 
           const questionPayload: any = {
-            subtopicId: questionSubtopicId,
             topicId: questionTopicId,
             question: questionText.trim(),
             difficulty: "medium",
             points: 1,
             isActive: true,
           };
+
+          if (questionSubtopicId?.trim()) {
+            questionPayload.subtopicId = questionSubtopicId.trim();
+          }
 
           if (convertedBack.system) questionPayload.system = convertedBack.system;
 
@@ -1800,7 +1803,7 @@ export default function BulkDocxUploader({
 
                         {/* Subtopic */}
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Subtopic</label>
+                          <label className="mb-1 block text-xs font-medium text-foreground dark:text-slate-200">Subtopic (optional)</label>
                           {result.questionData.subtopic && (
                             <p className="mb-1 break-words text-[11px] text-muted-foreground dark:text-slate-400">
                               Parsed: {result.questionData.subtopic}
@@ -1867,7 +1870,7 @@ export default function BulkDocxUploader({
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping. Questions are saved under General Principles when no system is set.</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → MCQ Title mapping (Subtopic optional). Questions are saved under General Principles when no system is set.</p>
 
                       {/* Question Preview */}
                       <div className="mt-4 rounded-md border border-border bg-background/60 p-3 dark:border-slate-500/35 dark:bg-slate-800/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">

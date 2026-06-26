@@ -2,7 +2,7 @@
 
 export interface Question {
   id: string;
-  subtopicId: string;
+  subtopicId?: string;
   topicId?: string;
   title?: string;
   question: string;
@@ -75,7 +75,7 @@ export interface QuestionChoiceQueryParams {
 
 // Create DTOs
 export interface CreateQuestionDto {
-  subtopicId: string;
+  subtopicId?: string;
   topicId?: string;
   question: string;
   explanation?: string;

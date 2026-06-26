@@ -225,7 +225,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
       m.parsedTopicName ||
       m.parsedSubtopicName
     if (!hasParsedNames) return
-    if (m.categoryId && m.systemId && m.topicId && m.subtopicId) {
+    if (m.categoryId && m.systemId && m.topicId) {
       parsedHierarchyResolved.current = true
       return
     }
@@ -2124,7 +2124,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
                         {/* Subtopic */}
                         <div>
                           <div className="text-xs font-semibold text-muted-foreground dark:text-gray-300 uppercase tracking-wide mb-1">
-                            Subtopic
+                            Subtopic (optional)
                           </div>
                           <div className="flex gap-2 mb-1">
                             <div className="min-w-0 flex-1">

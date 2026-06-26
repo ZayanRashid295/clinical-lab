@@ -1409,12 +1409,15 @@ export default function BulkMarkdownUploader({
           }
 
           const questionPayload: any = {
-            subtopicId: questionSubtopicId,
             topicId: questionTopicId,
             question: questionText.trim(),
             difficulty: "medium",
             points: 1,
             isActive: true,
+          }
+
+          if (questionSubtopicId?.trim()) {
+            questionPayload.subtopicId = questionSubtopicId.trim()
           }
 
           if (convertedBack.system) questionPayload.system = convertedBack.system
@@ -2088,7 +2091,7 @@ export default function BulkMarkdownUploader({
                               </div>
                             </div>
                           </div>
-                          <p className="mt-2 text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → Subtopic → MCQ Title mapping.</p>
+                          <p className="mt-2 text-xs text-muted-foreground dark:text-slate-400">Questions follow Category → Product → System → Topic → MCQ Title mapping (Subtopic optional).</p>
 
                           {/* Question Preview */}
                           <div className="space-y-3 rounded-md border border-border bg-background/50 p-3 dark:border-slate-600/30 dark:bg-slate-800/40">
