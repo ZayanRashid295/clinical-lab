@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query,
+  Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Request,
 } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { ContentService } from "./content.service";
@@ -10,11 +10,20 @@ import { CreateSubtopicDto } from "./dto/create-subtopic.dto";
 import { UpdateSubtopicDto } from "./dto/update-subtopic.dto";
 import { QueryTopicDto } from "./dto/query-topic.dto";
 import { QuerySubtopicDto } from "./dto/query-subtopic.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 @ApiTags("content")
 @Controller("content")
 export class ContentController {
-  constructor(private readonly contentService: ContentService) {}
+  constructor(
+    private readonly contentService: ContentService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   // ========== TOPICS (was Chapters) ==========
   @Get("topics")
@@ -52,8 +61,19 @@ export class ContentController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create new topic" })
-  async createTopic(@Body() createDto: CreateTopicDto) {
-    return this.contentService.createTopic(createDto);
+  async createTopic(@Request() req, @Body() createDto: CreateTopicDto) {
+    const created = await this.contentService.createTopic(createDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.CONTENT,
+      eventName: ACTIVITY_EVENTS.TOPIC_CREATED,
+      contextType: "topic",
+      contextId: created?.id,
+      contextLabel: created?.name,
+      ...ctx,
+    });
+    return created;
   }
 
   @Patch("topics/:id")
@@ -123,8 +143,19 @@ export class ContentController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create new subtopic" })
-  async createSubtopic(@Body() createDto: CreateSubtopicDto) {
-    return this.contentService.createSubtopic(createDto);
+  async createSubtopic(@Request() req, @Body() createDto: CreateSubtopicDto) {
+    const created = await this.contentService.createSubtopic(createDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.CONTENT,
+      eventName: ACTIVITY_EVENTS.SUBTOPIC_CREATED,
+      contextType: "subtopic",
+      contextId: created?.id,
+      contextLabel: created?.name,
+      ...ctx,
+    });
+    return created;
   }
 
   @Patch("subtopics/:id")

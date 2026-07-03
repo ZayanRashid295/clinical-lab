@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
@@ -18,6 +18,7 @@ import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { UsersModule } from "../users/users.module";
 import { InstitutionModule } from "../institution/institution.module";
+import { ActivityLogModule } from "../activity-log/activity-log.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { InstitutionModule } from "../institution/institution.module";
     InstitutionModule,
     SubscriptionsModule, // Import to use SubscriptionsService in guards
     NotificationsModule, // Welcome notification on signup
+    forwardRef(() => ActivityLogModule),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>("JWT_SECRET"),

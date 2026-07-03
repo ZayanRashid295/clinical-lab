@@ -16,13 +16,22 @@ import {
   CreateQuestionReportDto,
   UpdateQuestionReportDto,
 } from "./dto/question-report.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 @ApiTags("question-reports")
 @Controller("question-reports")
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class QuestionReportsController {
-  constructor(private readonly service: QuestionReportsService) {}
+  constructor(
+    private readonly service: QuestionReportsService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   @Get("me")
   @ApiOperation({ summary: "List my submitted reports" })
@@ -47,8 +56,21 @@ export class QuestionReportsController {
 
   @Post()
   @ApiOperation({ summary: "File a question report" })
-  create(@Request() req, @Body() dto: CreateQuestionReportDto) {
-    return this.service.create(req.user?.userId, dto);
+  async create(@Request() req, @Body() dto: CreateQuestionReportDto) {
+    const report = await this.service.create(req.user?.userId, dto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QUESTION_REPORT,
+      eventName: ACTIVITY_EVENTS.QUESTION_REPORT_CREATED,
+      contextType: "question",
+      contextId: dto.questionId,
+      contextLabel: dto.reason,
+      metadata: { reportId: report.id },
+      ...ctx,
+    });
+    return report;
   }
 
   @Patch(":id")

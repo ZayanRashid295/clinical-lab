@@ -35,10 +35,13 @@ export interface QuestionCreatorData {
 
 export interface QuestionCreatorProps {
   initialData?: Partial<QuestionCreatorData>
-  onSave: (data: QuestionCreatorData) => void
+  onSave: (data: QuestionCreatorData) => void | Promise<boolean | void>
   onCancel: () => void
   onPreview?: (data: QuestionCreatorData) => void
   onPreviewModeChange?: (isPreview: boolean) => void
+  /** Parent-controlled busy state (e.g. batch save + load next question) */
+  isSavingExternal?: boolean
+  saveBusyLabel?: string
 }
 
 

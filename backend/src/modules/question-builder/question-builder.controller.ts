@@ -10,6 +10,7 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  Request,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { createReadStream } from "node:fs";
@@ -27,6 +28,12 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { QuestionBuilderService } from "./question-builder.service";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 const DOCX_FILE_FILTER = (
   _req: Express.Request,
@@ -46,7 +53,10 @@ const DOCX_FILE_FILTER = (
 @Roles("ADMIN", "SUPERADMIN")
 @ApiBearerAuth()
 export class QuestionBuilderController {
-  constructor(private readonly questionBuilderService: QuestionBuilderService) {}
+  constructor(
+    private readonly questionBuilderService: QuestionBuilderService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   @Post("convert")
   @UseInterceptors(
@@ -58,7 +68,10 @@ export class QuestionBuilderController {
   @ApiConsumes("multipart/form-data")
   @ApiOperation({ summary: "Convert structured DOCX files to question JSON (no AI)" })
   @ApiResponse({ status: 201, description: "Conversion completed" })
-  async convertFiles(@UploadedFiles() files: Express.Multer.File[]) {
+  async convertFiles(
+    @Request() req,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     if (!files?.length) {
       throw new BadRequestException("No files uploaded");
     }
@@ -66,6 +79,22 @@ export class QuestionBuilderController {
     const results = await this.questionBuilderService.convertMultiple(files);
     const succeeded = results.filter((result) => result.success);
     const failed = results.filter((result) => !result.success);
+
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QBANK,
+      eventName: ACTIVITY_EVENTS.QUESTION_IMPORTED,
+      contextType: "import_batch",
+      contextLabel: `${succeeded.length} of ${results.length} files converted`,
+      metadata: {
+        total: results.length,
+        succeeded: succeeded.length,
+        failed: failed.length,
+        filenames: files.map((f) => f.originalname),
+      },
+      ...ctx,
+    });
 
     return {
       total: results.length,

@@ -55,8 +55,33 @@ interface Question {
   explanation: string;
   subject: string;
   system: string;
+  topic: string;
+  mcqTitle: string;
   difficulty: "Easy" | "Medium" | "Hard";
   imageUrl?: string;
+}
+
+function parseMcqTitleFromTags(tags: unknown, fallbackTitle?: string | null): string {
+  const tagList = Array.isArray(tags) ? tags : [];
+  for (const tag of tagList) {
+    if (typeof tag === "string" && tag.startsWith("__mcqTitle:")) {
+      return tag.replace("__mcqTitle:", "").trim();
+    }
+  }
+  return fallbackTitle?.trim() || "";
+}
+
+function formatQuestionContextLabel(question: {
+  system?: string;
+  topic?: string;
+  mcqTitle?: string;
+}): string | null {
+  const parts = [
+    question.system?.trim() || "",
+    question.topic?.trim() || "",
+    question.mcqTitle?.trim() || "",
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : null;
 }
 
 export default function TestSessionPage() {
@@ -163,17 +188,23 @@ export default function TestSessionPage() {
           for (const questionId of questionIds) {
             try {
               const question = await questionsService.getQuestion(questionId);
+              const q = question as any;
+              const systemName = q.system?.name || "General";
+              const topicName = q.topic?.name || "General";
+              const mcqTitle = parseMcqTitleFromTags(q.tags, q.title);
               fetchedQuestions.push({
                 id: question.id,
-                text: (question as any).stem || question.question,
+                text: q.stem || question.question,
                 options: (question.choices || []).map((c: any) => c.text),
                 correctAnswer:
                   (question.choices || []).find((c: any) => c.isCorrect)?.text || "",
                 explanation: question.explanation || "",
-                subject: (question as any).system?.name || "General",
-                system: question.topic?.name || "General",
+                subject: q.category?.name || systemName,
+                system: systemName,
+                topic: topicName,
+                mcqTitle,
                 difficulty: "Medium" as const,
-                imageUrl: (question as any).imageUrl,
+                imageUrl: q.imageUrl,
               });
             } catch (err) {
               if (
@@ -564,6 +595,9 @@ export default function TestSessionPage() {
   }
 
   const currentQuestion = questions[currentQuestionIndex];
+  const questionContextLabel = currentQuestion
+    ? formatQuestionContextLabel(currentQuestion)
+    : null;
   const selectedAnswer = selectedAnswers[currentQuestionIndex];
   const isAnswered = selectedAnswer !== undefined;
   const totalAnswered = Object.keys(selectedAnswers).length;
@@ -644,11 +678,17 @@ export default function TestSessionPage() {
           <Card data-testid={`question-card-${currentQuestionIndex}`}>
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
-                <CardTitle className="text-lg flex-1 text-gray-900 dark:text-white">
-                  {currentQuestion.text}
-                </CardTitle>
-                <div className="flex gap-2 items-center">
-                  <Badge variant="secondary">{currentQuestion.subject}</Badge>
+                <div className="flex-1 min-w-0">
+                  {questionContextLabel && (
+                    <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">
+                      {questionContextLabel}
+                    </p>
+                  )}
+                  <CardTitle className="text-lg text-gray-900 dark:text-white">
+                    {currentQuestion.text}
+                  </CardTitle>
+                </div>
+                <div className="flex gap-2 items-center flex-shrink-0">
                   <Badge variant="outline">{currentQuestion.difficulty}</Badge>
                   <Button
                     variant="ghost"

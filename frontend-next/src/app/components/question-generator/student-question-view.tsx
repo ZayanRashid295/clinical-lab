@@ -24,6 +24,45 @@ import { authService } from "@/shared/services/auth.service"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import { Crown } from "lucide-react"
 
+function parseQuestionTags(tags: unknown): {
+  storedQuestionId: string | null
+  storedMcqTitle: string | null
+  filteredTags: string[]
+} {
+  let storedQuestionId: string | null = null
+  let storedMcqTitle: string | null = null
+  const filteredTags: string[] = []
+  const tagList = Array.isArray(tags) ? tags : []
+
+  for (const tag of tagList) {
+    if (typeof tag !== "string") continue
+    if (tag.startsWith("__questionId:")) {
+      storedQuestionId = tag.replace("__questionId:", "")
+    } else if (tag.startsWith("__mcqTitle:")) {
+      storedMcqTitle = tag.replace("__mcqTitle:", "").trim()
+    } else if (!tag.startsWith("__")) {
+      filteredTags.push(tag)
+    }
+  }
+
+  return { storedQuestionId, storedMcqTitle, filteredTags }
+}
+
+function formatQuestionContextLabel(question: {
+  system?: string
+  topic?: string | { name?: string }
+  mcqTitle?: string
+}): string | null {
+  const system = question.system?.trim() || ""
+  const topic =
+    typeof question.topic === "string"
+      ? question.topic.trim()
+      : question.topic?.name?.trim() || ""
+  const mcqTitle = question.mcqTitle?.trim() || ""
+  const parts = [system, topic, mcqTitle].filter(Boolean)
+  return parts.length > 0 ? parts.join(", ") : null
+}
+
 export default function StudentQuestionView() {
   const { toast } = useToast()
   const router = useRouter()
@@ -337,18 +376,9 @@ export default function StudentQuestionView() {
           })
       : []
 
-    // Extract questionId from tags if stored there (from edit mode)
-    let storedQuestionId: string | null = null
-    const tags = Array.isArray(backendQuestion.tags) ? backendQuestion.tags : []
-    const filteredTags: string[] = []
-    
-    for (const tag of tags) {
-      if (typeof tag === "string" && tag.startsWith("__questionId:")) {
-        storedQuestionId = tag.replace("__questionId:", "")
-      } else {
-        filteredTags.push(String(tag))
-      }
-    }
+    const { storedQuestionId, storedMcqTitle, filteredTags } = parseQuestionTags(
+      backendQuestion.tags,
+    )
     
     // Generate questionId based on system and topic (same logic as edit mode)
     // Only generate if not stored in tags
@@ -383,6 +413,7 @@ export default function StudentQuestionView() {
       system: backendQuestion.system?.name || backendQuestion.system || "",
       topic: backendQuestion.topic,
       topicId: backendQuestion.topicId,
+      mcqTitle: storedMcqTitle || backendQuestion.title || "",
       options,
       explanation,
       perAnswerExplanations,
@@ -457,6 +488,7 @@ export default function StudentQuestionView() {
       const systemIdsParam = searchParams.get("systemIds")
       const subjectIdsParam = searchParams.get("subjectIds") // Deprecated, but keep for fallback if needed during transition
       const topicIdsParam = searchParams.get("topicIds")
+      const subtopicIdsParam = searchParams.get("subtopicIds")
       const poolParam = searchParams.get("pool")
       const markedParam = searchParams.get("marked")
       const limitParam = searchParams.get("limit")
@@ -553,6 +585,9 @@ export default function StudentQuestionView() {
         }
         if (topicIdsParam) {
           filters.topicIds = topicIdsParam.split(",").filter((id) => id.trim())
+        }
+        if (subtopicIdsParam) {
+          filters.subtopicIds = subtopicIdsParam.split(",").filter((id) => id.trim())
         }
         if (limitParam) {
           filters.limit = parseInt(limitParam, 10)
@@ -1639,6 +1674,8 @@ export default function StudentQuestionView() {
     )
   }
 
+  const questionContextLabel = formatQuestionContextLabel(currentQuestion)
+
   const correctOption = currentQuestion.options.find((o: any) => o.correct)
   const isCorrect = selectedAnswer === correctOption?.value
   const correctAnswerLabel = correctOption?.label
@@ -1700,12 +1737,13 @@ export default function StudentQuestionView() {
               >
                 {loading ? "⏳ Loading..." : "↻ Refresh"}
               </button>
-              {currentQuestion.system && (
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-secondary/12 dark:bg-secondary/20 text-secondary dark:text-purple-400 rounded-lg text-xs font-semibold border border-secondary/25 dark:border-secondary/30">
-                    {currentQuestion.system}
-                  </span>
-                </div>
+              {questionContextLabel && (
+                <span
+                  className="px-3 py-1.5 bg-secondary/12 dark:bg-secondary/20 text-secondary dark:text-purple-300 rounded-lg text-xs font-medium border border-secondary/25 dark:border-secondary/30 normal-case tracking-normal max-w-full truncate sm:whitespace-normal sm:overflow-visible"
+                  title={questionContextLabel}
+                >
+                  {questionContextLabel}
+                </span>
               )}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -1878,6 +1916,7 @@ export default function StudentQuestionView() {
                   chapter={currentQuestion.system}
                   chapterLabel="System"
                   topic={currentQuestion.topic}
+                  mcqTitle={currentQuestion.mcqTitle}
                 />
               </div>
             ) : (

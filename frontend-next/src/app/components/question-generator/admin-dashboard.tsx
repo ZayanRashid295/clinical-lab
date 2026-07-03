@@ -184,6 +184,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     active: number
     inactive: number
   } | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
   const [detailQuestion, setDetailQuestion] = useState<Question | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -1063,6 +1064,17 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     } as any
   }
 
+  const refreshQuestionStats = useCallback(async () => {
+    try {
+      const stats = await questionsService.getQuestionStats()
+      setQuestionStats(stats)
+    } catch {
+      setQuestionStats(null)
+    } finally {
+      setStatsLoading(false)
+    }
+  }, [questionsService])
+
   const loadQuestions = useCallback(async (options?: { silent?: boolean; page?: number }) => {
     const silent = options?.silent === true
     const { debouncedSearchTerm: search, systemFilter: system, currentPage: pageDefault } =
@@ -1108,6 +1120,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           totalPages: transformedQuestions.length > 0 ? 1 : 0,
         })
       }
+
+      void refreshQuestionStats()
     } catch (err: unknown) {
       if (requestId !== loadRequestIdRef.current) return
       console.error("Failed to load questions:", err)
@@ -1131,7 +1145,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         setLoading(false)
       }
     }
-  }, [questionsService])
+  }, [questionsService, refreshQuestionStats])
 
   const loadQuestionDetail = useCallback(async (id: string) => {
     setDetailLoading(true)
@@ -1183,14 +1197,9 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           setBankSystems(names)
         })
         .catch(() => setBankSystems([]))
-
-      questionsService
-        .getQuestionStats()
-        .then((stats) => setQuestionStats(stats))
-        .catch(() => setQuestionStats(null))
     }, 0)
     return () => window.clearTimeout(deferredId)
-  }, [questionsService, systemsService])
+  }, [systemsService])
 
   useEffect(() => {
     if (authService.isAuthenticated()) {
@@ -1655,7 +1664,15 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const displayedQuestions = questions
 
   const bankStatCards = useMemo(() => {
-    const n = questionStats?.active ?? pagination.total
+    const hasListFilters =
+      systemFilter !== "all" || debouncedSearchTerm.trim().length > 0
+    const totalActive =
+      questionStats?.active ??
+      (!hasListFilters ? pagination.total : null)
+    const totalDisplay =
+      statsLoading && questionStats == null && totalActive == null
+        ? "…"
+        : String(totalActive ?? "—")
     let optionSum = 0
     questions.forEach((q) => {
       optionSum += q.options?.length ?? 0
@@ -1672,7 +1689,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       {
         id: "total",
         title: t("questionGenerator.statTotal"),
-        value: String(n),
+        value: totalDisplay,
         hint: t("questionGenerator.statTotalHint"),
       },
       {
@@ -1692,7 +1709,16 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
         value: String(productsOnPage.size),
       },
     ]
-  }, [questions, t, questionStats, pagination.total, bankSystems.length])
+  }, [
+    questions,
+    t,
+    questionStats,
+    statsLoading,
+    pagination.total,
+    bankSystems.length,
+    systemFilter,
+    debouncedSearchTerm,
+  ])
 
   if (loading && questions.length === 0 && !error) {
     return (

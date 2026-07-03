@@ -4,7 +4,7 @@ import QuestionEditor from "../unified-editor/QuestionEditor"
 import { QuestionCreatorProps, QuestionCreatorData } from "./types"
 
 export default function QuestionCreator(props: QuestionCreatorProps) {
-  const handleSave = (data: {
+  const handleSave = async (data: {
     stem: any[]
     choices: any[]
     perAnswerExplanations: Record<string, any[]>
@@ -18,7 +18,7 @@ export default function QuestionCreator(props: QuestionCreatorProps) {
       mainExplanation: data.mainExplanation,
       metadata: data.metadata,
     }
-    props.onSave(questionData)
+    return props.onSave(questionData)
   }
 
   return (
@@ -27,6 +27,8 @@ export default function QuestionCreator(props: QuestionCreatorProps) {
       onSave={handleSave}
       onCancel={props.onCancel}
       onPreviewModeChange={props.onPreviewModeChange}
+      isSavingExternal={props.isSavingExternal}
+      saveBusyLabel={props.saveBusyLabel}
     />
   )
 }

@@ -9,6 +9,7 @@ import ChatRoomsList from "../components/Chat/ChatRoomsList";
 import SupportChatRoomsList from "../components/Chat/SupportChatRoomsList";
 import NotificationsList from "../components/Notifications/NotificationsList";
 import UserManagementContent from "../components/Content/UserManagementContent";
+import ActivityLogsManagementContent from "../components/Content/ActivityLogsManagementContent";
 import RoleManagementContent from "../components/Content/RoleManagementContent";
 import SystemSettingsContent from "../components/Content/SystemSettingsContent";
 import SubscriptionManagementContent from "../components/Content/SubscriptionManagementContent";
@@ -117,6 +118,7 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Admin sub-routes
     "/admin/users": () => <UserManagementContent />,
+    "/admin/activity-logs": () => <ActivityLogsManagementContent />,
     "/admin/roles": () => <RoleManagementContent />,
     "/admin/settings": () => <SystemSettingsContent />,
     // "/admin/tables": () => <TwoTablesWithPagination />,

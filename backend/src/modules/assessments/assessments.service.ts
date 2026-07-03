@@ -10,6 +10,7 @@ import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
 import { AchievementsService } from "../achievements/achievements.service";
 import { GoalsService } from "../goals/goals.service";
+import { buildQuestionPaperAuditSnapshot } from "../../common/utils/question-paper-audit.util";
 
 @Injectable()
 export class AssessmentsService {
@@ -511,6 +512,11 @@ export class AssessmentsService {
       },
       submittedAt: new Date(),
     };
+  }
+
+  /** Compact audit snapshot for activity logs and admin review. */
+  async getQuestionPaperAuditSnapshot(questionPaperId: string) {
+    return buildQuestionPaperAuditSnapshot(this.prisma, questionPaperId);
   }
 
   async getAssessmentResults(id: string) {

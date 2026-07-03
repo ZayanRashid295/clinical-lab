@@ -478,6 +478,13 @@ export const MENU_CONFIG = {
           roles: ["SUPERADMIN", "ADMIN"],
         },
         {
+          id: "activity-logs",
+          label: "menu.activityLogs",
+          icon: "📝",
+          path: "/admin/activity-logs",
+          roles: ["SUPERADMIN", "ADMIN"],
+        },
+        {
           id: "system-settings",
           label: "menu.systemSettings",
           icon: "⚙️",

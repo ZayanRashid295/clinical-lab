@@ -138,13 +138,7 @@ export function AuthScreen({
 
   const isSignup = view === "signup";
 
-  const fieldLabel = "text-sm font-medium tracking-tight text-slate-200";
-
-  const inputClass =
-    "h-12 rounded-xl border border-white/10 bg-slate-900/80 px-4 text-slate-100 shadow-sm transition-[border-color,box-shadow] placeholder:text-slate-500 focus-visible:border-primary-500/50 focus-visible:ring-2 focus-visible:ring-primary-500/20";
-
-  const primaryBtn =
-    "h-12 w-full rounded-xl text-[15px] font-semibold text-white shadow-lg shadow-primary-900/30 transition-all duration-200 bg-primary-600 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-900/40 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none";
+  const inputClass = "mkt-auth-input w-full shadow-sm disabled:opacity-50";
 
   const heroBullets = isSignup
     ? [
@@ -159,53 +153,44 @@ export function AuthScreen({
       ];
 
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] w-full flex-col overflow-hidden bg-slate-950 lg:flex-row">
+    <div className="mkt-auth-root flex min-h-[calc(100dvh-4rem)] w-full flex-col overflow-hidden lg:flex-row">
       {/* Hero — full width on mobile, half viewport on large screens */}
       <section className="relative flex min-h-[min(52vh,480px)] flex-1 flex-col items-center justify-center px-8 py-16 sm:px-12 sm:py-20 lg:min-h-0 lg:flex-[1.08] lg:items-center lg:justify-center lg:px-20 lg:py-24 xl:px-24 xl:py-28">
+        <div className="mkt-auth-hero absolute inset-0" aria-hidden />
+        <div className="mkt-auth-hero-glow absolute inset-0" aria-hidden />
         <div
-          className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
-          aria-hidden
-        />
-        <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_0%_-20%,rgba(var(--color-primary-500-rgb,16,185,129),0.2),transparent_50%)]"
-          aria-hidden
-        />
-        <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_100%,rgba(99,102,241,0.18),transparent_45%)]"
-          aria-hidden
-        />
-        <div
-          className="absolute inset-0 opacity-[0.4]"
+          className="absolute inset-0 opacity-[0.35]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 38v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 38v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23059669' fill-opacity='0.06'%3E%3Cpath d='M36 38v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 38v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent lg:from-slate-950/40" aria-hidden />
 
         <div className="relative z-[1] flex w-full max-w-xl flex-col items-center justify-center gap-10 py-4 text-center sm:gap-12 lg:max-w-xl lg:gap-16 lg:py-10">
           <div
             className={cn(
-              "flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl sm:h-24 sm:w-24",
-              "bg-gradient-to-br from-white/15 to-white/5 shadow-2xl shadow-black/20 ring-1 ring-white/20 backdrop-blur-xl",
+              "mkt-auth-icon-shell flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl sm:h-24 sm:w-24",
             )}
           >
             {isSignup ? (
-              <UserPlus className="h-10 w-10 text-white/95 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden />
+              <UserPlus className="h-10 w-10 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden style={{ color: "var(--mkt-text)" }} />
             ) : (
-              <Stethoscope className="h-10 w-10 text-white/95 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden />
+              <Stethoscope className="h-10 w-10 sm:h-11 sm:w-11" strokeWidth={1.5} aria-hidden style={{ color: "var(--mkt-text)" }} />
             )}
           </div>
 
           <div className="flex flex-col items-center gap-6 sm:gap-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary-500/30 bg-primary-500/10 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-primary-300 shadow-sm backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5 text-primary-400" aria-hidden />
-              AI clinical education platform
+            <div className="mkt-auth-badge inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden style={{ color: "var(--mkt-accent-muted)" }} />
+              Clinical exam preparation
             </div>
-            <h1 className="max-w-lg text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl lg:leading-[1.12]">
+            <h1
+              className="max-w-lg text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:leading-tight"
+              style={{ color: "var(--mkt-text)" }}
+            >
               {isSignup ? "Create your account" : "Welcome back"}
             </h1>
-            <p className="max-w-lg text-pretty text-base leading-relaxed text-slate-300 sm:text-lg sm:leading-relaxed">
+            <p className="max-w-lg text-pretty text-base leading-relaxed sm:text-lg sm:leading-relaxed mkt-auth-muted">
               {isSignup
                 ? "Practice clinical skills with AI in a secure, structured environment — built for serious medical learners."
                 : "Sign in to continue simulations, assessments, and your personalized learning path."}
@@ -216,12 +201,13 @@ export function AuthScreen({
             {heroBullets.map((line) => (
               <li
                 key={line}
-                className="flex w-full max-w-md items-start justify-center gap-4 text-left text-sm leading-relaxed text-slate-300/95 sm:text-base"
+                className="flex w-full max-w-md items-start justify-center gap-4 text-left text-sm leading-relaxed sm:text-base mkt-auth-muted"
               >
                 <CheckCircle2
-                  className="mt-0.5 h-5 w-5 shrink-0 text-primary-400 sm:h-6 sm:w-6"
+                  className="mt-0.5 h-5 w-5 shrink-0 sm:h-6 sm:w-6"
                   strokeWidth={2}
                   aria-hidden
+                  style={{ color: "var(--mkt-accent-muted)" }}
                 />
                 <span>{line}</span>
               </li>
@@ -233,16 +219,16 @@ export function AuthScreen({
       {/* Form — full width below hero on mobile, half viewport on large screens */}
       <section
         className={cn(
-          "relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t border-white/10 bg-slate-950",
+          "mkt-auth-panel relative z-[2] flex flex-1 flex-col justify-center overflow-y-auto border-t",
           "px-6 py-12 sm:px-10 sm:py-16 lg:min-h-0 lg:border-l lg:border-t-0 lg:px-14 lg:py-20 xl:px-20 xl:py-24",
         )}
       >
         <div className="mx-auto w-full max-w-md lg:max-w-lg">
-        <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary-400 lg:text-left">
-          {isSignup ? "Registration" : "Account access"}
+        <p className="mkt-auth-eyebrow mb-5 text-center lg:text-left">
+          {isSignup ? "Registration" : "Sign in"}
         </p>
         <div
-          className="mb-8 flex rounded-2xl border border-white/10 bg-slate-900/70 p-1.5 shadow-inner"
+          className="mkt-auth-tab-shell mb-8 flex rounded-2xl p-1.5 shadow-inner"
           role="tablist"
           aria-label="Sign in or create account"
         >
@@ -252,9 +238,7 @@ export function AuthScreen({
             aria-selected={!isSignup}
             className={cn(
               "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
-              !isSignup
-                ? "bg-slate-800 text-white shadow-md shadow-black/30 ring-1 ring-white/10"
-                : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
+              !isSignup ? "mkt-auth-tab-active" : "mkt-auth-tab-idle",
             )}
             onClick={() => goToView("login")}
           >
@@ -266,9 +250,7 @@ export function AuthScreen({
             aria-selected={isSignup}
             className={cn(
               "flex-1 cursor-pointer rounded-xl py-3 text-sm font-semibold transition-all duration-200",
-              isSignup
-                ? "bg-slate-800 text-white shadow-md shadow-black/30 ring-1 ring-white/10"
-                : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
+              isSignup ? "mkt-auth-tab-active" : "mkt-auth-tab-idle",
             )}
             onClick={() => goToView("signup")}
           >
@@ -291,7 +273,7 @@ export function AuthScreen({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="auth-first-name" className={fieldLabel}>
+                <Label htmlFor="auth-first-name" className="mkt-auth-label">
                   First name
                 </Label>
                 <Input
@@ -307,7 +289,7 @@ export function AuthScreen({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="auth-last-name" className={fieldLabel}>
+                <Label htmlFor="auth-last-name" className="mkt-auth-label">
                   Last name
                 </Label>
                 <Input
@@ -325,7 +307,7 @@ export function AuthScreen({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auth-signup-email" className={fieldLabel}>
+              <Label htmlFor="auth-signup-email" className="mkt-auth-label">
                 Work or school email
               </Label>
               <Input
@@ -343,9 +325,9 @@ export function AuthScreen({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auth-phone" className={fieldLabel}>
+              <Label htmlFor="auth-phone" className="mkt-auth-label">
                 Phone{" "}
-                <span className="font-normal text-muted-foreground">(optional)</span>
+                <span className="font-normal mkt-auth-muted">(optional)</span>
               </Label>
               <Input
                 id="auth-phone"
@@ -361,7 +343,7 @@ export function AuthScreen({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auth-signup-password" className={fieldLabel}>
+              <Label htmlFor="auth-signup-password" className="mkt-auth-label">
                 Password
               </Label>
               <div className="relative">
@@ -381,7 +363,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg mkt-auth-muted hover:bg-[var(--mkt-accent-soft)]"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -389,11 +371,11 @@ export function AuthScreen({
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <p className="text-xs leading-relaxed text-slate-400">{PASSWORD_HINT}</p>
+              <p className="text-xs leading-relaxed mkt-auth-muted">{PASSWORD_HINT}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auth-confirm-password" className={fieldLabel}>
+              <Label htmlFor="auth-confirm-password" className="mkt-auth-label">
                 Confirm password
               </Label>
               <Input
@@ -412,11 +394,7 @@ export function AuthScreen({
             <button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                primaryBtn,
-                "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-primary-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-              )}
+              className="mkt-auth-btn-primary mt-2 inline-flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[var(--mkt-accent-ring)]"
             >
               {isLoading ? "Creating account…" : "Create account"}
             </button>
@@ -435,7 +413,7 @@ export function AuthScreen({
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="auth-email" className={fieldLabel}>
+              <Label htmlFor="auth-email" className="mkt-auth-label">
                 Email
               </Label>
               <Input
@@ -453,7 +431,7 @@ export function AuthScreen({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auth-password" className={fieldLabel}>
+              <Label htmlFor="auth-password" className="mkt-auth-label">
                 Password
               </Label>
               <div className="relative">
@@ -473,7 +451,7 @@ export function AuthScreen({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 rounded-lg mkt-auth-muted hover:bg-[var(--mkt-accent-soft)]"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -486,22 +464,21 @@ export function AuthScreen({
             <button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                primaryBtn,
-                "mt-2 inline-flex cursor-pointer items-center justify-center outline-none",
-                "focus-visible:ring-2 focus-visible:ring-primary-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-              )}
+              className="mkt-auth-btn-primary mt-2 inline-flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[var(--mkt-accent-ring)]"
             >
               {isLoading ? "Signing in…" : "Sign in"}
             </button>
           </form>
         )}
 
-        <div className="mt-8 flex gap-3.5 rounded-2xl border border-primary-500/20 bg-primary-500/10 px-4 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-500/15">
-            <ShieldCheck className="h-4 w-4 text-primary-400" aria-hidden />
+        <div className="mkt-auth-trust mt-8 flex gap-3.5 rounded-2xl px-4 py-4">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "var(--mkt-accent-soft)" }}
+          >
+            <ShieldCheck className="h-4 w-4" aria-hidden style={{ color: "var(--mkt-accent-muted)" }} />
           </div>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed mkt-auth-muted">
             {isSignup
               ? "By continuing, you agree to use MedPrepAI responsibly. We protect your data with encryption in transit and at rest."
               : "Use a strong password and a device you trust. Never share your credentials with anyone."}
@@ -509,8 +486,8 @@ export function AuthScreen({
         </div>
 
         {isDev && !isSignup && (
-          <div className="mt-8 border-t border-white/10 pt-8">
-            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
+          <div className="mt-8 border-t pt-8" style={{ borderColor: "var(--mkt-border)" }}>
+            <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.15em] mkt-auth-muted">
               Local development
             </p>
             <Button
@@ -519,7 +496,8 @@ export function AuthScreen({
               size="sm"
               onClick={fillTestCredentials}
               disabled={isLoading}
-              className="w-full cursor-pointer rounded-xl border-dashed border-white/20 bg-slate-900/60 text-slate-200 hover:bg-slate-800"
+              className="w-full cursor-pointer rounded-xl border border-dashed mkt-auth-muted hover:bg-[var(--mkt-accent-soft)]"
+              style={{ borderColor: "var(--mkt-border)", background: "var(--mkt-bg-muted)" }}
             >
               Fill demo credentials
             </Button>
@@ -527,11 +505,11 @@ export function AuthScreen({
         )}
 
         {isSignup ? (
-          <p className="mt-8 text-center text-sm leading-relaxed text-slate-400 lg:text-left">
+          <p className="mt-8 text-center text-sm leading-relaxed mkt-auth-muted lg:text-left">
             Already have an account?{" "}
             <button
               type="button"
-              className="font-semibold text-primary-400 underline-offset-4 transition-colors hover:text-primary-300 hover:underline"
+              className="mkt-auth-link"
               onClick={() => goToView("login")}
             >
               Sign in
@@ -539,17 +517,17 @@ export function AuthScreen({
           </p>
         ) : (
           <div className="mt-8 space-y-2 text-center lg:text-left">
-            <p className="text-sm leading-relaxed text-slate-400">
+            <p className="text-sm leading-relaxed mkt-auth-muted">
               New to MedPrepAI?{" "}
               <button
                 type="button"
-                className="font-semibold text-primary-400 underline-offset-4 transition-colors hover:text-primary-300 hover:underline"
+                className="mkt-auth-link"
                 onClick={() => goToView("signup")}
               >
                 Create an account
               </button>
             </p>
-            <p className="text-xs leading-relaxed text-slate-500">
+            <p className="text-xs leading-relaxed mkt-auth-muted">
               Institutional access is managed by your administrator.
             </p>
           </div>

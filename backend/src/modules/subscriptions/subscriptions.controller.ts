@@ -28,6 +28,12 @@ import { UpdatePackageFeatureDto } from "./dto/update-package-feature.dto";
 import { QuerySubscriptionDto } from "./dto/query-subscription.dto";
 import { QuerySubscriptionPackageDto } from "./dto/query-subscription-package.dto";
 import { QueryPackageFeatureDto } from "./dto/query-package-feature.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 import { CreateEntitlementDefinitionDto } from "./dto/create-entitlement-definition.dto";
 import { UpdateEntitlementDefinitionDto } from "./dto/update-entitlement-definition.dto";
 import { QueryEntitlementDefinitionDto } from "./dto/query-entitlement-definition.dto";
@@ -37,7 +43,10 @@ import { PricingQuoteRequestDto } from "./dto/pricing-quote.dto";
 @ApiTags("subscriptions")
 @Controller("subscriptions")
 export class SubscriptionsController {
-  constructor(private readonly subscriptionsService: SubscriptionsService) {}
+  constructor(
+    private readonly subscriptionsService: SubscriptionsService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   @Post("pricing/quote")
   @UseGuards(JwtAuthGuard)
@@ -344,9 +353,24 @@ export class SubscriptionsController {
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async createSubscription(
-    @Body() createSubscriptionDto: CreateSubscriptionDto
+    @Request() req,
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
   ) {
-    return this.subscriptionsService.createSubscription(createSubscriptionDto);
+    const created = await this.subscriptionsService.createSubscription(
+      createSubscriptionDto,
+    );
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: createSubscriptionDto.userId,
+      component: ACTIVITY_COMPONENTS.SUBSCRIPTION,
+      eventName: ACTIVITY_EVENTS.SUBSCRIPTION_CREATED,
+      contextType: "subscription",
+      contextId: created?.id,
+      contextLabel: created?.subscriptionPackage?.name ?? created?.id,
+      ...ctx,
+    });
+    return created;
   }
 
   @Patch(":id")
@@ -360,13 +384,27 @@ export class SubscriptionsController {
   @ApiResponse({ status: 404, description: "Subscription not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async updateSubscription(
+    @Request() req,
     @Param("id") id: string,
-    @Body() updateSubscriptionDto: UpdateSubscriptionDto
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
   ) {
-    return this.subscriptionsService.updateSubscription(
+    const updated = await this.subscriptionsService.updateSubscription(
       id,
-      updateSubscriptionDto
+      updateSubscriptionDto,
     );
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: updated?.userId,
+      component: ACTIVITY_COMPONENTS.SUBSCRIPTION,
+      eventName: ACTIVITY_EVENTS.SUBSCRIPTION_UPDATED,
+      contextType: "subscription",
+      contextId: id,
+      contextLabel: updated?.subscriptionPackage?.name ?? id,
+      metadata: { status: updateSubscriptionDto.status ?? updated?.status },
+      ...ctx,
+    });
+    return updated;
   }
 
   @Delete(":id")
@@ -379,8 +417,19 @@ export class SubscriptionsController {
   })
   @ApiResponse({ status: 404, description: "Subscription not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async cancelSubscription(@Param("id") id: string) {
-    return this.subscriptionsService.cancelSubscription(id);
+  async cancelSubscription(@Request() req, @Param("id") id: string) {
+    const cancelled = await this.subscriptionsService.cancelSubscription(id);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: cancelled?.userId,
+      component: ACTIVITY_COMPONENTS.SUBSCRIPTION,
+      eventName: ACTIVITY_EVENTS.SUBSCRIPTION_CANCELLED,
+      contextType: "subscription",
+      contextId: id,
+      ...ctx,
+    });
+    return cancelled;
   }
 
   @Post("cleanup-duplicates/:userId")

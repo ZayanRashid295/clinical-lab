@@ -278,13 +278,13 @@ export default function QuestionBuilderUploader({
     }
   };
 
-  const handleEditorSave = async (questionData: QuestionCreatorData) => {
-    if (!activeId) return;
+  const handleEditorSave = async (questionData: QuestionCreatorData): Promise<boolean> => {
+    if (!activeId || saving) return false;
     const savedId = activeId;
     setSaving(true);
     try {
       const ok = await onSave(questionData, { batchReview: true });
-      if (!ok) return;
+      if (!ok) return false;
 
       dataCacheRef.current[savedId] = {
         ...questionData,
@@ -319,6 +319,7 @@ export default function QuestionBuilderUploader({
           description: "All questions in this batch have been saved.",
         });
       }
+      return true;
     } finally {
       setSaving(false);
     }
@@ -456,6 +457,14 @@ export default function QuestionBuilderUploader({
 
   if (phase === "batch") {
     const succeededCount = batchResults.filter((r) => r.success).length;
+    const isBatchBusy = saving || !!loadingId;
+    const saveBusyLabel = saving
+      ? loadingId
+        ? "Loading next…"
+        : "Saving…"
+      : loadingId
+        ? "Loading…"
+        : undefined;
 
     return (
       <div className="flex h-[calc(100vh-12rem)] min-h-[520px] overflow-hidden rounded-xl border border-border bg-card dark:border-gray-700 dark:bg-gray-800">
@@ -464,13 +473,35 @@ export default function QuestionBuilderUploader({
           statuses={statuses}
           activeId={activeId}
           loadingId={loadingId}
-          saving={saving}
-          onSelect={(id) => void loadQuestionForEdit(id)}
+          saving={isBatchBusy}
+          onSelect={(id) => {
+            if (isBatchBusy) return;
+            void loadQuestionForEdit(id);
+          }}
           onUploadMore={handleUploadMore}
           onFinish={() => void handleFinishBatch()}
         />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative flex min-w-0 flex-1 flex-col">
+          {isBatchBusy && activeId && creatorData && (
+            <div
+              className="absolute inset-0 z-20 flex items-center justify-center bg-background/75 backdrop-blur-[2px] dark:bg-gray-950/75"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card px-8 py-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <Loader2 className="h-8 w-8 animate-spin text-primary dark:text-blue-400" />
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-foreground dark:text-gray-100">
+                    {saving ? (loadingId ? "Loading next question" : "Saving question") : "Loading question"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground dark:text-gray-400">
+                    Please wait — do not save again until this finishes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {showUploadPanel ? (
             <div className="flex flex-1 flex-col overflow-y-auto p-6">
               <div className="mb-4 flex items-center justify-between">
@@ -500,7 +531,7 @@ export default function QuestionBuilderUploader({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  disabled={saving}
+                  disabled={isBatchBusy}
                   onClick={handleEditorCancel}
                 >
                   Back to list
@@ -510,8 +541,10 @@ export default function QuestionBuilderUploader({
                 <QuestionCreator
                   key={activeId}
                   initialData={editorInitialData}
-                  onSave={(data) => void handleEditorSave(data)}
+                  onSave={handleEditorSave}
                   onCancel={handleEditorCancel}
+                  isSavingExternal={isBatchBusy}
+                  saveBusyLabel={saveBusyLabel}
                 />
               </div>
             </div>

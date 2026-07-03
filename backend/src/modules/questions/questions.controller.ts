@@ -39,11 +39,20 @@ import { QueryQuestionDto } from "./dto/query-question.dto";
 import { QueryQuestionChoiceDto } from "./dto/query-question-choice.dto";
 import { FilteredQuestionsDto } from "./dto/filtered-questions.dto";
 import { ConvertDocxDto } from "./dto/convert-docx.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 @ApiTags("questions")
 @Controller("questions")
 export class QuestionsController {
-  constructor(private readonly questionsService: QuestionsService) {}
+  constructor(
+    private readonly questionsService: QuestionsService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, FeatureGuard, EntitlementGuard)
@@ -294,8 +303,19 @@ export class QuestionsController {
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 403, description: "Admin role required" })
-  async create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionsService.create(createQuestionDto);
+  async create(@Request() req, @Body() createQuestionDto: CreateQuestionDto) {
+    const created = await this.questionsService.create(createQuestionDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QBANK,
+      eventName: ACTIVITY_EVENTS.QUESTION_CREATED,
+      contextType: "question",
+      contextId: created?.id,
+      contextLabel: (created as { subject?: string })?.subject ?? created?.id,
+      ...ctx,
+    });
+    return created;
   }
 
   @Patch(":id")
@@ -308,10 +328,22 @@ export class QuestionsController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 403, description: "Admin role required" })
   async update(
+    @Request() req,
     @Param("id") id: string,
     @Body() updateQuestionDto: UpdateQuestionDto
   ) {
-    return this.questionsService.update(id, updateQuestionDto);
+    const updated = await this.questionsService.update(id, updateQuestionDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QBANK,
+      eventName: ACTIVITY_EVENTS.QUESTION_UPDATED,
+      contextType: "question",
+      contextId: id,
+      contextLabel: (updated as { subject?: string })?.subject ?? id,
+      ...ctx,
+    });
+    return updated;
   }
 
   @Delete("permanent/:id")
@@ -321,8 +353,20 @@ export class QuestionsController {
   @ApiOperation({ summary: "Permanently delete question (Admin only)" })
   @ApiResponse({ status: 200, description: "Question permanently deleted" })
   @ApiResponse({ status: 404, description: "Question not found" })
-  async removePermanent(@Param("id") id: string) {
-    return this.questionsService.removePermanent(id);
+  async removePermanent(@Request() req, @Param("id") id: string) {
+    const result = await this.questionsService.removePermanent(id);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QBANK,
+      eventName: ACTIVITY_EVENTS.QUESTION_DELETED,
+      contextType: "question",
+      contextId: id,
+      contextLabel: id,
+      metadata: { permanent: true },
+      ...ctx,
+    });
+    return result;
   }
 
   @Delete(":id")
@@ -333,8 +377,19 @@ export class QuestionsController {
   @ApiResponse({ status: 200, description: "Question marked inactive successfully" })
   @ApiResponse({ status: 404, description: "Question not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async remove(@Param("id") id: string) {
-    return this.questionsService.remove(id);
+  async remove(@Request() req, @Param("id") id: string) {
+    const result = await this.questionsService.remove(id);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.QBANK,
+      eventName: ACTIVITY_EVENTS.QUESTION_DELETED,
+      contextType: "question",
+      contextId: id,
+      contextLabel: id,
+      ...ctx,
+    });
+    return result;
   }
 
   @Post("choices")

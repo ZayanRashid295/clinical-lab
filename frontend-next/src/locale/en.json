@@ -113,6 +113,7 @@
     "questionGenerator": "Question Generator",
     "admin": "Administration",
     "users": "User Management",
+    "activityLogs": "Activity Logs",
     "roles": "Role Management",
     "profile": "Profile",
     "settings": "Settings",

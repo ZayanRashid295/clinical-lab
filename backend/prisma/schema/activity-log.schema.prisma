@@ -1,0 +1,26 @@
+// Moodle-style activity logging for admin audit trails
+
+model ActivityLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  affectedUserId String?
+  component      String
+  eventName      String
+  contextType    String?
+  contextId      String?
+  contextLabel   String?
+  ipAddress      String?
+  userAgent      String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  user         User? @relation("ActivityLogActor", fields: [userId], references: [id], onDelete: SetNull)
+  affectedUser User? @relation("ActivityLogAffected", fields: [affectedUserId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([affectedUserId, createdAt])
+  @@index([component, createdAt])
+  @@index([eventName, createdAt])
+  @@index([createdAt])
+  @@map("activity_logs")
+}

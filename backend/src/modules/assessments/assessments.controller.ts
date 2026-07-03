@@ -33,11 +33,20 @@ import { StartAssessmentDto } from "./dto/start-assessment.dto";
 import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
 import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 @ApiTags("assessments")
 @Controller("assessments")
 export class AssessmentsController {
-  constructor(private readonly assessmentsService: AssessmentsService) {}
+  constructor(
+    private readonly assessmentsService: AssessmentsService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   // ========== QUESTION PAPERS ==========
   @Get()
@@ -249,7 +258,19 @@ export class AssessmentsController {
     }
     // Override userId with authenticated user's ID
     createQuestionPaperDto.userId = authenticatedUserId;
-    return this.assessmentsService.create(createQuestionPaperDto);
+    const created = await this.assessmentsService.create(createQuestionPaperDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: authenticatedUserId,
+      affectedUserId: authenticatedUserId,
+      component: ACTIVITY_COMPONENTS.ASSESSMENT,
+      eventName: ACTIVITY_EVENTS.QUIZ_CREATED,
+      contextType: "question_paper",
+      contextId: created?.id,
+      contextLabel: created?.name ?? createQuestionPaperDto.name,
+      ...ctx,
+    });
+    return created;
   }
 
   @Patch(":id")
@@ -320,10 +341,23 @@ export class AssessmentsController {
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async startAssessment(
+    @Request() req,
     @Param("id") id: string,
     @Body() startAssessmentDto: StartAssessmentDto
   ) {
-    return this.assessmentsService.startAssessment(id, startAssessmentDto);
+    const result = await this.assessmentsService.startAssessment(id, startAssessmentDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.ASSESSMENT,
+      eventName: ACTIVITY_EVENTS.QUIZ_STARTED,
+      contextType: "question_paper",
+      contextId: id,
+      contextLabel: result?.questionPaper?.name,
+      ...ctx,
+    });
+    return result;
   }
 
   @Post(":id/submit")
@@ -341,11 +375,32 @@ export class AssessmentsController {
     @Param("id") id: string,
     @Body() submitAssessmentDto: SubmitAssessmentDto
   ) {
-    return this.assessmentsService.submitAssessment(
+    const result = await this.assessmentsService.submitAssessment(
       id,
       submitAssessmentDto,
       req.user?.userId
     );
+    const ctx = extractRequestContext(req);
+    const testHistory =
+      await this.assessmentsService.getQuestionPaperAuditSnapshot(id);
+    const paperName = testHistory?.questionPaper?.name ?? id;
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.ASSESSMENT,
+      eventName: ACTIVITY_EVENTS.QUIZ_SUBMITTED,
+      contextType: "question_paper",
+      contextId: id,
+      contextLabel: paperName,
+      metadata: {
+        score: result?.results?.score,
+        correctAnswers: result?.results?.correctAnswers,
+        totalQuestions: result?.results?.totalQuestions,
+        testHistory,
+      },
+      ...ctx,
+    });
+    return result;
   }
 
   @Get(":id/results")
@@ -358,8 +413,20 @@ export class AssessmentsController {
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  async getAssessmentResults(@Param("id") id: string) {
-    return this.assessmentsService.getAssessmentResults(id);
+  async getAssessmentResults(@Request() req, @Param("id") id: string) {
+    const result = await this.assessmentsService.getAssessmentResults(id);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user?.userId,
+      affectedUserId: req.user?.userId,
+      component: ACTIVITY_COMPONENTS.ASSESSMENT,
+      eventName: ACTIVITY_EVENTS.QUIZ_VIEWED,
+      contextType: "question_paper",
+      contextId: id,
+      contextLabel: result?.questionPaper?.name ?? id,
+      ...ctx,
+    });
+    return result;
   }
 
   @Post("questions")

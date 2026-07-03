@@ -20,29 +20,61 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { PatchUiPreferencesDto } from "./dto/patch-ui-preferences.dto";
 import { UsersService } from "../users/users.service";
 import { UpdateOwnProfileDto } from "../users/dto/update-own-profile.dto";
+import { ActivityLogService } from "../activity-log/activity-log.service";
+import {
+  ACTIVITY_COMPONENTS,
+  ACTIVITY_EVENTS,
+} from "../activity-log/activity-log.constants";
+import { extractRequestContext } from "../../common/utils/request-context.util";
 
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({ status: 201, description: "User successfully registered" })
   @ApiResponse({ status: 400, description: "Bad request" })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Request() req, @Body() registerDto: RegisterDto) {
+    const user = await this.authService.register(registerDto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: user.id,
+      affectedUserId: user.id,
+      component: ACTIVITY_COMPONENTS.AUTH,
+      eventName: ACTIVITY_EVENTS.USER_REGISTERED,
+      contextType: "user",
+      contextId: user.id,
+      contextLabel: `${user.firstName} ${user.lastName}`,
+      ...ctx,
+    });
+    return user;
   }
 
   @Post("login")
   @ApiOperation({ summary: "Login user" })
   @ApiResponse({ status: 200, description: "User successfully logged in" })
   @ApiResponse({ status: 401, description: "Invalid credentials" })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Request() req, @Body() loginDto: LoginDto) {
+    const result = await this.authService.login(loginDto);
+    const ctx = extractRequestContext(req);
+    const user = result.user as { id: string; firstName?: string; lastName?: string };
+    this.activityLogService.logAsync({
+      userId: user.id,
+      affectedUserId: user.id,
+      component: ACTIVITY_COMPONENTS.AUTH,
+      eventName: ACTIVITY_EVENTS.USER_LOGGED_IN,
+      contextType: "user",
+      contextId: user.id,
+      contextLabel: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
+      ...ctx,
+    });
+    return result;
   }
 
   @Get("profile")
@@ -96,7 +128,19 @@ export class AuthController {
     @Request() req,
     @Body() dto: UpdateOwnProfileDto
   ) {
-    return this.usersService.updateOwnProfile(req.user.userId, dto);
+    const updated = await this.usersService.updateOwnProfile(req.user.userId, dto);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user.userId,
+      affectedUserId: req.user.userId,
+      component: ACTIVITY_COMPONENTS.AUTH,
+      eventName: ACTIVITY_EVENTS.PROFILE_UPDATED,
+      contextType: "user",
+      contextId: req.user.userId,
+      contextLabel: updated?.email ?? req.user.userId,
+      ...ctx,
+    });
+    return updated;
   }
 
   @Post("logout")
@@ -106,10 +150,20 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "User successfully logged out" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async logout(@Request() req) {
-    // Extract token from Authorization header
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
+    const token = authHeader && authHeader.split(" ")[1];
 
-    return this.authService.logout(req.user.userId, token);
+    const result = await this.authService.logout(req.user.userId, token);
+    const ctx = extractRequestContext(req);
+    this.activityLogService.logAsync({
+      userId: req.user.userId,
+      affectedUserId: req.user.userId,
+      component: ACTIVITY_COMPONENTS.AUTH,
+      eventName: ACTIVITY_EVENTS.USER_LOGGED_OUT,
+      contextType: "user",
+      contextId: req.user.userId,
+      ...ctx,
+    });
+    return result;
   }
 }

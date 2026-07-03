@@ -16,6 +16,7 @@ import QuestionPaperManagementContent from "../src/app/components/Content/Questi
 import QuestionPaperQuestionManagementContent from "../src/app/components/Content/QuestionPaperQuestionManagementContent";
 import QuestionManagementContent from "../src/app/components/Content/QuestionManagementContent";
 import QuestionChoiceManagementContent from "../src/app/components/Content/QuestionChoiceManagementContent";
+import ActivityLogsManagementContent from "../src/app/components/Content/ActivityLogsManagementContent";
 import { transportationContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
@@ -230,7 +231,8 @@ export default function AdminPage() {
       roles: () => <RoleManagementContent />,
       "system-settings": () => <SystemSettingsContent />,
       reports: () => <SystemSettingsContent />, // Placeholder - ReportsContent not yet implemented
-      "audit-logs": () => <SystemSettingsContent />, // Placeholder - AuditLogsContent not yet implemented
+      "audit-logs": () => <ActivityLogsManagementContent />,
+      "activity-logs": () => <ActivityLogsManagementContent />,
       subscriptions: () => <SubscriptionManagementContent />,
       "subscriptions-list": () => <SubscriptionManagementContent />,
       "subscription-packages": () => <SubscriptionPackageManagementContent />,

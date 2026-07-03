@@ -29,7 +29,7 @@ import PerAnswerExplanationEditor from "./PerAnswerExplanationEditor"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { ApiHttpError, getApiErrorMessage } from "@/app/services/base/api-http-error"
 import { Editor } from "@tiptap/react"
-import { RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
+import { Loader2, RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
 import { runAutoMatch } from "../metadata-auto-match"
 import {
@@ -57,12 +57,21 @@ import {
 
 interface QuestionEditorProps {
   initialData?: Partial<QuestionCreatorData>
-  onSave: (data: QuestionCreatorData) => void
+  onSave: (data: QuestionCreatorData) => void | Promise<boolean | void>
   onCancel: () => void
   onPreviewModeChange?: (isPreview: boolean) => void
+  isSavingExternal?: boolean
+  saveBusyLabel?: string
 }
 
-export default function QuestionEditor({ initialData, onSave, onCancel, onPreviewModeChange }: QuestionEditorProps) {
+export default function QuestionEditor({
+  initialData,
+  onSave,
+  onCancel,
+  onPreviewModeChange,
+  isSavingExternal = false,
+  saveBusyLabel,
+}: QuestionEditorProps) {
   const { toast } = useToast()
   const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(() =>
     normalizeStemBlocksForDisplay(initialData?.stem || [])
@@ -1284,7 +1293,10 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
 
   const [saving, setSaving] = useState(false)
 
+  const isSaveBusy = saving || isSavingExternal
+
   const handleSave = useCallback(async () => {
+    if (saving || isSavingExternal) return
     setSaving(true)
     try {
       let metadataToSave = { ...metadata, questionId }
@@ -1305,7 +1317,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
         return
       }
 
-      onSave({
+      await onSave({
         stem: stemBlocks,
         choices,
         perAnswerExplanations,
@@ -1325,6 +1337,7 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
     onSave,
     parsedTopicName,
     toast,
+    isSavingExternal,
   ])
 
   const handleChoiceChange = useCallback(
@@ -1521,21 +1534,32 @@ export default function QuestionEditor({ initialData, onSave, onCancel, onPrevie
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" onClick={onCancel} disabled={isSaveBusy}>
               Cancel
             </Button>
-            <Button variant="outline" onClick={() => {
-              setIsPreviewMode(true)
-              onPreviewModeChange?.(true)
-            }}>
+            <Button
+              variant="outline"
+              disabled={isSaveBusy}
+              onClick={() => {
+                setIsPreviewMode(true)
+                onPreviewModeChange?.(true)
+              }}
+            >
               Preview
             </Button>
             <Button
               onClick={() => void handleSave()}
-              disabled={saving}
-              className="bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700"
+              disabled={isSaveBusy}
+              className="min-w-[7.5rem] bg-primary dark:bg-blue-600 text-primary-foreground dark:text-white hover:bg-primary/90 dark:hover:bg-blue-700 disabled:opacity-70"
             >
-              {saving ? "Saving..." : "Save"}
+              {isSaveBusy ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {saveBusyLabel ?? (isSavingExternal ? "Please wait…" : "Saving…")}
+                </>
+              ) : (
+                "Save"
+              )}
             </Button>
           </div>
         </div>

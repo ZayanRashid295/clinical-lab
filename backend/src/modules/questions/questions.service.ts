@@ -20,6 +20,7 @@ import {
   extractDocxHierarchyMetadata,
   getDocxCompletionMaxTokens,
 } from "./docx-hierarchy-metadata";
+import { sortQuestionsByCurriculumOrder, buildCurriculumOrderMaps } from "../../common/utils/question-curriculum-order.util";
 
 interface QuestionFilters {
   subtopicId?: string;
@@ -1502,16 +1503,16 @@ export class QuestionsService {
         include: {
           topics: {
             where: { isActive: true },
-            orderBy: { order: "asc" },
+            orderBy: [{ order: "asc" }, { createdAt: "asc" }],
             include: {
               subtopics: {
                 where: { isActive: true },
-                orderBy: { order: "asc" },
+                orderBy: [{ order: "asc" }, { createdAt: "asc" }],
               },
             },
           },
         },
-        orderBy: { order: "asc" },
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
       });
 
       const systemsWithData = systemsWithDataArr.map((system) => {
@@ -1650,8 +1651,20 @@ export class QuestionsService {
             },
           },
           system: { include: { product: { select: { id: true, name: true } } } },
-          topic: true,
-          subtopic: true,
+          topic: {
+            include: {
+              system: { select: { order: true } },
+            },
+          },
+          subtopic: {
+            include: {
+              topic: {
+                include: {
+                  system: { select: { order: true } },
+                },
+              },
+            },
+          },
         },
         orderBy: {
           createdAt: "asc",
@@ -1832,6 +1845,10 @@ export class QuestionsService {
           questions = [];
         }
       }
+
+      // Canonical curriculum order for newly assembled tests (system → topic → subtopic → createdAt).
+      const curriculumOrderMaps = await buildCurriculumOrderMaps(this.prisma);
+      questions = sortQuestionsByCurriculumOrder(questions, curriculumOrderMaps);
 
       // Check if user has ADMIN or SUPERADMIN role - bypass subscription checks
       const isAdmin = userRoles.includes('ADMIN') || userRoles.includes('SUPERADMIN');

@@ -72,6 +72,10 @@ model User {
   // Achievements / points
   points UserPoints?
 
+  // Activity logging
+  activityLogsAsActor    ActivityLog[] @relation("ActivityLogActor")
+  activityLogsAsAffected ActivityLog[] @relation("ActivityLogAffected")
+
   @@map("users")
 }
 

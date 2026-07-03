@@ -35,6 +35,7 @@ import { FeedbackModule } from "./modules/feedback/feedback.module";
 import { QuestionReportsModule } from "./modules/question-reports/question-reports.module";
 import { InstitutionModule } from "./modules/institution/institution.module";
 import { FacultyModule } from "./modules/faculty/faculty.module";
+import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { FacultyModule } from "./modules/faculty/faculty.module";
     QuestionReportsModule,
     InstitutionModule,
     FacultyModule,
+    ActivityLogModule,
   ],
 })
 export class AppModule {}
