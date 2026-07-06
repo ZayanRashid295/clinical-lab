@@ -5,9 +5,8 @@ import { MenuSystem, authService } from "../src/shared";
 import UserManagementContent from "../src/app/components/Content/UserManagementContent";
 import RoleManagementContent from "../src/app/components/Content/RoleManagementContent";
 import SystemSettingsContent from "../src/app/components/Content/SystemSettingsContent";
-import SubscriptionManagementContent from "../src/app/components/Content/SubscriptionManagementContent";
-import SubscriptionPackageManagementContent from "../src/app/components/Content/SubscriptionPackageManagementContent";
-import PackageFeatureManagementContent from "../src/app/components/Content/PackageFeatureManagementContent";
+import BillingPlanManagement from "../src/app/components/Billing/BillingPlanManagement";
+import PromotionManagement from "../src/app/components/Billing/PromotionManagement";
 import CategoryManagementContent from "../src/app/components/Content/CategoryManagementContent";
 import ProductManagementContent from "../src/app/components/Content/ProductManagementContent";
 import ProductSubtypeManagementContent from "../src/app/components/Content/ProductSubtypeManagementContent";
@@ -233,10 +232,8 @@ export default function AdminPage() {
       reports: () => <SystemSettingsContent />, // Placeholder - ReportsContent not yet implemented
       "audit-logs": () => <ActivityLogsManagementContent />,
       "activity-logs": () => <ActivityLogsManagementContent />,
-      subscriptions: () => <SubscriptionManagementContent />,
-      "subscriptions-list": () => <SubscriptionManagementContent />,
-      "subscription-packages": () => <SubscriptionPackageManagementContent />,
-      "package-features": () => <PackageFeatureManagementContent />,
+      "billing-plans": () => <BillingPlanManagement />,
+      "billing-promotions": () => <PromotionManagement />,
       categories: () => <CategoryManagementContent />,
       products: () => <ProductManagementContent />,
       "products-list": () => <ProductManagementContent />,

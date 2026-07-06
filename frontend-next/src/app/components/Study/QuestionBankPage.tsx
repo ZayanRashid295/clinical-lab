@@ -42,6 +42,10 @@ import {
 } from "@/app/services/student";
 import ReportQuestionButton from "@/app/components/Launch/ReportQuestionButton";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -82,6 +86,11 @@ const paperQuestionsService = new QuestionPaperQuestionsService();
 
 export default function QuestionBankPage() {
   const router = useRouter();
+  const {
+    handleSubscriptionError,
+    ensureAccess,
+    UpgradeModal,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.questionBank, "Question Bank");
   const [questions, setQuestions] = useState<ApiQuestion[]>([]);
   const [bookmarks, setBookmarks] = useState<BookmarkRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +137,9 @@ export default function QuestionBankPage() {
       setQuestions(list);
       setBookmarks(bRes);
     } catch (e: any) {
-      setError(getApiErrorMessage(e, "Failed to load questions"));
+      if (!handleSubscriptionError(e, "Question Bank")) {
+        setError(getApiErrorMessage(e, "Failed to load questions"));
+      }
     } finally {
       setLoading(false);
     }
@@ -233,6 +244,7 @@ export default function QuestionBankPage() {
 
   const launchPractice = async (questionIds: string[]) => {
     if (questionIds.length === 0) return;
+    if (!ensureAccess()) return;
     const user = authService.getCurrentUser();
     if (!user?.id) {
       setError("Please sign in to start a practice session");
@@ -289,10 +301,13 @@ export default function QuestionBankPage() {
       params.set("mode", "tutor");
       params.set("tutor", "true");
       params.set("questionPaperId", paperId);
+      params.set("from", "question-bank");
 
       window.location.href = `/question-generator/student?${params.toString()}`;
     } catch (e: any) {
-      setError(getApiErrorMessage(e, "Could not start practice"));
+      if (!handleSubscriptionError(e, "Question Bank")) {
+        setError(getApiErrorMessage(e, "Could not start practice"));
+      }
     } finally {
       setLaunching(false);
     }
@@ -701,6 +716,7 @@ export default function QuestionBankPage() {
           }}
         />
       )}
+      {UpgradeModal}
     </div>
   );
 }

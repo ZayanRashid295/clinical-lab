@@ -5,6 +5,7 @@ import {
   ConflictException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import * as bcrypt from "bcryptjs";
 import { LoginDto } from "./dto/login.dto";
@@ -128,16 +129,47 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const phoneTrimmed = registerDto.phone?.trim();
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        firstName: registerDto.firstName.trim(),
-        lastName: registerDto.lastName.trim(),
-        password: hashedPassword,
-        ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
-      },
-    });
+    const phoneTrimmed = registerDto.phone?.trim() || undefined;
+
+    if (phoneTrimmed) {
+      const existingPhone = await this.prisma.user.findFirst({
+        where: { phone: phoneTrimmed },
+      });
+      if (existingPhone) {
+        throw new ConflictException("An account with this phone number already exists");
+      }
+    }
+
+    let user;
+    try {
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          firstName: registerDto.firstName.trim(),
+          lastName: registerDto.lastName.trim(),
+          password: hashedPassword,
+          ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const target = Array.isArray(error.meta?.target)
+          ? error.meta.target.join(",")
+          : String(error.meta?.target ?? "");
+
+        if (target.includes("email")) {
+          throw new ConflictException("An account with this email already exists");
+        }
+        if (target.includes("phone")) {
+          throw new ConflictException("An account with this phone number already exists");
+        }
+        throw new ConflictException("An account with these details already exists");
+      }
+      throw error;
+    }
 
     await this.ensureStudentRole(user.id);
     await this.linkInstitutionForUser(user.id, email);

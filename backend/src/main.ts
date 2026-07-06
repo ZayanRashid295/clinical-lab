@@ -57,7 +57,7 @@ async function bootstrap() {
     .addTag("auth", "Authentication endpoints")
     .addTag("users", "User management")
     .addTag("rides", "Ride management")
-    .addTag("payments", "Payment processing")
+    .addTag("billing", "Subscription & billing")
     .addTag("notifications", "Notification system")
     .addTag("chat", "Chat and messaging")
     .addTag("locations", "Location services")

@@ -366,10 +366,10 @@ export class ActivityLogDetailsService {
     contextId: string,
     meta: Record<string, unknown>,
   ): Promise<ActivityLogDetailSection> {
-    const subscription = await this.prisma.subscription.findUnique({
+    const subscription = await this.prisma.billingSubscription.findUnique({
       where: { id: contextId },
       include: {
-        subscriptionPackage: { select: { name: true } },
+        plan: { select: { name: true } },
         user: {
           select: { email: true, firstName: true, lastName: true },
         },
@@ -382,8 +382,8 @@ export class ActivityLogDetailsService {
       fields: [
         { label: "Subscription ID", value: contextId },
         {
-          label: "Package",
-          value: subscription?.subscriptionPackage?.name ?? null,
+          label: "Plan",
+          value: subscription?.plan?.name ?? null,
         },
         { label: "Status", value: subscription?.status ?? null },
         {
@@ -393,12 +393,12 @@ export class ActivityLogDetailsService {
             : null,
         },
         {
-          label: "Start date",
-          value: subscription?.startDate?.toISOString() ?? null,
+          label: "Period start",
+          value: subscription?.currentPeriodStart?.toISOString() ?? null,
         },
         {
-          label: "End date",
-          value: subscription?.endDate?.toISOString() ?? null,
+          label: "Period end",
+          value: subscription?.currentPeriodEnd?.toISOString() ?? null,
         },
         ...(Object.entries(meta).map(([key, value]) => ({
           label: key.replace(/_/g, " "),

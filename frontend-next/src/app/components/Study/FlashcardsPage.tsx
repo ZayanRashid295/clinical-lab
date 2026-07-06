@@ -42,6 +42,11 @@ import {
   type CreateFlashcardPayload,
 } from "@/app/services/student";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -54,6 +59,12 @@ const blankDraft: CreateFlashcardPayload = {
 };
 
 export default function FlashcardsPage() {
+  const { confirm } = useConfirm();
+  const {
+    handleSubscriptionError,
+    ensureAccess,
+    UpgradeModal,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.flashcards, "Flashcards");
   const [tab, setTab] = useState<"review" | "library">("review");
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [stats, setStats] = useState<FlashcardsStats | null>(null);
@@ -80,7 +91,9 @@ export default function FlashcardsPage() {
       setCards(list);
       setStats(s);
     } catch (e) {
-      setError(getApiErrorMessage(e, "Failed to load flashcards"));
+      if (!handleSubscriptionError(e, "Flashcards")) {
+        setError(getApiErrorMessage(e, "Failed to load flashcards"));
+      }
     } finally {
       setLoading(false);
     }
@@ -124,6 +137,7 @@ export default function FlashcardsPage() {
   };
 
   const openCreate = () => {
+    if (!ensureAccess()) return;
     setEditing(null);
     setDraft({ ...blankDraft, deck: deck || "General" });
     setShowEditor(true);
@@ -142,6 +156,7 @@ export default function FlashcardsPage() {
 
   const save = async () => {
     if (!draft.front.trim() || !draft.back.trim()) return;
+    if (!editing && !ensureAccess()) return;
     setBusy(true);
     try {
       if (editing) {
@@ -152,19 +167,29 @@ export default function FlashcardsPage() {
       setShowEditor(false);
       await loadAll();
     } catch (e) {
-      setError(getApiErrorMessage(e, "Could not save card"));
+      if (!handleSubscriptionError(e, "Flashcards")) {
+        setError(getApiErrorMessage(e, "Could not save card"));
+      }
     } finally {
       setBusy(false);
     }
   };
 
   const remove = async (c: Flashcard) => {
-    if (!confirm("Delete this card?")) return;
+    const ok = await confirm({
+      title: "Delete flashcard?",
+      message: "This card will be removed from your library.",
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await flashcardsService.remove(c.id);
       await loadAll();
     } catch (e) {
-      setError(getApiErrorMessage(e, "Could not delete"));
+      if (!handleSubscriptionError(e, "Flashcards")) {
+        setError(getApiErrorMessage(e, "Could not delete"));
+      }
     }
   };
 
@@ -480,6 +505,7 @@ export default function FlashcardsPage() {
           </Card>
         </div>
       )}
+      {UpgradeModal}
     </div>
   );
 }

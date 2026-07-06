@@ -67,7 +67,7 @@ export class MockExamsController {
   @Post(":id/start")
   @ApiOperation({ summary: "Start a new attempt for a mock exam" })
   start(@Request() req, @Param("id") id: string) {
-    return this.service.start(req.user?.userId, id);
+    return this.service.start(req.user?.userId, id, req.user?.roles);
   }
 
   @Post("attempts/:attemptId/submit")

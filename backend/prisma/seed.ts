@@ -4,10 +4,10 @@ import { PrismaClient } from "@prisma/client";
 // import { seedLearningCases } from "./seed-learning-cases";
 import { seedBase } from "./seed-base";
 import { seedUSMLE } from "./seed-usmle";
-import { seedPayments } from "./seed-payments";
+import { seedBilling } from "./seed-billing";
+import { seedBetaPromotions } from "./seed-promotions";
 import { seedQuestions } from "./seed-questions";
 import { seedCategories } from "./seed-categories";
-import { seedSubscriptions } from "./seed-subscriptions";
 import { seedStudentContent } from "./seed-student-content";
 import { seedLaunch } from "./seed-launch";
 import { seedFaculty } from "./seed-faculty";
@@ -22,17 +22,15 @@ async function main() {
     // Seed base data first (users, roles, etc.)
     await seedBase(prisma);
 
-    // Seed payments (requires users to exist)
-    await seedPayments(prisma);
+    // Seed billing plans
+    await seedBilling(prisma);
+    await seedBetaPromotions(prisma);
 
     // Seed categories hierarchy first
     await seedCategories(prisma);
 
     // Seed content hierarchy (Product → Sections → Chapters → Topics) for question creation
     await seedUSMLE(prisma);
-
-    // Subscription packages + sample user subscriptions (needs products + users)
-    await seedSubscriptions(prisma);
 
     // Demo notes / flashcards / study tasks / bookmarks for the primary student
     await seedStudentContent(prisma);

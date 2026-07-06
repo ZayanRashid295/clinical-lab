@@ -182,6 +182,7 @@ export function isSubscriptionUpgradeRequiredError(e: unknown): boolean {
   return (
     msg.includes("entitlement") ||
     msg.includes("missing entitlements") ||
+    msg.includes("missing features") ||
     msg.includes("upgrade your subscription") ||
     msg.includes("access denied") ||
     msg.includes("required features") ||

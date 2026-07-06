@@ -111,7 +111,7 @@ export function AiTutorQuotaModal({
               View plans
             </Button>
           </Link>
-          <Link href="/my-subscription">
+          <Link href="/billing">
             <Button
               type="button"
               className="w-full bg-primary-600 text-white shadow-sm transition-colors hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35 sm:w-auto"

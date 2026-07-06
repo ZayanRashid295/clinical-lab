@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import {
   Dialog,
@@ -10,72 +11,59 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
-import { Lock, Sparkles } from "lucide-react";
+import { Crown, Sparkles } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
 
 export interface SubscriptionUpgradeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Short product name, e.g. "Study Planner" */
-  featureLabel: string;
+  featureLabel?: string;
 }
 
-/**
- * Shown when a 403 indicates the current subscription does not include a feature.
- * Keeps copy user-facing; avoids exposing internal entitlement keys.
- */
 export function SubscriptionUpgradeModal({
   open,
   onOpenChange,
   featureLabel,
 }: SubscriptionUpgradeModalProps) {
+  const feature = featureLabel ?? "This feature";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md gap-0 overflow-hidden border-border/60 p-0 shadow-xl">
-        <DialogHeader className="space-y-3 px-6 pt-6 pb-4 text-left border-b border-border/50 bg-gradient-to-br from-primary/[0.06] via-transparent to-transparent">
-          <div className="flex items-start gap-3">
-            <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/15"
-              aria-hidden
-            >
-              <Lock className="h-5 w-5 text-primary" />
-            </div>
-            <div className="min-w-0 space-y-1">
-              <DialogTitle className="text-lg font-semibold tracking-tight text-foreground pr-8">
-                {featureLabel} is not on your current plan
-              </DialogTitle>
-              <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
-                This area is included with a subscription that covers{" "}
-                <span className="font-medium text-foreground/90">{featureLabel}</span>.
-                You can review available plans and upgrade when you are ready—your
-                progress elsewhere in the app is not affected.
-              </DialogDescription>
-            </div>
+      <DialogContent
+        className={cn(
+          "overflow-hidden border-primary/25 p-0 sm:max-w-md",
+          "dark:border-primary/35"
+        )}
+      >
+        <div className="border-b border-primary/15 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent px-6 pb-5 pt-6 dark:border-primary/25 dark:from-primary/25 dark:via-primary/10">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+            <Crown className="h-6 w-6" />
           </div>
-        </DialogHeader>
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="text-xl">Upgrade your plan</DialogTitle>
+            <DialogDescription className="text-base leading-relaxed">
+              <span className="font-semibold text-foreground">{feature}</span> requires an active
+              subscription. Pick a plan and apply a promotion code at checkout if you have one.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="px-6 py-4 space-y-3">
-          <div className="flex gap-2 rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5 text-xs text-muted-foreground">
-            <Sparkles className="h-4 w-4 shrink-0 text-primary mt-0.5" aria-hidden />
-            <p className="leading-relaxed">
-              After upgrading, refresh this page or return from{" "}
-              <span className="font-medium text-foreground/90">My subscription</span>{" "}
-              to use {featureLabel} immediately.
+        <div className="space-y-3 px-6 py-4">
+          <div className="flex items-start gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2.5 dark:border-emerald-500/30 dark:bg-emerald-500/15">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <p className="text-sm text-emerald-800 dark:text-emerald-200">
+              Unlock question bank, study tools, and more with a paid plan.
             </p>
           </div>
         </div>
 
-        <DialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-end px-6 pb-6 pt-0 border-t-0">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full sm:w-auto"
-            onClick={() => onOpenChange(false)}
-          >
-            Close
+        <DialogFooter className="gap-2 border-t border-border/80 bg-muted/20 px-6 py-4 dark:border-white/10 dark:bg-white/[0.03] sm:gap-2">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Not now
           </Button>
-          <Button type="button" className="w-full sm:w-auto" asChild>
-            <Link href="/my-subscription" onClick={() => onOpenChange(false)}>
-              View plans and subscription
+          <Button asChild className="shadow-sm">
+            <Link href="/pricing" onClick={() => onOpenChange(false)}>
+              View plans
             </Link>
           </Button>
         </DialogFooter>
@@ -83,3 +71,5 @@ export function SubscriptionUpgradeModal({
     </Dialog>
   );
 }
+
+export default SubscriptionUpgradeModal;

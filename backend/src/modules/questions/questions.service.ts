@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../common/prisma/prisma.service";
-import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { BillingSubscriptionsService } from "../billing/subscriptions/billing-subscriptions.service";
 import * as fs from "fs";
 import * as path from "path";
 import { Express } from "express";
@@ -61,7 +61,7 @@ export class QuestionsService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigService,
-    private subscriptionsService: SubscriptionsService
+    private billingService: BillingSubscriptionsService
   ) {
     const openaiApiKey = this.configService.get<string>("OPENAI_API_KEY");
     if (openaiApiKey) {
@@ -1276,9 +1276,10 @@ export class QuestionsService {
     pool?: "unused" | "marked" | "incorrect" | "correct" | "omitted";
     marked?: boolean;
     userId?: string;
+    userRoles?: string[];
   }) {
     try {
-      const { pool, marked, userId } = options || {};
+      const { pool, marked, userId, userRoles = [] } = options || {};
 
       // Get all active product tags
       const systems = await this.prisma.system.findMany({
@@ -1602,6 +1603,11 @@ export class QuestionsService {
     try {
       const { systemIds = [], subjectIds = [], topicIds = [], subtopicIds = [], pool, marked, limit = 100, userId, userRoles = [] } = filters;
 
+      // Enforce qbank only when assembling an actual test session, not filter previews/counts.
+      if (userId && limit > 0 && limit <= 40) {
+        await this.billingService.assertCanUseQbank(userId, userRoles);
+      }
+
       // Build where clause
       const where: any = {
         isActive: true,
@@ -1850,87 +1856,7 @@ export class QuestionsService {
       const curriculumOrderMaps = await buildCurriculumOrderMaps(this.prisma);
       questions = sortQuestionsByCurriculumOrder(questions, curriculumOrderMaps);
 
-      // Check if user has ADMIN or SUPERADMIN role - bypass subscription checks
-      const isAdmin = userRoles.includes('ADMIN') || userRoles.includes('SUPERADMIN');
-      
-      // Check subscription status for non-subscribed users
-      // If user has no active subscription, always return the same 10 fixed demo questions
-      // But allow full count for count checks (when limit is very high or not set)
-      // ADMIN and SUPERADMIN bypass subscription checks
-      let hasActiveSubscription = false;
-      if (isAdmin) {
-        // ADMIN and SUPERADMIN have full access regardless of subscription
-        hasActiveSubscription = true;
-      } else if (userId) {
-        try {
-          const activeSubscriptions = await this.subscriptionsService.getUserSubscriptions(
-            userId,
-            "ACTIVE"
-          );
-          hasActiveSubscription = activeSubscriptions && activeSubscriptions.length > 0;
-        } catch (error) {
-          // If subscription check fails, assume no subscription (fail-safe)
-          console.error("Error checking subscription status:", error);
-          hasActiveSubscription = false;
-        }
-      }
-
-      // Determine if this is a count check or test generation
-      // Count checks typically set limit to 999+ or use default 100
-      // Test generation typically sets a specific limit (like 40)
-      const isCountCheck = limit >= 999;
-      const isTestGeneration = limit < 999 && limit > 0;
-
-      // For non-subscribed users during test generation, always return the same 10 fixed demo questions
-      if (!hasActiveSubscription && isTestGeneration) {
-        // Get or initialize the fixed demo question IDs
-        if (!this.demoQuestionIds) {
-          await this.initializeDemoQuestions();
-        }
-
-        // Fetch the fixed demo questions with full details
-        if (this.demoQuestionIds && this.demoQuestionIds.length > 0) {
-          const demoQuestions = await this.prisma.question.findMany({
-            where: {
-              id: { in: this.demoQuestionIds },
-              isActive: true,
-            },
-            include: {
-              choices: {
-                orderBy: { order: "asc" },
-              },
-              questionStemBlocks: {
-                orderBy: { order: "asc" },
-              },
-              explanationBlocks: {
-                orderBy: { order: "asc" },
-              },
-              perAnswerExplanations: {
-                include: {
-                  blocks: { orderBy: { order: "asc" } },
-                },
-              },
-              system: { include: { product: { select: { id: true, name: true } } } },
-              topic: true,
-              subtopic: true,
-            },
-          });
-
-          // Return the demo questions in the same order as stored IDs
-          const orderedDemoQuestions = this.demoQuestionIds
-            .map((id) => demoQuestions.find((q) => q.id === id))
-            .filter((q) => q !== undefined);
-
-          return orderedDemoQuestions;
-        }
-      } else if (hasActiveSubscription || isCountCheck) {
-        // Subscribed users or count checks: limit to requested amount
-        questions = questions.slice(0, limit || questions.length);
-      } else {
-        // No subscription but count check: return all for accurate count
-        questions = questions.slice(0, limit || questions.length);
-      }
-
+      questions = questions.slice(0, limit || questions.length);
       return questions;
     } catch (error) {
       console.error("Error fetching filtered questions:", error);

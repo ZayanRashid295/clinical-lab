@@ -32,6 +32,11 @@ import {
   type CreateNotePayload,
 } from "@/app/services/student";
 import { getApiErrorMessage } from "@/app/services/base/api-http-error";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -52,6 +57,12 @@ const blankNote: CreateNotePayload = {
 };
 
 export default function NotesPage() {
+  const { confirm } = useConfirm();
+  const {
+    handleSubscriptionError,
+    ensureAccess,
+    UpgradeModal,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.notes, "My Notes");
   const [notes, setNotes] = useState<StudentNote[]>([]);
   const [stats, setStats] = useState<{
     total: number;
@@ -78,7 +89,9 @@ export default function NotesPage() {
       setNotes(list);
       setStats(s);
     } catch (e: any) {
-      setError(getApiErrorMessage(e, "Failed to load notes"));
+      if (!handleSubscriptionError(e, "My Notes")) {
+        setError(getApiErrorMessage(e, "Failed to load notes"));
+      }
     } finally {
       setLoading(false);
     }
@@ -108,6 +121,7 @@ export default function NotesPage() {
   }, [notes, search]);
 
   const openCreate = () => {
+    if (!ensureAccess()) return;
     setEditing(null);
     setDraft(blankNote);
     setTagInput("");
@@ -129,6 +143,7 @@ export default function NotesPage() {
 
   const save = async () => {
     if (!draft.title.trim() || !draft.body.trim()) return;
+    if (!editing && !ensureAccess()) return;
     setBusy(true);
     try {
       if (editing) {
@@ -139,7 +154,9 @@ export default function NotesPage() {
       setShowEditor(false);
       await load();
     } catch (e: any) {
-      setError(getApiErrorMessage(e, "Could not save note"));
+      if (!handleSubscriptionError(e, "My Notes")) {
+        setError(getApiErrorMessage(e, "Could not save note"));
+      }
     } finally {
       setBusy(false);
     }
@@ -155,12 +172,20 @@ export default function NotesPage() {
   };
 
   const remove = async (n: StudentNote) => {
-    if (!confirm(`Delete note "${n.title}"?`)) return;
+    const ok = await confirm({
+      title: "Delete note?",
+      message: `"${n.title}" will be permanently removed.`,
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await notesService.remove(n.id);
       await load();
     } catch (e: any) {
-      setError(getApiErrorMessage(e, "Failed to delete note"));
+      if (!handleSubscriptionError(e, "My Notes")) {
+        setError(getApiErrorMessage(e, "Failed to delete note"));
+      }
     }
   };
 
@@ -437,6 +462,7 @@ export default function NotesPage() {
             </Card>
         </div>
       )}
+      {UpgradeModal}
     </div>
   );
 }

@@ -458,7 +458,7 @@ export default function TestSessionPage() {
                 className="w-full bg-emerald-600 hover:bg-emerald-700 sm:w-auto"
                 asChild
               >
-                <Link href="/my-subscription">View plans and subscription</Link>
+                <Link href="/billing">View plans and billing</Link>
               </Button>
               <Button variant="outline" className="w-full sm:w-auto" asChild>
                 <Link href="/previous-tests">Back to my tests</Link>

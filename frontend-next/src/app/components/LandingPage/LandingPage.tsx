@@ -346,7 +346,7 @@ export function LandingPage() {
   };
 
   const handlePackageSelect = (packageId: string) => {
-    if (isAuthenticated) void router.push(`/checkout-basic?packageId=${packageId}`);
+    if (isAuthenticated) void router.push(`/checkout?planId=${packageId}`);
     else goToAuth({ packageId });
   };
 

@@ -7,7 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { BillingSubscriptionsService } from "../billing/subscriptions/billing-subscriptions.service";
 import { AchievementsService } from "../achievements/achievements.service";
 import { AiTutorRole } from "@prisma/client";
 import {
@@ -34,7 +34,7 @@ export class AiTutorService {
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
-    private subscriptionsService: SubscriptionsService,
+    private billingService: BillingSubscriptionsService,
     private achievements: AchievementsService
   ) {
     const apiKey =
@@ -282,49 +282,37 @@ export class AiTutorService {
   }
 
   private async enforceAndConsumeChatQuota(userId: string) {
-    // Ensure the entitlement definition exists (so we can track usage consistently).
-    const entitlementDef = await this.prisma.entitlementDefinition.upsert({
-      where: { key: "aitutor.chat" },
-      update: {},
-      create: {
-        key: "aitutor.chat",
-        displayName: "AI Tutor Chat",
-        description: "Chat quota for AI Tutor",
-        type: "NUMBER_LIMIT" as any,
-        isActive: true,
-      },
-    });
-
-    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
-    const { limit, period } = this.resolveAiTutorChatQuota(
-      entitlements as Record<string, unknown>
-    );
-
-    const now = new Date();
-    let periodStart: Date;
-    let periodEnd: Date;
-
-    if (period === "MONTH") {
-      periodStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
-      periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
-    } else {
-      // default: DAY
-      periodStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
-      periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
-    }
-
-    if (limit <= 0) {
+    const features = await this.billingService.getUserFeatures(userId);
+    if (!features.includes("aitutor.chat")) {
       throw new ForbiddenException(
-        "AI Tutor is not included in your current subscription package, or your chat quota is set to zero. Add AI Tutor to your plan or upgrade to continue."
+        "AI Tutor is not included in your current plan. Upgrade to continue."
       );
     }
 
+    const sub = await this.billingService.getCurrentSubscription(userId);
+    const planFeatures = sub?.plan?.featuresJson;
+    let limit = this.config.get<number>("AI_TUTOR_CHAT_FALLBACK_LIMIT", 20);
+    if (Array.isArray(planFeatures)) {
+      const chatFeature = planFeatures.find(
+        (f: any) => f?.key === "aitutor.chat" && typeof f?.limit === "number"
+      ) as { limit?: number } | undefined;
+      if (chatFeature?.limit != null) limit = chatFeature.limit;
+    }
+
+    const now = new Date();
+    const periodStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
+    const periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+
+    if (limit <= 0) {
+      throw new ForbiddenException("AI Tutor chat quota is not available on your plan.");
+    }
+
     await this.prisma.$transaction(async (tx) => {
-      const usage = await tx.entitlementUsage.findUnique({
+      const usage = await tx.billingFeatureUsage.findUnique({
         where: {
-          userId_entitlementDefinitionId_periodStart_periodEnd: {
+          userId_featureKey_periodStart_periodEnd: {
             userId,
-            entitlementDefinitionId: entitlementDef.id,
+            featureKey: "aitutor.chat",
             periodStart,
             periodEnd,
           },
@@ -334,25 +322,16 @@ export class AiTutorService {
       const used = usage?.usedCount ?? 0;
       if (used >= limit) {
         throw new ForbiddenException(
-          period === "MONTH"
-            ? `AI Tutor chat limit reached (${used}/${limit} this month). Upgrade your plan or wait until your quota resets.`
-            : `AI Tutor chat limit reached (${used}/${limit} today). Upgrade your plan or wait until your quota resets.`
+          `AI Tutor chat limit reached (${used}/${limit} today). Upgrade your plan or wait until your quota resets.`
         );
       }
 
       if (!usage) {
-        await tx.entitlementUsage.create({
-          data: {
-            userId,
-            entitlementDefinitionId: entitlementDef.id,
-            periodStart,
-            periodEnd,
-            usedCount: 1,
-            metadataJson: { source: "ai-tutor" },
-          },
+        await tx.billingFeatureUsage.create({
+          data: { userId, featureKey: "aitutor.chat", periodStart, periodEnd, usedCount: 1 },
         });
       } else {
-        await tx.entitlementUsage.update({
+        await tx.billingFeatureUsage.update({
           where: { id: usage.id },
           data: { usedCount: { increment: 1 } },
         });

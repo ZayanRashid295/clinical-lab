@@ -10,11 +10,8 @@ import { TokenBlacklistService } from "./token-blacklist.service";
 import { JwtAuthWithBlacklistGuard } from "./guards/jwt-auth-with-blacklist.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { PermissionsGuard } from "./guards/permissions.guard";
-import { SubscriptionGuard } from "./guards/subscription.guard";
-import { FeatureGuard } from "./guards/feature.guard";
-import { CombinedAccessGuard } from "./guards/combined-access.guard";
-import { EntitlementGuard } from "./guards/entitlement.guard";
-import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
+import { FeatureAccessGuard } from "../billing/guards/feature-access.guard";
+import { BillingModule } from "../billing/billing.module";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { UsersModule } from "../users/users.module";
 import { InstitutionModule } from "../institution/institution.module";
@@ -25,8 +22,8 @@ import { ActivityLogModule } from "../activity-log/activity-log.module";
     PassportModule,
     UsersModule,
     InstitutionModule,
-    SubscriptionsModule, // Import to use SubscriptionsService in guards
-    NotificationsModule, // Welcome notification on signup
+    forwardRef(() => BillingModule),
+    NotificationsModule,
     forwardRef(() => ActivityLogModule),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
@@ -47,22 +44,16 @@ import { ActivityLogModule } from "../activity-log/activity-log.module";
     JwtAuthWithBlacklistGuard,
     RolesGuard,
     PermissionsGuard,
-    SubscriptionGuard,
-    FeatureGuard,
-    CombinedAccessGuard,
-    EntitlementGuard,
+    FeatureAccessGuard,
   ],
   exports: [
     AuthService,
+    TokenBlacklistService,
+    JwtAuthWithBlacklistGuard,
     RolesGuard,
     PermissionsGuard,
-    SubscriptionGuard,
-    FeatureGuard,
-    CombinedAccessGuard,
-    EntitlementGuard,
-    // Re-export so feature modules that import AuthModule can resolve
-    // EntitlementGuard → SubscriptionsService without importing SubscriptionsModule.
-    SubscriptionsModule,
+    FeatureAccessGuard,
+    BillingModule,
   ],
 })
 export class AuthModule {}

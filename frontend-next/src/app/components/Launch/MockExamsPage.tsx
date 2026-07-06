@@ -29,6 +29,10 @@ import {
 } from "@/app/services/launch";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -42,6 +46,10 @@ const DIFF_COLORS: Record<string, string> = {
 export default function MockExamsPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { ensureAccess, handleSubscriptionError, UpgradeModal } = useStudyFeatureGate(
+    STUDY_FEATURE_KEYS.questionBank,
+    "Mock Exams"
+  );
   const [tab, setTab] = useState<"available" | "history">("available");
   const [exams, setExams] = useState<MockExam[]>([]);
   const [attempts, setAttempts] = useState<MockExamAttempt[]>([]);
@@ -70,13 +78,16 @@ export default function MockExamsPage() {
   }, []);
 
   const onStart = async (exam: MockExam) => {
+    if (!ensureAccess({ requireSubscription: true })) return;
+
     setStarting(exam.id);
     try {
       const { questionPaperId } = await mockExamsService.start(exam.id);
       router.push(
-        `/question-generator/student?questionPaperId=${questionPaperId}&mode=tutor&tutor=true&limit=${exam.totalQuestions}`
+        `/question-generator/student?questionPaperId=${questionPaperId}&mode=tutor&tutor=true&limit=${exam.totalQuestions}&from=mock-exam`
       );
     } catch (e) {
+      if (handleSubscriptionError(e, "Mock Exams")) return;
       toastApiError(toast, e, "Couldn’t start exam");
     } finally {
       setStarting(null);
@@ -245,6 +256,7 @@ export default function MockExamsPage() {
           )}
         </div>
       )}
+      {UpgradeModal}
     </div>
   );
 }

@@ -22,7 +22,7 @@ export const NAV_SIDEBAR_SECTIONS: readonly NavSidebarSectionDef[] = [
     id: "overview",
     labelKey: "nav.section.overview",
     /** Dashboard + student entry points; keep students from an empty Overview section */
-    menuItemIds: ["dashboard", "my-subscription", "achievements"],
+    menuItemIds: ["dashboard", "billing", "achievements"],
   },
   {
     id: "content",

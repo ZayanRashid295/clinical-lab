@@ -124,13 +124,6 @@ export class ProductsService {
 
     return this.prisma.productSubtype.findMany({
       where,
-      include: {
-        subscriptionPackages: {
-          include: {
-            subscriptionFeatures: { include: { packageFeature: true } },
-          },
-        },
-      },
       orderBy: { name: "asc" },
     });
   }
@@ -274,53 +267,13 @@ export class ProductsService {
   }
 
   /**
-   * Removes subtypes, their packages, user subscriptions, and linked payments so the product can be deleted.
+   * Removes product subtypes before product deletion.
    */
   private async deleteProductSubtypeCommercialChainInTx(
     tx: Prisma.TransactionClient,
     productId: string,
   ): Promise<void> {
-    const subtypes = await tx.productSubtype.findMany({
-      where: { productId },
-      select: { id: true },
-    });
-    const subtypeIds = subtypes.map((s) => s.id);
-    if (subtypeIds.length === 0) return;
-
-    const packages = await tx.subscriptionPackage.findMany({
-      where: { productSubtypeId: { in: subtypeIds } },
-      select: { id: true },
-    });
-    const packageIds = packages.map((p) => p.id);
-
-    if (packageIds.length > 0) {
-      const subscriptions = await tx.subscription.findMany({
-        where: { subscriptionPackageId: { in: packageIds } },
-        select: { id: true },
-      });
-      const subscriptionIds = subscriptions.map((s) => s.id);
-
-      if (subscriptionIds.length > 0) {
-        const payments = await tx.payment.findMany({
-          where: { subscriptionId: { in: subscriptionIds } },
-          select: { id: true },
-        });
-        const paymentIds = payments.map((p) => p.id);
-        if (paymentIds.length > 0) {
-          await tx.promoCodeUsage.deleteMany({ where: { paymentId: { in: paymentIds } } });
-          await tx.walletTransaction.deleteMany({ where: { paymentId: { in: paymentIds } } });
-          await tx.refund.deleteMany({ where: { paymentId: { in: paymentIds } } });
-          await tx.payment.deleteMany({ where: { id: { in: paymentIds } } });
-        }
-        await tx.subscription.deleteMany({ where: { id: { in: subscriptionIds } } });
-      }
-      await tx.subscriptionFeatures.deleteMany({
-        where: { subscriptionPackageId: { in: packageIds } },
-      });
-      await tx.subscriptionPackage.deleteMany({ where: { id: { in: packageIds } } });
-    }
-
-    await tx.productSubtype.deleteMany({ where: { id: { in: subtypeIds } } });
+    await tx.productSubtype.deleteMany({ where: { productId } });
   }
 
   /**
@@ -394,7 +347,6 @@ export class ProductsService {
 
       const include = {
         product: { select: { id: true, name: true } },
-        subscriptionPackages: { select: { id: true, name: true } },
       };
 
       if (query.listAll) {
@@ -422,9 +374,6 @@ export class ProductsService {
       where: { id },
       include: {
         product: { select: { id: true, name: true } },
-        subscriptionPackages: {
-          include: { subscriptionFeatures: { include: { packageFeature: true } } },
-        },
       },
     });
     if (!subtype) throw new NotFoundException(`Product subtype with ID ${id} not found`);

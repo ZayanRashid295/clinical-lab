@@ -26,7 +26,7 @@ export function AuthRoutePage() {
     if (!router.isReady) return;
     if (authService.isAuthenticated()) {
       const dest = packageId
-        ? `/checkout-basic?packageId=${encodeURIComponent(packageId)}`
+        ? `/checkout?planId=${encodeURIComponent(packageId)}`
         : "/";
       void router.replace(dest);
       return;

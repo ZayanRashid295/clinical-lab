@@ -35,6 +35,11 @@ import {
 } from "@/app/services/launch";
 import { useToast } from "@/shared/ui/use-toast";
 import { toastApiError } from "@/app/services/base/api-http-error";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -51,6 +56,12 @@ const PERIODS: GoalPeriod[] = ["DAILY", "WEEKLY", "MONTHLY"];
 
 export default function GoalsPage() {
   const { toast } = useToast();
+  const { confirm } = useConfirm();
+  const {
+    handleSubscriptionError,
+    ensureAccess,
+    UpgradeModal,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.planner, "Goals");
   const [goals, setGoals] = useState<GoalWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -83,6 +94,7 @@ export default function GoalsPage() {
   }, []);
 
   const openCreate = () => {
+    if (!ensureAccess()) return;
     setEditing(null);
     setDraft({
       title: "",
@@ -112,6 +124,7 @@ export default function GoalsPage() {
 
   const onSave = async () => {
     if (!draft.title.trim() || draft.target <= 0) return;
+    if (!editing && !ensureAccess()) return;
     setSaving(true);
     try {
       if (editing) {
@@ -122,7 +135,9 @@ export default function GoalsPage() {
       setShowEditor(false);
       load();
     } catch (e) {
-      toastApiError(toast, e, "Couldn’t save goal");
+      if (!handleSubscriptionError(e, "Goals")) {
+        toastApiError(toast, e, "Couldn’t save goal");
+      }
     } finally {
       setSaving(false);
     }
@@ -138,12 +153,20 @@ export default function GoalsPage() {
   };
 
   const onDelete = async (g: Goal) => {
-    if (!confirm(`Delete goal "${g.title}"?`)) return;
+    const ok = await confirm({
+      title: "Delete goal?",
+      message: `"${g.title}" will be permanently removed.`,
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await goalsService.remove(g.id);
       load();
     } catch (e) {
-      toastApiError(toast, e, "Couldn’t delete goal");
+      if (!handleSubscriptionError(e, "Goals")) {
+        toastApiError(toast, e, "Couldn’t delete goal");
+      }
     }
   };
 
@@ -385,6 +408,7 @@ export default function GoalsPage() {
           </Card>
         </div>
       )}
+      {UpgradeModal}
     </div>
   );
 }

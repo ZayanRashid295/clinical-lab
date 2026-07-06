@@ -1,0 +1,243 @@
+/**
+ * Professional UI density — aligns app pages with Landing Page 2 at 100% zoom.
+ * Imported AFTER Tailwind utilities so overrides win the cascade.
+ * Landing (.medprep-landing-v2) and auth (.mkt-auth-page) are excluded.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+
+.medprep-site-root {
+  font-family: "Source Sans 3", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App shell (dashboard, study, admin, etc.) ── */
+.medprep-app-ui {
+  font-size: 14px !important;
+  line-height: 1.45;
+  color: var(--app-text);
+}
+
+.medprep-app-ui h1 {
+  font-size: 1.375rem !important;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.medprep-app-ui h2 {
+  font-size: 1.1875rem !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.medprep-app-ui h3 {
+  font-size: 1.0625rem !important;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.medprep-app-ui h4,
+.medprep-app-ui h5,
+.medprep-app-ui h6 {
+  font-size: 0.9375rem !important;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Tailwind text utilities — compact scale inside app UI */
+.medprep-app-ui .text-xs {
+  font-size: 0.6875rem !important;
+  line-height: 1rem !important;
+}
+
+.medprep-app-ui .text-sm {
+  font-size: 0.8125rem !important;
+  line-height: 1.25rem !important;
+}
+
+.medprep-app-ui .text-base {
+  font-size: 0.875rem !important;
+  line-height: 1.375rem !important;
+}
+
+.medprep-app-ui .text-lg {
+  font-size: 0.9375rem !important;
+  line-height: 1.5rem !important;
+}
+
+.medprep-app-ui .text-xl {
+  font-size: 1.0625rem !important;
+  line-height: 1.5rem !important;
+}
+
+.medprep-app-ui .text-2xl {
+  font-size: 1.1875rem !important;
+  line-height: 1.5rem !important;
+}
+
+.medprep-app-ui .text-3xl {
+  font-size: 1.3125rem !important;
+  line-height: 1.625rem !important;
+}
+
+.medprep-app-ui .text-4xl {
+  font-size: 1.4375rem !important;
+  line-height: 1.75rem !important;
+}
+
+.medprep-app-ui .text-5xl {
+  font-size: 1.625rem !important;
+  line-height: 1.875rem !important;
+}
+
+.medprep-app-ui .text-6xl {
+  font-size: 1.875rem !important;
+  line-height: 2rem !important;
+}
+
+@media (min-width: 640px) {
+  .medprep-app-ui .sm\:text-lg {
+    font-size: 0.9375rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .medprep-app-ui .sm\:text-xl {
+    font-size: 1.0625rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .medprep-app-ui .sm\:text-2xl {
+    font-size: 1.1875rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .medprep-app-ui .sm\:text-3xl {
+    font-size: 1.3125rem !important;
+    line-height: 1.625rem !important;
+  }
+
+  .medprep-app-ui .sm\:text-4xl {
+    font-size: 1.4375rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  .medprep-app-ui .sm\:text-5xl {
+    font-size: 1.625rem !important;
+    line-height: 1.875rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .medprep-app-ui .lg\:text-2xl {
+    font-size: 1.1875rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .medprep-app-ui .lg\:text-3xl {
+    font-size: 1.3125rem !important;
+    line-height: 1.625rem !important;
+  }
+
+  .medprep-app-ui .lg\:text-4xl {
+    font-size: 1.4375rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  .medprep-app-ui .lg\:text-5xl {
+    font-size: 1.625rem !important;
+    line-height: 1.875rem !important;
+  }
+}
+
+/* Form controls */
+.medprep-app-ui [data-slot="input"] {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  font-size: 0.8125rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.medprep-app-ui [data-slot="button"]:not([class*="size-icon"]) {
+  font-size: 0.8125rem !important;
+}
+
+.medprep-app-ui [data-slot="button"].h-9,
+.medprep-app-ui [data-slot="button"][class*="size-sm"] {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.medprep-app-ui [data-slot="button"].h-10,
+.medprep-app-ui [data-slot="button"][class*="size-lg"] {
+  height: 2.125rem !important;
+  min-height: 2.125rem !important;
+}
+
+.medprep-app-ui [data-slot="card-title"] {
+  font-size: 0.875rem !important;
+  font-weight: 600;
+}
+
+.medprep-app-ui [data-slot="card-description"] {
+  font-size: 0.75rem !important;
+}
+
+/* Tighter cards site-wide inside app shell */
+.medprep-app-ui [data-slot="card"] {
+  gap: 0.75rem !important;
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+  border-radius: 0.625rem !important;
+}
+
+.medprep-app-ui [data-slot="card-header"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.medprep-app-ui [data-slot="card-content"],
+.medprep-app-ui [data-slot="card-footer"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Narrower sidebar */
+.medprep-app-shell .w-56 {
+  width: 13.5rem !important;
+}
+
+/* ── Marketing/auth (not landing v2 or dedicated auth page) ── */
+.marketing-surface:not(.medprep-landing-v2):not(.mkt-auth-page) {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.marketing-surface:not(.medprep-landing-v2):not(.mkt-auth-page) .text-3xl {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.marketing-surface:not(.medprep-landing-v2):not(.mkt-auth-page) .text-4xl {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.marketing-surface:not(.medprep-landing-v2):not(.mkt-auth-page) .text-lg {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+.marketing-surface:not(.medprep-landing-v2):not(.mkt-auth-page) .text-base {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* Auth — fixed 17px base (matches Landing Page 2) */
+.marketing-surface.mkt-auth-page {
+  font-size: 17px;
+  line-height: 1.5;
+}

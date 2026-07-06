@@ -1,14 +1,12 @@
 // Main API service that aggregates all module-specific services
 import { authService } from "./auth.service";
 import { usersService } from "./users.service";
-import { paymentsService } from "./payments.service";
+import { billingService } from "@/app/services/billing/billing.service";
 import { notificationsService } from "./notifications.service";
 import { chatService } from "./chat.service";
-import { payoutsService } from "./payouts.service";
 import { adminService } from "./admin.service";
 
 class ApiService {
-  // Auth endpoints
   async login(email: string, password: string): Promise<any> {
     return authService.login(email, password);
   }
@@ -25,7 +23,6 @@ class ApiService {
     return authService.logout();
   }
 
-  // User endpoints
   async getUsers(): Promise<any> {
     return usersService.getUsers();
   }
@@ -38,37 +35,14 @@ class ApiService {
     return usersService.updateUser(id, userData);
   }
 
-  // Payment endpoints
-  async getPayments(): Promise<any> {
-    return paymentsService.getPayments();
+  async getMyBilling(): Promise<any> {
+    return billingService.getMyBilling();
   }
 
-  async createPayment(paymentData: any): Promise<any> {
-    return paymentsService.createPayment(paymentData);
+  async getPublicPlans(): Promise<any> {
+    return billingService.getPublicPlans();
   }
 
-  async getPayment(id: string): Promise<any> {
-    return paymentsService.getPayment(id);
-  }
-
-  // Payment method endpoints
-  async getPaymentMethods(userId?: string): Promise<any> {
-    return paymentsService.getPaymentMethods(userId);
-  }
-
-  async createPaymentMethod(methodData: any): Promise<any> {
-    return paymentsService.createPaymentMethod(methodData);
-  }
-
-  async updatePaymentMethod(id: string, methodData: any): Promise<any> {
-    return paymentsService.updatePaymentMethod(id, methodData);
-  }
-
-  async deletePaymentMethod(id: string): Promise<any> {
-    return paymentsService.deletePaymentMethod(id);
-  }
-
-  // Notification endpoints
   async getNotifications(): Promise<any> {
     return notificationsService.getNotifications();
   }
@@ -77,7 +51,6 @@ class ApiService {
     return notificationsService.markNotificationAsRead(id);
   }
 
-  // Chat endpoints
   async getChatRooms(): Promise<any> {
     return chatService.getChatRooms();
   }
@@ -94,79 +67,6 @@ class ApiService {
     return chatService.getRoomMessages(roomId);
   }
 
-  // Payout endpoints
-  async getPayouts(params?: any): Promise<any> {
-    return payoutsService.getPayouts(params);
-  }
-
-  async getPayout(id: string): Promise<any> {
-    return payoutsService.getPayout(id);
-  }
-
-  async createPayout(payoutData: any): Promise<any> {
-    return payoutsService.createPayout(payoutData);
-  }
-
-  async updatePayout(id: string, payoutData: any): Promise<any> {
-    return payoutsService.updatePayout(id, payoutData);
-  }
-
-  async deletePayout(id: string): Promise<any> {
-    return payoutsService.deletePayout(id);
-  }
-
-  async getDriverPayouts(driverId: string, params?: any): Promise<any> {
-    return payoutsService.getDriverPayouts(driverId, params);
-  }
-
-  // Earnings endpoints
-  async getEarnings(params?: any): Promise<any> {
-    return payoutsService.getEarnings(params);
-  }
-
-  async getDriverEarnings(driverId: string, params?: any): Promise<any> {
-    return payoutsService.getDriverEarnings(driverId, params);
-  }
-
-  async getPendingEarnings(driverId: string): Promise<any> {
-    return payoutsService.getPendingEarnings(driverId);
-  }
-
-  async createEarnings(earningsData: any): Promise<any> {
-    return payoutsService.createEarnings(earningsData);
-  }
-
-  async calculateEarningsForRide(rideId: string): Promise<any> {
-    return payoutsService.calculateEarningsForRide(rideId);
-  }
-
-  // Payout settings endpoints
-  async getPayoutSettings(driverId: string): Promise<any> {
-    return payoutsService.getPayoutSettings(driverId);
-  }
-
-  async updatePayoutSettings(
-    driverId: string,
-    settingsData: any
-  ): Promise<any> {
-    return payoutsService.updatePayoutSettings(driverId, settingsData);
-  }
-
-  // Payout statistics endpoints
-  async getPayoutStats(): Promise<any> {
-    return payoutsService.getPayoutStats();
-  }
-
-  async getDriverPayoutStats(driverId: string): Promise<any> {
-    return payoutsService.getDriverPayoutStats(driverId);
-  }
-
-  // Admin payout endpoints
-  async processScheduledPayouts(): Promise<any> {
-    return payoutsService.processScheduledPayouts();
-  }
-
-  // Admin endpoints
   async getSystemStats(): Promise<any> {
     return adminService.getSystemStats();
   }

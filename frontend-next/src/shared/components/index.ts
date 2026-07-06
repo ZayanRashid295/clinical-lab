@@ -19,5 +19,16 @@ export { iconMap } from "./Common/IconMap";
 // Placeholder components
 export { default as UnderConstruction } from "./placeholders/under-construction";
 
+export {
+  SubscriptionUpgradeModal,
+  type SubscriptionUpgradeModalProps,
+} from "./SubscriptionUpgradeModal";
+
+export {
+  useSubscriptionUpgradeModal,
+  useStudyFeatureGate,
+  STUDY_FEATURE_KEYS,
+} from "@/hooks/useSubscriptionUpgradeModal";
+
 // Default export
 export { default } from "./MenuSystem";

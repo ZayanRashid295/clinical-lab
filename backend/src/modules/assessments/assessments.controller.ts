@@ -19,11 +19,8 @@ import {
 } from "@nestjs/swagger";
 import { AssessmentsService } from "./assessments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { SubscriptionGuard } from "../auth/guards/subscription.guard";
 import { FeatureGuard } from "../auth/guards/feature.guard";
-import { CombinedAccessGuard } from "../auth/guards/combined-access.guard";
-import { RequireActiveSubscription } from "../auth/decorators/subscription.decorator";
-import { RequiredFeatures } from "../auth/decorators/features.decorator";
+import { RequiredEntitlements } from "../auth/decorators/entitlements.decorator";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CreateQuestionPaperDto } from "./dto/create-question-paper.dto";
 import { UpdateQuestionPaperDto } from "./dto/update-question-paper.dto";
@@ -39,6 +36,7 @@ import {
   ACTIVITY_EVENTS,
 } from "../activity-log/activity-log.constants";
 import { extractRequestContext } from "../../common/utils/request-context.util";
+import { BillingSubscriptionsService } from "../billing/subscriptions/billing-subscriptions.service";
 
 @ApiTags("assessments")
 @Controller("assessments")
@@ -46,6 +44,7 @@ export class AssessmentsController {
   constructor(
     private readonly assessmentsService: AssessmentsService,
     private readonly activityLogService: ActivityLogService,
+    private readonly billingService: BillingSubscriptionsService,
   ) {}
 
   // ========== QUESTION PAPERS ==========
@@ -238,7 +237,8 @@ export class AssessmentsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create new question paper" })
   @ApiResponse({
@@ -247,15 +247,16 @@ export class AssessmentsController {
   })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank access required" })
   async create(
     @Request() req,
     @Body() createQuestionPaperDto: CreateQuestionPaperDto
   ) {
-    // Ensure users can only create tests for themselves
     const authenticatedUserId = req.user?.userId;
     if (!authenticatedUserId) {
       throw new Error("User not authenticated");
     }
+    await this.billingService.assertCanUseQbank(authenticatedUserId, req.user?.roles);
     // Override userId with authenticated user's ID
     createQuestionPaperDto.userId = authenticatedUserId;
     const created = await this.assessmentsService.create(createQuestionPaperDto);
@@ -430,7 +431,8 @@ export class AssessmentsController {
   }
 
   @Post("questions")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create question paper question (Admin only)" })
   @ApiResponse({
@@ -439,16 +441,20 @@ export class AssessmentsController {
   })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank access required" })
   async createQuestionPaperQuestion(
+    @Request() req,
     @Body() createQuestionPaperQuestionDto: CreateQuestionPaperQuestionDto
   ) {
+    await this.billingService.assertCanUseQbank(req.user?.userId, req.user?.roles);
     return this.assessmentsService.createQuestionPaperQuestion(
       createQuestionPaperQuestionDto
     );
   }
 
   @Post(":questionPaperId/questions")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FeatureGuard)
+  @RequiredEntitlements("qbank.access")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Add question to question paper" })
   @ApiResponse({
@@ -457,10 +463,13 @@ export class AssessmentsController {
   })
   @ApiResponse({ status: 404, description: "Question paper not found" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 403, description: "Qbank access required" })
   async addQuestionToPaper(
+    @Request() req,
     @Param("questionPaperId") questionPaperId: string,
     @Body() createQuestionPaperQuestionDto: CreateQuestionPaperQuestionDto
   ) {
+    await this.billingService.assertCanUseQbank(req.user?.userId, req.user?.roles);
     return this.assessmentsService.addQuestionToPaper(
       questionPaperId,
       createQuestionPaperQuestionDto

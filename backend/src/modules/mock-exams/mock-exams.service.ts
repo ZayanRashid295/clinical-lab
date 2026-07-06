@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { AchievementsService } from "../achievements/achievements.service";
+import { BillingSubscriptionsService } from "../billing/subscriptions/billing-subscriptions.service";
 import {
   CreateMockExamDto,
   SubmitMockExamDto,
@@ -18,7 +19,8 @@ export class MockExamsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
-    private achievements: AchievementsService
+    private achievements: AchievementsService,
+    private billingService: BillingSubscriptionsService
   ) {}
 
   // ---------- catalog ----------
@@ -101,7 +103,9 @@ export class MockExamsService {
   }
 
   // ---------- attempts ----------
-  async start(userId: string, mockExamId: string) {
+  async start(userId: string, mockExamId: string, userRoles?: unknown) {
+    await this.billingService.assertCanUseQbank(userId, userRoles);
+
     const exam = await this.findOne(mockExamId);
     if (!exam.isPublished) {
       throw new ForbiddenException("This mock exam is not available");

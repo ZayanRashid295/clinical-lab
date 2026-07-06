@@ -46,7 +46,8 @@ import {
   getApiErrorMessage,
   isSubscriptionUpgradeRequiredError,
 } from "@/app/services/base/api-http-error";
-import { SubscriptionUpgradeModal } from "@/shared/components/SubscriptionUpgradeModal";
+import { useSubscriptionUpgradeModal } from "@/hooks/useSubscriptionUpgradeModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
 
@@ -89,13 +90,14 @@ function classify(t: StudyTask): "upcoming" | "overdue" | "completed" {
 
 export default function StudyPlannerPage() {
   const router = useRouter();
+  const { confirm } = useConfirm();
+  const { openUpgrade, UpgradeModal } = useSubscriptionUpgradeModal("Study Planner");
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [progress, setProgress] = useState<StudyPlanProgress | null>(null);
   const [tasks, setTasks] = useState<StudyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   const [showTaskEditor, setShowTaskEditor] = useState(false);
   const [editingTask, setEditingTask] = useState<StudyTask | null>(null);
@@ -137,7 +139,7 @@ export default function StudyPlannerPage() {
         setPlan(null);
         setProgress(null);
         setTasks([]);
-        setSubscriptionModalOpen(true);
+        openUpgrade();
         setError(null);
       } else {
         setError(messages.length ? messages.join(" ") : null);
@@ -222,19 +224,25 @@ export default function StudyPlannerPage() {
       setShowTaskEditor(false);
       await load();
     } catch (e: unknown) {
-      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      if (isSubscriptionUpgradeRequiredError(e)) openUpgrade();
       else setError(getApiErrorMessage(e, "Could not save task."));
     } finally {
       setBusy(false);
     }
   };
   const removeTask = async (t: StudyTask) => {
-    if (!confirm(`Delete task "${t.title}"?`)) return;
+    const ok = await confirm({
+      title: "Delete task?",
+      message: `"${t.title}" will be removed from your plan.`,
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await studyPlansService.deleteTask(t.id);
       await load();
     } catch (e: unknown) {
-      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      if (isSubscriptionUpgradeRequiredError(e)) openUpgrade();
       else setError(getApiErrorMessage(e, "Could not delete task."));
     }
   };
@@ -243,7 +251,7 @@ export default function StudyPlannerPage() {
       await studyPlansService.updateTask(t.id, { status });
       await load();
     } catch (e: unknown) {
-      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      if (isSubscriptionUpgradeRequiredError(e)) openUpgrade();
       else setError(getApiErrorMessage(e, "Could not update task."));
     }
   };
@@ -262,7 +270,7 @@ export default function StudyPlannerPage() {
       setShowPlanEditor(false);
       await load();
     } catch (e: unknown) {
-      if (isSubscriptionUpgradeRequiredError(e)) setSubscriptionModalOpen(true);
+      if (isSubscriptionUpgradeRequiredError(e)) openUpgrade();
       else setError(getApiErrorMessage(e, "Could not save plan."));
     } finally {
       setBusy(false);
@@ -271,11 +279,7 @@ export default function StudyPlannerPage() {
 
   return (
     <div className={cn(APP_PAGE_SHELL, APP_PAGE_PADDING, "space-y-6")}>
-      <SubscriptionUpgradeModal
-        open={subscriptionModalOpen}
-        onOpenChange={setSubscriptionModalOpen}
-        featureLabel="Study Planner"
-      />
+      {UpgradeModal}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Study Planner</h1>

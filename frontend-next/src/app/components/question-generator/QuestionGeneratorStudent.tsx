@@ -8,7 +8,20 @@ export default function QuestionGeneratorStudent() {
   const router = useRouter()
 
   const handleBackClick = () => {
-    router.push("/question-generator")
+    const from = router.query.from as string | undefined
+    if (from === "mock-exam") {
+      void router.push("/mock-exams")
+      return
+    }
+    if (from === "create-test") {
+      void router.push("/test-creation/study-create")
+      return
+    }
+    if (from === "question-bank") {
+      void router.push("/study/question-bank")
+      return
+    }
+    void router.push("/dashboard")
   }
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-background dark:from-gray-900 via-background dark:via-gray-900 to-background/95 dark:to-gray-900/95">

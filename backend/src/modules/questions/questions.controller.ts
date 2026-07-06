@@ -252,6 +252,7 @@ export class QuestionsController {
       pool: pool as "unused" | "marked" | "incorrect" | "correct" | "omitted" | undefined,
       marked: markedBool,
       userId: req.user?.userId,
+      userRoles: req.user?.roles || [],
     });
   }
 

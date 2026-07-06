@@ -10,7 +10,7 @@ import {
   type MedprepSession,
 } from "@/lib/fyp/medprep-session-service";
 import { getClinicalUserId } from "@/lib/fyp/medprep-user";
-import useMyEntitlements from "../../../hooks/useMyEntitlements";
+import useBillingFeatures from "@/hooks/useBillingFeatures";
 import {
   isMedprepSlugAllowed,
   medprepSessionModeToSlug,
@@ -164,7 +164,7 @@ function ModeCardIcon({ modeId }: { modeId: MedPrepModeId }) {
 export default function MedPrepOverviewPage() {
   const [sessions, setSessions] = useState<MedprepSession[]>([]);
   const [caseLimits, setCaseLimits] = useState<CaseLimitsPayload | null>(null);
-  const { entitlements, loading } = useMyEntitlements();
+  const { entitlements, loading } = useBillingFeatures();
   const hasAccess = Boolean(
     entitlements["medprepai.access"]?.enabled ??
       entitlements["medprepai.access"] ??

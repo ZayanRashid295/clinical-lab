@@ -5,20 +5,17 @@ export * from "./base/api-types";
 // Auth services - using shared auth service
 export { authService, AuthService } from "../../shared/services/auth.service";
 
-// Payments services
-export { paymentsService, PaymentsService } from "./payments/payments.service";
-export * from "./payments/payments.types";
+// Billing services
+export { billingService, BillingService } from "./billing/billing.service";
 
 // Users services
 export { UsersService } from "./users/users.service";
 export * from "./users/users.types";
 
-// Re-import for the api object
-import { paymentsService } from "./payments/payments.service";
+import { billingService } from "./billing/billing.service";
 import { authService } from "../../shared/services/auth.service";
 
-// Convenience exports for commonly used services
 export const api = {
   auth: authService,
-  payments: paymentsService,
+  billing: billingService,
 };

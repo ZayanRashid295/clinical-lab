@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { authService } from "@/shared/services/auth.service";
-import { SubscriptionsService } from "@/app/services/subscriptions/subscriptions.service";
+import { billingService } from "@/app/services/billing/billing.service";
 
 interface AccessInfo {
   roles: string[];
@@ -41,7 +41,6 @@ export function useAccessControl() {
     }
 
     try {
-      // Get user profile with roles and permissions
       const profile = await authService.getProfile();
       const roles = profile?.roles?.map((ur: any) => 
         typeof ur === 'string' ? ur : ur.role?.name || ur.name
@@ -51,29 +50,18 @@ export function useAccessControl() {
         typeof up === 'string' ? up : up.permission?.name || up.name
       ).filter(Boolean) || [];
 
-      // Get active subscription and features
       let hasActiveSubscription = false;
       let subscription = null;
       const features: string[] = [];
 
       if (profile?.id) {
-        const subscriptionsService = new SubscriptionsService();
-        const activeSubscriptions = await subscriptionsService.getUserSubscriptions(
-          profile.id,
-          "ACTIVE"
-        );
-
-        hasActiveSubscription = activeSubscriptions && activeSubscriptions.length > 0;
-        subscription = hasActiveSubscription ? activeSubscriptions[0] : null;
-
-        // Extract features from active subscription
-        if (subscription?.subscriptionPackage?.subscriptionFeatures) {
-          subscription.subscriptionPackage.subscriptionFeatures.forEach((sf: any) => {
-            const featureName = sf.packageFeature?.name;
-            if (featureName) {
-              features.push(featureName);
-            }
-          });
+        try {
+          const billing = await billingService.getMyBilling();
+          subscription = billing.subscription;
+          hasActiveSubscription = !!subscription;
+          features.push(...(await billingService.getMyFeatures()));
+        } catch {
+          hasActiveSubscription = false;
         }
       }
 
@@ -84,8 +72,7 @@ export function useAccessControl() {
         hasActiveSubscription,
         subscription,
       });
-    } catch (error) {
-      console.error("Error loading access info:", error);
+    } catch {
       setAccessInfo({
         roles: [],
         permissions: [],
@@ -100,119 +87,29 @@ export function useAccessControl() {
 
   useEffect(() => {
     loadAccessInfo();
-    
-    // Reload when auth state changes
-    const interval = setInterval(() => {
-      if (authService.isAuthenticated()) {
-        loadAccessInfo();
-      }
-    }, 30000); // Check every 30 seconds
-
-    return () => clearInterval(interval);
   }, [loadAccessInfo]);
 
-  const hasRole = useCallback(
-    (role: string): boolean => {
-      return accessInfo.roles.includes(role);
-    },
-    [accessInfo.roles]
-  );
-
-  const hasAnyRole = useCallback(
-    (roles: string[]): boolean => {
-      return roles.some((role) => accessInfo.roles.includes(role));
-    },
-    [accessInfo.roles]
-  );
-
-  const hasPermission = useCallback(
-    (permission: string): boolean => {
-      return accessInfo.permissions.includes(permission);
-    },
-    [accessInfo.permissions]
-  );
-
-  const hasAnyPermission = useCallback(
-    (permissions: string[]): boolean => {
-      return permissions.some((perm) => accessInfo.permissions.includes(perm));
-    },
-    [accessInfo.permissions]
-  );
-
-  const hasFeature = useCallback(
-    (feature: string): boolean => {
-      return accessInfo.features.includes(feature);
-    },
-    [accessInfo.features]
-  );
-
-  const hasAnyFeature = useCallback(
-    (features: string[]): boolean => {
-      return features.some((feature) => accessInfo.features.includes(feature));
-    },
-    [accessInfo.features]
-  );
-
-  const canAccess = useCallback(
+  const hasAccess = useCallback(
     (requirements: AccessRequirements): boolean => {
-      // Check role
       if (requirements.role) {
-        const requiredRoles = Array.isArray(requirements.role)
-          ? requirements.role
-          : [requirements.role];
-        if (!hasAnyRole(requiredRoles)) {
-          return false;
-        }
+        const required = Array.isArray(requirements.role) ? requirements.role : [requirements.role];
+        if (!required.some((r) => accessInfo.roles.includes(r))) return false;
       }
-
-      // Check permission
       if (requirements.permission) {
-        const requiredPermissions = Array.isArray(requirements.permission)
-          ? requirements.permission
-          : [requirements.permission];
-        if (!hasAnyPermission(requiredPermissions)) {
-          return false;
-        }
+        const required = Array.isArray(requirements.permission) ? requirements.permission : [requirements.permission];
+        if (!required.some((p) => accessInfo.permissions.includes(p))) return false;
       }
-
-      // Check feature
       if (requirements.feature) {
-        const requiredFeatures = Array.isArray(requirements.feature)
-          ? requirements.feature
-          : [requirements.feature];
-        if (!hasAnyFeature(requiredFeatures)) {
-          return false;
-        }
+        const required = Array.isArray(requirements.feature) ? requirements.feature : [requirements.feature];
+        if (!required.some((f) => accessInfo.features.includes(f))) return false;
       }
-
-      // Check subscription
-      if (requirements.requireSubscription && !accessInfo.hasActiveSubscription) {
-        return false;
-      }
-
+      if (requirements.requireSubscription && !accessInfo.hasActiveSubscription) return false;
       return true;
     },
-    [accessInfo, hasAnyRole, hasAnyPermission, hasAnyFeature]
+    [accessInfo]
   );
 
-  return {
-    ...accessInfo,
-    loading,
-    hasRole,
-    hasAnyRole,
-    hasPermission,
-    hasAnyPermission,
-    hasFeature,
-    hasAnyFeature,
-    canAccess,
-    refresh: loadAccessInfo,
-  };
+  return { ...accessInfo, loading, hasAccess, refresh: loadAccessInfo };
 }
 
-
-
-
-
-
-
-
+export default useAccessControl;

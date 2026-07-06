@@ -7,7 +7,7 @@ import {
 import { MEDPREP_MODES } from "./medprep-modes";
 import { MedprepConversationStatus, MedprepMode } from "@prisma/client";
 import { PrismaService } from "../../common/prisma/prisma.service";
-import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { BillingSubscriptionsService } from "../billing/subscriptions/billing-subscriptions.service";
 import { AchievementsService } from "../achievements/achievements.service";
 import { StudentInstitutionService } from "../faculty/student-institution.service";
 import {
@@ -29,7 +29,7 @@ import {
 export class MedprepAiService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly subscriptionsService: SubscriptionsService,
+    private readonly billingService: BillingSubscriptionsService,
     private readonly achievements: AchievementsService,
     private readonly studentInstitution: StudentInstitutionService,
   ) {}
@@ -465,7 +465,7 @@ export class MedprepAiService {
 
   /** null = no subscription-side filter (legacy); empty = none allowed */
   private async listSubscriptionAllowedModes(userId: string): Promise<MedprepMode[] | null> {
-    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    const entitlements = await this.billingService.getUserEntitlementsMap(userId);
     const policy = this.resolveMedprepModesPolicy(entitlements);
     if (!policy.restrictModes) return null;
     const modes: MedprepMode[] = [];
@@ -477,7 +477,7 @@ export class MedprepAiService {
   }
 
   private async assertMedprepModeAllowed(userId: string, mode: MedprepMode) {
-    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    const entitlements = await this.billingService.getUserEntitlementsMap(userId);
     if (!this.medprepAccessEnabled(entitlements)) {
       throw new ForbiddenException(
         "MedPrepAI is not included in your subscription. Upgrade to unlock case practice.",
@@ -500,7 +500,7 @@ export class MedprepAiService {
 
   /** Per-mode distinct-case quota (optional caps in `limitsPerMode`). */
   private async enforceDistinctCaseQuota(userId: string, mode: MedprepMode) {
-    const entitlements = await this.subscriptionsService.getUserEntitlements(userId);
+    const entitlements = await this.billingService.getUserEntitlementsMap(userId);
     const modesPack = entitlements["medprepai.modes"] as Record<string, any> | undefined;
     if (!modesPack || typeof modesPack !== "object") {
       return;
@@ -534,7 +534,7 @@ export class MedprepAiService {
   /** Student dashboard: limits + usage per MedPrep mode (slug = frontend route id). */
   async getMyCaseLimitSummary(userId: string | undefined) {
     this.ensureUserId(userId);
-    const entitlements = await this.subscriptionsService.getUserEntitlements(userId!);
+    const entitlements = await this.billingService.getUserEntitlementsMap(userId!);
     const hasAccess = this.medprepAccessEnabled(entitlements);
     const policy = this.resolveMedprepModesPolicy(entitlements);
 

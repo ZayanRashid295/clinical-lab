@@ -1,0 +1,316 @@
+// Billing & subscription platform schema
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum BillingSubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+  INCOMPLETE
+  PAYMENT_FAILED
+  PAUSED
+}
+
+enum BillingPaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELED
+}
+
+enum BillingInvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum BillingWebhookStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum BillingRetryStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  EXHAUSTED
+}
+
+enum BillingPromotionType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_FIRST_CYCLE
+  MULTI_CYCLE_PERCENTAGE
+  LIFETIME_PERCENTAGE
+}
+
+model BillingPlan {
+  id                   String    @id @default(cuid())
+  name                 String
+  description          String?   @db.Text
+  monthlyPrice         Decimal   @db.Decimal(10, 2)
+  yearlyPrice          Decimal   @db.Decimal(10, 2)
+  currency             String    @default("USD")
+  trialEnabled         Boolean   @default(false)
+  trialDurationDays    Int       @default(0)
+  featuresJson         Json      @default("[]")
+  displayOrder         Int       @default(0)
+  isPopular            Boolean   @default(false)
+  isActive             Boolean   @default(true)
+  isPublic             Boolean   @default(true)
+  isDefault            Boolean   @default(false)
+  maxUsers             Int?
+  storageLimitMb       Int?
+  apiLimitMonthly      Int?
+  stripeProductId      String?
+  stripeMonthlyPriceId String?
+  stripeYearlyPriceId  String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
+
+  subscriptions BillingSubscription[]
+  coupons       BillingCoupon[]
+
+  @@index([isActive, isPublic, displayOrder])
+  @@map("billing_plans")
+}
+
+model BillingSubscription {
+  id                   String                    @id @default(cuid())
+  userId               String
+  planId               String
+  status               BillingSubscriptionStatus @default(INCOMPLETE)
+  billingInterval      BillingInterval           @default(MONTHLY)
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean                   @default(false)
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  providerCustomerId   String?
+  providerSubscriptionId String?                 @unique
+  couponId             String?
+  metadataJson         Json                      @default("{}")
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan     BillingPlan    @relation(fields: [planId], references: [id])
+  coupon   BillingCoupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  payments BillingPayment[]
+  invoices BillingInvoice[]
+  retries  BillingPaymentRetry[]
+
+  @@index([userId, status])
+  @@index([status, currentPeriodEnd])
+  @@index([trialEnd])
+  @@map("billing_subscriptions")
+}
+
+model BillingPaymentMethod {
+  id               String   @id @default(cuid())
+  userId           String
+  provider         String   @default("stripe")
+  providerMethodId String
+  cardBrand        String?
+  cardLast4        String?
+  cardExpMonth     Int?
+  cardExpYear      Int?
+  isDefault        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  metadataJson     Json     @default("{}")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerMethodId])
+  @@index([userId, isDefault])
+  @@map("billing_payment_methods")
+}
+
+model BillingPayment {
+  id                String               @id @default(cuid())
+  userId            String
+  subscriptionId    String?
+  amount            Decimal              @db.Decimal(10, 2)
+  currency          String               @default("USD")
+  status            BillingPaymentStatus @default(PENDING)
+  provider          String               @default("stripe")
+  providerPaymentId String?              @unique
+  description       String?
+  failureReason     String?
+  metadataJson      Json                 @default("{}")
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription BillingSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("billing_payments")
+}
+
+model BillingInvoice {
+  id                String               @id @default(cuid())
+  userId            String
+  subscriptionId    String?
+  invoiceNumber     String               @unique
+  amount            Decimal              @db.Decimal(10, 2)
+  currency          String               @default("USD")
+  status            BillingInvoiceStatus @default(DRAFT)
+  providerInvoiceId String?              @unique
+  pdfUrl            String?
+  periodStart       DateTime?
+  periodEnd         DateTime?
+  paidAt            DateTime?
+  metadataJson      Json                 @default("{}")
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription BillingSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("billing_invoices")
+}
+
+model BillingCoupon {
+  id                   String               @id @default(cuid())
+  code                 String               @unique
+  name                 String?
+  description          String?              @db.Text
+  type                 BillingPromotionType @default(PERCENTAGE)
+  percentOff           Decimal?             @db.Decimal(5, 2)
+  amountOff            Decimal?             @db.Decimal(10, 2)
+  maxDiscountAmount    Decimal?             @db.Decimal(10, 2)
+  currency             String?
+  durationMonths       Int?
+  durationCycles       Int?
+  maxRedemptions       Int?
+  maxRedemptionsPerUser Int?                @default(1)
+  redemptionCount      Int                  @default(0)
+  planId               String?
+  applicablePlanIds    Json                 @default("[]")
+  applicableIntervals  Json                 @default("[]")
+  firstTimeOnly        Boolean              @default(false)
+  existingCustomersOnly Boolean             @default(false)
+  stackable            Boolean              @default(false)
+  autoApply            Boolean              @default(false)
+  isActive             Boolean              @default(true)
+  validFrom            DateTime             @default(now())
+  validUntil           DateTime?
+  archivedAt           DateTime?
+  providerCouponId     String?
+  createdBy            String?
+  updatedBy            String?
+  metadataJson         Json                 @default("{}")
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  plan          BillingPlan?              @relation(fields: [planId], references: [id], onDelete: SetNull)
+  redemptions   BillingCouponRedemption[]
+  subscriptions BillingSubscription[]
+
+  @@index([isActive, validFrom, validUntil])
+  @@index([code])
+  @@map("billing_coupons")
+}
+
+model BillingCouponRedemption {
+  id               String   @id @default(cuid())
+  couponId         String
+  userId           String
+  subscriptionId   String?
+  originalAmount   Decimal  @db.Decimal(10, 2)
+  discountAmount   Decimal  @db.Decimal(10, 2)
+  finalAmount      Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  billingInterval  BillingInterval?
+  metadataJson     Json     @default("{}")
+  createdAt        DateTime @default(now())
+
+  coupon BillingCoupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([couponId, userId])
+  @@index([userId, createdAt])
+  @@map("billing_coupon_redemptions")
+}
+
+model BillingEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  payload   Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type, createdAt])
+  @@index([userId, createdAt])
+  @@map("billing_events")
+}
+
+model BillingWebhookEvent {
+  id            String               @id @default(cuid())
+  provider      String               @default("stripe")
+  eventId       String               @unique
+  eventType     String
+  payload       Json
+  status        BillingWebhookStatus @default(PENDING)
+  errorMessage  String?
+  processedAt   DateTime?
+  createdAt     DateTime             @default(now())
+
+  @@index([status, createdAt])
+  @@map("billing_webhook_events")
+}
+
+model BillingPaymentRetry {
+  id             String             @id @default(cuid())
+  subscriptionId String
+  attemptNumber  Int
+  scheduledAt    DateTime
+  attemptedAt    DateTime?
+  status         BillingRetryStatus @default(PENDING)
+  failureReason  String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, status])
+  @@index([scheduledAt, status])
+  @@map("billing_payment_retries")
+}
+
+model BillingFeatureUsage {
+  id           String   @id @default(cuid())
+  userId       String
+  featureKey   String
+  periodStart  DateTime
+  periodEnd    DateTime
+  usedCount    Int      @default(0)
+  metadataJson Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, featureKey, periodStart, periodEnd], map: "billing_fu_user_feat_period_key")
+  @@index([userId, featureKey])
+  @@map("billing_feature_usages")
+}

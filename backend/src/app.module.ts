@@ -6,7 +6,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { RolesModule } from "./modules/roles/roles.module";
 
-import { PaymentsModule } from "./modules/payments/payments.module";
+import { BillingModule } from "./modules/billing/billing.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { ProductsModule } from "./modules/products/products.module";
@@ -15,7 +15,6 @@ import { SystemsModule } from "./modules/systems/systems.module";
 import { ContentModule } from "./modules/content/content.module";
 import { QuestionsModule } from "./modules/questions/questions.module";
 import { QuestionBuilderModule } from "./modules/question-builder/question-builder.module";
-import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { AssessmentsModule } from "./modules/assessments/assessments.module";
 import { MedprepAiModule } from "./modules/medprep-ai/medprep-ai.module";
 import { BookmarksModule } from "./modules/bookmarks/bookmarks.module";
@@ -48,7 +47,7 @@ import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
     AuthModule,
     UsersModule,
     RolesModule,
-    PaymentsModule,
+    BillingModule,
     NotificationsModule,
     ChatModule,
     ProductsModule,
@@ -57,7 +56,6 @@ import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
     ContentModule,
     QuestionsModule,
     QuestionBuilderModule,
-    SubscriptionsModule,
     AssessmentsModule,
     MedprepAiModule,
     BookmarksModule,

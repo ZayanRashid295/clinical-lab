@@ -67,9 +67,7 @@ model ProductSubtype {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  product              Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
-  subscriptionPackages SubscriptionPackage[]
-  entitlementDefinitions EntitlementDefinition[]
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([productId, name])
   @@map("product_subtypes")

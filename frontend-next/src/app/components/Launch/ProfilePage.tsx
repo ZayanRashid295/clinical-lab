@@ -379,7 +379,7 @@ export default function ProfilePage() {
                 </Link>
               </Button>
               <Button variant="outline" className="justify-start" asChild>
-                <Link href="/my-subscription">
+                <Link href="/billing">
                   <CreditCard className="mr-2 h-4 w-4" />
                   My subscription
                 </Link>

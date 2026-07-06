@@ -1,10 +1,10 @@
 import { ContentRegistry } from "../types/dashboard";
 
 // Import ride-sharing specific components
-import PaymentHistoryContent from "../components/Content/PaymentHistoryContent";
-import PaymentMethodsContent from "../components/Content/PaymentMethodsContent";
-import PayoutsContent from "../components/Content/PayoutsContent";
-import InvoicesContent from "../components/Content/InvoicesContent";
+import BillingPage from "../components/Billing/BillingPage";
+import BillingPlanManagement from "../components/Billing/BillingPlanManagement";
+import PromotionManagement from "../components/Billing/PromotionManagement";
+import PricingPage from "../components/Billing/PricingPage";
 import ChatRoomsList from "../components/Chat/ChatRoomsList";
 import SupportChatRoomsList from "../components/Chat/SupportChatRoomsList";
 import NotificationsList from "../components/Notifications/NotificationsList";
@@ -12,10 +12,6 @@ import UserManagementContent from "../components/Content/UserManagementContent";
 import ActivityLogsManagementContent from "../components/Content/ActivityLogsManagementContent";
 import RoleManagementContent from "../components/Content/RoleManagementContent";
 import SystemSettingsContent from "../components/Content/SystemSettingsContent";
-import SubscriptionManagementContent from "../components/Content/SubscriptionManagementContent";
-import SubscriptionPackageManagementContent from "../components/Content/SubscriptionPackageManagementContent";
-import PackageFeatureManagementContent from "../components/Content/PackageFeatureManagementContent";
-import EntitlementDefinitionManagementContent from "../components/Content/EntitlementDefinitionManagementContent";
 import CategoryManagementContent from "../components/Content/CategoryManagementContent";
 import ProductManagementContent from "../components/Content/ProductManagementContent";
 import SystemManagementContent from "../components/Content/SystemManagementContent";
@@ -48,7 +44,6 @@ import TestSessionPage from "../components/test-session/TestSessionPage";
 import QuestionGeneratorPage from "../components/question-generator/QuestionGeneratorPage";
 import QuestionGeneratorStudent from "../components/question-generator/QuestionGeneratorStudent";
 import QuestionGeneratorAdmin from "../components/question-generator/QuestionGeneratorAdmin";
-import MySubscriptionPage from "../components/Subscriptions/MySubscriptionPage";
 import OrgChartView from "../components/OrgChart/OrgChartView";
 import MedPrepOverviewPage from "../components/medprep-ai/MedPrepOverviewPage";
 import { EvaluationPage } from "../components/medprep-ai/EvaluationPage";
@@ -93,11 +88,9 @@ export const transportationContentRegistry: ContentRegistry = {
     "/": () => <StudentDashboardPage />,
     "/dashboard": () => <StudentDashboardPage />,
 
-    // Payment routes
-    "/payments/history": () => <PaymentHistoryContent />,
-    "/payments/methods": () => <PaymentMethodsContent />,
-    "/payments/payouts": () => <PayoutsContent />,
-    "/payments/invoices": () => <InvoicesContent />,
+    // Billing routes
+    "/billing": () => <BillingPage />,
+    "/pricing": () => <PricingPage />,
 
     // Chat routes
     "/chat/rooms": () => (
@@ -123,16 +116,9 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/settings": () => <SystemSettingsContent />,
     // "/admin/tables": () => <TwoTablesWithPagination />,
 
-    // Subscription routes
-    "/admin/subscriptions": () => <SubscriptionManagementContent />,
-    "/admin/subscriptions/packages": () => (
-      <SubscriptionPackageManagementContent />
-    ),
-    "/admin/subscriptions/features": () => <PackageFeatureManagementContent />,
-    "/admin/subscriptions/entitlements": () => (
-      <EntitlementDefinitionManagementContent />
-    ),
-    "/my-subscription": () => <MySubscriptionPage />,
+    // Billing admin routes
+    "/admin/billing/plans": () => <BillingPlanManagement />,
+    "/admin/billing/promotions": () => <PromotionManagement />,
 
     // Institution (faculty ↔ student)
     "/assignments": () => (
@@ -173,6 +159,7 @@ export const transportationContentRegistry: ContentRegistry = {
     "/study/question-bank": () => <QuestionBankPage />,
     "/study/flashcards": () => <FlashcardsPage />,
     "/study/notes": () => <NotesPage />,
+    "/study/goals": () => <GoalsPage />,
     "/study-planner": () => <StudyPlannerPage />,
 
     // MedPrepAI learning modes

@@ -135,7 +135,7 @@ const Header: React.FC<HeaderProps> = ({
               <DropdownMenuItem
                 onClick={() => {
                   try {
-                    window.location.href = "/my-subscription";
+                    window.location.href = "/billing";
                   } catch {
                     /* noop */
                   }

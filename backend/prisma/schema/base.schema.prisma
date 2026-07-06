@@ -26,11 +26,14 @@ model User {
   chatMessageReactions ChatMessageReaction[] @relation("ChatMessageReaction")
   chatReadStatus       ChatReadStatus[]      @relation("ChatReadStatus")
 
-  // Payment module
-  payments        Payment[]        @relation("UserPayments")
-  paymentMethods  PaymentMethod[]  @relation("UserPaymentMethods")
-  promoCodeUsages PromoCodeUsage[] @relation("PromoCodeUsage")
-  wallet          Wallet?
+  // Billing module
+  billingSubscriptions   BillingSubscription[]
+  billingPaymentMethods  BillingPaymentMethod[]
+  billingPayments        BillingPayment[]
+  billingInvoices        BillingInvoice[]
+  billingCouponRedemptions BillingCouponRedemption[]
+  billingEvents          BillingEvent[]
+  billingFeatureUsages   BillingFeatureUsage[]
 
   // Notification module
   notifications           Notification[]          @relation("UserNotifications")
@@ -38,8 +41,6 @@ model User {
 
   // LMS module
   questionPapers QuestionPaper[]
-  subscriptions  Subscription[]
-  entitlementUsages EntitlementUsage[]
 
   // MedPrep AI module
   medprepConversations      MedprepConversation[]

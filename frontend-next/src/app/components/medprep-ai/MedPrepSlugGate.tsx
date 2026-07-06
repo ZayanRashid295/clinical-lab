@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import useMyEntitlements from "@/hooks/useMyEntitlements";
+import useBillingFeatures from "@/hooks/useBillingFeatures";
 import { isMedprepSlugAllowed } from "@/lib/fyp/medprep-entitlements";
 
 type MedPrepSlugGateProps = {
@@ -17,7 +17,7 @@ type MedPrepSlugGateProps = {
  * Blocks MedPrep routes when the subscription omits `medprepai.access` or the mode slug in `medprepai.modes`.
  */
 export function MedPrepSlugGate({ slug, modeLabel, children }: MedPrepSlugGateProps) {
-  const { entitlements, loading } = useMyEntitlements();
+  const { entitlements, loading } = useBillingFeatures();
   const hasMedprepModuleAccess = Boolean(
     entitlements["medprepai.access"]?.enabled ??
       entitlements["medprepai.access"] ??
