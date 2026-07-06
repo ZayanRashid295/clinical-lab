@@ -29,6 +29,8 @@ export interface UIConfig {
   typographyPreset: TypographyPreset;
   enableAnimations: boolean;
   enableNotifications: boolean;
+  /** Set when the user toggles theme locally — prevents server from overwriting on login. */
+  themeUpdatedAt?: number;
 }
 
 export const DEFAULT_UI_CONFIG: UIConfig = {
@@ -36,7 +38,7 @@ export const DEFAULT_UI_CONFIG: UIConfig = {
   menuStyle: "sidebar",
   theme: "light",
   colorScheme: "emerald",
-  fontSize: "medium",
+  fontSize: "small",
   typographyPreset: "system",
   enableAnimations: true,
   enableNotifications: true,
@@ -130,7 +132,7 @@ export class UIConfigService {
   }
 
   public setTheme(theme: "light" | "dark"): void {
-    const updates: Partial<UIConfig> = { theme };
+    const updates: Partial<UIConfig> = { theme, themeUpdatedAt: Date.now() };
     if (
       theme === "dark" &&
       COLOR_SCHEMES_EXCLUDED_IN_DARK.has(this.config.colorScheme)

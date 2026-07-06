@@ -1,6 +1,7 @@
 import React from "react";
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../../hooks/useTheme";
+import { cn } from "@/shared/utils/cn";
 
 interface ThemeToggleProps {
   showLabels?: boolean;
@@ -14,6 +15,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = "",
 }) => {
   const { config, setTheme } = useTheme();
+  const isDark = config.theme === "dark";
 
   const sizeClasses = {
     sm: "w-8 h-8",
@@ -27,41 +29,22 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
     lg: 24,
   };
 
-  const getNextTheme = () => {
-    return config.theme === "light" ? "dark" : "light";
-  };
-
-  const getIcon = () => {
-    return config.theme === "light" ? (
-      <Sun size={iconSizes[size]} />
-    ) : (
-      <Moon size={iconSizes[size]} />
-    );
-  };
-
-  const getLabel = () => {
-    return config.theme === "light" ? "Light" : "Dark";
-  };
-
   return (
     <button
-      onClick={() => setTheme(getNextTheme())}
-      className={`
-        ${sizeClasses[size]}
-        flex items-center justify-center
-        bg-white dark:bg-gray-800
-        border border-gray-200 dark:border-gray-700
-        rounded-lg
-        hover:bg-gray-50 dark:hover:bg-gray-700
-        transition-colors
-        ${className}
-      `}
-      title={`Current theme: ${getLabel()}. Click to toggle theme.`}
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={cn("mkt-theme-toggle", sizeClasses[size], className)}
+      title={`Current theme: ${isDark ? "Dark" : "Light"}. Click to toggle.`}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {getIcon()}
+      {isDark ? (
+        <Sun size={iconSizes[size]} strokeWidth={1.75} />
+      ) : (
+        <Moon size={iconSizes[size]} strokeWidth={1.75} />
+      )}
       {showLabels && (
-        <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          {getLabel()}
+        <span className="ml-2 text-sm font-medium" style={{ color: "var(--mkt-text-muted)" }}>
+          {isDark ? "Dark" : "Light"}
         </span>
       )}
     </button>

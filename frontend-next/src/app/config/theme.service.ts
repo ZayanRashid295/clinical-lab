@@ -611,8 +611,8 @@ export class ThemeService {
 
     const fontSizeMap: Record<UIConfig["fontSize"], string> = {
       small: "14px",
-      medium: "16px",
-      large: "18px",
+      medium: "15px",
+      large: "16px",
     };
     root.style.setProperty("--base-font-size", fontSizeMap[config.fontSize]);
 
@@ -643,6 +643,80 @@ export class ThemeService {
     root.style.fontSize = fontSizeMap[config.fontSize];
     root.style.lineHeight =
       presetLineHeight[preset] || presetLineHeight.system;
+
+    this.applyMarketingTokens(isDarkMode, colorScheme);
+  }
+
+  /** Marketing / landing / auth surfaces — same palette as the app shell. */
+  private applyMarketingTokens(isDarkMode: boolean, colorScheme: ColorScheme): void {
+    const root = document.documentElement;
+    const p = colorScheme.primary;
+
+    root.style.setProperty("--mkt-bg", isDarkMode ? "#09090b" : "#f4f4f5");
+    root.style.setProperty("--mkt-bg-elevated", isDarkMode ? "#18181b" : "#ffffff");
+    root.style.setProperty("--mkt-bg-muted", isDarkMode ? "#27272a" : "#f1f5f9");
+    root.style.setProperty("--mkt-text", isDarkMode ? "#fafafa" : "#18181b");
+    root.style.setProperty("--mkt-text-muted", isDarkMode ? "#a1a1aa" : "#71717a");
+    root.style.setProperty("--mkt-text-subtle", isDarkMode ? "#71717a" : "#a1a1aa");
+    root.style.setProperty("--mkt-border", isDarkMode ? "#27272a" : "#e4e4e7");
+    root.style.setProperty("--mkt-accent", p["600"]);
+    root.style.setProperty("--mkt-accent-hover", p["700"]);
+    root.style.setProperty("--mkt-accent-muted", p["500"]);
+    root.style.setProperty(
+      "--mkt-accent-soft",
+      this.rgbaFromHex(p["600"], isDarkMode ? 0.14 : 0.1)
+    );
+    root.style.setProperty(
+      "--mkt-accent-ring",
+      this.rgbaFromHex(p["600"], isDarkMode ? 0.35 : 0.22)
+    );
+    root.style.setProperty(
+      "--mkt-header-bg",
+      isDarkMode ? "rgba(9, 9, 11, 0.92)" : "rgba(255, 255, 255, 0.92)"
+    );
+    root.style.setProperty(
+      "--mkt-overlay-bg",
+      isDarkMode ? "rgba(9, 9, 11, 0.98)" : "rgba(255, 255, 255, 0.98)"
+    );
+    root.style.setProperty(
+      "--mkt-badge-bg",
+      this.rgbaFromHex(p["500"], isDarkMode ? 0.12 : 0.08)
+    );
+    root.style.setProperty(
+      "--mkt-card-hover",
+      this.rgbaFromHex(p["600"], isDarkMode ? 0.12 : 0.06)
+    );
+    root.style.setProperty(
+      "--mkt-stat-bg",
+      isDarkMode ? "rgba(255, 255, 255, 0.06)" : "#f8fafc"
+    );
+    root.style.setProperty(
+      "--mkt-stat-border",
+      isDarkMode ? "rgba(255, 255, 255, 0.1)" : "#e4e4e7"
+    );
+    root.style.setProperty("--mkt-footer-text", isDarkMode ? "#d4d4d8" : "#334155");
+    root.style.setProperty("--mkt-footer-muted", isDarkMode ? "#a1a1aa" : "#64748b");
+    root.style.setProperty("--mkt-footer-dim", isDarkMode ? "#71717a" : "#94a3b8");
+    root.style.setProperty(
+      "--mkt-shadow",
+      isDarkMode ? "rgba(0, 0, 0, 0.35)" : "rgba(15, 23, 42, 0.08)"
+    );
+    root.style.setProperty(
+      "--mkt-input-bg",
+      isDarkMode ? "rgba(24, 24, 27, 0.9)" : "#ffffff"
+    );
+    root.style.setProperty("--mkt-hero-gradient-from", isDarkMode ? "#09090b" : "#f4f4f5");
+    root.style.setProperty("--mkt-hero-gradient-via", isDarkMode ? "#18181b" : p["50"]);
+    root.style.setProperty(
+      "--mkt-glow",
+      this.rgbaFromHex(p["600"], isDarkMode ? 0.2 : 0.12)
+    );
+  }
+
+  private rgbaFromHex(hex: string, alpha: number): string {
+    const rgb = this.hexToRgb(hex);
+    if (!rgb) return `rgba(0, 0, 0, ${alpha})`;
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
   }
 
   public getColorScheme(colorSchemeName: string): ColorScheme | undefined {

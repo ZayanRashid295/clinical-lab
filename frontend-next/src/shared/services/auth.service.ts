@@ -1,4 +1,9 @@
 import { BaseApiService } from "../../app/services/base/base-api.service";
+import { UIConfigService } from "../../app/config/ui.config";
+import {
+  applyServerPrefsToUiConfig,
+  configToServerPatchBody,
+} from "../utils/ui-preferences-sync";
 
 export class AuthService extends BaseApiService {
   async login(email: string, password: string): Promise<any> {
@@ -93,13 +98,10 @@ export class AuthService extends BaseApiService {
 
           localStorage.setItem("userData", JSON.stringify(userWithAccess));
           try {
-            const { applyServerPrefsToUiConfig } = await import(
-              "../utils/ui-preferences-sync"
-            );
             const us = (profileResponse as { userSettings?: Record<string, unknown> })
               .userSettings;
             if (us) {
-              applyServerPrefsToUiConfig({
+              const mergeResult = applyServerPrefsToUiConfig({
                 uiTheme: us.uiTheme as string,
                 uiColorScheme: us.uiColorScheme as string,
                 uiMenuLayout: us.uiMenuLayout as string,
@@ -107,6 +109,12 @@ export class AuthService extends BaseApiService {
                 uiFontSize: us.uiFontSize as string,
                 uiTypographyPreset: us.uiTypographyPreset as string,
               });
+              if (mergeResult.pushLocalTheme) {
+                const cfg = UIConfigService.getInstance().getConfig();
+                void this.patchUiPreferences(
+                  configToServerPatchBody(cfg) as Record<string, unknown>
+                ).catch(() => undefined);
+              }
             }
           } catch {
             /* ignore UI hydrate errors */

@@ -7,7 +7,11 @@ import {
 } from "../../app/config/ui.config";
 import { ThemeService } from "../../app/config/theme.service";
 import { authService } from "../services/auth.service";
-import { applyServerPrefsToUiConfig } from "../utils/ui-preferences-sync";
+import {
+  applyServerPrefsToUiConfig,
+  configToServerPatchBody,
+} from "../utils/ui-preferences-sync";
+import { usePersistUiPreferences } from "../hooks/usePersistUiPreferences";
 
 interface UIConfigContextType {
   config: UIConfig;
@@ -38,6 +42,12 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
   );
   const themeService = React.useRef(ThemeService.getInstance());
 
+  React.useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      themeService.current.applyTheme(UIConfigService.getInstance().getConfig());
+    }
+  }, []);
+
   React.useEffect(() => {
     const unsubscribe = UIConfigService.getInstance().subscribe(setConfig);
     return unsubscribe;
@@ -52,7 +62,15 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
       try {
         const prefs = await authService.getUiPreferences();
         if (!cancelled && prefs && Object.keys(prefs).length > 0) {
-          applyServerPrefsToUiConfig(prefs as Parameters<typeof applyServerPrefsToUiConfig>[0]);
+          const mergeResult = applyServerPrefsToUiConfig(
+            prefs as Parameters<typeof applyServerPrefsToUiConfig>[0]
+          );
+          if (mergeResult.pushLocalTheme) {
+            const cfg = UIConfigService.getInstance().getConfig();
+            void authService
+              .patchUiPreferences(configToServerPatchBody(cfg) as Record<string, unknown>)
+              .catch(() => undefined);
+          }
         }
       } catch {
         /* offline or older backend */
@@ -62,6 +80,8 @@ export const UIConfigProvider: React.FC<UIConfigProviderProps> = ({
       cancelled = true;
     };
   }, []);
+
+  usePersistUiPreferences(config);
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {

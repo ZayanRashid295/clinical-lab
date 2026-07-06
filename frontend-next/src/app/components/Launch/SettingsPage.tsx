@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { useTheme } from "../../../hooks/useTheme";
 import { COLOR_SCHEMES, getColorSchemeKeysForTheme } from "../../config/theme.service";
 import { useLanguage } from "../../../shared/contexts/LanguageContext";
-import { authService } from "../../../shared/services/auth.service";
-import { configToServerPatchBody } from "../../../shared/utils/ui-preferences-sync";
 import type { TypographyPreset } from "../../config/ui.config";
 import { cn } from "@/shared/utils/cn";
 
@@ -29,21 +27,6 @@ const SettingsPage: React.FC = () => {
     setTypographyPreset,
   } = useTheme();
   const { t } = useLanguage();
-  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !authService.isAuthenticated()) return;
-    if (persistTimer.current) clearTimeout(persistTimer.current);
-    persistTimer.current = setTimeout(() => {
-      persistTimer.current = null;
-      void authService
-        .patchUiPreferences(configToServerPatchBody(config) as Record<string, unknown>)
-        .catch(() => undefined);
-    }, 800);
-    return () => {
-      if (persistTimer.current) clearTimeout(persistTimer.current);
-    };
-  }, [config]);
 
   const colorKeys = getColorSchemeKeysForTheme(config.theme);
   const navIsLeft = config.menuLayout === "vertical" && config.menuStyle === "sidebar";

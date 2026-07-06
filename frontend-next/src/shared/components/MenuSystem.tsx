@@ -5,9 +5,6 @@ import { getMenuItemsForRole, MenuItem } from "../../app/types/menu";
 import { MenuSystemProps } from "../../app/types/ui";
 import { User } from "../../app/types/core";
 import AdaptiveLayout from "./Layout/AdaptiveLayout";
-import {
-  UIConfigProvider,
-} from "../contexts/UIConfigContext";
 import ContentRenderer from "./Content/ContentRenderer";
 import { APP_DISPLAY_NAME } from "../../app/config/brand";
 // import { createContentRegistry } from "../../app/config/content.registry";
@@ -267,8 +264,7 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
   }, [getPageContent]);
 
   return (
-    <UIConfigProvider>
-      <AdaptiveLayout
+    <AdaptiveLayout
         menuItems={menuItems}
         activeMenu={activeMenu}
         expandedMenus={expandedMenus}
@@ -284,7 +280,6 @@ const MenuSystem: React.FC<MenuSystemProps> = ({
           {renderContent()}
         </div>
       </AdaptiveLayout>
-    </UIConfigProvider>
   );
 };
 

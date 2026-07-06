@@ -28,7 +28,7 @@
   --color-secondary-900: #0f172a;
 
   /* Base font size and border radius */
-  --base-font-size: 16px;
+  --base-font-size: 14px;
   --base-border-radius: 0.5rem;
 
   /* Elevation system for hover/active effects */
@@ -41,7 +41,23 @@
   --foreground-color: #111827;
   --muted-bg: #f3f4f6;
   --muted-foreground-color: #6b7280;
-  --border-color: #e5e7eb;
+  /* App shell semantic colors (overridden by ThemeService.applyTheme) */
+  --app-bg: #f4f4f5;
+  --app-surface: #ffffff;
+  --app-elevated: #fafafa;
+  --app-text: #18181b;
+  --app-muted: #71717a;
+  --app-border: #e4e4e7;
+
+  /* Marketing / landing aliases (same palette — set by ThemeService) */
+  --mkt-bg: var(--app-bg);
+  --mkt-bg-elevated: var(--app-surface);
+  --mkt-text: var(--app-text);
+  --mkt-text-muted: var(--app-muted);
+  --mkt-border: var(--app-border);
+  --mkt-accent: var(--color-primary-600);
+  --mkt-accent-hover: var(--color-primary-700);
+  --mkt-accent-muted: var(--color-primary-500);
 }
 
 /* Dark mode - colors will be dynamically set by ThemeService */
@@ -60,13 +76,15 @@ html {
   font-size: var(--base-font-size);
 }
 
-/* Global dark mode text colors - softer for better eye comfort */
+/* Global text — follows app semantic tokens */
 body {
-  color: #111827;
+  color: var(--app-text, #18181b);
+  background: var(--app-bg, #f4f4f5);
 }
 
 .dark body {
-  color: #e5e7eb;
+  color: var(--app-text, #fafafa);
+  background: var(--app-bg, #09090b);
 }
 
 /* Theme-aware utility classes */

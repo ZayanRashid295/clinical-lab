@@ -25,7 +25,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, progress, color =
         <Icon className={`h-4 w-4 ${colorClasses[color]}`} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900 dark:text-slate-100" data-testid={`text-stat-value-${title.toLowerCase().replace(/\s+/g, '-')}`}>{value}</div>
+        <div className="text-xl font-bold text-gray-900 dark:text-slate-100" data-testid={`text-stat-value-${title.toLowerCase().replace(/\s+/g, '-')}`}>{value}</div>
         {subtitle && <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{subtitle}</p>}
         {progress !== undefined && (
           <Progress value={progress} className="mt-3" />

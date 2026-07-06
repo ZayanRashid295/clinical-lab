@@ -21,8 +21,12 @@ import { QuestionsService } from "@/app/services/questions/questions.service"
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service"
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service"
 import { authService } from "@/shared/services/auth.service"
-import { useAccessControl } from "@/hooks/useAccessControl"
-import { Crown } from "lucide-react"
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal"
+import { isSubscriptionUpgradeRequiredError } from "@/app/services/base/api-http-error"
+import Link from "next/link"
 
 function parseQuestionTags(tags: unknown): {
   storedQuestionId: string | null
@@ -48,21 +52,6 @@ function parseQuestionTags(tags: unknown): {
   return { storedQuestionId, storedMcqTitle, filteredTags }
 }
 
-function formatQuestionContextLabel(question: {
-  system?: string
-  topic?: string | { name?: string }
-  mcqTitle?: string
-}): string | null {
-  const system = question.system?.trim() || ""
-  const topic =
-    typeof question.topic === "string"
-      ? question.topic.trim()
-      : question.topic?.name?.trim() || ""
-  const mcqTitle = question.mcqTitle?.trim() || ""
-  const parts = [system, topic, mcqTitle].filter(Boolean)
-  return parts.length > 0 ? parts.join(", ") : null
-}
-
 export default function StudentQuestionView() {
   const { toast } = useToast()
   const router = useRouter()
@@ -74,7 +63,7 @@ export default function StudentQuestionView() {
   const [error, setError] = useState<string | null>(null)
   const [showEndTestDialog, setShowEndTestDialog] = useState(false)
   const [isEndingTest, setIsEndingTest] = useState(false)
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+  const [accessBlocked, setAccessBlocked] = useState(false)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set())
   const [questionPaperQuestionIds, setQuestionPaperQuestionIds] = useState<Record<string, string>>({})
@@ -83,7 +72,20 @@ export default function StudentQuestionView() {
   const questionsService = new QuestionsService()
   const questionPapersService = new QuestionPapersService()
   const questionPaperQuestionsService = new QuestionPaperQuestionsService()
-  const { hasActiveSubscription } = useAccessControl()
+  const {
+    handleSubscriptionError,
+    openUpgrade,
+    UpgradeModal,
+    hasAccess: hasQbankAccess,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.questionBank, "Question Bank");
+
+  const blockForMissingQbankAccess = (err?: unknown) => {
+    if (err) handleSubscriptionError(err, "Question Bank")
+    else openUpgrade()
+    setAccessBlocked(true)
+    setError(null)
+    setQuestions([])
+  }
 
   // #region agent log
   useEffect(() => {
@@ -463,13 +465,14 @@ export default function StudentQuestionView() {
   }
 
   useEffect(() => {
-    loadQuestions()
+    void loadQuestions().catch(() => {})
   }, [])
 
   const loadQuestions = async () => {
     try {
       setLoading(true)
       setError(null)
+      setAccessBlocked(false)
       
       // Check if auth token exists
       const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null
@@ -559,17 +562,26 @@ export default function StudentQuestionView() {
         // Update answers state
         setAnswers(restoredAnswers)
         
-        // Fetch full question details
-        const questionPromises = questionIds.map(async (questionId: string) => {
+        // Fetch full question details — probe first to avoid dozens of parallel 403s
+        if (questionIds.length > 0) {
           try {
-            return await questionsService.getQuestion(questionId)
+            const first = await questionsService.getQuestion(questionIds[0])
+            if (questionIds.length === 1) {
+              allQuestions = [first]
+            } else {
+              const rest = await Promise.all(
+                questionIds.slice(1).map((id) => questionsService.getQuestion(id))
+              )
+              allQuestions = [first, ...rest]
+            }
           } catch (err) {
-            console.error(`Failed to fetch question ${questionId}:`, err)
+            if (isSubscriptionUpgradeRequiredError(err)) {
+              blockForMissingQbankAccess(err)
+              return
+            }
             throw err
           }
-        })
-        
-        allQuestions = await Promise.all(questionPromises)
+        }
       } else {
         // Original logic for loading from filters or all questions
         const hasFilters = tagIdsParam || systemIdsParam || topicIdsParam
@@ -1032,8 +1044,13 @@ export default function StudentQuestionView() {
         }
       }
     } catch (err: any) {
+      if (isSubscriptionUpgradeRequiredError(err)) {
+        blockForMissingQbankAccess(err)
+        return
+      }
+
       console.error("❌ Failed to load questions:", err)
-      
+
       let errorMessage = err.message || "Failed to load questions"
       if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
         errorMessage = "Authentication required. Please log in to view questions."
@@ -1042,7 +1059,8 @@ export default function StudentQuestionView() {
       } else if (err.message?.includes("Network") || err.message?.includes("fetch")) {
         errorMessage = "Network error. Please check your connection."
       }
-      
+
+      setAccessBlocked(false)
       setError(errorMessage)
       setQuestions([])
     } finally {
@@ -1613,11 +1631,10 @@ export default function StudentQuestionView() {
         }
       }
 
-      // Show upgrade prompt for non-subscribed users after successful test completion
-      if (!hasActiveSubscription) {
-        setShowUpgradePrompt(true)
+      // Prompt upgrade when test ends without full qbank access
+      if (!hasQbankAccess) {
+        openUpgrade()
       } else {
-        // Navigate to previous tests page
         router.push("/previous-tests")
       }
     } catch (error: any) {
@@ -1631,6 +1648,28 @@ export default function StudentQuestionView() {
       setIsEndingTest(false)
       setShowEndTestDialog(false)
     }
+  }
+
+  if (accessBlocked) {
+    return (
+      <div className="h-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-background dark:bg-gray-900">
+        <Card className="p-8 sm:p-12 text-center w-full max-w-md bg-card/50 dark:bg-gray-800/50 backdrop-blur-sm border-border dark:border-gray-700">
+          <p className="text-lg font-semibold text-foreground dark:text-slate-100">
+            Question bank access required
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400">
+            Your current plan doesn&apos;t include the question bank. Upgrade to start practicing.
+          </p>
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button onClick={() => openUpgrade()}>View plans</Button>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard">Back to dashboard</Link>
+            </Button>
+          </div>
+        </Card>
+        {UpgradeModal}
+      </div>
+    )
   }
 
   if (loading) {
@@ -1673,8 +1712,6 @@ export default function StudentQuestionView() {
       </div>
     )
   }
-
-  const questionContextLabel = formatQuestionContextLabel(currentQuestion)
 
   const correctOption = currentQuestion.options.find((o: any) => o.correct)
   const isCorrect = selectedAnswer === correctOption?.value
@@ -1737,14 +1774,6 @@ export default function StudentQuestionView() {
               >
                 {loading ? "⏳ Loading..." : "↻ Refresh"}
               </button>
-              {questionContextLabel && (
-                <span
-                  className="px-3 py-1.5 bg-secondary/12 dark:bg-secondary/20 text-secondary dark:text-purple-300 rounded-lg text-xs font-medium border border-secondary/25 dark:border-secondary/30 normal-case tracking-normal max-w-full truncate sm:whitespace-normal sm:overflow-visible"
-                  title={questionContextLabel}
-                >
-                  {questionContextLabel}
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -1804,54 +1833,7 @@ export default function StudentQuestionView() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Upgrade Prompt for Non-Subscribed Users */}
-      {showUpgradePrompt && !hasActiveSubscription && (
-        <AlertDialog open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt}>
-          <AlertDialogContent className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-500 dark:border-yellow-700">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
-                <Crown className="h-5 w-5" />
-                Great Job! 🎉
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-yellow-700 dark:text-yellow-300">
-                <p className="mb-3">
-                  You&apos;ve completed the test! You&apos;ve seen a preview of our question bank.
-                </p>
-                <p className="mb-4 font-semibold">
-                  Upgrade now to unlock:
-                </p>
-                <ul className="list-disc list-inside space-y-1 text-sm mb-4">
-                  <li>Full access to all questions in the question bank</li>
-                  <li>Unlimited test creation with custom filters</li>
-                  <li>Advanced analytics and performance tracking</li>
-                  <li>Study planner and progress monitoring</li>
-                </ul>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel 
-                onClick={() => {
-                  setShowUpgradePrompt(false)
-                  router.push("/previous-tests")
-                }}
-                className="dark:bg-gray-700 dark:text-gray-200"
-              >
-                Maybe Later
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  setShowUpgradePrompt(false)
-                  router.push("/landing-page#pricing")
-                }}
-                className="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white font-semibold"
-              >
-                <Crown className="h-4 w-4 mr-2" />
-                View Plans
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+      {UpgradeModal}
 
       <div className="flex-1 min-h-0 overflow-hidden" data-testid="student-question-content">
         <div className="h-full min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2 p-2 lg:p-3" data-testid="student-question-grid">

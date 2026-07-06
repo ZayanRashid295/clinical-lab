@@ -35,15 +35,37 @@ const COLOR_KEYS = new Set<string>([
   "fuchsia",
 ]);
 
-/** Merge API `user_settings` UI columns into local UIConfig (server wins). */
-export function applyServerPrefsToUiConfig(prefs: ServerUiPreferences | null | undefined): void {
-  if (!prefs || typeof prefs !== "object") return;
+export type ServerPrefsMergeResult = {
+  /** True when local theme should be pushed to the server (user chose locally). */
+  pushLocalTheme: boolean;
+};
 
+function localThemeIsExplicit(): boolean {
+  const local = UIConfigService.getInstance().getConfig();
+  return typeof local.themeUpdatedAt === "number" && local.themeUpdatedAt > 0;
+}
+
+/** Merge API `user_settings` UI columns into local UIConfig. Local theme wins once the user has toggled it. */
+export function applyServerPrefsToUiConfig(
+  prefs: ServerUiPreferences | null | undefined,
+): ServerPrefsMergeResult {
+  const result: ServerPrefsMergeResult = { pushLocalTheme: false };
+  if (!prefs || typeof prefs !== "object") return result;
+
+  const local = UIConfigService.getInstance().getConfig();
   const updates: Partial<UIConfig> = {};
+  const explicitLocalTheme = localThemeIsExplicit();
 
   if (prefs.uiTheme === "light" || prefs.uiTheme === "dark") {
-    updates.theme = prefs.uiTheme;
+    if (explicitLocalTheme) {
+      if (prefs.uiTheme !== local.theme) {
+        result.pushLocalTheme = true;
+      }
+    } else {
+      updates.theme = prefs.uiTheme;
+    }
   }
+
   if (prefs.uiColorScheme && COLOR_KEYS.has(prefs.uiColorScheme)) {
     updates.colorScheme = prefs.uiColorScheme as UIColorScheme;
   }
@@ -64,9 +86,11 @@ export function applyServerPrefsToUiConfig(prefs: ServerUiPreferences | null | u
     updates.typographyPreset = prefs.uiTypographyPreset as TypographyPreset;
   }
 
-  if (Object.keys(updates).length === 0) return;
+  if (Object.keys(updates).length > 0) {
+    UIConfigService.getInstance().updateConfig(updates);
+  }
 
-  UIConfigService.getInstance().updateConfig(updates);
+  return result;
 }
 
 export function configToServerPatchBody(config: UIConfig): ServerUiPreferences {

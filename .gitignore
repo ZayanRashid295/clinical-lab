@@ -1,36 +1,26 @@
-# Dependency directories
+# Dependencies
 node_modules/
 .env
 .env.*
-.env.example
+!.env.example
+!**/env.example
+
+# Build output
 dist/
 build/
-
-# Python (if backend uses Python)
-__pycache__/
-*.py[cod]
-venv/
-ENV/
-env/
+.next/
+out/
 
 # Logs
 *.log
 
-# IDE / Editor
+# IDE / OS
 .vscode/
 .idea/
-
-# System files
 .DS_Store
 Thumbs.db
 
-# Existing ignored paths
-ref/
-org-data/
-nextjs/.next/
-nextjs/node_modules/
-
-# Accidental TypeScript emit outside dist/ (run tsc from repo root)
+# TypeScript emit outside dist/
 tsc-output*.txt
 backend/*.js
 backend/*.js.map
@@ -42,20 +32,41 @@ backend/scripts/*.js
 backend/scripts/*.js.map
 backend/scripts/*.d.ts
 
-# Local docs / thesis artifacts (not part of the app)
-thesis/
-thesis.zip
-*.docx
-!test_questions/**/*.docx
-
-# Generated question-builder / upload artifacts (runtime + test output)
+# Uploads (runtime)
 backend/uploads/*
 !backend/uploads/.gitkeep
 backend/public/uploads/*
 !backend/public/uploads/.gitkeep
+
+# Local / generated data (not part of the app)
 clinical-lab-data-test-output/
 clinical-lab-data-test-output*/
+clinical lab data/
 data1-output/
-data1-output*/
 data1/
-my-world-question-builder/
+ref/
+org-data/
+thesis/
+thesis.zip
+medprep-ai/
+nextjs/
+react/
+MedPrepAI-main/
+uworld-replit/
+uworld-bolt/
+opt/
+test_questions/
+
+# Archives and scratch at repo root
+*.zip
+*.tar.gz
+patch-*.js
+tmp-*.js
+restore-and-patch.js
+prisma-seed-output.txt
+
+# Docs / credentials (keep in docs/ or env only)
+TEST_CREDENTIALS.md
+
+# Word docs (except if explicitly needed elsewhere)
+*.docx

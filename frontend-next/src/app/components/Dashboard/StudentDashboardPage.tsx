@@ -49,9 +49,9 @@ import {
   getApiErrorMessage,
   isSubscriptionUpgradeRequiredError,
 } from "@/app/services/base/api-http-error";
-import { SubscriptionUpgradeModal } from "@/shared/components/SubscriptionUpgradeModal";
 import { authService } from "@/shared/services/auth.service";
-import useMyEntitlements from "@/hooks/useMyEntitlements";
+import SubscriptionWidget from "../Billing/SubscriptionWidget";
+import useBillingFeatures from "@/hooks/useBillingFeatures";
 import {
   isMedprepSlugAllowed,
   medprepSessionModeToSlug,
@@ -192,10 +192,11 @@ export default function StudentDashboardPage() {
   const [medprepSessionsLoading, setMedprepSessionsLoading] = useState(true);
   const [caseLimits, setCaseLimits] = useState<CaseLimitsPayload | null>(null);
 
-  const { entitlements, loading: entitlementsLoading } = useMyEntitlements();
+  const { entitlements, loading: entitlementsLoading } = useBillingFeatures();
 
   const hasMedprepModuleAccess = Boolean(
-    entitlements["medprepai.access"]?.enabled ??
+    (entitlements["medprepai.access"] as { enabled?: boolean } | undefined)?.enabled ??
+      entitlements["medprepai.modes"] ??
       entitlements["medprepai.access"] ??
       false
   );
@@ -350,14 +351,8 @@ export default function StudentDashboardPage() {
       className="min-h-full bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(var(--color-primary-500-rgb),0.08),transparent)] dark:bg-gradient-to-b dark:from-gray-950 dark:via-gray-900 dark:to-gray-950"
       data-testid="page-dashboard"
     >
-      <SubscriptionUpgradeModal
-        open={subscriptionModalOpen}
-        onOpenChange={setSubscriptionModalOpen}
-        featureLabel="Study Planner"
-      />
-
       <div className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <div className="w-full max-w-none space-y-2 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="w-full max-w-none space-y-1.5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
               MedPrepAI
@@ -386,11 +381,11 @@ export default function StudentDashboardPage() {
                 className="bg-primary-600 text-white shadow-sm transition-colors hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500/35 dark:bg-primary-600 dark:hover:bg-primary-500"
                 asChild
               >
-                <Link href="/my-subscription">Subscription</Link>
+                <Link href="/billing">Billing</Link>
               </Button>
             </div>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
             Welcome back{displayName ? `, ${displayName}` : ""}
           </h1>
           <p className="overflow-x-auto text-sm leading-relaxed whitespace-nowrap text-slate-600 [scrollbar-width:thin] dark:text-slate-400">
@@ -399,7 +394,7 @@ export default function StudentDashboardPage() {
         </div>
       </div>
 
-      <div className="w-full max-w-none space-y-10 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         {error && (
           <div
             role="alert"
@@ -449,6 +444,10 @@ export default function StudentDashboardPage() {
             icon={Brain}
             color="warning"
           />
+        </section>
+
+        <section className="max-w-md">
+          <SubscriptionWidget />
         </section>
 
         {/* Resume */}
@@ -787,7 +786,7 @@ export default function StudentDashboardPage() {
                       </Button>
                     ) : (
                       <Button variant="secondary" className="w-full" asChild>
-                        <Link href="/my-subscription">
+                        <Link href="/billing">
                           <Lock className="mr-2 h-4 w-4" />
                           Compare plans
                         </Link>

@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       `}</style>
       <div
         className={`h-full flex flex-col transition-all duration-300 ease-in-out relative border-r bg-[color:var(--sidebar-bg)] text-[color:var(--sidebar-fg)] border-[color:var(--sidebar-border)] ${
-          isCollapsed ? "w-16" : "w-64"
+          isCollapsed ? "w-16" : "w-56"
         }`}
       >
         {/* Brand header */}

@@ -21,11 +21,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import { useUIConfigContext } from "@/shared/contexts/UIConfigContext";
-import { ThemeService } from "@/app/config/theme.service";
-import { useAccessControl } from "@/hooks/useAccessControl";
-import { Alert, AlertDescription } from "@/shared/ui/alert";
-import { Info, Crown } from "lucide-react";
+import {
+  STUDY_FEATURE_KEYS,
+  useStudyFeatureGate,
+} from "@/hooks/useSubscriptionUpgradeModal";
 
 interface ValidationErrors {
   subjects?: string;
@@ -55,25 +54,10 @@ export default function StudyCreateTestPage() {
   const [showInsufficientQuestionsDialog, setShowInsufficientQuestionsDialog] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showQuickGuide, setShowQuickGuide] = useState(false);
-  const { hasActiveSubscription } = useAccessControl();
-
-  // Get theme config to ensure theme is applied
-  const { config: uiConfig } = useUIConfigContext();
-  const themeService = ThemeService.getInstance();
-
-  // Apply theme on mount and when theme changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      themeService.applyTheme(uiConfig);
-      // Force a re-render by toggling a state if needed
-      const htmlElement = document.documentElement;
-      if (uiConfig.theme === 'dark') {
-        htmlElement.classList.add('dark');
-      } else {
-        htmlElement.classList.remove('dark');
-      }
-    }
-  }, [uiConfig.theme, uiConfig.colorScheme, uiConfig.fontSize, uiConfig.typographyPreset, themeService]);
+  const {
+    ensureAccess,
+    UpgradeModal: SubscriptionUpgradeModal,
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.createTest, "Create Test");
 
   // Refresh counts when page becomes visible (user returns from test)
   useEffect(() => {
@@ -327,6 +311,8 @@ export default function StudyCreateTestPage() {
   };
 
   const handleGenerateTest = async () => {
+    if (!ensureAccess({ requireSubscription: true })) return;
+
     // Clear previous messages
     setError(null);
     setSuccess(null);
@@ -416,6 +402,8 @@ export default function StudyCreateTestPage() {
       params.set("tutor", "true");
     }
 
+    params.set("from", "create-test");
+
     // Navigate to student mode with filters
     window.location.href = `/question-generator/student?${params.toString()}`;
   };
@@ -455,28 +443,6 @@ export default function StudyCreateTestPage() {
         {/* Scrollable Content */}
         <main className="flex-1 overflow-auto scrollbar-thin">
           <div className="p-6">
-      {/* Demo Mode Indicator */}
-      {!hasActiveSubscription && (
-        <Alert className="mb-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
-          <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-          <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <strong className="font-semibold">Demo Mode:</strong> You&apos;re viewing a limited preview. 
-                You&apos;ll receive the same 10 demo questions regardless of filters. 
-                <Button
-                  variant="link"
-                  className="h-auto p-0 ml-1 text-yellow-700 dark:text-yellow-300 underline font-semibold"
-                  onClick={() => window.location.href = "/landing-page#pricing"}
-                >
-                  Upgrade to unlock full access
-                </Button>
-              </div>
-              <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400 ml-2" />
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Error/Success Messages */}
       {error && (
@@ -738,6 +704,7 @@ export default function StudyCreateTestPage() {
 
       {/* Quick Guide Modal */}
       <QuickGuideModal open={showQuickGuide} onOpenChange={setShowQuickGuide} />
+      {SubscriptionUpgradeModal}
     </div>
   );
 }

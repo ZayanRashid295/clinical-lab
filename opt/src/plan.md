@@ -1,3 +1,0 @@
-- create compact relation schema
-- create one table in a sepaate file based on compact
-- join module tables
