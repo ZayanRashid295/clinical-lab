@@ -47,14 +47,18 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
 
   // Use stem as-is; no hardcoded parsing or line-breaking. Doc structure is preserved.
   const displayStem = stripOptionsAndExplanationsFromStemString(question.stem || "")
-  const stemHighlightItems = filterAnnotationsForTarget(
-    feedbackHighlights.map((h) => ({
-      id: h.id,
-      targetKey: h.targetKey,
-      selectedText: h.selectedText,
-      severity: h.severity,
-    })),
-    "stem"
+  const mappedHighlights = feedbackHighlights.map((h) => ({
+    id: h.id,
+    targetKey: h.targetKey,
+    selectedText: h.selectedText,
+    severity: h.severity,
+    body: h.body,
+  }))
+  const stemHighlightItems = mergeHighlightItems(
+    annotationsToHighlightItems(mappedHighlights, "stem", {
+      fullTextFallback: displayStem,
+    }),
+    highlightItemsMatchingPlainText(mappedHighlights, displayStem)
   )
 
   return (
@@ -152,19 +156,10 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
           const showCorrectTick = isPreviewMode ? isCorrect : (answered && isCorrect)
 
           const displayText = `${option.label}. ${option.text}`
-          const mappedHighlights = feedbackHighlights.map((h) => ({
-            id: h.id,
-            targetKey: h.targetKey,
-            selectedText: h.selectedText,
-            severity: h.severity,
-            body: h.body,
-          }))
           const optionHighlights = mergeHighlightItems(
-            annotationsToHighlightItems(
-              mappedHighlights,
-              `option:${option.label}`,
-              { fullTextFallback: displayText }
-            ),
+            annotationsToHighlightItems(mappedHighlights, `option:${option.label}`, {
+              fullTextFallback: displayText,
+            }),
             highlightItemsMatchingPlainText(mappedHighlights, displayText)
           )
 
