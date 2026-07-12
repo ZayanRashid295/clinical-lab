@@ -30,7 +30,7 @@ describe("MedprepAiService", () => {
 
   const subscriptionsMock: any = {
     /** Legacy-style: access only → all modes allowed */
-    getUserEntitlements: jest.fn().mockResolvedValue({
+    getUserEntitlementsMap: jest.fn().mockResolvedValue({
       "medprepai.access": { enabled: true },
     }),
   };
@@ -83,7 +83,7 @@ describe("MedprepAiService", () => {
   });
 
   it("blocks starting a session when package lists modes but none are selected", async () => {
-    subscriptionsMock.getUserEntitlements.mockResolvedValueOnce({
+    subscriptionsMock.getUserEntitlementsMap.mockResolvedValueOnce({
       "medprepai.access": { enabled: true },
       "medprepai.modes": { items: [], limitsPerMode: {}, limitPeriod: "MONTH" },
     });
@@ -99,7 +99,7 @@ describe("MedprepAiService", () => {
   });
 
   it("blocks LEARNING when subscription only includes Practice (let-me-drive)", async () => {
-    subscriptionsMock.getUserEntitlements.mockResolvedValueOnce({
+    subscriptionsMock.getUserEntitlementsMap.mockResolvedValueOnce({
       "medprepai.access": { enabled: true },
       "medprepai.modes": {
         items: ["let-me-drive"],

@@ -44,7 +44,7 @@ export function useLandingV2Actions() {
 
   const beginPrep = useCallback(() => {
     if (isAuthenticated) {
-      void router.push("/study/question-bank");
+      void router.push("/test-creation/study-create");
       return;
     }
     goToAuth();

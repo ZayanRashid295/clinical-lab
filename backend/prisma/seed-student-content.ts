@@ -3,7 +3,7 @@ import { EDUCATION_SEED_PRIMARY_STUDENT_EMAIL } from "./education-users.seed";
 
 /**
  * Seeds learner-facing demo data for the primary student so the dashboard,
- * study planner, flashcards and notes pages have real, non-empty data on
+ * study planner pages have real, non-empty data on
  * a fresh database.
  */
 export async function seedStudentContent(prisma: PrismaClient) {
@@ -43,7 +43,7 @@ export async function seedStudentContent(prisma: PrismaClient) {
 
   const task = (
     title: string,
-    type: "READING" | "PRACTICE" | "REVIEW" | "FLASHCARDS" | "ASSESSMENT",
+    type: "READING" | "PRACTICE" | "REVIEW" | "ASSESSMENT",
     dayOffset: number,
     durationMinutes: number,
     description?: string
@@ -62,7 +62,6 @@ export async function seedStudentContent(prisma: PrismaClient) {
     data: [
       task("Read: Cardiac physiology overview", "READING", -1, 45),
       task("Practice: 20 cardiology MCQs", "PRACTICE", 0, 30),
-      task("Flashcards: due cards", "FLASHCARDS", 0, 15),
       task("Review: missed neurology questions", "REVIEW", 1, 30),
       task("Assessment: 40-question timed block", "ASSESSMENT", 2, 60),
       task("Read: Pharmacology — beta blockers", "READING", 3, 30),
@@ -83,89 +82,6 @@ export async function seedStudentContent(prisma: PrismaClient) {
       data: { status: "COMPLETED", completedAt: new Date() },
     });
   }
-
-  // ────── notes ──────
-  await prisma.studentNote.deleteMany({ where: { userId: student.id } });
-  await prisma.studentNote.createMany({
-    data: [
-      {
-        userId: student.id,
-        title: "STEMI vs NSTEMI",
-        body: "ST elevation = transmural ischemia → urgent reperfusion (PCI within 90 min). NSTEMI = subendocardial ischemia, manage medically + risk stratify.",
-        color: "yellow",
-        pinned: true,
-        tags: ["cardiology", "high-yield"],
-      },
-      {
-        userId: student.id,
-        title: "Murmur cheatsheet",
-        body: "S1/S2, systolic vs diastolic, radiation patterns. Mitral regurg → axilla. Aortic stenosis → carotids.",
-        color: "blue",
-        pinned: true,
-        tags: ["cardiology"],
-      },
-      {
-        userId: student.id,
-        title: "Cranial nerves mnemonic",
-        body: "Oh Oh Oh To Touch And Feel Very Good Velvet Ah Heaven.",
-        color: "green",
-        pinned: false,
-        tags: ["neuro"],
-      },
-    ],
-  });
-
-  // ────── flashcards ──────
-  await prisma.flashcard.deleteMany({ where: { userId: student.id } });
-  const baseCards = [
-    {
-      deck: "Cardiology",
-      front: "Most common cause of MI",
-      back: "Atherosclerotic plaque rupture",
-    },
-    {
-      deck: "Cardiology",
-      front: "First-line for stable angina",
-      back: "Beta blockers + nitrates as needed",
-    },
-    {
-      deck: "Cardiology",
-      front: "Drug to avoid in acute decompensated HF",
-      back: "Verapamil (negative inotrope)",
-    },
-    {
-      deck: "Neurology",
-      front: "Most common cause of subarachnoid hemorrhage",
-      back: "Ruptured berry aneurysm",
-    },
-    {
-      deck: "Neurology",
-      front: "Hallmark of myasthenia gravis",
-      back: "Fatigable weakness; anti-AChR antibodies",
-    },
-    {
-      deck: "Emergency",
-      front: "First-line for anaphylaxis",
-      back: "Intramuscular epinephrine 0.3–0.5 mg",
-    },
-    {
-      deck: "Emergency",
-      front: "Reversal agent for benzodiazepine OD",
-      back: "Flumazenil",
-    },
-  ];
-  await prisma.flashcard.createMany({
-    data: baseCards.map((c, i) => ({
-      userId: student.id,
-      deck: c.deck,
-      front: c.front,
-      back: c.back,
-      // Spread due dates: half are due now, half upcoming
-      dueAt: new Date(
-        Date.now() + (i % 2 === 0 ? -1 : 2) * 24 * 3600 * 1000
-      ),
-    })),
-  });
 
   // ────── bookmarks ──────
   await prisma.bookmark.deleteMany({ where: { userId: student.id } });

@@ -139,7 +139,7 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
 
           <div className="border-t border-border/50 dark:border-white/10" />
 
-          {/* Step 4 - Subjects & Systems */}
+          {/* Step 4 - Systems & topics */}
           <div className="flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
@@ -149,17 +149,20 @@ export function QuickGuideModal({ open, onOpenChange }: QuickGuideModalProps) {
             <div className="flex-1 space-y-2">
               <div className="flex items-center gap-2">
                 <MousePointerClick className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-foreground dark:text-slate-100">Choose Subjects & Systems</h3>
+                <h3 className="font-semibold text-foreground dark:text-slate-100">Choose systems & topics</h3>
               </div>
               <p className="text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">
-                Click on subjects and organ systems to include them in your test. You can select multiple items from
-                each category. Use the search bar to quickly find specific topics.
+                <span className="font-medium text-foreground dark:text-slate-100">Systems</span> (left) are required — e.g.
+                Cardiovascular, Hematology. Optionally narrow with{" "}
+                <span className="font-medium text-foreground dark:text-slate-100">topics</span> and{" "}
+                <span className="font-medium text-foreground dark:text-slate-100">subtopics</span> (right). Expand a topic to
+                pick individual subtopics.
               </p>
               <div className="bg-muted/50 dark:bg-white/10 rounded-lg p-3 mt-2 flex items-start gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground dark:text-slate-400">
-                  <span className="font-medium text-foreground dark:text-slate-100">Pro tip:</span> Use &quot;Select All&quot; to quickly include all
-                  items, then deselect the ones you don&apos;t need.
+                  <span className="font-medium text-foreground dark:text-slate-100">Pro tip:</span> The Topics header checkbox
+                  selects all topics under your chosen systems only — not the whole question bank.
                 </p>
               </div>
             </div>

@@ -6,9 +6,6 @@ import { isSubscriptionUpgradeRequiredError } from "@/app/services/base/api-http
 import useAccessControl from "@/hooks/useAccessControl";
 
 export const STUDY_FEATURE_KEYS = {
-  questionBank: "qbank.access",
-  flashcards: "study.flashcards",
-  notes: "study.notes",
   planner: "study.planner",
   createTest: "qbank.access",
 } as const;

@@ -65,7 +65,7 @@ export function SystemSelector({ selectedSystems, onSystemToggle, selectedPool, 
   };
 
   return (
-    <div className="flex flex-col h-full" data-testid="card-subjects">
+    <div className="flex flex-col h-full" data-testid="card-systems">
       <div className="shrink-0 border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

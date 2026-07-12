@@ -99,7 +99,7 @@ export function userFacingApiMessage(
   // Not found (common Nest messages)
   if (
     /\bnot found\b/i.test(lower) &&
-    (/(discussion|report|flashcard|note|session|attempt|exam|paper)\b/i.test(
+    (/(discussion|report|note|session|attempt|exam|paper)\b/i.test(
       lower
     ) ||
       /question paper/i.test(lower))

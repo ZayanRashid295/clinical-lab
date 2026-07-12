@@ -37,8 +37,6 @@ export type {
   CreateStudyGroupPayload,
   CreateGroupPostPayload,
 } from "./study-groups.service";
-export { goalsService, GoalsService } from "./goals.service";
-export type { CreateGoalPayload, UpdateGoalPayload } from "./goals.service";
 export { feedbackService, FeedbackService } from "./feedback.service";
 export type {
   CreateFeedbackPayload,

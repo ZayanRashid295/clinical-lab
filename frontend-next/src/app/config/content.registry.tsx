@@ -25,9 +25,6 @@ import QuestionChoiceManagementContent from "../components/Content/QuestionChoic
 import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
 
 // Import study components
-import QuestionBankPage from "../components/Study/QuestionBankPage";
-import FlashcardsPage from "../components/Study/FlashcardsPage";
-import NotesPage from "../components/Study/NotesPage";
 import StudyIndexPage from "../components/Study/StudyIndexPage";
 import StudyPlannerPage from "../components/Study/StudyPlannerPage";
 
@@ -71,9 +68,9 @@ import DiscussionsPage from "../components/Launch/DiscussionsPage";
 import AiTutorPage from "../components/Launch/AiTutorPage";
 import MockExamsPage from "../components/Launch/MockExamsPage";
 import StudyGroupsPage from "../components/Launch/StudyGroupsPage";
-import GoalsPage from "../components/Launch/GoalsPage";
 import FeedbackPage from "../components/Launch/FeedbackPage";
 import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
+import QuestionReviewAdminPage from "../components/QuestionReview/QuestionReviewAdminPage";
 import SettingsPage from "../components/Launch/SettingsPage";
 import ProfilePage from "../components/Launch/ProfilePage";
 import { StudentAssignmentsPage } from "../components/institution/StudentAssignmentsPage";
@@ -119,6 +116,7 @@ export const transportationContentRegistry: ContentRegistry = {
     // Billing admin routes
     "/admin/billing/plans": () => <BillingPlanManagement />,
     "/admin/billing/promotions": () => <PromotionManagement />,
+    "/admin/content/question-review": () => <QuestionReviewAdminPage />,
 
     // Institution (faculty ↔ student)
     "/assignments": () => (
@@ -156,10 +154,6 @@ export const transportationContentRegistry: ContentRegistry = {
 
     // Study routes
     "/study": () => <StudyIndexPage />,
-    "/study/question-bank": () => <QuestionBankPage />,
-    "/study/flashcards": () => <FlashcardsPage />,
-    "/study/notes": () => <NotesPage />,
-    "/study/goals": () => <GoalsPage />,
     "/study-planner": () => <StudyPlannerPage />,
 
     // MedPrepAI learning modes
@@ -264,7 +258,6 @@ export const transportationContentRegistry: ContentRegistry = {
     ),
     "/mock-exams": () => <MockExamsPage />,
     "/study-groups": () => <StudyGroupsPage />,
-    "/goals": () => <GoalsPage />,
     "/feedback": () => <FeedbackPage />,
     "/my-reports": () => <QuestionReportsPage />,
     "/profile": () => <ProfilePage />,

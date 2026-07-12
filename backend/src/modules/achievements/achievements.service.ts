@@ -217,8 +217,6 @@ export class AchievementsService {
     const [
       qpq,
       mockAttempt,
-      flashReview,
-      note,
       discussion,
       reply,
       aiMsg,
@@ -237,16 +235,6 @@ export class AchievementsService {
         where: { userId, status: "COMPLETED" },
         orderBy: { completedAt: "desc" },
         select: { completedAt: true },
-      }),
-      this.prisma.flashcardReview.findFirst({
-        where: { userId },
-        orderBy: { reviewedAt: "desc" },
-        select: { reviewedAt: true },
-      }),
-      this.prisma.studentNote.findFirst({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        select: { createdAt: true },
       }),
       this.prisma.discussion.findFirst({
         where: { authorId: userId },
@@ -293,8 +281,6 @@ export class AchievementsService {
     const dates = [
       qpq?.updatedAt ?? null,
       mockAttempt?.completedAt ?? null,
-      flashReview?.reviewedAt ?? null,
-      note?.createdAt ?? null,
       discussion?.createdAt ?? null,
       reply?.createdAt ?? null,
       aiMsg?.createdAt ?? null,
@@ -442,10 +428,6 @@ export class AchievementsService {
         });
       case "TESTS_COMPLETED":
         return this.countFullyAnsweredQuestionPapers(userId);
-      case "FLASHCARDS_REVIEWED":
-        return this.prisma.flashcardReview.count({ where: { userId } });
-      case "NOTES_CREATED":
-        return this.prisma.studentNote.count({ where: { userId } });
       case "STREAK_DAYS": {
         const s = await this.prisma.userStreak.findUnique({
           where: { userId },
@@ -483,10 +465,6 @@ export class AchievementsService {
         ]);
         return threads + replies;
       }
-      case "GOAL_COMPLETED":
-        return this.prisma.goalProgress.count({
-          where: { userId, achieved: true },
-        });
       case "AI_TUTOR_MESSAGES":
         return this.prisma.aiTutorMessage.count({
           where: { role: "USER", conversation: { userId } },

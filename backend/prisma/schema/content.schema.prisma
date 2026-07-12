@@ -67,6 +67,8 @@ model Question {
   explanationBlocks      ExplanationBlock[]      @relation("QuestionExplanation")
   perAnswerExplanations  PerAnswerExplanation[]
   questionPaperQuestions QuestionPaperQuestion[]
+  questionReviewBundleItems QuestionReviewBundleItem[]
+  questionReviewResponses   QuestionReviewResponse[]
 
   @@map("questions")
 }

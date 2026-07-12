@@ -13,7 +13,7 @@ export class StudentStatsController {
   @Get("dashboard")
   @ApiOperation({
     summary:
-      "Aggregated dashboard stats: question score, qbank usage, tests, plan progress, flashcards, notes, bookmarks",
+      "Aggregated dashboard stats: question score, qbank usage, tests, plan progress, notes, bookmarks",
   })
   dashboard(@Request() req) {
     return this.service.getDashboard(req.user.userId ?? req.user.id);

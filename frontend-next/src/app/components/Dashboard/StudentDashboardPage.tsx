@@ -8,12 +8,10 @@ import {
   BarChart3,
   BookMarked,
   BookOpen,
-  Brain,
   ClipboardCheck,
   ClipboardList,
   Clock,
   Eye,
-  FileQuestion,
   GraduationCap,
   Layers,
   Loader2,
@@ -24,7 +22,6 @@ import {
   Sparkles,
   Stethoscope,
   Target,
-  Trophy,
   Users,
 } from "lucide-react";
 
@@ -56,7 +53,6 @@ import {
   isMedprepSlugAllowed,
   medprepSessionModeToSlug,
 } from "@/lib/fyp/medprep-entitlements";
-import { MEDPREP_MODES } from "@/app/components/medprep-ai/modes";
 import type { MedPrepModeId } from "@/app/components/medprep-ai/modes";
 import {
   medprepSessionService,
@@ -65,6 +61,12 @@ import {
 import { getClinicalUserId } from "@/lib/fyp/medprep-user";
 import { cn } from "@/shared/utils/cn";
 import { DashboardInstitutionPanel } from "@/app/components/Dashboard/DashboardInstitutionPanel";
+import {
+  AchievementsCatalogSection,
+  AchievementsProgressSummary,
+  AchievementsRecentUnlocks,
+  useDashboardAchievements,
+} from "@/app/components/Dashboard/DashboardAchievements";
 
 type CaseLimitsPayload = {
   hasMedprepAccess: boolean;
@@ -86,13 +88,6 @@ function formatRelativeUpdated(iso?: string): string | null {
     day: "numeric",
   });
 }
-
-const MEDPREP_ROUTE: Record<MedPrepModeId, string> = {
-  "let-me-drive": "/medprep-ai/let-me-drive",
-  qa: "/medprep-ai/qa",
-  "ai-evaluation": "/medprep-ai/ai-evaluation",
-  "shadow-mode": "/medprep-ai/shadow-mode",
-};
 
 const MODE_VISUAL: Record<
   MedPrepModeId,
@@ -147,17 +142,9 @@ const MODE_VISUAL: Record<
 };
 
 const QUICK_LINK_ICON: Record<
-  "achievements" | "mockExams" | "studyGroups" | "settings",
+  "studyGroups" | "settings" | "performance",
   { wrap: string }
 > = {
-  achievements: {
-    wrap:
-      "bg-amber-100 text-amber-900 ring-amber-200/80 dark:bg-amber-500/30 dark:text-amber-50 dark:ring-amber-400/50",
-  },
-  mockExams: {
-    wrap:
-      "bg-indigo-100 text-indigo-900 ring-indigo-200/80 dark:bg-indigo-500/30 dark:text-indigo-50 dark:ring-indigo-400/50",
-  },
   studyGroups: {
     wrap:
       "bg-emerald-100 text-emerald-900 ring-emerald-200/80 dark:bg-emerald-500/30 dark:text-emerald-50 dark:ring-emerald-400/50",
@@ -165,6 +152,10 @@ const QUICK_LINK_ICON: Record<
   settings: {
     wrap:
       "bg-slate-100 text-slate-800 ring-slate-200/80 dark:bg-slate-600/70 dark:text-slate-50 dark:ring-white/25",
+  },
+  performance: {
+    wrap:
+      "bg-indigo-100 text-indigo-900 ring-indigo-200/80 dark:bg-indigo-500/30 dark:text-indigo-50 dark:ring-indigo-400/50",
   },
 };
 
@@ -192,7 +183,14 @@ export default function StudentDashboardPage() {
   const [medprepSessionsLoading, setMedprepSessionsLoading] = useState(true);
   const [caseLimits, setCaseLimits] = useState<CaseLimitsPayload | null>(null);
 
-  const { entitlements, loading: entitlementsLoading } = useBillingFeatures();
+  const { entitlements } = useBillingFeatures();
+  const {
+    overview: achievementsOverview,
+    leaderboard,
+    loading: achievementsLoading,
+    live: leaderboardLive,
+    reload: reloadAchievements,
+  } = useDashboardAchievements();
 
   const hasMedprepModuleAccess = Boolean(
     (entitlements["medprepai.access"] as { enabled?: boolean } | undefined)?.enabled ??
@@ -319,6 +317,15 @@ export default function StudentDashboardPage() {
     void loadAll();
   }, []);
 
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!router.asPath.includes("#achievements")) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById("achievements")?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [router.isReady, router.asPath]);
+
   const upcomingPreview = useMemo(() => {
     return tasks
       .filter((t) => classifyTask(t) === "upcoming")
@@ -369,6 +376,7 @@ export default function StudentDashboardPage() {
                 onClick={() => {
                   void loadAll();
                   void refreshMedprepSessions();
+                  void reloadAchievements();
                 }}
                 data-testid="button-refresh-dashboard"
               >
@@ -388,8 +396,8 @@ export default function StudentDashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
             Welcome back{displayName ? `, ${displayName}` : ""}
           </h1>
-          <p className="overflow-x-auto text-sm leading-relaxed whitespace-nowrap text-slate-600 [scrollbar-width:thin] dark:text-slate-400">
-            Your hub for QBank study, assessments, MedPrepAI clinical cases, and subscription-aware tools—organized in one place.
+          <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            Pick up where you left off, track your progress, and jump into study tools—all in one place.
           </p>
         </div>
       </div>
@@ -406,51 +414,7 @@ export default function StudentDashboardPage() {
 
         <DashboardInstitutionPanel />
 
-        {/* KPI strip */}
-        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            title="Question accuracy"
-            value={`${Math.round(stats?.questionScore.percent ?? 0)}%`}
-            subtitle={`${stats?.questionScore.correct ?? 0}/${
-              stats?.questionScore.attempted ?? 0
-            } correct`}
-            icon={Target}
-            color="success"
-          />
-          <StatCard
-            title="QBank coverage"
-            value={`${Math.round(stats?.qbankUsage.percent ?? 0)}%`}
-            subtitle={`${stats?.qbankUsage.used ?? 0} of ${
-              stats?.qbankUsage.total ?? 0
-            } seen`}
-            icon={Layers}
-            progress={Math.round(stats?.qbankUsage.percent ?? 0)}
-            color="primary"
-          />
-          <StatCard
-            title="Tests completed"
-            value={`${Math.round(stats?.tests.percent ?? 0)}%`}
-            subtitle={`${stats?.tests.completed ?? 0}/${
-              stats?.tests.total ?? 0
-            } tests`}
-            icon={ClipboardList}
-            progress={Math.round(stats?.tests.percent ?? 0)}
-            color="primary"
-          />
-          <StatCard
-            title="Flashcards due"
-            value={String(stats?.flashcards.due ?? 0)}
-            subtitle={`${stats?.flashcards.total ?? 0} total in decks`}
-            icon={Brain}
-            color="warning"
-          />
-        </section>
-
-        <section className="max-w-md">
-          <SubscriptionWidget />
-        </section>
-
-        {/* Resume */}
+        {/* Resume in-progress test — highest priority action */}
         {(inProgress || lastCompleted) && (
           <section className="grid gap-4 lg:grid-cols-2">
             {inProgress && (
@@ -502,7 +466,56 @@ export default function StudentDashboardPage() {
           </section>
         )}
 
-        {/* MedPrep — resume active simulations (same source as MedPrep overview) */}
+        {/* Study KPIs */}
+        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Question accuracy"
+            value={`${Math.round(stats?.questionScore.percent ?? 0)}%`}
+            subtitle={`${stats?.questionScore.correct ?? 0}/${
+              stats?.questionScore.attempted ?? 0
+            } correct`}
+            icon={Target}
+            color="success"
+          />
+          <StatCard
+            title="QBank coverage"
+            value={`${Math.round(stats?.qbankUsage.percent ?? 0)}%`}
+            subtitle={`${stats?.qbankUsage.used ?? 0} of ${
+              stats?.qbankUsage.total ?? 0
+            } seen`}
+            icon={Layers}
+            progress={Math.round(stats?.qbankUsage.percent ?? 0)}
+            color="primary"
+          />
+          <StatCard
+            title="Tests completed"
+            value={`${Math.round(stats?.tests.percent ?? 0)}%`}
+            subtitle={`${stats?.tests.completed ?? 0}/${
+              stats?.tests.total ?? 0
+            } tests`}
+            icon={ClipboardList}
+            progress={Math.round(stats?.tests.percent ?? 0)}
+            color="primary"
+          />
+          <StatCard
+            title="Bookmarks"
+            value={String(stats?.bookmarks ?? 0)}
+            subtitle="Saved for review"
+            icon={BookMarked}
+            color="warning"
+          />
+        </section>
+
+        <AchievementsProgressSummary
+          overview={achievementsOverview}
+          loading={achievementsLoading}
+        />
+
+        {achievementsOverview ? (
+          <AchievementsRecentUnlocks overview={achievementsOverview} />
+        ) : null}
+
+        {/* MedPrep — resume active simulations */}
         {(medprepSessionsLoading || activeMedprepSessions.length > 0) && (
           <section aria-labelledby="dash-medprep-resume-heading">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -636,27 +649,20 @@ export default function StudentDashboardPage() {
               <Link href="/study">Study index</Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
             {[
               {
-                title: "Question Bank",
-                desc: "Systems, topics, and tracked progress",
-                href: "/study/question-bank",
+                title: "Create Test",
+                desc: "Build custom practice blocks",
+                href: "/test-creation/study-create",
                 icon: BookOpen,
                 accent: "from-primary-500 to-primary-700",
               },
               {
-                title: "Flashcards",
-                desc: "Spaced repetition decks",
-                href: "/study/flashcards",
-                icon: Brain,
-                accent: "from-primary-400 to-primary-600",
-              },
-              {
-                title: "Notes",
-                desc: "Your clinical notes & pins",
-                href: "/study/notes",
-                icon: BookMarked,
+                title: "Mock Exams",
+                desc: "Full-length timed exams",
+                href: "/mock-exams",
+                icon: ClipboardList,
                 accent: "from-primary-600 to-primary-800",
               },
               {
@@ -668,6 +674,20 @@ export default function StudentDashboardPage() {
                 icon: Target,
                 accent: "from-primary-300 to-primary-500",
                 locked: studyPlannerBlocked,
+              },
+              {
+                title: "Past Tests",
+                desc: "Scores, attempts, and review",
+                href: "/previous-tests",
+                icon: ClipboardCheck,
+                accent: "from-slate-500 to-slate-700",
+              },
+              {
+                title: "Performance",
+                desc: "Trends and breakdowns",
+                href: "/performance",
+                icon: BarChart3,
+                accent: "from-indigo-500 to-violet-600",
               },
             ].map((item) => (
               <Card
@@ -717,141 +737,6 @@ export default function StudentDashboardPage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </section>
-
-        {/* MedPrepAI */}
-        <section>
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                MedPrepAI
-              </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Clinical simulation modes—access follows your subscription
-              </p>
-            </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/medprep-ai">Overview & resume</Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {MEDPREP_MODES.map((mode) => {
-              const id = mode.id as MedPrepModeId;
-              const allowed = isMedprepSlugAllowed(
-                entitlements as Record<string, unknown>,
-                id,
-                hasMedprepModuleAccess
-              );
-              const vis = MODE_VISUAL[id];
-              const Icon = vis.Icon;
-              const href = MEDPREP_ROUTE[id];
-
-              return (
-                <Card
-                  key={id}
-                  className="relative overflow-hidden border-slate-200/90 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md"
-                >
-                  <div
-                    className={cn("h-1.5 w-full bg-gradient-to-r", vis.bar)}
-                  />
-                  <CardHeader className="space-y-3">
-                    <div
-                      className={cn(
-                        "flex h-12 w-12 items-center justify-center rounded-xl ring-1 ring-black/5 dark:ring-white/10",
-                        vis.iconBg
-                      )}
-                    >
-                      <Icon className={cn("h-6 w-6", vis.iconFg)} aria-hidden />
-                    </div>
-                    <CardTitle className="text-base dark:text-white">{mode.title}</CardTitle>
-                    <CardDescription className="line-clamp-2 text-xs leading-relaxed dark:text-slate-400">
-                      {mode.summary}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {!hasMedprepModuleAccess && !entitlementsLoading && (
-                      <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-                        MedPrepAI is not included on your current plan.
-                      </p>
-                    )}
-                    {entitlementsLoading ? (
-                      <Button variant="secondary" className="w-full" disabled>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Checking access…
-                      </Button>
-                    ) : allowed ? (
-                      <Button className="w-full" asChild>
-                        <Link href={href}>{mode.ctaLabel}</Link>
-                      </Button>
-                    ) : (
-                      <Button variant="secondary" className="w-full" asChild>
-                        <Link href="/billing">
-                          <Lock className="mr-2 h-4 w-4" />
-                          Compare plans
-                        </Link>
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Assessments */}
-        <section>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Assessments & analytics
-            </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Build tests, review history, track performance
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
-              <CardHeader>
-                <FileQuestion className="mb-2 h-8 w-8 text-primary-600 dark:text-primary-400" />
-                <CardTitle className="text-base dark:text-white">Create a test</CardTitle>
-                <CardDescription className="text-xs dark:text-slate-400">
-                  Tutor or timed, pools, systems, and topics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" asChild>
-                  <Link href="/test-creation/study-create">New test</Link>
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
-              <CardHeader>
-                <ClipboardList className="mb-2 h-8 w-8 text-slate-700 dark:text-slate-300" />
-                <CardTitle className="text-base dark:text-white">Past tests</CardTitle>
-                <CardDescription className="text-xs dark:text-slate-400">
-                  Scores, attempts, and review
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10" asChild>
-                  <Link href="/previous-tests">View history</Link>
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className="border-slate-200 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
-              <CardHeader>
-                <BarChart3 className="mb-2 h-8 w-8 text-primary-600 dark:text-primary-400" />
-                <CardTitle className="text-base dark:text-white">Performance</CardTitle>
-                <CardDescription className="text-xs dark:text-slate-400">
-                  Trends and breakdowns
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10" asChild>
-                  <Link href="/performance">Open dashboard</Link>
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </section>
 
@@ -975,46 +860,52 @@ export default function StudentDashboardPage() {
           </Card>
         </section>
 
-        {/* Quick links — full-width strip */}
+        <Card className="overflow-hidden border-slate-200/90 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+          <div className="h-1 w-full bg-gradient-to-r from-rose-500 via-teal-500 to-indigo-600" />
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/12 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300">
+                <Stethoscope className="h-5 w-5" aria-hidden />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">MedPrepAI clinical simulations</p>
+                <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-400">
+                  Practice, learning, shadow, and evaluation modes—access follows your plan.
+                </p>
+              </div>
+            </div>
+            <Button asChild className="shrink-0">
+              <Link href="/medprep-ai">
+                Open MedPrep hub
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {achievementsOverview ? (
+          <AchievementsCatalogSection
+            overview={achievementsOverview}
+            leaderboard={leaderboard}
+            live={leaderboardLive}
+          />
+        ) : achievementsLoading ? (
+          <div className="flex items-center justify-center py-12 text-sm text-slate-500 dark:text-slate-400">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading achievements…
+          </div>
+        ) : null}
+
+        <section className="max-w-md">
+          <SubscriptionWidget />
+        </section>
+
+        {/* Quick links */}
         <section className="border-t border-slate-200/80 pt-8 dark:border-white/10">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-            Quick links
+            More
           </p>
-          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Link
-              href="/achievements"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
-            >
-              <span
-                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.achievements.wrap}`}
-              >
-                <Trophy className="h-5 w-5" strokeWidth={2.25} aria-hidden />
-              </span>
-              <span className="min-w-0 flex-1">Achievements</span>
-              <ArrowRight
-                className="h-4 w-4 shrink-0 text-slate-400 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-slate-500"
-                aria-hidden
-              />
-            </Link>
-            <Link
-              href="/mock-exams"
-              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
-            >
-              <span
-                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.mockExams.wrap}`}
-              >
-                <ClipboardCheck
-                  className="h-5 w-5"
-                  strokeWidth={2.25}
-                  aria-hidden
-                />
-              </span>
-              <span className="min-w-0 flex-1">Mock exams</span>
-              <ArrowRight
-                className="h-4 w-4 shrink-0 text-slate-400 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-slate-500"
-                aria-hidden
-              />
-            </Link>
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
             <Link
               href="/study-groups"
               className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
@@ -1025,6 +916,21 @@ export default function StudentDashboardPage() {
                 <Users className="h-5 w-5" strokeWidth={2.25} aria-hidden />
               </span>
               <span className="min-w-0 flex-1">Study groups</span>
+              <ArrowRight
+                className="h-4 w-4 shrink-0 text-slate-400 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-slate-500"
+                aria-hidden
+              />
+            </Link>
+            <Link
+              href="/performance"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-primary-300/60 hover:bg-primary-50/50 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md dark:text-white dark:hover:border-primary-600/40 dark:hover:bg-white/10"
+            >
+              <span
+                className={`${quickLinkIconBox} ${QUICK_LINK_ICON.performance.wrap}`}
+              >
+                <BarChart3 className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1">Performance</span>
               <ArrowRight
                 className="h-4 w-4 shrink-0 text-slate-400 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-slate-500"
                 aria-hidden

@@ -1,21 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
 const DEFAULT_FEATURES = {
-  starter: [
-    { key: "qbank.access", name: "QBank Access", enabled: true },
-    { key: "study.notes", name: "Study Notes", enabled: true },
-  ],
+  starter: [{ key: "qbank.access", name: "QBank Access", enabled: true }],
   pro: [
     { key: "qbank.access", name: "QBank Access", enabled: true },
-    { key: "study.notes", name: "Study Notes", enabled: true },
-    { key: "study.flashcards", name: "Flashcards", enabled: true },
     { key: "study.planner", name: "Study Planner", enabled: true },
     { key: "aitutor.chat", name: "AI Tutor", enabled: true, limit: 50 },
   ],
   enterprise: [
     { key: "qbank.access", name: "QBank Access", enabled: true },
-    { key: "study.notes", name: "Study Notes", enabled: true },
-    { key: "study.flashcards", name: "Flashcards", enabled: true },
     { key: "study.planner", name: "Study Planner", enabled: true },
     { key: "aitutor.chat", name: "AI Tutor", enabled: true, limit: 500 },
     { key: "medprepai.modes", name: "MedPrep AI Modes", enabled: true },

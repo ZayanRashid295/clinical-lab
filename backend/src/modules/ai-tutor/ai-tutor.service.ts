@@ -373,7 +373,7 @@ export class AiTutorService {
       `2. **List the differentials.** What else could explain the findings?`,
       `3. **Find the discriminating feature.** What in the stem points to one answer?`,
       `4. **Mechanism check.** Can you explain the underlying physiology in one sentence?`,
-      `5. **Take-home pearl.** Write a 1-line note for your flashcards.`,
+      `5. **Take-home pearl.** Write a 1-line note for your study notes.`,
       ``,
       `Add a Google AI API key in the backend \`.env\` (\`GOOGLE_API_KEY\`, same as Gemini elsewhere) and restart to enable full tutor responses.`,
     ].join("\n");

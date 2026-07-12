@@ -5,13 +5,16 @@ import { ProgramBrandLanding } from "./ProgramBrandLanding";
 import type { ExamTrack } from "./landing-v2-data";
 import { useLandingV2Actions } from "./use-landing-v2-actions";
 import { MarketingThemeShell } from "../marketing/marketing-theme";
+import { LenisScrollProvider } from "../hero-sequence";
 
 export function LandingPage2() {
   const { homeActions } = useLandingV2Actions();
 
   return (
     <MarketingThemeShell className="medprep-landing-v2">
-      <MedPrepAILanding actions={homeActions} />
+      <LenisScrollProvider>
+        <MedPrepAILanding actions={homeActions} />
+      </LenisScrollProvider>
     </MarketingThemeShell>
   );
 }
@@ -21,7 +24,9 @@ export function LandingPage2Program({ track }: { track: ExamTrack }) {
 
   return (
     <MarketingThemeShell className="medprep-landing-v2">
-      <ProgramBrandLanding track={track} actions={programActions()} />
+      <LenisScrollProvider>
+        <ProgramBrandLanding track={track} actions={programActions()} />
+      </LenisScrollProvider>
     </MarketingThemeShell>
   );
 }

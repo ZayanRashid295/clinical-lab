@@ -9,15 +9,13 @@ import { SubmitAssessmentDto } from "./dto/submit-assessment.dto";
 import { QueryQuestionPaperDto } from "./dto/query-question-paper.dto";
 import { QueryQuestionPaperQuestionDto } from "./dto/query-question-paper-question.dto";
 import { AchievementsService } from "../achievements/achievements.service";
-import { GoalsService } from "../goals/goals.service";
 import { buildQuestionPaperAuditSnapshot } from "../../common/utils/question-paper-audit.util";
 
 @Injectable()
 export class AssessmentsService {
   constructor(
     private prisma: PrismaService,
-    private achievements: AchievementsService,
-    private goals: GoalsService
+    private achievements: AchievementsService
   ) {}
 
   // ========== QUESTION PAPERS ==========
@@ -477,25 +475,6 @@ export class AssessmentsService {
           .catch(() => undefined),
         this.achievements
           .recordActivity(userId, "STUDY_MINUTES", 0)
-          .catch(() => undefined)
-      );
-      if (totalQuestions > 0) {
-        tasks.push(
-          this.goals
-            .recordProgress(userId, "QUESTIONS_ANSWERED", totalQuestions)
-            .catch(() => undefined)
-        );
-      }
-      if (correctAnswers > 0) {
-        tasks.push(
-          this.goals
-            .recordProgress(userId, "CORRECT_ANSWERS", correctAnswers)
-            .catch(() => undefined)
-        );
-      }
-      tasks.push(
-        this.goals
-          .recordProgress(userId, "TESTS_COMPLETED", 1)
           .catch(() => undefined)
       );
       await Promise.all(tasks);

@@ -32,7 +32,7 @@ async function main() {
     // Seed content hierarchy (Product → Sections → Chapters → Topics) for question creation
     await seedUSMLE(prisma);
 
-    // Demo notes / flashcards / study tasks / bookmarks for the primary student
+    // Demo notes / study tasks / bookmarks for the primary student
     await seedStudentContent(prisma);
 
     // Launch-time seeds: achievements catalogue, mock exams, welcome discussion, public study group

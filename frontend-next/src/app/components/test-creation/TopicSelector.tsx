@@ -61,6 +61,18 @@ export function TopicSelector({
     return systems.flatMap(system => system.topics);
   }, [systems]);
 
+  /** Topics visible for bulk actions — only under systems the user already selected */
+  const topicsInSelectedSystems = useMemo(() => {
+    return systems
+      .filter((system) => selectedSystems.includes(system.id))
+      .flatMap((system) => system.topics);
+  }, [systems, selectedSystems]);
+
+  const enabledTopicsInSelectedSystems = useMemo(
+    () => topicsInSelectedSystems.filter((t) => t.count > 0),
+    [topicsInSelectedSystems]
+  );
+
   const hasExpanded = expandedTopics.length > 0;
 
   const toggleExpandAll = () => {
@@ -120,7 +132,7 @@ export function TopicSelector({
   };
 
   const getAllTopicsState = (): boolean | 'indeterminate' => {
-    const enabledTopics = allTopics.filter((t) => t.count > 0);
+    const enabledTopics = enabledTopicsInSelectedSystems;
     if (enabledTopics.length === 0) {
       return false;
     }
@@ -245,44 +257,61 @@ export function TopicSelector({
   };
 
   const handleSelectAll = (checked: boolean | "indeterminate") => {
-    if (checked) {
-      systems.forEach((system) => {
-        if (system.count > 0 && !selectedSystems.includes(system.id)) {
-          onSystemToggle(system.id);
-        }
-      });
+    const enabledTopics = enabledTopicsInSelectedSystems;
+    if (enabledTopics.length === 0) return;
+
+    const shouldSelect = checked === true;
+
+    if (shouldSelect) {
       if (onTopicToggle) {
-        allTopics.forEach((topic) => {
-          if (topic.count > 0 && !selectedTopics.includes(topic.id)) {
+        enabledTopics.forEach((topic) => {
+          if (!selectedTopics.includes(topic.id)) {
             onTopicToggle(topic.id);
           }
         });
       }
       if (onSubtopicToggle) {
-        allTopics.forEach((topic) => {
-          if (topic.count > 0) {
-            topic.subtopics.forEach((subtopic) => {
-              if (subtopic.count > 0 && !selectedSubtopics.includes(subtopic.id)) {
-                onSubtopicToggle(subtopic.id);
-              }
-            });
-          }
+        enabledTopics.forEach((topic) => {
+          topic.subtopics.forEach((subtopic) => {
+            if (subtopic.count > 0 && !selectedSubtopics.includes(subtopic.id)) {
+              onSubtopicToggle(subtopic.id);
+            }
+          });
         });
       }
     } else {
-      if (onSubtopicToggle) selectedSubtopics.forEach(id => onSubtopicToggle(id));
-      if (onTopicToggle) selectedTopics.forEach(id => onTopicToggle(id));
-      selectedSystems.forEach((id) => onSystemToggle(id));
+      if (onSubtopicToggle) {
+        enabledTopics.forEach((topic) => {
+          topic.subtopics.forEach((subtopic) => {
+            if (selectedSubtopics.includes(subtopic.id)) {
+              onSubtopicToggle(subtopic.id);
+            }
+          });
+        });
+      }
+      if (onTopicToggle) {
+        enabledTopics.forEach((topic) => {
+          if (selectedTopics.includes(topic.id)) {
+            onTopicToggle(topic.id);
+          }
+        });
+      }
     }
   };
 
   return (
-    <div className="flex flex-col h-full" data-testid="card-systems">
+    <div className="flex flex-col h-full" data-testid="card-topics">
       <div className="shrink-0 border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <label className="flex items-center cursor-pointer">
-              <Checkbox id="select-all-topics" checked={getAllTopicsState()} onCheckedChange={handleSelectAll} className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+              <Checkbox
+                id="select-all-topics"
+                checked={getAllTopicsState()}
+                onCheckedChange={handleSelectAll}
+                disabled={selectedSystems.length === 0}
+                className="h-4 w-4 sm:h-[18px] sm:w-[18px]"
+              />
             </label>
             <div className="flex items-center gap-2 border-l border-border/50 pl-3">
               <div className="w-2 h-2 rounded-full bg-amber-500" />
@@ -413,8 +442,23 @@ export function TopicSelector({
 
       <div className="shrink-0 border-t border-slate-200/80 bg-muted/30 px-4 py-2.5 dark:border-white/10 dark:bg-white/5">
         <p className="text-xs text-muted-foreground dark:text-gray-400">
-          <span className="font-medium text-foreground dark:text-gray-100">{selectedTopics.length}</span> of {allTopics.length} topics selected
-          {selectedSubtopics.length > 0 && <span className="ml-2 text-primary dark:text-blue-400">({selectedSubtopics.length} subtopics)</span>}
+          <span className="font-medium text-foreground dark:text-gray-100">
+            {
+              topicsInSelectedSystems.filter((t) => selectedTopics.includes(t.id))
+                .length
+            }
+          </span>{" "}
+          of {topicsInSelectedSystems.length} topics selected
+          {selectedSystems.length === 0 && (
+            <span className="ml-1 text-amber-600 dark:text-amber-400">
+              (select a system first)
+            </span>
+          )}
+          {selectedSubtopics.length > 0 && (
+            <span className="ml-2 text-primary dark:text-blue-400">
+              ({selectedSubtopics.length} subtopic{selectedSubtopics.length === 1 ? "" : "s"})
+            </span>
+          )}
         </p>
       </div>
     </div>

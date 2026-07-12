@@ -13,7 +13,8 @@
     "data:backend": "node scripts/switch-data-source.js backend",
     "data:status": "node scripts/switch-data-source.js status",
     "dev:mock": "npm run data:mock && npm run dev",
-    "dev:backend": "npm run data:backend && npm run dev"
+    "dev:backend": "npm run data:backend && npm run dev",
+    "hero:frames": "node scripts/generate-hero-frames.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -77,6 +78,7 @@
     "google": "^2.1.0",
     "gray-matter": "^4.0.3",
     "input-otp": "latest",
+    "lenis": "^1.3.25",
     "lucide-react": "^0.542.0",
     "mammoth": "^1.11.0",
     "next": "^15.1.0",
@@ -110,6 +112,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -118,6 +121,7 @@
     "eslint": "^9.33.0",
     "eslint-config-next": "^15.1.0",
     "postcss": "^8.5.6",
+    "sharp": "^0.35.3",
     "tailwindcss": "^3.4.0",
     "typescript": "~5.8.3"
   }

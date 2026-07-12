@@ -4,6 +4,12 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Container, LANDING_V2_CSS } from "./landing-v2-layout";
+import { HERO_CINEMATIC_CSS } from "../hero-sequence/hero-cinematic.css";
+import { LANDING_CINEMATIC_BODY_CSS } from "../hero-sequence/landing-cinematic-body.css";
+import { CINEMATIC_SECTIONS_CSS } from "../hero-sequence/cinematic-sections.css";
+import { LANDING_TYPOGRAPHY_CSS } from "../hero-sequence/landing-typography.css";
+import { LANDING_SPACING_CSS } from "../hero-sequence/landing-spacing.css";
+import { PROGRAM_SHOWCASE_CSS } from "./program-showcase.css";
 import { MarketingThemeToggle } from "../marketing/marketing-theme";
 import type { ExamTrack } from "./landing-v2-data";
 
@@ -50,14 +56,30 @@ function ChromeBtn({
   children,
   onClick,
   fullWidth,
+  cinematic,
 }: {
   variant?: "primary" | "ghost";
   children: ReactNode;
   onClick?: () => void;
   fullWidth?: boolean;
+  cinematic?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const isPrimary = variant === "primary";
+
+  if (cinematic && isPrimary) {
+    return (
+      <button
+        type="button"
+        className="landing-cinematic-header-cta"
+        onClick={onClick}
+        style={{ width: fullWidth ? "100%" : "auto" }}
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -176,13 +198,15 @@ export function LandingV2Chrome({
   activePage,
   actions,
   children,
+  cinematicNav = false,
   footerBlurb = "Smart exam preparation for learners who want clarity — not cramming. Every option explained. Built for serious study.",
   footerBottomNote = "Built for learners who refuse to guess · Pakistan",
 }: {
   activePage: LandingV2Page;
   actions: LandingV2ChromeActions;
   children: ReactNode;
-  /** Home page uses generic copy; program pages override with track-specific text. */
+  /** Dark transparent nav over cinematic hero */
+  cinematicNav?: boolean;
   footerBlurb?: string;
   footerBottomNote?: string;
 }) {
@@ -206,22 +230,34 @@ export function LandingV2Chrome({
   const faqHref = "#faq";
 
   return (
-    <>
+    <div className={cinematicNav ? "landing-cinematic" : undefined}>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: auto; }
+        html.lenis.lenis-smooth { scroll-behavior: auto !important; }
         body { background: var(--mkt-bg); color: var(--mkt-text); }
         ${LANDING_V2_CSS}
+        ${HERO_CINEMATIC_CSS}
+        ${LANDING_CINEMATIC_BODY_CSS}
+        ${CINEMATIC_SECTIONS_CSS}
+        ${LANDING_TYPOGRAPHY_CSS}
+        ${LANDING_SPACING_CSS}
+        ${PROGRAM_SHOWCASE_CSS}
       `}</style>
 
       <header
+        className={cinematicNav ? "landing-cinematic-header" : undefined}
         style={{
           position: "sticky",
           top: 0,
-          zIndex: 100,
-          background: "var(--mkt-header-bg)",
-          backdropFilter: "blur(10px)",
-          borderBottom: `1px solid ${T.line}`,
+          zIndex: cinematicNav ? 200 : 100,
+          ...(cinematicNav
+            ? {}
+            : {
+                background: "var(--mkt-header-bg)",
+                backdropFilter: "blur(10px)",
+                borderBottom: `1px solid ${T.line}`,
+              }),
         }}
       >
         <Container style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 18, paddingBottom: 18 }}>
@@ -249,7 +285,7 @@ export function LandingV2Chrome({
 
           <div className="nav-desktop" style={{ display: "flex", gap: 14, alignItems: "center" }}>
             <MarketingThemeToggle />
-            <ChromeBtn variant="primary" onClick={actions.onLogin}>
+            <ChromeBtn variant="primary" cinematic={cinematicNav} onClick={actions.onLogin}>
               {actions.primaryCtaLabel}
             </ChromeBtn>
           </div>
@@ -303,6 +339,7 @@ export function LandingV2Chrome({
                   </div>
                   <ChromeBtn
                     variant="primary"
+                    cinematic={cinematicNav}
                     fullWidth
                     onClick={() => {
                       actions.onLogin();
@@ -320,11 +357,14 @@ export function LandingV2Chrome({
 
       {children}
 
-      <footer style={{ background: "var(--mkt-bg)", color: "var(--mkt-footer-text)", padding: "64px 0 32px", borderTop: `1px solid ${T.line}` }}>
+      <footer
+        className="lp-footer"
+        style={{ background: "var(--mkt-bg)", color: "var(--mkt-footer-text)", borderTop: `1px solid ${T.line}` }}
+      >
         <Container>
-          <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
+          <div className="footer-grid lp-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr" }}>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, color: "var(--mkt-text)", fontSize: "1.0625rem", marginBottom: 14 }}>
+              <div className="lp-footer-brand" style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, color: "var(--mkt-text)", fontSize: "1.0625rem" }}>
                 <LogoBadge size={28} />
                 MedPrepAI
               </div>
@@ -333,15 +373,15 @@ export function LandingV2Chrome({
               </p>
             </div>
             <div>
-              <h4 style={{ color: "var(--mkt-text)", fontSize: "1rem", marginBottom: 12, fontWeight: 600 }}>Programs</h4>
-              <ul style={{ listStyle: "none" }}>
+              <h4 className="lp-h4-ui">Programs</h4>
+              <ul className="lp-footer-list" style={{ listStyle: "none" }}>
                 {(
                   [
                     ["FCPS-1", "fcps"],
                     ["JCAT (MDMS)", "jcat"],
                   ] as Array<[string, ExamTrack]>
                 ).map(([label, id]) => (
-                  <li key={label} style={{ marginBottom: 10, fontSize: "1rem" }}>
+                  <li key={label} style={{ fontSize: "1rem" }}>
                     <button
                       type="button"
                       onClick={() => actions.onNavigateToProgram(id)}
@@ -354,9 +394,9 @@ export function LandingV2Chrome({
               </ul>
             </div>
             <div>
-              <h4 style={{ color: "var(--mkt-text)", fontSize: "1rem", marginBottom: 12, fontWeight: 600 }}>Account</h4>
-              <ul style={{ listStyle: "none" }}>
-                <li style={{ marginBottom: 10, fontSize: "1rem" }}>
+              <h4 className="lp-h4-ui">Account</h4>
+              <ul className="lp-footer-list" style={{ listStyle: "none" }}>
+                <li style={{ fontSize: "1rem" }}>
                   <button
                     type="button"
                     onClick={actions.onLogin}
@@ -365,7 +405,7 @@ export function LandingV2Chrome({
                     Sign in
                   </button>
                 </li>
-                <li style={{ marginBottom: 10, fontSize: "1rem" }}>
+                <li style={{ fontSize: "1rem" }}>
                   <a href={faqHref} style={{ color: "var(--mkt-footer-text)", textDecoration: "none" }}>
                     FAQ
                   </a>
@@ -390,6 +430,6 @@ export function LandingV2Chrome({
           </div>
         </Container>
       </footer>
-    </>
+    </div>
   );
 }

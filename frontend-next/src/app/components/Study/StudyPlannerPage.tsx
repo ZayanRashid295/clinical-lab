@@ -55,7 +55,6 @@ const TYPES: StudyTaskType[] = [
   "READING",
   "PRACTICE",
   "REVIEW",
-  "FLASHCARDS",
   "ASSESSMENT",
   "GENERAL",
 ];

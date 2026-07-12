@@ -121,6 +121,12 @@ export function createActivityLogTableConfig(
   const filterConfig: FilterConfig<ActivityLogFilters> = {
     fields: [
       {
+        key: "search",
+        label: "Search",
+        type: "text",
+        placeholder: "Name, email, context, or IP",
+      },
+      {
         key: "component",
         label: "Component",
         type: "select",
@@ -134,8 +140,13 @@ export function createActivityLogTableConfig(
       },
       {
         key: "dateFrom",
-        label: "Date",
-        type: "dateRange",
+        label: "From",
+        type: "date",
+      },
+      {
+        key: "dateTo",
+        label: "To",
+        type: "date",
       },
     ],
     layout: "grid",

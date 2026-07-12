@@ -70,10 +70,7 @@ export const LANDING_V2_CSS = `
   .medprep-landing-v2 h3,
   .medprep-landing-v2 h4 {
     font-family: inherit;
-    font-weight: 600;
-    letter-spacing: -0.025em;
     color: var(--mkt-text);
-    line-height: 1.25;
   }
 
   .medprep-landing-v2 p {

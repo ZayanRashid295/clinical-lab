@@ -91,6 +91,13 @@ export const MENU_CONFIG = {
           path: "/admin/content/question-choices",
           roles: ["SUPERADMIN", "ADMIN"],
         },
+        {
+          id: "question-quality-review",
+          label: "MCQ Quality Review",
+          icon: "📝",
+          path: "/admin/content/question-review",
+          roles: ["SUPERADMIN", "ADMIN", "FACULTY"],
+        },
       ],
     },
     {
@@ -124,19 +131,6 @@ export const MENU_CONFIG = {
       roles: ["STUDENT", "INSTITUTION_MANAGER", "FACULTY"],
     },
     {
-      id: "achievements",
-      label: "menu.achievements",
-      icon: "🏆",
-      path: "/achievements",
-      roles: [
-        "SUPERADMIN",
-        "ADMIN",
-        "STUDENT",
-        "FACULTY",
-        "INSTITUTION_MANAGER",
-      ],
-    },
-    {
       id: "study",
       label: "menu.study",
       icon: "📚",
@@ -150,62 +144,10 @@ export const MENU_CONFIG = {
       ],
       submenu: [
         {
-          id: "question-bank",
-          label: "menu.questionBank",
-          icon: "🗂️",
-          path: "/study/question-bank",
-          roles: [
-            "SUPERADMIN",
-            "ADMIN",
-            "STUDENT",
-            "FACULTY",
-            "INSTITUTION_MANAGER",
-          ],
-        },
-        {
-          id: "flashcards",
-          label: "menu.flashcards",
-          icon: "🃏",
-          path: "/study/flashcards",
-          roles: [
-            "SUPERADMIN",
-            "ADMIN",
-            "STUDENT",
-            "FACULTY",
-            "INSTITUTION_MANAGER",
-          ],
-        },
-        {
-          id: "notes",
-          label: "menu.notes",
-          icon: "📝",
-          path: "/study/notes",
-          roles: [
-            "SUPERADMIN",
-            "ADMIN",
-            "STUDENT",
-            "FACULTY",
-            "INSTITUTION_MANAGER",
-          ],
-        },
-        {
           id: "study-planner",
           label: "menu.studyPlanner",
           icon: "📅",
           path: "/study-planner",
-          roles: [
-            "SUPERADMIN",
-            "ADMIN",
-            "STUDENT",
-            "FACULTY",
-            "INSTITUTION_MANAGER",
-          ],
-        },
-        {
-          id: "goals",
-          label: "menu.goals",
-          icon: "🎯",
-          path: "/goals",
           roles: [
             "SUPERADMIN",
             "ADMIN",

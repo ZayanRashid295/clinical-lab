@@ -18,8 +18,6 @@ import { QuestionBuilderModule } from "./modules/question-builder/question-build
 import { AssessmentsModule } from "./modules/assessments/assessments.module";
 import { MedprepAiModule } from "./modules/medprep-ai/medprep-ai.module";
 import { BookmarksModule } from "./modules/bookmarks/bookmarks.module";
-import { NotesModule } from "./modules/notes/notes.module";
-import { FlashcardsModule } from "./modules/flashcards/flashcards.module";
 import { StudyPlansModule } from "./modules/study-plans/study-plans.module";
 import { StudentStatsModule } from "./modules/student-stats/student-stats.module";
 
@@ -29,12 +27,12 @@ import { DiscussionsModule } from "./modules/discussions/discussions.module";
 import { AiTutorModule } from "./modules/ai-tutor/ai-tutor.module";
 import { MockExamsModule } from "./modules/mock-exams/mock-exams.module";
 import { StudyGroupsModule } from "./modules/study-groups/study-groups.module";
-import { GoalsModule } from "./modules/goals/goals.module";
 import { FeedbackModule } from "./modules/feedback/feedback.module";
 import { QuestionReportsModule } from "./modules/question-reports/question-reports.module";
 import { InstitutionModule } from "./modules/institution/institution.module";
 import { FacultyModule } from "./modules/faculty/faculty.module";
 import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
+import { QuestionReviewModule } from "./modules/question-review/question-review.module";
 
 @Module({
   imports: [
@@ -59,8 +57,6 @@ import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
     AssessmentsModule,
     MedprepAiModule,
     BookmarksModule,
-    NotesModule,
-    FlashcardsModule,
     StudyPlansModule,
     StudentStatsModule,
     // Launch modules
@@ -69,12 +65,12 @@ import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
     AiTutorModule,
     MockExamsModule,
     StudyGroupsModule,
-    GoalsModule,
     FeedbackModule,
     QuestionReportsModule,
     InstitutionModule,
     FacultyModule,
     ActivityLogModule,
+    QuestionReviewModule,
   ],
 })
 export class AppModule {}

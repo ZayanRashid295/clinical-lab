@@ -2,8 +2,6 @@
 
 export type BookmarkType =
   | "QUESTION"
-  | "NOTE"
-  | "FLASHCARD"
   | "TOPIC"
   | "SUBTOPIC"
   | "PRODUCT"
@@ -19,50 +17,10 @@ export interface Bookmark {
   updatedAt: string;
 }
 
-export interface StudentNote {
-  id: string;
-  userId: string;
-  title: string;
-  body: string;
-  color?: string | null;
-  pinned: boolean;
-  tags?: string[] | null;
-  questionId?: string | null;
-  topicId?: string | null;
-  subtopicId?: string | null;
-  systemId?: string | null;
-  productId?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type FlashcardStatus = "NEW" | "LEARNING" | "REVIEW" | "MASTERED";
-export type FlashcardRating = "AGAIN" | "HARD" | "GOOD" | "EASY";
-
-export interface Flashcard {
-  id: string;
-  userId: string;
-  deck: string;
-  front: string;
-  back: string;
-  hint?: string | null;
-  tags?: string[] | null;
-  difficulty: string;
-  status: FlashcardStatus;
-  intervalDays: number;
-  easeFactor: number;
-  repetitions: number;
-  dueAt: string;
-  lastReviewedAt?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export type StudyTaskType =
   | "READING"
   | "PRACTICE"
   | "REVIEW"
-  | "FLASHCARDS"
   | "ASSESSMENT"
   | "GENERAL";
 
@@ -145,7 +103,5 @@ export interface StudentDashboardStats {
     } | null;
   };
   bookmarks: number;
-  flashcards: { total: number; due: number };
-  notes: number;
   plan: { active: StudyPlan | null; progress: StudyPlanProgress };
 }

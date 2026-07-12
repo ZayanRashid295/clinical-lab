@@ -5,15 +5,11 @@ import { Activity, Clock, TrendingUp, Users } from "lucide-react";
 interface ActivityLogStatsBarProps {
   stats: ActivityLogStats | null;
   loading: boolean;
-  onFilterToday?: () => void;
-  onFilterComponent?: (component: string) => void;
 }
 
 export default function ActivityLogStatsBar({
   stats,
   loading,
-  onFilterToday,
-  onFilterComponent,
 }: ActivityLogStatsBarProps) {
   const cards = [
     {
@@ -22,15 +18,13 @@ export default function ActivityLogStatsBar({
       value: stats?.total ?? 0,
       hint: "Complete audit history",
       icon: Activity,
-      onClick: undefined,
     },
     {
       key: "today",
       label: "Today",
       value: stats?.today ?? 0,
-      hint: "Click to filter today",
+      hint: "Events logged today",
       icon: Clock,
-      onClick: onFilterToday,
     },
     {
       key: "users",
@@ -38,7 +32,6 @@ export default function ActivityLogStatsBar({
       value: stats?.uniqueUsersToday ?? 0,
       hint: "Unique people with activity",
       icon: Users,
-      onClick: undefined,
     },
     {
       key: "top",
@@ -48,9 +41,6 @@ export default function ActivityLogStatsBar({
         ? `${stats.topComponents[0].count} events`
         : "No data yet",
       icon: TrendingUp,
-      onClick: stats?.topComponents?.[0]
-        ? () => onFilterComponent?.(stats.topComponents![0].component)
-        : undefined,
       isText: true,
     },
   ];
@@ -59,18 +49,10 @@ export default function ActivityLogStatsBar({
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
-        const clickable = Boolean(card.onClick);
         return (
-          <button
+          <div
             key={card.key}
-            type="button"
-            onClick={card.onClick}
-            disabled={!clickable}
-            className={`text-left rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all ${
-              clickable
-                ? "hover:border-primary/40 hover:shadow-md cursor-pointer"
-                : "cursor-default"
-            }`}
+            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
@@ -88,7 +70,7 @@ export default function ActivityLogStatsBar({
                 <Icon className="h-5 w-5" />
               </div>
             </div>
-          </button>
+          </div>
         );
       })}
     </div>

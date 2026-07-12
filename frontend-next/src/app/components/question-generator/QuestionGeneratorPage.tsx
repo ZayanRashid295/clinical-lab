@@ -14,7 +14,7 @@ export default function QuestionGeneratorPage() {
   useEffect(() => {
     if (loading) return;
     if (!hasAccess({ role: ADMIN_ROLES })) {
-      void router.replace("/study/question-bank");
+      void router.replace("/dashboard");
     }
   }, [loading, hasAccess, router]);
 

@@ -17,10 +17,6 @@ export default function QuestionGeneratorStudent() {
       void router.push("/test-creation/study-create")
       return
     }
-    if (from === "question-bank") {
-      void router.push("/study/question-bank")
-      return
-    }
     void router.push("/dashboard")
   }
   return (
@@ -43,7 +39,7 @@ export default function QuestionGeneratorStudent() {
           </button>
           <div className="flex items-center gap-4">
             <div className="text-xs sm:text-sm text-foreground/50 dark:text-gray-400 font-medium tracking-wide uppercase">
-              Question Bank
+              Practice
             </div>
             <ThemeToggle />
           </div>

@@ -40,11 +40,11 @@ export function getNotificationRoute(n: AppNotification): string | null {
     case "GOAL_COMPLETED":
     case "GOAL_PROGRESS":
     case "GOAL_DUE":
-      return "/goals";
+      return "/study";
     case "ACHIEVEMENT_UNLOCKED":
     case "STREAK_MILESTONE":
     case "STREAK_RISK":
-      return "/achievements";
+      return "/dashboard#achievements";
     case "SUBSCRIPTION_EXPIRING":
     case "SUBSCRIPTION_EXPIRED":
     case "SUBSCRIPTION_RENEWED":

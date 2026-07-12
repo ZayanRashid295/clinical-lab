@@ -11,17 +11,14 @@ import {
 } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import {
-  BookOpen,
-  Layers,
-  StickyNote,
   CalendarDays,
   ChevronRight,
-  Target,
   Trophy,
   Sparkles,
   ClipboardList,
   Users,
   MessageSquare,
+  PenLine,
 } from "lucide-react";
 import { APP_GLASS_CARD, APP_PAGE_PADDING, APP_PAGE_SHELL } from "@/app/config/app-shell";
 import { cn } from "@/shared/utils/cn";
@@ -31,25 +28,11 @@ const TILE_ICON_BG = "bg-primary-500/10 dark:bg-primary-500/15";
 
 const TILES = [
   {
-    href: "/study/question-bank",
-    title: "Question Bank",
+    href: "/test-creation/study-create",
+    title: "Create Test",
     description:
-      "Practice the live medical question library. Filter by system, topic and difficulty, and bookmark for later.",
-    icon: BookOpen,
-  },
-  {
-    href: "/study/flashcards",
-    title: "Flashcards",
-    description:
-      "Spaced-repetition decks. Review what's due today and add your own cards for active recall.",
-    icon: Layers,
-  },
-  {
-    href: "/study/notes",
-    title: "Notes",
-    description:
-      "Pin pearls, mnemonics and full write-ups. Tag and search across everything you've captured.",
-    icon: StickyNote,
+      "Build custom practice blocks by system, topic, and difficulty — then take them in timed or tutor mode.",
+    icon: PenLine,
   },
   {
     href: "/study-planner",
@@ -59,17 +42,10 @@ const TILES = [
     icon: CalendarDays,
   },
   {
-    href: "/goals",
-    title: "Goals",
-    description:
-      "Set daily, weekly or monthly targets and watch progress update automatically as you study.",
-    icon: Target,
-  },
-  {
-    href: "/achievements",
+    href: "/dashboard#achievements",
     title: "Achievements",
     description:
-      "Earn badges, build streaks, and level up as you complete questions, decks and goals.",
+      "Points, streaks, badges, and leaderboard—on your dashboard.",
     icon: Trophy,
   },
   {
@@ -109,8 +85,7 @@ export default function StudyIndexPage() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Study</h1>
         <p className="text-muted-foreground mt-2 dark:text-slate-400">
-          Everything you need to study — questions, flashcards, notes and
-          materials in one place.
+          Practice questions, plan your schedule, and connect with peers — all in one place.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

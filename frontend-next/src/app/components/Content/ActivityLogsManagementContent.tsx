@@ -5,7 +5,6 @@ import {
   LayoutGrid,
   RefreshCw,
   Search,
-  SlidersHorizontal,
   Table,
   X,
 } from "lucide-react";
@@ -13,65 +12,122 @@ import useActivityLogs from "../../../hooks/useActivityLogs";
 import useActivityLogStats from "../../../hooks/useActivityLogStats";
 import { ActivityLog, ActivityLogFilterOptions } from "../../types/activity-log";
 import ActivityLogStatsBar from "../ActivityLogs/ActivityLogStatsBar";
-import ActivityLogQuickFilters from "../ActivityLogs/ActivityLogQuickFilters";
 import ActivityLogFeed from "../ActivityLogs/ActivityLogFeed";
 import ActivityLogTableView from "../ActivityLogs/ActivityLogTableView";
 import ActivityLogDetailPanel from "../ActivityLogs/ActivityLogDetailPanel";
-import { getDateRangeForPreset } from "../ActivityLogs/activity-log.utils";
 import PaginationComponent from "../Users/Pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SELECT_EMPTY_VALUE,
+} from "@/shared/ui/select";
 
-function AdvancedFilters({
+function FilterSelect({
+  label,
+  value,
+  placeholder,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  placeholder: string;
+  options: Array<{ value: string; label: string }>;
+  onChange: (value: string | undefined) => void;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-gray-600 mb-1">
+        {label}
+      </label>
+      <Select
+        value={value || SELECT_EMPTY_VALUE}
+        onValueChange={(v) =>
+          onChange(v === SELECT_EMPTY_VALUE ? undefined : v)
+        }
+      >
+        <SelectTrigger className="w-full h-[38px] rounded-lg border-gray-300 bg-white shadow-none">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent position="popper" className="max-h-[280px]">
+          <SelectItem value={SELECT_EMPTY_VALUE}>{placeholder}</SelectItem>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function ActivityLogFilters({
   filters,
   filterOptions,
+  searchInput,
+  onSearchInputChange,
+  onSearchSubmit,
   onChange,
   onClear,
 }: {
   filters: Record<string, unknown>;
   filterOptions: ActivityLogFilterOptions | null;
+  searchInput: string;
+  onSearchInputChange: (value: string) => void;
+  onSearchSubmit: (e: React.FormEvent) => void;
   onChange: (patch: Record<string, unknown>) => void;
   onClear: () => void;
 }) {
+  const hasActiveFilters = Boolean(
+    filters.search ||
+      filters.component ||
+      filters.eventName ||
+      filters.dateFrom ||
+      filters.dateTo,
+  );
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">
-          Component
-        </label>
-        <select
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+      <form onSubmit={onSearchSubmit} className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => onSearchInputChange(e.target.value)}
+            placeholder="Search by name, email, context, or IP…"
+            className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+        <button
+          type="submit"
+          className="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          Search
+        </button>
+      </form>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <FilterSelect
+          label="Component"
           value={(filters.component as string) ?? ""}
-          onChange={(e) =>
-            onChange({ component: e.target.value || undefined, page: 1 })
-          }
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="">All components</option>
-          {filterOptions?.components.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">
-          Event type
-        </label>
-        <select
+          placeholder="All components"
+          options={filterOptions?.components ?? []}
+          onChange={(component) => onChange({ component, page: 1 })}
+        />
+
+        <FilterSelect
+          label="Event"
           value={(filters.eventName as string) ?? ""}
-          onChange={(e) =>
-            onChange({ eventName: e.target.value || undefined, page: 1 })
-          }
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="">All events</option>
-          {filterOptions?.events.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
+          placeholder="All events"
+          options={filterOptions?.events ?? []}
+          onChange={(eventName) => onChange({ eventName, page: 1 })}
+        />
+
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">
             From
@@ -85,6 +141,7 @@ function AdvancedFilters({
             className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
+
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">
             To
@@ -99,22 +156,25 @@ function AdvancedFilters({
           />
         </div>
       </div>
-      <div className="md:col-span-3 flex justify-end">
-        <button
-          type="button"
-          onClick={onClear}
-          className="text-sm text-gray-600 hover:text-gray-900"
-        >
-          Reset advanced filters
-        </button>
-      </div>
+
+      {hasActiveFilters && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onClear}
+            className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80"
+          >
+            <X className="h-3.5 w-3.5" />
+            Clear filters
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function ActivityLogsManagementContent() {
   const [viewMode, setViewMode] = useState<"feed" | "table">("feed");
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
   const [searchInput, setSearchInput] = useState("");
@@ -138,25 +198,15 @@ export default function ActivityLogsManagementContent() {
     setSearchInput(filters.search ?? "");
   }, [filters.search]);
 
-  const hasActiveAdvanced = Boolean(
-    filters.component ||
-      filters.eventName ||
-      filters.dateFrom ||
-      filters.dateTo ||
-      filters.search,
-  );
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateFilters({ search: searchInput.trim() || undefined, page: 1 });
   };
 
-  const handleClearAll = () => {
+  const handleClearFilters = () => {
     setSearchInput("");
     updateFilters({
       search: undefined,
-      userId: undefined,
-      affectedUserId: undefined,
       component: undefined,
       eventName: undefined,
       dateFrom: undefined,
@@ -185,7 +235,6 @@ export default function ActivityLogsManagementContent() {
 
   return (
     <div className="px-[50px] pb-[50px] pt-[25px] space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Activity Logs</h1>
@@ -215,88 +264,18 @@ export default function ActivityLogsManagementContent() {
         </div>
       </div>
 
-      <ActivityLogStatsBar
-        stats={stats}
-        loading={statsLoading}
-        onFilterToday={() => {
-          const range = getDateRangeForPreset("today");
-          updateFilters({ ...range, page: 1 });
-        }}
-        onFilterComponent={(component) =>
-          updateFilters({ component, dateFrom: undefined, dateTo: undefined, page: 1 })
-        }
+      <ActivityLogStatsBar stats={stats} loading={statsLoading} />
+
+      <ActivityLogFilters
+        filters={filters as Record<string, unknown>}
+        filterOptions={filterOptions}
+        searchInput={searchInput}
+        onSearchInputChange={setSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+        onChange={(patch) => updateFilters(patch)}
+        onClear={handleClearFilters}
       />
 
-      {/* Toolbar */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-        <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search by name, email, context, or IP…"
-              className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium ${
-                showAdvanced || hasActiveAdvanced
-                  ? "border-primary/40 bg-primary/5 text-primary"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-            </button>
-          </div>
-        </form>
-
-        <ActivityLogQuickFilters filters={filters} onApply={updateFilters} />
-
-        {showAdvanced && (
-          <AdvancedFilters
-            filters={filters as Record<string, unknown>}
-            filterOptions={filterOptions}
-            onChange={(patch) => updateFilters(patch)}
-            onClear={() =>
-              updateFilters({
-                component: undefined,
-                eventName: undefined,
-                dateFrom: undefined,
-                dateTo: undefined,
-                page: 1,
-              })
-            }
-          />
-        )}
-
-        {hasActiveAdvanced && (
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-500">{resultSummary}</span>
-            <button
-              type="button"
-              onClick={handleClearAll}
-              className="inline-flex items-center gap-1 text-primary hover:text-primary/80"
-            >
-              <X className="h-3.5 w-3.5" />
-              Clear all filters
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* View toggle + results */}
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-gray-600">{resultSummary}</p>
         <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1">

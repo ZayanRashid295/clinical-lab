@@ -27,6 +27,7 @@
     "prisma:seed:billing": "tsx prisma/seed-billing-only.ts",
     "prisma:seed:promotions": "tsx prisma/seed-promotions-only.ts",
     "prisma:seed:billing-promotions": "tsx prisma/seed-billing-promotions.ts",
+    "prisma:seed:question-review": "tsx prisma/seed-question-review-bundles.ts",
     "prisma:seed:demo": "tsx prisma/seed-demo-full.ts",
     "migrate:indexes": "tsx scripts/add-access-control-indexes.ts",
     "migrate:medprep-json": "tsx scripts/migrate-medprep-json-to-prisma.ts",

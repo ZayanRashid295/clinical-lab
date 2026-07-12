@@ -1,0 +1,72 @@
+// Fixed shareable MCQ review bundles for external quality testing (doctor / student reviewers).
+
+model QuestionReviewBundle {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items    QuestionReviewBundleItem[]
+  attempts QuestionReviewAttempt[]
+
+  @@map("question_review_bundles")
+}
+
+model QuestionReviewBundleItem {
+  id         String @id @default(cuid())
+  bundleId   String
+  questionId String
+  order      Int    @default(0)
+
+  bundle   QuestionReviewBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  question Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([bundleId, questionId])
+  @@index([bundleId, order])
+  @@map("question_review_bundle_items")
+}
+
+model QuestionReviewAttempt {
+  id            String                      @id @default(cuid())
+  bundleId      String
+  attemptSecret String                      @unique
+  reviewerName  String
+  reviewerEmail String?
+  status        QuestionReviewAttemptStatus @default(IN_PROGRESS)
+  startedAt     DateTime                    @default(now())
+  completedAt   DateTime?
+
+  bundle    QuestionReviewBundle     @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  responses QuestionReviewResponse[]
+
+  @@index([bundleId, status])
+  @@map("question_review_attempts")
+}
+
+model QuestionReviewResponse {
+  id             String   @id @default(cuid())
+  attemptId      String
+  questionId     String
+  order          Int      @default(0)
+  userAnswer     String?
+  isCorrect      Boolean?
+  qualityComment String?  @db.Text
+  timeSpent      Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  attempt  QuestionReviewAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question              @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId, order])
+  @@map("question_review_responses")
+}
+
+enum QuestionReviewAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+}

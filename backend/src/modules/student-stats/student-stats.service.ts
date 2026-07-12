@@ -13,9 +13,6 @@ export class StudentStatsService {
       papers,
       answeredAggregate,
       bookmarks,
-      flashcardsTotal,
-      flashcardsDue,
-      notesCount,
       activePlan,
     ] = await Promise.all([
       this.prisma.question.count({ where: { isActive: true } }),
@@ -42,11 +39,6 @@ export class StudentStatsService {
         _count: { _all: true },
       }),
       this.prisma.bookmark.count({ where: { userId } }),
-      this.prisma.flashcard.count({ where: { userId } }),
-      this.prisma.flashcard.count({
-        where: { userId, dueAt: { lte: new Date() } },
-      }),
-      this.prisma.studentNote.count({ where: { userId } }),
       this.prisma.studyPlan.findFirst({
         where: { userId, isActive: true },
         orderBy: { createdAt: "desc" },
@@ -165,8 +157,6 @@ export class StudentStatsService {
         inProgress: inProgressPaper,
       },
       bookmarks,
-      flashcards: { total: flashcardsTotal, due: flashcardsDue },
-      notes: notesCount,
       plan: { active: activePlan, progress: planProgress },
     };
   }

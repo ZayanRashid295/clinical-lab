@@ -1,4 +1,4 @@
-// Student-facing schema: bookmarks, notes, flashcards, study plans, sessions.
+// Student-facing schema: bookmarks, notes, study plans, sessions.
 // Designed to be self-contained and to use scalar foreign-key columns so it
 // can compile with the existing modular schema layout without forcing
 // every other model to declare a back-relation.
@@ -23,103 +23,10 @@ model Bookmark {
 
 enum BookmarkType {
   QUESTION
-  NOTE
-  FLASHCARD
   TOPIC
   SUBTOPIC
   PRODUCT
   MATERIAL
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Notes
-// Free-form learner notes. Optionally attached to a content node so the UI
-// can render notes per question / topic / subtopic.
-// ────────────────────────────────────────────────────────────────────────────
-model StudentNote {
-  id         String   @id @default(cuid())
-  userId     String
-  title      String
-  body       String   @db.Text
-  color      String? // for the cards UI (e.g. "yellow")
-  pinned     Boolean  @default(false)
-  tags       Json?
-  questionId String?
-  topicId    String?
-  subtopicId String?
-  systemId   String?
-  productId  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([userId, pinned])
-  @@index([userId, updatedAt])
-  @@map("student_notes")
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Flashcards
-// Lightweight SRS: each card carries due date + ease tracking from reviews.
-// ────────────────────────────────────────────────────────────────────────────
-model Flashcard {
-  id             String          @id @default(cuid())
-  userId         String
-  deck           String          @default("General")
-  front          String          @db.Text
-  back           String          @db.Text
-  hint           String?         @db.Text
-  tags           Json?
-  difficulty     String          @default("medium") // easy | medium | hard
-  status         FlashcardStatus @default(NEW)
-  questionId     String?
-  topicId        String?
-  subtopicId     String?
-  systemId       String?
-  productId      String?
-  // SRS fields
-  intervalDays   Int             @default(0)
-  easeFactor     Float           @default(2.5)
-  repetitions    Int             @default(0)
-  dueAt          DateTime        @default(now())
-  lastReviewedAt DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  reviews FlashcardReview[]
-
-  @@index([userId, dueAt])
-  @@index([userId, deck])
-  @@map("flashcards")
-}
-
-enum FlashcardStatus {
-  NEW
-  LEARNING
-  REVIEW
-  MASTERED
-}
-
-model FlashcardReview {
-  id           String          @id @default(cuid())
-  flashcardId  String
-  userId       String
-  rating       FlashcardRating
-  intervalDays Int
-  easeFactor   Float
-  reviewedAt   DateTime        @default(now())
-
-  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
-
-  @@index([userId, reviewedAt])
-  @@index([flashcardId, reviewedAt])
-  @@map("flashcard_reviews")
-}
-
-enum FlashcardRating {
-  AGAIN
-  HARD
-  GOOD
-  EASY
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -174,7 +81,6 @@ enum StudyTaskType {
   READING
   PRACTICE
   REVIEW
-  FLASHCARDS
   ASSESSMENT
   GENERAL
 }
@@ -207,6 +113,5 @@ enum StudySessionType {
   STUDY
   PRACTICE
   ASSESSMENT
-  FLASHCARDS
   REVIEW
 }

@@ -80,6 +80,7 @@ export function ProgramBtn({
   return (
     <button
       type="button"
+      className={`lp-program-btn ${isPrimary ? "lp-program-btn--primary" : "lp-program-btn--ghost"}`.trim()}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

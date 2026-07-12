@@ -107,27 +107,6 @@ async function seedAchievements(prisma: PrismaClient) {
       threshold: 30,
       metric: "STREAK_DAYS",
     },
-    // MASTERY - flashcards
-    {
-      code: "DECK_50",
-      title: "Deck Wrangler",
-      description: "Review 50 flashcards.",
-      category: "MASTERY",
-      icon: "🃏",
-      points: 20,
-      threshold: 50,
-      metric: "FLASHCARDS_REVIEWED",
-    },
-    {
-      code: "DECK_500",
-      title: "Spaced-rep Sage",
-      description: "Review 500 flashcards.",
-      category: "MASTERY",
-      icon: "🧠",
-      points: 80,
-      threshold: 500,
-      metric: "FLASHCARDS_REVIEWED",
-    },
     // MILESTONE - tests
     {
       code: "FIRST_TEST",
@@ -181,28 +160,6 @@ async function seedAchievements(prisma: PrismaClient) {
       points: 10,
       threshold: 1,
       metric: "DISCUSSION_POSTS",
-    },
-    // GOAL_COMPLETED
-    {
-      code: "GOAL_GETTER",
-      title: "Goal Getter",
-      description: "Hit a personal goal for the first time.",
-      category: "PROGRESS",
-      icon: "🎯",
-      points: 15,
-      threshold: 1,
-      metric: "GOAL_COMPLETED",
-    },
-    // NOTES_CREATED
-    {
-      code: "NOTE_TAKER",
-      title: "Note Taker",
-      description: "Create 10 notes.",
-      category: "STUDY",
-      icon: "📝",
-      points: 15,
-      threshold: 10,
-      metric: "NOTES_CREATED",
     },
     // AI Tutor
     {

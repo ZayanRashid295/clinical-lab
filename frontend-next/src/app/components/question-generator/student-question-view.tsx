@@ -77,10 +77,10 @@ export default function StudentQuestionView() {
     openUpgrade,
     UpgradeModal,
     hasAccess: hasQbankAccess,
-  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.questionBank, "Question Bank");
+  } = useStudyFeatureGate(STUDY_FEATURE_KEYS.createTest, "Practice");
 
   const blockForMissingQbankAccess = (err?: unknown) => {
-    if (err) handleSubscriptionError(err, "Question Bank")
+    if (err) handleSubscriptionError(err, "Practice")
     else openUpgrade()
     setAccessBlocked(true)
     setError(null)
@@ -570,7 +570,7 @@ export default function StudentQuestionView() {
               allQuestions = [first]
             } else {
               const rest = await Promise.all(
-                questionIds.slice(1).map((id) => questionsService.getQuestion(id))
+                questionIds.slice(1).map((id: string) => questionsService.getQuestion(id))
               )
               allQuestions = [first, ...rest]
             }

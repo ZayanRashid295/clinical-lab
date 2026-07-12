@@ -1,6 +1,6 @@
 import { ApiHttpError } from "./api-http-error";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 /** NestJS often returns `{ message: string | string[] }` — flatten for UI + ApiHttpError. */
 function normalizeApiErrorBodyMessage(errorData: unknown, status: number): string {

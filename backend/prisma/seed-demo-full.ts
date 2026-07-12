@@ -4,7 +4,7 @@
  * Populates (for the primary student by default):
  * - All 4 MedPrep modes (Practice, Learning, Evaluation, Shadow)
  * - Dashboard stats (QBank papers, answered questions, study plan progress)
- * - Study (notes, flashcards, reviews, goals, study tasks)
+ * - Study (study tasks)
  * - Achievements (unlocks + points + streak)
  * - Community (discussions + replies)
  * - Study groups (multiple groups, members, posts)
@@ -20,8 +20,6 @@ import { resolve } from "path";
 import {
   FeedbackCategory,
   FeedbackStatus,
-  FlashcardRating,
-  GoalMetric,
   MedprepConversationStatus,
   MedprepMessageRole,
   MedprepMode,
@@ -115,10 +113,6 @@ async function cleanupDemoData(prisma: PrismaClient, userId: string) {
       where: { id: { in: demoGroups.map((g) => g.id) } },
     });
   }
-
-  await prisma.goal.deleteMany({
-    where: { userId, title: { startsWith: DEMO_PREFIX } },
-  });
 
   const demoPapers = await prisma.questionPaper.findMany({
     where: { userId, name: { startsWith: DEMO_PREFIX } },
@@ -714,84 +708,34 @@ async function seedFeedbackDemo(
   }
 }
 
-async function seedGoalsAndStudyExtras(prisma: PrismaClient, userId: string) {
-  console.log("   🎯 Goals & study extras…");
-
-  const hasDemoGoal = await prisma.goal.findFirst({
-    where: { userId, title: { startsWith: DEMO_PREFIX } },
-  });
-  if (hasDemoGoal) {
-    console.log("   ⏭ Demo goals already present.");
-    return;
-  }
-
-  const goal = await prisma.goal.create({
-    data: {
-      userId,
-      title: `${DEMO_PREFIX} Answer 30 questions this week`,
-      description: "Stay on track for Step 1 cardio block",
-      metric: GoalMetric.QUESTIONS_ANSWERED,
-      target: 30,
-      period: "WEEKLY",
-      startDate: daysAgo(7),
-      endDate: daysAgo(-7),
-      isActive: true,
-    },
-  });
-
-  const bucket = new Date().toISOString().slice(0, 10);
-  await prisma.goalProgress.create({
-    data: {
-      goalId: goal.id,
-      userId,
-      bucket,
-      value: 22,
-      achieved: false,
-    },
-  });
-
-  const cards = await prisma.flashcard.findMany({
-    where: { userId },
-    take: 5,
-  });
-  for (const card of cards) {
-    await prisma.flashcardReview.create({
-      data: {
-        flashcardId: card.id,
-        userId,
-        rating: FlashcardRating.GOOD,
-        intervalDays: 3,
-        easeFactor: 2.5,
-        reviewedAt: daysAgo(1),
-      },
-    });
-    await prisma.flashcard.update({
-      where: { id: card.id },
-      data: {
-        lastReviewedAt: daysAgo(1),
-        repetitions: { increment: 1 },
-        status: "REVIEW",
-      },
-    });
-  }
+async function seedStudyTaskDemo(prisma: PrismaClient, userId: string) {
+  console.log("   📅 Study task demo…");
 
   const plan = await prisma.studyPlan.findFirst({
     where: { userId, isActive: true },
   });
-  if (plan) {
-    await prisma.studyTask.create({
-      data: {
-        studyPlanId: plan.id,
-        userId,
-        title: `${DEMO_PREFIX} MedPrep Practice case debrief`,
-        description: "Review SOAP feedback from demo chest pain case",
-        type: "REVIEW",
-        scheduledFor: daysAgo(-1),
-        durationMinutes: 25,
-        status: StudyTaskStatus.PENDING,
-      },
-    });
+  if (!plan) return;
+
+  const existing = await prisma.studyTask.findFirst({
+    where: { userId, title: { startsWith: DEMO_PREFIX } },
+  });
+  if (existing) {
+    console.log("   ⏭ Demo study task already present.");
+    return;
   }
+
+  await prisma.studyTask.create({
+    data: {
+      studyPlanId: plan.id,
+      userId,
+      title: `${DEMO_PREFIX} MedPrep Practice case debrief`,
+      description: "Review SOAP feedback from demo chest pain case",
+      type: "REVIEW",
+      scheduledFor: daysAgo(-1),
+      durationMinutes: 25,
+      status: StudyTaskStatus.PENDING,
+    },
+  });
 }
 
 async function seedAiTutorDemo(prisma: PrismaClient, userId: string) {
@@ -915,7 +859,7 @@ export async function seedDemoFull(
     peers.map((p) => p.id),
   );
   await seedFeedbackDemo(prisma, student.id, admin?.id);
-  await seedGoalsAndStudyExtras(prisma, student.id);
+  await seedStudyTaskDemo(prisma, student.id);
   await seedAiTutorDemo(prisma, student.id);
   await seedQuestionReportDemo(prisma, student.id);
 

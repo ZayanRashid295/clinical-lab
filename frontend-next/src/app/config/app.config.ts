@@ -8,7 +8,7 @@ import { APP_DISPLAY_NAME } from "./brand";
 export const appConfig = {
   // API Configuration
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:43817",
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
     timeout: 10000, // 10 seconds
   },
 

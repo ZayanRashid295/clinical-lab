@@ -47,7 +47,7 @@ export default function MockExamsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { ensureAccess, handleSubscriptionError, UpgradeModal } = useStudyFeatureGate(
-    STUDY_FEATURE_KEYS.questionBank,
+    STUDY_FEATURE_KEYS.createTest,
     "Mock Exams"
   );
   const [tab, setTab] = useState<"available" | "history">("available");

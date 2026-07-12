@@ -9,7 +9,7 @@ import { TopicSelector } from "./TopicSelector";
 import { QuickGuideModal } from "./QuickGuideModal";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { AlertCircle, CheckCircle2, ArrowRight, Hash, Layers, HelpCircle, ChevronRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, Hash, HelpCircle, ChevronRight } from "lucide-react";
 import { QuestionsService } from "@/app/services/questions/questions.service";
 import {
   AlertDialog,
@@ -27,7 +27,6 @@ import {
 } from "@/hooks/useSubscriptionUpgradeModal";
 
 interface ValidationErrors {
-  subjects?: string;
   systems?: string;
   questionCount?: string;
 }
@@ -37,17 +36,15 @@ export default function StudyCreateTestPage() {
   const [isTimed, setIsTimed] = useState(false);
   const [selectedPool, setSelectedPool] = useState("unused");
   const [isMarked, setIsMarked] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedSystems, setSelectedSystems] = useState<string[]>([]);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  /** Curriculum: System → Topic → Subtopic */
+  const [selectedSystemIds, setSelectedSystemIds] = useState<string[]>([]);
+  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
+  const [selectedSubtopicIds, setSelectedSubtopicIds] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
-    {}
-  );
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   const [availableQuestionsCount, setAvailableQuestionsCount] = useState<number | null>(null);
   const [loadingCount, setLoadingCount] = useState(false);
@@ -59,111 +56,57 @@ export default function StudyCreateTestPage() {
     UpgradeModal: SubscriptionUpgradeModal,
   } = useStudyFeatureGate(STUDY_FEATURE_KEYS.createTest, "Create Test");
 
-  // Refresh counts when page becomes visible (user returns from test)
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // User returned to the page, refresh counts
-        setRefreshTrigger(prev => prev + 1);
+      if (document.visibilityState === "visible") {
+        setRefreshTrigger((prev) => prev + 1);
       }
     };
+    const handleFocus = () => setRefreshTrigger((prev) => prev + 1);
 
-    const handleFocus = () => {
-      // Also refresh when window gains focus
-      setRefreshTrigger(prev => prev + 1);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
-  const handleTagToggle = (tagId: string) => {
-    setSelectedTags((prev) => {
-      const newTags = prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId];
-
-      // Clear validation error when tag is selected
-      if (newTags.length > 0) {
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.subjects;
-          return newErrors;
-        });
-      }
-
-      return newTags;
-    });
-  };
-
   const handleSystemToggle = (systemId: string) => {
-    setSelectedSystems((prev) => {
-      const newSystems = prev.includes(systemId)
+    setSelectedSystemIds((prev) => {
+      const next = prev.includes(systemId)
         ? prev.filter((id) => id !== systemId)
         : [...prev, systemId];
-
-      // Clear validation error when system is selected
-      if (newSystems.length > 0) {
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.systems;
-          return newErrors;
+      if (next.length > 0) {
+        setValidationErrors((e) => {
+          const copy = { ...e };
+          delete copy.systems;
+          return copy;
         });
       }
-
-      return newSystems;
-    });
-  };
-
-  const handleSubjectToggle = (subjectId: string) => {
-    setSelectedSubjects((prev) => {
-      const newSubjects = prev.includes(subjectId)
-        ? prev.filter((id) => id !== subjectId)
-        : [...prev, subjectId];
-
-      // Clear validation error when subject is selected
-      if (newSubjects.length > 0) {
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.systems;
-          return newErrors;
-        });
-      }
-
-      return newSubjects;
+      return next;
     });
   };
 
   const handleTopicToggle = (topicId: string) => {
-    setSelectedTopics((prev) => {
-      const newTopics = prev.includes(topicId)
+    setSelectedTopicIds((prev) =>
+      prev.includes(topicId)
         ? prev.filter((id) => id !== topicId)
-        : [...prev, topicId];
-
-      // Clear validation error when topic is selected
-      if (newTopics.length > 0) {
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.systems;
-          return newErrors;
-        });
-      }
-
-      return newTopics;
-    });
+        : [...prev, topicId]
+    );
   };
 
-  // Fetch available questions count based on current filters
+  const handleSubtopicToggle = (subtopicId: string) => {
+    setSelectedSubtopicIds((prev) =>
+      prev.includes(subtopicId)
+        ? prev.filter((id) => id !== subtopicId)
+        : [...prev, subtopicId]
+    );
+  };
+
   useEffect(() => {
     const fetchAvailableCount = async () => {
-      // Only fetch if we have tags selected and at least one of: systems, subjects, or topics
-      const hasSelection = selectedSystems.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0;
-      if (selectedTags.length === 0 || !hasSelection) {
+      if (selectedSystemIds.length === 0) {
         setAvailableQuestionsCount(null);
         return;
       }
@@ -171,135 +114,70 @@ export default function StudyCreateTestPage() {
       try {
         setLoadingCount(true);
         const questionsService = new QuestionsService();
-        // Fetch with max allowed limit (1000) to get the count
-        // If we get exactly 1000, there might be more, so show "1000+"
-        // Determine pool filter (exclude "marked" as it's now a separate parameter)
-        // Note: "unused" is the default, but we should still pass it explicitly if selected
-        const poolFilter: "unused" | "incorrect" | "correct" | "omitted" | undefined = 
-          selectedPool 
-            ? selectedPool as "unused" | "incorrect" | "correct" | "omitted"
+        const poolFilter: "unused" | "incorrect" | "correct" | "omitted" | undefined =
+          selectedPool
+            ? (selectedPool as "unused" | "incorrect" | "correct" | "omitted")
             : undefined;
 
         const questions = await questionsService.getFilteredQuestions({
-          systemIds: selectedTags.length > 0 ? selectedTags : undefined,
-          topicIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-          subtopicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+          systemIds: selectedSystemIds,
+          topicIds: selectedTopicIds.length > 0 ? selectedTopicIds : undefined,
+          subtopicIds: selectedSubtopicIds.length > 0 ? selectedSubtopicIds : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
-          limit: 1000, // Use max allowed limit (backend validation max is 1000)
+          limit: 1000,
         });
-        // If we got exactly 1000, there might be more, so show "1000+"
-        // Otherwise show the actual count
         setAvailableQuestionsCount(questions.length === 1000 ? 1000 : questions.length);
-      } catch (error) {
-        console.error("Failed to fetch available questions count:", error);
+      } catch (err) {
+        console.error("Failed to fetch available questions count:", err);
         setAvailableQuestionsCount(null);
       } finally {
         setLoadingCount(false);
       }
     };
 
-    // Debounce the API call
-    const timeoutId = setTimeout(() => {
-      fetchAvailableCount();
-    }, 300);
-
+    const timeoutId = setTimeout(fetchAvailableCount, 300);
     return () => clearTimeout(timeoutId);
-  }, [selectedTags, selectedSystems, selectedSubjects, selectedTopics, selectedPool, isMarked]);
+  }, [
+    selectedSystemIds,
+    selectedTopicIds,
+    selectedSubtopicIds,
+    selectedPool,
+    isMarked,
+    refreshTrigger,
+  ]);
 
-  const validateQuestionCount = useCallback(
-    (value: string): string | undefined => {
-      if (!value || value.trim() === "") {
-        return "Number of questions is required.";
-      }
-
-      const num = parseInt(value, 10);
-
-      if (isNaN(num)) {
-        return "Please enter a valid number.";
-      }
-
-      if (num <= 0) {
-        return "Number of questions must be greater than 0.";
-      }
-
-      if (num > 40) {
-        return "Maximum 40 questions allowed per test.";
-      }
-
-      return undefined;
-    },
-    []
-  );
-
-  const handleQuestionCountChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-
-    // Only allow numbers
-    if (value === "" || /^\d+$/.test(value)) {
-      setQuestionCount(value);
-      setTouchedFields((prev) => new Set(prev).add("questionCount"));
-
-      // Only validate and show error if field has been touched and has invalid data
-      if (touchedFields.has("questionCount") || value !== "") {
-        const error = validateQuestionCount(value);
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          if (error) {
-            newErrors.questionCount = error;
-          } else {
-            delete newErrors.questionCount;
-          }
-          return newErrors;
-        });
-      }
+  const validateQuestionCount = useCallback((value: string): string | undefined => {
+    if (!value || value.trim() === "") {
+      return "Number of questions is required.";
     }
-  };
+    const num = parseInt(value, 10);
+    if (isNaN(num)) return "Please enter a valid number.";
+    if (num <= 0) return "Number of questions must be greater than 0.";
+    if (num > 40) return "Maximum 40 questions allowed per test.";
+    return undefined;
+  }, []);
 
   const handleQuestionCountBlur = () => {
     setTouchedFields((prev) => new Set(prev).add("questionCount"));
-    const error = validateQuestionCount(questionCount);
+    const countError = validateQuestionCount(questionCount);
     setValidationErrors((prev) => {
-      const newErrors = { ...prev };
-      if (error) {
-        newErrors.questionCount = error;
-      } else {
-        delete newErrors.questionCount;
-      }
-      return newErrors;
+      const next = { ...prev };
+      if (countError) next.questionCount = countError;
+      else delete next.questionCount;
+      return next;
     });
-  };
-
-  const showError = (message: string) => {
-    setError(message);
-    setTimeout(() => setError(null), 5000);
-  };
-
-  const showSuccess = (message: string) => {
-    setSuccess(message);
-    setTimeout(() => setSuccess(null), 5000);
   };
 
   const validateForm = (): boolean => {
     const errors: ValidationErrors = {};
     let isValid = true;
 
-    // Validate tags
-    if (selectedTags.length === 0) {
-      errors.subjects = "Please select at least one tag.";
+    if (selectedSystemIds.length === 0) {
+      errors.systems = "Select at least one system (e.g. Cardiovascular, Hematology).";
       isValid = false;
     }
 
-    // Validate systems/subjects/topics - at least one must be selected
-    const hasSystemSelection = selectedSystems.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0;
-    if (!hasSystemSelection) {
-      errors.systems = "Please select at least one system, subject, or topic.";
-      isValid = false;
-    }
-
-    // Validate question count
     const questionCountError = validateQuestionCount(questionCount);
     if (questionCountError) {
       errors.questionCount = questionCountError;
@@ -313,325 +191,312 @@ export default function StudyCreateTestPage() {
   const handleGenerateTest = async () => {
     if (!ensureAccess({ requireSubscription: true })) return;
 
-    // Clear previous messages
     setError(null);
     setSuccess(null);
+    setTouchedFields(new Set(["systems", "questionCount"]));
 
-    // Mark all fields as touched when submitting
-    setTouchedFields(new Set(["subjects", "systems", "questionCount"]));
-
-    // Validate form
     if (!validateForm()) {
-      // Scroll to first error
-      const firstErrorField = document.querySelector(
-        '[data-validation-error="true"]'
-      );
-      if (firstErrorField) {
-        firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+      const firstErrorField = document.querySelector('[data-validation-error="true"]');
+      firstErrorField?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
     const questionCountNum = parseInt(questionCount, 10);
 
-    // Check if enough questions are available
-    // If count is not available yet, fetch it first
-    const hasSelection = selectedSystems.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0;
-    if (availableQuestionsCount === null && selectedTags.length > 0 && hasSelection) {
+    if (availableQuestionsCount === null && selectedSystemIds.length > 0) {
       try {
         setLoadingCount(true);
         const questionsService = new QuestionsService();
-        const poolFilter: "unused" | "incorrect" | "correct" | "omitted" | undefined = 
-          selectedPool 
-            ? selectedPool as "unused" | "incorrect" | "correct" | "omitted"
+        const poolFilter: "unused" | "incorrect" | "correct" | "omitted" | undefined =
+          selectedPool
+            ? (selectedPool as "unused" | "incorrect" | "correct" | "omitted")
             : undefined;
 
         const questions = await questionsService.getFilteredQuestions({
-          systemIds: selectedTags.length > 0 ? selectedTags : undefined,
-          topicIds: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-          subtopicIds: selectedTopics.length > 0 ? selectedTopics : undefined,
+          systemIds: selectedSystemIds,
+          topicIds: selectedTopicIds.length > 0 ? selectedTopicIds : undefined,
+          subtopicIds: selectedSubtopicIds.length > 0 ? selectedSubtopicIds : undefined,
           pool: poolFilter,
           marked: isMarked ? true : undefined,
-          limit: 1000, // Use max allowed limit (backend validation max is 1000)
+          limit: 1000,
         });
-        // If we got exactly 1000, there might be more, so treat as 1000+
         const count = questions.length === 1000 ? 1000 : questions.length;
         setAvailableQuestionsCount(count);
-        
+
         if (questionCountNum > count) {
           setShowInsufficientQuestionsDialog(true);
           setLoadingCount(false);
           return;
         }
         setLoadingCount(false);
-      } catch (error) {
-        console.error("Failed to fetch available questions count:", error);
+      } catch (err) {
+        console.error("Failed to fetch available questions count:", err);
         setLoadingCount(false);
-        // Continue with test generation if count fetch fails
       }
     } else if (availableQuestionsCount !== null && questionCountNum > availableQuestionsCount) {
       setShowInsufficientQuestionsDialog(true);
       return;
     }
 
-    // Build query parameters
     const params = new URLSearchParams();
-    if (selectedTags.length > 0) {
-      params.set("systemIds", selectedTags.join(","));
+    params.set("systemIds", selectedSystemIds.join(","));
+    if (selectedTopicIds.length > 0) {
+      params.set("topicIds", selectedTopicIds.join(","));
     }
-    if (selectedSubjects.length > 0) {
-      params.set("topicIds", selectedSubjects.join(","));
+    if (selectedSubtopicIds.length > 0) {
+      params.set("subtopicIds", selectedSubtopicIds.join(","));
     }
-    if (selectedTopics.length > 0) {
-      params.set("subtopicIds", selectedTopics.join(","));
-    }
-    if (selectedPool) {
-      params.set("pool", selectedPool);
-    }
-    if (isMarked) {
-      params.set("marked", "true");
-    }
+    if (selectedPool) params.set("pool", selectedPool);
+    if (isMarked) params.set("marked", "true");
     params.set("limit", questionCountNum.toString());
-    // Determine mode: if tutor is enabled, use "tutor", otherwise use "timed" if timed is enabled
-    const mode = isTutor ? "tutor" : (isTimed ? "timed" : "tutor");
+    const mode = isTutor ? "tutor" : isTimed ? "timed" : "tutor";
     params.set("mode", mode);
-    if (isTimed) {
-      params.set("timed", "true");
-    }
-    if (isTutor) {
-      params.set("tutor", "true");
-    }
-
+    if (isTimed) params.set("timed", "true");
+    if (isTutor) params.set("tutor", "true");
     params.set("from", "create-test");
 
-    // Navigate to student mode with filters
     window.location.href = `/question-generator/student?${params.toString()}`;
   };
 
   const isFormValid =
-    selectedTags.length > 0 &&
-    (selectedSystems.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0) &&
+    selectedSystemIds.length > 0 &&
     questionCount &&
     parseInt(questionCount, 10) > 0 &&
     parseInt(questionCount, 10) <= 40;
+
+  const filterSummaryParts: string[] = [];
+  if (selectedSystemIds.length > 0) {
+    filterSummaryParts.push(
+      `${selectedSystemIds.length} system${selectedSystemIds.length === 1 ? "" : "s"}`
+    );
+  }
+  if (selectedTopicIds.length > 0) {
+    filterSummaryParts.push(
+      `${selectedTopicIds.length} topic${selectedTopicIds.length === 1 ? "" : "s"}`
+    );
+  }
+  if (selectedSubtopicIds.length > 0) {
+    filterSummaryParts.push(
+      `${selectedSubtopicIds.length} subtopic${selectedSubtopicIds.length === 1 ? "" : "s"}`
+    );
+  }
 
   return (
     <div
       className="flex h-screen min-h-0 w-full overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950"
       data-testid="page-create-test"
     >
-      {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/80 px-6 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <div>
+          <div>
             <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Create Test</h1>
-            <p className="text-xs text-muted-foreground dark:text-slate-400">Customize your learning path</p>
-        </div>
-          <div className="flex items-center gap-2">
-        <Button
-              variant="ghost"
-          size="sm"
-              className="h-8 text-xs font-medium text-muted-foreground hover:text-foreground dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100"
-              onClick={() => setShowQuickGuide(true)}
-        >
-              <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
-              Quick Guide
-        </Button>
-      </div>
+            <p className="text-xs text-muted-foreground dark:text-slate-400">
+              Pick systems, then narrow by topic or subtopic
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs font-medium text-muted-foreground hover:text-foreground dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100"
+            onClick={() => setShowQuickGuide(true)}
+          >
+            <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
+            Quick Guide
+          </Button>
         </header>
 
-        {/* Scrollable Content */}
         <main className="flex-1 overflow-auto scrollbar-thin">
           <div className="p-6">
-
-      {/* Error/Success Messages */}
-      {error && (
-              <div className="bg-destructive/5 dark:bg-destructive/10 border border-destructive/20 dark:border-destructive/30 text-destructive dark:text-destructive px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
-          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            {error && (
+              <div className="bg-destructive/5 dark:bg-destructive/10 border border-destructive/20 dark:border-destructive/30 text-destructive px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <strong className="font-medium">Error:</strong> {error}
-          </div>
-        </div>
-      )}
-      {success && (
-              <div className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
+                </div>
+              </div>
+            )}
+            {success && (
+              <div className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-lg flex items-start gap-3 mb-4">
                 <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <div className="text-sm dark:text-slate-100">
+                <div className="text-sm">
                   <strong className="font-medium">Success:</strong> {success}
                 </div>
-        </div>
-      )}
+              </div>
+            )}
 
-            {/* Settings Row */}
             <div className="grid grid-cols-3 gap-4 mb-4">
-          <TestModeSelector
+              <TestModeSelector
                 isTutor={isTutor}
-            isTimed={isTimed}
+                isTimed={isTimed}
                 onTutorChange={setIsTutor}
-            onTimedChange={setIsTimed}
-          />
-
+                onTimedChange={setIsTimed}
+              />
               <MarkedToggle
                 isMarked={isMarked}
                 onMarkedChange={setIsMarked}
                 selectedPool={selectedPool}
                 refreshTrigger={refreshTrigger}
               />
-
-          <QuestionPoolSelector
-            selectedPool={selectedPool}
-            onPoolChange={setSelectedPool}
-            isMarked={isMarked}
-            filters={{
-              systemIds: selectedTags,
-              topicIds: selectedSubjects,
-              subtopicIds: selectedTopics,
-            }}
-          />
+              <QuestionPoolSelector
+                selectedPool={selectedPool}
+                onPoolChange={setSelectedPool}
+                isMarked={isMarked}
+                filters={{
+                  systemIds: selectedSystemIds,
+                  topicIds: selectedTopicIds,
+                  subtopicIds: selectedSubtopicIds,
+                }}
+              />
             </div>
 
-            {/* Subjects & Systems */}
             <div className="mb-4 overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
               <div className="grid min-h-[500px] grid-cols-[280px_1fr] divide-x divide-slate-200/80 dark:divide-white/10">
-                <div data-validation-error={!!validationErrors.subjects} className="flex flex-col">
-            <SystemSelector
-              selectedSystems={selectedTags}
-              onSystemToggle={handleTagToggle}
-            selectedPool={selectedPool}
+                <div
+                  data-validation-error={!!validationErrors.systems}
+                  className="flex flex-col"
+                >
+                  <SystemSelector
+                    selectedSystems={selectedSystemIds}
+                    onSystemToggle={handleSystemToggle}
+                    selectedPool={selectedPool}
                     isMarked={isMarked}
-            />
-            {validationErrors.subjects && (
-                    <div className="px-4 py-2 bg-destructive/5 dark:bg-destructive/10 border-t border-destructive/20">
+                  />
+                  {validationErrors.systems && (
+                    <div className="px-4 py-2 bg-destructive/5 border-t border-destructive/20">
                       <p className="text-sm text-destructive flex items-center gap-1.5">
-                <AlertCircle className="h-4 w-4" />
-                {validationErrors.subjects}
-              </p>
+                        <AlertCircle className="h-4 w-4" />
+                        {validationErrors.systems}
+                      </p>
                     </div>
-            )}
-          </div>
-
-                <div className="flex flex-col" data-validation-error={!!validationErrors.systems}>
-            <TopicSelector
-              selectedSystems={selectedTags}
-              onSystemToggle={handleTagToggle}
-            selectedPool={selectedPool}
-              selectedTopics={selectedSubjects}
-              selectedSubtopics={selectedTopics}
-                    isMarked={isMarked}
-              onTopicToggle={handleSubjectToggle}
-              onSubtopicToggle={handleTopicToggle}
-            />
-            {validationErrors.systems && (
-                    <div className="px-4 py-2 bg-destructive/5 dark:bg-destructive/10 border-t border-destructive/20 dark:border-red-500/30">
-                      <p className="text-sm text-destructive dark:text-red-400 flex items-center gap-1.5">
-                <AlertCircle className="h-4 w-4" />
-                {validationErrors.systems}
-              </p>
-                    </div>
-            )}
+                  )}
                 </div>
-        </div>
-      </div>
 
-            {/* Question Count */}
+                <div className="flex flex-col">
+                  <TopicSelector
+                    selectedSystems={selectedSystemIds}
+                    onSystemToggle={handleSystemToggle}
+                    selectedPool={selectedPool}
+                    selectedTopics={selectedTopicIds}
+                    selectedSubtopics={selectedSubtopicIds}
+                    isMarked={isMarked}
+                    onTopicToggle={handleTopicToggle}
+                    onSubtopicToggle={handleSubtopicToggle}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="mb-4 overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
               <div className="border-b border-slate-200/80 px-4 py-3 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-violet-500" />
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100">Question Count</h3>
-                  <span className="ml-auto text-xs text-muted-foreground dark:text-slate-400">max 40</span>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    Question Count
+                  </h3>
+                  <span className="ml-auto text-xs text-muted-foreground">max 40</span>
                 </div>
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Hash className="h-4 w-4 text-muted-foreground" />
-              <Input
-                id="question-count"
+                    <Input
+                      id="question-count"
                       type="number"
                       min={1}
                       max={40}
-                value={questionCount}
+                      value={questionCount}
                       onChange={(e) => {
                         const val = e.target.value;
                         if (val === "" || /^\d+$/.test(val)) {
                           const num = parseInt(val, 10) || 0;
-                          setQuestionCount(Math.min(40, Math.max(0, num)).toString() || "");
+                          setQuestionCount(
+                            Math.min(40, Math.max(0, num)).toString() || ""
+                          );
                         }
                       }}
-                onBlur={handleQuestionCountBlur}
+                      onBlur={handleQuestionCountBlur}
                       className={`h-9 w-20 border-slate-200/90 bg-slate-50 text-center dark:border-white/10 dark:bg-white/10 ${
-                  validationErrors.questionCount
+                        validationErrors.questionCount
                           ? "border-destructive focus-visible:ring-destructive"
-                    : ""
-                }`}
-                data-testid="input-question-count"
-                data-validation-error={!!validationErrors.questionCount}
-                disabled={isLoading}
-              />
+                          : ""
+                      }`}
+                      data-testid="input-question-count"
+                      data-validation-error={!!validationErrors.questionCount}
+                      disabled={isLoading}
+                    />
                   </div>
                   <div className="flex-1">
                     <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
                       <div
                         className="h-full rounded-full bg-primary-600 transition-all duration-300 dark:bg-primary-500"
-                        style={{ width: `${((parseInt(questionCount) || 0) / 40) * 100}%` }}
+                        style={{
+                          width: `${((parseInt(questionCount) || 0) / 40) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
-                  <span className="text-sm text-muted-foreground dark:text-slate-400">
-                    {parseInt(questionCount) || 0} questions
+                  <span className="text-sm text-muted-foreground">
+                    {parseInt(questionCount) || 0} in test
                   </span>
                 </div>
-              {validationErrors.questionCount && (
-                  <p className="text-sm text-destructive dark:text-red-400 mt-2 flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4" />
-                  {validationErrors.questionCount}
-                </p>
-              )}
+                {validationErrors.questionCount && (
+                  <p className="text-sm text-destructive mt-2 flex items-center gap-1.5">
+                    <AlertCircle className="h-4 w-4" />
+                    {validationErrors.questionCount}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </main>
 
         <footer className="flex h-16 shrink-0 items-center justify-between border-t border-slate-200/80 bg-white/80 px-6 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground dark:text-slate-500" />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {filterSummaryParts.length > 0 ? (
               <span className="text-sm text-muted-foreground dark:text-slate-400">
-                <span className="font-medium text-gray-900 dark:text-slate-100">{selectedTags.length + selectedSystems.length}</span> selections
+                Filter:{" "}
+                <span className="font-medium text-gray-900 dark:text-slate-100">
+                  {filterSummaryParts.join(" · ")}
+                </span>
               </span>
-            </div>
-            {selectedTags.length > 0 && (
-              <span className="rounded-full border border-primary-500/25 bg-primary-500/10 px-2 py-1 text-xs text-primary-700 dark:border-primary-500/35 dark:bg-primary-900/25 dark:text-primary-200">
-                {selectedTags.length} subjects
-              </span>
+            ) : (
+              <span className="text-sm text-muted-foreground">No systems selected</span>
             )}
-            {selectedSubjects.length > 0 && (
-              <span className="rounded-full border border-primary-500/25 bg-primary-500/10 px-2 py-1 text-xs text-primary-700 dark:border-primary-500/35 dark:bg-primary-900/25 dark:text-primary-200">
-                {selectedSubjects.length} Systems
-              </span>
-            )}
-              {availableQuestionsCount !== null && (
+            {selectedSystemIds.length > 0 && (
               <>
-                <div className="mx-2 h-5 w-px bg-border dark:bg-white/10" />
+                <div className="hidden sm:block h-5 w-px bg-border dark:bg-white/10" />
                 <span className="text-sm text-muted-foreground dark:text-slate-400">
-                  Available: <span className="font-medium text-gray-900 dark:text-slate-100">
-                    {loadingCount ? "..." : availableQuestionsCount === 1000 ? "1000+" : availableQuestionsCount.toLocaleString()}
-                  </span>
+                  Matching pool:{" "}
+                  <span className="font-medium text-gray-900 dark:text-slate-100">
+                    {loadingCount
+                      ? "…"
+                      : availableQuestionsCount === null
+                        ? "—"
+                        : availableQuestionsCount === 1000
+                          ? "1000+"
+                          : availableQuestionsCount.toLocaleString()}
+                  </span>{" "}
+                  questions
                 </span>
               </>
-              )}
-            </div>
+            )}
+          </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="h-9 bg-transparent" onClick={() => {
-              setSelectedTags([]);
-              setSelectedSystems([]);
-              setSelectedSubjects([]);
-              setSelectedTopics([]);
-              setQuestionCount("");
-              setSelectedPool("unused");
-              setIsMarked(false);
-            }}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 bg-transparent"
+              onClick={() => {
+                setSelectedSystemIds([]);
+                setSelectedTopicIds([]);
+                setSelectedSubtopicIds([]);
+                setQuestionCount("");
+                setSelectedPool("unused");
+                setIsMarked(false);
+                setAvailableQuestionsCount(null);
+              }}
+            >
               Reset All
             </Button>
             <Button
@@ -641,23 +506,7 @@ export default function StudyCreateTestPage() {
               data-testid="button-generate-test"
               disabled={isLoading || !isFormValid}
             >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Generating...
-                </>
-              ) : (
+              {isLoading ? "Generating…" : (
                 <>
                   Generate Test
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -668,41 +517,36 @@ export default function StudyCreateTestPage() {
         </footer>
       </div>
 
-      {/* Insufficient Questions Dialog */}
-      <AlertDialog open={showInsufficientQuestionsDialog} onOpenChange={setShowInsufficientQuestionsDialog}>
-        <AlertDialogContent className="border-slate-200/90 bg-white dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-md">
+      <AlertDialog
+        open={showInsufficientQuestionsDialog}
+        onOpenChange={setShowInsufficientQuestionsDialog}
+      >
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-gray-900 dark:text-slate-100">
-              <AlertCircle className="h-5 w-5 text-destructive dark:text-red-400" />
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
               Not Enough Questions Available
             </AlertDialogTitle>
-            <AlertDialogDescription className="pt-2 text-muted-foreground dark:text-slate-300">
-              <p className="mb-2 dark:text-slate-200">
-                You requested <strong className="text-foreground dark:text-slate-100">{questionCount}</strong> questions, but only{" "}
-                <strong className="text-foreground dark:text-slate-100">{availableQuestionsCount}</strong> {availableQuestionsCount === 1 ? "question is" : "questions are"} available
-                for the current filter settings.
+            <AlertDialogDescription className="pt-2">
+              <p className="mb-2">
+                You requested <strong>{questionCount}</strong> questions, but only{" "}
+                <strong>{availableQuestionsCount}</strong> match your current filters.
               </p>
-              <p className="text-sm text-muted-foreground dark:text-slate-400">
-                Please adjust your question count or modify your filter selections (subjects, systems, pool type, or marked status)
-                to include more questions.
+              <p className="text-sm text-muted-foreground">
+                Add more systems, broaden topic selection, change the question pool, or
+                lower the question count.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white">
-              Close
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => setShowInsufficientQuestionsDialog(false)}
-              className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
-            >
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setShowInsufficientQuestionsDialog(false)}>
               Understood
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quick Guide Modal */}
       <QuickGuideModal open={showQuickGuide} onOpenChange={setShowQuickGuide} />
       {SubscriptionUpgradeModal}
     </div>
