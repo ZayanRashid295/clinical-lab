@@ -33,6 +33,9 @@ export interface QuestionCreatorData {
   metadata: QuestionMetadata
 }
 
+import { QuestionCreatorData } from "./types"
+import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
+
 export interface QuestionCreatorProps {
   initialData?: Partial<QuestionCreatorData>
   onSave: (data: QuestionCreatorData) => void | Promise<boolean | void>
@@ -42,6 +45,8 @@ export interface QuestionCreatorProps {
   /** Parent-controlled busy state (e.g. batch save + load next question) */
   isSavingExternal?: boolean
   saveBusyLabel?: string
+  feedbackHighlights?: QaFeedbackHighlight[] | null
+  feedbackReviewerName?: string | null
 }
 
 

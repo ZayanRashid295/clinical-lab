@@ -47,26 +47,216 @@ model QuestionReviewAttempt {
 }
 
 model QuestionReviewResponse {
-  id             String   @id @default(cuid())
-  attemptId      String
-  questionId     String
-  order          Int      @default(0)
-  userAnswer     String?
-  isCorrect      Boolean?
-  qualityComment String?  @db.Text
-  timeSpent      Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                       String                    @id @default(cuid())
+  attemptId                String
+  questionId               String
+  order                    Int                       @default(0)
+  userAnswer               String?
+  isCorrect                Boolean?
+  qualityComment           String?                   @db.Text
+  timeSpent                Int?
+  questionQualityRating    Int?
+  explanationQualityRating Int?
+  imageQualityRating       Int?
+  difficultyRating         ReviewDifficultyRating?
+  approvalStatus           ReviewApprovalStatus?
+  overallComment           String?                   @db.Text
+  reviewProgress           Json?
+  reviewModeEnteredAt      DateTime?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
 
-  attempt  QuestionReviewAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  question Question              @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  attempt     QuestionReviewAttempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question    Question                   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  annotations QuestionReviewAnnotation[]
 
   @@unique([attemptId, questionId])
   @@index([attemptId, order])
   @@map("question_review_responses")
 }
 
+model QuestionReviewAnnotation {
+  id           String                     @id @default(cuid())
+  responseId   String
+  targetType   ReviewAnnotationTarget
+  targetKey    String
+  section      String
+  selectedText String?                    @db.Text
+  anchorMeta   Json?
+  body         String                     @db.Text
+  tags         Json                       @default("[]")
+  severity     ReviewAnnotationSeverity   @default(MINOR)
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+
+  response QuestionReviewResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  qaIssue  QaIssue?
+
+  @@index([responseId, targetType])
+  @@index([responseId, targetKey])
+  @@map("question_review_annotations")
+}
+
+// ---------- Admin QA workflow ----------
+
+model QaIssue {
+  id                String                   @id @default(cuid())
+  questionId        String
+  annotationId      String?                  @unique
+  targetType        ReviewAnnotationTarget
+  targetKey         String
+  section           String
+  category          String?
+  severity          ReviewAnnotationSeverity @default(MINOR)
+  title             String                   @db.VarChar(500)
+  body              String                   @db.Text
+  selectedText      String?                  @db.Text
+  currentContent    String?                  @db.Text
+  suggestedRevision String?                  @db.Text
+  status            QaIssueStatus            @default(NEW)
+  assignedToId      String?
+  reporterNames     Json                     @default("[]")
+  sourceAnnotationIds Json                   @default("[]")
+  replyCount        Int                      @default(0)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  resolvedAt        DateTime?
+
+  question   Question                   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  annotation QuestionReviewAnnotation?  @relation(fields: [annotationId], references: [id], onDelete: SetNull)
+  assignedTo User?                      @relation("QaIssueAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  comments   QaIssueComment[]
+  activities QaIssueActivity[]
+
+  @@index([questionId, status])
+  @@index([questionId, targetKey])
+  @@index([status, severity])
+  @@index([assignedToId])
+  @@map("qa_issues")
+}
+
+model QaIssueComment {
+  id         String   @id @default(cuid())
+  issueId    String
+  authorId   String?
+  authorName String
+  body       String   @db.Text
+  isInternal Boolean  @default(false)
+  mentions   Json     @default("[]")
+  createdAt  DateTime @default(now())
+
+  issue  QaIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  author User?   @relation("QaIssueCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([issueId, createdAt])
+  @@map("qa_issue_comments")
+}
+
+model QaIssueActivity {
+  id         String   @id @default(cuid())
+  issueId    String?
+  questionId String?
+  actorId    String?
+  actorName  String
+  action     String
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  issue    QaIssue?  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  actor    User?     @relation("QaIssueActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([issueId, createdAt])
+  @@index([questionId, createdAt])
+  @@map("qa_issue_activities")
+}
+
+model QuestionQaRecord {
+  id               String                   @id @default(cuid())
+  questionId       String                   @unique
+  productionStatus QuestionProductionStatus @default(DRAFT)
+  draftSnapshot    Json?
+  ratings          Json?
+  decisionNote     String?                  @db.Text
+  approvedById     String?
+  approvedAt       DateTime?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  approvedBy User?    @relation("QuestionQaApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@map("question_qa_records")
+}
+
+model QuestionQaVersion {
+  id         String   @id @default(cuid())
+  questionId String
+  version    Int
+  authorId   String
+  summary    String?  @db.Text
+  snapshot   Json
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  author   User     @relation("QuestionQaVersionAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, version])
+  @@index([questionId, createdAt])
+  @@map("question_qa_versions")
+}
+
+enum QaIssueStatus {
+  NEW
+  UNDER_REVIEW
+  ASSIGNED
+  IN_PROGRESS
+  WAITING_MEDICAL_REVIEW
+  RESOLVED
+  VERIFIED
+  CLOSED
+  REJECTED
+}
+
+enum QuestionProductionStatus {
+  DRAFT
+  NEEDS_REVISION
+  APPROVED
+  REJECTED
+}
+
 enum QuestionReviewAttemptStatus {
   IN_PROGRESS
   COMPLETED
+}
+
+enum ReviewAnnotationTarget {
+  STEM
+  OPTION
+  EXPLANATION
+  KEYWORD
+  TABLE
+  TABLE_CELL
+  TABLE_ROW
+  IMAGE
+  METADATA
+  OVERALL
+}
+
+enum ReviewAnnotationSeverity {
+  MINOR
+  MAJOR
+  CRITICAL
+}
+
+enum ReviewDifficultyRating {
+  TOO_EASY
+  APPROPRIATE
+  TOO_DIFFICULT
+}
+
+enum ReviewApprovalStatus {
+  APPROVE
+  NEEDS_REVISION
+  REJECT
 }

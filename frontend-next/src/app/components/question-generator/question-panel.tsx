@@ -11,16 +11,24 @@ import {
   stripOptionsAndExplanationsFromStemString,
   stripOptionsAndExplanationsFromBlock,
 } from "./stem-blocks-utils"
+import { annotationsToHighlightItems } from "@/app/components/QuestionReview/review/annotation-highlight"
+import { HighlightedText } from "@/app/components/QuestionReview/review/HighlightedText"
+import {
+  highlightItemsMatchingPlainText,
+  mergeHighlightItems,
+} from "@/app/components/QuestionReview/review/highlight-text-utils"
+import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
 
 interface QuestionPanelProps {
   question?: any
   selectedAnswer: string | null
   answered: boolean
   onSelectAnswer: (option: string) => void
-  isPreviewMode?: boolean // If true, show correct answer highlighted even when not answered
+  isPreviewMode?: boolean
+  feedbackHighlights?: QaFeedbackHighlight[]
 }
 
-export default function QuestionPanel({ question, selectedAnswer, answered, onSelectAnswer, isPreviewMode = false }: QuestionPanelProps) {
+export default function QuestionPanel({ question, selectedAnswer, answered, onSelectAnswer, isPreviewMode = false, feedbackHighlights = [] }: QuestionPanelProps) {
   if (!question) {
     return (
       <Card className="p-7 shadow-xl border border-border/30 dark:border-gray-700 bg-card/50 dark:bg-gray-800/50 backdrop-blur-sm sticky top-6 rounded-xl">
@@ -39,6 +47,15 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
 
   // Use stem as-is; no hardcoded parsing or line-breaking. Doc structure is preserved.
   const displayStem = stripOptionsAndExplanationsFromStemString(question.stem || "")
+  const stemHighlightItems = filterAnnotationsForTarget(
+    feedbackHighlights.map((h) => ({
+      id: h.id,
+      targetKey: h.targetKey,
+      selectedText: h.selectedText,
+      severity: h.severity,
+    })),
+    "stem"
+  )
 
   return (
     <Card className="p-2 shadow-md border border-border/40 dark:border-gray-700 bg-card/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
@@ -46,10 +63,16 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
       <div className="flex-1 min-h-0">
         <div className="animate-fade-in">
         {/* Render stem blocks if available, otherwise use plain text stem */}
-        {hasStemBlocks ? (
+        {hasStemBlocks && !stemHighlightItems.length ? (
           <div className="text-foreground text-pretty text-base leading-normal font-medium mb-1">
             <RichContentRenderer content={questionStemBlocksMerged.map((b: any) => stripOptionsAndExplanationsFromBlock(b))} stemMode />
           </div>
+        ) : stemHighlightItems.length > 0 ? (
+          <HighlightedText
+            text={displayStem}
+            items={stemHighlightItems}
+            className="text-foreground text-pretty text-base leading-normal font-medium mb-1 dark:text-gray-200"
+          />
         ) : (
         <div className="prose prose-sm dark:prose-invert max-w-none text-foreground dark:text-gray-200 text-pretty text-base leading-normal font-medium mb-1 [&_h1]:font-bold [&_h1]:text-center [&_h2]:font-bold [&_h2]:text-center [&_h3]:font-bold [&_h3]:text-center [&_h4]:font-bold [&_h4]:text-center [&_h5]:font-bold [&_h5]:text-center [&_h6]:font-bold [&_h6]:text-center">
           <ReactMarkdown
@@ -119,7 +142,8 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
           {/* Answer Options - Now inside the scrollable container */}
       <div className="space-y-1">
         {question.options.map((option: any, idx: number) => {
-          const isSelected = selectedAnswer === option.value
+          const optionValue = option.value ?? option.label
+          const isSelected = selectedAnswer === optionValue
           const isCorrect = option.correct
           const showFeedback = answered && isSelected
           // In preview mode, show correct answer highlighted even when not answered
@@ -127,10 +151,27 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
           const showCorrectHighlight = isPreviewMode ? isCorrect : (answered && isCorrect)
           const showCorrectTick = isPreviewMode ? isCorrect : (answered && isCorrect)
 
+          const displayText = `${option.label}. ${option.text}`
+          const mappedHighlights = feedbackHighlights.map((h) => ({
+            id: h.id,
+            targetKey: h.targetKey,
+            selectedText: h.selectedText,
+            severity: h.severity,
+            body: h.body,
+          }))
+          const optionHighlights = mergeHighlightItems(
+            annotationsToHighlightItems(
+              mappedHighlights,
+              `option:${option.label}`,
+              { fullTextFallback: displayText }
+            ),
+            highlightItemsMatchingPlainText(mappedHighlights, displayText)
+          )
+
           return (
             <button
-              key={option.value}
-              onClick={() => onSelectAnswer(option.value)}
+              key={optionValue || idx}
+              onClick={() => onSelectAnswer(optionValue)}
               disabled={answered}
               className={`w-full text-left p-2 rounded-lg border-2 transition-all duration-300 flex items-center gap-1.5 group ${
                 isSelected
@@ -163,8 +204,23 @@ export default function QuestionPanel({ question, selectedAnswer, answered, onSe
               </div>
 
               <div className="flex-1 min-w-0">
-                <span className="font-bold text-sm text-foreground dark:text-gray-100">{option.label}.</span>
-                <span className="text-sm text-foreground/75 dark:text-gray-300"> {option.text}</span>
+                {optionHighlights.length > 0 ? (
+                  <HighlightedText
+                    text={displayText}
+                    items={optionHighlights}
+                    className="text-sm text-foreground/75 dark:text-gray-300"
+                  />
+                ) : (
+                  <>
+                    <span className="font-bold text-sm text-foreground dark:text-gray-100">
+                      {option.label}.
+                    </span>
+                    <span className="text-sm text-foreground/75 dark:text-gray-300">
+                      {" "}
+                      {option.text}
+                    </span>
+                  </>
+                )}
               </div>
 
               {showFeedback && (

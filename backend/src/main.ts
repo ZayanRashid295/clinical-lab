@@ -30,6 +30,7 @@ async function bootstrap() {
       "Accept",
       "Origin",
       "X-Requested-With",
+      "X-Review-Attempt-Secret",
     ],
     exposedHeaders: ["Authorization"],
   });

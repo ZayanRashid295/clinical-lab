@@ -9,10 +9,12 @@ import { QuestionCreatorData } from "./question-creator/types"
 import { blocksToHTML } from "./unified-editor/content-utils"
 import { SystemsService } from "@/app/services/systems/systems.service"
 import { TopicsService } from "@/app/services/content/topics.service"
+import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
 
 interface UnifiedQuestionPreviewProps {
   questionData: QuestionCreatorData
   questionId?: string | null
+  feedbackHighlights?: QaFeedbackHighlight[]
   onEdit?: () => void
   onClose?: () => void
 }
@@ -20,6 +22,7 @@ interface UnifiedQuestionPreviewProps {
 export default function UnifiedQuestionPreview({ 
   questionData, 
   questionId,
+  feedbackHighlights,
   onEdit,
   onClose 
 }: UnifiedQuestionPreviewProps) {
@@ -157,6 +160,7 @@ export default function UnifiedQuestionPreview({
                   answered={answered}
                   onSelectAnswer={handleSelectAnswer}
                   isPreviewMode={true}
+                  feedbackHighlights={feedbackHighlights}
                 />
 
                 {/* Feedback Box - Visible when answered */}

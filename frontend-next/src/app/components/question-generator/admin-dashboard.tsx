@@ -26,6 +26,7 @@ import { CreateQuestionDto } from "@/app/types/question"
 import { authService } from "@/shared/services/auth.service"
 import { useLanguage } from "@/shared/contexts/LanguageContext"
 import { QuestionBankListHeader } from "./QuestionBankListHeader"
+import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
 import {
   ApiHttpError,
   getApiErrorMessage,
@@ -153,9 +154,12 @@ interface Question {
 interface AdminDashboardProps {
   onQuestionViewChange?: (questionId: string | null, dbId: string | null, isViewing: boolean) => void
   onEditorPreviewModeChange?: (isPreview: boolean) => void
+  initialQuestionId?: string | null
+  feedbackHighlights?: QaFeedbackHighlight[] | null
+  feedbackReviewerName?: string | null
 }
 
-export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange }: AdminDashboardProps) {
+export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange, initialQuestionId, feedbackHighlights, feedbackReviewerName }: AdminDashboardProps) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const { confirm } = useConfirm()
@@ -196,6 +200,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
   const loadRequestIdRef = useRef(0)
+  const initialQuestionOpenedRef = useRef(false)
   const filtersRef = useRef({ currentPage, debouncedSearchTerm, systemFilter })
   filtersRef.current = { currentPage, debouncedSearchTerm, systemFilter }
   const questionsService = useMemo(() => new QuestionsService(), [])
@@ -1212,6 +1217,21 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
   }, [loadQuestions, currentPage, debouncedSearchTerm, systemFilter])
 
   useEffect(() => {
+    if (!initialQuestionId || initialQuestionOpenedRef.current) return
+    if (!authService.isAuthenticated()) return
+    initialQuestionOpenedRef.current = true
+    setEditingId(initialQuestionId)
+    setViewingId(null)
+    setShowNewQuestion(false)
+    setShowMarkdownUploader(false)
+    setShowBulkUploader(false)
+    setShowDocxUploader(false)
+    setShowBulkDocxUploader(false)
+    setShowQuestionBuilder(false)
+    setParsedMarkdownData(null)
+  }, [initialQuestionId])
+
+  useEffect(() => {
     const detailId = editingId || viewingId
     if (!detailId) {
       setDetailQuestion(null)
@@ -1720,7 +1740,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     debouncedSearchTerm,
   ])
 
-  if (loading && questions.length === 0 && !error) {
+  if (loading && questions.length === 0 && !error && !editingId && !viewingId) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Card className="p-12 bg-card dark:bg-gray-800 border-border dark:border-gray-700">
@@ -1838,6 +1858,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                   : undefined
             }
             onSave={handleSaveQuestion}
+            feedbackHighlights={feedbackHighlights}
+            feedbackReviewerName={feedbackReviewerName}
             onCancel={() => {
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)

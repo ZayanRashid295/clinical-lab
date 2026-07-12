@@ -19,14 +19,22 @@ async function reviewRequest(
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`Invalid response from server (${response.status})`);
+    }
+  }
 
   if (!response.ok) {
+    const payload = data as { message?: string | string[] } | null;
     const message =
-      typeof data?.message === "string"
-        ? data.message
-        : Array.isArray(data?.message)
-          ? data.message.join(". ")
+      typeof payload?.message === "string"
+        ? payload.message
+        : Array.isArray(payload?.message)
+          ? payload.message.join(". ")
           : `Request failed (${response.status})`;
     throw new Error(message);
   }
@@ -42,6 +50,44 @@ export type ReviewBundleMeta = {
   questionCount: number;
 };
 
+export type ReviewAnnotation = {
+  id: string;
+  targetType: string;
+  targetKey: string;
+  section: string;
+  selectedText?: string | null;
+  anchorMeta?: Record<string, unknown> | null;
+  body: string;
+  tags: string[];
+  severity: string;
+  createdAt?: string;
+};
+
+export type ReviewProgress = {
+  stemReviewed: boolean;
+  explanationReviewed: boolean;
+  imagesReviewed: boolean;
+  metadataReviewed: boolean;
+  overallReviewed: boolean;
+};
+
+export type ReviewQuestionResponse = {
+  id?: string;
+  userAnswer: string | null;
+  isCorrect: boolean | null;
+  qualityComment: string | null;
+  overallComment: string | null;
+  timeSpent: number | null;
+  questionQualityRating: number | null;
+  explanationQualityRating: number | null;
+  imageQualityRating: number | null;
+  difficultyRating: string | null;
+  approvalStatus: string | null;
+  reviewProgress: ReviewProgress | null;
+  reviewModeEnteredAt: string | null;
+  annotations: ReviewAnnotation[];
+};
+
 export type ReviewQuestion = {
   order: number;
   id: string;
@@ -50,15 +96,10 @@ export type ReviewQuestion = {
   system: string | null;
   topic: string | null;
   questionStemBlocks: unknown[];
-  options: Array<{ label: string; text: string; correct: boolean }>;
+  options: Array<{ label: string; text: string; correct: boolean; value?: string }>;
   explanation: unknown[];
   perAnswerExplanations: Record<string, string | unknown[]>;
-  response?: {
-    userAnswer: string | null;
-    isCorrect: boolean | null;
-    qualityComment: string | null;
-    timeSpent: number | null;
-  };
+  response?: ReviewQuestionResponse;
 };
 
 export const questionReviewService = {
@@ -66,10 +107,7 @@ export const questionReviewService = {
     return reviewRequest(`/question-review/bundles/${slug}`);
   },
 
-  startAttempt(
-    slug: string,
-    body: { reviewerName: string; reviewerEmail?: string }
-  ) {
+  startAttempt(slug: string, body: { reviewerName: string; reviewerEmail?: string }) {
     return reviewRequest(`/question-review/bundles/${slug}/start`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -98,18 +136,26 @@ export const questionReviewService = {
     attemptId: string,
     questionId: string,
     attemptSecret: string,
-    body: {
-      userAnswer?: string;
-      isCorrect?: boolean;
-      qualityComment?: string;
-      timeSpent?: number;
-    }
+    body: Record<string, unknown>
   ) {
     return reviewRequest(
       `/question-review/attempts/${attemptId}/responses/${questionId}`,
       { method: "PATCH", body: JSON.stringify(body) },
       attemptSecret
-    );
+    ) as Promise<ReviewQuestionResponse>;
+  },
+
+  createAnnotation(
+    attemptId: string,
+    questionId: string,
+    attemptSecret: string,
+    body: Record<string, unknown>
+  ) {
+    return reviewRequest(
+      `/question-review/attempts/${attemptId}/responses/${questionId}/annotations`,
+      { method: "POST", body: JSON.stringify(body) },
+      attemptSecret
+    ) as Promise<ReviewAnnotation>;
   },
 
   completeAttempt(attemptId: string, attemptSecret: string) {
@@ -166,7 +212,13 @@ export function loadReviewSession(slug: string) {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(getReviewSessionKey(slug));
-    return raw ? (JSON.parse(raw) as { attemptId: string; attemptSecret: string; reviewerName: string }) : null;
+    return raw
+      ? (JSON.parse(raw) as {
+          attemptId: string;
+          attemptSecret: string;
+          reviewerName: string;
+        })
+      : null;
   } catch {
     return null;
   }

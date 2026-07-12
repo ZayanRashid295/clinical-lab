@@ -6,12 +6,17 @@ import {
 } from "@nestjs/common";
 import { randomBytes } from "crypto";
 import { PrismaService } from "../../common/prisma/prisma.service";
+import { QuestionReviewAdminService } from "./question-review-admin.service";
 import { StartReviewAttemptDto } from "./dto/start-review-attempt.dto";
 import { UpdateReviewResponseDto } from "./dto/update-review-response.dto";
+import { CreateReviewAnnotationDto } from "./dto/create-review-annotation.dto";
 
 @Injectable()
 export class QuestionReviewService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private adminService: QuestionReviewAdminService
+  ) {}
 
   async getBundleBySlug(slug: string) {
     const bundle = await this.prisma.questionReviewBundle.findFirst({
@@ -97,6 +102,7 @@ export class QuestionReviewService {
       where: { attemptId },
       orderBy: { order: "asc" },
       include: {
+        annotations: { orderBy: { createdAt: "asc" } },
         question: {
           include: {
             choices: { orderBy: { order: "asc" } },
@@ -120,13 +126,48 @@ export class QuestionReviewService {
       bundleId: attempt.bundleId,
       questions: responses.map((r) => ({
         ...this.mapQuestionForReview(r.question, r.order),
-        response: {
-          userAnswer: r.userAnswer,
-          isCorrect: r.isCorrect,
-          qualityComment: r.qualityComment,
-          timeSpent: r.timeSpent,
-        },
+        response: this.mapResponsePayload(r),
       })),
+    };
+  }
+
+  private mapResponsePayload(r: any) {
+    return {
+      id: r.id,
+      userAnswer: r.userAnswer,
+      isCorrect: r.isCorrect,
+      qualityComment: r.qualityComment,
+      overallComment: r.overallComment ?? r.qualityComment,
+      timeSpent: r.timeSpent,
+      questionQualityRating: r.questionQualityRating,
+      explanationQualityRating: r.explanationQualityRating,
+      imageQualityRating: r.imageQualityRating,
+      difficultyRating: r.difficultyRating,
+      approvalStatus: r.approvalStatus,
+      reviewProgress: r.reviewProgress ?? this.defaultReviewProgress(),
+      reviewModeEnteredAt: r.reviewModeEnteredAt,
+      annotations: (r.annotations ?? []).map((a: any) => ({
+        id: a.id,
+        targetType: a.targetType,
+        targetKey: a.targetKey,
+        section: a.section,
+        selectedText: a.selectedText,
+        anchorMeta: a.anchorMeta,
+        body: a.body,
+        tags: a.tags,
+        severity: a.severity,
+        createdAt: a.createdAt,
+      })),
+    };
+  }
+
+  private defaultReviewProgress() {
+    return {
+      stemReviewed: false,
+      explanationReviewed: false,
+      imagesReviewed: false,
+      metadataReviewed: false,
+      overallReviewed: false,
     };
   }
 
@@ -146,14 +187,181 @@ export class QuestionReviewService {
     });
     if (!response) throw new NotFoundException("Question not found in this review");
 
-    return this.prisma.questionReviewResponse.update({
+    const data: Record<string, unknown> = {};
+    if (dto.userAnswer !== undefined) data.userAnswer = dto.userAnswer;
+    if (dto.isCorrect !== undefined) data.isCorrect = dto.isCorrect;
+    if (dto.qualityComment !== undefined) {
+      data.qualityComment = dto.qualityComment.trim() || null;
+    }
+    if (dto.timeSpent !== undefined) data.timeSpent = dto.timeSpent;
+    if (dto.questionQualityRating !== undefined) {
+      data.questionQualityRating = dto.questionQualityRating;
+    }
+    if (dto.explanationQualityRating !== undefined) {
+      data.explanationQualityRating = dto.explanationQualityRating;
+    }
+    if (dto.imageQualityRating !== undefined) {
+      data.imageQualityRating = dto.imageQualityRating;
+    }
+    if (dto.difficultyRating !== undefined) {
+      data.difficultyRating = dto.difficultyRating;
+    }
+    if (dto.approvalStatus !== undefined) {
+      data.approvalStatus = dto.approvalStatus;
+    }
+    if (dto.overallComment !== undefined) {
+      const trimmed = dto.overallComment.trim();
+      data.overallComment = trimmed || null;
+      data.qualityComment = trimmed || null;
+    }
+    if (dto.reviewProgress !== undefined) {
+      data.reviewProgress = dto.reviewProgress;
+    }
+    if (dto.enterReviewMode) {
+      data.reviewModeEnteredAt = new Date();
+    }
+
+    const updated = await this.prisma.questionReviewResponse.update({
       where: { id: response.id },
+      data,
+      include: { annotations: { orderBy: { createdAt: "asc" } } },
+    });
+
+    return this.mapResponsePayload(updated);
+  }
+
+  async listAnnotations(
+    attemptId: string,
+    questionId: string,
+    attemptSecret: string
+  ) {
+    const response = await this.getResponseForAttempt(
+      attemptId,
+      questionId,
+      attemptSecret
+    );
+    return this.prisma.questionReviewAnnotation.findMany({
+      where: { responseId: response.id },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async createAnnotation(
+    attemptId: string,
+    questionId: string,
+    attemptSecret: string,
+    dto: CreateReviewAnnotationDto
+  ) {
+    const attempt = await this.assertAttemptAccess(attemptId, attemptSecret);
+    if (attempt.status === "COMPLETED") {
+      throw new BadRequestException("This review session is already completed");
+    }
+
+    const response = await this.getResponseForAttempt(
+      attemptId,
+      questionId,
+      attemptSecret
+    );
+
+    const body = dto.body?.trim();
+    if (!body) {
+      throw new BadRequestException("Comment text is required");
+    }
+
+    const annotation = await this.prisma.questionReviewAnnotation.create({
       data: {
-        userAnswer: dto.userAnswer,
-        isCorrect: dto.isCorrect,
-        qualityComment: dto.qualityComment?.trim(),
-        timeSpent: dto.timeSpent,
+        responseId: response.id,
+        targetType: dto.targetType as any,
+        targetKey: dto.targetKey,
+        section: dto.section,
+        selectedText: dto.selectedText?.trim() || null,
+        anchorMeta: (dto.anchorMeta as object) ?? undefined,
+        body,
+        tags: dto.tags ?? [],
+        severity: (dto.severity as any) ?? "MINOR",
       },
+    });
+
+    await this.touchReviewProgressFromAnnotation(response.id, dto.targetType);
+
+    const fullAnnotation = await this.prisma.questionReviewAnnotation.findUnique({
+      where: { id: annotation.id },
+      include: {
+        response: {
+          include: { attempt: { select: { reviewerName: true } } },
+        },
+      },
+    });
+    if (fullAnnotation) {
+      await this.adminService.upsertIssueFromAnnotation(fullAnnotation as any);
+    }
+
+    return annotation;
+  }
+
+  async deleteAnnotation(
+    attemptId: string,
+    questionId: string,
+    annotationId: string,
+    attemptSecret: string
+  ) {
+    await this.assertAttemptAccess(attemptId, attemptSecret);
+    const response = await this.getResponseForAttempt(
+      attemptId,
+      questionId,
+      attemptSecret
+    );
+    const row = await this.prisma.questionReviewAnnotation.findFirst({
+      where: { id: annotationId, responseId: response.id },
+    });
+    if (!row) throw new NotFoundException("Annotation not found");
+    await this.prisma.questionReviewAnnotation.delete({ where: { id: annotationId } });
+    return { deleted: true };
+  }
+
+  private async getResponseForAttempt(
+    attemptId: string,
+    questionId: string,
+    attemptSecret: string
+  ) {
+    await this.assertAttemptAccess(attemptId, attemptSecret);
+    const response = await this.prisma.questionReviewResponse.findFirst({
+      where: { attemptId, questionId },
+    });
+    if (!response) throw new NotFoundException("Question not found in this review");
+    return response;
+  }
+
+  private async touchReviewProgressFromAnnotation(
+    responseId: string,
+    targetType: string
+  ) {
+    const response = await this.prisma.questionReviewResponse.findUnique({
+      where: { id: responseId },
+    });
+    if (!response) return;
+
+    const progress = {
+      ...this.defaultReviewProgress(),
+      ...((response.reviewProgress as Record<string, boolean>) ?? {}),
+    };
+
+    if (targetType === "STEM") progress.stemReviewed = true;
+    if (
+      targetType === "EXPLANATION" ||
+      targetType === "KEYWORD" ||
+      targetType === "TABLE" ||
+      targetType === "TABLE_CELL" ||
+      targetType === "TABLE_ROW"
+    ) {
+      progress.explanationReviewed = true;
+    }
+    if (targetType === "IMAGE") progress.imagesReviewed = true;
+    if (targetType === "METADATA") progress.metadataReviewed = true;
+
+    await this.prisma.questionReviewResponse.update({
+      where: { id: responseId },
+      data: { reviewProgress: progress },
     });
   }
 
@@ -174,10 +382,17 @@ export class QuestionReviewService {
       );
     }
 
-    const missingComments = responses.filter((r) => !r.qualityComment?.trim());
-    if (missingComments.length) {
+    const incompleteOverall = responses.filter((r) => {
+      const comment = (r.overallComment ?? r.qualityComment)?.trim();
+      const progress = {
+        ...this.defaultReviewProgress(),
+        ...((r.reviewProgress as Record<string, boolean>) ?? {}),
+      };
+      return !comment || !r.approvalStatus || !progress.overallReviewed;
+    });
+    if (incompleteOverall.length) {
       throw new BadRequestException(
-        `A quality comment is required on every question (${missingComments.length} missing)`
+        `Complete the overall review on every question (${incompleteOverall.length} remaining)`
       );
     }
 
@@ -232,6 +447,7 @@ export class QuestionReviewService {
         responses: {
           orderBy: { order: "asc" },
           include: {
+            annotations: { orderBy: { createdAt: "asc" } },
             question: {
               select: {
                 id: true,
@@ -264,6 +480,7 @@ export class QuestionReviewService {
     const labels = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const options = (question.choices ?? []).map((choice: any, index: number) => ({
       label: labels[index] ?? String(index + 1),
+      value: labels[index] ?? String(index + 1),
       text: choice.text,
       correct: choice.isCorrect,
     }));

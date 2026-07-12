@@ -93,7 +93,7 @@ export const MENU_CONFIG = {
         },
         {
           id: "question-quality-review",
-          label: "MCQ Quality Review",
+          label: "Question Feedback",
           icon: "📝",
           path: "/admin/content/question-review",
           roles: ["SUPERADMIN", "ADMIN", "FACULTY"],

@@ -71,6 +71,7 @@ import StudyGroupsPage from "../components/Launch/StudyGroupsPage";
 import FeedbackPage from "../components/Launch/FeedbackPage";
 import QuestionReportsPage from "../components/Launch/QuestionReportsPage";
 import QuestionReviewAdminPage from "../components/QuestionReview/QuestionReviewAdminPage";
+import QaAdminPortal from "../components/QuestionReview/admin/QaAdminPortal";
 import SettingsPage from "../components/Launch/SettingsPage";
 import ProfilePage from "../components/Launch/ProfilePage";
 import { StudentAssignmentsPage } from "../components/institution/StudentAssignmentsPage";
@@ -117,6 +118,12 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/billing/plans": () => <BillingPlanManagement />,
     "/admin/billing/promotions": () => <PromotionManagement />,
     "/admin/content/question-review": () => <QuestionReviewAdminPage />,
+    "/admin/content/question-review/inbox": () => <QaAdminPortal view="inbox" />,
+    "/admin/content/question-review/reviewers": () => <QaAdminPortal view="inbox" />,
+    "/admin/content/question-review/links": () => <QaAdminPortal view="links" />,
+    "/admin/content/question-review/question": () => (
+      <QaAdminPortal view="question" />
+    ),
 
     // Institution (faculty ↔ student)
     "/assignments": () => (

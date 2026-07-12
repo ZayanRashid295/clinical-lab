@@ -77,6 +77,13 @@ model User {
   activityLogsAsActor    ActivityLog[] @relation("ActivityLogActor")
   activityLogsAsAffected ActivityLog[] @relation("ActivityLogAffected")
 
+  // QA content review
+  qaIssuesAssigned   QaIssue[]           @relation("QaIssueAssignee")
+  qaIssueComments    QaIssueComment[]    @relation("QaIssueCommentAuthor")
+  qaIssueActivities  QaIssueActivity[]   @relation("QaIssueActivityActor")
+  questionQaVersions QuestionQaVersion[] @relation("QuestionQaVersionAuthor")
+  questionQaApprovals QuestionQaRecord[]   @relation("QuestionQaApprover")
+
   @@map("users")
 }
 

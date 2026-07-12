@@ -1,0 +1,289 @@
+"use client";
+
+import { useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import RichContentRenderer from "@/app/components/question-generator/rich-content-renderer";
+import {
+  normalizeStemBlocksForDisplay,
+  stripOptionsAndExplanationsFromStemString,
+} from "@/app/components/question-generator/stem-blocks-utils";
+import type { ReviewQuestion } from "@/app/services/question-review/question-review.service";
+import { ReviewableBlock } from "./ReviewableBlock";
+import { ReviewableOption } from "./ReviewableOption";
+import { ReviewableTable } from "./ReviewableTable";
+import { ReviewableImage } from "./ReviewableImage";
+import { OverallReviewCard } from "./OverallReviewCard";
+import { useTextSelectionReview } from "./useTextSelectionReview";
+import type { OverallReviewState, ReviewProgress } from "./review-types";
+
+type Props = {
+  question: ReviewQuestion;
+  selectedAnswer: string | null;
+  overallReview: OverallReviewState;
+  onOverallChange: (v: OverallReviewState) => void;
+  onOverallSave: () => void;
+  overallSaving?: boolean;
+  progress: ReviewProgress;
+  onMarkSection: (key: keyof ReviewProgress) => void;
+};
+
+export function QuestionReviewDocument({
+  question,
+  selectedAnswer,
+  overallReview,
+  onOverallChange,
+  onOverallSave,
+  overallSaving,
+  progress,
+  onMarkSection,
+}: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { Toolbar } = useTextSelectionReview({
+    containerRef,
+    enabled: true,
+    defaultSection: "Explanation",
+    defaultTargetType: "EXPLANATION",
+  });
+
+  const correctLabel =
+    question.options.find((o) => o.correct)?.label ?? "";
+  const stemBlocks = normalizeStemBlocksForDisplay(
+    (question.questionStemBlocks as any[]) ?? []
+  );
+  const displayStem = stripOptionsAndExplanationsFromStemString(
+    question.stem || ""
+  );
+
+  const renderExplanationBlocks = () => {
+    const blocks = (question.explanation as any[]) ?? [];
+    if (!blocks.length) {
+      return (
+        <p className="text-sm text-muted-foreground dark:text-slate-400">
+          No explanation available.
+        </p>
+      );
+    }
+
+    const hasPerAnswerBlock = blocks.some(
+      (b) =>
+        b.type === "per-answer-explanation" ||
+        b.type === "PER_ANSWER_EXPLANATION" ||
+        b.data?.placeholder === true ||
+        b.data?.isPerAnswerExplanation === true
+    );
+
+    const rendered = blocks.map((block: any, index: number) => {
+      const id = block.id || `block-${index}`;
+      if (block.type === "table") {
+        const html =
+          block.data?.tableHtml || block.data?.html || block.data?.content || "";
+        return (
+          <ReviewableBlock
+            key={id}
+            label={`Table ${index + 1}`}
+            section={`Table ${index + 1}`}
+            targetType="TABLE"
+            targetKey={`table:${id}`}
+            onMarkReviewed={() => onMarkSection("explanationReviewed")}
+          >
+            <ReviewableTable tableId={id} tableHtml={html} />
+          </ReviewableBlock>
+        );
+      }
+      if (block.type === "images" || block.type === "image") {
+        const images = block.data?.images || block.data?.urls || [];
+        const list = Array.isArray(images) ? images : [block.data?.url].filter(Boolean);
+        return (
+          <div key={id} className="space-y-3">
+            {list.map((img: any, i: number) => {
+              const src = typeof img === "string" ? img : img?.url || img?.src;
+              if (!src) return null;
+              return (
+                <ReviewableImage
+                  key={`${id}-${i}`}
+                  imageId={`${id}-${i}`}
+                  src={src}
+                  alt={img?.alt}
+                  caption={img?.caption}
+                />
+              );
+            })}
+          </div>
+        );
+      }
+      if (
+        block.type === "per-answer-explanation" ||
+        block.type === "PER_ANSWER_EXPLANATION" ||
+        block.data?.placeholder === true ||
+        block.data?.isPerAnswerExplanation === true
+      ) {
+        return (
+          <ReviewableBlock
+            key={id}
+            label="Per-answer explanations"
+            section="Answer breakdown"
+            targetType="EXPLANATION"
+            targetKey={`per-answer:${id}`}
+            onMarkReviewed={() => onMarkSection("explanationReviewed")}
+          >
+            <RichContentRenderer
+              content={[block]}
+              perAnswerExplanations={question.perAnswerExplanations}
+              options={question.options}
+              selectedAnswer={selectedAnswer}
+            />
+          </ReviewableBlock>
+        );
+      }
+      return (
+        <ReviewableBlock
+          key={id}
+          section="Explanation"
+          targetType="EXPLANATION"
+          targetKey={`explanation:${id}`}
+          onMarkReviewed={() => onMarkSection("explanationReviewed")}
+        >
+          <RichContentRenderer content={[block]} stemMode={false} />
+        </ReviewableBlock>
+      );
+    });
+
+    // Legacy data: per-answer content exists but no placeholder block in explanation array
+    if (
+      !hasPerAnswerBlock &&
+      Object.keys(question.perAnswerExplanations || {}).length > 0
+    ) {
+      rendered.push(
+        <ReviewableBlock
+          key="per-answer-fallback"
+          label="Per-answer explanations"
+          section="Answer breakdown"
+          targetType="EXPLANATION"
+          targetKey="answer-breakdown"
+          onMarkReviewed={() => onMarkSection("explanationReviewed")}
+        >
+          <RichContentRenderer
+            content={[
+              {
+                id: "per-answer-fallback",
+                type: "per-answer-explanation",
+                data: { placeholder: true },
+              },
+            ]}
+            perAnswerExplanations={question.perAnswerExplanations}
+            options={question.options}
+            selectedAnswer={selectedAnswer}
+          />
+        </ReviewableBlock>
+      );
+    }
+
+    return rendered;
+  };
+
+  return (
+    <>
+      {Toolbar}
+      <div ref={containerRef} className="space-y-8 pb-8">
+        {/* Metadata */}
+        <ReviewableBlock
+          label="Metadata"
+          section="Metadata"
+          targetType="METADATA"
+          targetKey="metadata"
+          onMarkReviewed={() => onMarkSection("metadataReviewed")}
+          className="p-4 bg-muted/30 dark:bg-slate-800/30"
+        >
+          <div className="grid sm:grid-cols-3 gap-4 text-sm">
+            {question.system && (
+              <div>
+                <p className="text-[10px] uppercase text-muted-foreground">System</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {question.system}
+                </p>
+              </div>
+            )}
+            {question.topic && (
+              <div>
+                <p className="text-[10px] uppercase text-muted-foreground">Topic</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {question.topic}
+                </p>
+              </div>
+            )}
+            {question.title && (
+              <div>
+                <p className="text-[10px] uppercase text-muted-foreground">Title</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {question.title}
+                </p>
+              </div>
+            )}
+          </div>
+        </ReviewableBlock>
+
+        {/* Stem */}
+        <ReviewableBlock
+          label="Question stem"
+          section="Question stem"
+          targetType="STEM"
+          targetKey="stem"
+          onMarkReviewed={() => onMarkSection("stemReviewed")}
+          className="p-4"
+        >
+          {stemBlocks.length > 0 ? (
+            <RichContentRenderer content={stemBlocks} stemMode />
+          ) : (
+            <div className="prose prose-sm dark:prose-invert max-w-none text-slate-800 dark:text-slate-200">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayStem}</ReactMarkdown>
+            </div>
+          )}
+        </ReviewableBlock>
+
+        {/* Options */}
+        <section className="space-y-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-1">
+            Options
+          </h3>
+          {question.options.map((opt) => (
+            <ReviewableOption
+              key={opt.label}
+              label={opt.label}
+              text={opt.text}
+              correct={opt.correct}
+              selected={selectedAnswer === opt.label}
+              showCorrect
+            />
+          ))}
+          <p className="text-xs text-muted-foreground px-1 pt-1">
+            Correct answer: <strong className="text-emerald-600 dark:text-emerald-400">{correctLabel}</strong>
+            {selectedAnswer && (
+              <>
+                {" "}
+                · Your answer:{" "}
+                <strong className="text-slate-900 dark:text-slate-100">{selectedAnswer}</strong>
+              </>
+            )}
+          </p>
+        </section>
+
+        {/* Explanation */}
+        <section className="space-y-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-1">
+            Explanation & breakdown
+          </h3>
+          {renderExplanationBlocks()}
+        </section>
+
+        {/* Overall */}
+        <OverallReviewCard
+          value={overallReview}
+          onChange={onOverallChange}
+          onSave={onOverallSave}
+          saving={overallSaving}
+        />
+      </div>
+    </>
+  );
+}

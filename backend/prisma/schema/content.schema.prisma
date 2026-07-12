@@ -69,6 +69,10 @@ model Question {
   questionPaperQuestions QuestionPaperQuestion[]
   questionReviewBundleItems QuestionReviewBundleItem[]
   questionReviewResponses   QuestionReviewResponse[]
+  qaIssues                  QaIssue[]
+  qaRecord                  QuestionQaRecord?
+  qaVersions                QuestionQaVersion[]
+  qaActivities              QaIssueActivity[]
 
   @@map("questions")
 }
