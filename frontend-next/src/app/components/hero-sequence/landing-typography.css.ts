@@ -34,10 +34,16 @@ export const LANDING_TYPOGRAPHY_CSS = `
     --lp-h4-ui-weight: 600;
     --lp-h4-ui-tracking: -0.01em;
 
-    /* Section lead / hero subtitle */
+    /* Section lead */
     --lp-lead-size: clamp(1rem, 2vw, 1.125rem);
     --lp-lead-lh: 1.5;
     --lp-lead-max-w: min(52rem, 94vw);
+
+    /* Hero subtitle — larger / stronger than section leads */
+    --lp-hero-sub-size: clamp(1.25rem, 2.8vw, 1.625rem);
+    --lp-hero-sub-lh: 1.4;
+    --lp-hero-sub-weight: 500;
+    --lp-hero-sub-max-w: min(40rem, 94vw);
 
     /* Kickers */
     --lp-kicker-hero-size: 0.8125rem;
@@ -119,14 +125,22 @@ export const LANDING_TYPOGRAPHY_CSS = `
     color: var(--cine-text, var(--mkt-text));
   }
 
-  /* ── Leads & hero subtitles ── */
-  .medprep-landing-v2 .cine-section-lead,
-  .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle,
-  .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle--center,
-  .medprep-landing-v2 .hero-cinematic--program .hero-brand-subtitle--center {
+  /* ── Section leads ── */
+  .medprep-landing-v2 .cine-section-lead {
     font-size: var(--lp-lead-size) !important;
     line-height: var(--lp-lead-lh) !important;
     max-width: var(--lp-lead-max-w) !important;
+    text-wrap: balance;
+  }
+
+  /* ── Hero subtitle ── */
+  .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle,
+  .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle--center,
+  .medprep-landing-v2 .hero-cinematic--program .hero-brand-subtitle--center {
+    font-size: var(--lp-hero-sub-size) !important;
+    line-height: var(--lp-hero-sub-lh) !important;
+    font-weight: var(--lp-hero-sub-weight) !important;
+    max-width: var(--lp-hero-sub-max-w) !important;
     text-wrap: balance;
   }
 

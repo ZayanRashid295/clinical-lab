@@ -78,6 +78,11 @@ export function readThemeCanvasPalette(): ThemeCanvasPalette {
   };
 }
 
+export function isDocumentDarkTheme(): boolean {
+  if (typeof document === "undefined") return true;
+  return document.documentElement.classList.contains("dark");
+}
+
 export function readHeroCanvasBg(fallback = "#050508"): string {
   if (typeof document === "undefined") return fallback;
   const root = document.documentElement;
@@ -87,4 +92,13 @@ export function readHeroCanvasBg(fallback = "#050508"): string {
   if (fromCine) return fromCine;
   const fromMkt = getComputedStyle(root).getPropertyValue("--mkt-bg-muted").trim();
   return fromMkt || fallback;
+}
+
+/** Parsed hero/page background for canvas fades that match CSS theme. */
+export function readHeroCanvasBgRgb(fallback = "#050508"): Rgb {
+  const parsed = parseCssColor(readHeroCanvasBg(fallback));
+  if (parsed) return parsed;
+  return isDocumentDarkTheme()
+    ? { r: 5, g: 5, b: 8 }
+    : { r: 248, g: 250, b: 252 };
 }

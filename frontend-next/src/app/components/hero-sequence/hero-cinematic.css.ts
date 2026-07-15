@@ -78,13 +78,8 @@ export const HERO_CINEMATIC_CSS = `
     pointer-events: none;
   }
 
-  .hero-cinematic-blend-visual .hero-orbital-core-vignette {
-    background: radial-gradient(
-      ellipse 72% 62% at 50% 42%,
-      transparent 22%,
-      color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 12%, transparent) 52%,
-      color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 42%, transparent) 100%
-    );
+  .hero-cinematic-blend-visual .hero-background-vignette {
+    display: none;
   }
 
   .hero-cinematic-blend-scrim {
@@ -94,16 +89,32 @@ export const HERO_CINEMATIC_CSS = `
     pointer-events: none;
     background:
       radial-gradient(
-        ellipse 68% 55% at 50% 38%,
-        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 8%, transparent) 0%,
-        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 38%, transparent) 52%,
-        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 82%, transparent) 100%
+        ellipse 46% 40% at 50% 36%,
+        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 55%, transparent) 0%,
+        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 22%, transparent) 48%,
+        transparent 78%
       ),
       linear-gradient(
         to top,
-        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 75%, transparent) 0%,
-        transparent 20%
+        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 92%, transparent) 0%,
+        color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg-muted)) 35%, transparent) 10%,
+        transparent 24%
       );
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+  }
+
+  .hero-background-canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent;
   }
 
   .hero-cinematic-copy--center {
@@ -176,17 +187,18 @@ export const HERO_CINEMATIC_CSS = `
     left: 50%;
     top: 55%;
     transform: translate(-50%, -50%);
-    width: 130%;
-    height: 160%;
+    width: 115%;
+    height: 130%;
     background: radial-gradient(
       ellipse at center,
-      color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 22%, transparent) 0%,
-      color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 8%, transparent) 42%,
-      transparent 72%
+      color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 18%, transparent) 0%,
+      color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 6%, transparent) 50%,
+      transparent 75%
     );
     pointer-events: none;
     z-index: -1;
-    filter: blur(8px);
+    filter: blur(22px);
+    opacity: 0.75;
   }
 
   .hero-cinematic-blended-slot {
@@ -214,8 +226,8 @@ export const HERO_CINEMATIC_CSS = `
     margin: 0 auto !important;
     background: linear-gradient(
       180deg,
-      var(--cine-title-from, #ffffff) 0%,
-      var(--cine-title-to, #c4b5fd) 100%
+      var(--cine-title-from, var(--mkt-text)) 0%,
+      var(--cine-title-to, var(--mkt-accent-muted)) 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -445,6 +457,14 @@ export const HERO_CINEMATIC_CSS = `
     pointer-events: none;
   }
 
+  .hero-background--program {
+    opacity: 0.9;
+  }
+
+  .hero-background-vignette {
+    display: none;
+  }
+
   .hero-orbital-core {
     position: absolute;
     inset: 0;
@@ -650,13 +670,17 @@ export const HERO_CINEMATIC_CSS = `
   .hero-cinematic .hero-brand-title {
     color: var(--cine-text, var(--mkt-text)) !important;
     margin: 0 !important;
-    text-shadow: 0 2px 32px color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 35%, transparent);
+    text-shadow:
+      0 1px 2px color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg)) 55%, transparent),
+      0 8px 40px color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg)) 45%, transparent),
+      0 0 48px color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 18%, transparent);
   }
 
   .hero-cinematic .hero-brand-subtitle {
-    color: var(--cine-body, var(--cine-text, var(--mkt-text))) !important;
-    margin: 0 0 1.25rem !important;
-    font-weight: 400 !important;
+    color: var(--cine-text, var(--mkt-text)) !important;
+    margin: 0.35rem 0 1.5rem !important;
+    opacity: 0.95;
+    text-shadow: 0 2px 24px color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg)) 50%, transparent);
   }
 
   .hero-cinematic .hero-brand-punchlines {
@@ -666,16 +690,25 @@ export const HERO_CINEMATIC_CSS = `
     margin: 0 0 1.75rem;
     padding: 0;
     list-style: none;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
   }
 
   .hero-cinematic .hero-brand-punchlines li {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--cine-text, var(--mkt-text));
-    border: 1px solid color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 28%, transparent);
+    color: var(--cine-text, var(--mkt-text)) !important;
+    border: 1px solid color-mix(in srgb, var(--cine-accent, var(--mkt-accent)) 40%, var(--cine-border, var(--mkt-border)));
     border-radius: 999px;
-    padding: 0.35rem 0.75rem;
-    background: var(--cine-accent-soft, var(--mkt-accent-soft));
+    padding: 0.4rem 0.9rem;
+    background: color-mix(
+      in srgb,
+      var(--cine-bg-elevated, var(--mkt-bg-elevated)) 78%,
+      var(--cine-accent, var(--mkt-accent)) 22%
+    );
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--cine-hero-bg, var(--mkt-bg)) 28%, transparent);
   }
 
   .hero-cinematic .hero-brand-cta {
@@ -850,7 +883,7 @@ export const HERO_CINEMATIC_CSS = `
     z-index: 0;
   }
 
-  .hero-cinematic--program .hero-cinematic-blend-visual--program .hero-orbital-core-vignette {
+  .hero-cinematic--program .hero-cinematic-blend-visual--program .hero-background-vignette {
     display: none;
   }
 

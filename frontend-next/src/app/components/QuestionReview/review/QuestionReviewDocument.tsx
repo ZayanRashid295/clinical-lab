@@ -12,8 +12,9 @@ import type { ReviewQuestion } from "@/app/services/question-review/question-rev
 import { ReviewableBlock } from "./ReviewableBlock";
 import { ReviewableOption } from "./ReviewableOption";
 import { ReviewableTable } from "./ReviewableTable";
-import { ReviewableImage } from "./ReviewableImage";
+import { ReviewableImage, imageTargetKey } from "./ReviewableImage";
 import { OverallReviewCard } from "./OverallReviewCard";
+import { ReviewableAnswerBreakdown } from "./ReviewableAnswerBreakdown";
 import { useTextSelectionReview } from "./useTextSelectionReview";
 import type { OverallReviewState, ReviewProgress } from "./review-types";
 
@@ -54,6 +55,7 @@ export function QuestionReviewDocument({
   const displayStem = stripOptionsAndExplanationsFromStemString(
     question.stem || ""
   );
+  const hasStemBlocks = stemBlocks.length > 0;
 
   const renderExplanationBlocks = () => {
     const blocks = (question.explanation as any[]) ?? [];
@@ -93,19 +95,24 @@ export function QuestionReviewDocument({
       }
       if (block.type === "images" || block.type === "image") {
         const images = block.data?.images || block.data?.urls || [];
-        const list = Array.isArray(images) ? images : [block.data?.url].filter(Boolean);
+        const list = (
+          Array.isArray(images) ? images : [block.data?.url].filter(Boolean)
+        ).filter(Boolean);
+        const total = list.length;
         return (
           <div key={id} className="space-y-3">
             {list.map((img: any, i: number) => {
               const src = typeof img === "string" ? img : img?.url || img?.src;
               if (!src) return null;
+              const targetKey = imageTargetKey(id, i, total);
               return (
                 <ReviewableImage
-                  key={`${id}-${i}`}
-                  imageId={`${id}-${i}`}
+                  key={targetKey}
+                  targetKey={targetKey}
                   src={src}
                   alt={img?.alt}
                   caption={img?.caption}
+                  label={total > 1 ? `Image ${i + 1}` : "Image"}
                 />
               );
             })}
@@ -119,21 +126,35 @@ export function QuestionReviewDocument({
         block.data?.isPerAnswerExplanation === true
       ) {
         return (
-          <ReviewableBlock
+          <section
             key={id}
-            label="Per-answer explanations"
-            section="Answer breakdown"
-            targetType="EXPLANATION"
-            targetKey={`per-answer:${id}`}
-            onMarkReviewed={() => onMarkSection("explanationReviewed")}
+            data-review-section="Answer breakdown"
+            data-review-target={`per-answer:${id}`}
+            data-review-type="EXPLANATION"
+            data-target-key={`per-answer:${id}`}
+            className="space-y-2 scroll-mt-24"
           >
-            <RichContentRenderer
-              content={[block]}
-              perAnswerExplanations={question.perAnswerExplanations}
+            <div className="flex items-center justify-between gap-2 px-1">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground dark:text-slate-400">
+                Per-answer explanations
+              </h3>
+              <button
+                type="button"
+                onClick={() => onMarkSection("explanationReviewed")}
+                className="text-[10px] text-muted-foreground hover:text-foreground dark:text-slate-500 dark:hover:text-slate-300"
+              >
+                Mark reviewed
+              </button>
+            </div>
+            <ReviewableAnswerBreakdown
+              blockId={id}
               options={question.options}
+              perAnswerExplanations={
+                question.perAnswerExplanations as Record<string, unknown>
+              }
               selectedAnswer={selectedAnswer}
             />
-          </ReviewableBlock>
+          </section>
         );
       }
       return (
@@ -155,27 +176,35 @@ export function QuestionReviewDocument({
       Object.keys(question.perAnswerExplanations || {}).length > 0
     ) {
       rendered.push(
-        <ReviewableBlock
+        <section
           key="per-answer-fallback"
-          label="Per-answer explanations"
-          section="Answer breakdown"
-          targetType="EXPLANATION"
-          targetKey="answer-breakdown"
-          onMarkReviewed={() => onMarkSection("explanationReviewed")}
+          data-review-section="Answer breakdown"
+          data-review-target="per-answer:answer-breakdown"
+          data-review-type="EXPLANATION"
+          data-target-key="per-answer:answer-breakdown"
+          className="space-y-2 scroll-mt-24"
         >
-          <RichContentRenderer
-            content={[
-              {
-                id: "per-answer-fallback",
-                type: "per-answer-explanation",
-                data: { placeholder: true },
-              },
-            ]}
-            perAnswerExplanations={question.perAnswerExplanations}
+          <div className="flex items-center justify-between gap-2 px-1">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground dark:text-slate-400">
+              Per-answer explanations
+            </h3>
+            <button
+              type="button"
+              onClick={() => onMarkSection("explanationReviewed")}
+              className="text-[10px] text-muted-foreground hover:text-foreground"
+            >
+              Mark reviewed
+            </button>
+          </div>
+          <ReviewableAnswerBreakdown
+            blockId="answer-breakdown"
             options={question.options}
+            perAnswerExplanations={
+              question.perAnswerExplanations as Record<string, unknown>
+            }
             selectedAnswer={selectedAnswer}
           />
-        </ReviewableBlock>
+        </section>
       );
     }
 
@@ -230,14 +259,22 @@ export function QuestionReviewDocument({
           targetType="STEM"
           targetKey="stem"
           onMarkReviewed={() => onMarkSection("stemReviewed")}
-          className="p-4"
+          className="p-4 bg-white border border-slate-200/80 rounded-xl"
         >
-          {stemBlocks.length > 0 ? (
-            <RichContentRenderer content={stemBlocks} stemMode />
-          ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none text-slate-800 dark:text-slate-200">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayStem}</ReactMarkdown>
+          {hasStemBlocks ? (
+            <div className="prose prose-sm max-w-none text-slate-900 [&_*]:text-slate-900">
+              <RichContentRenderer content={stemBlocks} stemMode />
             </div>
+          ) : displayStem ? (
+            <div className="prose prose-sm max-w-none text-slate-900">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {displayStem}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500 italic">
+              No question stem content was provided for this MCQ.
+            </p>
           )}
         </ReviewableBlock>
 
@@ -257,14 +294,8 @@ export function QuestionReviewDocument({
             />
           ))}
           <p className="text-xs text-muted-foreground px-1 pt-1">
-            Correct answer: <strong className="text-emerald-600 dark:text-emerald-400">{correctLabel}</strong>
-            {selectedAnswer && (
-              <>
-                {" "}
-                · Your answer:{" "}
-                <strong className="text-slate-900 dark:text-slate-100">{selectedAnswer}</strong>
-              </>
-            )}
+            Correct answer:{" "}
+            <strong className="text-emerald-600">{correctLabel}</strong>
           </p>
         </section>
 

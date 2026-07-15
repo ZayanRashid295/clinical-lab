@@ -95,13 +95,23 @@ export const DEFAULT_OVERALL_REVIEW: OverallReviewState = {
   overallComment: "",
 };
 
+function annotationBelongsToTarget(annotationKey: string, targetKey: string) {
+  if (annotationKey === targetKey) return true;
+  const selIdx = annotationKey.indexOf(":sel-");
+  const block = selIdx === -1 ? annotationKey : annotationKey.slice(0, selIdx);
+  if (block === targetKey) return true;
+  return (
+    annotationKey.startsWith(`${targetKey}:`) &&
+    annotationKey.charAt(targetKey.length) === ":"
+  );
+}
+
 export function countAnnotationsForTarget(
   annotations: ReviewAnnotation[],
   targetKey: string
 ) {
-  return annotations.filter(
-    (a) =>
-      a.targetKey === targetKey || a.targetKey.startsWith(`${targetKey}:`)
+  return annotations.filter((a) =>
+    annotationBelongsToTarget(a.targetKey, targetKey)
   ).length;
 }
 

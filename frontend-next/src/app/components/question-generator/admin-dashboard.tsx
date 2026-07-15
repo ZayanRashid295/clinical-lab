@@ -26,7 +26,6 @@ import { CreateQuestionDto } from "@/app/types/question"
 import { authService } from "@/shared/services/auth.service"
 import { useLanguage } from "@/shared/contexts/LanguageContext"
 import { QuestionBankListHeader } from "./QuestionBankListHeader"
-import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
 import {
   ApiHttpError,
   getApiErrorMessage,
@@ -155,11 +154,9 @@ interface AdminDashboardProps {
   onQuestionViewChange?: (questionId: string | null, dbId: string | null, isViewing: boolean) => void
   onEditorPreviewModeChange?: (isPreview: boolean) => void
   initialQuestionId?: string | null
-  feedbackHighlights?: QaFeedbackHighlight[] | null
-  feedbackReviewerName?: string | null
 }
 
-export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange, initialQuestionId, feedbackHighlights, feedbackReviewerName }: AdminDashboardProps) {
+export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewModeChange, initialQuestionId }: AdminDashboardProps) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const { confirm } = useConfirm()
@@ -1858,8 +1855,6 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                   : undefined
             }
             onSave={handleSaveQuestion}
-            feedbackHighlights={feedbackHighlights}
-            feedbackReviewerName={feedbackReviewerName}
             onCancel={() => {
               setShowNewQuestion(false)
               setShowMarkdownUploader(false)

@@ -12,6 +12,18 @@ import type {
   ReviewAnnotation,
   ReviewTarget,
 } from "./review-types";
+import { blockTargetKey } from "./annotation-highlight";
+
+function belongsToBlock(annotationKey: string, targetKey: string): boolean {
+  if (annotationKey === targetKey) return true;
+  const block = blockTargetKey(annotationKey);
+  if (block === targetKey) return true;
+  // Boundary-safe prefix (avoids explanation:block-1 matching block-10)
+  return (
+    annotationKey.startsWith(`${targetKey}:`) &&
+    annotationKey.charAt(targetKey.length) === ":"
+  );
+}
 
 type ReviewContextValue = {
   annotations: ReviewAnnotation[];
@@ -51,10 +63,7 @@ export function ReviewProvider({
 
   const countForTarget = useCallback(
     (targetKey: string) =>
-      annotations.filter(
-        (a) =>
-          a.targetKey === targetKey || a.targetKey.startsWith(`${targetKey}:`)
-      ).length,
+      annotations.filter((a) => belongsToBlock(a.targetKey, targetKey)).length,
     [annotations]
   );
 
@@ -66,11 +75,7 @@ export function ReviewProvider({
 
   const annotationsForBlock = useCallback(
     (targetKey: string) =>
-      annotations.filter(
-        (a) =>
-          a.targetKey === targetKey ||
-          a.targetKey.startsWith(`${targetKey}:`)
-      ),
+      annotations.filter((a) => belongsToBlock(a.targetKey, targetKey)),
     [annotations]
   );
 

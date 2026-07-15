@@ -31,6 +31,7 @@ export function ReviewableBlock({
 }: Props) {
   const { openDrawer, countForTarget, annotationsForBlock } = useReviewContext();
   const count = countForTarget(targetKey);
+
   const highlightItems = useMemo(
     () => annotationsToHighlightItems(annotationsForBlock(targetKey), targetKey),
     [annotationsForBlock, targetKey]

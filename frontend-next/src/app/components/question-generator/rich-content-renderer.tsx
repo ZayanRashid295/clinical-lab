@@ -83,7 +83,8 @@ export default function RichContentRenderer({ content, perAnswerExplanations = {
     : content
 
   const renderedContent = sortedContent.map((item) => {
-      switch (item.type) {
+      const type = String(item.type ?? "").toLowerCase()
+      switch (type) {
         case "text":
           return renderMarkdown(item, isDark, stemMode)
         case "table":

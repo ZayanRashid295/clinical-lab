@@ -81,57 +81,6 @@ export function formatDate(value: string) {
   });
 }
 
-export type QuestionEditDraft = {
-  stem: string;
-  title?: string;
-  options: Array<{ label: string; text: string; correct: boolean }>;
-  explanationBlocks: Record<string, string>;
-};
-
-export function buildQuestionEditDraft(question: {
-  stem?: string;
-  title?: string | null;
-  options: Array<{ label: string; text: string; correct: boolean }>;
-  explanation?: Array<{ id?: string; type?: string; content?: string; data?: { content?: string; text?: string } }>;
-}): QuestionEditDraft {
-  const explanationBlocks: Record<string, string> = {};
-  for (const block of question.explanation ?? []) {
-    const id = block.id ?? "";
-    if (!id) continue;
-    if (block.type === "text" || block.type === "markdown") {
-      explanationBlocks[id] =
-        block.content ?? block.data?.content ?? block.data?.text ?? "";
-    }
-  }
-  return {
-    stem: question.stem ?? "",
-    title: question.title ?? undefined,
-    options: question.options.map((o) => ({ ...o })),
-    explanationBlocks,
-  };
-}
-
-export function draftFromSnapshot(
-  snapshot: Record<string, unknown> | null | undefined,
-  question: Parameters<typeof buildQuestionEditDraft>[0]
-): QuestionEditDraft {
-  const base = buildQuestionEditDraft(question);
-  if (!snapshot) return base;
-  return {
-    stem: typeof snapshot.stem === "string" ? snapshot.stem : base.stem,
-    title: typeof snapshot.title === "string" ? snapshot.title : base.title,
-    options: Array.isArray(snapshot.options)
-      ? (snapshot.options as QuestionEditDraft["options"])
-      : base.options,
-    explanationBlocks:
-      snapshot.explanationBlocks &&
-      typeof snapshot.explanationBlocks === "object" &&
-      !Array.isArray(snapshot.explanationBlocks)
-        ? (snapshot.explanationBlocks as Record<string, string>)
-        : base.explanationBlocks,
-  };
-}
-
 /** Naive line diff for draft previews */
 export function diffLines(before: string, after: string) {
   const a = before.split("\n");
@@ -150,3 +99,4 @@ export function diffLines(before: string, after: string) {
   }
   return lines;
 }
+

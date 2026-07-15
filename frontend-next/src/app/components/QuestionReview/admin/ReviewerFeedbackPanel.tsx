@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/shared/ui/button";
-import { Pencil, X } from "lucide-react";
 import { formatDate, severityStyles } from "./qa-admin-utils";
 
 export type ReviewerAnnotation = {
@@ -25,6 +23,8 @@ export type ReviewerFeedbackBundle = {
   approvalStatus?: string | null;
   questionQualityRating?: number | null;
   explanationQualityRating?: number | null;
+  imageQualityRating?: number | null;
+  difficultyRating?: string | null;
   feedbackCount: number;
   annotations: ReviewerAnnotation[];
 };
@@ -32,50 +32,33 @@ export type ReviewerFeedbackBundle = {
 type Props = {
   bundles: ReviewerFeedbackBundle[];
   activeAttemptId: string | null;
-  editMode: boolean;
-  editAttemptId: string | null;
   activeAnnotationId: string | null;
   onSelectReviewer: (attemptId: string) => void;
   onSelectAnnotation: (annotation: ReviewerAnnotation) => void;
-  onStartEditMode: (attemptId: string) => void;
-  onExitEditMode: () => void;
 };
 
 export function ReviewerFeedbackPanel({
   bundles,
   activeAttemptId,
-  editMode,
-  editAttemptId,
   activeAnnotationId,
   onSelectReviewer,
   onSelectAnnotation,
-  onStartEditMode,
-  onExitEditMode,
 }: Props) {
   const active =
     bundles.find((b) => b.attemptId === activeAttemptId) ?? bundles[0];
 
   if (!active) return null;
 
-  const isEditingThisReviewer = editMode && editAttemptId === active.attemptId;
-
   return (
     <aside className="w-full xl:w-[min(420px,34vw)] shrink-0 rounded-xl border border-border/60 bg-card flex flex-col xl:sticky xl:top-4 xl:max-h-[calc(100vh-6rem)]">
       <div className="p-3 border-b border-border/60 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-sm font-semibold dark:text-slate-100">
-              Reviewer feedback
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              Combined notes from one reviewer on this question
-            </p>
-          </div>
-          {isEditingThisReviewer && (
-            <Button variant="ghost" size="sm" onClick={onExitEditMode}>
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+        <div>
+          <p className="text-sm font-semibold dark:text-slate-100">
+            Reviewer feedback
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Inline notes from one reviewer on this question
+          </p>
         </div>
 
         {bundles.length > 1 && (
@@ -98,48 +81,25 @@ export function ReviewerFeedbackPanel({
           </div>
         )}
 
-        <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm space-y-2">
+        <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm space-y-1">
           <div className="flex items-center justify-between gap-2">
             <p className="font-medium dark:text-slate-100">{active.reviewerName}</p>
             <span className="text-[10px] text-muted-foreground">
               {active.feedbackCount} item{active.feedbackCount === 1 ? "" : "s"}
             </span>
           </div>
-          {active.overallComment?.trim() && (
-            <div className="text-xs dark:text-slate-200 border-t border-border/40 pt-2">
-              <p className="text-[10px] uppercase text-muted-foreground mb-1">
-                Overall comment
-              </p>
-              <p className="whitespace-pre-wrap">{active.overallComment}</p>
-            </div>
-          )}
-          {(active.questionQualityRating ?? 0) > 0 && (
-            <p className="text-[11px] text-muted-foreground">
-              Quality rating: {active.questionQualityRating}/5
+          {active.completedAt && (
+            <p className="text-[10px] text-muted-foreground">
+              Completed {formatDate(active.completedAt)}
             </p>
           )}
         </div>
-
-        {!isEditingThisReviewer ? (
-          <Button
-            size="sm"
-            className="w-full"
-            onClick={() => onStartEditMode(active.attemptId)}
-          >
-            <Pencil className="h-4 w-4 mr-1" />
-            Edit question with highlights
-          </Button>
-        ) : (
-          <p className="text-[11px] text-primary bg-primary/5 border border-primary/20 rounded-md px-2 py-1.5">
-            Edit mode — flagged text is highlighted in the question panel.
-          </p>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
         {active.annotations.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            No inline annotations — only an overall comment was submitted.
+            No inline annotations — see overall review below the question.
           </p>
         ) : (
           active.annotations.map((annotation, idx) => (

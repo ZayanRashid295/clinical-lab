@@ -78,6 +78,7 @@ export function AnnotationHighlighter({
     apply();
 
     const observer = new MutationObserver(() => {
+      if (applyingRef.current || cancelled) return;
       window.requestAnimationFrame(apply);
     });
 

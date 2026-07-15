@@ -28,7 +28,7 @@ export function severityHighlightClass(severity?: string) {
 
 /** Unwrap all highlight marks inside root, merging adjacent text nodes. */
 export function removeHighlightsInRoot(root: HTMLElement) {
-  const marks = [...root.querySelectorAll<HTMLMarkElement>(HIGHLIGHT_SELECTOR)];
+  const marks = [...root.querySelectorAll(HIGHLIGHT_SELECTOR)];
   for (const mark of marks) {
     const parent = mark.parentNode;
     if (!parent) continue;
@@ -57,16 +57,17 @@ function collectTextNodes(root: HTMLElement): Text[] {
   return nodes;
 }
 
-/** Collapse whitespace for fuzzy matching across rendered HTML. */
+/** Collapse whitespace so DOM join vs Selection.toString() still align. */
 function normalizeForMatch(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
 /**
- * Find phrase in concatenated text nodes — exact first, then whitespace-normalized.
- * Returns global character offsets in the joined text.
+ * Find the exact selected phrase in concatenated text nodes.
+ * Exact substring first; whitespace-normalized only when spacing differs.
+ * No markdown/label rewriting — selection text is authoritative.
  */
-function findPhraseOffsets(
+export function findPhraseOffsets(
   nodes: Text[],
   phrase: string
 ): { start: number; end: number } | null {
@@ -74,9 +75,9 @@ function findPhraseOffsets(
   const trimmed = phrase.trim();
   if (!trimmed) return null;
 
-  let idx = raw.indexOf(trimmed);
-  if (idx !== -1) {
-    return { start: idx, end: idx + trimmed.length };
+  const exactIdx = raw.indexOf(trimmed);
+  if (exactIdx !== -1) {
+    return { start: exactIdx, end: exactIdx + trimmed.length };
   }
 
   const normPhrase = normalizeForMatch(trimmed);
@@ -106,21 +107,6 @@ function findPhraseOffsets(
   return { start, end };
 }
 
-function resolveGlobalOffset(
-  nodes: Text[],
-  offset: number
-): { node: Text; offset: number } | null {
-  let pos = 0;
-  for (const node of nodes) {
-    const len = node.textContent?.length ?? 0;
-    if (offset <= pos + len) {
-      return { node, offset: Math.max(0, offset - pos) };
-    }
-    pos += len;
-  }
-  return null;
-}
-
 function wrapRangeWithMark(
   nodes: Text[],
   start: number,
@@ -130,41 +116,58 @@ function wrapRangeWithMark(
 ): boolean {
   if (end <= start) return false;
 
-  const startPos = resolveGlobalOffset(nodes, start);
-  const endPos = resolveGlobalOffset(nodes, end);
-  if (!startPos || !endPos) return false;
+  let cursor = 0;
+  let wrapped = false;
 
-  const range = document.createRange();
-  range.setStart(startPos.node, startPos.offset);
-  range.setEnd(endPos.node, endPos.offset);
+  for (const node of nodes) {
+    const len = node.textContent?.length ?? 0;
+    const nodeStart = cursor;
+    const nodeEnd = cursor + len;
+    cursor = nodeEnd;
 
-  const mark = document.createElement("mark");
-  mark.className = severityHighlightClass(item.severity);
-  mark.style.color = "rgb(15 23 42)";
-  mark.dataset.highlightId = item.id;
-  mark.title = "Click to view feedback";
-  mark.addEventListener("click", (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onClick(item);
-  });
+    const overlapStart = Math.max(start, nodeStart);
+    const overlapEnd = Math.min(end, nodeEnd);
+    if (overlapEnd <= overlapStart) continue;
 
-  try {
-    const contents = range.extractContents();
-    mark.appendChild(contents);
-    range.insertNode(mark);
-    return true;
-  } catch {
+    const localStart = overlapStart - nodeStart;
+    const localEnd = overlapEnd - nodeStart;
+    const parent = node.parentNode;
+    if (!parent || !node.textContent) continue;
+
     try {
-      range.surroundContents(mark);
-      return true;
+      const text = node.textContent;
+      const before = text.slice(0, localStart);
+      const mid = text.slice(localStart, localEnd);
+      const after = text.slice(localEnd);
+      if (!mid) continue;
+
+      const mark = document.createElement("mark");
+      mark.className = severityHighlightClass(item.severity);
+      mark.style.color = "rgb(15 23 42)";
+      mark.dataset.highlightId = item.id;
+      mark.title = "Click to view feedback";
+      mark.addEventListener("click", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onClick(item);
+      });
+      mark.textContent = mid;
+
+      const frag = document.createDocumentFragment();
+      if (before) frag.appendChild(document.createTextNode(before));
+      frag.appendChild(mark);
+      if (after) frag.appendChild(document.createTextNode(after));
+      parent.replaceChild(frag, node);
+      wrapped = true;
     } catch {
-      return false;
+      /* continue other nodes */
     }
   }
+
+  return wrapped;
 }
 
-/** Apply clickable highlight marks for phrase matches inside root. Returns cleanup. */
+/** Apply clickable highlight marks for exact phrase matches inside root. */
 export function applyTextHighlights(
   root: HTMLElement,
   items: HighlightItem[],
@@ -195,19 +198,25 @@ export function applyTextHighlights(
   };
 }
 
-function matchesTarget(
+/** True when annotation belongs to this block (sel-suffix ok; no false prefix hits). */
+export function matchesTarget(
   annotationTargetKey: string,
-  targetKey: string,
-  blockKey: string
+  targetKey: string
 ): boolean {
+  const blockKey = blockTargetKey(targetKey);
   const annBlock = blockTargetKey(annotationTargetKey);
+  if (annBlock === blockKey) return true;
+  if (annotationTargetKey === targetKey) return true;
   return (
-    annBlock === blockKey ||
-    annotationTargetKey === targetKey ||
-    annotationTargetKey.startsWith(`${targetKey}:`)
+    annotationTargetKey.startsWith(`${blockKey}:`) &&
+    annotationTargetKey.charAt(blockKey.length) === ":"
   );
 }
 
+/**
+ * Only annotations with selectedText for this target become highlights.
+ * No full-block body fallback — the reviewer's selection is the highlight.
+ */
 export function annotationsToHighlightItems(
   items: Array<{
     id: string;
@@ -216,31 +225,14 @@ export function annotationsToHighlightItems(
     severity?: string;
     body?: string | null;
   }>,
-  targetKey: string,
-  opts?: { fullTextFallback?: string }
+  targetKey: string
 ): HighlightItem[] {
-  const blockKey = blockTargetKey(targetKey);
-  const matching = items.filter((a) => matchesTarget(a.targetKey, targetKey, blockKey));
-
-  const withSelection = matching
+  return items
+    .filter((a) => matchesTarget(a.targetKey, targetKey))
     .filter((a) => a.selectedText?.trim())
     .map((a) => ({
       id: a.id,
       text: a.selectedText!.trim(),
-      targetKey: a.targetKey,
-      severity: a.severity,
-    }));
-
-  if (withSelection.length) return withSelection;
-
-  const fallback = opts?.fullTextFallback?.trim();
-  if (!fallback) return [];
-
-  return matching
-    .filter((a) => (a.body ?? "").trim())
-    .map((a) => ({
-      id: a.id,
-      text: fallback,
       targetKey: a.targetKey,
       severity: a.severity,
     }));
@@ -254,20 +246,17 @@ export function filterAnnotationsForTarget(
     severity?: string;
     body?: string | null;
   }>,
-  targetKey: string,
-  opts?: { fullTextFallback?: string }
+  targetKey: string
 ): HighlightItem[] {
-  return annotationsToHighlightItems(items, targetKey, opts);
+  return annotationsToHighlightItems(items, targetKey);
 }
 
-/** Stable key for effect deps — avoids re-highlighting on unrelated parent re-renders. */
 export function highlightItemsKey(items: HighlightItem[]): string {
   return items
     .map((i) => `${i.id}\0${i.text}\0${i.targetKey}\0${i.severity ?? ""}`)
     .join("\n");
 }
 
-/** How many highlights were successfully applied. */
 export function countAppliedHighlights(
   root: HTMLElement,
   items: HighlightItem[]

@@ -29,8 +29,6 @@ export default function QuestionCreator(props: QuestionCreatorProps) {
       onPreviewModeChange={props.onPreviewModeChange}
       isSavingExternal={props.isSavingExternal}
       saveBusyLabel={props.saveBusyLabel}
-      feedbackHighlights={props.feedbackHighlights}
-      feedbackReviewerName={props.feedbackReviewerName}
     />
   )
 }

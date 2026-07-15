@@ -11,6 +11,8 @@ export type { CinematicHeroLayout } from "./CinematicHero";
 export { CinematicHeroContent } from "./CinematicHeroContent";
 export type { CinematicHeroContentProps, CinematicHeroStat } from "./CinematicHeroContent";
 export { CinematicContent3D, CinematicDepthLayer } from "./CinematicContent3D";
+export { HeroBackground } from "./HeroBackground";
+export type { HeroBackgroundProps } from "./HeroBackground";
 export { HeroOrbitalCore } from "./HeroOrbitalCore";
 export type { HeroOrbitalCoreProps } from "./HeroOrbitalCore";
 export { Monitor3DScene } from "./Monitor3DScene";

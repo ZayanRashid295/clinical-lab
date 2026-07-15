@@ -33,7 +33,7 @@ export const PROGRAMS: Record<ExamTrack, ProgramConfig> = {
     slug: "fcps",
     badge: "FCPS-1",
     heroSubtitle:
-      "Thousands of postgraduate candidates rely on our platform for focused, high-yield FCPS-1 preparation. We combine a rigorous question bank with in-depth explanations to develop lasting clinical knowledge and exam confidence.",
+      "Thousands of graduate candidates rely on our platform for focused, high-yield FCPS-1 preparation. We combine a rigorous question bank with in-depth explanations to develop lasting clinical knowledge and exam confidence.",
     stats: [
       { num: "3,000+", label: "Questions at Exam-Level Difficulty" },
       { num: "100%", label: "Options Explained for Every MCQ" },

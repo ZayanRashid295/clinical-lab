@@ -25,33 +25,33 @@ export const LANDING_CINEMATIC_BODY_CSS = `
   }
 
   html.dark .medprep-landing-v2 {
-    /* Cinematic dark — deeper than app shell, matches hero reference */
-    --cine-bg: #050508;
-    --cine-bg-elevated: #0a0a10;
-    --cine-hero-bg: #050508;
+    /* Cinematic dark — deeper than app shell; accents still follow ThemeService */
+    --cine-bg: color-mix(in srgb, var(--mkt-bg) 35%, #050508);
+    --cine-bg-elevated: color-mix(in srgb, var(--mkt-bg-elevated) 40%, #0a0a10);
+    --cine-hero-bg: color-mix(in srgb, var(--mkt-bg-muted) 30%, #050508);
     --cine-text: #f8fafc;
     --cine-muted: rgba(203, 213, 225, 0.92);
     --cine-body: rgba(226, 232, 240, 0.96);
     --cine-subtle: rgba(148, 163, 184, 0.88);
     --cine-border: rgba(148, 163, 184, 0.12);
-    --cine-header-bg: rgba(5, 5, 8, 0.55);
+    --cine-header-bg: color-mix(in srgb, var(--cine-hero-bg) 55%, transparent);
     --cine-stat-rail-bg: linear-gradient(
       165deg,
-      rgba(15, 23, 42, 0.55) 0%,
-      rgba(15, 23, 42, 0.32) 100%
+      color-mix(in srgb, var(--mkt-bg-elevated) 55%, transparent) 0%,
+      color-mix(in srgb, var(--mkt-bg-elevated) 32%, transparent) 100%
     );
     --cine-stat-rail-border: color-mix(in srgb, var(--mkt-accent) 14%, transparent);
     --cine-stat-num-from: #ffffff;
-    --cine-stat-num-to: #c4b5fd;
+    --cine-stat-num-to: var(--mkt-accent-muted);
     --cine-title-from: #ffffff;
-    --cine-title-to: #f3e8ff;
+    --cine-title-to: var(--mkt-accent-muted);
     --cine-mission-em-from: #ffffff;
-    --cine-mission-em-to: #c4b5fd;
+    --cine-mission-em-to: var(--mkt-accent);
     --cine-ambient-strength: 0.11;
   }
 
   html.dark:has(.landing-cinematic) body {
-    background: #050508;
+    background: var(--cine-hero-bg, #050508);
   }
 
   html:not(.dark) .medprep-landing-v2 {
@@ -151,7 +151,7 @@ export const LANDING_CINEMATIC_BODY_CSS = `
 
   .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle,
   .medprep-landing-v2 .hero-cinematic .hero-brand-subtitle--center {
-    color: var(--cine-body, var(--cine-text)) !important;
+    color: var(--cine-text) !important;
   }
 
   .landing-cinematic .cta-buttons .lp-home-btn--primary,

@@ -14,10 +14,30 @@ type Props = {
 
 let selectionTargetCounter = 0;
 
+function reviewSectionFromNode(node: Node | null): Element | null {
+  if (!node) return null;
+  const el =
+    node.nodeType === Node.ELEMENT_NODE
+      ? (node as Element)
+      : node.parentElement;
+  return el?.closest("[data-review-section][data-review-target]") ?? null;
+}
+
+/** Prefer start/end containers so nested HTML selections still resolve a review block. */
+function resolveReviewSection(range: Range): Element | null {
+  const startEl = reviewSectionFromNode(range.startContainer);
+  const endEl = reviewSectionFromNode(range.endContainer);
+  if (startEl && endEl && startEl !== endEl) {
+    // Cross-block selection — anchor to where the selection began
+    return startEl;
+  }
+  return startEl ?? endEl ?? reviewSectionFromNode(range.commonAncestorContainer);
+}
+
 export function useTextSelectionReview({
   containerRef,
   enabled,
-  defaultSection = "Content",
+  defaultSection = "Explanation",
   defaultTargetType = "EXPLANATION",
 }: Props) {
   const { openDrawer } = useReviewContext();
@@ -75,25 +95,24 @@ export function useTextSelectionReview({
         return;
       }
 
-      const rect = range.getBoundingClientRect();
-      let section = defaultSection;
-      let targetType = defaultTargetType;
-      let targetKey = `${defaultTargetType.toLowerCase()}:selection`;
-
-      const el = (
-        range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
-          ? (range.commonAncestorContainer as Element)
-          : range.commonAncestorContainer.parentElement
-      )?.closest("[data-review-section]");
-
-      if (el) {
-        section = el.getAttribute("data-review-section") || section;
-        targetKey =
-          el.getAttribute("data-review-target") ||
-          `${section.toLowerCase().replace(/\s+/g, "-")}:selection`;
-        const tt = el.getAttribute("data-review-type");
-        if (tt) targetType = tt as ReviewAnnotationTarget;
+      const el = resolveReviewSection(range);
+      // Require a real review target — orphan *:selection keys never highlight
+      if (!el) {
+        setToolbar(null);
+        return;
       }
+
+      const targetAttr = el.getAttribute("data-review-target")?.trim();
+      if (!targetAttr) {
+        setToolbar(null);
+        return;
+      }
+
+      const rect = range.getBoundingClientRect();
+      const section =
+        el.getAttribute("data-review-section") || defaultSection;
+      const tt = el.getAttribute("data-review-type");
+      const targetType = (tt as ReviewAnnotationTarget) || defaultTargetType;
 
       selectionTargetCounter += 1;
       setToolbar({
@@ -103,7 +122,7 @@ export function useTextSelectionReview({
         text,
         section,
         targetType,
-        targetKey: `${targetKey}:sel-${selectionTargetCounter}`,
+        targetKey: `${targetAttr}:sel-${selectionTargetCounter}`,
       });
     };
 

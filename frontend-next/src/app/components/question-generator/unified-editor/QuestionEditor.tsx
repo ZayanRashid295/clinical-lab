@@ -31,8 +31,6 @@ import { ApiHttpError, getApiErrorMessage } from "@/app/services/base/api-http-e
 import { Editor } from "@tiptap/react"
 import { Loader2, RotateCcw, Eye, EyeOff, Plus } from "lucide-react"
 import { QuestionCreatorData } from "../question-creator/types"
-import { QaFeedbackHighlightsBar } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
-import type { QaFeedbackHighlight } from "@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar"
 import { runAutoMatch } from "../metadata-auto-match"
 import {
   mergeResolvedMetadata,
@@ -64,8 +62,6 @@ interface QuestionEditorProps {
   onPreviewModeChange?: (isPreview: boolean) => void
   isSavingExternal?: boolean
   saveBusyLabel?: string
-  feedbackHighlights?: import("@/app/components/QuestionReview/admin/QaFeedbackHighlightsBar").QaFeedbackHighlight[] | null
-  feedbackReviewerName?: string | null
 }
 
 export default function QuestionEditor({
@@ -75,8 +71,6 @@ export default function QuestionEditor({
   onPreviewModeChange,
   isSavingExternal = false,
   saveBusyLabel,
-  feedbackHighlights,
-  feedbackReviewerName,
 }: QuestionEditorProps) {
   const { toast } = useToast()
   const [stemBlocks, setStemBlocks] = useState<ContentBlock[]>(() =>
@@ -1462,7 +1456,6 @@ export default function QuestionEditor({
       <UnifiedQuestionPreview
         questionData={questionData}
         questionId={questionId || metadata?.questionId || undefined}
-        feedbackHighlights={feedbackHighlights ?? undefined}
         onEdit={() => {
           setIsPreviewMode(false)
           onPreviewModeChange?.(false)
@@ -1477,14 +1470,6 @@ export default function QuestionEditor({
 
   return (
     <div className="flex flex-col h-full">
-      {feedbackHighlights && feedbackHighlights.length > 0 && (
-        <div className="px-4 pt-4 shrink-0">
-          <QaFeedbackHighlightsBar
-            highlights={feedbackHighlights}
-            reviewerName={feedbackReviewerName}
-          />
-        </div>
-      )}
       {/* Unified Toolbar */}
       <UnifiedToolbar
         editor={activeEditor}

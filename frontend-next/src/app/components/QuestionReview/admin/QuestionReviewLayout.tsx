@@ -10,16 +10,34 @@ import { ReviewerFeedbackPanel } from "./ReviewerFeedbackPanel";
 import type { ReviewerFeedbackBundle } from "./ReviewerFeedbackPanel";
 import { ApprovalCard } from "./ApprovalCard";
 import { blockTargetKey } from "../review/annotation-highlight";
-import {
-  draftFromSnapshot,
-  type QuestionEditDraft,
-} from "./qa-admin-utils";
-import { ArrowLeft, ExternalLink, Save } from "lucide-react";
-import { useToast } from "@/shared/ui/use-toast";
+import { OverallReviewCard } from "../review/OverallReviewCard";
+import type {
+  OverallReviewState,
+  ReviewApproval,
+  ReviewDifficulty,
+} from "../review/review-types";
+import { DEFAULT_OVERALL_REVIEW } from "../review/review-types";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+
+function overallFromBundle(
+  bundle: ReviewerFeedbackBundle | null
+): OverallReviewState {
+  if (!bundle) return DEFAULT_OVERALL_REVIEW;
+  return {
+    questionQualityRating: bundle.questionQualityRating ?? 0,
+    explanationQualityRating: bundle.explanationQualityRating ?? 0,
+    imageQualityRating: bundle.imageQualityRating ?? 0,
+    difficultyRating:
+      (bundle.difficultyRating as ReviewDifficulty) ||
+      DEFAULT_OVERALL_REVIEW.difficultyRating,
+    approvalStatus:
+      (bundle.approvalStatus as ReviewApproval) ||
+      DEFAULT_OVERALL_REVIEW.approvalStatus,
+    overallComment: bundle.overallComment ?? "",
+  };
+}
 
 export function QuestionReviewLayout({ questionId }: { questionId: string }) {
-  const { toast } = useToast();
-
   const [data, setData] = useState<any>(null);
   const [activeReviewerAttemptId, setActiveReviewerAttemptId] = useState<
     string | null
@@ -28,10 +46,6 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
     null
   );
   const [activeTargetKey, setActiveTargetKey] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editAttemptId, setEditAttemptId] = useState<string | null>(null);
-  const [editDraft, setEditDraft] = useState<QuestionEditDraft | null>(null);
-  const [savingDraft, setSavingDraft] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -104,7 +118,9 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
   }, [activeReviewer, data?.issues]);
 
   const highlightIssues = useMemo(() => {
-    const withText = highlightAnnotations.filter((a) => a.selectedText?.trim());
+    const withText = highlightAnnotations.filter(
+      (a: { selectedText?: string | null }) => a.selectedText?.trim()
+    );
     return withText.length ? withText : null;
   }, [highlightAnnotations]);
 
@@ -114,52 +130,6 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
   }) => {
     setActiveAnnotationId(annotation.id);
     setActiveTargetKey(annotation.targetKey);
-  };
-
-  const handleStartEditMode = (attemptId: string) => {
-    if (!data?.question) return;
-    const bundle = reviewerBundles.find((b) => b.attemptId === attemptId);
-    setActiveReviewerAttemptId(attemptId);
-    setEditAttemptId(attemptId);
-    setEditMode(true);
-    setEditDraft(
-      draftFromSnapshot(data.draftSnapshot, data.question)
-    );
-    if (bundle?.annotations[0]) {
-      setActiveAnnotationId(bundle.annotations[0].id);
-      setActiveTargetKey(bundle.annotations[0].targetKey);
-    }
-  };
-
-  const handleExitEditMode = () => {
-    setEditMode(false);
-    setEditAttemptId(null);
-    setEditDraft(null);
-    setActiveAnnotationId(null);
-    setActiveTargetKey(null);
-  };
-
-  const handleSaveDraft = async () => {
-    if (!editDraft) return;
-    setSavingDraft(true);
-    try {
-      await qaAdminService.saveDraft(questionId, {
-        draftSnapshot: editDraft as unknown as Record<string, unknown>,
-        summary: activeReviewer
-          ? `Draft while addressing ${activeReviewer.reviewerName}'s feedback`
-          : "Question draft saved",
-      });
-      toast({ title: "Draft saved" });
-      await load();
-    } catch (e) {
-      toast({
-        title: "Could not save draft",
-        description: e instanceof Error ? e.message : "Unknown error",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingDraft(false);
-    }
   };
 
   if (error) {
@@ -176,6 +146,7 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
   ).length;
 
   const hasReviewerFeedback = reviewerBundles.length > 0;
+  const overallReview = overallFromBundle(activeReviewer);
 
   return (
     <div className="space-y-4">
@@ -210,45 +181,11 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {editMode && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleExitEditMode}
-              >
-                Exit edit mode
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleSaveDraft}
-                disabled={savingDraft}
-              >
-                <Save className="h-4 w-4 mr-1" />
-                {savingDraft ? "Saving…" : "Save draft"}
-              </Button>
-            </>
-          )}
           <Button size="sm" variant="outline" asChild>
             <a
-              href={`/question-generator/admin?questionId=${questionId}${activeReviewerAttemptId ? `&reviewAttemptId=${activeReviewerAttemptId}` : ""}`}
+              href={`/question-generator/admin?questionId=${questionId}`}
               target="_blank"
               rel="noreferrer"
-              onClick={() => {
-                if (!highlightIssues?.length) return;
-                try {
-                  sessionStorage.setItem(
-                    `qa-review-highlights:${questionId}`,
-                    JSON.stringify({
-                      attemptId: activeReviewerAttemptId,
-                      reviewerName: activeReviewer?.reviewerName,
-                      highlights: highlightIssues,
-                    })
-                  );
-                } catch {
-                  /* ignore */
-                }
-              }}
             >
               <ExternalLink className="h-4 w-4 mr-1" />
               Full editor
@@ -256,18 +193,6 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
           </Button>
         </div>
       </div>
-
-      {editMode && activeReviewer && (
-        <Card className="p-3 border-primary/30 bg-primary/5 text-sm">
-          <p className="font-medium text-primary">
-            Editing with {activeReviewer.reviewerName}&apos;s highlights
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Flagged phrases are highlighted in amber boxes. Update the fields
-            below each flagged section, then save your draft.
-          </p>
-        </Card>
-      )}
 
       <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 min-h-[calc(100vh-12rem)]">
         <div className="flex-1 min-w-0 space-y-6">
@@ -281,10 +206,15 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
               setActiveTargetKey(targetKey);
               if (issueId) setActiveAnnotationId(issueId);
             }}
-            editMode={editMode}
-            editDraft={editDraft}
-            onEditDraftChange={setEditDraft}
           />
+
+          {activeReviewer && (
+            <OverallReviewCard
+              value={overallReview}
+              readOnly
+              reviewerName={activeReviewer.reviewerName}
+            />
+          )}
 
           {(data.issues ?? []).length > 0 && (
             <Card className="p-4 border-border/60">
@@ -310,18 +240,9 @@ export function QuestionReviewLayout({ questionId }: { questionId: string }) {
           <ReviewerFeedbackPanel
             bundles={reviewerBundles}
             activeAttemptId={activeReviewerAttemptId}
-            editMode={editMode}
-            editAttemptId={editAttemptId}
             activeAnnotationId={activeAnnotationId}
-            onSelectReviewer={(attemptId) => {
-              setActiveReviewerAttemptId(attemptId);
-              if (editMode && editAttemptId !== attemptId) {
-                handleExitEditMode();
-              }
-            }}
+            onSelectReviewer={setActiveReviewerAttemptId}
             onSelectAnnotation={handleSelectAnnotation}
-            onStartEditMode={handleStartEditMode}
-            onExitEditMode={handleExitEditMode}
           />
         ) : (
           <Card className="p-4 xl:w-[min(420px,34vw)] shrink-0 text-sm text-muted-foreground">

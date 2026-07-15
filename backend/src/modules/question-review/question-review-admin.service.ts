@@ -986,10 +986,56 @@ export class QuestionReviewAdminService {
       system: question.system?.name ?? null,
       topic: question.topic?.name ?? null,
       subtopic: question.subtopic?.name ?? null,
-      questionStemBlocks: question.questionStemBlocks ?? [],
+      questionStemBlocks: (question.questionStemBlocks ?? [])
+        .map((block: any) => this.mapStemBlock(block))
+        .filter(Boolean),
       options,
       explanation,
       perAnswerExplanations,
+    };
+  }
+
+  private mapStemBlock(block: any) {
+    if (!block) return null;
+    const blockData = block.data ?? {};
+    if (block.type === "TEXT") {
+      return {
+        id: block.id,
+        type: "text",
+        order: block.order ?? 0,
+        data: {
+          html: blockData.html || "",
+          markdown:
+            blockData.markdown ||
+            blockData.content ||
+            (typeof blockData === "string" ? blockData : ""),
+          ...blockData,
+        },
+      };
+    }
+    if (block.type === "TABLE") {
+      return {
+        id: block.id,
+        type: "table",
+        order: block.order ?? 0,
+        data: blockData.tableHtml
+          ? blockData
+          : { ...blockData, tableHtml: blockData.html || blockData.tableHtml },
+      };
+    }
+    if (block.type === "IMAGES") {
+      return {
+        id: block.id,
+        type: "images",
+        order: block.order ?? 0,
+        data: blockData,
+      };
+    }
+    return {
+      id: block.id,
+      type: String(block.type ?? "text").toLowerCase(),
+      order: block.order ?? 0,
+      data: blockData,
     };
   }
 

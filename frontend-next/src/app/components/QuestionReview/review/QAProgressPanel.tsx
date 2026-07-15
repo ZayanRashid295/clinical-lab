@@ -7,7 +7,6 @@ import type { ReviewProgress } from "./review-types";
 type Props = {
   questionIndex: number;
   questionTotal: number;
-  answered: boolean;
   progress: ReviewProgress;
 };
 
@@ -51,16 +50,14 @@ function Item({
 export function QAProgressPanel({
   questionIndex,
   questionTotal,
-  answered,
   progress,
 }: Props) {
   return (
-    <div className="rounded-xl border bg-card/80 px-4 py-3 dark:bg-slate-900/50 dark:border-slate-800">
-      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
+    <div className="rounded-xl border bg-white px-4 py-3 border-slate-200">
+      <p className="text-sm font-semibold text-slate-900 mb-2">
         Question {questionIndex + 1} of {questionTotal}
       </p>
       <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5">
-        <Item done={answered} label="Answered" />
         <Item done={progress.stemReviewed} label="Stem reviewed" />
         <Item done={progress.explanationReviewed} label="Explanation reviewed" />
         <Item done={progress.imagesReviewed} label="Images reviewed" />

@@ -35,14 +35,8 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
       <CinematicHero ariaLabel="MedPrepAI — intelligent exam preparation">
         <CinematicHeroContent
           kicker="MedPrepAI"
-          title={
-            <>
-              Stop guessing.
-              <br />
-              Start understanding.
-            </>
-          }
-          subtitle="3,000+ exam-level questions with a full explanation for every single option — so you learn deeply, score higher, and walk in confident."
+          title="We Make Complex Stuff Easier to Understand."
+          subtitle="Learning Tools Designed for High-Stakes Exams"
           punchlines={["Every option explained", "Zero guesswork", "Exam-day ready"]}
           primaryCta={{
             label: actions.isAuthenticated ? "Go to dashboard" : "Start free — no card required",

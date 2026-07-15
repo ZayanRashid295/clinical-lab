@@ -1,25 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ZoomIn, MessageSquarePlus, MapPin } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { CommentBadge } from "./CommentBadge";
+import { AnnotationHighlighter } from "./AnnotationHighlighter";
 import { useReviewContext } from "./ReviewContext";
 import { anchorYFromEvent } from "./review-panel-position";
+import { annotationsToHighlightItems } from "./annotation-highlight";
 
 type Props = {
-  imageId: string;
+  /** Stable key used for feedback + admin scroll (e.g. image:blockId or image:blockId:0). */
+  targetKey: string;
   src: string;
   alt?: string;
   caption?: string;
+  label?: string;
 };
 
-export function ReviewableImage({ imageId, src, alt, caption }: Props) {
-  const { openDrawer, countForTarget } = useReviewContext();
+export function ReviewableImage({
+  targetKey,
+  src,
+  alt,
+  caption,
+  label = "Image",
+}: Props) {
+  const { openDrawer, countForTarget, annotationsForBlock } = useReviewContext();
   const [annotateMode, setAnnotateMode] = useState(false);
   const [pins, setPins] = useState<Array<{ x: number; y: number }>>([]);
-  const targetKey = `image:${imageId}`;
   const count = countForTarget(targetKey) + pins.length;
+  const hasFeedback = countForTarget(targetKey) > 0;
+
+  const captionHighlights = useMemo(
+    () =>
+      caption
+        ? annotationsToHighlightItems(annotationsForBlock(targetKey), targetKey)
+        : [],
+    [annotationsForBlock, targetKey, caption]
+  );
+
+  const handleHighlightClick = useCallback(
+    (item: { id: string; text: string; targetKey: string }) => {
+      openDrawer({
+        targetType: "IMAGE",
+        targetKey: item.targetKey,
+        section: label,
+        selectedText: item.text,
+        highlightAnnotationId: item.id,
+        viewOnly: true,
+      });
+    },
+    [openDrawer, label]
+  );
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!annotateMode) return;
@@ -30,8 +62,8 @@ export function ReviewableImage({ imageId, src, alt, caption }: Props) {
     openDrawer({
       targetType: "IMAGE",
       targetKey,
-      section: "Image",
-      preview: alt || caption || "Image",
+      section: label,
+      preview: alt || caption || label,
       anchorMeta: { x, y, unit: "percent" },
       anchorY: e.clientY,
     });
@@ -39,7 +71,16 @@ export function ReviewableImage({ imageId, src, alt, caption }: Props) {
   };
 
   return (
-    <figure className="group relative rounded-xl overflow-hidden border dark:border-slate-700">
+    <figure
+      data-review-section={label}
+      data-review-target={targetKey}
+      data-review-type="IMAGE"
+      data-target-key={targetKey}
+      className={cn(
+        "group relative rounded-xl overflow-hidden border dark:border-slate-700 scroll-mt-24",
+        hasFeedback && "ring-2 ring-amber-400/80 border-amber-400/60"
+      )}
+    >
       <div
         className={cn(
           "relative",
@@ -71,8 +112,8 @@ export function ReviewableImage({ imageId, src, alt, caption }: Props) {
             openDrawer({
               targetType: "IMAGE",
               targetKey,
-              section: "Image",
-              preview: alt || caption,
+              section: label,
+              preview: alt || caption || label,
               anchorY: anchorYFromEvent(e),
             })
           }
@@ -101,9 +142,19 @@ export function ReviewableImage({ imageId, src, alt, caption }: Props) {
       </div>
       {caption && (
         <figcaption className="text-xs text-muted-foreground px-3 py-2 dark:text-slate-400">
-          {caption}
+          <AnnotationHighlighter
+            items={captionHighlights}
+            onItemClick={handleHighlightClick}
+          >
+            {caption}
+          </AnnotationHighlighter>
         </figcaption>
       )}
     </figure>
   );
+}
+
+/** Stable target key shared by reviewer + admin image sections. */
+export function imageTargetKey(blockId: string, imageIndex: number, total: number) {
+  return total <= 1 ? `image:${blockId}` : `image:${blockId}:${imageIndex}`;
 }

@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { HeroOrbitalCore } from "./HeroOrbitalCore";
+import { HeroBackground } from "./HeroBackground";
 import { ScrollController } from "./ScrollController";
 import { AnimationTimeline } from "./AnimationTimeline";
 import { HERO_SEQUENCE } from "./constants";
@@ -101,20 +101,19 @@ export function CinematicHero({
             {layout !== "program" ? (
               <>
                 <div className="hero-cinematic-blend-visual" aria-hidden="true">
-                  <HeroOrbitalCore
+                  <HeroBackground
                     scrollProgress={uiProgress.raw}
                     reducedMotion={reducedMotion}
-                    centered
                   />
                 </div>
                 <div className="hero-cinematic-blend-scrim" aria-hidden="true" />
               </>
             ) : (
               <div className="hero-cinematic-blend-visual hero-cinematic-blend-visual--program" aria-hidden="true">
-                <HeroOrbitalCore
+                <HeroBackground
                   scrollProgress={uiProgress.raw}
                   reducedMotion={reducedMotion}
-                  centered
+                  className="hero-background--program"
                 />
               </div>
             )}

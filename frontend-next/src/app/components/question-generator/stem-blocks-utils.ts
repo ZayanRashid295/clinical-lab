@@ -98,6 +98,29 @@ function isTextBlock(block: any): boolean {
   return t === "text"
 }
 
+/** Map API/DB enums (TEXT, TABLE, IMAGES) to renderer types (text, table, images). */
+export function normalizeStemBlockType(type: unknown): string {
+  const t = String(type ?? "").toLowerCase()
+  if (t === "text" || t === "table" || t === "images" || t === "image") return t
+  return t || "text"
+}
+
+function withNormalizedType(block: any): any {
+  if (!block || typeof block !== "object") return block
+  return { ...block, type: normalizeStemBlockType(block.type) }
+}
+
+function blockHasTextContent(block: any): boolean {
+  if (!block?.data) return false
+  const md = String(block.data.markdown ?? "").trim()
+  const content = String(block.data.content ?? "").trim()
+  const html = String(block.data.html ?? "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+  return Boolean(md || content || html)
+}
+
 /**
  * Normalize existing stem blocks for display/edit: merge consecutive text blocks into one
  * and ensure markdown has no single newlines (so one paragraph does not render line-by-line).
@@ -105,17 +128,25 @@ function isTextBlock(block: any): boolean {
 export function normalizeStemBlocksForDisplay(blocks: any[]): any[] {
   if (!Array.isArray(blocks) || blocks.length === 0) return blocks
   // Strip "Options and Explanations" from each block and drop blocks that are only that heading
-  let list = blocks.map(stripOptionsAndExplanationsFromBlock).filter((b) => {
-    if (isOptionsAndExplanationsBlock(b)) return false
-    const md = (b?.data?.markdown ?? b?.data?.content ?? "").trim()
-    return md !== ""
-  })
-  if (list.length === 0) return blocks.length ? [stripOptionsAndExplanationsFromBlock(blocks[0])] : blocks
+  let list = blocks
+    .map(withNormalizedType)
+    .map(stripOptionsAndExplanationsFromBlock)
+    .filter((b) => {
+      if (isOptionsAndExplanationsBlock(b)) return false
+      return blockHasTextContent(b)
+    })
+  if (list.length === 0) {
+    const fallback = blocks
+      .map(withNormalizedType)
+      .map(stripOptionsAndExplanationsFromBlock)
+      .find((b) => blockHasTextContent(b) || b?.data?.html)
+    return fallback ? [fallback] : []
+  }
   if (list.length === 1) {
     const b = list[0]
     if (isTextBlock(b) && (b?.data?.markdown ?? b?.data?.content)) {
       const md = normalizeStemToParagraphs(String(b.data.markdown ?? b.data.content ?? ""))
-      return [{ ...b, data: { ...b.data, markdown: md, html: "" } }]
+      return [{ ...b, type: "text", data: { ...b.data, markdown: md, html: b?.data?.html || "" } }]
     }
     return list
   }
@@ -138,13 +169,19 @@ export function normalizeStemBlocksForDisplay(blocks: any[]): any[] {
       .map((b) => (b?.data?.markdown ?? b?.data?.content ?? "").trim())
       .filter(Boolean)
       .join(" ")
+    const mergedHtml = run
+      .map((b) => String(b?.data?.html ?? "").trim())
+      .filter(Boolean)
+      .join("")
     const normalizedMarkdown = normalizeStemToParagraphs(mergedMarkdown)
     result.push({
       ...run[0],
+      type: "text",
       data: {
         ...run[0].data,
         markdown: normalizedMarkdown,
-        html: "",
+        // Keep HTML when we merged markdown-less HTML-only blocks
+        html: normalizedMarkdown ? "" : mergedHtml,
         content: "",
       },
     })

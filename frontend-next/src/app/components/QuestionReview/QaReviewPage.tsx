@@ -5,8 +5,8 @@ import Head from "next/head";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { useToast } from "@/shared/ui/use-toast";
-import QuestionPanel from "@/app/components/question-generator/question-panel";
 import {
   clearReviewSession,
   loadReviewSession,
@@ -26,12 +26,47 @@ import {
   type OverallReviewState,
   type ReviewTarget,
 } from "./review";
-import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Highlighter,
+  MessageSquarePlus,
+  MousePointerClick,
+  StickyNote,
+  Eye,
+} from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 
 type Props = { slug: string };
 
-type QuestionPhase = "answer" | "review";
+const REVIEW_GUIDELINES = [
+  {
+    icon: Eye,
+    title: "1. Read the full question",
+    body: "You’ll see the stem, options, and explanation on one page. Take a moment to read everything before leaving comments.",
+  },
+  {
+    icon: Highlighter,
+    title: "2. Highlight anything that looks wrong",
+    body: "Select text in the stem, options, or explanation. A small “Add feedback” button will appear — click it to leave a comment on that exact phrase.",
+  },
+  {
+    icon: MessageSquarePlus,
+    title: "3. Comment on whole sections too",
+    body: "Hover any block (stem, option, image, table, explanation) and click Comment if the whole section needs a note — typos, unclear wording, wrong facts, or weak distractors.",
+  },
+  {
+    icon: StickyNote,
+    title: "4. Be specific and helpful",
+    body: "Say what is wrong and how you’d fix it. Short notes are fine: e.g. “Option B wording is ambiguous” or “Explanation contradicts guideline X.”",
+  },
+  {
+    icon: MousePointerClick,
+    title: "5. Finish with an overall comment",
+    body: "At the bottom of each question, leave a short overall note, then use Next. You can go back to earlier questions before you submit the full review.",
+  },
+] as const;
 
 function mapOverallFromResponse(r?: ReviewQuestion["response"]): OverallReviewState {
   if (!r) return { ...DEFAULT_OVERALL_REVIEW };
@@ -53,6 +88,151 @@ function mapProgressFromResponse(r?: ReviewQuestion["response"]): ReviewProgress
   return { ...DEFAULT_REVIEW_PROGRESS, ...(r?.reviewProgress ?? {}) };
 }
 
+function QaReviewWelcome({
+  title,
+  description,
+  questionCount,
+  reviewerName,
+  onNameChange,
+  guidelinesAccepted,
+  onGuidelinesAcceptedChange,
+  starting,
+  onStart,
+}: {
+  title: string;
+  description: string | null;
+  questionCount: number;
+  reviewerName: string;
+  onNameChange: (v: string) => void;
+  guidelinesAccepted: boolean;
+  onGuidelinesAcceptedChange: (v: boolean) => void;
+  starting: boolean;
+  onStart: () => void;
+}) {
+  const canStart =
+    guidelinesAccepted && reviewerName.trim().length > 0 && !starting;
+
+  return (
+    <div className="w-full max-w-3xl mx-auto px-4 py-8 sm:py-12">
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="border-b border-slate-100 bg-slate-50/80 px-6 py-6 sm:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+            Content QA · Review
+          </p>
+          <h2 className="mt-2 text-2xl sm:text-[1.75rem] font-semibold tracking-tight text-slate-900">
+            Before you begin
+          </h2>
+          <p className="mt-2 text-sm text-slate-600 leading-relaxed max-w-2xl">
+            {description?.trim() ||
+              "You’ll review each MCQ on one page — stem, options, and explanation — and leave clear feedback so we can improve the question bank."}
+          </p>
+          <p className="mt-3 inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+            {questionCount} question{questionCount === 1 ? "" : "s"} · {title}
+          </p>
+        </div>
+
+        <div className="px-6 py-6 sm:px-8 space-y-6">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">
+              How to give feedback
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Read these steps once — they take under a minute and apply to every
+              question.
+            </p>
+            <ul className="mt-4 space-y-3">
+              {REVIEW_GUIDELINES.map(({ icon: Icon, title: stepTitle, body }) => (
+                <li
+                  key={stepTitle}
+                  className="flex gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-3.5"
+                >
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-emerald-700">
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {stepTitle}
+                    </p>
+                    <p className="mt-0.5 text-sm text-slate-600 leading-relaxed">
+                      {body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950/90 leading-relaxed">
+            <span className="font-semibold">Tip:</span> You do not need a perfect
+            medical essay — clear, concrete feedback helps most. If something feels
+            off, say so.
+          </div>
+
+          <div className="space-y-4 border-t border-slate-100 pt-6">
+            <div>
+              <label
+                htmlFor="qa-reviewer-name"
+                className="text-sm font-medium text-slate-900"
+              >
+                Your name
+              </label>
+              <Input
+                id="qa-reviewer-name"
+                value={reviewerName}
+                onChange={(e) => onNameChange(e.target.value)}
+                className="mt-1.5 h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+                placeholder="e.g. Dr. Ayesha Khan / Student name"
+                autoComplete="name"
+              />
+            </div>
+
+            <label
+              htmlFor="qa-guidelines-ack"
+              className={cn(
+                "flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-colors",
+                guidelinesAccepted
+                  ? "border-emerald-300 bg-emerald-50/60"
+                  : "border-slate-200 bg-white hover:bg-slate-50"
+              )}
+            >
+              <Checkbox
+                id="qa-guidelines-ack"
+                checked={guidelinesAccepted}
+                onCheckedChange={(v) => onGuidelinesAcceptedChange(v === true)}
+                className="mt-0.5 border-slate-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+              />
+              <span className="text-sm text-slate-700 leading-relaxed">
+                I have read the guidelines and understand how to highlight text,
+                leave comments, and submit overall feedback for each question.
+              </span>
+            </label>
+
+            <Button
+              className="w-full h-11 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+              onClick={onStart}
+              disabled={!canStart}
+            >
+              {starting
+                ? "Starting…"
+                : `Start review · ${questionCount} question${questionCount === 1 ? "" : "s"}`}
+            </Button>
+            {!guidelinesAccepted && (
+              <p className="text-center text-xs text-slate-500">
+                Check the box above after reading the guidelines to enable Start.
+              </p>
+            )}
+            {guidelinesAccepted && !reviewerName.trim() && (
+              <p className="text-center text-xs text-slate-500">
+                Enter your name to continue.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function QaReviewPage({ slug }: Props) {
   const { toast } = useToast();
 
@@ -63,6 +243,7 @@ export default function QaReviewPage({ slug }: Props) {
     questionCount: number;
   } | null>(null);
   const [reviewerName, setReviewerName] = useState("");
+  const [guidelinesAccepted, setGuidelinesAccepted] = useState(false);
   const [starting, setStarting] = useState(false);
 
   const [attemptId, setAttemptId] = useState<string | null>(null);
@@ -72,7 +253,6 @@ export default function QaReviewPage({ slug }: Props) {
   const [completed, setCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const [phases, setPhases] = useState<Record<string, QuestionPhase>>({});
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [annotationsByQuestion, setAnnotationsByQuestion] = useState<
     Record<string, ReviewAnnotation[]>
@@ -87,22 +267,31 @@ export default function QaReviewPage({ slug }: Props) {
   const [annotationSaving, setAnnotationSaving] = useState(false);
   const [overallSaving, setOverallSaving] = useState(false);
 
+  /** Reviewer UAT pages stay light regardless of site theme. */
+  useEffect(() => {
+    const root = document.documentElement;
+    const hadDark = root.classList.contains("dark");
+    root.classList.remove("dark");
+    root.classList.add("light");
+    root.style.colorScheme = "light";
+    return () => {
+      root.classList.remove("light");
+      root.style.colorScheme = "";
+      if (hadDark) root.classList.add("dark");
+    };
+  }, []);
+
   const currentQuestion = questions[currentIndex];
-  const currentPhase = currentQuestion
-    ? phases[currentQuestion.id] ?? (selectedAnswers[currentQuestion.id] ? "review" : "answer")
-    : "answer";
 
   const hydrateQuestions = useCallback((qs: ReviewQuestion[]) => {
     const answers: Record<string, string> = {};
     const ann: Record<string, ReviewAnnotation[]> = {};
     const prog: Record<string, ReviewProgress> = {};
     const overall: Record<string, OverallReviewState> = {};
-    const ph: Record<string, QuestionPhase> = {};
 
     qs.forEach((q) => {
       if (q.response?.userAnswer) {
         answers[q.id] = q.response.userAnswer;
-        ph[q.id] = q.response.reviewModeEnteredAt ? "review" : "review";
       }
       ann[q.id] = (q.response?.annotations ?? []) as ReviewAnnotation[];
       prog[q.id] = mapProgressFromResponse(q.response);
@@ -113,7 +302,6 @@ export default function QaReviewPage({ slug }: Props) {
     setAnnotationsByQuestion(ann);
     setProgressByQuestion(prog);
     setOverallByQuestion(overall);
-    setPhases(ph);
   }, []);
 
   useEffect(() => {
@@ -158,6 +346,14 @@ export default function QaReviewPage({ slug }: Props) {
   }, [slug, toast, hydrateQuestions]);
 
   const handleStart = async () => {
+    if (!guidelinesAccepted) {
+      toast({
+        title: "Please confirm the guidelines",
+        description: "Check the box after reading how feedback works.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!reviewerName.trim()) {
       toast({ title: "Please enter your name", variant: "destructive" });
       return;
@@ -188,36 +384,27 @@ export default function QaReviewPage({ slug }: Props) {
     }
   };
 
-  const enterReviewMode = async (questionId: string, answer: string) => {
+  const enterReviewMode = async (questionId: string) => {
     if (!attemptId || !attemptSecret) return;
-    const q = questions.find((x) => x.id === questionId);
-    const option = q?.options.find((o) => o.label === answer);
-    await questionReviewService.updateResponse(
-      attemptId,
-      questionId,
-      attemptSecret,
-      {
-        userAnswer: answer,
-        isCorrect: !!option?.correct,
-        enterReviewMode: true,
-      }
-    );
-    setPhases((p) => ({ ...p, [questionId]: "review" }));
-  };
-
-  const handleSelectAnswer = async (label: string) => {
-    if (!currentQuestion || completed || !label) return;
-    setSelectedAnswers((prev) => ({ ...prev, [currentQuestion.id]: label }));
     try {
-      await enterReviewMode(currentQuestion.id, label);
-    } catch (e) {
-      toast({
-        title: "Could not save answer",
-        description: e instanceof Error ? e.message : "Unknown error",
-        variant: "destructive",
-      });
+      await questionReviewService.updateResponse(
+        attemptId,
+        questionId,
+        attemptSecret,
+        {
+          enterReviewMode: true,
+        }
+      );
+    } catch {
+      /* best effort — review UI still works offline of this flag */
     }
   };
+
+  useEffect(() => {
+    if (!currentQuestion || !attemptId || completed) return;
+    void enterReviewMode(currentQuestion.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when question changes
+  }, [currentQuestion?.id, attemptId, completed]);
 
   const handleAnnotationSave = async (payload: {
     target: ReviewTarget;
@@ -245,7 +432,10 @@ export default function QaReviewPage({ slug }: Props) {
       );
       setAnnotationsByQuestion((prev) => ({
         ...prev,
-        [currentQuestion.id]: [...(prev[currentQuestion.id] ?? []), created as ReviewAnnotation],
+        [currentQuestion.id]: [
+          ...(prev[currentQuestion.id] ?? []),
+          created as ReviewAnnotation,
+        ],
       }));
       toast({ title: "Feedback saved" });
       return true;
@@ -328,18 +518,12 @@ export default function QaReviewPage({ slug }: Props) {
   const nextBlockers = useMemo(() => {
     if (!currentQuestion) return ["Loading question…"];
     const blockers: string[] = [];
-    if (!selectedAnswers[currentQuestion.id]) {
-      blockers.push("select an answer");
-    }
-    if (currentPhase === "answer") {
-      blockers.push("finish the answer step");
-    }
     const overall = overallByQuestion[currentQuestion.id] ?? DEFAULT_OVERALL_REVIEW;
     if (!overall.overallComment.trim()) {
       blockers.push("add an overall comment at the bottom of the page");
     }
     return blockers;
-  }, [currentQuestion, selectedAnswers, currentPhase, overallByQuestion]);
+  }, [currentQuestion, overallByQuestion]);
 
   const canGoNext = nextBlockers.length === 0;
 
@@ -396,22 +580,10 @@ export default function QaReviewPage({ slug }: Props) {
     }
   };
 
-  const mapToPanelQuestion = useCallback((q: ReviewQuestion) => ({
-    id: q.id,
-    stem: q.stem,
-    questionStemBlocks: q.questionStemBlocks,
-    system: q.system,
-    topic: q.topic,
-    mcqTitle: q.title,
-    options: q.options.map((o) => ({ ...o, value: o.label })),
-    explanation: q.explanation,
-    perAnswerExplanations: q.perAnswerExplanations,
-  }), []);
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Loading UAT review…</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] text-slate-900">
+        <p className="text-sm text-slate-500">Loading review…</p>
       </div>
     );
   }
@@ -429,61 +601,53 @@ export default function QaReviewPage({ slug }: Props) {
   return (
     <>
       <Head>
-        <title>{bundle?.title ?? "MCQ UAT Review"}</title>
+        <title>{bundle?.title ?? "MCQ Content Review"}</title>
       </Head>
 
-      <div className="min-h-screen bg-background text-slate-900 dark:text-slate-100 flex flex-col">
-        <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-20 px-4 py-3 dark:border-slate-800">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div className="qa-review-root min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
+        <header className="border-b border-slate-200 bg-white sticky top-0 z-20 px-4 py-3.5">
+          <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-widest text-primary font-semibold">
-                Content QA · UAT
+              <p className="text-[10px] uppercase tracking-[0.14em] text-emerald-700 font-semibold">
+                Content QA · Review
               </p>
-              <h1 className="font-semibold truncate">{bundle?.title}</h1>
+              <h1 className="font-semibold truncate text-slate-900 text-[15px] sm:text-base">
+                {bundle?.title}
+              </h1>
             </div>
-            {reviewerName && (
-              <p className="text-xs text-muted-foreground shrink-0">
-                Reviewer: {reviewerName}
+            {reviewerName && attemptId && (
+              <p className="text-xs text-slate-500 shrink-0">
+                Reviewer:{" "}
+                <span className="font-medium text-slate-700">{reviewerName}</span>
               </p>
             )}
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
-          {!attemptId && !completed && (
-            <Card className="max-w-md mx-auto m-6 p-6 space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold">Begin content review</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {bundle?.description}
-                </p>
-                <p className="text-sm mt-2">
-                  Answer each question, then review the full content on one page —
-                  highlight text, comment on images, tables, and options like a
-                  document review.
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Your name</label>
-                <Input
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                  className="mt-1 dark:bg-slate-900/80 dark:text-slate-100"
-                  placeholder="Dr. / Student name"
-                />
-              </div>
-              <Button className="w-full" onClick={handleStart} disabled={starting}>
-                {starting ? "Starting…" : `Start · ${bundle?.questionCount} questions`}
-              </Button>
-            </Card>
+        <main className="flex-1 flex flex-col w-full">
+          {!attemptId && !completed && bundle && (
+            <QaReviewWelcome
+              title={bundle.title}
+              description={bundle.description}
+              questionCount={bundle.questionCount}
+              reviewerName={reviewerName}
+              onNameChange={setReviewerName}
+              guidelinesAccepted={guidelinesAccepted}
+              onGuidelinesAcceptedChange={setGuidelinesAccepted}
+              starting={starting}
+              onStart={() => void handleStart()}
+            />
           )}
 
           {completed && (
-            <Card className="max-w-md mx-auto m-6 p-8 text-center space-y-3">
-              <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-              <h2 className="text-lg font-semibold">UAT review submitted</h2>
-              <p className="text-sm text-muted-foreground">
-                Thank you, {reviewerName}. Your detailed feedback has been recorded.
+            <Card className="max-w-md mx-auto m-8 p-8 text-center space-y-3 border-slate-200 bg-white shadow-sm">
+              <CheckCircle2 className="h-10 w-10 text-emerald-600 mx-auto" />
+              <h2 className="text-lg font-semibold text-slate-900">
+                Review submitted
+              </h2>
+              <p className="text-sm text-slate-600">
+                Thank you, {reviewerName}. Your feedback has been recorded and will
+                help improve these questions.
               </p>
             </Card>
           )}
@@ -500,81 +664,73 @@ export default function QaReviewPage({ slug }: Props) {
                 });
               }}
             >
-              <div className="flex-1 min-h-0 flex flex-col">
+              <div className="flex-1 min-h-0 flex flex-col max-w-5xl mx-auto w-full">
                 <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-w-0">
                   <QAProgressPanel
                     questionIndex={currentIndex}
                     questionTotal={questions.length}
-                    answered={!!selectedAnswers[currentQuestion.id]}
                     progress={currentProgress}
                   />
 
-                  {currentPhase === "answer" ? (
-                    <div className="max-w-3xl mx-auto space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        Step 1 — Answer the question. The full review view unlocks
-                        after you submit.
-                      </p>
-                      <QuestionPanel
-                        question={mapToPanelQuestion(currentQuestion)}
-                        selectedAnswer={selectedAnswers[currentQuestion.id] ?? null}
-                        answered={!!selectedAnswers[currentQuestion.id]}
-                        onSelectAnswer={handleSelectAnswer}
-                      />
-                    </div>
-                  ) : (
-                    <QuestionReviewDocument
-                      question={currentQuestion}
-                      selectedAnswer={selectedAnswers[currentQuestion.id] ?? null}
-                      overallReview={currentOverall}
-                      onOverallChange={(v) =>
-                        setOverallByQuestion((o) => ({
-                          ...o,
-                          [currentQuestion.id]: v,
-                        }))
-                      }
-                      onOverallSave={saveOverallReview}
-                      overallSaving={overallSaving}
-                      progress={currentProgress}
-                      onMarkSection={markSection}
-                    />
-                  )}
+                  <QuestionReviewDocument
+                    question={currentQuestion}
+                    selectedAnswer={
+                      selectedAnswers[currentQuestion.id] ?? null
+                    }
+                    overallReview={currentOverall}
+                    onOverallChange={(v) =>
+                      setOverallByQuestion((o) => ({
+                        ...o,
+                        [currentQuestion.id]: v,
+                      }))
+                    }
+                    onOverallSave={saveOverallReview}
+                    overallSaving={overallSaving}
+                    progress={currentProgress}
+                    onMarkSection={markSection}
+                  />
 
-                  <div className="max-w-3xl space-y-2 pt-4 border-t dark:border-slate-800">
+                  <div className="max-w-3xl space-y-2 pt-4 border-t border-slate-200">
                     {!canGoNext && (
-                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                      <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
                         To continue: {nextBlockers.join(" · ")}
                       </p>
                     )}
                     <div className="flex justify-between gap-3">
-                    <Button
-                      variant="outline"
-                      disabled={currentIndex === 0}
-                      onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-                    >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
-                      Previous
-                    </Button>
-                    {currentIndex < questions.length - 1 ? (
                       <Button
-                        onClick={() => void goNext()}
-                        disabled={!canGoNext || overallSaving}
+                        variant="outline"
+                        disabled={currentIndex === 0}
+                        onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+                        className="border-slate-200 bg-white"
                       >
-                        {overallSaving ? "Saving…" : "Next question"}
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
                       </Button>
-                    ) : (
-                      <Button
-                        onClick={() => void handleSubmitAll()}
-                        disabled={submitting || overallSaving || !canGoNext}
-                      >
-                        {submitting ? "Submitting…" : "Submit UAT review"}
-                      </Button>
-                    )}
+                      {currentIndex < questions.length - 1 ? (
+                        <Button
+                          onClick={() => void goNext()}
+                          disabled={!canGoNext || overallSaving}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          {overallSaving ? "Saving…" : "Next question"}
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => void handleSubmitAll()}
+                          disabled={submitting || overallSaving || !canGoNext}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          {submitting ? "Submitting…" : "Submit review"}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
-                <ReviewDrawer onSave={handleAnnotationSave} saving={annotationSaving} />
+                <ReviewDrawer
+                  onSave={handleAnnotationSave}
+                  saving={annotationSaving}
+                />
               </div>
             </ReviewProvider>
           )}

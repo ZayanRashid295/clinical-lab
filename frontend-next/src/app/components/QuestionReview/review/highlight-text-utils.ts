@@ -1,12 +1,14 @@
 import type { HighlightItem } from "./annotation-highlight";
-import { severityHighlightClass } from "./annotation-highlight";
 
 export type HighlightSegment = {
   text: string;
   item?: HighlightItem;
 };
 
-/** Find phrase in plain text — exact match, then whitespace-normalized. */
+/**
+ * Find exact selected phrase in plain text.
+ * Exact match first; whitespace-normalized only when spacing differs.
+ */
 export function findPhraseInText(text: string, phrase: string): number {
   const trimmed = phrase.trim();
   if (!trimmed || !text) return -1;
@@ -34,7 +36,7 @@ export function findPhraseInText(text: string, phrase: string): number {
   return map[normIdx] ?? -1;
 }
 
-/** Resolve phrase position — tries exact match, label-stripped, and label-prefixed variants. */
+/** Resolve exact selected phrase position — no label/markdown rewriting. */
 export function resolvePhraseRange(
   text: string,
   phrase: string
@@ -42,23 +44,35 @@ export function resolvePhraseRange(
   const trimmed = phrase.trim();
   if (!trimmed || !text) return null;
 
-  let start = findPhraseInText(text, trimmed);
-  if (start !== -1) return { start, length: trimmed.length };
+  const start = findPhraseInText(text, trimmed);
+  if (start === -1) return null;
 
-  const stripped = trimmed.replace(/^[A-H]\.\s*/i, "").trim();
-  if (stripped && stripped !== trimmed) {
-    start = findPhraseInText(text, stripped);
-    if (start !== -1) return { start, length: stripped.length };
+  // For whitespace-normalized hits, length must cover the matched region in raw text
+  const exact = text.indexOf(trimmed);
+  if (exact === start) {
+    return { start, length: trimmed.length };
   }
 
-  const labelMatch = text.match(/^([A-H])\.\s*/i);
-  if (labelMatch && !/^[A-H]\.\s/i.test(trimmed)) {
-    const prefixed = `${labelMatch[0]}${trimmed}`;
-    start = findPhraseInText(text, prefixed);
-    if (start !== -1) return { start, length: prefixed.length };
+  const normPhrase = trimmed.replace(/\s+/g, " ");
+  let normText = "";
+  const map: number[] = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (/\s/.test(ch)) {
+      if (normText.length === 0 || normText[normText.length - 1] !== " ") {
+        map.push(i);
+        normText += " ";
+      }
+    } else {
+      map.push(i);
+      normText += ch;
+    }
   }
-
-  return null;
+  const normIdx = normText.indexOf(normPhrase);
+  if (normIdx === -1) return null;
+  const endNormPos = normIdx + normPhrase.length - 1;
+  const end = (map[endNormPos] ?? start) + 1;
+  return { start, length: end - start };
 }
 
 export function buildHighlightSegments(
@@ -105,50 +119,6 @@ export function buildHighlightSegments(
   return segments;
 }
 
-type AnnotationLike = {
-  id: string;
-  targetKey: string;
-  selectedText?: string | null;
-  severity?: string;
-};
-
-/** Match annotations by phrase in plain text — handles mis-tagged targets (e.g. option text saved as Explanation). */
-export function highlightItemsMatchingPlainText(
-  items: AnnotationLike[],
-  plainText: string
-): HighlightItem[] {
-  const text = plainText.trim();
-  if (!text) return [];
-
-  return items
-    .filter((a) => {
-      const phrase = a.selectedText?.trim();
-      if (!phrase) return false;
-      return resolvePhraseRange(text, phrase) !== null;
-    })
-    .map((a) => ({
-      id: a.id,
-      text: a.selectedText!.trim(),
-      targetKey: a.targetKey,
-      severity: a.severity,
-    }));
-}
-
-export function mergeHighlightItems(
-  ...lists: HighlightItem[][]
-): HighlightItem[] {
-  const seen = new Set<string>();
-  const merged: HighlightItem[] = [];
-  for (const list of lists) {
-    for (const item of list) {
-      if (seen.has(item.id)) continue;
-      seen.add(item.id);
-      merged.push(item);
-    }
-  }
-  return merged;
-}
-
 export function stripHtml(html: string): string {
   return html
     .replace(/<br\s*\/?>/gi, "\n")
@@ -158,23 +128,27 @@ export function stripHtml(html: string): string {
     .trim();
 }
 
+/** Plain text for display helpers. */
 export function blockToPlainText(block: any): string {
   if (!block) return "";
   const data = block.data ?? {};
-  if (typeof block.content === "string" && block.content.trim()) {
-    return block.content.trim();
-  }
-  if (typeof data.markdown === "string" && data.markdown.trim()) {
-    return data.markdown.trim();
-  }
-  if (typeof data.content === "string" && data.content.trim()) {
-    return data.content.trim();
-  }
+
   if (typeof data.html === "string" && data.html.trim()) {
     return stripHtml(data.html);
   }
   if (typeof data.tableHtml === "string" && data.tableHtml.trim()) {
     return stripHtml(data.tableHtml);
+  }
+  if (typeof block.content === "string" && block.content.trim()) {
+    return block.content.trim();
+  }
+  if (typeof data.content === "string" && data.content.trim()) {
+    const raw = data.content.trim();
+    if (/<[a-z][\s\S]*>/i.test(raw)) return stripHtml(raw);
+    return raw;
+  }
+  if (typeof data.markdown === "string" && data.markdown.trim()) {
+    return data.markdown.trim();
   }
   return "";
 }

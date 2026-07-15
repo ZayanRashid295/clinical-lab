@@ -8,10 +8,6 @@ import { HighlightedContent } from "./HighlightedContent";
 import { useReviewContext } from "./ReviewContext";
 import { anchorYFromEvent } from "./review-panel-position";
 import { annotationsToHighlightItems } from "./annotation-highlight";
-import {
-  highlightItemsMatchingPlainText,
-  mergeHighlightItems,
-} from "./highlight-text-utils";
 
 type Props = {
   label: string;
@@ -28,22 +24,16 @@ export function ReviewableOption({
   selected,
   showCorrect,
 }: Props) {
-  const { openDrawer, countForTarget, annotationsForBlock, annotations } =
-    useReviewContext();
+  const { openDrawer, countForTarget, annotationsForBlock } = useReviewContext();
   const targetKey = `option:${label}`;
   const count = countForTarget(targetKey);
   const highlight = showCorrect && correct;
   const displayText = `${label}. ${text}`;
 
-  const highlightItems = useMemo(() => {
-    const blockAnnotations = annotationsForBlock(targetKey);
-    return mergeHighlightItems(
-      annotationsToHighlightItems(blockAnnotations, targetKey, {
-        fullTextFallback: displayText,
-      }),
-      highlightItemsMatchingPlainText(annotations, displayText)
-    );
-  }, [annotations, annotationsForBlock, targetKey, displayText]);
+  const highlightItems = useMemo(
+    () => annotationsToHighlightItems(annotationsForBlock(targetKey), targetKey),
+    [annotationsForBlock, targetKey]
+  );
 
   const handleHighlightClick = useCallback(
     (item: { id: string; text: string; targetKey: string }) => {
@@ -83,7 +73,6 @@ export function ReviewableOption({
       </div>
       <HighlightedContent
         highlightItems={highlightItems}
-        plainText={displayText}
         onItemClick={handleHighlightClick}
         className="flex-1 min-w-0 pr-8 text-sm text-slate-800 dark:text-slate-200"
       >
