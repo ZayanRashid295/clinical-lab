@@ -23,6 +23,10 @@ export interface QuestionMetadata {
   parsedTopicName?: string
   parsedSubtopicName?: string
   parsedMcqTitle?: string
+  /** Marketing sample only — hidden from student QBank. */
+  isDemo?: boolean
+  /** Landing pack this demo question belongs to. */
+  demoPack?: string | null
 }
 
 export interface QuestionCreatorData {

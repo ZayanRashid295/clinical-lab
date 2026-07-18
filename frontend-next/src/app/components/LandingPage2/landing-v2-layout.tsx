@@ -955,13 +955,81 @@ export const LANDING_V2_CSS = `
     background: var(--mkt-bg);
     margin-top: 6px;
   }
+
+  /* Demo lead modal stays light even when the app/marketing theme is dark */
+  .medprep-landing-v2 .lp-program .demo-lead-modal,
+  .program-ui .demo-lead-modal {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    color-scheme: light;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .modal-title,
+  .medprep-landing-v2 .lp-program .demo-lead-modal .modal-brand,
+  .program-ui .demo-lead-modal .modal-title,
+  .program-ui .demo-lead-modal .modal-brand {
+    color: #0f172a !important;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .modal-title,
+  .program-ui .demo-lead-modal .modal-title {
+    white-space: nowrap;
+    font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+    line-height: 1.35;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal,
+  .program-ui .demo-lead-modal {
+    max-width: min(560px, calc(100vw - 2rem));
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .modal-close,
+  .program-ui .demo-lead-modal .modal-close {
+    color: #64748b !important;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field,
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field label,
+  .program-ui .demo-lead-modal .field,
+  .program-ui .demo-lead-modal .field label {
+    color: #475569 !important;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field input,
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field select,
+  .program-ui .demo-lead-modal .field input,
+  .program-ui .demo-lead-modal .field select {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #d1d5db !important;
+    color-scheme: light;
+    -webkit-text-fill-color: #0f172a;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field input::placeholder,
+  .program-ui .demo-lead-modal .field input::placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8;
+  }
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field input:focus,
+  .medprep-landing-v2 .lp-program .demo-lead-modal .field select:focus,
+  .program-ui .demo-lead-modal .field input:focus,
+  .program-ui .demo-lead-modal .field select:focus {
+    outline: 2px solid color-mix(in srgb, var(--mkt-accent) 45%, #93c5fd);
+    outline-offset: 1px;
+    border-color: color-mix(in srgb, var(--mkt-accent) 55%, #93c5fd) !important;
+  }
+
   .medprep-landing-v2 .lp-program .required { color: #DC2626; }
   .medprep-landing-v2 .lp-program .brand-mark {
     width: 30px;
     height: 30px;
     border-radius: 8px;
     background: var(--mkt-accent);
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .medprep-landing-v2 .lp-program .brand-mark img {
+    width: 62%;
+    height: 62%;
+    object-fit: contain;
+    display: block;
   }
   .medprep-landing-v2 .nav-link-active { color: var(--mkt-text) !important; font-weight: 600; }
 
@@ -1218,6 +1286,16 @@ export const LANDING_V2_CSS = `
     width: min(calc(100vw - 2rem), 1440px) !important;
     max-width: min(calc(100vw - 2rem), 1440px) !important;
     max-height: 96vh;
+    z-index: 320 !important;
+  }
+
+  body:has(.landing-v2-gallery-dialog) [data-slot="dialog-overlay"] {
+    z-index: 310 !important;
+    background: rgba(0, 0, 0, 0.78) !important;
+  }
+
+  body:has(.landing-v2-gallery-dialog) .landing-v2-lightbox-close {
+    z-index: 330 !important;
   }
 
   .landing-v2-gallery-dialog--nav {
@@ -1254,12 +1332,16 @@ export const LANDING_V2_CSS = `
     -webkit-overflow-scrolling: touch;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .landing-v2-lightbox-scroll img {
     display: block;
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    max-width: min(100%, 1400px);
+    max-height: min(90vh, calc(100vh - 3rem));
     height: auto;
     margin: 0 auto;
     object-fit: contain;

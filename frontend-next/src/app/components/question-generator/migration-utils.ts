@@ -139,6 +139,8 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
         : (oldQuestion.productTagId ? [oldQuestion.productTagId] : oldQuestion.productTagIds || undefined),
       tags: filteredTags, // Return tags without the questionId marker
       questionId: questionId, // Preserve questionId from tags or existing metadata
+      isDemo: Boolean(oldQuestion.isDemo),
+      demoPack: oldQuestion.demoPack || null,
     },
   }
 }
@@ -170,6 +172,8 @@ export function convertNewQuestionToOld(newData: QuestionCreatorData): any {
         : undefined),
     productTagIds: newData.metadata.productTagIds,
     tags: newData.metadata.tags || [],
+    isDemo: Boolean(newData.metadata.isDemo),
+    demoPack: newData.metadata.isDemo ? newData.metadata.demoPack || null : null,
     metadata: {
       questionId: newData.metadata.questionId,
     },

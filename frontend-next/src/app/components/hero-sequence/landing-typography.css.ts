@@ -144,6 +144,12 @@ export const LANDING_TYPOGRAPHY_CSS = `
     text-wrap: balance;
   }
 
+  /* Product pages — wider subtitle so copy sits on ~2–3 lines */
+  .medprep-landing-v2 .hero-cinematic--program .hero-brand-subtitle--center {
+    max-width: min(58rem, 94vw) !important;
+    text-wrap: pretty;
+  }
+
   .medprep-landing-v2 .cine-section-head--left .cine-section-lead {
     text-align: left;
     margin-left: 0;

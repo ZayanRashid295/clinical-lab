@@ -16,6 +16,7 @@ import { ReviewableImage, imageTargetKey } from "./ReviewableImage";
 import { OverallReviewCard } from "./OverallReviewCard";
 import { ReviewableAnswerBreakdown } from "./ReviewableAnswerBreakdown";
 import { useTextSelectionReview } from "./useTextSelectionReview";
+import { ProtectedMcqContent } from "@/app/components/question-generator/ProtectedMcqContent";
 import type { OverallReviewState, ReviewProgress } from "./review-types";
 
 type Props = {
@@ -214,6 +215,7 @@ export function QuestionReviewDocument({
   return (
     <>
       {Toolbar}
+      <ProtectedMcqContent mode="allowSelection">
       <div ref={containerRef} className="space-y-8 pb-8">
         {/* Metadata */}
         <ReviewableBlock
@@ -315,6 +317,7 @@ export function QuestionReviewDocument({
           saving={overallSaving}
         />
       </div>
+      </ProtectedMcqContent>
     </>
   );
 }

@@ -53,6 +53,10 @@ model Question {
   difficulty  String   @default("medium")
   points      Int      @default(1)
   isActive    Boolean  @default(true)
+  /// Marketing sample only — excluded from student QBank / assessments.
+  isDemo      Boolean  @default(false)
+  /// Landing pack slug when isDemo=true (e.g. fcps-medicine-and-allied).
+  demoPack    String?  @db.VarChar(80)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -74,6 +78,8 @@ model Question {
   qaVersions                QuestionQaVersion[]
   qaActivities              QaIssueActivity[]
 
+  @@index([isDemo, isActive])
+  @@index([isDemo, demoPack])
   @@map("questions")
 }
 

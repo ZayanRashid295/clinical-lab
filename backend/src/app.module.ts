@@ -33,6 +33,7 @@ import { InstitutionModule } from "./modules/institution/institution.module";
 import { FacultyModule } from "./modules/faculty/faculty.module";
 import { ActivityLogModule } from "./modules/activity-log/activity-log.module";
 import { QuestionReviewModule } from "./modules/question-review/question-review.module";
+import { MarketingModule } from "./modules/marketing/marketing.module";
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { QuestionReviewModule } from "./modules/question-review/question-review.
     FacultyModule,
     ActivityLogModule,
     QuestionReviewModule,
+    MarketingModule,
   ],
 })
 export class AppModule {}

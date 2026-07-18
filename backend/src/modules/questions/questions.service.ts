@@ -296,7 +296,7 @@ export class QuestionsService {
   }
 
   async getRandomQuestions(filters: RandomQuestionFilters) {
-    const where: any = { isActive: true };
+    const where: any = { isActive: true, isDemo: false };
 
     if (filters.subtopicId) {
       where.subtopicId = filters.subtopicId;
@@ -1611,6 +1611,7 @@ export class QuestionsService {
       // Build where clause
       const where: any = {
         isActive: true,
+        isDemo: false,
       };
 
       // Filter by subtopics (if provided)
@@ -1870,21 +1871,25 @@ export class QuestionsService {
    */
   private async initializeDemoQuestions(): Promise<void> {
     try {
-      // Get the first N active questions (ordered by creation date for consistency)
-      const demoQuestions = await this.prisma.question.findMany({
-        where: {
-          isActive: true,
-        },
-        select: {
-          id: true,
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
+      // Prefer explicitly flagged marketing/demo questions when present.
+      const flagged = await this.prisma.question.findMany({
+        where: { isActive: true, isDemo: true },
+        select: { id: true },
+        orderBy: { createdAt: "asc" },
         take: this.demoQuestionCount,
       });
 
-      this.demoQuestionIds = demoQuestions.map((q) => q.id);
+      if (flagged.length > 0) {
+        this.demoQuestionIds = flagged.map((q) => q.id);
+      } else {
+        const demoQuestions = await this.prisma.question.findMany({
+          where: { isActive: true },
+          select: { id: true },
+          orderBy: { createdAt: "asc" },
+          take: this.demoQuestionCount,
+        });
+        this.demoQuestionIds = demoQuestions.map((q) => q.id);
+      }
 
       if (this.demoQuestionIds.length < this.demoQuestionCount) {
         console.warn(
@@ -1899,7 +1904,6 @@ export class QuestionsService {
       }
     } catch (error) {
       console.error("Error initializing demo questions:", error);
-      // Set to empty array as fallback
       this.demoQuestionIds = [];
     }
   }

@@ -1046,6 +1046,7 @@ export class AssessmentsService {
     // Build where clause for filtering questions
     const questionWhere: any = {
       isActive: true,
+      isDemo: false,
     };
 
     // Filter by topics (if provided)

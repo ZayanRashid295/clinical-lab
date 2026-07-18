@@ -161,7 +161,15 @@ export function normalizeQuestionId(raw: string): string {
 
 export function findQuestionId(paragraphs: string[]): string | null {
   const stemIndex = paragraphs.findIndex((p) => QUESTION_NUM_RE.test(p));
-  const searchEnd = stemIndex >= 0 ? stemIndex : Math.min(paragraphs.length, 20);
+  const answerIndex = paragraphs.findIndex((p) => ANSWER_RE.test(p));
+  // Prefer the stem window (through ANSWER) so multi-question docs and
+  // stems that put "(Question Id: N)" on a continuation line both work.
+  const searchEnd =
+    answerIndex >= 0
+      ? answerIndex
+      : stemIndex >= 0
+        ? Math.min(paragraphs.length, stemIndex + 12)
+        : Math.min(paragraphs.length, 20);
   for (let index = 0; index < searchEnd; index += 1) {
     const match = paragraphs[index].match(QUESTION_ID_RE);
     if (match) return normalizeQuestionId(match[1]);

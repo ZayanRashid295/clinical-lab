@@ -361,13 +361,15 @@ export const HERO_CINEMATIC_CSS = `
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--cine-muted, var(--mkt-text-muted)) !important;
+    color: var(--cine-text, var(--mkt-text)) !important;
+    opacity: 0.88;
     margin-top: 0.35rem;
     line-height: 1.35;
   }
 
   html.dark .hero-cinematic-action-zone .hero-cinematic-stat-label {
-    color: rgba(148, 163, 184, 0.88) !important;
+    color: rgba(226, 232, 240, 0.92) !important;
+    opacity: 1;
   }
 
   .hero-cinematic-cta-glow--center {
@@ -458,7 +460,7 @@ export const HERO_CINEMATIC_CSS = `
   }
 
   .hero-background--program {
-    opacity: 0.9;
+    opacity: 1;
   }
 
   .hero-background-vignette {
@@ -879,7 +881,7 @@ export const HERO_CINEMATIC_CSS = `
   }
 
   .hero-cinematic--program .hero-cinematic-blend-visual--program {
-    opacity: 0.35;
+    opacity: 1;
     z-index: 0;
   }
 
@@ -935,6 +937,7 @@ export const HERO_CINEMATIC_CSS = `
   .hero-cinematic--program .hero-brand-subtitle--center {
     margin: 0 auto 1rem !important;
     padding-top: 0.25rem;
+    max-width: min(58rem, 94vw) !important;
   }
 
   .hero-cinematic--program .hero-cinematic-action-zone {
@@ -964,11 +967,18 @@ export const HERO_CINEMATIC_CSS = `
   .hero-cinematic--program .hero-cinematic-action-zone .hero-cinematic-stat-label {
     text-transform: none !important;
     letter-spacing: 0.01em !important;
-    font-size: 0.6875rem !important;
-    font-weight: 500 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
     line-height: 1.4 !important;
+    color: rgba(241, 245, 249, 0.95) !important;
+    opacity: 1 !important;
     text-wrap: balance;
     hyphens: auto;
+  }
+
+  html:not(.dark) .hero-cinematic--program .hero-cinematic-action-zone .hero-cinematic-stat-label {
+    color: var(--cine-text, var(--mkt-text)) !important;
+    opacity: 0.9 !important;
   }
 
   @media (min-width: 769px) and (max-width: 1100px) {

@@ -111,7 +111,8 @@ export function CinematicHero({
             ) : (
               <div className="hero-cinematic-blend-visual hero-cinematic-blend-visual--program" aria-hidden="true">
                 <HeroBackground
-                  scrollProgress={uiProgress.raw}
+                  /* Keep cards in the early/chaos frame so they stay as visible as the main landing. */
+                  scrollProgress={0.06}
                   reducedMotion={reducedMotion}
                   className="hero-background--program"
                 />

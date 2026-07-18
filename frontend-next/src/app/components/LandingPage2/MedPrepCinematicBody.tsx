@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { CinematicSection } from "../hero-sequence";
-import { CinematicSectionHead, CinematicEditorialLine } from "./cinematic-section-head";
+import { CinematicSectionHead } from "./cinematic-section-head";
+import { CATEGORIES, type ExamTrack } from "./landing-v2-data";
 
 const PILLARS = [
   {
@@ -21,20 +22,6 @@ const PILLARS = [
     title: "Analytics That Show the Gap",
     body: "Live dashboards reveal exactly where you're strong, where you're slipping, and what to tackle before exam day.",
   },
-];
-
-const PLATFORM_FEATURES = [
-  { title: "Deep Question Banks", desc: "Thousands of practice questions at exam-level difficulty — organised by subject and topic." },
-  { title: "Every Option Explained", desc: "See why each answer is right or wrong. No more guessing — just clear reasoning." },
-  { title: "Scenario-Based Learning", desc: "Real-world case scenarios with full option-level breakdowns that build thinking skills." },
-  { title: "Exam-Like Interface", desc: "Practice in an environment that mirrors high-stakes test conditions." },
-  { title: "Performance Analytics", desc: "Track scores, spot weak topics, and watch your progress climb session by session." },
-];
-
-const HIGHLIGHTS = [
-  { kicker: "Interactive Practice", title: "Learn by Doing, Not Cramming", body: "Work through real scenarios with instant feedback — deliberate practice, not a pop quiz you're failing." },
-  { kicker: "Full Transparency", title: "Every Option, Explained In Full", body: "Wrong answers aren't failures — they're untaught lessons. We break down why each choice is right or wrong." },
-  { kicker: "Performance, Visualised", title: "See Exactly Where You Stand", body: "Scores become a clear study plan. Dashboards show subject trends, weak spots, and improvement over time." },
 ];
 
 const STEPS = [
@@ -61,28 +48,58 @@ const FAQ_DATA = [
 export interface MedPrepCinematicBodyProps {
   onStartTrial: () => void;
   onScrollToPlatform: () => void;
+  onNavigateToCategory: (category: ExamTrack) => void;
   isAuthenticated: boolean;
 }
 
 export function MedPrepCinematicBody({
   onStartTrial,
   onScrollToPlatform,
+  onNavigateToCategory,
   isAuthenticated,
 }: MedPrepCinematicBodyProps) {
   const [faqOpen, setFaqOpen] = useState(0);
 
   return (
     <>
-      <CinematicSection id="mission" theme="mission" align="left" ariaLabel="Our mission">
-        <CinematicEditorialLine kicker="Our Mission">
-          Confidence comes from understanding — not from cramming the night before.
-        </CinematicEditorialLine>
+      <CinematicSection id="categories" theme="mission" align="left" ariaLabel="Exam categories">
+        <CinematicSectionHead
+          kicker="Choose Your Path"
+          title={
+            <>
+              Prep Tracks Built for <span>High-Stakes Exams</span>
+            </>
+          }
+          lead="Open a category to explore product suites designed for your exam."
+        />
+        <div className="cine-text-grid cine-text-grid--2">
+          {(Object.keys(CATEGORIES) as ExamTrack[]).map((id) => {
+            const cat = CATEGORIES[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                className="cine-category-pick"
+                onClick={() => onNavigateToCategory(id)}
+              >
+                <span className="cine-category-kicker">Category</span>
+                <h3 className="lp-h3">{cat.label}</h3>
+                <p>{cat.landingBlurb}</p>
+                <span className="cine-category-cta">Explore {cat.label} →</span>
+              </button>
+            );
+          })}
+        </div>
       </CinematicSection>
 
       <CinematicSection id="why-us" theme="distinction" align="left" ariaLabel="What sets MedPrepAI apart">
         <CinematicSectionHead
           kicker="Our Distinction"
-          title={<>What Sets <span>MedPrepAI</span> Apart</>}
+          title={
+            <>
+              What Sets <span>MedPrepAI</span> Apart
+            </>
+          }
           lead="Four reasons learners switch — and stay."
         />
         <div className="cine-text-grid cine-text-grid--2">
@@ -93,40 +110,16 @@ export function MedPrepCinematicBody({
             </article>
           ))}
         </div>
-        <CinematicEditorialLine kicker="Collaborative By Design" nowrap>
-          One shared view of progress — so coaching is grounded in data, not guesswork.
-        </CinematicEditorialLine>
-      </CinematicSection>
-
-      <CinematicSection id="platform" theme="platform" align="left" ariaLabel="The MedPrepAI platform">
-        <CinematicSectionHead
-          kicker="The Platform"
-          title={<>Everything You Need to <span>Prepare With Clarity</span></>}
-          lead="One platform for serious learners — question banks, explanations, and analytics in a single, focused workflow."
-        />
-        <div className="cine-text-grid cine-text-grid--2">
-          {PLATFORM_FEATURES.map(({ title, desc }) => (
-            <article key={title} className="cine-text-block cine-text-block--feature">
-              <h4 className="lp-h4">{title}</h4>
-              <p>{desc}</p>
-            </article>
-          ))}
-        </div>
-        <div className="cine-text-grid cine-text-grid--3 cine-text-grid--spaced">
-          {HIGHLIGHTS.map(({ kicker, title, body }) => (
-            <article key={title} className="cine-text-block">
-              <span className="cine-highlight-kicker">{kicker}</span>
-              <h3 className="lp-h3">{title}</h3>
-              <p>{body}</p>
-            </article>
-          ))}
-        </div>
       </CinematicSection>
 
       <CinematicSection id="how-it-works" theme="workflow" align="left" ariaLabel="How MedPrepAI works">
         <CinematicSectionHead
           kicker="Preparation Workflow"
-          title={<>How <span>MedPrepAI</span> Works</>}
+          title={
+            <>
+              How <span>MedPrepAI</span> Works
+            </>
+          }
           lead="Four steps from sign-up to exam-day confidence."
         />
         <div className="cine-text-grid cine-text-grid--4">
@@ -144,7 +137,7 @@ export function MedPrepCinematicBody({
         <CinematicSectionHead
           kicker="Testimonials"
           title="Trusted by Serious Learners"
-          lead="Real results from people who stopped guessing and started understanding."
+          lead="Real results from people who stopped guessing and started comprehending."
         />
         <div className="cine-text-grid cine-text-grid--3">
           {TESTIMONIALS.map(({ text, name, role }) => (
@@ -169,7 +162,7 @@ export function MedPrepCinematicBody({
             {isAuthenticated ? "Open question bank" : "Start Free Today"}
           </button>
           <button type="button" className="hero-btn-ghost" onClick={onScrollToPlatform}>
-            Explore the Platform
+            Explore what sets us apart
           </button>
         </div>
       </CinematicSection>
@@ -177,7 +170,11 @@ export function MedPrepCinematicBody({
       <CinematicSection id="faq" theme="faq" align="left" ariaLabel="Frequently asked questions">
         <CinematicSectionHead
           kicker="Frequently Asked Questions"
-          title={<>Common <span>Questions</span></>}
+          title={
+            <>
+              Common <span>Questions</span>
+            </>
+          }
           lead="Answers to the questions learners ask most before they start preparing."
         />
         <div className="cine-faq-list">

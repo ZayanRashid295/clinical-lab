@@ -159,3 +159,7 @@ temp/
 
 # Prisma
 #/prisma/migrations
+
+# Question-builder / demo seed temp output
+tmp-demo-convert/
+tmp-fcps-demo-convert/

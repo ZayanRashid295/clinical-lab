@@ -1533,7 +1533,44 @@ export default function QuestionEditor({
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 mr-2 rounded-lg border border-border/60 dark:border-gray-700 px-2.5 py-1.5 bg-card/40">
+              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  className="rounded border-border"
+                  checked={Boolean(metadata.isDemo)}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    setMetadata((prev) => ({
+                      ...prev,
+                      isDemo: checked,
+                      demoPack: checked
+                        ? prev.demoPack || "fcps-medicine-and-allied"
+                        : null,
+                    }))
+                  }}
+                />
+                Demo question
+              </label>
+              {metadata.isDemo ? (
+                <select
+                  className="h-8 text-xs rounded-md border border-border bg-background px-2"
+                  value={metadata.demoPack || "fcps-medicine-and-allied"}
+                  onChange={(e) =>
+                    setMetadata((prev) => ({ ...prev, demoPack: e.target.value }))
+                  }
+                  title="Landing pack this demo is shown for"
+                >
+                  <option value="fcps-medicine-and-allied">
+                    FCPS-1 · Medicine and Allied
+                  </option>
+                  <option value="jcat-medicine-and-allied">
+                    JCAT (MDMS) · Medicine and Allied
+                  </option>
+                </select>
+              ) : null}
+            </div>
             <Button variant="outline" onClick={onCancel} disabled={isSaveBusy}>
               Cancel
             </Button>

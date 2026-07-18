@@ -40,6 +40,8 @@ function CinematicResourceCard({
   const imgParallaxX = lift ? (parallax.pointerX - 50) * 0.12 : 0;
   const imgParallaxY = lift ? (parallax.pointerY - 50) * 0.1 : 0;
 
+  const openLightbox = () => setLightboxOpen(true);
+
   return (
     <>
       <motion.div
@@ -86,10 +88,15 @@ function CinematicResourceCard({
                     "0 1px 0 color-mix(in srgb, #ffffff 12%, transparent) inset, 0 18px 40px -20px rgba(0,0,0,0.35)",
                 }
           }
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="cine-resource-card__spotlight" aria-hidden />
-          <div className="cine-resource-card__media">
+          <button
+            type="button"
+            className="cine-resource-card__media"
+            aria-label={`Enlarge image: ${item.alt}`}
+            onClick={openLightbox}
+          >
             <motion.div
               className="cine-resource-card__media-inner"
               animate={
@@ -103,21 +110,13 @@ function CinematicResourceCard({
               }
               transition={SPRING}
             >
-              <img src={item.img} alt={item.alt} draggable={false} />
+              <img src={item.img} alt="" draggable={false} />
             </motion.div>
             <span className="cine-resource-card__sheen" aria-hidden />
-            <button
-              type="button"
-              className="cine-resource-card__zoom"
-              aria-label={`Enlarge image: ${item.alt}`}
-              onClick={(event) => {
-                event.stopPropagation();
-                setLightboxOpen(true);
-              }}
-            >
+            <span className="cine-resource-card__zoom" aria-hidden>
               <ProgramIcon name="zoom" size={15} />
-            </button>
-          </div>
+            </span>
+          </button>
           <div className="cine-resource-card__body">
             <h3 className="lp-h3">{item.title}</h3>
             <p>{item.desc}</p>

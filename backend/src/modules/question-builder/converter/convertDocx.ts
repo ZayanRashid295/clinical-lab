@@ -527,10 +527,19 @@ function parseMetadata(paragraphs: string[], startIndex: number, endIndex: numbe
   return metadata;
 }
 
-async function parseDocxFromBuffer(
-  buffer: Buffer,
-): Promise<{ questionData: QuestionData; diagramImageCount: number }> {
-  const entries = await extractParagraphEntriesFromBuffer(buffer);
+function findQuestionStemStarts(paragraphs: string[]): number[] {
+  const starts: number[] = [];
+  for (let index = 0; index < paragraphs.length; index += 1) {
+    if (QUESTION_NUM_RE.test(paragraphs[index])) starts.push(index);
+  }
+  return starts;
+}
+
+function parseQuestionFromEntries(
+  entries: FormattedParagraphEntry[],
+  bodyBlocks: BodyBlock[],
+  paragraphOffset: number,
+): { questionData: QuestionData; diagramImageCount: number } {
   const paragraphs = entries.map((entry) => entry.formatted.text);
   const question = parseQuestionBlock(entries);
 
@@ -567,13 +576,17 @@ async function parseDocxFromBuffer(
     metadata = parseMetadata(paragraphs, metadataStart, metadataEnd);
   }
 
-  const { documentXml, numberingXml } = await readDocxPartsFromBuffer(buffer);
-  const bodyBlocks = collectOrderedBodyBlocks(documentXml, numberingXml);
-  const metadataSearchFrom = blockIndexForParagraphOrder(bodyBlocks, firstKeyConceptIndex);
+  const absoluteKeyConceptIndex = paragraphOffset + firstKeyConceptIndex;
+  const metadataSearchFrom = blockIndexForParagraphOrder(bodyBlocks, absoluteKeyConceptIndex);
   const metadataBlockRange = findMetadataBlockRange(bodyBlocks, metadataSearchFrom);
+  const rangeEndAbs = paragraphOffset + entries.length;
+  const rangeEndBlockIndex = blockIndexForParagraphOrder(bodyBlocks, Math.max(0, rangeEndAbs - 1)) + 1;
   const contentEndBlockIndex = metadataBlockRange
-    ? findBlockContentEnd(bodyBlocks, question.questionId, metadataBlockRange.end)
-    : bodyBlocks.length;
+    ? Math.min(
+        findBlockContentEnd(bodyBlocks, question.questionId, metadataBlockRange.end),
+        rangeEndBlockIndex || bodyBlocks.length,
+      )
+    : rangeEndBlockIndex || bodyBlocks.length;
   const supplemental = parseSupplementalContentFromBlocks(
     bodyBlocks,
     contentEndBlockIndex,
@@ -616,6 +629,104 @@ async function parseDocxFromBuffer(
   }
 
   return { questionData: result, diagramImageCount };
+}
+
+async function parseDocxFromBuffer(
+  buffer: Buffer,
+): Promise<{ questionData: QuestionData; diagramImageCount: number }> {
+  const entries = await extractParagraphEntriesFromBuffer(buffer);
+  const { documentXml, numberingXml } = await readDocxPartsFromBuffer(buffer);
+  const bodyBlocks = collectOrderedBodyBlocks(documentXml, numberingXml);
+  return parseQuestionFromEntries(entries, bodyBlocks, 0);
+}
+
+/**
+ * Parse a DOCX that contains multiple MCQs (Q 01…Q 10) using the same
+ * question-builder rules as single-question files.
+ */
+export async function convertMultiQuestionDocxFromBuffer(
+  buffer: Buffer,
+  outputDir: string,
+): Promise<Array<{ questionId: string; questionData: QuestionData; success: boolean; error?: string }>> {
+  await mkdir(outputDir, { recursive: true });
+  const entries = await extractParagraphEntriesFromBuffer(buffer);
+  const paragraphs = entries.map((entry) => entry.formatted.text);
+  const stemStarts = findQuestionStemStarts(paragraphs);
+  if (!stemStarts.length) {
+    throw new Error("No question stems found (expected Q 01:, Q 02:, …)");
+  }
+
+  const { documentXml, numberingXml } = await readDocxPartsFromBuffer(buffer);
+  const bodyBlocks = collectOrderedBodyBlocks(documentXml, numberingXml);
+  const allImages = await extractImagesFromBuffer(
+    buffer,
+    path.join(outputDir, "_shared-media"),
+  );
+  let imageCursor = 0;
+
+  const results: Array<{
+    questionId: string;
+    questionData: QuestionData;
+    success: boolean;
+    error?: string;
+  }> = [];
+
+  for (let i = 0; i < stemStarts.length; i += 1) {
+    const rangeStart = stemStarts[i];
+    const rangeEnd = i + 1 < stemStarts.length ? stemStarts[i + 1] : entries.length;
+    const slice = entries.slice(rangeStart, rangeEnd);
+    try {
+      const { questionData, diagramImageCount } = parseQuestionFromEntries(
+        slice,
+        bodyBlocks,
+        rangeStart,
+      );
+      const questionDir = path.join(outputDir, questionData.questionId);
+      const imagesDir = path.join(questionDir, "images");
+      await mkdir(imagesDir, { recursive: true });
+
+      const take = Math.max(0, diagramImageCount || 0);
+      const assigned = allImages.slice(imageCursor, imageCursor + take);
+      imageCursor += take;
+      if (assigned.length) {
+        // Copy shared extract into per-question folder paths expected by attachDiagramImages.
+        const localImages: ImageRef[] = [];
+        for (const [idx, img] of assigned.entries()) {
+          const targetName = `image${idx + 1}${path.extname(img.filename) || ".bin"}`;
+          const targetPath = path.join(imagesDir, targetName);
+          const sourcePath = path.join(outputDir, "_shared-media", img.filename);
+          const { copyFile } = await import("node:fs/promises");
+          await copyFile(sourcePath, targetPath);
+          localImages.push({
+            filename: targetName,
+            path: `images/${targetName}`,
+            sourceName: img.sourceName,
+          });
+        }
+        await attachDiagramImages(questionData, localImages);
+      }
+
+      await writeFile(
+        path.join(questionDir, "question.json"),
+        `${JSON.stringify(questionData, null, 2)}\n`,
+        "utf-8",
+      );
+      results.push({
+        questionId: questionData.questionId,
+        questionData,
+        success: true,
+      });
+    } catch (error) {
+      results.push({
+        questionId: `q-${i + 1}`,
+        questionData: {} as QuestionData,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  return results;
 }
 
 async function attachDiagramImages(

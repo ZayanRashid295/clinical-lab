@@ -1,0 +1,18 @@
+// Marketing lead capture for landing-page sample / demo packs.
+
+model MarketingDemoLead {
+  id             String   @id @default(cuid())
+  email          String   @db.VarChar(320)
+  firstName      String   @db.VarChar(120)
+  lastName       String   @db.VarChar(120)
+  graduatingYear String?  @db.VarChar(40)
+  country        String?  @db.VarChar(120)
+  pack           String   @db.VarChar(80)
+  ipHash         String?  @db.VarChar(64)
+  userAgent      String?  @db.VarChar(512)
+  createdAt      DateTime @default(now())
+
+  @@index([email, pack])
+  @@index([createdAt])
+  @@map("marketing_demo_leads")
+}

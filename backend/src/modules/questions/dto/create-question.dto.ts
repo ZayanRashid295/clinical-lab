@@ -118,6 +118,26 @@ export class CreateQuestionDto {
   @IsBoolean()
   isActive?: boolean;
 
+  @ApiProperty({
+    description: "Marketing sample / demo question flag",
+    example: false,
+    default: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isDemo?: boolean;
+
+  @ApiProperty({
+    description:
+      "Landing demo pack when isDemo is true (fcps-medicine-and-allied or jcat-medicine-and-allied)",
+    example: "fcps-medicine-and-allied",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  demoPack?: string;
+
   // New optional metadata fields for question-generator
   @ApiProperty({
     description: "Subject for categorization (e.g., Pathology) - display name from Product",

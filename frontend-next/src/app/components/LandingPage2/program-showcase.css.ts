@@ -295,11 +295,26 @@ export const PROGRAM_SHOWCASE_CSS = `
 
   .cine-resource-card__media {
     position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
     overflow: hidden;
     border-radius: 16px 16px 0 0;
     aspect-ratio: 4 / 3;
     background: var(--mkt-bg-muted);
     transform-style: preserve-3d;
+    cursor: zoom-in;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+  }
+
+  .cine-resource-card__media:focus-visible {
+    outline: 2px solid var(--mkt-accent);
+    outline-offset: -2px;
   }
 
   .cine-resource-card__media-inner {
@@ -352,13 +367,16 @@ export const PROGRAM_SHOWCASE_CSS = `
     background: color-mix(in srgb, var(--mkt-bg) 78%, transparent);
     border: 1px solid var(--mkt-border);
     color: var(--mkt-text-muted);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    cursor: pointer;
+    opacity: 0.85;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
   }
 
-  .cine-resource-card--hovered .cine-resource-card__zoom {
+  .cine-resource-card--hovered .cine-resource-card__zoom,
+  .cine-resource-card__media:focus-visible .cine-resource-card__zoom {
     opacity: 1;
+    transform: scale(1.05);
+    background: color-mix(in srgb, var(--mkt-bg) 90%, transparent);
   }
 
   .cine-resource-card__body {

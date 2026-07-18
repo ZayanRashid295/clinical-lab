@@ -4,8 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { authService } from "@/shared";
 import { routeAfterLogin } from "@/lib/auth/post-login-route";
-import type { ExamTrack } from "./landing-v2-data";
+import {
+  categoryPath,
+  productPath,
+  type ExamProduct,
+  type ExamTrack,
+} from "./landing-v2-data";
 import type { MedPrepLandingActions } from "./MedPrepAILanding";
+import type { ProgramUiActions } from "./ProgramUiLanding";
 import type { ProgramBrandActions } from "./ProgramBrandLanding";
 
 export function useLandingV2Actions() {
@@ -35,9 +41,16 @@ export function useLandingV2Actions() {
     void router.push(dest);
   }, [router]);
 
+  const navigateToCategory = useCallback(
+    (category: ExamTrack) => {
+      void router.push(categoryPath(category));
+    },
+    [router],
+  );
+
   const navigateToProgram = useCallback(
-    (program: ExamTrack) => {
-      void router.push(`/landing-page/${program}`);
+    (program: ExamTrack, product: ExamProduct = "medicine-and-allied") => {
+      void router.push(productPath(program, product));
     },
     [router],
   );
@@ -68,10 +81,27 @@ export function useLandingV2Actions() {
         else goToAuth({ mode: "signup" });
       },
       onNavigateToProgram: navigateToProgram,
+      onNavigateToCategory: navigateToCategory,
     }),
-    [goToAuth, isAuthenticated, navigateToProgram, openApp],
+    [goToAuth, isAuthenticated, navigateToCategory, navigateToProgram, openApp],
   );
 
+  /** Actions for new clinical category pages (ui/ design). */
+  const programUiActions = useCallback(
+    (): ProgramUiActions => ({
+      isAuthenticated,
+      primaryCtaLabel: isAuthenticated ? "Go to dashboard" : "Sign in",
+      onLogin: () => {
+        if (isAuthenticated) openApp();
+        else goToAuth();
+      },
+      onNavigateToProgram: navigateToProgram,
+      onBeginPrep: beginPrep,
+    }),
+    [beginPrep, goToAuth, isAuthenticated, navigateToProgram, openApp],
+  );
+
+  /** Actions for Medicine and Allied cinematic product pages. */
   const programActions = useCallback(
     (): ProgramBrandActions => ({
       isAuthenticated,
@@ -86,5 +116,5 @@ export function useLandingV2Actions() {
     [beginPrep, goToAuth, isAuthenticated, navigateToProgram, openApp],
   );
 
-  return { homeActions, programActions };
+  return { homeActions, programUiActions, programActions };
 }

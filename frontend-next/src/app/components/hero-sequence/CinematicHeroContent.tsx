@@ -9,7 +9,7 @@ export interface CinematicHeroStat {
 }
 
 export interface CinematicHeroContentProps {
-  kicker: string;
+  kicker?: string;
   title: ReactNode;
   subtitle: string;
   primaryCta: { label: string; onClick: () => void };
@@ -35,12 +35,14 @@ export function CinematicHeroContent({
 }: CinematicHeroContentProps) {
   return (
     <CinematicContent3D className="hero-content-3d hero-content-3d--center" depth={0.45}>
-      <CinematicDepthLayer z={20}>
-        <span className="hero-brand-kicker hero-brand-kicker--center">
-          <span className="hero-brand-kicker-dot" aria-hidden />
-          {kicker}
-        </span>
-      </CinematicDepthLayer>
+      {kicker ? (
+        <CinematicDepthLayer z={20}>
+          <span className="hero-brand-kicker hero-brand-kicker--center">
+            <span className="hero-brand-kicker-dot" aria-hidden />
+            {kicker}
+          </span>
+        </CinematicDepthLayer>
+      ) : null}
 
       <CinematicDepthLayer z={100} className="hero-cinematic-title-zone">
         <h1 className="hero-brand-title hero-brand-title--center lp-h1">{title}</h1>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DemoModal } from "./landing-v2-program-ui";
-import { PROGRAMS, type ExamTrack } from "./landing-v2-data";
+import { MEDICINE_PRODUCT_COPY, PROGRAMS, type ExamTrack } from "./landing-v2-data";
 import { LandingV2Chrome, type LandingV2ChromeActions } from "./landing-v2-chrome";
 import { ProgramCinematicBody } from "./ProgramCinematicBody";
 import {
@@ -11,6 +11,7 @@ import {
   Monitor3DScene,
 } from "../hero-sequence";
 import { PROGRAM_HERO_SCREEN } from "./monitor-mockup";
+import { demoPackForTrack } from "./landing-demo-lead";
 
 export interface ProgramBrandActions extends LandingV2ChromeActions {
   onBeginPrep: () => void;
@@ -25,23 +26,18 @@ export function ProgramBrandLanding({
 }) {
   const [demoOpen, setDemoOpen] = useState(false);
   const p = PROGRAMS[track];
+  const copy = MEDICINE_PRODUCT_COPY[track];
 
-  const beginLabel = track === "fcps" ? "Begin FCPS-1 Preparation" : "Begin JCAT (MDMS) Preparation";
-  const pageTitle =
-    track === "fcps" ? (
-      <>
-        FCPS-1
-        <br />
-        preparation
-      </>
-    ) : (
-      <>
-        JCAT (MDMS)
-        <br />
-        preparation
-      </>
-    );
-  const otherTrack = track === "fcps" ? "JCAT (MDMS)" : "FCPS-1";
+  const beginLabel = "Begin Medicine and Allied Preparation";
+  const pageTitle = (
+    <>
+      Medicine and Allied
+      <br />
+      preparation
+    </>
+  );
+  const otherTrackLabel =
+    track === "fcps" ? "Medicine and Allied under JCAT (MDMS)" : "Medicine and Allied under FCPS-1";
 
   return (
     <LandingV2Chrome
@@ -52,50 +48,55 @@ export function ProgramBrandLanding({
       footerBottomNote="Trusted for FCPS-1 & JCAT Preparation · Pakistan"
     >
       <div className="lp-program">
-      {demoOpen && (
-        <DemoModal
-          badge={p.badge}
-          onClose={() => setDemoOpen(false)}
-          onSubmit={actions.onBeginPrep}
-        />
-      )}
+        {demoOpen && (
+          <DemoModal
+            badge="Medicine and Allied"
+            pack={demoPackForTrack(track)}
+            onClose={() => setDemoOpen(false)}
+            onUnlocked={(result) => {
+              void window.location.assign(result.samplePath);
+            }}
+          />
+        )}
 
-      <CinematicHero
-        layout="program"
-        sectionId={track === "fcps" ? "fcps" : "jcat"}
-        ariaLabel={`${p.badge} exam preparation`}
-      >
-        <CinematicHeroContent
-          kicker={`${p.badge} · Medicine & Allied`}
-          title={pageTitle}
-          subtitle={p.heroSubtitle}
-          blendedVisual={
-            <Monitor3DScene
-              straight
-              zoomable
-              screenSrc={PROGRAM_HERO_SCREEN}
-              alt={`${p.badge} question bank on desktop monitor`}
-            />
-          }
-          primaryCta={{ label: beginLabel, onClick: actions.onBeginPrep }}
-          secondaryCta={{
-            label: "View sample questions",
-            onClick: () => setDemoOpen(true),
-          }}
-          stats={p.stats.map((s) => ({ num: s.num, label: s.label }))}
-        />
-      </CinematicHero>
+        <CinematicHero
+          layout="program"
+          sectionId={track === "fcps" ? "fcps" : "jcat"}
+          ariaLabel="Medicine and Allied exam preparation"
+        >
+          <CinematicHeroContent
+            kicker={track === "fcps" ? "FCPS-1 product" : "JCAT (MDMS) product"}
+            title={pageTitle}
+            subtitle={copy.heroSubtitle}
+            blendedVisual={
+              <Monitor3DScene
+                straight
+                zoomable
+                screenSrc={PROGRAM_HERO_SCREEN}
+                alt="Medicine and Allied question bank on desktop monitor"
+              />
+            }
+            primaryCta={{ label: beginLabel, onClick: actions.onBeginPrep }}
+            secondaryCta={{
+              label: "View sample questions",
+              onClick: () => setDemoOpen(true),
+            }}
+            stats={p.stats.map((s) => ({ num: s.num, label: s.label }))}
+          />
+        </CinematicHero>
 
-      <div className="landing-content-bridge lp-cinematic-body">
-        <ProgramCinematicBody
-          track={track}
-          onBeginPrep={actions.onBeginPrep}
-          onOpenDemo={() => setDemoOpen(true)}
-          onExploreOther={() => actions.onNavigateToProgram(track === "fcps" ? "jcat" : "fcps")}
-          otherTrackLabel={otherTrack}
-        />
+        <div className="landing-content-bridge lp-cinematic-body">
+          <ProgramCinematicBody
+            track={track}
+            onBeginPrep={actions.onBeginPrep}
+            onOpenDemo={() => setDemoOpen(true)}
+            onExploreOther={() =>
+              actions.onNavigateToProgram(track === "fcps" ? "jcat" : "fcps", "medicine-and-allied")
+            }
+            otherTrackLabel={otherTrackLabel}
+          />
+        </div>
       </div>
-    </div>
     </LandingV2Chrome>
   );
 }

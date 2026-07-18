@@ -6,8 +6,7 @@ import { CinematicSectionHead } from "./cinematic-section-head";
 import { CinematicQBankCarousel } from "./CinematicQBankCarousel";
 import { CinematicResourceGrid } from "./CinematicResourceGrid";
 import {
-  PROGRAMS,
-  PROGRAM_FAQS,
+  MEDICINE_PRODUCT_COPY,
   PROGRAM_QBANK_CAROUSEL,
   PROGRAM_RESOURCE_IMAGES_BY_INDEX,
   PROGRAM_TESTIMONIALS,
@@ -36,19 +35,17 @@ export function ProgramCinematicBody({
   onExploreOther,
   otherTrackLabel,
 }: ProgramCinematicBodyProps) {
-  const p = PROGRAMS[track];
-  const faqEyebrow = track === "fcps" ? "FCPS-1 FAQ" : "JCAT (MDMS) FAQ";
-  const testimonialHeading =
-    track === "fcps" ? "What FCPS-1 candidates say" : "What JCAT (MDMS) candidates say";
-  const beginLabel =
-    track === "fcps" ? "Begin FCPS-1 Preparation" : "Begin JCAT (MDMS) Preparation";
+  const copy = MEDICINE_PRODUCT_COPY[track];
+  const faqEyebrow = "Medicine and Allied FAQ";
+  const testimonialHeading = "What Medicine and Allied candidates say";
+  const beginLabel = "Begin Medicine and Allied Preparation";
   const [faqOpen, setFaqOpen] = useState(0);
 
   const testimonials = PROGRAM_TESTIMONIALS[track].slice(0, 3);
 
   const resourceItems = useMemo(
     () =>
-      p.resources.map((item, index) => ({
+      copy.resources.map((item, index) => ({
         title: item.title,
         desc: item.desc,
         img:
@@ -56,7 +53,7 @@ export function ProgramCinematicBody({
           PROGRAM_RESOURCE_IMAGES_BY_INDEX[0]!,
         alt: item.title,
       })),
-    [p.resources],
+    [copy.resources],
   );
 
   return (
@@ -64,8 +61,8 @@ export function ProgramCinematicBody({
       <CinematicSection id="qbank" theme="platform" align="left" ariaLabel="Question bank overview">
         <CinematicSectionHead
           kicker="Inside The Question Bank"
-          title={p.qbankHeading}
-          lead={p.qbankText}
+          title={copy.qbankHeading}
+          lead={copy.qbankText}
         />
         <div className="cine-program-media">
           <CinematicQBankCarousel images={[...PROGRAM_QBANK_CAROUSEL]} />
@@ -75,27 +72,11 @@ export function ProgramCinematicBody({
       <CinematicSection theme="distinction" align="left" ariaLabel="Study resources">
         <CinematicSectionHead
           kicker="Study Resources"
-          title={p.resourcesHeading}
-          lead={p.resourcesText}
+          title={copy.resourcesHeading}
+          lead="Fill in knowledge gaps and sharpen your clinical reasoning as you build toward exam day."
         />
         <div className="cine-program-media">
           <CinematicResourceGrid items={resourceItems} />
-        </div>
-      </CinematicSection>
-
-      <CinematicSection theme="platform" align="left" ariaLabel="Built into every question">
-        <CinematicSectionHead
-          kicker="Built Into Every Question"
-          title="What you get with each item"
-          lead="Every MCQ is designed to build reasoning — not memorisation."
-        />
-        <div className="cine-text-grid cine-text-grid--2">
-          {p.cards.map(({ title, desc }) => (
-            <article key={title} className="cine-text-block cine-text-block--feature">
-              <h4 className="lp-h4">{title}</h4>
-              <p>{desc}</p>
-            </article>
-          ))}
         </div>
       </CinematicSection>
 
@@ -133,7 +114,7 @@ export function ProgramCinematicBody({
         <CinematicSectionHead
           align="center"
           kicker="Start Preparing"
-          title={track === "fcps" ? "FCPS-1 question bank" : "JCAT (MDMS) question bank"}
+          title="Medicine and Allied question bank"
           lead="Full explanations for every option."
         />
         <div className="cine-cta-row">
@@ -149,7 +130,7 @@ export function ProgramCinematicBody({
       <CinematicSection id="faq" theme="faq" align="left" ariaLabel="FAQ">
         <CinematicSectionHead kicker={faqEyebrow} title="Common questions" />
         <div className="cine-faq-list">
-          {PROGRAM_FAQS[track].map((item, i) => (
+          {copy.faqs.map((item, i) => (
             <div key={item.q} className="cine-faq-item">
               <button
                 type="button"

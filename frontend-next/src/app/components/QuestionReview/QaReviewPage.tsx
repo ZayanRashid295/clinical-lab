@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -37,6 +37,8 @@ import {
   Eye,
 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
+import { ThemeService } from "@/app/config/theme.service";
+import { UIConfigService } from "@/app/config/ui.config";
 
 type Props = { slug: string };
 
@@ -267,17 +269,43 @@ export default function QaReviewPage({ slug }: Props) {
   const [annotationSaving, setAnnotationSaving] = useState(false);
   const [overallSaving, setOverallSaving] = useState(false);
 
-  /** Reviewer UAT pages stay light regardless of site theme. */
-  useEffect(() => {
+  /**
+   * Reviewer pages are light-only. UIConfig/ThemeService may re-add `dark` after mount,
+   * so keep stripping it and pin light app tokens for the session.
+   */
+  useLayoutEffect(() => {
     const root = document.documentElement;
-    const hadDark = root.classList.contains("dark");
-    root.classList.remove("dark");
-    root.classList.add("light");
-    root.style.colorScheme = "light";
+
+    const forceLight = () => {
+      if (root.classList.contains("dark")) {
+        root.classList.remove("dark");
+      }
+      root.classList.add("light");
+      root.style.colorScheme = "light";
+      root.style.setProperty("--app-bg", "#f4f4f5");
+      root.style.setProperty("--app-surface", "#ffffff");
+      root.style.setProperty("--app-elevated", "#fafafa");
+      root.style.setProperty("--app-text", "#18181b");
+      root.style.setProperty("--app-muted", "#71717a");
+      root.style.setProperty("--app-border", "#e4e4e7");
+    };
+
+    forceLight();
+
+    const observer = new MutationObserver(() => {
+      if (root.classList.contains("dark")) {
+        forceLight();
+      }
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
     return () => {
+      observer.disconnect();
       root.classList.remove("light");
       root.style.colorScheme = "";
-      if (hadDark) root.classList.add("dark");
+      ThemeService.getInstance().applyTheme(
+        UIConfigService.getInstance().getConfig(),
+      );
     };
   }, []);
 
@@ -604,7 +632,11 @@ export default function QaReviewPage({ slug }: Props) {
         <title>{bundle?.title ?? "MCQ Content Review"}</title>
       </Head>
 
-      <div className="qa-review-root min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
+      <div
+        className="qa-review-root min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col"
+        style={{ colorScheme: "light", color: "#0f172a", background: "#f8fafc" }}
+        data-theme="light"
+      >
         <header className="border-b border-slate-200 bg-white sticky top-0 z-20 px-4 py-3.5">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">

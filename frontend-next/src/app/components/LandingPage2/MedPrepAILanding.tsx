@@ -3,7 +3,7 @@
 import { LandingV2Chrome } from "./landing-v2-chrome";
 import { CinematicHero, CinematicHeroContent, useLenis } from "../hero-sequence";
 import { MedPrepCinematicBody } from "./MedPrepCinematicBody";
-import type { ExamTrack } from "./landing-v2-data";
+import type { ExamProduct, ExamTrack } from "./landing-v2-data";
 
 export type { ExamTrack };
 
@@ -11,7 +11,8 @@ export interface MedPrepLandingActions {
   onLogin: () => void;
   onSignup: () => void;
   onStartTrial: () => void;
-  onNavigateToProgram: (program: ExamTrack) => void;
+  onNavigateToProgram: (program: ExamTrack, product?: ExamProduct) => void;
+  onNavigateToCategory: (category: ExamTrack) => void;
   isAuthenticated: boolean;
   primaryCtaLabel: string;
   loginLabel: string;
@@ -37,9 +38,8 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
           kicker="MedPrepAI"
           title="We Make Complex Stuff Easier to Understand."
           subtitle="Learning Tools Designed for High-Stakes Exams"
-          punchlines={["Every option explained", "Zero guesswork", "Exam-day ready"]}
           primaryCta={{
-            label: actions.isAuthenticated ? "Go to dashboard" : "Start free — no card required",
+            label: actions.isAuthenticated ? "Go to dashboard" : "Start free",
             onClick: actions.onStartTrial,
           }}
           secondaryCta={{
@@ -58,7 +58,8 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
       <div className="landing-content-bridge lp-cinematic-body">
         <MedPrepCinematicBody
           onStartTrial={actions.onStartTrial}
-          onScrollToPlatform={() => scrollTo("platform")}
+          onScrollToPlatform={() => scrollTo("why-us")}
+          onNavigateToCategory={actions.onNavigateToCategory}
           isAuthenticated={actions.isAuthenticated}
         />
       </div>

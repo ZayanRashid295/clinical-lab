@@ -17,6 +17,7 @@ import {
 } from "@/shared/ui/alert-dialog"
 import QuestionPanel from "./question-panel"
 import ExplanationPanel from "./explanation-panel"
+import { ProtectedMcqContent } from "./ProtectedMcqContent"
 import { QuestionsService } from "@/app/services/questions/questions.service"
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service"
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service"
@@ -1836,6 +1837,7 @@ export default function StudentQuestionView() {
       {UpgradeModal}
 
       <div className="flex-1 min-h-0 overflow-hidden" data-testid="student-question-content">
+        <ProtectedMcqContent className="h-full min-h-0" mode="strict">
         <div className="h-full min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2 p-2 lg:p-3" data-testid="student-question-grid">
           {/* Left column - Questions */}
           <div className="lg:col-span-2 flex flex-col overflow-hidden min-h-0" data-testid="student-question-left">
@@ -1924,6 +1926,7 @@ export default function StudentQuestionView() {
             )}
           </div>
         </div>
+        </ProtectedMcqContent>
       </div>
     </div>
   )

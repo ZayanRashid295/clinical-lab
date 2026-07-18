@@ -1,6 +1,7 @@
 "use client";
 
 import { MedPrepAILanding } from "./MedPrepAILanding";
+import { ProgramUiLanding } from "./ProgramUiLanding";
 import { ProgramBrandLanding } from "./ProgramBrandLanding";
 import type { ExamTrack } from "./landing-v2-data";
 import { useLandingV2Actions } from "./use-landing-v2-actions";
@@ -19,6 +20,14 @@ export function LandingPage2() {
   );
 }
 
+/** Category hubs opened from landing category cards — new clinical UI. */
+export function LandingPage2Category({ category }: { category: ExamTrack }) {
+  const { programUiActions } = useLandingV2Actions();
+
+  return <ProgramUiLanding track={category} actions={programUiActions()} />;
+}
+
+/** Medicine and Allied product pages — earlier cinematic product landing. */
 export function LandingPage2Program({ track }: { track: ExamTrack }) {
   const { programActions } = useLandingV2Actions();
 

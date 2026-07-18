@@ -25,6 +25,7 @@ import {
   subscriptionGateFromApiError,
 } from "@/app/services/base/api-http-error";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { ProtectedMcqContent } from "@/app/components/question-generator/ProtectedMcqContent";
 import { QuestionPapersService } from "@/app/services/assessments/question-papers.service";
 import { QuestionPaperQuestionsService } from "@/app/services/assessments/question-paper-questions.service";
 import { QuestionsService } from "@/app/services/questions/questions.service";
@@ -675,6 +676,7 @@ export default function TestSessionPage() {
             </CardContent>
           </Card>
         ) : currentQuestion ? (
+          <ProtectedMcqContent mode="strict">
           <Card data-testid={`question-card-${currentQuestionIndex}`}>
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
@@ -779,6 +781,7 @@ export default function TestSessionPage() {
               )}
             </CardContent>
           </Card>
+          </ProtectedMcqContent>
         ) : null}
 
         {questions.length > 0 && (

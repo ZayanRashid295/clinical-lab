@@ -2,6 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 import { LandingImageLightbox } from "./landing-v2-image-lightbox";
+import { DemoLeadFormFields, type MarketingDemoPackId } from "./landing-demo-lead";
+
+const LOGO_ICON = "/images/landing-v2/logo-icon.png";
 
 export function ProgramIcon({ name, size = 18 }: { name: string; size?: number }) {
   const stroke = {
@@ -68,20 +71,25 @@ export function ProgramBtn({
   children,
   onClick,
   fullWidth,
+  type = "button",
+  disabled,
 }: {
   variant?: "primary" | "ghost";
   size?: "md" | "lg";
   children: ReactNode;
   onClick?: () => void;
   fullWidth?: boolean;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const isPrimary = variant === "primary";
   return (
     <button
-      type="button"
+      type={type}
       className={`lp-program-btn ${isPrimary ? "lp-program-btn--primary" : "lp-program-btn--ghost"}`.trim()}
       onClick={onClick}
+      disabled={disabled}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -91,7 +99,8 @@ export function ProgramBtn({
         gap: 8,
         borderRadius: 8,
         fontWeight: 600,
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.7 : 1,
         border: isPrimary ? "none" : `1px solid ${hovered ? "var(--mkt-accent)" : "var(--mkt-border)"}`,
         background: isPrimary
           ? hovered
@@ -422,66 +431,46 @@ export function ProgramFAQ({ items, eyebrow }: { items: Array<{ q: string; a: st
   );
 }
 
-export function DemoModal({ badge, onClose, onSubmit }: { badge: string; onClose: () => void; onSubmit?: () => void }) {
+export function DemoModal({
+  badge,
+  pack,
+  onClose,
+  onUnlocked,
+}: {
+  badge: string;
+  /** Landing demo pack — FCPS and JCAT must stay separate. */
+  pack?: MarketingDemoPackId;
+  onClose: () => void;
+  /** Called after lead submit succeeds (token stored). Prefer over onSubmit. */
+  onUnlocked?: (result: { accessToken: string; pack: string; samplePath: string }) => void;
+  /** @deprecated Prefer onUnlocked — kept so older call sites compile. */
+  onSubmit?: () => void;
+}) {
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay demo-lead-modal-overlay" onClick={onClose}>
+      <div className="modal-card demo-lead-modal" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <ProgramIcon name="close" />
         </button>
         <div className="modal-brand">
-          <span className="brand-mark" />
+          <span className="brand-mark" aria-hidden>
+            <img src={LOGO_ICON} alt="" />
+          </span>
           <span style={{ fontFamily: "Georgia, serif", fontWeight: 600 }}>MedPrepAI</span>
         </div>
-        <h3 className="modal-title">Complete the form to explore MedPrepAI&apos;s {badge} demo</h3>
-        <div className="field-row">
-          <label className="field">
-            First Name <span className="required">*</span>
-            <input />
-          </label>
-          <label className="field">
-            Last Name <span className="required">*</span>
-            <input />
-          </label>
-        </div>
-        <div className="field-row">
-          <label className="field">
-            Email <span className="required">*</span>
-            <input type="email" />
-          </label>
-          <label className="field">
-            Graduating Year <span className="required">*</span>
-            <select defaultValue="">
-              <option value="" disabled>
-                Please select...
-              </option>
-              <option>2026</option>
-              <option>2027</option>
-              <option>2028</option>
-              <option>2029</option>
-              <option>Already Graduated</option>
-            </select>
-          </label>
-        </div>
-        <label className="field" style={{ marginBottom: 22, display: "block" }}>
-          Country
-          <select defaultValue="">
-            <option value="" disabled>
-              Please select...
-            </option>
-            <option>Pakistan</option>
-            <option>Other</option>
-          </select>
-        </label>
-        <ProgramBtn
-          size="lg"
-          onClick={() => {
-            onSubmit?.();
+        <DemoLeadFormFields
+          badge={badge}
+          pack={pack}
+          onSuccess={(result) => {
+            onUnlocked?.(result);
             onClose();
           }}
-        >
-          Submit
-        </ProgramBtn>
+          submitSlot={({ submitting }) => (
+            <ProgramBtn size="lg" type="submit" disabled={submitting}>
+              {submitting ? "Starting…" : "Submit"}
+            </ProgramBtn>
+          )}
+        />
       </div>
     </div>
   );

@@ -84,6 +84,8 @@ export interface CreateQuestionDto {
   difficulty?: "easy" | "medium" | "hard";
   points?: number;
   isActive?: boolean;
+  isDemo?: boolean;
+  demoPack?: string | null;
   explanationBlocks?: Array<{
     type: "TEXT" | "TABLE" | "IMAGES";
     order?: number;
@@ -116,6 +118,8 @@ export interface UpdateQuestionDto {
   difficulty?: "easy" | "medium" | "hard";
   points?: number;
   isActive?: boolean;
+  isDemo?: boolean;
+  demoPack?: string | null;
 }
 
 export interface CreateQuestionChoiceDto {

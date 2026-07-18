@@ -949,6 +949,16 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       payload.title = String(frontendQuestion.title).trim()
     }
 
+    if (frontendQuestion.isDemo) {
+      payload.isDemo = true
+      if (frontendQuestion.demoPack && String(frontendQuestion.demoPack).trim()) {
+        payload.demoPack = String(frontendQuestion.demoPack).trim()
+      }
+    } else {
+      payload.isDemo = false
+      payload.demoPack = null
+    }
+
     if (frontendQuestion.subject && String(frontendQuestion.subject).trim()) {
       payload.subject = String(frontendQuestion.subject).trim()
     }
@@ -1333,6 +1343,10 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       }
       
       const finalPayload = cleanPayload(questionPayload)
+      finalPayload.isDemo = Boolean(questionData.metadata.isDemo)
+      finalPayload.demoPack = finalPayload.isDemo
+        ? questionData.metadata.demoPack || null
+        : null
       
       if (editingId) {
         // Transform explanation blocks if they exist as ContentBlocks
@@ -1349,10 +1363,18 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
           systemId: questionData.metadata.systemId,
           system: questionData.metadata.system,
           tags: questionData.metadata.tags || [],
+          isDemo: Boolean(questionData.metadata.isDemo),
+          demoPack: questionData.metadata.isDemo
+            ? questionData.metadata.demoPack || null
+            : null,
         }
 
         // Final clean and update
         const cleanUpdated = cleanPayload(updatedData)
+        cleanUpdated.isDemo = Boolean(questionData.metadata.isDemo)
+        cleanUpdated.demoPack = cleanUpdated.isDemo
+          ? questionData.metadata.demoPack || null
+          : null
         await questionsService.updateQuestion(editingId, cleanUpdated)
 
         // Update choices separately

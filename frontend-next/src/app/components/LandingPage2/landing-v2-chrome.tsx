@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Container, LANDING_V2_CSS } from "./landing-v2-layout";
@@ -11,7 +11,11 @@ import { LANDING_TYPOGRAPHY_CSS } from "../hero-sequence/landing-typography.css"
 import { LANDING_SPACING_CSS } from "../hero-sequence/landing-spacing.css";
 import { PROGRAM_SHOWCASE_CSS } from "./program-showcase.css";
 import { MarketingThemeToggle } from "../marketing/marketing-theme";
-import type { ExamTrack } from "./landing-v2-data";
+import {
+  CATEGORIES,
+  type ExamProduct,
+  type ExamTrack,
+} from "./landing-v2-data";
 
 const logoIcon = "/images/landing-v2/logo-icon.png";
 
@@ -29,7 +33,7 @@ export interface LandingV2ChromeActions {
   onLogin: () => void;
   primaryCtaLabel: string;
   isAuthenticated: boolean;
-  onNavigateToProgram: (program: ExamTrack) => void;
+  onNavigateToProgram: (program: ExamTrack, product?: ExamProduct) => void;
 }
 
 function LogoBadge({ size = 34 }: { size?: number }) {
@@ -123,6 +127,11 @@ const Icon = {
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   ),
+  chevron: (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  ),
 };
 
 function NavLink({
@@ -159,38 +168,180 @@ function NavLink({
   );
 }
 
-function NavButton({
-  children,
-  onClick,
+function CategoryNavDropdown({
+  category,
   active,
+  onSelectProduct,
 }: {
-  children: ReactNode;
-  onClick: () => void;
+  category: ExamTrack;
   active?: boolean;
+  onSelectProduct: (product: ExamProduct) => void;
 }) {
-  const [hov, setHov] = useState(false);
+  const cfg = CATEGORIES[category];
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const menuId = useId();
+
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const openMenu = () => {
+    clearCloseTimer();
+    setOpen(true);
+  };
+
+  const scheduleClose = () => {
+    clearCloseTimer();
+    closeTimerRef.current = setTimeout(() => setOpen(false), 220);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  useEffect(() => () => clearCloseTimer(), []);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={active ? "nav-link-active" : undefined}
-      style={{
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        fontFamily: "inherit",
-        fontSize: "1rem",
-        fontWeight: active ? 600 : 400,
-        color: active || hov ? T.ink : T.slate,
-        padding: 0,
-        textAlign: "left",
-        transition: "color .15s",
-      }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+    <div
+      ref={rootRef}
+      className="nav-cat-dropdown"
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
     >
-      {children}
-    </button>
+      <button
+        type="button"
+        className={active ? "nav-link-active" : undefined}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-controls={menuId}
+        onClick={() => {
+          clearCloseTimer();
+          setOpen((v) => !v);
+        }}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "inherit",
+          fontSize: "1rem",
+          fontWeight: active ? 600 : 400,
+          color: active || open ? T.ink : T.slate,
+          padding: "4px 0",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          transition: "color .15s",
+        }}
+      >
+        {cfg.navLabel}
+        <span style={{ display: "inline-flex", opacity: 0.7, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}>
+          {Icon.chevron}
+        </span>
+      </button>
+      {open ? (
+        <div id={menuId} role="menu" className="nav-cat-menu">
+          <div className="nav-cat-menu-panel">
+            {cfg.products.map((product) => (
+              <button
+                key={product.slug}
+                type="button"
+                role="menuitem"
+                className="nav-cat-item"
+                onClick={() => {
+                  clearCloseTimer();
+                  setOpen(false);
+                  onSelectProduct(product.slug);
+                }}
+              >
+                {product.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function MobileCategoryBlock({
+  category,
+  active,
+  onSelectProduct,
+}: {
+  category: ExamTrack;
+  active?: boolean;
+  onSelectProduct: (product: ExamProduct) => void;
+}) {
+  const cfg = CATEGORIES[category];
+  const [open, setOpen] = useState(active ?? false);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "inherit",
+          fontSize: "1rem",
+          fontWeight: active ? 600 : 400,
+          color: active ? T.ink : T.slate,
+          padding: 0,
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          textAlign: "left",
+        }}
+      >
+        {cfg.navLabel}
+        <span style={{ opacity: 0.7, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}>
+          {Icon.chevron}
+        </span>
+      </button>
+      {open ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10, paddingLeft: 4 }}>
+          {cfg.products.map((product) => (
+            <button
+              key={product.slug}
+              type="button"
+              onClick={() => onSelectProduct(product.slug)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: "0.9375rem",
+                color: T.ink,
+                padding: "6px 0",
+                textAlign: "left",
+              }}
+            >
+              {product.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -199,6 +350,7 @@ export function LandingV2Chrome({
   actions,
   children,
   cinematicNav = false,
+  hideFooter = false,
   footerBlurb = "Smart exam preparation for learners who want clarity — not cramming. Every option explained. Built for serious study.",
   footerBottomNote = "Built for learners who refuse to guess · Pakistan",
 }: {
@@ -207,6 +359,8 @@ export function LandingV2Chrome({
   children: ReactNode;
   /** Dark transparent nav over cinematic hero */
   cinematicNav?: boolean;
+  /** Hide site footer (e.g. full-viewport sample / practice pages). */
+  hideFooter?: boolean;
   footerBlurb?: string;
   footerBottomNote?: string;
 }) {
@@ -220,9 +374,9 @@ export function LandingV2Chrome({
     void router.push("/landing-page");
   };
 
-  const goProgram = (track: ExamTrack) => {
+  const goProduct = (track: ExamTrack, product: ExamProduct = "medicine-and-allied") => {
     closeMobile();
-    actions.onNavigateToProgram(track);
+    actions.onNavigateToProgram(track, product);
   };
 
   const homeHref = activePage === "home" ? "#home" : "/landing-page#home";
@@ -230,7 +384,14 @@ export function LandingV2Chrome({
   const faqHref = "#faq";
 
   return (
-    <div className={cinematicNav ? "landing-cinematic" : undefined}>
+    <div
+      className={cinematicNav ? "landing-cinematic" : undefined}
+      style={
+        hideFooter
+          ? { minHeight: "100dvh", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }
+          : undefined
+      }
+    >
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: auto; }
@@ -243,6 +404,80 @@ export function LandingV2Chrome({
         ${LANDING_TYPOGRAPHY_CSS}
         ${LANDING_SPACING_CSS}
         ${PROGRAM_SHOWCASE_CSS}
+        .nav-cat-dropdown { position: relative; }
+        .nav-cat-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          min-width: 200px;
+          padding: 10px 0 0;
+          z-index: 220;
+        }
+        .nav-cat-menu-panel {
+          padding: 6px;
+          border-radius: 12px;
+          border: 1px solid var(--mkt-border);
+          background: var(--mkt-overlay-bg, var(--mkt-bg-elevated));
+          backdrop-filter: blur(14px);
+          box-shadow: 0 18px 40px color-mix(in srgb, #000 16%, transparent);
+        }
+        .nav-cat-item {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: transparent;
+          border-radius: 8px;
+          padding: 10px 12px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--mkt-text);
+          transition: background .15s ease;
+          white-space: nowrap;
+        }
+        .nav-cat-item:hover { background: color-mix(in srgb, var(--mkt-accent) 10%, transparent); }
+        .cine-category-pick {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: 1px solid var(--mkt-border);
+          background: color-mix(in srgb, var(--mkt-bg-elevated) 80%, transparent);
+          border-radius: 14px;
+          padding: 1.5rem 1.35rem;
+          cursor: pointer;
+          font-family: inherit;
+          color: inherit;
+          transition: border-color .2s ease, transform .2s ease, background .2s ease;
+        }
+        .cine-category-pick:hover {
+          border-color: color-mix(in srgb, var(--mkt-accent) 55%, var(--mkt-border));
+          background: color-mix(in srgb, var(--mkt-accent) 6%, var(--mkt-bg-elevated));
+          transform: translateY(-2px);
+        }
+        .cine-category-pick .cine-category-kicker {
+          display: inline-block;
+          font-size: 0.75rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--mkt-accent);
+          font-weight: 600;
+          margin-bottom: 0.65rem;
+        }
+        .cine-category-pick .lp-h3 { margin-bottom: 0.55rem; }
+        .cine-category-pick p {
+          color: var(--mkt-text-muted);
+          line-height: 1.6;
+          margin: 0 0 1rem;
+          font-size: 1rem;
+        }
+        .cine-category-cta {
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--mkt-accent);
+        }
       `}</style>
 
       <header
@@ -273,12 +508,16 @@ export function LandingV2Chrome({
             <NavLink href={homeHref} active={activePage === "home"} onClick={activePage === "home" ? closeMobile : undefined}>
               Home
             </NavLink>
-            <NavButton onClick={() => goProgram("fcps")} active={activePage === "fcps"}>
-              FCPS-1
-            </NavButton>
-            <NavButton onClick={() => goProgram("jcat")} active={activePage === "jcat"}>
-              JCAT (MDMS)
-            </NavButton>
+            <CategoryNavDropdown
+              category="fcps"
+              active={activePage === "fcps"}
+              onSelectProduct={(product) => goProduct("fcps", product)}
+            />
+            <CategoryNavDropdown
+              category="jcat"
+              active={activePage === "jcat"}
+              onSelectProduct={(product) => goProduct("jcat", product)}
+            />
             <NavLink href={howHref}>How It Works</NavLink>
             <NavLink href={faqHref}>FAQ</NavLink>
           </div>
@@ -321,12 +560,16 @@ export function LandingV2Chrome({
                 <NavLink href={homeHref} active={activePage === "home"} onClick={goHome}>
                   Home
                 </NavLink>
-                <NavButton onClick={() => goProgram("fcps")} active={activePage === "fcps"}>
-                  FCPS-1
-                </NavButton>
-                <NavButton onClick={() => goProgram("jcat")} active={activePage === "jcat"}>
-                  JCAT (MDMS)
-                </NavButton>
+                <MobileCategoryBlock
+                  category="fcps"
+                  active={activePage === "fcps"}
+                  onSelectProduct={(product) => goProduct("fcps", product)}
+                />
+                <MobileCategoryBlock
+                  category="jcat"
+                  active={activePage === "jcat"}
+                  onSelectProduct={(product) => goProduct("jcat", product)}
+                />
                 <NavLink href={howHref} onClick={closeMobile}>
                   How It Works
                 </NavLink>
@@ -355,8 +598,13 @@ export function LandingV2Chrome({
         )}
       </header>
 
-      {children}
+      {hideFooter ? (
+        <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{children}</div>
+      ) : (
+        children
+      )}
 
+      {!hideFooter && (
       <footer
         className="lp-footer"
         style={{ background: "var(--mkt-bg)", color: "var(--mkt-footer-text)", borderTop: `1px solid ${T.line}` }}
@@ -375,22 +623,28 @@ export function LandingV2Chrome({
             <div>
               <h4 className="lp-h4-ui">Programs</h4>
               <ul className="lp-footer-list" style={{ listStyle: "none" }}>
-                {(
-                  [
-                    ["FCPS-1", "fcps"],
-                    ["JCAT (MDMS)", "jcat"],
-                  ] as Array<[string, ExamTrack]>
-                ).map(([label, id]) => (
-                  <li key={label} style={{ fontSize: "1rem" }}>
-                    <button
-                      type="button"
-                      onClick={() => actions.onNavigateToProgram(id)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--mkt-footer-text)", fontFamily: "inherit", fontSize: "1rem", padding: 0, textAlign: "left" }}
-                    >
-                      {label}
-                    </button>
-                  </li>
-                ))}
+                {(Object.keys(CATEGORIES) as ExamTrack[]).flatMap((id) =>
+                  CATEGORIES[id].products.map((product) => (
+                    <li key={`${id}-${product.slug}`} style={{ fontSize: "1rem" }}>
+                      <button
+                        type="button"
+                        onClick={() => actions.onNavigateToProgram(id, product.slug)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "var(--mkt-footer-text)",
+                          fontFamily: "inherit",
+                          fontSize: "1rem",
+                          padding: 0,
+                          textAlign: "left",
+                        }}
+                      >
+                        {CATEGORIES[id].label} · {product.label}
+                      </button>
+                    </li>
+                  )),
+                )}
               </ul>
             </div>
             <div>
@@ -430,6 +684,7 @@ export function LandingV2Chrome({
           </div>
         </Container>
       </footer>
+      )}
     </div>
   );
 }
