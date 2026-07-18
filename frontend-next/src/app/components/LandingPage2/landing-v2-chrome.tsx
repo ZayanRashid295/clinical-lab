@@ -19,6 +19,95 @@ import {
 
 const logoIcon = "/images/landing-v2/logo-icon.png";
 
+/** Hoisted so SSR/client share one string; avoids inline-template drift under HMR. */
+const LANDING_V2_CHROME_CSS = `
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: auto; }
+        html.lenis.lenis-smooth { scroll-behavior: auto !important; }
+        body { background: var(--mkt-bg); color: var(--mkt-text); }
+        ${LANDING_V2_CSS}
+        ${HERO_CINEMATIC_CSS}
+        ${LANDING_CINEMATIC_BODY_CSS}
+        ${CINEMATIC_SECTIONS_CSS}
+        ${LANDING_TYPOGRAPHY_CSS}
+        ${LANDING_SPACING_CSS}
+        ${PROGRAM_SHOWCASE_CSS}
+        .nav-cat-dropdown { position: relative; }
+        .nav-cat-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          min-width: 200px;
+          padding: 10px 0 0;
+          z-index: 220;
+        }
+        .nav-cat-menu-panel {
+          padding: 6px;
+          border-radius: 12px;
+          border: 1px solid var(--mkt-border);
+          background: var(--mkt-overlay-bg, var(--mkt-bg-elevated));
+          backdrop-filter: blur(14px);
+          box-shadow: 0 18px 40px color-mix(in srgb, #000 16%, transparent);
+        }
+        .nav-cat-item {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: transparent;
+          border-radius: 8px;
+          padding: 10px 12px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--mkt-text);
+          transition: background .15s ease;
+          white-space: nowrap;
+        }
+        .nav-cat-item:hover { background: color-mix(in srgb, var(--mkt-accent) 10%, transparent); }
+        .cine-category-pick {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: 1px solid var(--mkt-border);
+          background: color-mix(in srgb, var(--mkt-bg-elevated) 80%, transparent);
+          border-radius: 14px;
+          padding: 1.5rem 1.35rem;
+          cursor: pointer;
+          font-family: inherit;
+          color: inherit;
+          transition: border-color .2s ease, transform .2s ease, background .2s ease;
+        }
+        .cine-category-pick:hover {
+          border-color: color-mix(in srgb, var(--mkt-accent) 55%, var(--mkt-border));
+          background: color-mix(in srgb, var(--mkt-accent) 6%, var(--mkt-bg-elevated));
+          transform: translateY(-2px);
+        }
+        .cine-category-pick .cine-category-kicker {
+          display: inline-block;
+          font-size: 0.75rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--mkt-accent);
+          font-weight: 600;
+          margin-bottom: 0.65rem;
+        }
+        .cine-category-pick .lp-h3 { margin-bottom: 0.55rem; }
+        .cine-category-pick p {
+          color: var(--mkt-text-muted);
+          line-height: 1.6;
+          margin: 0 0 1rem;
+          font-size: 1rem;
+        }
+        .cine-category-cta {
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--mkt-accent);
+        }
+`;
+
 const T = {
   ink: "var(--mkt-text)",
   slate: "var(--mkt-text-muted)",
@@ -392,93 +481,10 @@ export function LandingV2Chrome({
           : undefined
       }
     >
-      <style>{`
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: auto; }
-        html.lenis.lenis-smooth { scroll-behavior: auto !important; }
-        body { background: var(--mkt-bg); color: var(--mkt-text); }
-        ${LANDING_V2_CSS}
-        ${HERO_CINEMATIC_CSS}
-        ${LANDING_CINEMATIC_BODY_CSS}
-        ${CINEMATIC_SECTIONS_CSS}
-        ${LANDING_TYPOGRAPHY_CSS}
-        ${LANDING_SPACING_CSS}
-        ${PROGRAM_SHOWCASE_CSS}
-        .nav-cat-dropdown { position: relative; }
-        .nav-cat-menu {
-          position: absolute;
-          top: 100%;
-          left: 50%;
-          transform: translateX(-50%);
-          min-width: 200px;
-          padding: 10px 0 0;
-          z-index: 220;
-        }
-        .nav-cat-menu-panel {
-          padding: 6px;
-          border-radius: 12px;
-          border: 1px solid var(--mkt-border);
-          background: var(--mkt-overlay-bg, var(--mkt-bg-elevated));
-          backdrop-filter: blur(14px);
-          box-shadow: 0 18px 40px color-mix(in srgb, #000 16%, transparent);
-        }
-        .nav-cat-item {
-          display: block;
-          width: 100%;
-          text-align: left;
-          border: none;
-          background: transparent;
-          border-radius: 8px;
-          padding: 10px 12px;
-          cursor: pointer;
-          font-family: inherit;
-          font-size: 0.9375rem;
-          font-weight: 600;
-          color: var(--mkt-text);
-          transition: background .15s ease;
-          white-space: nowrap;
-        }
-        .nav-cat-item:hover { background: color-mix(in srgb, var(--mkt-accent) 10%, transparent); }
-        .cine-category-pick {
-          display: block;
-          width: 100%;
-          text-align: left;
-          border: 1px solid var(--mkt-border);
-          background: color-mix(in srgb, var(--mkt-bg-elevated) 80%, transparent);
-          border-radius: 14px;
-          padding: 1.5rem 1.35rem;
-          cursor: pointer;
-          font-family: inherit;
-          color: inherit;
-          transition: border-color .2s ease, transform .2s ease, background .2s ease;
-        }
-        .cine-category-pick:hover {
-          border-color: color-mix(in srgb, var(--mkt-accent) 55%, var(--mkt-border));
-          background: color-mix(in srgb, var(--mkt-accent) 6%, var(--mkt-bg-elevated));
-          transform: translateY(-2px);
-        }
-        .cine-category-pick .cine-category-kicker {
-          display: inline-block;
-          font-size: 0.75rem;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--mkt-accent);
-          font-weight: 600;
-          margin-bottom: 0.65rem;
-        }
-        .cine-category-pick .lp-h3 { margin-bottom: 0.55rem; }
-        .cine-category-pick p {
-          color: var(--mkt-text-muted);
-          line-height: 1.6;
-          margin: 0 0 1rem;
-          font-size: 1rem;
-        }
-        .cine-category-cta {
-          font-size: 0.9375rem;
-          font-weight: 600;
-          color: var(--mkt-accent);
-        }
-      `}</style>
+      <style
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: LANDING_V2_CHROME_CSS }}
+      />
 
       <header
         className={cinematicNav ? "landing-cinematic-header" : undefined}

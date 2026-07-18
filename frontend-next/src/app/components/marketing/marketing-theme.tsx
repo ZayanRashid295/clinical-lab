@@ -467,7 +467,10 @@ export function MarketingThemeShell({
 }) {
   return (
     <>
-      <style>{MARKETING_THEME_CSS}</style>
+      <style
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: MARKETING_THEME_CSS }}
+      />
       <div
         className={cn("marketing-surface min-h-screen w-full", className)}
         style={{ background: "var(--mkt-bg)", color: "var(--mkt-text)" }}
