@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { MenuSystem, authService } from "../../src/shared"
-import { transportationContentRegistry } from "../../src/app/config/content.registry"
+import { appContentRegistry } from "../../src/app/config/content.registry"
 import { SoapConversationRoute } from "../../src/app/components/medprep-ai/fyp/soap-conversation-route"
 
 export default function SoapConversationPage() {
@@ -54,7 +54,7 @@ export default function SoapConversationPage() {
         <meta name="description" content="Document and submit your SOAP note for this case." />
       </Head>
       <MenuSystem
-        contentRegistry={transportationContentRegistry}
+        contentRegistry={appContentRegistry}
         applicationTitle="MedPrepAI"
         customContent={customContent}
       />

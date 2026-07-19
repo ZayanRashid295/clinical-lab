@@ -1,11 +1,11 @@
 import React from "react";
 import { MenuSystem } from "../../src/shared";
-import { transportationContentRegistry } from "../../src/app/config/content.registry";
+import { appContentRegistry } from "../../src/app/config/content.registry";
 
 export default function RefDesignPage() {
   return (
     <MenuSystem
-      contentRegistry={transportationContentRegistry}
+      contentRegistry={appContentRegistry}
       applicationTitle="MedPrepAI"
     />
   );

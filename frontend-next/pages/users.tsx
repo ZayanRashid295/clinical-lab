@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { MenuSystem, authService } from "../src/shared";
-import { transportationContentRegistry } from "../src/app/config/content.registry";
+import { appContentRegistry } from "../src/app/config/content.registry";
 
 export default function Users() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function Users() {
 
   return (
     <MenuSystem
-      contentRegistry={transportationContentRegistry}
+      contentRegistry={appContentRegistry}
       applicationTitle="MedPrepAI"
     />
   );

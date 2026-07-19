@@ -542,13 +542,11 @@ export function parseMarkdown(content: string): ParsedQuestion {
     const correctOption = questionData.options.find((opt) => opt.correct)
     if (correctOption) {
       questionData.correctAnswer = correctOption.label
-      console.log(`[parseMarkdown] Inferred correct answer from option flag: ${questionData.correctAnswer}`)
     } else {
       // Method 2: Check for visual markers in option text
       for (const opt of questionData.options) {
         if (opt.text && (opt.text.includes("✅") || opt.text.match(/\(correct\)/i))) {
           questionData.correctAnswer = opt.label
-          console.log(`[parseMarkdown] Inferred correct answer from option marker: ${questionData.correctAnswer}`)
           break
         }
       }
@@ -591,7 +589,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
       const sortedScores = Object.entries(explanationScores).sort((a, b) => b[1] - a[1])
       if (sortedScores.length > 0 && sortedScores[0][1] > 0) {
         questionData.correctAnswer = sortedScores[0][0]
-        console.log(`[parseMarkdown] Inferred correct answer from explanation analysis: ${questionData.correctAnswer} (score: ${sortedScores[0][1]})`)
       }
     }
     
@@ -618,7 +615,6 @@ export function parseMarkdown(content: string): ParsedQuestion {
           const letter = match[0].match(/[a-e]/i)?.[0]?.toUpperCase()
           if (letter && ['A', 'B', 'C', 'D', 'E'].includes(letter)) {
             questionData.correctAnswer = letter
-            console.log(`[parseMarkdown] Inferred correct answer from main explanation: ${questionData.correctAnswer}`)
             break
           }
         }

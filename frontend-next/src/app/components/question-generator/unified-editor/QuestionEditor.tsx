@@ -1035,9 +1035,7 @@ export default function QuestionEditor({
       // Only generate if there's no stored questionId
       // This handles the case when creating a new question
       const generatedId = generateQuestionId()
-      if (process.env.NODE_ENV === "development") {
-        console.log("[QuestionEditor] Generating new questionId:", generatedId)
-      }
+
       setQuestionId(generatedId)
       setIsQuestionIdManuallyEdited(false)
     }

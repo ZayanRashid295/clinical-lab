@@ -360,7 +360,7 @@ export function LandingPage() {
       subtitle:
         "Practice clinical interviews, shadow expert doctors, and receive OSCE-style assessments—in a safe, scalable environment.",
       image: heroImage,
-      ctaPrimary: "Start free",
+      ctaPrimary: "Sign up",
       ctaSecondary: "Watch demo",
     },
     {

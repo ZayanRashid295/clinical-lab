@@ -14,7 +14,6 @@ export class UsersService {
 
   async findAll(query: QueryUserDto) {
     try {
-      console.log("Query received:", query);
       const {
         search,
         status,
@@ -27,7 +26,6 @@ export class UsersService {
         sortOrder = "desc",
       } = query;
 
-      console.log("Search parameter:", search);
 
       // Build where clause
       const where: any = {};

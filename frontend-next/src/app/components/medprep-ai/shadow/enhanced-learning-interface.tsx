@@ -184,7 +184,6 @@ export function EnhancedLearningInterface({
     if (getCurrentSessionPhase() === 'follow-up') {
       const initialConv = (getInitialSessionData?.() as any)?.conversation || [];
       const merged = [...initialConv, ...currentConv];
-      console.log(`📊 [CONVERSATION MERGE] Initial: ${initialConv.length}, Current: ${currentConv.length}, Merged: ${merged.length}`);
       return merged;
     }
     return currentConv;
@@ -343,9 +342,7 @@ export function EnhancedLearningInterface({
 
   // Debug: Monitor state changes (reduced logging)
   useEffect(() => {
-    if (showSmartReportPopup) {
-      console.log("🔍 [STATE DEBUG] Smart popup opened");
-    }
+
   }, [showSmartReportPopup]);
 
   // Generate replay states from conversation history
@@ -376,9 +373,6 @@ export function EnhancedLearningInterface({
         []) as DifferentialDiagnosisItem[];
       const turnMap = replaySession.shadowTurnsByDoctorIndex;
 
-      console.log("🔍 [REPLAY DEBUG] Starting replay generation with", conversation.length, "messages and", allReports.length, "reports");
-      console.log("🔍 [REPLAY DEBUG] Current mode:", currentMode);
-      console.log("🔍 [REPLAY DEBUG] All reports:", (allReports as Report[]).map((r: Report) => ({ type: r.type, timestamp: r.timestamp })));
       
       let stateNumber = 1;
       
@@ -434,7 +428,6 @@ export function EnhancedLearningInterface({
             canGoForward: true
           };
           addReplayState(doctorTurnState, { advanceStep: false });
-          console.log(`🔍 [REPLAY DEBUG] Added doctor turn state ${stateNumber}:`, doctorTurnState.doctorQuestion?.substring(0, 50));
           stateNumber++;
           
           // Group reports by questionIndex - get all reports generated for this specific doctor question
@@ -454,7 +447,6 @@ export function EnhancedLearningInterface({
               canGoForward: true
             } as any;
             addReplayState(reportReplayState, { advanceStep: false });
-            console.log(`🔍 [REPLAY DEBUG] Added report state ${stateNumber} for question ${currentQuestionIndex}:`, reportsForThisQuestion.length, "reports", (reportsForThisQuestion as Report[]).map((r: Report) => r.type));
             stateNumber++;
           }
           
@@ -480,7 +472,6 @@ export function EnhancedLearningInterface({
             canGoForward: true
           };
           addReplayState(patientTurnState, { advanceStep: false });
-          console.log(`🔍 [REPLAY DEBUG] Added patient turn state ${stateNumber}:`, patientTurnState.patientResponse?.substring(0, 50));
           stateNumber++;
           
           // No reports after patient responses - they're distributed after doctor questions
@@ -501,7 +492,6 @@ export function EnhancedLearningInterface({
           canGoForward: true
         };
         addReplayState(soapState, { advanceStep: false });
-        console.log(`🔍 [REPLAY DEBUG] Added SOAP note state ${stateNumber}`);
         stateNumber++;
       }
       
@@ -519,7 +509,6 @@ export function EnhancedLearningInterface({
           canGoForward: true
         };
         addReplayState(prescriptionState, { advanceStep: false });
-        console.log(`🔍 [REPLAY DEBUG] Added prescription state ${stateNumber}`);
         stateNumber++;
       }
       
@@ -539,31 +528,16 @@ export function EnhancedLearningInterface({
             canGoForward: true
           };
           addReplayState(reportState, { advanceStep: false });
-          console.log(`🔍 [REPLAY DEBUG] Added final report state ${stateNumber}: ${report.type}`);
           stateNumber++;
         }
       }
       
-      console.log(`🔍 [REPLAY DEBUG] Generated ${stateNumber - 1} total states (including SOAP, Prescription, and Final Reports)`);
       
       // Debug: Check the actual replay states array
       const finalReplayStates = useShadowModeStore.getState().replayStates;
-      console.log(`🔍 [REPLAY DEBUG] Final replay states count:`, finalReplayStates.length);
-      console.log(`🔍 [REPLAY DEBUG] Final replay states:`, finalReplayStates.map((state: ReplayState, index: number) => ({
-        index: index + 1,
-        type: state.type,
-        hasReports: state.reports?.length > 0,
-        reportCount: state.reports?.length || 0
-      })));
       
       // Additional debug: Verify the store state
       const storeState = useShadowModeStore.getState();
-      console.log(`🔍 [REPLAY DEBUG] Store state after generation:`, {
-        isReplayMode: storeState.isReplayMode,
-        replayMode: storeState.replayMode,
-        currentReplayStep: storeState.currentReplayStep,
-        replayStatesLength: storeState.replayStates.length
-      });
       
       // Update the last state to not have canGoForward
       if (finalReplayStates.length > 0) {
@@ -585,11 +559,9 @@ export function EnhancedLearningInterface({
   };
 
   useEffect(() => {
-    console.log("🔍 [STATE DEBUG] detectedTests changed:", detectedTests.length, detectedTests);
   }, [detectedTests]);
 
   useEffect(() => {
-    console.log("🔍 [STATE DEBUG] currentDoctorThought changed:", currentDoctorThought?.substring(0, 50) + "...");
   }, [currentDoctorThought]);
   
   // Focus management for accessibility
@@ -639,7 +611,6 @@ export function EnhancedLearningInterface({
     
     // Pause conversation for report generation (but don't interrupt current speech)
     setConversationPaused(true);
-    console.log("Conversation paused for report generation - blocking new API calls");
     
     // Show report type selection directly
     setShowReportTypeSelection(true);
@@ -706,7 +677,6 @@ export function EnhancedLearningInterface({
         }
 
         addReportToCache(reportWithMetadata)
-        console.log("📋 [SHADOW STORE] Added single report to cache:", reportWithMetadata.type, "for question index:", currentQuestionIndex)
 
         const header = structured.header
         setMedicalReport({
@@ -737,13 +707,11 @@ export function EnhancedLearningInterface({
   // Resume conversation after report
   const resumeConversation = async () => {
     // Reports are now managed by shadow mode store - no need for localStorage
-    console.log("Resuming conversation - reports are managed by shadow mode store");
     
     setConversationPaused(false);
     setShowMedicalReportModal(false);
     setMedicalReport(null);
     setSelectedReportType('');
-    console.log("Conversation resumed - continuing from where we left off");
     
     // The useEffect will handle the actual continuation
     // No need to call continueConversation here to avoid double execution
@@ -976,9 +944,6 @@ export function EnhancedLearningInterface({
     const last = built[built.length - 1];
     applyConversationNavState(last);
 
-    console.log(
-      `[RESUME] Rebuilt ${built.length} manual states (index ${built.length - 1}) for ${cid}`,
-    );
   }, [conversationMode, session.conversationId, session.conversation?.length]);
 
   useEffect(() => {
@@ -1378,32 +1343,19 @@ export function EnhancedLearningInterface({
   };
 
   const handleContinueConversation = () => {
-    console.log('🔘 [CONTINUE BUTTON] Clicked');
-    console.log('📊 [CONTINUE BUTTON] Current state:', {
-      conversationLength: session.conversation.length,
-      isComplete: session.isComplete,
-      lastMessageRole: session.conversation[session.conversation.length - 1]?.role,
-      conversationMode,
-      sessionPhase,
-      isProcessing
-    });
     // Block continuation while viewing initial session (read-only)
     if (activeSessionView === 'initial') {
-      console.log('⏸️ [CONTINUE BUTTON] Blocked - viewing initial session (read-only)');
       return;
     }
     
     if (session.conversation.length === 0) {
-      console.log('⚠️ [CONTINUE BUTTON] No conversation - returning');
       return;
     }
     if (studentQuestionMode) {
-      console.log('⚠️ [CONTINUE BUTTON] Student question mode active - returning');
       return;
     }
 
     if (isConsultationEnding()) {
-      console.log('⏸️ [CONTINUE BUTTON] Consultation ending — no further turns');
       return;
     }
 
@@ -1423,23 +1375,14 @@ export function EnhancedLearningInterface({
       (isDoctorClosingStatement(lastMessage.content) || sessionRef.current.diagnosisReady)
     ) {
       if (getCurrentSessionPhase() === "follow-up") {
-        console.log(
-          "✅ [CONTINUE BUTTON] Follow-up: doctor closing — use Complete Consultation, not initial Conclude",
-        );
         return;
       }
-      console.log(
-        "✅ [CONTINUE BUTTON] Doctor closed the interview — showing Conclude Consultation",
-      );
       activateDiagnosisReadyUi();
       return;
     }
     
     // In manual mode, if the last message is from a patient, generate next doctor question
     if (conversationMode === "manual" && lastMessage.role === "patient") {
-      console.log(
-        "✅ [CONTINUE BUTTON] Manual mode: termination check takes priority over in-flight APIs",
-      );
       if (autoContinueTimeoutRef.current) {
         clearTimeout(autoContinueTimeoutRef.current);
         autoContinueTimeoutRef.current = null;
@@ -1450,14 +1393,12 @@ export function EnhancedLearningInterface({
       return;
     }
     
-    console.log("✅ [CONTINUE BUTTON] Calling continueConversation()");
     continueConversation();
   };
 
   // NEW CLEAN STATE MANAGEMENT - NO DELAYS, NO RACE CONDITIONS
   const addConversationState = (messages: ChatMessage[], thoughts: any[], diagnosis: any[]) => {
     if (isNavigatingRef.current) {
-      console.log('🚫 Skip save - navigating');
       return;
     }
 
@@ -1487,7 +1428,6 @@ export function EnhancedLearningInterface({
     setConversationStates(newStates);
     setCurrentStateIndex(newIndex);
 
-    console.log(`💾 State ${newIndex + 1}/${newStates.length} saved: ${messages.length} msgs, ${thoughts.length} thoughts, ${diagnosis.length} diag`);
   };
 
   const applyConversationNavState = (state: ConversationState) => {
@@ -1518,9 +1458,6 @@ export function EnhancedLearningInterface({
     })
     applyConversationNavState(state)
     isNavigatingRef.current = false
-    console.log(
-      `[CONTINUE] Restored latest history step ${latestIndex + 1}/${states.length}`,
-    )
     return true
   }
 
@@ -1543,7 +1480,6 @@ export function EnhancedLearningInterface({
     onSessionUpdate({ ...sessionRef.current, conversation: [...state.messages] });
     applyConversationNavState(state);
 
-    console.log(`⬅️ Back to state ${newIndex + 1}`);
     setTimeout(() => { isNavigatingRef.current = false; }, 500);
   };
 
@@ -1561,7 +1497,6 @@ export function EnhancedLearningInterface({
     onSessionUpdate({ ...sessionRef.current, conversation: [...state.messages] });
     applyConversationNavState(state);
 
-    console.log(`➡️ Next to state ${newIndex + 1}`);
     setTimeout(() => { isNavigatingRef.current = false; }, 500);
   };
 
@@ -1763,10 +1698,6 @@ export function EnhancedLearningInterface({
 
   // Debug differential diagnosis state changes
   useEffect(() => {
-    console.log("🔍 Differential Diagnosis State Changed:", {
-      length: differentialDiagnosis?.length,
-      data: differentialDiagnosis
-    });
     // Also update the ref for state saving
     latestDifferentialDiagnosisRef.current = differentialDiagnosis;
   }, [differentialDiagnosis]);
@@ -1876,7 +1807,6 @@ export function EnhancedLearningInterface({
 
       // Restore doctor thoughts from session if available
       if (session.doctorThoughts && session.doctorThoughts.length > 0) {
-        console.log("🔄 [INIT] Loading doctor thoughts from session:", session.doctorThoughts.length);
         const formattedThoughts = session.doctorThoughts.map((thought: any) => ({
           time: thought.timestamp || thought.createdAt || new Date().toISOString(),
           thought: thought.content || thought.thought || "",
@@ -1889,7 +1819,6 @@ export function EnhancedLearningInterface({
 
       // Restore differential diagnosis from session if available
       if (session.differentialDiagnosis && session.differentialDiagnosis.length > 0) {
-        console.log("🔄 [INIT] Loading differential diagnosis from session:", session.differentialDiagnosis.length);
         setDifferentialDiagnosis(session.differentialDiagnosis);
         // Update last synced ref to prevent immediate re-sync
         lastSyncedDiagnosisRef.current = JSON.stringify(session.differentialDiagnosis);
@@ -1981,7 +1910,6 @@ export function EnhancedLearningInterface({
         if (soapSrc && !soapNote) {
           soapNoteRef.current = soapSrc;
           setSoapNote(soapSrc);
-          console.log('✅ [FOLLOW-UP RESTORE] Restored SOAP note from initial session data');
         }
         // Restore prescription if available and not already set
         const rxSrc =
@@ -1989,12 +1917,10 @@ export function EnhancedLearningInterface({
         if (rxSrc && !prescription) {
           prescriptionRef.current = rxSrc
           setPrescription(rxSrc);
-          console.log('✅ [FOLLOW-UP RESTORE] Restored prescription from initial session data');
         }
         // Restore final reports if available
         if (initialData.reports && initialData.reports.length > 0 && finalReports.length === 0) {
           setFinalReports(initialData.reports);
-          console.log('✅ [FOLLOW-UP RESTORE] Restored', initialData.reports.length, 'reports from initial session data');
         }
     }
   }, [
@@ -2015,7 +1941,6 @@ export function EnhancedLearningInterface({
   useEffect(() => {
     // Detect when we exit replay mode (transition from true to false)
     if (wasInReplayModeRef.current && !isReplayMode && session) {
-      console.log("🔄 [EXIT REPLAY] Restoring doctor thoughts and differential diagnosis");
       
       // Restore from session
       if (session.doctorThoughts && session.doctorThoughts.length > 0) {
@@ -2053,7 +1978,6 @@ export function EnhancedLearningInterface({
         !differentialDiagnosis.every(d => d.probability === 0);
 
       if (thoughtsChanged || diagnosisChanged) {
-        console.log("💾 [SYNC] Syncing doctor thoughts and differential diagnosis to session");
         isSyncingRef.current = true;
         
         const updatedSession = {
@@ -2163,9 +2087,7 @@ export function EnhancedLearningInterface({
 
     // Save initial empty state BEFORE starting conversation (only in manual mode)
     if (conversationMode === "manual") {
-      console.log(`[START] Current states: ${conversationStatesRef.current.length}`);
       if (conversationStatesRef.current.length === 0) {
-        console.log('[START] Saving initial empty state...');
         addConversationState([], [], differentialDiagnosis);
       }
     }
@@ -2264,47 +2186,31 @@ export function EnhancedLearningInterface({
   };
 
   const continueConversation = async () => {
-    console.log('🚀 [CONTINUE CONVERSATION] Function called');
-    console.log('📊 [CONTINUE CONVERSATION] Checks:', {
-      isComplete: session.isComplete,
-      isDiagnosisReady,
-      conversationPaused,
-      isPaused,
-      studentQuestionMode,
-      conversationLength: session.conversation.length
-    });
     
     if (isConsultationEnding()) {
-      console.log('❌ [CONTINUE CONVERSATION] Blocked: consultation ending');
       return;
     }
 
     // Check if conversation is paused - block new conversation flow
     if (conversationPaused || isPaused) {
-      console.log("❌ [CONTINUE CONVERSATION] Blocked: Conversation paused");
       return;
     }
 
     if (studentQuestionMode) {
-      console.log("❌ [CONTINUE CONVERSATION] Blocked: Student question mode");
       setIsProcessing(false);
       return;
     }
 
-    console.log(`✅ [CONTINUE CONVERSATION] Continuing conversation in ${conversationMode} mode`);
 
     setIsProcessing(true);
 
     try {
       // If conversation is empty, start with doctor's first question
       if (session.conversation.length === 0) {
-        console.log("Starting conversation with doctor question");
         
         // Save initial empty state BEFORE starting (only in manual mode)
         if (conversationMode === "manual") {
-          console.log(`[CONTINUE] Current states: ${conversationStatesRef.current.length}`);
           if (conversationStatesRef.current.length === 0) {
-            console.log('[CONTINUE] Saving initial empty state...');
             addConversationState([], [], differentialDiagnosis);
           }
         }
@@ -2395,14 +2301,9 @@ export function EnhancedLearningInterface({
       if (lastMessage.role === "doctor") {
         // Check if conversation is paused for report generation - block new patient responses
         if (conversationPaused) {
-          console.log("Conversation paused for report generation - blocking new patient response");
           return;
         }
 
-        console.log(
-          "Generating patient response to doctor question:",
-          lastMessage.content.substring(0, 50)
-        );
         // Use merged conversation for follow-up sessions
         const conversationForContext = getConversationForPrompt();
         const context = {
@@ -2430,11 +2331,7 @@ export function EnhancedLearningInterface({
         // Use consistent patient ID across all API calls
         const consistentPatientId = session?.caseId || medicalCase?.id || `patient-${Date.now()}`;
         
-        console.log('🔍 [PATIENT RESPONSE] Using consistent patient ID:', consistentPatientId);
         
-        console.log('🎭 [PATIENT RESPONSE] Generating response to:', lastMessage.content.substring(0, 100));
-        console.log('📋 [PATIENT RESPONSE] Available reports:', (getAllReports() as Report[]).map((r: Report) => r.type));
-        console.log('🔄 [PATIENT RESPONSE] Session phase:', sessionPhase);
         
         const { response: patientResponse, apiTime } = await makeAPICall(
           "/api/learning/patient-response",
@@ -2461,12 +2358,8 @@ export function EnhancedLearningInterface({
           "Patient Response"
         );
         
-        console.log('✅ [PATIENT RESPONSE] API call completed');
 
         if (isConsultationEnding() || isTurnEpochStale(turnEpoch)) {
-          console.log(
-            "⏭️ [PATIENT RESPONSE] Discarded — consultation ending or superseded",
-          );
           setConversationStatus("idle");
           setIsProcessing(false);
           return;
@@ -2715,8 +2608,7 @@ export function EnhancedLearningInterface({
       // Ensure voices are loaded
       const loadVoices = () => {
         const voices = synth.getVoices();
-        if (voices.length > 0) {
-        }
+
       };
       
       // Load voices immediately if available
@@ -2951,7 +2843,6 @@ export function EnhancedLearningInterface({
             word.endsWith("?") ||
             currentIndex >= words.length)
         ) {
-          console.log(`Starting speech for ${role} with: "${speechBuffer}..."`);
           addToSpeechQueue(text, role as "doctor" | "patient", messageId); // Speak the entire text
           hasStartedSpeaking = true;
         }
@@ -2962,9 +2853,6 @@ export function EnhancedLearningInterface({
       } else {
         // If we haven't started speaking yet (short message), start now
         if (!hasStartedSpeaking) {
-          console.log(
-            `Starting speech for ${role} (end of message): "${text}"`
-          );
           addToSpeechQueue(text, role as "doctor" | "patient", messageId);
         }
 
@@ -3013,12 +2901,10 @@ export function EnhancedLearningInterface({
   const updateDifferentialDiagnosis = async (conversation: ChatMessage[]): Promise<DifferentialDiagnosisItem[]> => {
     // Check if conversation is paused for report generation
     if (conversationPaused) {
-      console.log("Conversation paused for report generation");
       return differentialDiagnosis;
     }
 
     try {
-      console.log('🔍 [DIFFERENTIAL DIAGNOSIS] Starting differential diagnosis update...')
       
       // Add loading state immediately
       setDifferentialDiagnosis([{
@@ -3040,11 +2926,6 @@ export function EnhancedLearningInterface({
       // Use consistent patient ID across all API calls
       const consistentPatientId = session?.caseId || medicalCase?.id || `patient-${Date.now()}`;
       
-      console.log('📋 [DIFFERENTIAL DIAGNOSIS] Request data:', { 
-        context, 
-        conversationLength: conversation.length,
-        patientId: consistentPatientId
-      })
 
       const startTime = Date.now();
       const ddFetch = await safeClientFetch("/api/learning/differential-diagnosis", {
@@ -3100,7 +2981,6 @@ export function EnhancedLearningInterface({
         );
         return applyDifferentialDiagnosisFailure();
       }
-      console.log('✅ [DIFFERENTIAL DIAGNOSIS] Generated diagnosis:', diagnosis);
       
       // Ensure diagnosis is an array before mapping
       if (Array.isArray(diagnosis)) {
@@ -3111,7 +2991,6 @@ export function EnhancedLearningInterface({
         }));
         setDifferentialDiagnosis(diagnosisWithTiming);
         recordDdSnapshotForConversation(conversation, diagnosisWithTiming);
-        console.log("🔍 Updated differential diagnosis via updateDifferentialDiagnosis:", diagnosis);
         return diagnosisWithTiming; // Return for immediate use
       } else {
         console.error("❌ [DIFFERENTIAL DIAGNOSIS] Diagnosis is not an array:", diagnosis);
@@ -3162,15 +3041,11 @@ export function EnhancedLearningInterface({
         isDiagnosisReadyRef.current ||
         sessionRef.current.isComplete
       ) {
-        console.log(
-          "BLOCKED: Consultation ending or complete — not generating another doctor question",
-        );
         return;
       }
 
       // Check if conversation is paused - block new doctor questions
       if (conversationPaused || isPaused) {
-        console.log("BLOCKED: Conversation paused - not generating next doctor question");
         return;
       }
 
@@ -3180,7 +3055,6 @@ export function EnhancedLearningInterface({
       }
       
       setConversationStatus("doctor-thinking");
-      console.log("Generating next doctor question after patient response");
       const turnEpoch = captureTurnEpoch();
 
       // Use merged conversation for follow-up sessions
@@ -3232,9 +3106,6 @@ export function EnhancedLearningInterface({
       );
 
       if (isConsultationEnding() || isTurnEpochStale(turnEpoch)) {
-        console.log(
-          "⏭️ [DOCTOR QUESTION] Discarded — consultation ending or superseded",
-        );
         setConversationStatus("idle");
         return;
       }
@@ -3271,13 +3142,11 @@ export function EnhancedLearningInterface({
       );
 
       // Start streaming the next doctor question
-      console.log("🎬 Starting next doctor question streaming...");
       streamText(nextQuestion, "doctor", () => {
         if (isConsultationEnding() || isTurnEpochStale(turnEpoch)) {
           clearStreaming();
           return;
         }
-        console.log("🎬 Next doctor question streaming completed - triggering parallel API calls");
         // After streaming completes, add to conversation
         const finalUpdatedSession = {
           ...sessionRef.current,
@@ -3287,9 +3156,6 @@ export function EnhancedLearningInterface({
         clearStreaming();
 
         if (isDoctorClosingStatement(nextDoctorMessage.content)) {
-          console.log(
-            "✅ [DOCTOR QUESTION] Closing statement detected — Conclude Consultation",
-          );
           activateDiagnosisReadyUi();
           if (conversationMode === "manual") {
             addConversationState(
@@ -3305,7 +3171,6 @@ export function EnhancedLearningInterface({
         generateDoctorThought("Doctor asked question", [nextDoctorMessage]).then(async (updatedThoughts) => {
           if (isConsultationEnding()) return updatedThoughts;
           // Trigger parallel API calls after doctor question (now without doctor thought)
-          console.log("🚀 About to call handleParallelAPICalls for next doctor question...");
           const updatedDiagnosis = await handleParallelAPICalls(nextDoctorMessage, [...updatedConversation, nextDoctorMessage]);
           
           // Save state AFTER both doctor thought and parallel API calls complete
@@ -3339,7 +3204,6 @@ export function EnhancedLearningInterface({
   // Generate SOAP Note and Prescription (triggered by Conclude button)
   const handleConcludeConversation = async () => {
     try {
-      console.log('📋 [CONCLUDE] Starting SOAP note and prescription generation...');
       setShowConcludeButton(false);
       onSessionUpdate({
         ...sessionRef.current,
@@ -3359,7 +3223,6 @@ export function EnhancedLearningInterface({
         vitalsData = medicalCase.vitalSigns;
       }
       
-      console.log('📊 [SOAP GENERATION] Extracted vitals:', vitalsData);
       
       const soapResponse = await fetch('/api/learning/generate-soap-note', {
         method: 'POST',
@@ -3395,8 +3258,6 @@ export function EnhancedLearningInterface({
         throw new Error("SOAP note generation returned empty content");
       }
 
-      console.log("✅ [SOAP GENERATION] SOAP note generated successfully");
-      console.log("📄 [SOAP GENERATION] SOAP note length:", generatedSOAP.length);
 
       soapNoteRef.current = generatedSOAP;
       setSoapNote(generatedSOAP);
@@ -3441,21 +3302,15 @@ export function EnhancedLearningInterface({
       setPrescription(generatedRx);
       setIsGeneratingPrescription(false);
 
-      console.log("✅ [PRESCRIPTION GENERATION] Prescription generated successfully");
 
       // Step 4: Parse Plan section and extract test names (but don't generate reports yet)
       const testNames = soapPlanParserService.parseTestsFromPlan(generatedSOAP);
-      console.log("🔬 [TEST EXTRACTION] Extracted tests from SOAP Plan:", testNames);
       setExtractedTestNames(testNames);
 
       // Open modal only once both documents exist (prevents tab layout swap with empty body)
       setViewingDocumentType(null);
       setShowSOAPModal(true);
 
-      console.log(
-        "✅ [CONCLUDE] SOAP and Prescription ready — modal opened",
-        { soapLen: generatedSOAP.length, rxLen: generatedRx.length },
-      );
 
     } catch (error) {
       console.error('❌ [CONCLUDE] Error:', error);
@@ -3469,11 +3324,8 @@ export function EnhancedLearningInterface({
   // Generate medical test reports (triggered by button in SOAP modal)
   const handleGenerateReports = async () => {
     try {
-      console.log('🔬 [GENERATE REPORTS] Starting medical test report generation...');
-      console.log('🔬 [GENERATE REPORTS] Test names to generate:', extractedTestNames);
       
       if (extractedTestNames.length === 0) {
-        console.log('⚠️ [GENERATE REPORTS] No tests found in SOAP Plan. Skipping report generation.');
         // Still show prescription modal
         setShowSOAPModal(false);
         setShowPrescriptionModal(true);
@@ -3496,7 +3348,6 @@ export function EnhancedLearningInterface({
         soapNote,
         medicalCase,
         (progress) => {
-          console.log(`📊 [REPORT PROGRESS] ${progress.completed}/${progress.total} - ${progress.current}`);
         }
       );
 
@@ -3523,7 +3374,6 @@ export function EnhancedLearningInterface({
       setFinalReports(generatedReports);
       setIsGeneratingFinalReports(false);
       
-      console.log(`✅ [GENERATE REPORTS] Generated ${generatedReports.length} reports successfully`);
       
       // Close SOAP modal and show reports sequentially
       setShowSOAPModal(false);
@@ -3576,7 +3426,6 @@ export function EnhancedLearningInterface({
   // Handle moving to follow-up consultation session
   const handleMoveToFollowUpSession = async () => {
     try {
-      console.log('🔄 [FOLLOW-UP] Starting transition to follow-up consultation...');
       
       // Step 1: Preserve initial session data
       const initialData = {
@@ -3589,12 +3438,6 @@ export function EnhancedLearningInterface({
         timestamp: new Date().toISOString()
       };
       
-      console.log('📊 [FOLLOW-UP] Initial session data preserved:', {
-        conversationLength: initialData.conversation.length,
-        hasSOAP: !!initialData.soapNote,
-        hasPrescription: !!initialData.prescription,
-        reportsCount: initialData.reports.length
-      });
       
       // Count at end of initial visit (DB keeps full transcript; metadata uses this to split on resume).
       const initialMessageCount = initialData.conversation.length
@@ -3632,7 +3475,6 @@ export function EnhancedLearningInterface({
       setShowConsultationCompleteModal(false);
       
       // Step 4: Generate follow-up greeting from AI
-      console.log('👋 [FOLLOW-UP] Generating AI greeting...');
       const greetingResponse = await fetch('/api/learning/follow-up-greeting', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3655,7 +3497,6 @@ export function EnhancedLearningInterface({
       }
       
       const { greeting } = await greetingResponse.json();
-      console.log('✅ [FOLLOW-UP] Greeting generated:', greeting.substring(0, 100));
       
       // Clear initial-session messages from the live thread before the follow-up greeting
       onSessionUpdate({
@@ -3694,17 +3535,14 @@ export function EnhancedLearningInterface({
       if (initialData.soapNote) {
         soapNoteRef.current = initialData.soapNote;
         setSoapNote(initialData.soapNote);
-        console.log('✅ [FOLLOW-UP] Restored SOAP note from initial session');
       }
       if (initialData.prescription) {
         prescriptionRef.current = initialData.prescription;
         setPrescription(initialData.prescription);
-        console.log('✅ [FOLLOW-UP] Restored prescription from initial session');
       }
       // Keep final reports from initial session as well
       if (initialData.reports && initialData.reports.length > 0) {
         setFinalReports(initialData.reports);
-        console.log('✅ [FOLLOW-UP] Restored', initialData.reports.length, 'reports from initial session');
       }
       setExtractedTestNames([]);
       resetFollowUpConsultationUi();
@@ -3723,15 +3561,12 @@ export function EnhancedLearningInterface({
       if (conversationStatesRef.current) {
         conversationStatesRef.current = [];
         setCurrentStateIndex(0);
-        console.log('🔄 [FOLLOW-UP] Reset conversation states');
       }
       
-      console.log('✅ [FOLLOW-UP] Transition complete - ready for follow-up consultation');
       
       // Step 13: Auto-trigger continuation after a brief delay (if in auto mode)
       if (conversationMode === 'auto') {
         setTimeout(() => {
-          console.log('🔄 [FOLLOW-UP] Auto-continuing conversation after greeting');
           continueConversation();
         }, 2000); // Wait 2 seconds after greeting
       }
@@ -3750,7 +3585,6 @@ export function EnhancedLearningInterface({
     markConversationEnding();
 
     try {
-      console.log('🎬 [FINAL CONCLUSION] Generating AI conclusion message...');
       const isFollowUpSession = getCurrentSessionPhase() === "follow-up";
 
       const response = await fetch('/api/learning/doctor-question', {
@@ -3789,7 +3623,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       const data = await response.json();
       const conclusionText = data.question || data.nextQuestion || "I believe I have gathered enough information to make a comprehensive assessment of your condition. Let me conclude our consultation.";
       
-      console.log('✅ [FINAL CONCLUSION] AI conclusion generated:', conclusionText);
 
       // Add the AI-generated conclusion to conversation
       const finalDoctorMessage: ChatMessage = {
@@ -3801,7 +3634,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       
       const updatedConversation = [...conversation, finalDoctorMessage];
       
-      console.log('📝 [FINAL CONCLUSION] Final conversation length:', updatedConversation.length);
 
       if (isFollowUpSession) {
         onSessionUpdate({
@@ -3809,11 +3641,9 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
           conversation: updatedConversation,
         });
         setConversationStatus("idle");
-        console.log('✅ [FINAL CONCLUSION] Follow-up wrap-up complete — use Complete Consultation');
         return;
       }
 
-      console.log('🎯 [FINAL CONCLUSION] Setting showConcludeButton to TRUE');
       activateDiagnosisReadyUi({ persistSession: false });
       onSessionUpdate({
         ...sessionRef.current,
@@ -3822,7 +3652,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
         isComplete: false,
       });
       
-      console.log('✅ [FINAL CONCLUSION] State updates complete - Conclude button should now be visible');
       
     } catch (error) {
       console.error('❌ [FINAL CONCLUSION] Error generating conclusion:', error);
@@ -3911,14 +3740,10 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             context,
           );
 
-        console.log("🔍 Termination decision:", decision);
         setTerminationDecision(decision);
 
         if (!decision.shouldTerminate) return false;
 
-        console.log(
-          "✅ Termination approved — conclusion overrides any in-flight doctor/patient/student responses",
-        );
         markConversationEnding();
         await generateFinalDoctorConclusion(conversation);
         return true;
@@ -3971,19 +3796,12 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
     conversationHistory: any[]
   ) => {
     try {
-      console.log("🔍 [REPORT DETECTION] Analyzing doctor thought:", doctorThought);
       
       // Analyze doctor's thought for test recommendations
       const detectionResult = reportDetectionService.analyzeDoctorThought(doctorThought, false);
       
-      console.log("🔍 [REPORT DETECTION] Detection result:", {
-        hasRecommendations: detectionResult.hasRecommendations,
-        detectedTestsCount: detectionResult.detectedTests.length,
-        detectedTests: detectionResult.detectedTests
-      });
       
       if (detectionResult.hasRecommendations && detectionResult.detectedTests.length > 0) {
-        console.log("🔍 [REPORT DETECTION] ✅ Detected test recommendations:", detectionResult.detectedTests);
         
         // Get patient ID for duplicate checking
         const patientId = session?.caseId || medicalCase?.id || `patient-${Date.now()}`;
@@ -4001,12 +3819,10 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             });
             
             if (duplicateCheck.isDuplicate) {
-              console.log(`🚫 [DUPLICATE PREVENTION] Preventing duplicate ${test.type} request`);
               duplicateNotes.push(duplicateCheck.systemNote || `[SYSTEM NOTE: ${test.type} report already available in patient records.]`);
               
               // Note: System note added to duplicate prevention (no longer using context manager)
             } else {
-              console.log(`✅ [DUPLICATE PREVENTION] ${test.type} is available for generation`);
               filteredTests.push(test);
             }
           } catch (error) {
@@ -4017,32 +3833,20 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
         }
         
         // Show duplicate notes if any
-        if (duplicateNotes.length > 0) {
-          console.log("📝 [DUPLICATE PREVENTION] Duplicate notes:", duplicateNotes);
-          // You could show these notes in the UI if needed
-        }
+
         
         // Only proceed if there are tests that can be generated
         if (filteredTests.length > 0) {
-          console.log("🔍 [REPORT DETECTION] ✅ Filtered tests available for generation:", filteredTests);
           
           // Store filtered detection results
           setDetectedTests(filteredTests);
           setCurrentDoctorThought(doctorThought);
           
-          console.log("🔍 [REPORT DETECTION] State updated - filteredTests:", filteredTests.length);
           
-          console.log("🔍 [REPORT DETECTION] Showing smart popup for user selection");
-          console.log("🔍 [REPORT DETECTION] Setting showSmartReportPopup to true");
           // Show smart popup for user selection
           setShowSmartReportPopup(true);
           setConversationPaused(true);
-          console.log("🔍 [REPORT DETECTION] Popup state set - should show popup now");
-        } else {
-          console.log("🔍 [REPORT DETECTION] ❌ All detected tests are duplicates - no new tests to generate");
         }
-      } else {
-        console.log("🔍 [REPORT DETECTION] ❌ No test recommendations detected");
       }
     } catch (error) {
       console.error("❌ [REPORT DETECTION] Error in report detection:", error);
@@ -4139,22 +3943,16 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       // Add reports to cache
       shadowModeReports.forEach(report => {
         addReportToCache(report);
-        console.log("📋 [SHADOW STORE] Added report to cache:", report.type, "for question index:", report.questionIndex);
       });
       
       // Verify reports were added
       const allReportsAfter = getAllReports();
-      console.log("📋 [SHADOW STORE] Total reports after adding:", allReportsAfter.length);
-      console.log("📋 [SHADOW STORE] All reports:", (allReportsAfter as Report[]).map((r: Report) => ({ type: r.type, timestamp: r.timestamp })));
 
       // Insert report state into timeline
-      console.log(`🧾 [STATE] Inserting report state (${shadowModeReports.length} reports)`);
       addReportState(shadowModeReports, currentDoctorThought);
       
       // Report states are now automatically available through shadow mode store
-      console.log(`📋 [REPORTS] Reports saved to shadow mode store:`, shadowModeReports.length, "reports");
       
-      console.log("📋 [REPORT GENERATION] Successfully generated and cached reports:", successfulReports.length);
       
     } catch (error) {
       console.error("Error generating reports:", error);
@@ -4167,7 +3965,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
   const handleContinueAfterReports = () => {
     setShowGeneratedReports(false);
     setConversationPaused(false);
-    console.log("🔄 Conversation resumed with new report context");
   };
 
   const handleGoToDashboardAfterFollowUp = async () => {
@@ -4196,7 +3993,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
 
     // Check if conversation is paused for report generation
     if (conversationPaused) {
-      console.log("Conversation paused for report generation");
       return doctorThoughts;
     }
 
@@ -4206,7 +4002,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
     // Use consistent patient ID across all API calls
     const consistentPatientId = session?.caseId || medicalCase?.id || `patient-${Date.now()}`;
     
-    console.log('🔍 [DOCTOR THOUGHT] Using consistent patient ID:', consistentPatientId);
     
     try {
       const response = await fetch("/api/learning/doctor-thought", {
@@ -4241,7 +4036,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
 
       const { thought, redFlags, fullResponse } = await response.json();
       
-      console.log("🔍 [DOCTOR THOUGHT] Received response:", { thought, redFlags });
       
       // Add thought to history
       const newThought = {
@@ -4282,7 +4076,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
 
     // Check if conversation is paused for report generation
     if (conversationPaused) {
-      console.log("Conversation paused for report generation");
       return null;
     }
 
@@ -4307,7 +4100,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       });
 
       const responseTime = Date.now() - startTime;
-      console.log(`🛡️ AI Supervisor API Response Time: ${responseTime}ms`);
 
       if (!response.ok) {
         throw new Error("Failed to evaluate with AI supervisor");
@@ -4339,7 +4131,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
   const testAPIConnectivity = async () => {
     try {
       // Simple connectivity test without making actual API calls
-      console.log("🔍 API Connectivity Test - Skipping actual API call to prevent duplicate doctor thought calls");
       return true; // Assume API is available
     } catch (error) {
       console.error("🔍 API Connectivity Test - Error:", error);
@@ -4357,21 +4148,16 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
     conversationHistory: LearningConversationMessage[],
   ): Promise<DifferentialDiagnosisItem[]> => {
     const startTime = Date.now();
-    console.log(`🚀 Starting parallel API calls after ${message.role} message...`);
-    console.log(`📝 Message content:`, message.content);
-    console.log(`📊 Conversation history length:`, conversationHistory.length);
 
     // Prevent duplicate API calls for the same message
     const messageKey = `${message.id ?? message.timestamp}-${message.role}`;
     if (lastAPITriggerRef.current === messageKey) {
-      console.log("BLOCKED: Duplicate API call prevented for message:", messageKey);
       return differentialDiagnosis;
     }
     lastAPITriggerRef.current = messageKey;
 
     // Check if conversation is paused - block API calls
     if (isPaused || conversationPaused) {
-      console.log("BLOCKED: Conversation paused - skipping API calls");
       return differentialDiagnosis;
     }
 
@@ -4426,7 +4212,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
               }),
             });
             const responseTime = Date.now() - startTime;
-            console.log(`🛡️ AI Supervisor API Response Time: ${responseTime}ms`);
 
             if (response.ok) {
               const { evaluation } = await response.json();
@@ -4463,7 +4248,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
     apiCalls.push(
       (async () => {
         const startTime = Date.now();
-        console.log("🔍 [DIFFERENTIAL DIAGNOSIS] Starting optimized differential diagnosis generation...");
         
         // Add loading state immediately
         setDifferentialDiagnosis([{
@@ -4552,7 +4336,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
                     return newMap;
                   });
                   
-            console.log("🔍 Differential Diagnosis Complete:", diagnosis);
                 } else {
             console.error("❌ Diagnosis is not an array:", diagnosis);
             setDifferentialDiagnosis([]);
@@ -4576,7 +4359,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
     // This parallel API call is only for doctor questions, not patient responses
 
     // Execute all API calls in parallel with extended timeout for streaming
-    console.log(`🚀 Executing ${apiCalls.length} optimized parallel API calls...`);
     try {
       await Promise.race([
         Promise.allSettled(apiCalls),
@@ -4584,8 +4366,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       ]);
       
       const totalTime = Date.now() - startTime;
-      console.log(`✅ All optimized parallel API calls completed in: ${totalTime}ms`);
-      console.log(`📊 Returning diagnosis with ${latestDiagnosis.length} items`);
       
       // Return the captured diagnosis from API for immediate use
       return latestDiagnosis;
@@ -4603,7 +4383,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
 
     // Check if conversation is paused for report generation
     if (conversationPaused) {
-      console.log("Conversation paused for report generation");
       return;
     }
 
@@ -4643,7 +4422,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
 
       // Trigger parallel API calls for student question
       const startTime = Date.now();
-      console.log("🚀 Starting parallel API calls after student question...");
 
       const apiCalls = [];
 
@@ -4668,7 +4446,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
                 }),
               });
               const responseTime = Date.now() - startTime;
-              console.log(`🛡️ AI Supervisor API Response Time: ${responseTime}ms`);
               
               if (response.ok) {
                 const { evaluation } = await response.json();
@@ -4705,7 +4482,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             // Use consistent patient ID across all API calls
             const consistentPatientId = session?.caseId || medicalCase?.id || `patient-${Date.now()}`;
             
-            console.log('🔍 [PATIENT RESPONSE] Using consistent patient ID:', consistentPatientId);
             
             const response = await fetch("/api/learning/patient-response", {
               method: "POST",
@@ -4718,14 +4494,10 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
               }),
             });
             const responseTime = Date.now() - startTime;
-            console.log(`👤 Patient Response API Response Time: ${responseTime}ms`);
             
             if (response.ok) {
               const { response: patientText } = await response.json();
               if (isConsultationEnding() || isTurnEpochStale(turnEpoch)) {
-                console.log(
-                  "⏭️ [STUDENT→PATIENT] Discarded — consultation ending or superseded",
-                );
                 return;
               }
               const patientMessage: ChatMessage = {
@@ -4757,7 +4529,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
       try {
         await Promise.all(apiCalls);
         const totalTime = Date.now() - startTime;
-        console.log(`✅ All parallel API calls completed in: ${totalTime}ms`);
       } catch (error) {
         console.error("Error in parallel API calls:", error);
       }
@@ -4844,11 +4615,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
         speechQueueRef.current.length === 0 &&
         !isPlayingSpeechRef.current
       ) {
-        console.log(
-          `Fallback speech for: ${
-            latestMessage.role
-          } - "${latestMessage.content.substring(0, 50)}..."`
-        );
         spokenMessagesRef.current.add(messageKey);
         addToSpeechQueue(
           latestMessage.content,
@@ -4887,9 +4653,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
         const estimatedSpeechDuration = Math.max(textLength * 50, 2000); // 50ms per character, minimum 2 seconds
         const speechDelay = estimatedSpeechDuration + 2000; // Add 2 seconds buffer for speech completion
 
-        console.log(
-          `Doctor question length: ${textLength} chars, estimated speech duration: ${estimatedSpeechDuration}ms, delay: ${speechDelay}ms`
-        );
         
         const autoContinueTimer = setTimeout(() => {
           if (
@@ -4900,12 +4663,8 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             !conversationEndingRef.current &&
             !conversationPaused
           ) {
-            console.log(
-              "Auto-continuing after doctor question to generate patient response"
-            );
             continueConversation();
           } else if (conversationPaused) {
-            console.log("BLOCKED: Auto-continue skipped - conversation paused for report generation");
           }
         }, speechDelay);
 
@@ -5194,7 +4953,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  console.log("📋 [CONSULTATION] Opening consultation complete modal");
                   setShowConsultationCompleteModal(true);
                 }}
                 className={`${
@@ -6816,18 +6574,15 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
                 </button>
                 <button
                   onClick={() => {
-                    console.log("📚 [STUDY CASE] Study Case More clicked - closing modal and staying in interface");
                     
                     // Exit replay mode if active (to return to normal learning interface)
                     if (isReplayMode) {
-                      console.log("📚 [STUDY CASE] Exiting replay mode");
                       exitReplayMode();
                     }
                     
                     // Simply close the diagnosis modal and stay in the learning interface
                     setShowDiagnosisModal(false);
                     
-                    console.log("📚 [STUDY CASE] Modal closed - remaining in learning interface");
                   }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
@@ -6953,7 +6708,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
           setShowReportTypeSelection(false);
           // Resume conversation if user closes without selecting
           setConversationPaused(false);
-          console.log("Conversation resumed - report generation cancelled");
         }}
         onSelectReportType={handleReportTypeSelected}
         isGenerating={isGeneratingReport}
@@ -7104,7 +6858,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
           >
             <Button
               onClick={() => {
-                console.log('✅ [COMPLETE CONSULTATION] Opening consultation completed modal');
                 setShowConsultationCompletedModal(true);
               }}
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-6 rounded-xl shadow-2xl hover:shadow-green-500/50 transition-all duration-300 flex items-center gap-3 text-lg"
@@ -7458,7 +7211,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             {/* Close Button */}
             <button
               onClick={() => {
-                console.log("❌ [MODAL] Closing consultation complete modal");
                 setShowConsultationCompleteModal(false);
               }}
               className="absolute top-4 right-4 w-10 h-10 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-full flex items-center justify-center transition-colors z-10"
@@ -7549,18 +7301,15 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             <div className="space-y-3">
               <Button
                 onClick={() => {
-                  console.log("📚 [STUDY CASE] Study Case More clicked - closing modal");
                   
                   // Exit replay mode if active (to return to normal learning interface)
                   if (isReplayMode) {
-                    console.log("📚 [STUDY CASE] Exiting replay mode");
                     exitReplayMode();
                   }
                   
                   // Close the consultation complete modal
                   setShowConsultationCompleteModal(false);
                   
-                  console.log("📚 [STUDY CASE] Modal closed - remaining in learning interface");
                 }}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white h-12 flex items-center justify-center gap-2"
               >
@@ -7608,7 +7357,6 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             {/* Close Button */}
             <button
               onClick={() => {
-                console.log("❌ [MODAL] Closing consultation completed modal");
                 setShowConsultationCompletedModal(false);
               }}
               className="absolute top-4 right-4 w-10 h-10 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-full flex items-center justify-center transition-colors z-10"
@@ -7670,18 +7418,15 @@ Do NOT ask any more questions. This is a conclusion statement only.`,
             <div className="space-y-3">
               <Button
                 onClick={() => {
-                  console.log("📚 [STUDY CASE] Study Case More clicked - closing modal");
                   
                   // Exit replay mode if active (to return to normal learning interface)
                   if (isReplayMode) {
-                    console.log("📚 [STUDY CASE] Exiting replay mode");
                     exitReplayMode();
                   }
                   
                   // Close the consultation completed modal
                   setShowConsultationCompletedModal(false);
                   
-                  console.log("📚 [STUDY CASE] Modal closed - remaining in learning interface");
                 }}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white h-12 flex items-center justify-center gap-2"
               >

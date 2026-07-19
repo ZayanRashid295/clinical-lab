@@ -106,7 +106,6 @@ export async function convertDocxToMarkdown(
     const htmlSeq = getHtmlMediaSequence(html)
       .map((x) => (x.type === "image" ? `image:${x.key}` : `table:${x.index}`))
       .join(" → ");
-    console.log("[DOCX] HTML media order:", htmlSeq);
   }
 
   return {

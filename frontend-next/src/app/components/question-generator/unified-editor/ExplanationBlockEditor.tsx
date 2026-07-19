@@ -716,7 +716,7 @@ export default function ExplanationBlockEditor({
     convertBlocks()
   }, [blocks]) // Only depend on blocks, not onChange
   
-  // Helper function to detect markdown tables (copied from rich-content-editor.tsx)
+  // Helper function to detect markdown tables
   const detectMarkdownTable = useCallback((markdown: string): { isTable: boolean; tableMarkdown?: string } => {
     if (!markdown || typeof markdown !== "string") {
       return { isTable: false }
@@ -898,14 +898,7 @@ export default function ExplanationBlockEditor({
         }
         
         // Debug: Log when content is updated
-        if (process.env.NODE_ENV === "development") {
-          console.log("[handleBlockChange] Updating text block:", {
-            blockId: newBlocks[index].id,
-            htmlLength: html.length,
-            hasMarkdown: !!newBlocks[index].data.markdown,
-            htmlPreview: html.substring(0, 200),
-          })
-        }
+
         
         onChange(newBlocks)
       }
@@ -1280,18 +1273,6 @@ export default function ExplanationBlockEditor({
             hasContentOutsideTable = markdownWithoutTable.length > 0
           }
           
-          console.log("[ExplanationBlockEditor] Text block analysis:", {
-            blockId: block.id,
-            blockType: block.type,
-            hasMarkdown: !!blockMarkdown,
-            hasHtml: !!blockHtml,
-            htmlContainsTable: hasTableInHtml,
-            contentToCheckLength: contentToCheck.length,
-            detectedTable,
-            shouldRenderAsTable,
-            hasContentOutsideTable,
-            contentPreview: contentToCheck.substring(0, 300),
-          })
         }
         
         return (

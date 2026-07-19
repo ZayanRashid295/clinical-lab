@@ -324,9 +324,7 @@ function HtmlRenderer({ html, itemId, paragraphFlow = "pre-wrap" }: { html: stri
         if (process.env.NODE_ENV === "development") {
           const hasColspanAfter = finalHtml.includes('colspan') || finalHtml.includes('colSpan')
           const hasRowspanAfter = finalHtml.includes('rowspan') || finalHtml.includes('rowSpan')
-          if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
-            // Colspan was removed during sanitization
-          }
+
           if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
             console.warn("[HtmlRenderer] rowspan was removed during sanitization!")
           }
@@ -1157,13 +1155,7 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
         if (process.env.NODE_ENV === "development") {
           const hasColspan = cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')
           const hasRowspan = cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')
-          if (hasColspan || hasRowspan) {
-            console.log("[TableHtmlRenderer] HTML contains merged cells:", {
-              hasColspan,
-              hasRowspan,
-              sample: cleanedHtml.substring(0, 500)
-            })
-          }
+
         }
         
         // Use a very permissive schema that preserves all table attributes
@@ -1228,9 +1220,7 @@ function TableHtmlRenderer({ html, itemId, isDark }: { html: string; itemId: num
         if (process.env.NODE_ENV === "development") {
           const hasColspanAfter = sanitized.includes('colspan') || sanitized.includes('colSpan')
           const hasRowspanAfter = sanitized.includes('rowspan') || sanitized.includes('rowSpan')
-          if ((cleanedHtml.includes('colspan') || cleanedHtml.includes('colSpan')) && !hasColspanAfter) {
-            // Colspan was removed during sanitization
-          }
+
           if ((cleanedHtml.includes('rowspan') || cleanedHtml.includes('rowSpan')) && !hasRowspanAfter) {
             console.warn("[TableHtmlRenderer] rowspan was removed during sanitization!")
           }

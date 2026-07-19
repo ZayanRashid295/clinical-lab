@@ -382,10 +382,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
               if (markdownText.includes("|") && markdownText.match(/^\|.+\|/m)) {
                 // Markdown table detected - ensure we have HTML version
                 // If HTML is missing or contains raw markdown, we'll convert it in the editor
-                if (!blockData.html || (blockData.html.includes("|") && !blockData.html.includes("<table"))) {
-                  // HTML is missing or contains raw markdown - will be converted in editor
-                  // Keep markdown for now, editor will handle conversion
-                }
+
               }
               // Also preserve tableHtml for backward compatibility
               if (blockData.html && !blockData.tableHtml) {

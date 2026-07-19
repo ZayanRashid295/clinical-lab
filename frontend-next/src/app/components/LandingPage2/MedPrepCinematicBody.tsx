@@ -159,7 +159,7 @@ export function MedPrepCinematicBody({
         />
         <div className="cine-cta-row">
           <button type="button" className="hero-btn-primary" onClick={onStartTrial}>
-            {isAuthenticated ? "Open question bank" : "Start Free Today"}
+            {isAuthenticated ? "Open question bank" : "Create your account"}
           </button>
           <button type="button" className="hero-btn-ghost" onClick={onScrollToPlatform}>
             Explore what sets us apart

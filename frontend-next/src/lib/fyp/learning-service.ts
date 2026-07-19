@@ -185,7 +185,6 @@ class LearningService {
         prompt: "Say 'API connection successful'",
         maxOutputTokens: 64,
       })
-      console.log("API Test Response:", text)
       return text.includes("successful")
     } catch (error) {
       console.error("API Test Failed:", error)
@@ -411,12 +410,6 @@ Do you have enough information to proceed with diagnosis and treatment planning?
   }> {
     this.checkAPIKey()
     
-    console.log("Generating patient info with params:", {
-      disease,
-      specialty,
-      patientProfile,
-      symptoms
-    })
 
     const { text } = await generateText({
       maxOutputTokens: 2048,
@@ -449,14 +442,12 @@ Mother: [realistic family history]
 Father: [realistic family history]`
     })
 
-    console.log("LLM Response:", text)
 
     // Parse the response with improved error handling
     const parseSection = (label: string) => {
       const regex = new RegExp(`${label}[\\s\\*]*:?\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)`, "i")
       const match = text.match(regex)
       const result = match ? match[1].trim() : ""
-      console.log(`Parsed ${label}:`, result)
       return result
     }
 
@@ -466,7 +457,6 @@ Father: [realistic family history]`
         .filter(line => line.trim())
         .map(line => line.replace(/^[-•*]\s*/, '').trim())
         .filter(item => item.length > 0)
-      console.log(`Parsed ${label} list:`, items)
       return items
     }
 
@@ -475,7 +465,6 @@ Father: [realistic family history]`
       const regex = new RegExp(`${key}[\\s\\*]*:?\\s*([^\\n]+)`, "i")
       const match = content.match(regex)
       const result = match ? match[1].trim() : ""
-      console.log(`Parsed ${label} ${key}:`, result)
       return result
     }
 
@@ -496,7 +485,6 @@ Father: [realistic family history]`
       }
     }
 
-    console.log("Final parsed result:", result)
     return result
   }
 
@@ -659,7 +647,6 @@ Respond with ONLY a JSON object in this exact format:
       
       // Retry once with a different approach
       try {
-        console.log("Retrying vital signs generation...")
         const { text: retryText } = await generateText({
           jsonMode: true,
           maxOutputTokens: 512,

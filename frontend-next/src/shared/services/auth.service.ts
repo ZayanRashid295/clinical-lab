@@ -18,7 +18,6 @@ export class AuthService extends BaseApiService {
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(`Making login request to: ${url}`);
         const response = await fetch(url, config);
 
         let responseData;
@@ -38,12 +37,10 @@ export class AuthService extends BaseApiService {
 
           const errorMessage =
             responseData.message || `Authentication failed: ${response.status}`;
-          console.log(`🚫 Rejecting with error: ${errorMessage}`);
           reject(new Error(errorMessage));
           return;
         }
 
-        console.log(`✅ Login successful, resolving with data:`, responseData);
 
         // Store auth token in localStorage
         if (responseData.access_token) {
@@ -53,7 +50,6 @@ export class AuthService extends BaseApiService {
         // Fetch complete user profile with roles and permissions
         try {
           const profileResponse = await this.getProfile();
-          console.log(`✅ Profile fetched with roles:`, profileResponse);
 
           // Extract roles and permissions from JWT token if available
           let jwtRoles: string[] = [];

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../src/shared";
-import { transportationContentRegistry } from "../src/app/config/content.registry";
+import { appContentRegistry } from "../src/app/config/content.registry";
 import { useAccessControl } from "../src/hooks/useAccessControl";
 import { Alert, AlertDescription } from "../src/shared/ui/alert";
 import { Button } from "../src/shared/ui/button";
@@ -61,7 +61,7 @@ function DashboardContent() {
         </div>
       )}
 
-      <MenuSystem contentRegistry={transportationContentRegistry} applicationTitle="MedPrepAI" />
+      <MenuSystem contentRegistry={appContentRegistry} applicationTitle="MedPrepAI" />
     </>
   );
 }

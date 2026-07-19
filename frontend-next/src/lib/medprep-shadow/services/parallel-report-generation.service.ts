@@ -141,4 +141,3 @@ export class ParallelReportGenerationService {
 export const parallelReportGenerationService = new ParallelReportGenerationService();
 
 
-

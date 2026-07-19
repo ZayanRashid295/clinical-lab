@@ -296,10 +296,10 @@ export function LandingDemoPreviewSample({
         <DemoSampleStatus
           eyebrow={`${trackLabel} · Medicine and Allied`}
           title="Sample questions coming soon"
-          lead="We're finishing this product's preview set. You can still explore the product page or start free to access the full QBank when you're ready."
+          lead="We're finishing this product's preview set. You can still explore the product page or create an account to access the full QBank when you're ready."
           primaryLabel="Back to product"
           onPrimary={() => void router.push(productPath)}
-          secondaryLabel="Start free"
+          secondaryLabel="Sign up"
           onSecondary={onBeginPrep}
         />
       );
@@ -328,7 +328,7 @@ export function LandingDemoPreviewSample({
         }
         primaryLabel="Back to product"
         onPrimary={() => void router.push(productPath)}
-        secondaryLabel="Start free"
+        secondaryLabel="Sign up"
         onSecondary={onBeginPrep}
       />
     );
@@ -511,7 +511,7 @@ export function LandingDemoPreviewSample({
               className="demo-sample-complete-primary"
               onClick={onBeginPrep}
             >
-              Start free
+              Sign up
             </button>
             <button
               type="button"

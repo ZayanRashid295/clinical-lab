@@ -10,7 +10,6 @@ export class RolesService {
 
   async findAll(query: QueryRoleDto) {
     try {
-      console.log("Query received:", query);
       const {
         search,
         status,
@@ -22,7 +21,6 @@ export class RolesService {
         sortOrder = "desc",
       } = query;
 
-      console.log("Search parameter:", search);
 
       // Build where clause
       const where: any = {};

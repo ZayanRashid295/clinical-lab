@@ -1897,11 +1897,7 @@ export class QuestionsService {
         );
       }
 
-      if (process.env.NODE_ENV === "development") {
-        console.log(
-          `✅ Initialized ${this.demoQuestionIds.length} demo questions for non-subscribed users (config: ${this.demoQuestionCount})`
-        );
-      }
+
     } catch (error) {
       console.error("Error initializing demo questions:", error);
       this.demoQuestionIds = [];
@@ -2237,9 +2233,6 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
     const maxTokens = getDocxCompletionMaxTokens(model, systemMessage + prompt);
 
     try {
-      console.log(
-        `[Backend] DOCX conversion model=${model} estInputTokens≈${promptTokenEstimate} maxCompletionTokens=${maxTokens} htmlChars=${htmlForLlm.length} (full HTML, no trimming)`,
-      );
 
       const completion = await this.openai.chat.completions.create({
         model,
@@ -2271,7 +2264,6 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
         );
       }
 
-      console.log(`[Backend] DOCX conversion model: ${model}`);
 
       // Log the raw markdown so you can inspect it in the backend terminal
       // (look for "DOCX->Markdown (raw)" in the NestJS logs).
@@ -2279,9 +2271,6 @@ Output ONLY the final Markdown. Do NOT wrap it in backticks.`;
         rawMarkdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g) || []
       ).length;
       const expectedImages = dto.imagePlaceholders?.length ?? 0;
-      console.log(
-        `[Backend] Found ${placeholderCount} image placeholders in markdown (expected ${expectedImages})`,
-      );
 
       // Only add hierarchy lines if the LLM omitted them; do not rewrite question/explanation body.
       const markdown = ensureHierarchyMetadataInMarkdown(

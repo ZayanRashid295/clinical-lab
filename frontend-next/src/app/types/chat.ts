@@ -2,8 +2,6 @@
 
 import { User } from "./user";
 
-// import { RideUser } from "./ride";
-
 export type MessageType = "TEXT" | "IMAGE" | "FILE" | "LOCATION";
 export type ChatType = "SUPPORT" | "RIDE" | "GENERAL";
 

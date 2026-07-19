@@ -103,7 +103,6 @@ class AIHintTrackingService {
     this.hintUsages.set(sessionId, session)
     void this.persistSessionToDatabase(sessionId)
 
-    console.log(`Hint tracked: ${category} (${importance}) - Total hints: ${session.totalHintsUsed}`)
     return session
   }
 

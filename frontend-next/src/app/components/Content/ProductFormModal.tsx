@@ -308,7 +308,6 @@ export default function ProductFormModal({
             </div>
 
 
-
             <div className="flex items-center">
               <input
                 type="checkbox"

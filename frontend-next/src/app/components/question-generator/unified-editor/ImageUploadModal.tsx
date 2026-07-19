@@ -117,7 +117,3 @@ export default function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUpl
 }
 
 
-
-
-
-

@@ -159,7 +159,6 @@ ${reportContent}
     // Use clipboard API with fallback
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(reportText).then(() => {
-        console.log('Report copied to clipboard');
         onReportAction?.(reportId, 'copy');
       }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
@@ -184,7 +183,6 @@ ${reportContent}
     
     try {
       document.execCommand('copy');
-      console.log('Report copied to clipboard (fallback)');
     } catch (err) {
       console.error('Fallback copy failed:', err);
     }

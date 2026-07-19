@@ -42,7 +42,7 @@ export default function CatchAllPage() {
     let cancelled = false;
     void import("@/app/config/content.registry").then((m) => {
       if (!cancelled) {
-        setContentRegistry(m.transportationContentRegistry);
+        setContentRegistry(m.appContentRegistry);
         setBootstrapped(true);
       }
     });

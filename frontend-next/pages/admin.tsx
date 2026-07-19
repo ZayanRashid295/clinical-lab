@@ -16,7 +16,7 @@ import QuestionPaperQuestionManagementContent from "../src/app/components/Conten
 import QuestionManagementContent from "../src/app/components/Content/QuestionManagementContent";
 import QuestionChoiceManagementContent from "../src/app/components/Content/QuestionChoiceManagementContent";
 import ActivityLogsManagementContent from "../src/app/components/Content/ActivityLogsManagementContent";
-import { transportationContentRegistry } from "../src/app/config/content.registry";
+import { appContentRegistry } from "../src/app/config/content.registry";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -299,7 +299,7 @@ export default function AdminPage() {
       <MenuSystem
         applicationTitle="MedPrepAI"
         customContent={customContent}
-        contentRegistry={transportationContentRegistry}
+        contentRegistry={appContentRegistry}
       />
     </>
   );

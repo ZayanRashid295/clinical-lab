@@ -100,17 +100,13 @@ export function convertOldQuestionToNew(oldQuestion: any): Partial<QuestionCreat
   for (const tag of tags) {
     if (typeof tag === "string" && tag.startsWith("__questionId:")) {
       questionId = tag.replace("__questionId:", "")
-      if (process.env.NODE_ENV === "development") {
-        console.log("[convertOldQuestionToNew] Extracted questionId from tags:", questionId)
-      }
+
     } else {
       filteredTags.push(String(tag))
     }
   }
   
-  if (process.env.NODE_ENV === "development" && questionId) {
-    console.log("[convertOldQuestionToNew] Final questionId for metadata:", questionId)
-  }
+
 
   return {
     stem: stemBlocks,
@@ -405,7 +401,5 @@ export function convertNewPerAnswerExplanationsToOld(
   })
   return result
 }
-
-
 
 

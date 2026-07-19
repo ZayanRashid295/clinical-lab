@@ -455,15 +455,10 @@ export default function BulkDocxUploader({
     const warnings: string[] = [];
 
     try {
-      console.log(`[BulkDocxUploader] Processing DOCX file: ${fileName}`);
       
       // Step 1: Extract HTML (with image placeholders) and images from DOCX
       const { html, images } = await extractDocxText(file);
       const hierarchyFromHtml = extractDocxHierarchyMetadata(html);
-      console.log(`[BulkDocxUploader] Extracted content from ${fileName}:`, {
-        htmlLength: html.length,
-        imagesCount: images.length,
-      });
 
       // Step 2: Upload images first
       const imageMapping: Record<string, string> = {};
@@ -498,14 +493,9 @@ export default function BulkDocxUploader({
       let processedMarkdown = markdown;
       let replacementCount = 0;
       
-      console.log(`[BulkDocxUploader] Step 4: Replacing image placeholders for ${fileName}...`);
-      console.log(`[BulkDocxUploader] Image mapping:`, Object.keys(imageMapping).length, "images");
-      console.log(`[BulkDocxUploader] Markdown length:`, markdown.length);
-      console.log(`[BulkDocxUploader] Sample markdown (first 500 chars):`, markdown.substring(0, 500));
       
       // Check if markdown contains any placeholders
       const allPlaceholders = markdown.match(/\[IMAGE_PLACEHOLDER:[^\]]+\]/g);
-      console.log(`[BulkDocxUploader] Found placeholders in markdown:`, allPlaceholders);
       
       for (const [imageName, url] of Object.entries(imageMapping)) {
         const escapedName = imageName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -520,7 +510,6 @@ export default function BulkDocxUploader({
             replacementCount++;
             return `![${alt || "Image"}](${url})`;
           });
-          console.log(`[BulkDocxUploader] ✅ Replaced Format 1 for ${imageName}`);
         }
         
         // Format 2: [IMAGE_PLACEHOLDER:name] - Standalone placeholder
@@ -532,7 +521,6 @@ export default function BulkDocxUploader({
             found = true;
             return url;
           });
-          console.log(`[BulkDocxUploader] ✅ Replaced Format 2 for ${imageName}`);
         }
         
         // Format 3: [IMAGE: description] [IMAGE_PLACEHOLDER:name]
@@ -546,7 +534,6 @@ export default function BulkDocxUploader({
             found = true;
             return `![${description}](${url})`;
           });
-          console.log(`[BulkDocxUploader] ✅ Replaced Format 3 for ${imageName}`);
         }
         
         // Format 4: ![alt](name) - LLM might use just the filename
@@ -558,7 +545,6 @@ export default function BulkDocxUploader({
             found = true;
             return `![${alt || "Image"}](${url})`;
           });
-          console.log(`[BulkDocxUploader] ✅ Replaced Format 4 for ${imageName}`);
         }
         
         if (!found) {
@@ -567,11 +553,6 @@ export default function BulkDocxUploader({
       }
       
       const finalImageUrlCount = (processedMarkdown.match(/https?:\/\/[^\s)]+\.(jpg|jpeg|png|gif|webp|svg)/gi) || []).length;
-      console.log(`[BulkDocxUploader] After replacement:`, {
-        replacements: replacementCount,
-        imageURLsInMarkdown: finalImageUrlCount,
-        expectedImages: images.length,
-      });
       
       if (images.length > 0 && replacementCount < images.length) {
         warnings.push(`Only ${replacementCount} of ${images.length} image placeholders were replaced in Markdown`);
@@ -590,14 +571,6 @@ export default function BulkDocxUploader({
         },
         hierarchyFromHtml,
       );
-      console.log(`[BulkDocxUploader] Parsed data for ${fileName}:`, {
-        hasStem: !!parsed.stem,
-        optionsCount: parsed.options?.length || 0,
-        hasCorrectAnswer: !!parsed.correctAnswer,
-        category: hierarchy.category,
-        product: hierarchy.product,
-        system: hierarchy.system,
-      });
 
       // Step 6: Replace image paths in parsed content
       const updatedStem = replaceImagePaths(parsed.stem || "", imageMapping);
@@ -628,11 +601,6 @@ export default function BulkDocxUploader({
         questionId: parsed.questionId,
       };
 
-      console.log(`[BulkDocxUploader] Final questionData for ${fileName}:`, {
-        system: questionData.system,
-        productId: questionData.productId,
-        topic: questionData.topic,
-      });
 
       return {
         fileName,
@@ -652,7 +620,6 @@ export default function BulkDocxUploader({
 
   // Handle multiple file upload
   const handleMultipleFilesUpload = async (files: FileList) => {
-    console.log("[BulkDocxUploader] handleMultipleFilesUpload called with", files.length, "files");
     setIsProcessing(true);
     setErrors([]);
     setWarnings([]);
@@ -677,18 +644,9 @@ export default function BulkDocxUploader({
     const results: ProcessingResult[] = [];
 
     // Process each DOCX file
-    console.log("[BulkDocxUploader] Processing", docxFiles.length, "DOCX files");
     for (const docxFile of docxFiles) {
-      console.log("[BulkDocxUploader] Processing file:", docxFile.name);
       const result = await processDocxFile(docxFile);
-      console.log("[BulkDocxUploader] Result for", docxFile.name, ":", result.status, result.questionData ? "has data" : "no data");
-      if (result.questionData) {
-        console.log("[BulkDocxUploader] Parsed values:", {
-          system: result.questionData.system,
-          category: result.questionData.category,
-          topic: result.questionData.topic,
-        });
-      }
+
       results.push(result);
     }
 
@@ -1690,7 +1648,6 @@ export default function BulkDocxUploader({
                             </Button>
                           </div>
                         </div>
-
 
 
                         {/* System */}

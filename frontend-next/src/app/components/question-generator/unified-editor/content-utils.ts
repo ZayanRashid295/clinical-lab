@@ -311,9 +311,6 @@ export function htmlToBlocks(html: string, existingBlocks?: ContentBlock[]): Con
   const blockId = existingTextBlock?.id || `text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   const blockOrder = existingTextBlock?.order || 0
 
-  if (process.env.NODE_ENV === "development" && (cleanedHtml.includes('style=') || cleanedHtml.includes('font-size') || cleanedHtml.includes('font-family'))) {
-    console.log("htmlToBlocks: Preserving HTML with formatting:", cleanedHtml.substring(0, 200))
-  }
 
   // Create a single text block with the HTML content
   // This preserves all formatting (bold, italic, font-size, font-family, colors, etc.)

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { MenuSystem, authService } from "../../src/shared";
-import { transportationContentRegistry } from "../../src/app/config/content.registry";
+import { appContentRegistry } from "../../src/app/config/content.registry";
 
 export default function ChatRooms() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function ChatRooms() {
       </Head>
 
       <MenuSystem
-        contentRegistry={transportationContentRegistry}
+        contentRegistry={appContentRegistry}
         applicationTitle="MedPrepAI"
       />
     </>

@@ -1,9 +1,7 @@
 // Mock data for development and testing
 import { User } from "../app/types/core";
-// import { Ride } from "../app/types/ride";
 import { Alert, StatCard } from "../app/types/ui";
 import { ChatRoom, Message, Notification } from "../app/types/chat";
-// import { LocationData } from "../app/types/location";
 import { Car, AlertTriangle, CreditCard, Users } from "lucide-react";
 
 // Mock users for authentication

@@ -1,6 +1,5 @@
 import { ContentRegistry } from "../types/dashboard";
 
-// Import ride-sharing specific components
 import BillingPage from "../components/Billing/BillingPage";
 import BillingPlanManagement from "../components/Billing/BillingPlanManagement";
 import PromotionManagement from "../components/Billing/PromotionManagement";
@@ -22,7 +21,7 @@ import QuestionPaperManagementContent from "../components/Content/QuestionPaperM
 import QuestionPaperQuestionManagementContent from "../components/Content/QuestionPaperQuestionManagementContent";
 import QuestionManagementContent from "../components/Content/QuestionManagementContent";
 import QuestionChoiceManagementContent from "../components/Content/QuestionChoiceManagementContent";
-import { mainDashboardConfig, adminDashboardConfig } from "./dashboard.configs";
+import { adminDashboardConfig } from "./dashboard.configs";
 
 // Import study components
 import StudyIndexPage from "../components/Study/StudyIndexPage";
@@ -80,8 +79,7 @@ import { StudentMessagesPage } from "../components/institution/StudentMessagesPa
 // Import placeholder components
 import UnderConstruction from "../../shared/components/placeholders/under-construction";
 
-// Transportation content registry
-export const transportationContentRegistry: ContentRegistry = {
+export const appContentRegistry: ContentRegistry = {
   content: {
     "/": () => <StudentDashboardPage />,
     "/dashboard": () => <StudentDashboardPage />,
@@ -112,7 +110,6 @@ export const transportationContentRegistry: ContentRegistry = {
     "/admin/activity-logs": () => <ActivityLogsManagementContent />,
     "/admin/roles": () => <RoleManagementContent />,
     "/admin/settings": () => <SystemSettingsContent />,
-    // "/admin/tables": () => <TwoTablesWithPagination />,
 
     // Billing admin routes
     "/admin/billing/plans": () => <BillingPlanManagement />,
@@ -288,3 +285,6 @@ export const transportationContentRegistry: ContentRegistry = {
     </div>
   ),
 };
+
+/** Legacy alias for existing dynamic imports. Prefer `appContentRegistry`. */
+export const transportationContentRegistry = appContentRegistry;

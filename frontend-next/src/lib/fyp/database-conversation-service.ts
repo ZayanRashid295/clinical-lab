@@ -361,7 +361,6 @@ class DatabaseConversationService {
   async clearAllConversations(): Promise<void> {
     try {
       // This would need a separate API endpoint for admin use
-      console.log('Clear all conversations not implemented for database service')
     } catch (error) {
       console.error('Error clearing conversations:', error)
     }

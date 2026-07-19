@@ -123,7 +123,6 @@ export default function RichMarkdownEditor({
         if (process.env.NODE_ENV === 'development') {
           const editorHtml = editor.getHTML()
           if (normalizedInitial.includes('<h1>') || normalizedInitial.includes('<h2>') || normalizedInitial.includes('<h3>')) {
-            console.log('TipTap editor HTML after setting:', editorHtml)
             // Check if headings are present in editor
             const hasHeadings = editorHtml.includes('<h1>') || editorHtml.includes('<h2>') || editorHtml.includes('<h3>')
             if (!hasHeadings) {

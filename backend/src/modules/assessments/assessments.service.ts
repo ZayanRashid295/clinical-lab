@@ -281,7 +281,6 @@ export class AssessmentsService {
 
   async createQuestionPaper(createQuestionPaperDto: CreateQuestionPaperDto) {
     try {
-      console.log(`[AssessmentsService] Creating question paper for user: ${createQuestionPaperDto.userId}`);
       const { userId, ...paperData } = createQuestionPaperDto;
 
       return await this.prisma.questionPaper.create({

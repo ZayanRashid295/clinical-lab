@@ -521,15 +521,7 @@ export default function BulkMarkdownUploader({
       }
 
       // Parse markdown
-      console.log(`[ProcessFile] Parsing markdown for ${fileName}`)
       const parsed = parseMarkdown(content)
-      console.log(`[ProcessFile] Parsed result:`, {
-        system: parsed.system,
-        productId: parsed.productId,
-        topic: parsed.topic,
-        hasStem: !!parsed.stem,
-        optionsCount: parsed.options?.length || 0,
-      })
 
       // Replace image paths in stem (string)
       const updatedStem = replaceImagePaths(parsed.stem || "", uploadedImageMapping)
@@ -562,11 +554,6 @@ export default function BulkMarkdownUploader({
         questionId: parsed.questionId,
       }
       
-      console.log(`[ProcessFile] Final questionData for ${fileName}:`, {
-        system: questionData.system,
-        productId: questionData.productId,
-        topic: questionData.topic,
-      })
 
       // Auto-match will be called after all files are processed
 
@@ -589,7 +576,6 @@ export default function BulkMarkdownUploader({
 
   // Handle multiple file upload
   const handleMultipleFilesUpload = async (files: FileList) => {
-    console.log("[BulkUpload] handleMultipleFilesUpload called with", files.length, "files")
     setIsProcessing(true)
     setErrors([])
     setWarnings([])
@@ -620,18 +606,9 @@ export default function BulkMarkdownUploader({
     const imagePathMapping: Record<string, string> = {}
 
     // Process each MD file
-    console.log("[BulkUpload] Processing", mdFiles.length, "MD files")
     for (const mdFile of mdFiles) {
-      console.log("[BulkUpload] Processing file:", mdFile.name)
       const result = await processMarkdownFile(mdFile, imageFiles, imagePathMapping)
-      console.log("[BulkUpload] Result for", mdFile.name, ":", result.status, result.questionData ? "has data" : "no data")
-      if (result.questionData) {
-        console.log("[BulkUpload] Parsed values:", {
-          system: result.questionData.system,
-          category: result.questionData.category,
-          topic: result.questionData.topic,
-        })
-      }
+
       results.push(result)
     }
 
@@ -678,28 +655,18 @@ export default function BulkMarkdownUploader({
     }
 
     // Auto-match metadata for all successfully parsed questions
-    console.log("[BulkUpload] Starting auto-matching for", results.length, "results")
-    console.log("[BulkUpload] Products available:", products.length)
     
     for (const result of results) {
       if (result.status === "success" && result.questionData) {
-        console.log(`[BulkUpload] Processing ${result.fileName}:`, {
-          system: result.questionData.system,
-          category: result.questionData.category,
-          topic: result.questionData.topic,
-        })
         await autoMatchMetadata(
           result.fileName,
           result.questionData.system,
           result.questionData.category,
           result.questionData.topic
         )
-      } else {
-        console.log(`[BulkUpload] Skipping ${result.fileName}: status=${result.status}`)
       }
     }
     
-    console.log("[BulkUpload] Auto-matching completed")
   }
 
   // Handle directory upload
@@ -740,18 +707,9 @@ export default function BulkMarkdownUploader({
     const imagePathMapping: Record<string, string> = {}
 
     // Process each MD file
-    console.log("[BulkUpload] Processing", mdFiles.length, "MD files")
     for (const mdFile of mdFiles) {
-      console.log("[BulkUpload] Processing file:", mdFile.name)
       const result = await processMarkdownFile(mdFile, imageFiles, imagePathMapping)
-      console.log("[BulkUpload] Result for", mdFile.name, ":", result.status, result.questionData ? "has data" : "no data")
-      if (result.questionData) {
-        console.log("[BulkUpload] Parsed values:", {
-          system: result.questionData.system,
-          category: result.questionData.category,
-          topic: result.questionData.topic,
-        })
-      }
+
       results.push(result)
     }
 
@@ -798,28 +756,18 @@ export default function BulkMarkdownUploader({
     }
 
     // Auto-match metadata for all successfully parsed questions
-    console.log("[BulkUpload] Starting auto-matching for", results.length, "results")
-    console.log("[BulkUpload] Products available:", products.length)
     
     for (const result of results) {
       if (result.status === "success" && result.questionData) {
-        console.log(`[BulkUpload] Processing ${result.fileName}:`, {
-          system: result.questionData.system,
-          category: result.questionData.category,
-          topic: result.questionData.topic,
-        })
         await autoMatchMetadata(
           result.fileName,
           result.questionData.system,
           result.questionData.category,
           result.questionData.topic
         )
-      } else {
-        console.log(`[BulkUpload] Skipping ${result.fileName}: status=${result.status}`)
       }
     }
     
-    console.log("[BulkUpload] Auto-matching completed")
   }
 
   // Handle file selection (multiple files)

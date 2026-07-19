@@ -92,17 +92,14 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
   const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length;
 
   const handleMarkAsRead = (notification: Notification) => {
-    console.log("Mark as read:", notification.id);
     // TODO: Implement mark as read functionality
   };
 
   const handleMarkAllAsRead = () => {
-    console.log("Mark all as read");
     // TODO: Implement mark all as read functionality
   };
 
   const handleDeleteNotification = (notification: Notification) => {
-    console.log("Delete notification:", notification.id);
     // TODO: Implement delete functionality
   };
 

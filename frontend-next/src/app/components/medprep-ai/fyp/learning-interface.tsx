@@ -259,11 +259,9 @@ export function LearningInterface({
   // Generate patient information using LLM
   const generatePatientInformation = useCallback(async () => {
     if (!medicalCase || patientInfo || isLoadingPatientInfo) {
-      console.log("Skipping patient info generation:", { medicalCase: !!medicalCase, patientInfo: !!patientInfo, isLoadingPatientInfo })
       return
     }
     
-    console.log("Starting patient info generation for case:", medicalCase)
     setIsLoadingPatientInfo(true)
     try {
       const response = await fetch("/api/learning/patient-information", {
@@ -335,7 +333,6 @@ export function LearningInterface({
     // Use prop medical case if available, otherwise load from sample cases or localStorage
     if (propMedicalCase) {
       setMedicalCase(propMedicalCase)
-      console.log("LearningInterface - Using prop medical case:", propMedicalCase)
       return
     }
     
@@ -358,49 +355,32 @@ export function LearningInterface({
     }
     
     setMedicalCase(caseData)
-    console.log("LearningInterface - Loaded medical case:", caseData)
   }, [session.caseId, propMedicalCase])
 
   // Generate patient information when medical case is loaded
   useEffect(() => {
-    console.log("Patient info useEffect triggered:", { 
-      medicalCase: !!medicalCase, 
-      patientInfo: !!patientInfo, 
-      isLoadingPatientInfo,
-      sessionPatientInfo: !!session.patientInfo
-    })
     
     // If session already has patient info, use it
     if (session.patientInfo && !patientInfo) {
-      console.log("Restoring patient info from session")
       setPatientInfo(session.patientInfo)
       return
     }
     
     if (medicalCase && !patientInfo && !isLoadingPatientInfo) {
-      console.log("Calling generatePatientInformation")
       generatePatientInformation()
     }
   }, [generatePatientInformation, isLoadingPatientInfo, medicalCase, patientInfo, session.patientInfo, generatePatientInformation])
 
   // Generate vital signs when medical case is loaded
   useEffect(() => {
-    console.log("Vital signs useEffect triggered:", { 
-      medicalCase: !!medicalCase, 
-      vitalSigns: !!vitalSigns, 
-      isLoadingVitalSigns,
-      sessionVitalSigns: !!session.vitalSigns
-    })
     
     // If session already has vital signs, use them
     if (session.vitalSigns && !vitalSigns) {
-      console.log("Restoring vital signs from session")
       setVitalSigns(session.vitalSigns)
       return
     }
     
     if (medicalCase && !vitalSigns && !isLoadingVitalSigns) {
-      console.log("Calling generateVitalSigns")
       generateVitalSigns()
     }
   }, [medicalCase, vitalSigns, isLoadingVitalSigns, session.vitalSigns, generateVitalSigns])

@@ -57,11 +57,9 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag("auth", "Authentication endpoints")
     .addTag("users", "User management")
-    .addTag("rides", "Ride management")
     .addTag("billing", "Subscription & billing")
     .addTag("notifications", "Notification system")
     .addTag("chat", "Chat and messaging")
-    .addTag("locations", "Location services")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

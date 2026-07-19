@@ -46,14 +46,8 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
 
       // Step 1: Extract HTML (with image placeholders) and images from DOCX
       setProgress("Extracting content from DOCX file...");
-      console.log("[DocxUploader] Step 1: Extracting content from DOCX file:", file.name);
       const { html, images } = await extractDocxText(file);
       const hierarchyFromHtml = extractDocxHierarchyMetadata(html);
-      console.log("[DocxUploader] Extracted:", {
-        htmlLength: html.length,
-        imagesCount: images.length,
-        imageNames: images.map(img => img.name),
-      });
       
       // Yield after heavy extraction
       await yieldToBrowser();
@@ -62,7 +56,6 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       const imageMapping: Record<string, string> = {};
       if (images.length > 0) {
         setProgress(`Uploading ${images.length} image(s)...`);
-        console.log("[DocxUploader] Step 2: Uploading", images.length, "image(s)...");
         for (let idx = 0; idx < images.length; idx++) {
           const image = images[idx];
           try {
@@ -71,10 +64,8 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
             const blob = new Blob([image.buffer], { type: image.contentType });
             const imageFile = new File([blob], image.name, { type: image.contentType });
             
-            console.log(`[DocxUploader] Uploading image ${idx + 1}/${images.length}: ${image.name} (${image.contentType}, ${image.buffer.byteLength} bytes)`);
             const result = await questionsService.uploadImage(imageFile);
             imageMapping[image.name] = result.url;
-            console.log(`[DocxUploader] ✅ Uploaded image: ${image.name} -> ${result.url}`);
             
             // Yield periodically during uploads
             if (idx % 2 === 0) await yieldToBrowser();
@@ -84,9 +75,6 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
             imageMapping[image.name] = `[IMAGE_UPLOAD_FAILED:${image.name}]`;
           }
         }
-        console.log("[DocxUploader] Image upload complete. Mapping:", Object.keys(imageMapping).length, "images");
-      } else {
-        console.log("[DocxUploader] No images found in DOCX file");
       }
       
       // Yield before LLM call
@@ -94,7 +82,6 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
 
       // Step 3: Convert DOCX to Markdown using backend LLM service
       setProgress("Converting to Markdown using AI (this may take 30-60 seconds)...");
-      console.log("[DocxUploader] Step 3: Converting to Markdown using OpenAI (backend)...");
       
       // Add timeout wrapper for LLM call
       const convertWithTimeout = Promise.race([
@@ -105,7 +92,6 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       ]);
       
       const { markdown } = await convertWithTimeout;
-      console.log("[DocxUploader] Generated Markdown length:", markdown.length);
       
       // Yield after LLM call
       await yieldToBrowser();
@@ -113,8 +99,6 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
       // Step 4: Replace image placeholders with uploaded URLs
       setProgress("Processing Markdown and replacing image placeholders...");
       let processedMarkdown = markdown;
-      console.log("[DocxUploader] Step 4: Replacing image placeholders...");
-      console.log("[DocxUploader] Image mapping:", Object.keys(imageMapping).length, "images mapped");
       
       // Track replacements for logging
       let replacementCount = 0;
@@ -166,17 +150,8 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
           });
         }
         
-        if (found) {
-          console.log(`[DocxUploader] ✅ Replaced placeholders for image: ${imageName}`);
-        }
+
       }
-      
-      const finalImageUrlCount = (processedMarkdown.match(/https?:\/\/[^\s)]+\.(jpg|jpeg|png|gif|webp|svg)/gi) || []).length;
-      console.log("[DocxUploader] After replacement:", {
-        replacements: replacementCount,
-        imageURLsInMarkdown: finalImageUrlCount,
-        expectedImages: images.length,
-      });
       
       // Warn if not all images were replaced
       if (replacementCount < images.length) {
@@ -185,13 +160,7 @@ export default function DocxUploader({ onQuestionParsed }: DocxUploaderProps) {
 
       // Step 5: Parse Markdown using existing parser
       setProgress("Parsing Markdown content...");
-      console.log("[DocxUploader] Step 5: Parsing Markdown...");
       const parsed = parseMarkdown(processedMarkdown);
-      console.log("[DocxUploader] Parsed question:", {
-        subject: parsed.subject,
-        system: parsed.system,
-        optionsCount: parsed.options.length,
-      });
       
       // Yield before final processing
       await yieldToBrowser();

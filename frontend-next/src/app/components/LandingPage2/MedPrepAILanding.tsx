@@ -39,7 +39,7 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
           title="We Make Complex Stuff Easier to Understand."
           subtitle="Learning Tools Designed for High-Stakes Exams"
           primaryCta={{
-            label: actions.isAuthenticated ? "Go to dashboard" : "Start free",
+            label: actions.isAuthenticated ? "Go to dashboard" : "Sign up",
             onClick: actions.onStartTrial,
           }}
           secondaryCta={{

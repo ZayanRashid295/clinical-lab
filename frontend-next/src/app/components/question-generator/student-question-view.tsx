@@ -620,13 +620,10 @@ export default function StudentQuestionView() {
           filters.marked = true
         }
 
-        console.log("📋 Filter parameters:", filters)
 
         allQuestions = await questionsService.getFilteredQuestions(filters)
-        console.log(`✅ Loaded ${allQuestions.length} filtered questions`)
       } else {
         // Use regular questions endpoint (load all)
-        console.log("🔍 Starting to load all questions from database...")
         
         const cacheBuster = Date.now()
         let page = 1
@@ -634,7 +631,6 @@ export default function StudentQuestionView() {
         let hasMore = true
 
         while (hasMore && page <= 10) {
-          console.log(`📄 Fetching page ${page}...`)
 
           const response = await questionsService.getQuestions({ 
             status: "ACTIVE",
@@ -669,7 +665,6 @@ export default function StudentQuestionView() {
           page++
         }
         
-        console.log(`✅ Loaded ${allQuestions.length} total questions from database`)
         }
       }
       
@@ -741,12 +736,10 @@ export default function StudentQuestionView() {
               const isMarked = qpq.markedForReview === true || qpq.markedForReview === "true" || qpq.markedForReview === 1
               if (isMarked) {
                 restoredMarked.add(qpq.questionId)
-                console.log(`✅ Restored marked status for question ${qpq.questionId}`)
               }
               restoredQPQIds[qpq.questionId] = qpq.id
             })
             
-            console.log(`📌 Restored ${restoredMarked.size} marked questions from question paper:`, Array.from(restoredMarked))
             setMarkedQuestions(restoredMarked)
             setQuestionPaperQuestionIds(restoredQPQIds)
           } catch (error) {
@@ -758,7 +751,6 @@ export default function StudentQuestionView() {
           try {
             const user = authService.getCurrentUser()
             if (user && user.id && transformedQuestions.length > 0) {
-              console.log("🔍 Checking for previously marked questions...")
               
               // Get all question paper questions for this user to find previously marked questions
               const questionIds = transformedQuestions.map(q => q.id)
@@ -850,7 +842,6 @@ export default function StudentQuestionView() {
                 }
                 
                 if (allMarkedQuestions.size > 0) {
-                  console.log(`📌 Found ${allMarkedQuestions.size} questions that were marked in previous tests:`, Array.from(allMarkedQuestions))
                   // Merge with existing marked questions
                   setMarkedQuestions((prev) => {
                     const merged = new Set(prev)
@@ -1035,7 +1026,6 @@ export default function StudentQuestionView() {
                   })
                 )
                 
-                console.log("✅ Question paper created and questions initialized")
               }
             }
           } catch (error) {
@@ -1484,7 +1474,6 @@ export default function StudentQuestionView() {
                       limit: 100, // Ensure we get the result even if paginated
                     })
                     const existingArray = Array.isArray(existing) ? existing : (existing as any)?.data || []
-                    console.log(`🔍 Fetched ${existingArray.length} existing records for question ${question.id}`)
                     const existingQPQ = existingArray.find((qpq: any) => 
                       (qpq.questionId === question.id || qpq.question?.id === question.id) &&
                       qpq.questionPaperId === questionPaperId
@@ -1607,7 +1596,6 @@ export default function StudentQuestionView() {
         )
 
         // After creating question paper questions, reload them to restore marked status
-        console.log("🔄 Reloading question paper questions to restore marked status...")
         try {
           const reloadedResponse = await questionPaperQuestionsService.getQuestionPaperQuestions({
             questionPaperId,
@@ -1625,7 +1613,6 @@ export default function StudentQuestionView() {
             }
           })
           
-          console.log(`📌 Restored ${reloadedMarked.size} marked questions after creation:`, Array.from(reloadedMarked))
           setMarkedQuestions(reloadedMarked)
         } catch (reloadError) {
           console.error("Failed to reload question paper questions:", reloadError)
@@ -1760,7 +1747,6 @@ export default function StudentQuestionView() {
               </button>
               <button
                 onClick={async () => {
-                  console.log("🔄 Manual refresh triggered")
                   setLoading(true)
                   // Small delay to ensure any pending database updates are committed
                   await new Promise(resolve => setTimeout(resolve, 200))

@@ -7,7 +7,6 @@ import { User } from "../../app/types/core";
 import AdaptiveLayout from "./Layout/AdaptiveLayout";
 import ContentRenderer from "./Content/ContentRenderer";
 import { APP_DISPLAY_NAME } from "../../app/config/brand";
-// import { createContentRegistry } from "../../app/config/content.registry";
 
 /** Registry keys are pathnames only. Router `routeChangeComplete` passes `?query` which would break lookups and fall back to parent paths (e.g. `/medprep-ai`). */
 function pathWithoutQueryAndHash(path: string): string {
@@ -19,7 +18,6 @@ function pathWithoutQueryAndHash(path: string): string {
   if (h !== -1) s = s.slice(0, h);
   return s || "/";
 }
-// import { ContentRegistry } from "../../app/types/dashboard";
 
 const MenuSystem: React.FC<MenuSystemProps> = ({
   children,

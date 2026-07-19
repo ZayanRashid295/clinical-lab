@@ -62,7 +62,6 @@ export default function PreviousTestsPage() {
           ? questionPapersResponse
           : (questionPapersResponse as any)?.data || [];
 
-        console.log("Fetched question papers:", questionPapers);
 
         // For each question paper, calculate score and get metadata
         const testsData = await Promise.all(
@@ -101,7 +100,6 @@ export default function PreviousTestsPage() {
             }
             
             const questionsArray = allQuestions;
-            console.log(`Questions for paper ${paper.id}:`, questionsArray.length, `(total: ${totalQuestionCount})`);
 
             // Calculate score
             const totalQuestions = totalQuestionCount || questionsArray.length;
@@ -139,7 +137,6 @@ export default function PreviousTestsPage() {
           })
         );
 
-        console.log("Processed tests data:", testsData);
         setTests(testsData);
       } catch (error) {
         console.error("Failed to fetch tests:", error);
@@ -182,7 +179,6 @@ export default function PreviousTestsPage() {
     // Use window.location to ensure full navigation with query params
     // This ensures the route is properly matched and query params are preserved
     const url = `/question-generator/student?questionPaperId=${encodeURIComponent(id)}`;
-    console.log("Navigating to resume test:", url);
     window.location.href = url;
   };
 

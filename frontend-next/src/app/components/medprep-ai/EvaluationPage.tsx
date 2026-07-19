@@ -146,8 +146,6 @@ function parseLooseDifferentialDiagnoses(section: string): ParsedDdxItem[] {
 }
 
 async function getAIPatientResponse(studentQuestion: string, context: any, model: string) {
-  console.log("[v0] Getting patient response with model:", model)
-  console.log("[v0] Student question:", studentQuestion)
 
   // Use actualDisease for the AI patient (they know the real condition)
   const patientDisease = context.actualDisease || context.disease
@@ -183,14 +181,12 @@ Respond as the patient with ${patientDisease}.`,
   ]
 
   const provider = getModelProvider(model)
-  console.log("[v0] Using provider:", provider)
 
   if (provider !== "gemini") {
     throw new Error(`Unsupported model provider: ${provider}`)
   }
 
   const result = await callGeminiAPI(model, messages, 768, 0.7)
-  console.log("[v0] Patient response result:", result)
   return result
 }
 
@@ -668,15 +664,12 @@ function EvaluationPageContent({
     const mode = typeof router.query.mode === "string" ? router.query.mode : undefined
     const generated = typeof router.query.generated === "string" ? router.query.generated : undefined
 
-    console.log("Evaluation useEffect triggered:", { caseId, mode, generated, selectedCase: selectedCase?.id })
 
     if (mode === "evaluation" && isEvaluationMode && selectedCase && !showCaseSelection && !showCaseGenerationForm) {
-      console.log("Already in evaluation mode with case selected, skipping useEffect")
       return
     }
 
     if (mode === "evaluation" && selectedCase && !generated) {
-      console.log("Case already selected, not showing case selection")
       setShowCaseSelection(false)
       setShowCaseGenerationForm(false)
       return
@@ -688,7 +681,6 @@ function EvaluationPageContent({
       mode === "learning" ||
       (!mode && !caseId && !generated)
     ) {
-      console.log("Setting evaluation mode to true")
       setIsEvaluationMode(true)
 
       if (caseId) {
@@ -714,11 +706,9 @@ function EvaluationPageContent({
           setShowNurseReport(false)
         } else if (generated === "true") {
           const generatedCaseData = localStorage.getItem("generatedCase")
-          console.log("Generated case data from localStorage:", generatedCaseData)
           if (generatedCaseData) {
             try {
               const generatedCase = JSON.parse(generatedCaseData)
-              console.log("Setting generated case:", generatedCase)
               setSelectedCase(generatedCase)
               localStorage.removeItem("generatedCase")
               setShowCaseSelection(false)
@@ -741,7 +731,6 @@ function EvaluationPageContent({
               setShowCaseSelection(true)
             }
           } else {
-            console.log("No generated case data in localStorage, showing case selection")
             setShowCaseSelection(true)
           }
         } else {
@@ -750,7 +739,6 @@ function EvaluationPageContent({
       } else if (generated === "true") {
         setShowCaseGenerationForm(true)
       } else {
-        console.log("Showing evaluation landing page")
         setShowEvaluationLanding(true)
       }
     }
@@ -1114,11 +1102,6 @@ Please provide guidance and educational feedback.`,
   // Function to save current card state to history
   const saveCardState = () => {
     if (clinicalReasoning || learningInsights) {
-      console.log("Saving card state:", {
-        clinicalReasoning: clinicalReasoning ? "exists" : "null",
-        learningInsights: learningInsights ? "exists" : "null",
-        conversationLength: conversationWithRoles.length
-      })
       const currentState = {
         timestamp: new Date().toISOString(),
         conversationLength: conversationWithRoles.length,
@@ -1138,12 +1121,6 @@ Please provide guidance and educational feedback.`,
       setIsNavigating(true)
       const newIndex = currentCardIndex - 1
       const historyItem = cardHistory[newIndex]
-      console.log("Navigating to previous card:", {
-        fromIndex: currentCardIndex,
-        toIndex: newIndex,
-        historyItem: historyItem ? "exists" : "null",
-        learningInsights: historyItem?.learningInsights ? "exists" : "null"
-      })
       
       if (historyItem) {
         setClinicalReasoning(historyItem.clinicalReasoning)

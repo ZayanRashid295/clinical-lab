@@ -216,7 +216,6 @@ export default function PreviousTestsPage() {
   ]);
 
   const handleTestAction = (testId: string, action: string) => {
-    console.log(`Performing ${action} on test ${testId}`);
     // TODO: Implement actual actions
   };
 

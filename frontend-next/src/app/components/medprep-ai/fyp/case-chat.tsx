@@ -270,12 +270,6 @@ export function CaseChat({
 
     const initializeConversation = async () => {
       setSessionBlockedModal(null)
-      console.log("🚀 CaseChat useEffect - Creating case instance and conversation")
-      console.log("👤 Student ID:", student.id)
-      console.log("🏥 Medical Case ID:", medicalCase.id)
-      console.log("🏥 Medical Case Title:", medicalCase.title)
-      console.log("🏥 Medical Case Disease:", medicalCase.disease)
-      console.log("📋 Full Medical Case:", medicalCase)
 
       try {
         let resolvedConversationId: string | undefined
@@ -296,7 +290,6 @@ export function CaseChat({
             return
           }
         } else {
-          console.log("💬 Creating conversation directly for practice mode")
           const newConversation = await databaseConversationService.createConversation(
             student.id,
             medicalCase.id,
@@ -308,7 +301,6 @@ export function CaseChat({
               isGeneratedCase: Boolean(medicalCase.id?.includes?.("generated")),
             },
           )
-          console.log("✅ Created conversation object:", newConversation)
           resolvedConversationId = newConversation.id
           setConversation(newConversation)
           setMessages(newConversation.messages)
@@ -423,14 +415,10 @@ export function CaseChat({
   const handleSendMessage = async () => {
     if (!currentMessage.trim() || isLoading) return
 
-    console.log("📤 Sending message...")
-    console.log("💬 Current conversation:", conversation)
-    console.log("📝 Message content:", currentMessage)
     
     // If no conversation exists, create one
     let currentConversation = conversation
     if (!currentConversation) {
-      console.log("⚠️ No conversation found, creating new one...")
       try {
         currentConversation = await databaseConversationService.createConversation(
           student.id,
@@ -458,7 +446,6 @@ export function CaseChat({
     
     // If we have a local conversation (not in database), create a database one
     if (currentConversation.id.startsWith('local_')) {
-      console.log("🔄 Converting local conversation to database conversation...")
       try {
         const dbConversation = await databaseConversationService.createConversation(
           student.id,
@@ -471,7 +458,6 @@ export function CaseChat({
             isGeneratedCase: Boolean(medicalCase.id?.includes?.("generated")),
           },
         )
-        console.log("✅ Created database conversation:", dbConversation.id)
         setConversation(dbConversation)
         currentConversation = dbConversation
       } catch (error) {
@@ -485,7 +471,6 @@ export function CaseChat({
       }
     }
     
-    console.log("💬 Using conversation ID:", currentConversation.id)
 
     // Optimistically show the student's message immediately
     const tempId = `temp_${Date.now()}`
@@ -677,13 +662,11 @@ export function CaseChat({
       setCurrentSpeakingText({ role, text })
       
       utterance.onstart = () => {
-        console.log(`${role} started speaking`)
       }
       
       utterance.onend = () => {
         setIsSpeaking(false)
         setCurrentSpeakingText(null)
-        console.log(`${role} finished speaking`)
       }
       
       utterance.onerror = (event) => {
@@ -706,7 +689,7 @@ export function CaseChat({
 
   // Comment out HeyGen avatar handlers
   // const handleAvatarReady = (role: "patient" | "doctor") => {
-  //   console.log(`[v0] ${role} avatar ready - connection state: connected`)
+  //   
   //   setAvatarsReady((prev) => ({
   //     ...prev,
   //     [role]: true,
@@ -718,7 +701,7 @@ export function CaseChat({
   //   }))
 
   //   if (role === "patient") {
-  //     console.log("[v0] Patient connected ✅ - Now allowing doctor initialization")
+  //     
   //     setDoctorInitializationAllowed(true)
   //   }
   // }
@@ -735,7 +718,7 @@ export function CaseChat({
   // useEffect(() => {
   //   if (showAvatars && !doctorInitializationAllowed) {
   //     const timer = setTimeout(() => {
-  //       console.log("[v0] Patient avatar timeout - allowing doctor initialization")
+  //       
   //       setDoctorInitializationAllowed(true)
   //     }, 10000) // 10 second timeout
   //     
@@ -769,7 +752,7 @@ export function CaseChat({
   //   
   //   // Don't prevent doctor avatar from initializing if patient fails
   //   if (role === "patient") {
-  //     console.log("[v0] Patient avatar failed, but allowing doctor avatar to proceed")
+  //     
   //   }
   // }
 
@@ -1239,7 +1222,6 @@ export function CaseChat({
                   triggerRefresh={questionRefreshTrigger}
                   sessionId={sessionId}
                   onHintUsed={(category, importance) => {
-                    console.log(`Hint used in practice mode: ${category} (${importance})`)
                     // Update hint count for display
                     if (hintSession) {
                       const updatedSession = aiHintTrackingService.getSession(sessionId)

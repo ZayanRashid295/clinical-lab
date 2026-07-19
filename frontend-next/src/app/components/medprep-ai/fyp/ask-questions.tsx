@@ -524,7 +524,6 @@ export function AskQuestions({ context, onQuestionSelect, isLoading = false, tri
                           if (sessionId) {
                             const session = aiHintTrackingService.trackHintUsage(sessionId, question.category, question.importance)
                             if (session) {
-                              console.log(`Hint used: ${question.category} (${question.importance}) - Total hints: ${session.totalHintsUsed}`)
                               // Update local hint count
                               setHintUsageCount(session.totalHintsUsed)
                               // Notify parent component about hint usage
