@@ -179,6 +179,8 @@ export class QuestionsService {
               systemId: true,
               topicId: true,
               subtopicId: true,
+              isDemo: true,
+              demoPack: true,
               choices: {
                 select: { id: true, text: true, isCorrect: true, order: true },
                 orderBy: { order: "asc" },

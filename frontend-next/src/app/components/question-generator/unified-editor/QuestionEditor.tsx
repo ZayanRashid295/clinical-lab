@@ -219,6 +219,11 @@ export default function QuestionEditor({
         subtopicId: m.subtopicId || prev.subtopicId,
       }))
     }
+    setMetadata((prev) => ({
+      ...prev,
+      isDemo: Boolean(m.isDemo),
+      demoPack: m.isDemo ? m.demoPack || prev.demoPack || "fcps-medicine-and-allied" : null,
+    }))
   }, [initialData?.metadata])
 
   // Resolve parsed hierarchy names to DB IDs (dropdowns)

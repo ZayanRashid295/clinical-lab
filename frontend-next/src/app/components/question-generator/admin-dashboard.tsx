@@ -117,6 +117,8 @@ function transformBackendToListItem(backendQuestion: any): Question {
     topicId: backendQuestion.topicId,
     subtopicId: backendQuestion.subtopicId || "",
     topic: backendQuestion.topic,
+    isDemo: Boolean(backendQuestion.isDemo),
+    demoPack: backendQuestion.demoPack ?? null,
   }
 }
 
@@ -148,6 +150,8 @@ interface Question {
   productTagId?: string // Deprecated: use categoryId instead
   productTagIds?: string[] // Deprecated: use categoryId instead
   topic?: any // Topic object or string
+  isDemo?: boolean
+  demoPack?: string | null
 }
 
 interface AdminDashboardProps {
@@ -626,6 +630,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
       topicId: backendQuestion.topicId,
       subtopicId: backendQuestion.subtopicId || "",
       topic: backendQuestion.topic,
+      isDemo: Boolean(backendQuestion.isDemo),
+      demoPack: backendQuestion.demoPack ?? null,
     }
   }
 
