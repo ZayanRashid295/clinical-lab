@@ -39,7 +39,7 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
           title="We Make Complex Stuff Easier to Understand."
           subtitle="Learning Tools Designed for High-Stakes Exams"
           primaryCta={{
-            label: actions.isAuthenticated ? "Go to dashboard" : "Sign up",
+            label: actions.isAuthenticated ? "Go to dashboard" : "Create your account",
             onClick: actions.onStartTrial,
           }}
           secondaryCta={{
@@ -58,7 +58,7 @@ export function MedPrepAILanding({ actions }: { actions: MedPrepLandingActions }
       <div className="landing-content-bridge lp-cinematic-body">
         <MedPrepCinematicBody
           onStartTrial={actions.onStartTrial}
-          onScrollToPlatform={() => scrollTo("why-us")}
+          onScrollToHowItWorks={() => scrollTo("how-it-works")}
           onNavigateToCategory={actions.onNavigateToCategory}
           isAuthenticated={actions.isAuthenticated}
         />

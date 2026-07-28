@@ -299,7 +299,7 @@ export function LandingDemoPreviewSample({
           lead="We're finishing this product's preview set. You can still explore the product page or create an account to access the full QBank when you're ready."
           primaryLabel="Back to product"
           onPrimary={() => void router.push(productPath)}
-          secondaryLabel="Sign up"
+          secondaryLabel="Create your account"
           onSecondary={onBeginPrep}
         />
       );
@@ -328,7 +328,7 @@ export function LandingDemoPreviewSample({
         }
         primaryLabel="Back to product"
         onPrimary={() => void router.push(productPath)}
-        secondaryLabel="Sign up"
+        secondaryLabel="Create your account"
         onSecondary={onBeginPrep}
       />
     );
@@ -511,7 +511,7 @@ export function LandingDemoPreviewSample({
               className="demo-sample-complete-primary"
               onClick={onBeginPrep}
             >
-              Sign up
+              Create your account
             </button>
             <button
               type="button"

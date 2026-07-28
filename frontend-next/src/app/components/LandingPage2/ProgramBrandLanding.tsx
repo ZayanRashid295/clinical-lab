@@ -37,14 +37,14 @@ export function ProgramBrandLanding({
     </>
   );
   const otherTrackLabel =
-    track === "fcps" ? "Medicine and Allied under JCAT (MDMS)" : "Medicine and Allied under FCPS-1";
+    track === "fcps" ? "Medicine and Allied under MDMS/JCAT" : "Medicine and Allied under FCPS-1";
 
   return (
     <LandingV2Chrome
       activePage={track}
       actions={actions}
       cinematicNav
-      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and JCAT (MDMS). Every option explained. Built for clinical excellence."
+      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and MDMS/JCAT. Every option explained. Built for clinical excellence."
       footerBottomNote="Trusted for FCPS-1 & JCAT Preparation · Pakistan"
     >
       <div className="lp-program">
@@ -65,7 +65,7 @@ export function ProgramBrandLanding({
           ariaLabel="Medicine and Allied exam preparation"
         >
           <CinematicHeroContent
-            kicker={track === "fcps" ? "FCPS-1 product" : "JCAT (MDMS) product"}
+            kicker={track === "fcps" ? "FCPS-1 product" : "MDMS/JCAT product"}
             title={pageTitle}
             subtitle={copy.heroSubtitle}
             blendedVisual={

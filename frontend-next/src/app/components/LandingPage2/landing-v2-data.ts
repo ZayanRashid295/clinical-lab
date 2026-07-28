@@ -55,18 +55,18 @@ export const CATEGORIES: Record<ExamTrack, ExamCategoryConfig> = {
     heroSubtitle:
       "Choose a product track built for FCPS-1 preparation — starting with Medicine and Allied.",
     landingBlurb:
-      "Postgraduate fellowship prep with exam-level questions and full option explanations.",
+      "Turn knowledge into exam performance with comprehensive question banks and deep explanations built for FCPS aspirants.",
     products: [MEDICINE_AND_ALLIED],
   },
   jcat: {
     slug: "jcat",
-    label: "JCAT (MDMS)",
-    navLabel: "JCAT (MDMS)",
-    heroTitle: "JCAT (MDMS)",
+    label: "MDMS/ JCAT",
+    navLabel: "MDMS/ JCAT",
+    heroTitle: "MDMS/ JCAT",
     heroSubtitle:
       "Choose a product track built for the MDMS entrance exam — starting with Medicine and Allied.",
     landingBlurb:
-      "Entrance-exam prep tuned to JCAT scenario style, timing, and clinical reasoning.",
+      "Entrance exam preparation powered by clinical scenarios, reasoning-based questions, and complete answer breakdowns.",
     products: [MEDICINE_AND_ALLIED],
   },
 };
@@ -87,7 +87,7 @@ export const PROGRAMS: Record<ExamTrack, ProgramConfig> = {
     slug: "fcps",
     badge: "FCPS-1",
     heroSubtitle:
-      "Thousands of graduate candidates rely on our platform for focused, high-yield FCPS-1 preparation. We combine a rigorous question bank with in-depth explanations to develop lasting clinical knowledge and exam confidence.",
+      "A premium FCPS-1 Qbank with high-yield questions, comprehensive explanations for every option, and performance analytics designed to help you think like a specialist.",
     stats: [
       { num: "3,000+", label: "Questions at Exam-Level Difficulty" },
       { num: "100%", label: "Options Explained for Every MCQ" },
@@ -107,22 +107,22 @@ export const PROGRAMS: Record<ExamTrack, ProgramConfig> = {
   },
   jcat: {
     slug: "jcat",
-    badge: "JCAT (MDMS)",
+    badge: "MDMS/ JCAT",
     heroSubtitle:
-      "Purpose-built for candidates sitting the MDMS entrance exam. Scenario-heavy questions and full answer breakdowns build the clinical reasoning JCAT (MDMS) tests for.",
+      "Master real-world clinical reasoning through challenging cases, detailed explanations of every option, and exam-focused practice for MDMS/ JCAT success.",
     stats: [
       { num: "3,000+", label: "Questions at Exam-Level Difficulty" },
       { num: "100%", label: "Options Explained for Every MCQ" },
       { num: "Scenario", label: "Based QBank with Full Explanations" },
       { num: "Live", label: "Analytics to Track Your Performance" },
     ],
-    qbankHeading: "What to Expect from Your JCAT (MDMS) Question Bank",
+    qbankHeading: "What to Expect from Your MDMS/ JCAT Question Bank",
     qbankText:
-      "Our JCAT (MDMS) QBank gives you full control over what you study and how you study it. Build custom tests from 3,000+ practice questions and get comfortable with what you'll face on exam day.",
-    resourcesHeading: "JCAT (MDMS) Resources to Boost Your Confidence",
+      "Our MDMS/ JCAT QBank gives you full control over what you study and how you study it. Build custom tests from 3,000+ practice questions and get comfortable with what you'll face on exam day.",
+    resourcesHeading: "MDMS/ JCAT Resources to Boost Your Confidence",
     resourcesText: "Fill in knowledge gaps and sharpen your clinical reasoning as you build toward exam day.",
     resources: [
-      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks that mirror the real JCAT (MDMS) screen, so nothing feels unfamiliar on test day." },
+      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks that mirror the real MDMS/ JCAT screen, so nothing feels unfamiliar on test day." },
       { title: "Step-by-Step Reasoning for Every Question", desc: "Full walkthroughs, not just answer keys, so you understand the logic behind every option." },
       { title: "Visual Explanations with Labeled Diagrams", desc: "Charts, tables, and labeled illustrations that make complex clinical concepts easier to retain." },
     ],
@@ -226,20 +226,20 @@ export const PROGRAM_FAQS: Record<ExamTrack, Array<{ q: string; a: string }>> = 
   ],
   jcat: [
     {
-      q: "What does the JCAT (MDMS) QBank cover?",
+      q: "What does the MDMS/ JCAT QBank cover?",
       a: "It includes 3,000+ scenario-based questions purpose-built for the MDMS entrance exam's format and difficulty level.",
     },
     {
-      q: "How is JCAT prep different from FCPS-1 prep?",
-      a: "Both share the same explanation-first approach, but JCAT (MDMS) questions are weighted toward the entrance-exam syllabus and scenario format, while FCPS-1 questions target postgraduate-level clinical reasoning.",
+      q: "How is MDMS/ JCAT prep different from FCPS-1 prep?",
+      a: "Both share the same explanation-first approach, but MDMS/ JCAT questions are weighted toward the entrance-exam syllabus and scenario format, while FCPS-1 questions target postgraduate-level clinical reasoning.",
     },
     {
       q: "Does the QBank include full-length mock tests?",
-      a: "Yes. Alongside custom practice blocks, you can sit full-length timed mocks that mirror the real JCAT (MDMS) exam format.",
+      a: "Yes. Alongside custom practice blocks, you can sit full-length timed mocks that mirror the real MDMS/ JCAT exam format.",
     },
     {
       q: "Is there a free demo available?",
-      a: 'Yes. Use "View sample questions" above to try a short set of JCAT (MDMS) questions before you create an account.',
+      a: 'Yes. Use "View sample questions" above to try a short set of MDMS/ JCAT questions before you create an account.',
     },
   ],
 };

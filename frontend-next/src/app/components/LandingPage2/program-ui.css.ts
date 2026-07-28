@@ -266,7 +266,7 @@ export const PROGRAM_UI_CSS = `
 }
 .program-ui .hero-banner-h1 span{color:var(--teal-300)}
 .program-ui .hero-banner-lede{
-  font-size:1.08rem;color:#dbe6ef;max-width:52ch;
+  font-size:1.22rem;line-height:1.6;color:#dbe6ef;max-width:58ch;margin-bottom:1.5rem;
 }
 .program-ui .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px}
  

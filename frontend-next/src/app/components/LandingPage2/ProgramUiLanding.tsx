@@ -257,7 +257,7 @@ export function ProgramUiLanding({
   useScrollReveal(rootEl);
 
   const heroImg = track === "fcps" ? IMG.fcpsHero : IMG.jcatHero;
-  const beginLabel = track === "fcps" ? "Begin FCPS-1 Preparation" : "Begin JCAT (MDMS) Preparation";
+  const beginLabel = track === "fcps" ? "Begin FCPS-1 Preparation" : "Begin MDMS/ JCAT Preparation";
   const trustLine =
     track === "fcps"
       ? "Rated 4.9/5 by more than 1,200 FCPS-1 candidates for explanation quality and realism."
@@ -268,52 +268,52 @@ export function ProgramUiLanding({
   const mcq =
     track === "fcps"
       ? {
-          stem: "A 32-year-old develops sudden dyspnoea and pleuritic chest pain on post-op day 3. Best next step?",
-          options: [
-            { letter: "A", text: "Chest X-ray" },
-            {
-              letter: "B",
-              text: "CT pulmonary angiography",
-              state: "correct" as const,
-              explain: "Confirms or excludes PE — the leading diagnosis in this post-operative scenario.",
-            },
-            { letter: "C", text: "Empirical beta-blocker", state: "wrong" as const },
-          ],
-        }
+        stem: "A 32-year-old develops sudden dyspnoea and pleuritic chest pain on post-op day 3. Best next step?",
+        options: [
+          { letter: "A", text: "Chest X-ray" },
+          {
+            letter: "B",
+            text: "CT pulmonary angiography",
+            state: "correct" as const,
+            explain: "Confirms or excludes PE — the leading diagnosis in this post-operative scenario.",
+          },
+          { letter: "C", text: "Empirical beta-blocker", state: "wrong" as const },
+        ],
+      }
       : {
-          stem: "A patient presents with pallor, fatigue, and spoon-shaped nails. Which deficiency is most likely?",
-          options: [
-            { letter: "A", text: "Vitamin B12" },
-            {
-              letter: "B",
-              text: "Iron",
-              state: "correct" as const,
-              explain: "Koilonychia and fatigue with pallor are classic for iron-deficiency anaemia.",
-            },
-            { letter: "C", text: "Folate", state: "wrong" as const },
-          ],
-        };
+        stem: "A patient presents with pallor, fatigue, and spoon-shaped nails. Which deficiency is most likely?",
+        options: [
+          { letter: "A", text: "Vitamin B12" },
+          {
+            letter: "B",
+            text: "Iron",
+            state: "correct" as const,
+            explain: "Koilonychia and fatigue with pallor are classic for iron-deficiency anaemia.",
+          },
+          { letter: "C", text: "Folate", state: "wrong" as const },
+        ],
+      };
 
   const chart =
     track === "fcps"
       ? {
-          score: "78%",
-          bars: [
-            { label: "Medicine", height: "70%" },
-            { label: "Surgery", height: "40%", low: true },
-            { label: "Peds", height: "85%" },
-            { label: "OB-GYN", height: "60%" },
-          ],
-        }
+        score: "78%",
+        bars: [
+          { label: "Medicine", height: "70%" },
+          { label: "Surgery", height: "40%", low: true },
+          { label: "Peds", height: "85%" },
+          { label: "OB-GYN", height: "60%" },
+        ],
+      }
       : {
-          score: "74%",
-          bars: [
-            { label: "Anatomy", height: "65%" },
-            { label: "Pharm", height: "38%", low: true },
-            { label: "Physio", height: "80%" },
-            { label: "Pathology", height: "55%" },
-          ],
-        };
+        score: "74%",
+        bars: [
+          { label: "Anatomy", height: "65%" },
+          { label: "Pharm", height: "38%", low: true },
+          { label: "Physio", height: "80%" },
+          { label: "Pathology", height: "55%" },
+        ],
+      };
 
   const goProduct = (product: ExamProduct = "medicine-and-allied") => {
     setMobileOpen(false);
@@ -417,16 +417,16 @@ export function ProgramUiLanding({
           <div className="hero-banner-scrim" aria-hidden />
           <div className="container hero-banner-inner">
             <p className="eyebrow eyebrow--light">
-              {p.badge} · Medicine &amp; Allied
+              {p.badge}
             </p>
             <h1 className="hero-banner-h1">
               {track === "fcps" ? (
                 <>
-                  FCPS-1 <span>Preparation</span>
+                  FCPS-1, Where Clinical Reasoning <span>Meets Exam Success</span>
                 </>
               ) : (
                 <>
-                  JCAT (MDMS) <span>Preparation</span>
+                  Master Clinical Thinking. <span> Ace the MDMS/ JCAT</span>
                 </>
               )}
             </h1>
@@ -609,7 +609,7 @@ export function ProgramUiLanding({
         <section className="cta-band" id="start">
           <div className="container cta-inner">
             <p className="eyebrow eyebrow--light">Start Preparing</p>
-            <h2>{track === "fcps" ? "FCPS-1 question bank" : "JCAT (MDMS) question bank"}</h2>
+            <h2>{track === "fcps" ? "FCPS-1 question bank" : "MDMS/ JCAT question bank"}</h2>
             <p className="cta-lead">Full explanations for every option.</p>
             <div className="pill-row pill-row--center">
               <span className="pill">3,000+ Questions</span>
@@ -629,7 +629,7 @@ export function ProgramUiLanding({
 
         <section className="section" id="faq">
           <div className="container container--narrow">
-            <p className="eyebrow">{track === "fcps" ? "FCPS-1 FAQ" : "JCAT (MDMS) FAQ"}</p>
+            <p className="eyebrow">{track === "fcps" ? "FCPS-1 FAQ" : "MDMS/ JCAT FAQ"}</p>
             <h2>Common questions</h2>
             <div className="accordion">
               {faqs.map((item, i) => {
@@ -667,7 +667,7 @@ export function ProgramUiLanding({
               <span className="brand-name">MedPrepAI</span>
             </span>
             <p>
-              Postgraduate medical examination preparation for FCPS-1 and JCAT (MDMS). Every option explained. Built for
+              Postgraduate medical examination preparation for FCPS-1 and MDMS/ JCAT. Every option explained. Built for
               clinical excellence.
             </p>
           </div>
@@ -693,7 +693,7 @@ export function ProgramUiLanding({
                     goTrack("jcat");
                   }}
                 >
-                  JCAT (MDMS)
+                  MDMS/ JCAT
                 </a>
               </li>
             </ul>

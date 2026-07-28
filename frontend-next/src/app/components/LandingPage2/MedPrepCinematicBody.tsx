@@ -47,14 +47,14 @@ const FAQ_DATA = [
 
 export interface MedPrepCinematicBodyProps {
   onStartTrial: () => void;
-  onScrollToPlatform: () => void;
+  onScrollToHowItWorks: () => void;
   onNavigateToCategory: (category: ExamTrack) => void;
   isAuthenticated: boolean;
 }
 
 export function MedPrepCinematicBody({
   onStartTrial,
-  onScrollToPlatform,
+  onScrollToHowItWorks,
   onNavigateToCategory,
   isAuthenticated,
 }: MedPrepCinematicBodyProps) {
@@ -161,8 +161,8 @@ export function MedPrepCinematicBody({
           <button type="button" className="hero-btn-primary" onClick={onStartTrial}>
             {isAuthenticated ? "Open question bank" : "Create your account"}
           </button>
-          <button type="button" className="hero-btn-ghost" onClick={onScrollToPlatform}>
-            Explore what sets us apart
+          <button type="button" className="hero-btn-ghost" onClick={onScrollToHowItWorks}>
+            See how it works
           </button>
         </div>
       </CinematicSection>
