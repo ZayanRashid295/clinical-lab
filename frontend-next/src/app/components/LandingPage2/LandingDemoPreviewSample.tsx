@@ -205,7 +205,7 @@ export function LandingDemoPreviewSample({
 }) {
   const router = useRouter();
   const productPath = productPathForDemoPack(pack);
-  const trackLabel = track === "jcat" ? "JCAT (MDMS)" : "FCPS-1";
+  const trackLabel = track === "jcat" ? "MDMS/ JCAT" : "FCPS-1";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorKind, setErrorKind] = useState<DemoFetchErrorKind>("generic");

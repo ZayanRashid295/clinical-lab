@@ -261,7 +261,7 @@ export function ProgramUiLanding({
   const trustLine =
     track === "fcps"
       ? "Rated 4.9/5 by more than 1,200 FCPS-1 candidates for explanation quality and realism."
-      : "Rated 4.8/5 by more than 900 JCAT (MDMS) candidates for explanation quality and realism.";
+      : "Rated 4.8/5 by more than 900 MDMS/ JCAT candidates for explanation quality and realism.";
   const testimonials = PROGRAM_TESTIMONIALS[track].slice(0, 3);
   const faqs = PROGRAM_FAQS[track];
 
@@ -576,7 +576,7 @@ export function ProgramUiLanding({
         <section className="section section--muted" id="reviews">
           <div className="container">
             <p className="eyebrow">From Candidates</p>
-            <h2>{track === "fcps" ? "What FCPS-1 candidates say" : "What JCAT (MDMS) candidates say"}</h2>
+            <h2>{track === "fcps" ? "What FCPS-1 candidates say" : "What MDMS/ JCAT candidates say"}</h2>
 
             <div className="trust-stat" data-reveal>
               <div className="star-row" aria-hidden>

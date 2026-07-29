@@ -36,9 +36,22 @@ export function ProgramCinematicBody({
   otherTrackLabel,
 }: ProgramCinematicBodyProps) {
   const copy = MEDICINE_PRODUCT_COPY[track];
+  const isJcat = track === "jcat";
   const faqEyebrow = "Medicine and Allied FAQ";
   const testimonialHeading = "What Medicine and Allied candidates say";
   const beginLabel = "Begin Medicine and Allied Preparation";
+  const qbankLead = isJcat
+    ? "Work through realistic case-based questions that mirror the way Medicine and Allied problems are framed, then turn each attempt into a clearer revision plan."
+    : copy.qbankText;
+  const resourcesLead = isJcat
+    ? "Use the built-in resources to close weak spots quickly, strengthen clinical judgment, and turn reading into focused practice."
+    : "Fill in knowledge gaps and sharpen your clinical reasoning as you build toward exam day.";
+  const howItWorksLead = isJcat
+    ? "Move from setup to exam readiness without losing momentum or focus."
+    : "From sign-up to exam day.";
+  const ctaLead = isJcat
+    ? "Build confidence through detailed explanations and practice that feels close to the real exam experience."
+    : "Full explanations for every option.";
   const [faqOpen, setFaqOpen] = useState(0);
 
   const testimonials = PROGRAM_TESTIMONIALS[track].slice(0, 3);
@@ -62,7 +75,7 @@ export function ProgramCinematicBody({
         <CinematicSectionHead
           kicker="Inside The Question Bank"
           title={copy.qbankHeading}
-          lead={copy.qbankText}
+          lead={qbankLead}
         />
         <div className="cine-program-media">
           <CinematicQBankCarousel images={[...PROGRAM_QBANK_CAROUSEL]} />
@@ -73,7 +86,7 @@ export function ProgramCinematicBody({
         <CinematicSectionHead
           kicker="Study Resources"
           title={copy.resourcesHeading}
-          lead="Fill in knowledge gaps and sharpen your clinical reasoning as you build toward exam day."
+          lead={resourcesLead}
         />
         <div className="cine-program-media">
           <CinematicResourceGrid items={resourceItems} />
@@ -84,7 +97,7 @@ export function ProgramCinematicBody({
         <CinematicSectionHead
           kicker="Getting Started"
           title="How it works"
-          lead="From sign-up to exam day."
+          lead={howItWorksLead}
         />
         <div className="cine-text-grid cine-text-grid--4">
           {PROGRAM_STEPS.map(({ n, title, body }) => (
@@ -115,7 +128,7 @@ export function ProgramCinematicBody({
           align="center"
           kicker="Start Preparing"
           title="Medicine and Allied question bank"
-          lead="Full explanations for every option."
+          lead={ctaLead}
         />
         <div className="cine-cta-row">
           <button type="button" className="hero-btn-primary" onClick={onBeginPrep}>

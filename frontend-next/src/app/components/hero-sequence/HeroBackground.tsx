@@ -451,6 +451,7 @@ export function HeroBackground({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef(scrollProgress);
+  const lastScrollRef = useRef(scrollProgress);
   const motionRef = useRef(reducedMotion);
   const mouseRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const rafRef = useRef<number | null>(null);
@@ -510,6 +511,9 @@ export function HeroBackground({
       if (!reduced) time += dt;
 
       const progress = reduced ? 0.82 : scrollRef.current;
+      const scrollDelta = Math.abs(scrollRef.current - lastScrollRef.current);
+      const idleBoost = scrollDelta < 0.0006 ? 1.24 : 1;
+      lastScrollRef.current = scrollRef.current;
       const mouse = mouseRef.current;
       mouse.x = lerp(mouse.x, mouse.tx, 1 - Math.exp(-5 * dt));
       mouse.y = lerp(mouse.y, mouse.ty, 1 - Math.exp(-5 * dt));
@@ -594,10 +598,10 @@ export function HeroBackground({
         const driftScale = 1 - progress * 0.65;
         const driftX = reduced
           ? 0
-          : Math.sin(time * 0.32 + card.phase) * card.driftAmp * driftScale;
+          : Math.sin(time * (0.36 * idleBoost) + card.phase) * card.driftAmp * driftScale;
         const driftY = reduced
           ? 0
-          : Math.cos(time * 0.26 + card.phase * 1.2) * card.driftAmp * 0.8 * driftScale;
+          : Math.cos(time * (0.3 * idleBoost) + card.phase * 1.2) * card.driftAmp * 0.8 * driftScale;
 
         const stiffness = reduced ? 70 : 18 + progress * 14;
         const damping = reduced ? 18 : 11 + progress * 5;

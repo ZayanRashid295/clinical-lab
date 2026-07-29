@@ -17,8 +17,8 @@ function SampleInner({ track }: { track: ExamTrack }) {
       actions={actions}
       cinematicNav
       hideFooter
-      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and JCAT (MDMS)."
-      footerBottomNote="Trusted for FCPS-1 & JCAT Preparation · Pakistan"
+      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and MDMS/ JCAT."
+      footerBottomNote="Trusted for FCPS-1 & MDMS/ JCAT Preparation · Pakistan"
     >
       <LandingDemoPreviewSample
         pack={demoPackForTrack(track)}

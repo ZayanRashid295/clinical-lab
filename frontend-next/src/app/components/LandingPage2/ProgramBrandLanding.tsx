@@ -10,11 +10,114 @@ import {
   CinematicHeroContent,
   Monitor3DScene,
 } from "../hero-sequence";
-import { PROGRAM_HERO_SCREEN } from "./monitor-mockup";
+import { MonitorMockup, PROGRAM_HERO_SCREEN } from "./monitor-mockup";
 import { demoPackForTrack } from "./landing-demo-lead";
 
 export interface ProgramBrandActions extends LandingV2ChromeActions {
   onBeginPrep: () => void;
+}
+
+function HeroVisual({ screenSrc, useComputer }: { screenSrc: string; useComputer: boolean }) {
+  if (useComputer) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "12px 0 8px",
+        }}
+      >
+        <MonitorMockup screenSrc={screenSrc} alt="Medicine and Allied diagnostic preview" zoomable={false} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: 360,
+        margin: "0 auto",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "12px 0 8px",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: 288,
+          height: 336,
+          borderRadius: 30,
+          background: "linear-gradient(145deg, #fefefe 0%, #eaf3ff 100%)",
+          boxShadow: "0 24px 48px rgba(15, 23, 42, 0.16)",
+          border: "1px solid rgba(59, 130, 246, 0.16)",
+          transform: "rotate(0deg)",
+          padding: "24px 22px 26px",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 116,
+            height: 34,
+            borderRadius: "0 0 16px 16px",
+            background: "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
+            border: "1px solid rgba(37, 99, 235, 0.16)",
+            boxShadow: "0 10px 20px rgba(59, 130, 246, 0.16)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: "26px 24px 24px",
+            borderRadius: 24,
+            background: "linear-gradient(180deg, #fcfdff 0%, #f6f9fe 100%)",
+            border: "1px solid rgba(15, 23, 42, 0.08)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.75)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: 12,
+              background: "linear-gradient(90deg, rgba(37,99,235,0.16), rgba(15,23,42,0.03))",
+              borderBottom: "1px solid rgba(15,23,42,0.06)",
+            }}
+          />
+          <div
+            style={{
+              padding: 10,
+              height: "100%",
+              background: "repeating-linear-gradient(180deg, rgba(15,23,42,0.025) 0 1px, transparent 1px 18px)",
+            }}
+          >
+            <img
+              src={screenSrc}
+              alt="Medicine and Allied diagnostic preview"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: 14,
+                display: "block",
+                border: "1px solid rgba(15, 23, 42, 0.06)",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function ProgramBrandLanding({
@@ -29,23 +132,22 @@ export function ProgramBrandLanding({
   const copy = MEDICINE_PRODUCT_COPY[track];
 
   const beginLabel = "Begin Medicine and Allied Preparation";
+  const heroVisualSrc = track === "fcps" ? PROGRAM_HERO_SCREEN : "/images/landing-v2/clipboard-screen.png";
   const pageTitle = (
     <>
       Medicine and Allied
-      <br />
-      preparation
     </>
   );
   const otherTrackLabel =
-    track === "fcps" ? "Medicine and Allied under MDMS/JCAT" : "Medicine and Allied under FCPS-1";
+    track === "fcps" ? "Medicine and Allied under MDMS/ JCAT" : "Medicine and Allied under FCPS-1";
 
   return (
     <LandingV2Chrome
       activePage={track}
       actions={actions}
       cinematicNav
-      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and MDMS/JCAT. Every option explained. Built for clinical excellence."
-      footerBottomNote="Trusted for FCPS-1 & JCAT Preparation · Pakistan"
+      footerBlurb="Postgraduate medical examination preparation for FCPS-1 and MDMS/ JCAT. Every option explained. Built for clinical excellence."
+      footerBottomNote="Trusted for FCPS-1 & MDMS/ JCAT Preparation · Pakistan"
     >
       <div className="lp-program">
         {demoOpen && (
@@ -65,16 +167,11 @@ export function ProgramBrandLanding({
           ariaLabel="Medicine and Allied exam preparation"
         >
           <CinematicHeroContent
-            kicker={track === "fcps" ? "FCPS-1 product" : "MDMS/JCAT product"}
+            kicker={track === "fcps" ? "FCPS-1 product" : "MDMS/ JCAT product"}
             title={pageTitle}
             subtitle={copy.heroSubtitle}
             blendedVisual={
-              <Monitor3DScene
-                straight
-                zoomable
-                screenSrc={PROGRAM_HERO_SCREEN}
-                alt="Medicine and Allied question bank on desktop monitor"
-              />
+              <HeroVisual screenSrc={heroVisualSrc} useComputer={track === "fcps"} />
             }
             primaryCta={{ label: beginLabel, onClick: actions.onBeginPrep }}
             secondaryCta={{

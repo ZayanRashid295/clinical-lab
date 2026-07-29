@@ -143,15 +143,15 @@ export const MEDICINE_PRODUCT_COPY: Record<
 > = {
   fcps: {
     heroSubtitle:
-      "Thousands of graduate candidates rely on our platform for focused, high-yield Medicine and Allied preparation. We combine a rigorous question bank with in-depth explanations to develop lasting clinical knowledge and exam confidence.",
+      "Thousands of graduate candidates rely on our platform for focused, high-yield Medicine and Allied preparation. We pair a rigorous question bank with detailed explanations to build lasting clinical knowledge and exam confidence.",
     qbankHeading: "What to Expect from Your Medicine and Allied Question Bank",
     qbankText:
-      "Our Medicine and Allied QBank gives you full control over what you study and how you study it. Build custom tests from 3,000+ practice questions and get comfortable with what you'll face on exam day.",
+      "Our Medicine and Allied QBank gives you full control over your revision. Build custom tests from 3,000+ practice questions and become familiar with the format you'll face on exam day.",
     resourcesHeading: "Medicine and Allied Resources to Boost Your Confidence",
     resources: [
-      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks that mirror the real exam screen, so nothing feels unfamiliar on test day." },
-      { title: "Step-by-Step Reasoning for Every Question", desc: "Full walkthroughs, not just answer keys, so you understand the logic behind every option." },
-      { title: "Visual Explanations with Labeled Diagrams", desc: "Charts, tables, and labeled illustrations that make complex clinical concepts easier to retain." },
+      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks mirror the real exam screen, so nothing feels unfamiliar on test day." },
+      { title: "Step-by-Step Reasoning for Every Question", desc: "Full walkthroughs, not just answer keys, help you understand the logic behind every option." },
+      { title: "Visual Explanations with Labeled Diagrams", desc: "Charts, tables, and labeled illustrations make complex clinical concepts easier to picture and retain." },
     ],
     faqs: [
       {
@@ -164,7 +164,7 @@ export const MEDICINE_PRODUCT_COPY: Record<
       },
       {
         q: "Can I track my performance by subject?",
-        a: "Yes. Live analytics break down your accuracy and timing by subject, so you always know where to focus next.",
+        a: "Yes. Live analytics break down your accuracy and timing by subject, so you always know exactly where to focus next.",
       },
       {
         q: "Is there a free demo available?",
@@ -174,15 +174,15 @@ export const MEDICINE_PRODUCT_COPY: Record<
   },
   jcat: {
     heroSubtitle:
-      "Purpose-built for Medicine and Allied candidates. Scenario-heavy questions and full answer breakdowns build the clinical reasoning high-stakes entrance exams test for.",
+      "Purpose-built for Medicine and Allied candidates. Scenario-heavy questions and full answer breakdowns build the clinical reasoning that high-stakes entrance exams test for.",
     qbankHeading: "What to Expect from Your Medicine and Allied Question Bank",
     qbankText:
-      "Our Medicine and Allied QBank gives you full control over what you study and how you study it. Build custom tests from 3,000+ practice questions and get comfortable with what you'll face on exam day.",
+      "Our Medicine and Allied QBank gives you full control over your revision. Build custom tests from 3,000+ practice questions and become familiar with the format you'll face on exam day.",
     resourcesHeading: "Medicine and Allied Resources to Boost Your Confidence",
     resources: [
-      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks that mirror the real exam screen, so nothing feels unfamiliar on test day." },
-      { title: "Step-by-Step Reasoning for Every Question", desc: "Full walkthroughs, not just answer keys, so you understand the logic behind every option." },
-      { title: "Visual Explanations with Labeled Diagrams", desc: "Charts, tables, and labeled illustrations that make complex clinical concepts easier to retain." },
+      { title: "Realistic Exam-Style Testing Interface", desc: "Timed practice blocks mirror the real exam screen, so nothing feels unfamiliar on test day." },
+      { title: "Step-by-Step Reasoning for Every Question", desc: "Full walkthroughs, not just answer keys, help you understand the logic behind every option." },
+      { title: "Visual Explanations with Labeled Diagrams", desc: "Charts, tables, and labeled illustrations make complex clinical concepts easier to picture and retain." },
     ],
     faqs: [
       {

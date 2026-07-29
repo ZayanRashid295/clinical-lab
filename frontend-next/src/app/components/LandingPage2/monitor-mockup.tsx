@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "@/shared/ui/dialog";
 import { LandingLightboxClose } from "./landing-v2-lightbox-close";
 
 export const PROGRAM_HERO_SCREEN = "/images/landing-v2/computer-screen.jpeg";
+export const CLIPBOARD_SCREEN = "/images/landing-v2/clipboard-screen.jpeg";
 
 function ZoomIcon() {
   return (

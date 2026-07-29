@@ -1,383 +1,443 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JCAT (MDMS) Preparation | MedPrepAI</title>
-<meta name="description" content="Scenario-heavy JCAT (MDMS) QBank with 3,000+ exam-level questions, full option-level explanations, and live performance analytics.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MDMS/ JCAT Preparation | MedPrepAI</title>
+  <meta name="description"
+    content="An MDMS/ JCAT question bank built around real exam scenarios — 3,000+ questions at exam-level difficulty, an explanation for every option, and analytics that track your progress in real time.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
+
 <body>
- 
-<header class="site-header">
-  <div class="container nav-inner">
-    <a href="index.html" class="brand">
-      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="30" height="30" rx="8" fill="#123252"/>
-        <path d="M6 16.5H10.5L12.5 11L15.5 20L17.5 14.5L19 16.5H24" stroke="#8FD4CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      MedPrepAI
-    </a>
- 
-    <nav class="main-nav" id="mainNav">
-      <div class="nav-item has-dropdown">
-        <button class="nav-link" aria-expanded="false">FCPS
-          <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="dropdown">
-          <a href="fcps.html">Medicine &amp; Allied</a>
+
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="jcat.html" class="brand">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <rect width="30" height="30" rx="8" fill="#123252" />
+          <path class="brand-pulse" d="M6 16.5H10.5L12.5 11L15.5 20L17.5 14.5L19 16.5H24" stroke="#8FD4CF" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        MedPrepAI
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <div class="nav-item has-dropdown">
+          <button class="nav-link" aria-expanded="false">FCPS
+            <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="dropdown">
+            <a href="fcps.html">Medicine &amp; Allied</a>
+          </div>
         </div>
-      </div>
-      <div class="nav-item has-dropdown">
-        <button class="nav-link" aria-expanded="false">JCAT
-          <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="dropdown">
-          <a href="jcat.html">Medicine &amp; Allied</a>
+        <div class="nav-item has-dropdown">
+          <button class="nav-link" aria-expanded="false">MDMS/ JCAT
+            <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="dropdown">
+            <a href="jcat.html">Medicine &amp; Allied</a>
+          </div>
         </div>
-      </div>
-      <div class="nav-item has-dropdown">
-        <button class="nav-link" aria-expanded="false">Account
-          <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="dropdown">
-          <a href="#">Sign in</a>
-          <a href="#faq">FAQ</a>
+        <div class="nav-item has-dropdown">
+          <button class="nav-link" aria-expanded="false">Account
+            <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="dropdown">
+            <a href="#">Sign in</a>
+            <a href="#faq">FAQ</a>
+          </div>
         </div>
-      </div>
-    </nav>
- 
-    <a href="#start" class="btn btn-primary btn-sm nav-cta">Begin Prep</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
- 
-<main>
- 
-  <!-- ============ HERO ============ -->
-  <section class="hero-banner">
-    <img class="hero-banner-img" src="assets/images/image1.png" alt="Doctors preparing for the JCAT (MDMS) examination" loading="eager">
-    <div class="hero-banner-scrim" aria-hidden="true"></div>
-    <div class="container hero-banner-inner">
-      <p class="eyebrow eyebrow--light">JCAT (MDMS) · Medicine &amp; Allied</p>
-      <h1 class="hero-banner-h1">JCAT (MDMS) <span>Preparation</span></h1>
-      <p class="hero-banner-lede">Purpose-built for candidates sitting the MDMS entrance exam. Scenario-heavy questions and full answer breakdowns build the clinical reasoning JCAT (MDMS) tests for.</p>
-      <div class="hero-actions">
-        <a href="#start" class="btn btn-primary btn-light">Begin JCAT (MDMS) Preparation</a>
-        <a href="#inside" class="btn btn-ghost-light">View sample questions</a>
-      </div>
+      </nav>
+
+      <a href="#start" class="btn btn-primary btn-sm nav-cta">Begin Prep</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </section>
- 
-  <!-- ============ STATS BAND ============ -->
-  <section class="stats-band">
-    <div class="container stats-grid">
-      <div class="stat">
-        <span class="stat-num">3,000+</span>
-        <span class="stat-label">Questions at Exam-Level Difficulty</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">100%</span>
-        <span class="stat-label">Options Explained for Every MCQ</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">Scenario</span>
-        <span class="stat-label">Based QBank with Full Explanations</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">Live</span>
-        <span class="stat-label">Analytics to Track Your Performance</span>
-      </div>
-    </div>
-  </section>
- 
-  <!-- ============ INSIDE THE QUESTION BANK / STUDY RESOURCES ============ -->
-  <section class="section" id="inside">
-    <div class="container">
-      <p class="eyebrow">Inside The Question Bank</p>
-      <h2>What to Expect from Your JCAT (MDMS) Question Bank</h2>
-      <p class="section-lede">Our JCAT (MDMS) QBank gives you full control over what you study and how you study it. Build custom tests from 3,000+ practice questions and get comfortable with what you'll face on exam day.</p>
- 
-      <div class="feature-row" data-reveal>
-        <div class="feature-row-text">
-          <h3>Practice like it's exam day</h3>
-          <p>Timed blocks that mirror the real JCAT (MDMS) screen, paired with a full walkthrough of every option — not just an answer key — so the reasoning behind each choice actually sticks.</p>
+  </header>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero-banner">
+      <img class="hero-banner-img" src="assets/images/image1.png" alt="Doctors preparing for the MDMS/ JCAT examination"
+        loading="eager">
+      <div class="hero-banner-scrim" aria-hidden="true"></div>
+      <div class="container hero-banner-inner">
+        <p class="eyebrow eyebrow--light">MDMS/ JCAT · Medicine &amp; Allied</p>
+        <h1 class="hero-banner-h1">MDMS/ JCAT <span>Preparation</span></h1>
+        <p class="hero-banner-lede">Designed around the exact structure of the MDMS entrance test, with
+          scenario-driven questions, explanations that lead with reasoning, and analytics that tell you what to
+          study next.</p>
+        <div class="hero-actions">
+          <a href="#start" class="btn btn-primary btn-light">Begin MDMS/ JCAT Preparation</a>
+          <a href="#inside" class="btn btn-ghost-light">View sample questions</a>
         </div>
-        <div class="feature-row-media">
-          <div class="mini-mcq">
-            <p>A patient presents with pallor, fatigue, and spoon-shaped nails. Which deficiency is most likely?</p>
-            <ul>
-              <li><span class="opt-letter">A</span> Vitamin B12</li>
-              <li class="is-correct"><span class="opt-letter">B</span> Iron<span class="opt-explain">Koilonychia and fatigue with pallor are classic for iron-deficiency anaemia.</span></li>
-              <li class="is-wrong"><span class="opt-letter">C</span> Folate</li>
-            </ul>
+      </div>
+    </section>
+
+    <!-- ============ STATS BAND ============ -->
+    <section class="stats-band">
+      <div class="container stats-grid">
+        <div class="stat">
+          <span class="stat-num" data-count-to="3000" data-suffix="+">0</span>
+          <span class="stat-label">High-Difficulty Practice Questions</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count-to="100" data-suffix="%">0</span>
+          <span class="stat-label">Every MCQ Option, Fully Explained</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">Scenario</span>
+          <span class="stat-label">Driven QBank with In-Depth Rationales</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">Live</span>
+          <span class="stat-label">Progress Tracking as You Practice</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INSIDE THE QUESTION BANK / STUDY RESOURCES ============ -->
+    <section class="section section--dark" id="inside">
+      <div class="container">
+        <p class="eyebrow">Inside The Question Bank</p>
+        <h2>What to Expect from Your MDMS/ JCAT Question Bank</h2>
+        <p class="section-lede">The MDMS/ JCAT QBank is built around the entrance exam's real scoring pattern, so
+          you're not left decoding the format on test day — your time goes toward sharpening the reasoning it
+          actually rewards.</p>
+
+        <div class="feature-row" data-reveal>
+          <div class="feature-row-text">
+            <h3>Sit the real format, early and often</h3>
+            <p>Timing and layout in every block mirror the actual MDMS/ JCAT screen, so by exam day the format
+              itself is no longer a surprise — you'll have already run through it many times over.</p>
+          </div>
+          <div class="feature-row-media">
+            <figure class="diagram-figure diagram-figure--dark" data-tilt data-tilt-glare>
+              <img src="assets/images/mcq.jpeg" alt="MDMS/ JCAT exam-style MCQ practice screen" loading="lazy">
+            </figure>
+          </div>
+        </div>
+
+        <div class="feature-row" data-reveal>
+          <div class="feature-row-media">
+            <figure class="diagram-figure diagram-figure--dark" data-tilt data-tilt-glare>
+              <img src="assets/images/analytics-graphic.png" alt="Subject-wise accuracy breakdown and 30-day performance trend" loading="lazy">
+            </figure>
+          </div>
+          <div class="feature-row-text">
+            <h3>Turn scores into a study plan</h3>
+            <p>Each attempt updates a subject-wise breakdown, so rather than re-reading the whole syllabus before
+              the exam, you can direct the time you have left to exactly where it's needed most.</p>
+          </div>
+        </div>
+
+        <div class="feature-row" data-reveal>
+          <div class="feature-row-text">
+            <h3>Explanations that show the reasoning, not just the answer</h3>
+            <p>Each rationale explains what makes the correct option right and why the other choices fall short,
+              with labeled diagrams worked in wherever an image gets the point across quicker than text.</p>
+          </div>
+          <div class="feature-row-media">
+            <figure class="diagram-figure" data-tilt data-tilt-glare>
+              <img src="assets/images/labeled-diagram.jpeg" alt="Sample labeled clinical diagram" loading="lazy">
+            </figure>
           </div>
         </div>
       </div>
- 
-      <div class="feature-row" data-reveal>
-        <div class="feature-row-media">
-          <div class="mini-chart">
-            <div class="mini-chart-head">
-              <span>Subject Accuracy</span>
-              <span class="mini-chart-score">74%</span>
-            </div>
-            <div class="mini-chart-bars">
-              <div class="mini-chart-bar"><span class="bar" style="height:65%"></span><label>Anatomy</label></div>
-              <div class="mini-chart-bar is-low"><span class="bar" style="height:38%"></span><label>Pharm</label></div>
-              <div class="mini-chart-bar"><span class="bar" style="height:80%"></span><label>Physio</label></div>
-              <div class="mini-chart-bar"><span class="bar" style="height:55%"></span><label>Pathology</label></div>
-            </div>
+    </section>
+
+    <!-- ============ BUILT INTO EVERY QUESTION ============ -->
+    <section class="section section--muted" id="built-in" data-orb-field>
+      <div class="container">
+        <p class="eyebrow">Built Into Every Question</p>
+        <h2>One QBank, fully equipped</h2>
+        <p class="section-lede">Nothing sits behind a separate upgrade — every MDMS/ JCAT question arrives with the
+          full toolset from the moment you start.</p>
+
+        <div class="included-meta" data-reveal>
+          <span class="included-tag">Included With Every Question</span>
+          <span class="included-count">3,000+ Questions</span>
+        </div>
+
+        <div class="bento-grid" data-reveal>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6H14M4 12H20M4 18H10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+            <h4>Custom Practice Blocks</h4>
+            <p>Set the subject, topic, or difficulty level yourself, so each session closes a specific gap instead
+              of covering ground you've already mastered.</p>
+          </div>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21C12 21 4 15.5 4 9.5C4 6.5 6.5 4 9.5 4C10.9 4 12 4.7 12 4.7C12 4.7 13.1 4 14.5 4C17.5 4 20 6.5 20 9.5C20 15.5 12 21 12 21Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <h4>Save Favorites for Revision</h4>
+            <p>Flag the questions that give you trouble and come back to just that shortlist later, instead of
+              working back through the entire bank before test day.</p>
+          </div>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8" />
+                <path d="M4 10H20" stroke="currentColor" stroke-width="1.8" />
+                <path d="M9 4V10" stroke="currentColor" stroke-width="1.8" />
+              </svg>
+            </span>
+            <h4>Timed Mocks &amp; Free Practice</h4>
+            <p>Run a full timed mock when you want the real-exam pressure, or drop into untimed practice while a
+              concept is still coming together.</p>
+          </div>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3L4 7V12C4 16.4 7.4 20.4 12 21C16.6 20.4 20 16.4 20 12V7L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <h4>Trustworthy Rationales</h4>
+            <p>Every explanation is verified against standard entrance-exam references, so nothing you commit to
+              memory falls apart under closer scrutiny later.</p>
+          </div>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8" />
+                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <h4>Mapped to the Entrance Syllabus</h4>
+            <p>Coverage is verified topic-by-topic against the current MDMS/ JCAT syllabus, so nothing on exam day
+              is coming at you completely cold.</p>
+          </div>
+          <div class="bento-card" data-tilt data-tilt-glare>
+            <span class="icon-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M5 8L9 4M9 4L13 8M9 4V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M19 16L15 20M15 20L11 16M15 20V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <h4>Refreshed Every Cycle</h4>
+            <p>Content is reviewed and updated on every cycle, so the bank stays aligned with how the exam is
+              actually being written now.</p>
           </div>
         </div>
-        <div class="feature-row-text">
-          <h3>Know exactly where you stand</h3>
-          <p>Live analytics break your accuracy and timing down by subject, so your final weeks of prep go to the topics that will actually move your score.</p>
-        </div>
       </div>
- 
-      <div class="feature-row" data-reveal>
-        <div class="feature-row-text">
-          <h3>Visual explanations, not walls of text</h3>
-          <p>Labeled diagrams sit right inside the explanation, so complex concepts are easier to picture and easier to retain.</p>
-        </div>
-        <div class="feature-row-media">
-          <figure class="diagram-figure">
-            <img src="assets/images/labeled-diagram.jpeg" alt="Sample labeled clinical diagram" loading="lazy">
+    </section>
+
+    <!-- ============ CINEMATIC INTERLUDE ============ -->
+    <section class="cinematic-interlude" data-reveal>
+      <div class="cinematic-interlude-inner">
+        <p class="eyebrow eyebrow--light" style="justify-content:center">By The Numbers</p>
+        <p class="cinematic-stat" data-count-to="3000" data-suffix="+">0</p>
+        <h3>Scenario questions mapped to the actual MDMS entrance syllabus</h3>
+        <p>No filler and no recycled easy patterns — just enough depth and difficulty that the real exam feels like
+          one more block you've already sat through.</p>
+        <div class="cinematic-divider"></div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section" id="how" data-orb-field>
+      <div class="container">
+        <p class="eyebrow">Getting Started</p>
+        <h2>How it works</h2>
+        <p class="section-lede">From sign-up to exam-day readiness.</p>
+
+        <div class="section-banner" data-reveal>
+          <figure class="diagram-figure diagram-figure--dark" data-tilt data-tilt-glare>
+            <img src="assets/images/journey-graphic.png" alt="Four-stage roadmap from account creation to exam-day readiness" loading="lazy">
           </figure>
         </div>
-      </div>
-    </div>
-  </section>
- 
-  <!-- ============ BUILT INTO EVERY QUESTION ============ -->
-  <section class="section section--muted" id="built-in">
-    <div class="container">
-      <p class="eyebrow">Built Into Every Question</p>
-      <h2>Everything included, every time you practice</h2>
-      <p class="section-lede">No add-ons, no separate purchases — every question in the JCAT (MDMS) QBank ships with the same depth of support.</p>
- 
-      <div class="included-meta" data-reveal>
-        <span class="included-tag">Included With Every Question</span>
-        <span class="included-count">3,000+ Questions</span>
-      </div>
 
-      <div class="bento-grid" data-reveal>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="7" r="2" fill="var(--navy-950)" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="12" r="2" fill="var(--navy-950)" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="17" r="2" fill="var(--navy-950)" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-          <h4>Build Custom Tests</h4>
-          <p>Filter by subject, difficulty, or question status to build a block that targets exactly what you need.</p>
-        </div>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 4H17V20L12 16L7 20V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-          </span>
-          <h4>Bookmark &amp; Review</h4>
-          <p>Flag questions as you go and pull every flagged item into one review set before your next session.</p>
-        </div>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8V12L15 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <h4>Timed &amp; Tutor Modes</h4>
-          <p>Switch between exam-timed blocks and a relaxed tutor mode that reveals explanations as you go.</p>
-        </div>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 5C4 4 5 4 6 4H12V19H6C5 19 4 19 4 20V5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 5C20 4 19 4 18 4H12V19H18C19 19 20 19 20 20V5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-          </span>
-          <h4>Reference-Backed Answers</h4>
-          <p>Explanations are grounded in standard references, so what you're reading holds up under scrutiny.</p>
-        </div>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 4H18V20H6V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 9H15M9 13H15M9 17H12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </span>
-          <h4>Full Syllabus Coverage</h4>
-          <p>Every subject and topic in the official syllabus is represented, so nothing catches you by surprise.</p>
-        </div>
-        <div class="bento-card">
-          <span class="icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 4v4h-4M6 20v-4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <h4>Regularly Updated Content</h4>
-          <p>Refreshed each cycle to stay aligned with the current exam pattern and syllabus.</p>
-        </div>
+        <ol class="steps">
+          <li class="step" data-reveal>
+            <span class="step-num">01</span>
+            <h4>Set up your profile</h4>
+            <p>Enter your exam date and current starting point, so the plan built around you has a clear countdown
+              to work toward.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">02</span>
+            <h4>Work through the QBank</h4>
+            <p>Answer scenario-based questions written at real exam difficulty, choosing timed blocks or your own
+              pace as you go.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">03</span>
+            <h4>Study every rationale</h4>
+            <p>Look past whether you got it right and understand why each wrong option was a wrong option too.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">04</span>
+            <h4>Let the data steer you</h4>
+            <p>Check your subject-wise breakdown often and let it, not a hunch, decide what you study next.</p>
+          </li>
+        </ol>
       </div>
-    </div>
-  </section>
- 
-  <!-- ============ HOW IT WORKS ============ -->
-  <section class="section" id="how">
-    <div class="container">
-      <p class="eyebrow">Getting Started</p>
-      <h2>How it works</h2>
-      <p class="section-lede">From sign-up to exam day.</p>
- 
-      <ol class="steps">
-        <li class="step" data-reveal>
-          <span class="step-num">01</span>
-          <h4>Create your account</h4>
-          <p>Pick your exam track and set up your study profile in under a minute.</p>
-        </li>
-        <li class="step" data-reveal>
-          <span class="step-num">02</span>
-          <h4>Practice questions</h4>
-          <p>Work through scenario MCQs at real exam difficulty with every option explained.</p>
-        </li>
-        <li class="step" data-reveal>
-          <span class="step-num">03</span>
-          <h4>Read explanations</h4>
-          <p>Review why each option is right or wrong until the logic sticks.</p>
-        </li>
-        <li class="step" data-reveal>
-          <span class="step-num">04</span>
-          <h4>Track progress</h4>
-          <p>Use dashboards to spot weak areas and measure improvement over time.</p>
-        </li>
-      </ol>
-    </div>
-  </section>
- 
-  <!-- ============ TESTIMONIALS ============ -->
-  <section class="section section--muted" id="reviews">
-    <div class="container">
-      <p class="eyebrow">From Candidates</p>
-      <h2>What JCAT (MDMS) candidates say</h2>
- 
-      <div class="trust-stat" data-reveal>
-        <div class="star-row" aria-hidden="true">★★★★★</div>
-        <p class="mission-statement">Rated 4.8/5 by more than 900 JCAT (MDMS) candidates for explanation quality and realism.</p>
-      </div>
- 
-      <div class="testimonial-grid">
-        <blockquote class="testimonial" data-reveal>
-          <span class="stars" aria-hidden="true">★★★★★</span>
-          <p>The scenario-heavy format matched JCAT perfectly. Felt fully prepared walking in.</p>
-          <footer>
-            <span class="avatar">ZQ</span>
-            <span><strong>Zainab Qureshi</strong><br>Lahore, Pakistan</span>
-          </footer>
-        </blockquote>
-        <blockquote class="testimonial" data-reveal>
-          <span class="stars" aria-hidden="true">★★★★★</span>
-          <p>Subject-wise breakdown helped me focus my last two weeks on exactly the right topics.</p>
-          <footer>
-            <span class="avatar">AH</span>
-            <span><strong>Ali Hassan</strong><br>Rawalpindi, Pakistan</span>
-          </footer>
-        </blockquote>
-        <blockquote class="testimonial" data-reveal>
-          <span class="stars" aria-hidden="true">★★★★★</span>
-          <p>Clear visuals in the explanations made tough concepts click much faster.</p>
-          <footer>
-            <span class="avatar">MI</span>
-            <span><strong>Mahnoor Iqbal</strong><br>Karachi, Pakistan</span>
-          </footer>
-        </blockquote>
-      </div>
-    </div>
-  </section>
- 
-  <!-- ============ CTA BAND ============ -->
-  <section class="cta-band" id="start">
-    <div class="container cta-inner">
-      <p class="eyebrow eyebrow--light">Start Preparing</p>
-      <h2>JCAT (MDMS) question bank</h2>
-      <p>Full explanations for every option.</p>
-      <div class="pill-row pill-row--center">
-        <span class="pill">3,000+ Questions</span>
-        <span class="pill">100% Options Explained</span>
-        <span class="pill">Live Analytics</span>
-      </div>
-      <div class="hero-actions">
-        <a href="#" class="btn btn-primary btn-light">Begin JCAT (MDMS) Preparation</a>
-        <a href="#inside" class="btn btn-ghost-light">View sample questions</a>
-      </div>
-    </div>
-  </section>
- 
-  <!-- ============ FAQ ============ -->
-  <section class="section" id="faq">
-    <div class="container container--narrow">
-      <p class="eyebrow">JCAT (MDMS) FAQ</p>
-      <h2>Common questions</h2>
- 
-      <div class="accordion">
-        <div class="accordion-item">
-          <button class="accordion-trigger">
-            What does the JCAT (MDMS) QBank cover?
-            <span class="accordion-icon">+</span>
-          </button>
-          <div class="accordion-panel">
-            <p>It includes 3,000+ scenario-based questions purpose-built for the MDMS entrance exam's format and difficulty level.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-trigger">
-            How is JCAT prep different from FCPS-1 prep?
-            <span class="accordion-icon">+</span>
-          </button>
-          <div class="accordion-panel">
-            <p>Both share the same explanation-first approach, but JCAT (MDMS) questions are weighted toward the entrance-exam syllabus and scenario format, while FCPS-1 questions target postgraduate-level clinical reasoning.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-trigger">
-            Does the QBank include full-length mock tests?
-            <span class="accordion-icon">+</span>
-          </button>
-          <div class="accordion-panel">
-            <p>Yes. Alongside custom practice blocks, you can sit full-length timed mocks that mirror the real JCAT (MDMS) exam format.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-trigger">
-            Is there a free demo available?
-            <span class="accordion-icon">+</span>
-          </button>
-          <div class="accordion-panel">
-            <p>Yes. Use "View sample questions" above to try a short set of JCAT (MDMS) questions before you create an account.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
- 
+    </section>
 
-</main>
- 
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <span class="brand">MedPrepAI</span>
-      <p>Postgraduate medical examination preparation for FCPS-1 and JCAT (MDMS). Every option explained. Built for clinical excellence.</p>
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="section section--muted" id="reviews" data-orb-field>
+      <div class="container">
+        <p class="eyebrow">From Candidates</p>
+        <h2>What MDMS/ JCAT candidates say</h2>
+
+        <div class="trust-stat" data-reveal>
+          <div class="star-row" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <p class="mission-statement">Rated 4.8/5 by over 900 MDMS/ JCAT candidates for how realistic and clear the
+            explanations are.</p>
+        </div>
+
+        <div class="testimonial-grid">
+          <blockquote class="testimonial" data-reveal data-tilt>
+            <span class="stars" aria-hidden="true">★★★★★</span>
+            <p>The scenario-heavy style lined up perfectly with the real MDMS/ JCAT paper — I walked in already
+              knowing what to expect.</p>
+            <footer>
+              <span class="avatar">ZQ</span>
+              <span><strong>Zainab Qureshi</strong><br>Lahore, Pakistan</span>
+            </footer>
+          </blockquote>
+          <blockquote class="testimonial" data-reveal data-tilt>
+            <span class="stars" aria-hidden="true">★★★★★</span>
+            <p>Seeing my subject-wise breakdown let me spend my last two weeks on exactly the right topics.</p>
+            <footer>
+              <span class="avatar">AH</span>
+              <span><strong>Ali Hassan</strong><br>Rawalpindi, Pakistan</span>
+            </footer>
+          </blockquote>
+          <blockquote class="testimonial" data-reveal data-tilt>
+            <span class="stars" aria-hidden="true">★★★★★</span>
+            <p>The diagrams inside the explanations made concepts that used to confuse me click almost instantly.</p>
+            <footer>
+              <span class="avatar">MI</span>
+              <span><strong>Mahnoor Iqbal</strong><br>Karachi, Pakistan</span>
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA BAND ============ -->
+    <section class="cta-band" id="start" data-orb-field>
+      <div class="container cta-inner">
+        <p class="eyebrow eyebrow--light">Start Preparing</p>
+        <h2>MDMS/ JCAT question bank</h2>
+        <p>Reasoning-first prep, shaped around the entrance exam itself.</p>
+        <div class="pill-row pill-row--center">
+          <span class="pill">3,000+ Questions</span>
+          <span class="pill">100% Options Explained</span>
+          <span class="pill">Live Analytics</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-primary btn-light">Begin MDMS/ JCAT Preparation</a>
+          <a href="#inside" class="btn btn-ghost-light">View sample questions</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section" id="faq">
+      <div class="container container--narrow">
+        <p class="eyebrow">MDMS/ JCAT FAQ</p>
+        <h2>Common questions</h2>
+
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger">
+              What's covered in the MDMS/ JCAT QBank?
+              <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-panel">
+              <p>Over 3,000 scenario-based questions mapped to the current entrance syllabus, pitched at or above
+                the difficulty level candidates describe seeing on the actual paper.</p>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger">
+              How is this different from the FCPS-1 QBank?
+              <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-panel">
+              <p>Both banks share the same explanation-first approach, but this one is built around MDMS/ JCAT's
+                entrance format and syllabus, while FCPS-1 is aimed at postgraduate clinical reasoning.</p>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger">
+              Can I sit a full-length timed mock?
+              <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-panel">
+              <p>Yes — on top of custom practice blocks, you can start a full-length timed mock any time you want
+                to simulate real exam conditions.</p>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger">
+              Can I try it before signing up?
+              <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-panel">
+              <p>Yes. Tap "View sample questions" above to work through a short set of MDMS/ JCAT questions with no
+                account needed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <span class="brand">MedPrepAI</span>
+        <p>Postgraduate medical examination preparation for FCPS-1 and MDMS/ JCAT. Every option explained. Built for
+          clinical excellence.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Programs</h5>
+        <ul>
+          <li><a href="fcps.html">FCPS-1</a></li>
+          <li><a href="jcat.html">MDMS/ JCAT</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Account</h5>
+        <ul>
+          <li><a href="#">Sign in</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="footer-col">
-      <h5>Programs</h5>
-      <ul>
-        <li><a href="fcps.html">FCPS-1</a></li>
-        <li><a href="jcat.html">JCAT (MDMS)</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Account</h5>
-      <ul>
-        <li><a href="#">Sign in</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom container">© 2026 MedPrepAI. All rights reserved.</div>
-</footer>
- 
-<script src="js/script.js"></script>
+    <div class="footer-bottom container">© 2026 MedPrepAI. All rights reserved.</div>
+  </footer>
+
+  <script src="js/script.js?v=4"></script>
 </body>
+
 </html>

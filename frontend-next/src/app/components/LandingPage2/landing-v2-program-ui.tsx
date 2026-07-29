@@ -297,11 +297,12 @@ export function FeatureStrip({ items }: { items: Array<{ title: string; desc: st
 
 export function ProgramHowItWorks() {
   const steps = [
-    { title: "Create your account", desc: "Pick FCPS-1 or JCAT (MDMS) and set up your profile." },
+    { title: "Create your account", desc: "Pick FCPS-1 or MDMS/ JCAT and set up your profile." },
     { title: "Practice questions", desc: "Work through scenario MCQs at exam difficulty." },
     { title: "Read explanations", desc: "Review why each option is right or wrong." },
-    { title: "Track progress", desc: "Use dashboards to spot weak areas and trends." },
+    { title: "Track progress", desc: "Use dashboards to spot weak areas and measure improvement over time." },
   ];
+
   return (
     <section className="section" id="how-it-works">
       <div className="wrap">
