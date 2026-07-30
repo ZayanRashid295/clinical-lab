@@ -18,6 +18,8 @@ export interface CinematicHeroContentProps {
   punchlines?: string[];
   /** 3D asset blended into the centered stack (e.g. monitor on program pages). */
   blendedVisual?: ReactNode;
+  /** Optional desktop composition for product-specific hero artwork. */
+  composition?: "centered" | "visual-right";
 }
 
 /**
@@ -32,11 +34,15 @@ export function CinematicHeroContent({
   stats,
   punchlines,
   blendedVisual,
+  composition = "centered",
 }: CinematicHeroContentProps) {
   return (
-    <CinematicContent3D className="hero-content-3d hero-content-3d--center" depth={0.45}>
+    <CinematicContent3D
+      className={`hero-content-3d hero-content-3d--center hero-content-3d--${composition}`}
+      depth={0.45}
+    >
       {kicker ? (
-        <CinematicDepthLayer z={20}>
+        <CinematicDepthLayer z={20} className="hero-cinematic-kicker-zone">
           <span className="hero-brand-kicker hero-brand-kicker--center">
             <span className="hero-brand-kicker-dot" aria-hidden />
             {kicker}
@@ -54,7 +60,7 @@ export function CinematicHeroContent({
         </CinematicDepthLayer>
       ) : null}
 
-      <CinematicDepthLayer z={48}>
+      <CinematicDepthLayer z={48} className="hero-cinematic-subtitle-zone">
         <p className="hero-brand-subtitle hero-brand-subtitle--center">{subtitle}</p>
       </CinematicDepthLayer>
 

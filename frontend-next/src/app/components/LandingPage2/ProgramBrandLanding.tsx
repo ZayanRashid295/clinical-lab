@@ -38,6 +38,7 @@ function HeroVisual({ screenSrc, useComputer }: { screenSrc: string; useComputer
 
   return (
     <div
+      className="program-hero-visual program-hero-visual--clipboard"
       style={{
         position: "relative",
         width: "100%",
@@ -50,6 +51,7 @@ function HeroVisual({ screenSrc, useComputer }: { screenSrc: string; useComputer
       }}
     >
       <div
+        className="program-hero-clipboard"
         style={{
           position: "relative",
           width: 288,
@@ -133,11 +135,14 @@ export function ProgramBrandLanding({
 
   const beginLabel = "Begin Medicine and Allied Preparation";
   const heroVisualSrc = track === "fcps" ? PROGRAM_HERO_SCREEN : "/images/landing-v2/clipboard-screen.png";
-  const pageTitle = (
-    <>
-      Medicine and Allied
-    </>
-  );
+  const pageTitle =
+    track === "fcps" ? (
+      <>
+        Medicine and Allied
+      </>
+    ) : (
+      <>Medicine and Allied</>
+    );
   const otherTrackLabel =
     track === "fcps" ? "Medicine and Allied under MDMS/ JCAT" : "Medicine and Allied under FCPS-1";
 
@@ -167,6 +172,7 @@ export function ProgramBrandLanding({
           ariaLabel="Medicine and Allied exam preparation"
         >
           <CinematicHeroContent
+            composition={track === "jcat" ? "visual-right" : "centered"}
             kicker={track === "fcps" ? "FCPS-1 product" : "MDMS/ JCAT product"}
             title={pageTitle}
             subtitle={copy.heroSubtitle}

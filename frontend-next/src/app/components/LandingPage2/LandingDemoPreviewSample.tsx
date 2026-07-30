@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import UnifiedQuestionPreview from "../question-generator/unified-question-preview";
 import type { QuestionCreatorData } from "../question-generator/question-creator/types";
+import type { ContentBlock } from "../question-generator/rich-editor/types";
 import {
   DEMO_PACK_FCPS,
   DEMO_PACK_KEY,
@@ -166,6 +167,40 @@ function mapPackQuestionToCreatorData(
   q: any,
   pack: MarketingDemoPackId,
 ): QuestionCreatorData {
+  const normalizeBlock = (block: any, index: number): ContentBlock => {
+    const rawType = String(block?.type || "").toLowerCase();
+    const isPerAnswerExplanation =
+      rawType === "per_answer_explanation" ||
+      rawType === "per-answer-explanation" ||
+      block?.data?.placeholder === true ||
+      block?.data?.isPerAnswerExplanation === true;
+
+    return {
+      ...block,
+      id: String(block?.id || `demo-block-${index}`),
+      type: isPerAnswerExplanation
+        ? "per-answer-explanation"
+        : rawType === "images"
+          ? "image"
+          : rawType as ContentBlock["type"],
+      order: typeof block?.order === "number" ? block.order : index,
+      data: block?.data && typeof block.data === "object" ? block.data : {},
+    };
+  };
+
+  const mainExplanation = Array.isArray(q.explanation)
+    ? q.explanation.map(normalizeBlock)
+    : [];
+  const perAnswerExplanations: Record<string, ContentBlock[]> =
+    q.perAnswerExplanations && typeof q.perAnswerExplanations === "object"
+      ? Object.fromEntries(
+          Object.entries(q.perAnswerExplanations).map(([label, blocks]) => [
+            label,
+            Array.isArray(blocks) ? blocks.map(normalizeBlock) : [],
+          ]),
+        )
+      : {};
+
   return {
     stem: Array.isArray(q.questionStemBlocks) ? q.questionStemBlocks : [],
     choices: Array.isArray(q.options)
@@ -176,11 +211,8 @@ function mapPackQuestionToCreatorData(
           correct: Boolean(opt?.correct),
         }))
       : [],
-    mainExplanation: Array.isArray(q.explanation) ? q.explanation : [],
-    perAnswerExplanations:
-      q.perAnswerExplanations && typeof q.perAnswerExplanations === "object"
-        ? q.perAnswerExplanations
-        : {},
+    mainExplanation,
+    perAnswerExplanations,
     metadata: {
       systemId: q.systemId || "",
       topicId: q.topicId || "",

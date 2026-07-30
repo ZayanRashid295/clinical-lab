@@ -976,6 +976,317 @@ export const HERO_CINEMATIC_CSS = `
     hyphens: auto;
   }
 
+  .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+    text-align: left;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-subtitle-zone {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* MDMS/JCAT: keep the editorial copy on the left and the larger clipboard on the right. */
+  @media (min-width: 901px) {
+    .hero-cinematic--program .hero-content-3d--visual-right {
+      max-width: min(1500px, 96vw);
+      text-align: left;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-content-3d-rig {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(400px, 0.92fr);
+      grid-template-rows: auto auto auto 1fr;
+      column-gap: clamp(2rem, 4vw, 5rem);
+      align-items: center;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-depth-layer {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-kicker-zone {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: end;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-title-zone {
+      grid-column: 1;
+      grid-row: 2;
+      width: 100%;
+      padding: 0.35rem 0 0.15rem;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-kicker--center {
+      justify-content: flex-start;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-title--center {
+      max-width: 100% !important;
+      margin: 0 !important;
+      text-align: left !important;
+      font-size: clamp(3rem, 3.5vw, 4.4rem);
+      max-width: 100%;
+      line-height: 0.98;
+      white-space: normal;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+      position: relative;
+      z-index: 4;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-title-zone::before {
+      left: 0;
+      width: 145%;
+      transform: none;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-subtitle-zone {
+      grid-column: 1;
+      grid-row: 3;
+      width: 100%;
+    }
+
+  .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+    text-align: left;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-subtitle-zone {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+    max-width: 42rem !important;
+    margin: 0.95rem 0 1.5rem !important;
+      padding: 0;
+      text-align: left;
+      font-size: clamp(1.08rem, 1.15vw, 1.22rem);
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-blended-slot {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      width: 100%;
+      margin: 0;
+      align-self: center;
+      justify-content: flex-end;
+      overflow: visible;
+      transform: translateX(clamp(0px, 2vw, 2rem));
+      z-index: 1;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .program-hero-visual--clipboard {
+      --clipboard-width: clamp(420px, 30vw, 540px);
+      --clipboard-height: clamp(500px, 35vw, 640px);
+      max-width: 760px !important;
+      padding: 1rem 0 1.75rem !important;
+      justify-self: end;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .program-hero-clipboard {
+      width: var(--clipboard-width) !important;
+      height: var(--clipboard-height) !important;
+      border-radius: 44px !important;
+      box-shadow:
+        0 48px 110px rgba(2, 6, 23, 0.38),
+        0 0 84px color-mix(in srgb, var(--mkt-accent) 18%, transparent) !important;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-action-zone {
+      grid-column: 1 / -1;
+      grid-row: 5;
+      width: 100%;
+      max-width: none;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-cta--center {
+      justify-content: center;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-stats-rail {
+      max-width: none;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0.25rem 0 0;
+      align-items: stretch;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-stat-divider {
+      display: none;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-stat {
+      min-height: 100%;
+      padding: 1rem 0.9rem 1.05rem;
+      justify-content: flex-start;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-stat-num {
+      font-size: clamp(1.15rem, 1.9vw, 1.45rem);
+      line-height: 1.05;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-action-zone .hero-cinematic-stat-label {
+      font-size: 0.86rem !important;
+      line-height: 1.35 !important;
+      min-height: 4.1em;
+    }
+  }
+
+  /* Product heroes use a restrained two-column frame so copy and artwork stay balanced. */
+  @media (min-width: 1201px) {
+    .hero-cinematic--program .hero-cinematic-composition {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-inline: clamp(32px, 5vw, 80px);
+      transform: translateY(-24px);
+    }
+
+    .hero-cinematic--program .hero-cinematic-copy--center {
+      width: min(100%, 1400px);
+      max-width: 1400px;
+      padding: 0;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-content-3d-rig {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(520px, 620px) minmax(520px, 620px);
+      justify-content: space-between;
+      column-gap: clamp(48px, 6vw, 88px);
+      row-gap: 24px;
+      align-items: center;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-depth-layer {
+      min-width: 0;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-kicker-zone,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-title-zone,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-subtitle-zone {
+      grid-column: 1;
+      width: min(100%, 560px);
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-kicker--center,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-title--center,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+      width: 100%;
+      max-width: 560px !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      text-align: left !important;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+      max-width: 520px !important;
+      margin-top: 0.75rem !important;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-blended-slot {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      width: 100%;
+      margin: 0;
+      justify-content: center;
+      transform: none;
+      z-index: 2;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .program-hero-visual--clipboard {
+      --clipboard-width: clamp(450px, 32.5vw, 505px);
+      --clipboard-height: clamp(505px, 36vw, 612px);
+      width: min(100%, 505px);
+      max-width: 505px !important;
+      margin: 0 auto;
+      transform: translateX(-48px);
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-action-zone {
+      grid-column: 1;
+      grid-row: 4;
+      width: min(100%, 560px);
+      max-width: 560px;
+      margin-top: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-stats-rail {
+      width: min(100%, 580px);
+      max-width: 580px;
+      margin-top: 2.5rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1200px) {
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-composition {
+      min-height: 100vh;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .program-hero-visual--clipboard {
+      width: min(100%, 480px);
+      max-width: 480px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-content-3d-rig {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .cine-depth-layer,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-action-zone {
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+      align-items: center;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-kicker--center,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-title--center,
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-subtitle--center {
+      text-align: center !important;
+      margin-inline: auto !important;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-cinematic-blended-slot {
+      order: 5;
+      transform: none;
+      justify-content: center;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .program-hero-visual--clipboard {
+      width: min(100%, 440px);
+      max-width: 440px !important;
+    }
+
+    .hero-cinematic--program .hero-content-3d--visual-right .hero-brand-cta--center {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
   html:not(.dark) .hero-cinematic--program .hero-cinematic-action-zone .hero-cinematic-stat-label {
     color: var(--cine-text, var(--mkt-text)) !important;
     opacity: 0.9 !important;

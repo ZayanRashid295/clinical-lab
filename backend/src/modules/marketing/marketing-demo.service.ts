@@ -196,15 +196,20 @@ export class MarketingDemoService {
         const mapBlocks = (
           blocks: Array<{ id: string; type: string; order: number; data: unknown }>,
         ) =>
-          blocks.map((b) => ({
-            id: b.id,
-            type:
-              String(b.type).toLowerCase() === "images"
-                ? "image"
-                : String(b.type).toLowerCase(),
-            order: b.order,
-            data: b.data,
-          }));
+          blocks.map((b) => {
+            const rawType = String(b.type).toLowerCase();
+            return {
+              id: b.id,
+              type:
+                rawType === "per_answer_explanation"
+                  ? "per-answer-explanation"
+                  : rawType === "images"
+                    ? "image"
+                    : rawType,
+              order: b.order,
+              data: b.data,
+            };
+          });
 
         return {
           order: index + 1,

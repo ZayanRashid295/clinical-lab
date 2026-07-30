@@ -512,7 +512,10 @@ export function HeroBackground({
 
       const progress = reduced ? 0.82 : scrollRef.current;
       const scrollDelta = Math.abs(scrollRef.current - lastScrollRef.current);
-      const idleBoost = scrollDelta < 0.0006 ? 1.24 : 1;
+      // Keep the background visibly alive when the viewer is idle. The slower
+      // rate while scrolling prevents the autonomous drift from competing with
+      // the story transition, then it resumes a cinematic float at rest.
+      const idleBoost = scrollDelta < 0.0006 ? 2.5 : 1.35;
       lastScrollRef.current = scrollRef.current;
       const mouse = mouseRef.current;
       mouse.x = lerp(mouse.x, mouse.tx, 1 - Math.exp(-5 * dt));
