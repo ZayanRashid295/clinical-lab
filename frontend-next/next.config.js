@@ -1,5 +1,3 @@
-const path = require("path");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /** Skip bundling the Gemini SDK into API route chunks (smaller graphs, faster dev compile). */
@@ -36,7 +34,6 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
   // Monorepo: Next detected yarn.lock at repo root (clinical-lab); align tracing with that root.
-  outputFileTracingRoot: path.join(__dirname, ".."),
 }
 
 module.exports = nextConfig
