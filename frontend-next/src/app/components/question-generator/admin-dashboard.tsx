@@ -451,9 +451,18 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
     // Transform backend per-answer explanations if they exist
     if (backendQuestion.perAnswerExplanations && Array.isArray(backendQuestion.perAnswerExplanations)) {
       for (const pae of backendQuestion.perAnswerExplanations) {
-        if (!pae || !pae.choiceLabel) continue
+        if (!pae) continue
+
+        const choiceLabel = String(
+          pae.choiceLabel ?? pae.label ?? pae.answer ?? pae.choice ?? "",
+        ).trim().toUpperCase()
+        if (!choiceLabel) continue
         
-        const blocks = Array.isArray(pae.blocks) ? pae.blocks : []
+        const blocks = Array.isArray(pae.blocks)
+          ? pae.blocks
+          : Array.isArray(pae.explanationBlocks)
+            ? pae.explanationBlocks
+            : []
         
         // Check if we have rich content blocks (TABLE, IMAGES) or just TEXT
         const hasRichContent = blocks.some((b: any) => b && (b.type === "TABLE" || b.type === "IMAGES"))
@@ -508,6 +517,8 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
                 data: blockData,
               }
             })
+
+          transformedPerAnswerExplanations[choiceLabel] = transformedBlocks
         } else {
           // Simple text explanation - convert to text blocks for consistency
           const textBlocks = blocks
@@ -532,7 +543,7 @@ export default function AdminDashboard({ onQuestionViewChange, onEditorPreviewMo
             // Convert text strings to text blocks
             // Don't wrap markdown in HTML - let the editor convert it properly
             // If text is already HTML, use it; otherwise leave html empty so markdown conversion happens
-            transformedPerAnswerExplanations[pae.choiceLabel] = textBlocks.map((text: string, idx: number) => {
+            transformedPerAnswerExplanations[choiceLabel] = textBlocks.map((text: string, idx: number) => {
               // Check if text is already HTML
               const isHtml = text.trim().startsWith("<") && text.trim().includes(">")
               
