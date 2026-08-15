@@ -486,6 +486,11 @@ export class QuestionsService {
       throw new NotFoundException(`Question with ID ${id} not found`);
     }
 
+    console.log(
+      `[questions.findOne] ${id}: ${question.perAnswerExplanations.length} per-answer explanations, ` +
+        `${question.perAnswerExplanations.reduce((total, item) => total + item.blocks.length, 0)} linked blocks`,
+    );
+
     return question;
   }
 
