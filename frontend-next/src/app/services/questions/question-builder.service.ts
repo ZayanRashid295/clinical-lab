@@ -48,10 +48,8 @@ export class QuestionBuilderService extends BaseApiService {
   }
 
   private convertUrl(): string {
-    // Same-origin proxy avoids Next.js 1MB API limit and nginx routing quirks in production
-    if (typeof window !== "undefined") {
-      return "/api/question-builder/convert";
-    }
+    // Multipart uploads must go directly to Nest in the browser. Routing them through
+    // a Vercel Function causes Vercel to reject larger DOCX batches before our code runs.
     return `${this.baseURL}${this.endpoint}/convert`;
   }
 
@@ -72,7 +70,7 @@ export class QuestionBuilderService extends BaseApiService {
         const totalSize = files.reduce((sum, file) => sum + file.size, 0);
         throw new Error(
           `Upload is too large (${formatFileSize(totalSize)} for ${files.length} file(s)). ` +
-            "Try fewer files at once, or ask your admin to raise nginx client_max_body_size for /api/question-builder/convert."
+            "Try fewer files at once or upload smaller documents."
         );
       }
 
