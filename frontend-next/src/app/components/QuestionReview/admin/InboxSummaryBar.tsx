@@ -13,17 +13,27 @@ export function InboxSummaryBar() {
   } | null>(null);
 
   useEffect(() => {
-    qaAdminService
-      .getDashboard()
-      .then((d) =>
-        setStats({
-          openIssues: d.cards.openIssues as number,
-          criticalIssues: d.cards.criticalIssues as number,
-          questionsReviewed: d.cards.questionsReviewed as number,
-          activeReviewers: d.cards.activeReviewers as number,
-        })
-      )
-      .catch(() => {});
+    const load = () => {
+      qaAdminService
+        .getDashboard()
+        .then((d) =>
+          setStats({
+            openIssues: d.cards.openIssues as number,
+            criticalIssues: d.cards.criticalIssues as number,
+            questionsReviewed: d.cards.questionsReviewed as number,
+            activeReviewers: d.cards.activeReviewers as number,
+          })
+        )
+        .catch(() => {});
+    };
+    load();
+    const interval = window.setInterval(load, 15_000);
+    const refreshOnFocus = () => load();
+    window.addEventListener("focus", refreshOnFocus);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshOnFocus);
+    };
   }, []);
 
   if (!stats) return null;

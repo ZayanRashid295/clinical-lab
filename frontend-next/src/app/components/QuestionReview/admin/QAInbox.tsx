@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Select,
@@ -20,19 +20,28 @@ export function QAInbox() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    setLoading(true);
+  const load = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     try {
       const data = await qaAdminService.listInbox(filters);
       setIssues(data);
+    } catch {
+      // Keep the last successful result during a transient refresh failure.
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
-    load();
-  }, [filters]);
+    void load(true);
+    const interval = window.setInterval(() => void load(), 15_000);
+    const refreshOnFocus = () => void load();
+    window.addEventListener("focus", refreshOnFocus);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshOnFocus);
+    };
+  }, [load]);
 
   const setFilter = (key: string, value: string) => {
     setFilters((f) => {

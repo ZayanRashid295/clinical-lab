@@ -28,6 +28,7 @@ export class QuestionReviewAdminService {
   constructor(private prisma: PrismaService) {}
 
   async syncIssuesFromAnnotations() {
+    const overallReviews = await this.syncOverallReviewAnnotations();
     const issues = await this.prisma.qaIssue.findMany({
       select: { annotationId: true, sourceAnnotationIds: true },
     });
@@ -53,12 +54,90 @@ export class QuestionReviewAdminService {
 
     let created = 0;
     let merged = 0;
+    let updated = 0;
     for (const annotation of annotations) {
       const result = await this.upsertIssueFromAnnotation(annotation);
       if (result === "created") created++;
       if (result === "merged") merged++;
+      if (result === "updated") updated++;
     }
-    return { created, merged, scanned: annotations.length };
+    return {
+      created: created + overallReviews.created,
+      merged,
+      updated: updated + overallReviews.updated,
+      scanned: annotations.length + overallReviews.scanned,
+    };
+  }
+
+  /**
+   * Overall review comments are feedback too, but historically only inline
+   * annotations were promoted to the admin inbox. Mirror each saved overall
+   * review into a stable annotation so it uses the same QA issue workflow.
+   */
+  private async syncOverallReviewAnnotations() {
+    const responses = await this.prisma.questionReviewResponse.findMany({
+      where: {
+        overallComment: { not: null },
+      },
+      include: {
+        attempt: { select: { reviewerName: true } },
+        annotations: {
+          where: { targetType: "OVERALL" },
+          select: { id: true, targetKey: true, body: true, severity: true },
+        },
+      },
+    });
+
+    let created = 0;
+    let updated = 0;
+    let scanned = 0;
+
+    for (const response of responses) {
+      const body = response.overallComment?.trim();
+      if (!body) continue;
+      scanned++;
+
+      const targetKey = `overall-review:${response.id}`;
+      const severity = response.approvalStatus === "REJECT" ? "MAJOR" : "MINOR";
+      const existing = response.annotations.find((a) => a.targetKey === targetKey);
+      const annotation = existing
+        ? existing.body === body && existing.severity === severity
+          ? await this.prisma.questionReviewAnnotation.findUniqueOrThrow({
+              where: { id: existing.id },
+            })
+          : await this.prisma.questionReviewAnnotation.update({
+              where: { id: existing.id },
+              data: {
+                body,
+                severity,
+                tags: ["Overall review"],
+                section: "Overall review",
+              },
+            })
+        : await this.prisma.questionReviewAnnotation.create({
+            data: {
+              responseId: response.id,
+              targetType: "OVERALL",
+              targetKey,
+              section: "Overall review",
+              body,
+              tags: ["Overall review"],
+              severity,
+            },
+          });
+
+      const result = await this.upsertIssueFromAnnotation({
+        ...annotation,
+        response: {
+          questionId: response.questionId,
+          attempt: { reviewerName: response.attempt.reviewerName },
+        },
+      });
+      if (result === "created") created++;
+      if (result === "updated") updated++;
+    }
+
+    return { created, updated, scanned };
   }
 
   async upsertIssueFromAnnotation(annotation: {
@@ -77,6 +156,43 @@ export class QuestionReviewAdminService {
     const category = tags[0] ?? "General";
     const reporterName = annotation.response.attempt.reviewerName;
     const title = annotation.body.trim().slice(0, 120) || "Reviewer feedback";
+
+    const issueForAnnotation = await this.prisma.qaIssue.findUnique({
+      where: { annotationId: annotation.id },
+    });
+    if (issueForAnnotation) {
+      const names = new Set([
+        ...(Array.isArray(issueForAnnotation.reporterNames)
+          ? (issueForAnnotation.reporterNames as string[])
+          : []),
+        reporterName,
+      ]);
+      const reporterNames = [...names];
+      const currentNames = Array.isArray(issueForAnnotation.reporterNames)
+        ? (issueForAnnotation.reporterNames as string[])
+        : [];
+      const changed =
+        issueForAnnotation.title !== title ||
+        issueForAnnotation.body !== annotation.body ||
+        issueForAnnotation.selectedText !== annotation.selectedText ||
+        issueForAnnotation.category !== category ||
+        issueForAnnotation.severity !== annotation.severity ||
+        reporterNames.some((name) => !currentNames.includes(name));
+      if (changed) {
+        await this.prisma.qaIssue.update({
+          where: { id: issueForAnnotation.id },
+          data: {
+            title,
+            body: annotation.body,
+            selectedText: annotation.selectedText,
+            category,
+            severity: annotation.severity as any,
+            reporterNames,
+          },
+        });
+      }
+      return "updated" as const;
+    }
 
     const existing = await this.prisma.qaIssue.findFirst({
       where: {
