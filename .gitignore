@@ -70,3 +70,5 @@ TEST_CREDENTIALS.md
 
 # Word docs (except if explicitly needed elsewhere)
 *.docx
+.vercel
+.env*
